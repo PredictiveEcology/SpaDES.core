@@ -27,7 +27,7 @@ loadSimList(..., otherFiles = xxx). See zipSimList for details."><!-- mathjax --
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -89,7 +89,14 @@ all the files are correctly identified and passed to
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">loadSimList</span><span class="op">(</span><span class="va">filename</span>, paths <span class="op">=</span> <span class="fu"><a href="setPaths.html">getPaths</a></span><span class="op">(</span><span class="op">)</span>, otherFiles <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">loadSimList</span><span class="op">(</span></span>
+<span>  <span class="va">filename</span>,</span>
+<span>  projectPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  tempPath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  paths <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  otherFiles <span class="op">=</span> <span class="st">""</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.verbose"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">unzipSimList</span><span class="op">(</span><span class="va">zipfile</span>, load <span class="op">=</span> <span class="cn">TRUE</span>, paths <span class="op">=</span> <span class="fu"><a href="setPaths.html">getPaths</a></span><span class="op">(</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -99,6 +106,16 @@ all the files are correctly identified and passed to
     <dl><dt>filename</dt>
 <dd><p>Character giving the name of a saved simulation file.
 Currently, only file types <code>.qs</code> or <code>.rds</code> are supported.</p></dd>
+
+
+<dt>projectPath</dt>
+<dd><p>An optional path for the project within which the <code>simList</code>
+exists. This is used to identify relative paths for saving and loading the <code>simList</code>.</p></dd>
+
+
+<dt>tempPath</dt>
+<dd><p>A character string specifying the new base directory for the
+temporary paths maintained in a <code>simList</code>.</p></dd>
 
 
 <dt>paths</dt>
@@ -115,12 +132,20 @@ a different computer, path, or drive. This could be the output from <code>unzipS
 (which is calls <code>loadSimList</code> internally, passing the unzipped filenames)</p></dd>
 
 
+<dt>verbose</dt>
+<dd><p>Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., <code>options('reproducible.verbose' = 0) to reduce to minimal</code></p></dd>
+
+
 <dt>zipfile</dt>
-<dd><p>Filename of a zipped simList</p></dd>
+<dd><p>Filename of a zipped <code>simList</code></p></dd>
 
 
 <dt>load</dt>
-<dd><p>Logical. If <code>TRUE</code>, the default, then the simList will
+<dd><p>Logical. If <code>TRUE</code>, the default, then the <code>simList</code> will
 also be loaded into R.</p></dd>
 
 
@@ -132,10 +157,10 @@ also be loaded into R.</p></dd>
     <h2>Value</h2>
     
 
-<ul><li><p><code>loadSimList()</code>: A <code>simList</code> object.</p></li>
-<li><p><code>unzipSimList()</code>: Either a character vector of file names unzipped (if <code>load = FALSE</code>),
-or a <code>simList</code> object.</p></li>
-</ul></div>
+<p>For <code>loadSimList()</code>, a <code>simList</code> object.
+For <code>unzipSimList()</code>, either a character vector of file names unzipped
+(if <code>load = FALSE</code>), or a <code>simList</code> object.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>If <code>cache</code> is used, it is likely that it should be trimmed before

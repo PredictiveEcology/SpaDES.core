@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -81,7 +81,7 @@
       </tr></tbody><tbody><tr><td>
           <p><code><a href="Copy.html">Copy(<i>&lt;simList&gt;</i>)</a></code> </p>
         </td>
-        <td><p>Copy for simList class objects</p></td>
+        <td><p>Copy for <code>simList</code> class objects</p></td>
       </tr><tr><td>
           <p><code><a href="Plot.html">Plot(<i>&lt;simList&gt;</i>)</a></code> </p>
         </td>
@@ -93,7 +93,7 @@
       </tr><tr><td>
           <p><code><a href="SpaDES.core-package.html">SpaDES.core</a></code> <code><a href="SpaDES.core-package.html">SpaDES.core-package</a></code> </p>
         </td>
-        <td><p>Categorized overview of the `SpaDES.core` package</p></td>
+        <td><p>Categorized overview of the <code>SpaDES.core</code> package</p></td>
       </tr><tr><td>
           <p><code><a href="addChangedAttr.html">.addChangedAttr(<i>&lt;simList&gt;</i>)</a></code> </p>
         </td>
@@ -105,11 +105,11 @@
       </tr><tr><td>
           <p><code><a href="all.equal.simList.html">all(<i>&lt;equal.simList&gt;</i>)</a></code> </p>
         </td>
-        <td><p>All equal method for simLists</p></td>
+        <td><p>All equal method for <code>simList</code> objects</p></td>
       </tr><tr><td>
           <p><code><a href="anyPlotting.html">anyPlotting()</a></code> </p>
         </td>
-        <td><p>Test whether there should be any plotting from <code>.plot</code> parameter</p></td>
+        <td><p>Test whether there should be any plotting from <code>.plots</code> module parameter</p></td>
       </tr><tr><td>
           <p><code><a href="append_attr.html">append_attr()</a></code> </p>
         </td>
@@ -142,15 +142,19 @@
       </tr><tr><td>
           <p><code><a href="checkParams.html">checkParams()</a></code> </p>
         </td>
-        <td><p>Check use and existence of params passed to simulation.</p></td>
+        <td><p>Check use and existence of parameters passed to simulation.</p></td>
       </tr><tr><td>
-          <p><code><a href="checkpoint.html">doEvent.checkpoint()</a></code> <code><a href="checkpoint.html">checkpointLoad()</a></code> <code><a href="checkpoint.html">.checkpointSave()</a></code> <code><a href="checkpoint.html">checkpointFile()</a></code> <code><a href="checkpoint.html">`checkpointFile&lt;-`()</a></code> <code><a href="checkpoint.html">checkpointInterval()</a></code> <code><a href="checkpoint.html">`checkpointInterval&lt;-`()</a></code> </p>
+          <p><code><a href="checkpoint.html">checkpointFile()</a></code> <code><a href="checkpoint.html">`checkpointFile&lt;-`()</a></code> <code><a href="checkpoint.html">checkpointInterval()</a></code> <code><a href="checkpoint.html">`checkpointInterval&lt;-`()</a></code> <code><a href="checkpoint.html">doEvent.checkpoint()</a></code> <code><a href="checkpoint.html">checkpointLoad()</a></code> <code><a href="checkpoint.html">.checkpointSave()</a></code> </p>
         </td>
         <td><p>Simulation checkpoints.</p></td>
       </tr><tr><td>
           <p><code><a href="checksums.html">checksums()</a></code> </p>
         </td>
         <td><p>Calculate checksum for a module's data files</p></td>
+      </tr><tr><td>
+          <p><code><a href="citation.html">citation()</a></code> </p>
+        </td>
+        <td><p>A citation method for <code>SpaDES</code> modules</p></td>
       </tr><tr><td>
           <p><code><a href="classFilter.html">classFilter()</a></code> </p>
         </td>
@@ -172,6 +176,10 @@
         </td>
         <td><p>Define an output object of a module</p></td>
       </tr><tr><td>
+          <p><code><a href="dealWithClass.html">.wrap(<i>&lt;simList&gt;</i>)</a></code> <code><a href="dealWithClass.html">.unwrap(<i>&lt;simList&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Methods for <code>.wrap</code> and <code>.unwrap</code></p></td>
+      </tr><tr><td>
           <p><code><a href="defineEvent.html">defineEvent()</a></code> </p>
         </td>
         <td><p>Alternative way to define events in SpaDES.core</p></td>
@@ -184,7 +192,7 @@
         </td>
         <td><p>Define a parameter used in a module</p></td>
       </tr><tr><td>
-          <p><code><a href="deprecated.html">experiment()</a></code> <code><a href="deprecated.html">experiment2()</a></code> <code><a href="deprecated.html">POM()</a></code> <code><a href="deprecated.html">simInitAndExperiment()</a></code> </p>
+          <p><code><a href="deprecated.html">experiment()</a></code> <code><a href="deprecated.html">experiment2()</a></code> <code><a href="deprecated.html">POM()</a></code> <code><a href="deprecated.html">simInitAndExperiment()</a></code> <code><a href="deprecated.html">loadPackages()</a></code> </p>
         </td>
         <td><p>Deprecated functions</p></td>
       </tr><tr><td>
@@ -244,10 +252,6 @@
         </td>
         <td><p>File extensions map</p></td>
       </tr><tr><td>
-          <p><code><a href="loadPackages.html">loadPackages</a></code> <code><a href="loadPackages.html">loadPackages,character-method</a></code> <code><a href="loadPackages.html">loadPackages,list-method</a></code> <code><a href="loadPackages.html">loadPackages,NULL-method</a></code> </p>
-        </td>
-        <td><p>Load packages.</p></td>
-      </tr><tr><td>
           <p><code><a href="loadSimList.html">loadSimList()</a></code> <code><a href="loadSimList.html">unzipSimList()</a></code> </p>
         </td>
         <td><p>Load a saved <code>simList</code> and ancillary files</p></td>
@@ -278,7 +282,7 @@
       </tr><tr><td>
           <p><code><a href="moduleDefaults.html">moduleDefaults</a></code> </p>
         </td>
-        <td><p>Defaults values used in defineModule</p></td>
+        <td><p>Defaults values used in <code>defineModule</code></p></td>
       </tr><tr><td>
           <p><code><a href="moduleDiagram.html">moduleDiagram()</a></code> </p>
         </td>
@@ -336,7 +340,7 @@
         </td>
         <td><p>Identify synonyms in a <code>simList</code></p></td>
       </tr><tr><td>
-          <p><code><a href="objects.html">objs()</a></code> <code><a href="objects.html">`objs&lt;-`()</a></code> </p>
+          <p><code><a href="objects.html">objs()</a></code> <code><a href="objects.html">`objs&lt;-`()</a></code> <code><a href="objects.html">moduleObjects()</a></code> <code><a href="objects.html">findObjects()</a></code> </p>
         </td>
         <td><p>Extract or replace an object from the simulation environment</p></td>
       </tr><tr><td>
@@ -386,10 +390,7 @@
       </tr><tr><td>
           <p><code><a href="rasterCreate.html">rasterCreate()</a></code> </p>
         </td>
-        <td><p>Simple wrapper to load any <code>Raster*</code> object
-This wraps either <code><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster::raster</a></code>, <code><a href="https://rdrr.io/pkg/raster/man/stack.html" class="external-link">raster::stack</a></code>,
-or <code><a href="https://rdrr.io/pkg/raster/man/brick.html" class="external-link">raster::brick</a></code>, allowing a single function to be used
-to create a new object of the same class as a template.</p></td>
+        <td><p>Simple wrapper to load any <code>Raster*</code> object</p></td>
       </tr><tr><td>
           <p><code><a href="rasterToMemory.html">rasterToMemory()</a></code> </p>
         </td>
@@ -417,7 +418,7 @@ to create a new object of the same class as a template.</p></td>
       </tr><tr><td>
           <p><code><a href="saveFiles.html">saveFiles()</a></code> </p>
         </td>
-        <td><p>Save objects using `.saveObjects` in `params` slot of `simInit`</p></td>
+        <td><p>Save objects using <code>.saveObjects</code> in <code>params</code> slot of <code>simInit</code></p></td>
       </tr><tr><td>
           <p><code><a href="saveSimList.html">saveSimList()</a></code> <code><a href="saveSimList.html">zipSimList()</a></code> </p>
         </td>
@@ -443,7 +444,7 @@ to create a new object of the same class as a template.</p></td>
         </td>
         <td><p>Initialize a new simulation</p></td>
       </tr><tr><td>
-          <p><code><a href="simInitAnd.html">simInitAndSpades()</a></code> </p>
+          <p><code><a href="simInitAndSpades.html">simInitAndSpades()</a></code> </p>
         </td>
         <td><p>Call <code>simInit</code> and <code>spades</code> together</p></td>
       </tr><tr><td>
@@ -459,7 +460,7 @@ to create a new object of the same class as a template.</p></td>
         </td>
         <td><p>Simulation inputs</p></td>
       </tr><tr><td>
-          <p><code><a href="simList-accessors-metadata.html">inputObjects()</a></code> <code><a href="simList-accessors-metadata.html">outputObjects()</a></code> <code><a href="simList-accessors-metadata.html">outputObjectNames()</a></code> <code><a href="simList-accessors-metadata.html">reqdPkgs()</a></code> <code><a href="simList-accessors-metadata.html">documentation()</a></code> <code><a href="simList-accessors-metadata.html">citation()</a></code> <code><a href="simList-accessors-metadata.html">sessInfo()</a></code> </p>
+          <p><code><a href="simList-accessors-metadata.html">inputObjects()</a></code> <code><a href="simList-accessors-metadata.html">outputObjects()</a></code> <code><a href="simList-accessors-metadata.html">outputObjectNames()</a></code> <code><a href="simList-accessors-metadata.html">reqdPkgs()</a></code> <code><a href="simList-accessors-metadata.html">documentation()</a></code> <code><a href="simList-accessors-metadata.html">sessInfo()</a></code> </p>
         </td>
         <td><p>Metadata accessors</p></td>
       </tr><tr><td>
@@ -467,7 +468,7 @@ to create a new object of the same class as a template.</p></td>
         </td>
         <td><p>Simulation modules and dependencies</p></td>
       </tr><tr><td>
-          <p><code><a href="simList-accessors-outputs.html">outputs()</a></code> <code><a href="simList-accessors-outputs.html">`outputs&lt;-`()</a></code> <code><a href="simList-accessors-outputs.html">outputArgs()</a></code> <code><a href="simList-accessors-outputs.html">`outputArgs&lt;-`()</a></code> </p>
+          <p><code><a href="simList-accessors-outputs.html">outputs()</a></code> <code><a href="simList-accessors-outputs.html">`outputs&lt;-`()</a></code> <code><a href="simList-accessors-outputs.html">registerOutputs()</a></code> <code><a href="simList-accessors-outputs.html">outputArgs()</a></code> <code><a href="simList-accessors-outputs.html">`outputArgs&lt;-`()</a></code> </p>
         </td>
         <td><p>Simulation outputs</p></td>
       </tr><tr><td>
@@ -493,11 +494,15 @@ to create a new object of the same class as a template.</p></td>
       </tr><tr><td>
           <p><code><a href="spadesOptions.html">spadesOptions()</a></code> </p>
         </td>
-        <td><p>`SpaDES.core` options</p></td>
+        <td><p><code>SpaDES.core</code> options</p></td>
       </tr><tr><td>
           <p><code><a href="spadesTime.html">dhour()</a></code> <code><a href="spadesTime.html">dday()</a></code> <code><a href="spadesTime.html">dyears()</a></code> <code><a href="spadesTime.html">dmonths()</a></code> <code><a href="spadesTime.html">dweeks()</a></code> <code><a href="spadesTime.html">dweek()</a></code> <code><a href="spadesTime.html">dmonth()</a></code> <code><a href="spadesTime.html">dyear()</a></code> <code><a href="spadesTime.html">dsecond()</a></code> <code><a href="spadesTime.html">dNA()</a></code> </p>
         </td>
         <td><p>SpaDES time units</p></td>
+      </tr><tr><td>
+          <p><code><a href="sub-simList-character-ANY-method.html">`[`(<i>&lt;simList&gt;</i>,<i>&lt;character&gt;</i>,<i>&lt;ANY&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Extract an intact <code>simList</code> but with subset of objects</p></td>
       </tr><tr><td>
           <p><code><a href="suppliedElsewhere.html">suppliedElsewhere()</a></code> </p>
         </td>

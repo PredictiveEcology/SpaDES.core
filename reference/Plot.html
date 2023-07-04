@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -105,7 +105,8 @@
 <span>  zero.color <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  length <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  arr <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  plotFn <span class="op">=</span> <span class="st">"plot"</span></span>
+<span>  plotFn <span class="op">=</span> <span class="st">"plot"</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"quickPlot.verbose"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -141,7 +142,7 @@ the plot with the same name, such as plotting a
 
 
 <dt>gp</dt>
-<dd><p>A <code>gpar</code> object, created by <code>gpar()</code>,
+<dd><p>A <code>gpar</code> object, created by <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar()</a></code>,
 to change plotting parameters (see <span class="pkg">grid</span> package).</p></dd>
 
 
@@ -255,7 +256,18 @@ let Plot function do it automatically.</p></dd>
 <dd><p>An optional function name to do the plotting internally, e.g.,
 "barplot" to get a barplot() call. Default "plot".</p></dd>
 
+
+<dt>verbose</dt>
+<dd><p>Numeric or logical. If <code>TRUE</code> or <code>&gt;0</code>, then messages will be
+shown. If <code>FALSE</code> or <code>0</code>, most messages will be suppressed.</p></dd>
+
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>invoked for side effect of plotting</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>See <code><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">quickPlot::Plot</a></code>.

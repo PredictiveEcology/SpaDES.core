@@ -26,7 +26,7 @@ one can simply use sim$object or sim[["object"]].'><!-- mathjax --><script src="
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -95,14 +95,17 @@ one can simply use <code>sim$object</code> or <code>sim[["object"]]</code>.</p>
 <span><span class="fu">objs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="co"># S4 method for simList</span></span>
-<span><span class="fu">objs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span></code></pre></div>
+<span><span class="fu">objs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
+<span></span>
+<span><span class="fu">moduleObjects</span><span class="op">(</span><span class="va">sim</span>, <span class="va">module</span>, <span class="va">path</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">findObjects</span><span class="op">(</span><span class="va">objects</span>, <span class="va">sim</span>, <span class="va">module</span>, <span class="va">path</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>sim</dt>
-<dd><p>A <code>simList</code> object from which to extract element(s) or
-in which to replace element(s).</p></dd>
+<dd><p>A <code>simList</code> object from which to extract element(s) or in which to replace element(s).</p></dd>
 
 
 <dt>...</dt>
@@ -112,12 +115,37 @@ in which to replace element(s).</p></dd>
 <dt>value</dt>
 <dd><p>objects to assign to the <code>simList</code></p></dd>
 
+
+<dt>module</dt>
+<dd><p>Character vector of module name(s)</p></dd>
+
+
+<dt>path</dt>
+<dd><p>The path to the module., i.e., the <code>modulePath</code>.
+Only relevant if <code>sim</code> not supplied.</p></dd>
+
+
+<dt>objects</dt>
+<dd><p>A character vector of length &gt;= 1 with name(s) of objects to look
+for in the metadata. This is used in a <code>grep</code>, meaning it will do partial
+matching (e.g., <code>"studyArea"</code> will find <code>"studyArea"</code> and <code>"studyAreaLarge"</code>).
+User can use regular expressions.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
 <p>Returns or sets a list of objects in the <code>simList</code> environment.</p>
+
+
+<p><code>moduleObjects</code> returns a data.table with 4 columns, <code>module</code>, <code>objectName</code>, <code>type</code>, and <code>desc</code>,
+pulled directly from the object metadata in the <code>createsOutputs</code> and <code>expectsInputs</code>. These
+will be determined either from a <code>simList</code> or from the module source code.</p>
+
+
+<p><code>findObjects</code> returns a data.table similar to <code>moduleObjects</code>, but with only the
+objects provided by <code>objects</code>.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -128,10 +156,10 @@ the simulation environment.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="SpaDES.core-package.html">SpaDES.core-package()</a></code>, specifically the section 1.2.1 on Simulation Parameters.</p>
+    <div class="dont-index"><p><a href="SpaDES.core-package.html">SpaDES.core-package</a>, specifically the section 1.2.1 on Simulation Parameters.</p>
 <p>Other functions to access elements of a 'simList' object: 
 <code><a href="addDepends.html">.addDepends</a>()</code>,
-<code><a href="checkpoint.html">doEvent.checkpoint</a>()</code>,
+<code><a href="checkpoint.html">checkpointFile</a>()</code>,
 <code><a href="simList-accessors-envir.html">envir</a>()</code>,
 <code><a href="simList-accessors-events.html">events</a>()</code>,
 <code><a href="globals.html">globals</a>()</code>,
@@ -144,6 +172,19 @@ the simulation environment.</p>
 <code><a href="simList-accessors-times.html">times</a>()</code></p></div>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># findObjects</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">findObjects</span><span class="op">(</span>path <span class="op">=</span> <span class="va">path</span>, module <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">path</span><span class="op">)</span>, objects <span class="op">=</span> <span class="st">"caribou"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    objectName          module   type objectClass</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:    caribou caribouMovement  input  SpatVector</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:    caribou caribouMovement output  SpatVector</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                desc other</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: Object holding caribou locations      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:                               NA      </span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

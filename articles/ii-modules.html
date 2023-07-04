@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -93,16 +93,16 @@
 
       
 
-      </header><script src="ii-modules_files/htmlwidgets-1.6.1/htmlwidgets.js"></script><script src="ii-modules_files/d3-3.3.8/d3.min.js"></script><script src="ii-modules_files/dagre-0.4.0/dagre-d3.min.js"></script><link href="ii-modules_files/mermaid-0.3.0/dist/mermaid.css" rel="stylesheet">
+      </header><script src="ii-modules_files/htmlwidgets-1.6.2/htmlwidgets.js"></script><script src="ii-modules_files/d3-3.3.8/d3.min.js"></script><script src="ii-modules_files/dagre-0.4.0/dagre-d3.min.js"></script><link href="ii-modules_files/mermaid-0.3.0/dist/mermaid.css" rel="stylesheet">
 <script src="ii-modules_files/mermaid-0.3.0/dist/mermaid.slim.min.js"></script><link href="ii-modules_files/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
-<script src="ii-modules_files/chromatography-0.1/chromatography.js"></script><script src="ii-modules_files/DiagrammeR-binding-1.0.9/DiagrammeR.js"></script><div class="row">
+<script src="ii-modules_files/chromatography-0.1/chromatography.js"></script><script src="ii-modules_files/DiagrammeR-binding-1.0.10/DiagrammeR.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>02 Building <code>SpaDES</code> modules</h1>
                         <h4 data-toc-skip class="author">Alex M.
 Chubaty</h4>
             
-            <h4 data-toc-skip class="date">January 12 2023</h4>
+            <h4 data-toc-skip class="date">July 04 2023</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/vignettes/ii-modules.Rmd" class="external-link"><code>vignettes/ii-modules.Rmd</code></a></small>
       <div class="hidden name"><code>ii-modules.Rmd</code></div>
@@ -207,8 +207,9 @@ modules or should be merged into a single module.</p>
           |_ CHECKSUMS.txt      # contains checksums for data files
       |_ tests/                 # contains unit tests for module code
       |_ citation.bib           # bibtex citation for the module
-      |_ LICENSE.txt            # describes module's legal usage
-      |_ README.txt             # provide overview of key aspects
+      |_ LICENSE.md             # describes module's legal usage
+      |_ NEWS.md                # log of changes made to module code
+      |_ README.md              # symlink to rendered documentation file (moduleName.md)
       |_ moduleName.R           # module code file (incl. metadata)
       |_ moduleName.Rmd         # documentation, usage info, etc.
       |_ moduleName_x.y.z.zip   # zip archive of previous versions</code></pre>
@@ -379,15 +380,15 @@ defineModule(sim, list(
   description = "Simulate caribou movement via correlated random walk.",
   keywords = c("caribou", "individual based movement model", "correlated random walk"),
   childModules = character(),
-  authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca",
+  authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
                      role = c("aut", "cre"))),
-  version = list(caribouMovement = "1.6.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  version = list(caribouMovement = "1.6.1"),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "month",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("grid", "raster", "sp", "stats", "SpaDES.tools"),
+  reqdPkgs = list("grid", "terra", "sf", "stats", "SpaDES.tools (&gt;= 2.0.0)"),
   parameters = rbind(
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
     defineParameter("moveInitialTime", "numeric", start(sim) + 1, start(sim) + 1, end(sim),
@@ -397,6 +398,8 @@ defineModule(sim, list(
     defineParameter("N", "numeric", 100L, 10L, 1000L, "initial number of caribou"),
     defineParameter("torus", "logical", FALSE, FALSE, TRUE,
                     "should the map wrap around like a torus?"),
+    defineParameter(".plots", "character", "screen", NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
     defineParameter(".plotInitialTime", "numeric", start(sim), -Inf, Inf,
                     "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", 1, -Inf, Inf,
@@ -407,9 +410,7 @@ defineModule(sim, list(
                     "time interval between save events"),
     defineParameter(".seed", "list", list(), NA, NA,
                     paste("Named list of seeds to use for each event (names).",
-                          "E.g., `list('init' = 123)` will `set.seed(123)`",
-                          "for the `init` event only."))
-  ),</code></pre>
+                          "E.g., `list('init' = 123)` will `set.seed(123)`",</code></pre>
 </div>
 <div class="section level5">
 <h5 id="defining-module-parameters-defineparameter">Defining module parameters: <code>defineParameter()</code><a class="anchor" aria-label="anchor" href="#defining-module-parameters-defineparameter"></a>
@@ -440,7 +441,7 @@ parameters, and these defaults will be used unless overridden by the
 user. Default parameter values can overridden by passing values in the
 parameter list to <code>simInit</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span>  <span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Loading required package: quickPlot</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: reproducible</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
@@ -477,36 +478,52 @@ parameter list to <code>simInit</code>.</p>
 <span>                 objects <span class="op">=</span> <span class="va">objects</span>, paths <span class="op">=</span> <span class="va">paths</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Setting:</span></span>
 <span><span class="co">##   options(</span></span>
-<span><span class="co">##     spades.outputPath = '/tmp/RtmpSN6EAY/simOutputs'</span></span>
+<span><span class="co">##     spades.outputPath = '/tmp/RtmpX7oi2w/simOutputs'</span></span>
 <span><span class="co">##     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span></span>
 <span><span class="co">##   )</span></span></code></pre>
 <pre><code><span><span class="co">## Paths set to:</span></span>
 <span><span class="co">##   options(</span></span>
-<span><span class="co">##     rasterTmpDir = '/tmp/RtmpSN6EAY/SpaDES/scratch/raster'</span></span>
-<span><span class="co">##     reproducible.cachePath = '/tmp/RtmpSN6EAY/reproducible/cache'</span></span>
-<span><span class="co">##     spades.inputPath = '/tmp/RtmpSN6EAY/SpaDES/inputs'</span></span>
-<span><span class="co">##     spades.outputPath = '/tmp/RtmpSN6EAY/simOutputs'</span></span>
+<span><span class="co">##     rasterTmpDir = '/tmp/RtmpX7oi2w/SpaDES/scratch/raster'</span></span>
+<span><span class="co">##     reproducible.cachePath = '/tmp/RtmpX7oi2w/reproducible/cache'</span></span>
+<span><span class="co">##     spades.inputPath = '/tmp/RtmpX7oi2w/SpaDES/inputs'</span></span>
+<span><span class="co">##     spades.outputPath = '/tmp/RtmpX7oi2w/simOutputs'</span></span>
 <span><span class="co">##     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span></span>
-<span><span class="co">##     spades.scratchPath = '/tmp/RtmpSN6EAY/SpaDES/scratch'</span></span>
+<span><span class="co">##     spades.scratchPath = '/tmp/RtmpX7oi2w/SpaDES/scratch'</span></span>
 <span><span class="co">##   )</span></span>
-<span><span class="co">##   terra::terraOptions(tempdir = '/tmp/RtmpSN6EAY/SpaDES/scratch/terra'</span></span></code></pre>
-<pre><code><span><span class="co">## Loading required package: raster</span></span></code></pre>
-<pre><code><span><span class="co">## Loading required package: sp</span></span></code></pre>
+<span><span class="co">##   terra::terraOptions(tempdir = '/tmp/RtmpX7oi2w/SpaDES/scratch/terra'</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: RColorBrewer</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: terra</span></span></code></pre>
+<pre><code><span><span class="co">## terra 1.7.39</span></span></code></pre>
+<pre><code><span><span class="co">## </span></span>
+<span><span class="co">## Attaching package: 'terra'</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:SpaDES.core':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     time&lt;-</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:MASS':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     area</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:knitr':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     spin</span></span></code></pre>
+<pre><code><span><span class="co">## The following object is masked from 'package:SpaDES.tools':</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">##     wrap</span></span></code></pre>
 <pre><code><span><span class="co">## Loading required package: grid</span></span></code></pre>
 <pre><code><span><span class="co">## </span></span>
 <span><span class="co">## Attaching package: 'grid'</span></span></code></pre>
-<pre><code><span><span class="co">## The following object is masked from 'package:quickPlot':</span></span>
+<pre><code><span><span class="co">## The following object is masked from 'package:terra':</span></span>
 <span><span class="co">## </span></span>
-<span><span class="co">##     gpar</span></span></code></pre>
+<span><span class="co">##     depth</span></span></code></pre>
+<pre><code><span><span class="co">## Loading required package: sf</span></span></code></pre>
+<pre><code><span><span class="co">## Linking to GEOS 3.11.1, GDAL 3.6.2, PROJ 9.1.1; sf_use_s2() is TRUE</span></span></code></pre>
 <pre><code><span><span class="co">## Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span></span></code></pre>
 <pre><code><span><span class="co">## The following .globals were used:</span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BB0000;">             module    global</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BB0000;">1:  caribouMovement stackName</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BB0000;">2:       fireSpread stackName</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #BB0000;">3: randomLandscapes stackName</span></span></span></code></pre>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">##              module    global</span></span></code></pre>
+<pre><code><span><span class="co">## 1:  caribouMovement stackName</span></span></code></pre>
+<pre><code><span><span class="co">## 2:       fireSpread stackName</span></span></code></pre>
+<pre><code><span><span class="co">## 3: randomLandscapes stackName</span></span></code></pre>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## Access parameters</span></span>
 <span><span class="fu"><a href="../reference/params.html">P</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>                    <span class="co"># shows all parameters</span></span>
 <span><span class="fu"><a href="../reference/params.html">P</a></span><span class="op">(</span><span class="va">mySim</span>, module <span class="op">=</span> <span class="st">"caribouMovement"</span><span class="op">)</span> <span class="co"># only parameters in caribouMovement module</span></span>
@@ -533,23 +550,27 @@ possible, keep the definitions of each event type minimal, using
 functions (defined outside of the block) for the details of what is
 happening for each event.</p>
 <pre><code>## sample event type definitions for the default `caribouMovement` module
+  )
+))
+
+## event types
 doEvent.caribouMovement &lt;- function(sim, eventTime, eventType, debug = FALSE) {
   switch(
     eventType,
     init = {
       ### check for more detailed object dependencies:
       ### (use `checkObject` or similar)
-      SpaDES.core::checkObject(sim, name = SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
+      checkObject(sim, name = Par$stackName, layer = "habitatQuality")
 
       # do stuff for this event
       sim &lt;- Init(sim)
 
       # schedule the next event
-      sim &lt;- scheduleEvent(sim, SpaDES.core::P(sim)$moveInitialTime,
+      sim &lt;- scheduleEvent(sim, Par$moveInitialTime,
                            "caribouMovement", "move")
-      sim &lt;- scheduleEvent(sim, SpaDES.core::P(sim)$.plotInitialTime,
+      sim &lt;- scheduleEvent(sim, Par$.plotInitialTime,
                            "caribouMovement", "plot.init", .last())
-      sim &lt;- scheduleEvent(sim, SpaDES.core::P(sim)$.saveInitialTime,
+      sim &lt;- scheduleEvent(sim, Par$.saveInitialTime,
                            "caribouMovement", "save", .last() + 1)
     },
     move = {
@@ -557,38 +578,34 @@ doEvent.caribouMovement &lt;- function(sim, eventTime, eventType, debug = FALSE)
       sim &lt;- Move(sim)
 
       # schedule the next event
-      sim &lt;- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$moveInterval, "caribouMovement", "move")
+      sim &lt;- scheduleEvent(sim, time(sim) + Par$moveInterval, "caribouMovement", "move")
     },
     plot.init = {
-      # do stuff for this event
-      Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
-           new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
+      # If this is scheduled because .plotInitialTime is not NA, it may not do anything
+      #   if Par$.plots is not "screen", "png" or another type.
+      Plots(sim$caribou, addTo = paste("sim", Par$stackName, "habitatQuality", sep = "$"),
+           new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6), usePlot = TRUE)
 
       # schedule the next event
-      sim &lt;- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
+      sim &lt;- scheduleEvent(sim, time(sim) + Par$.plotInterval, "caribouMovement", "plot", .last())
     },
     plot = {
-      # do stuff for this event
-      Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
-           new = FALSE, pch = 19, size = 0.2, gp = gpar(cex = 0.6))
-      Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
+      Plots(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6),
+            usePlot = TRUE)
 
       # schedule the next event
-      sim &lt;- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
+      sim &lt;- scheduleEvent(sim, time(sim) + Par$.plotInterval, "caribouMovement", "plot", .last())
     },
     save = {
       # do stuff for this event
       sim &lt;- saveFiles(sim)
 
       # schedule the next event
-      sim &lt;- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.saveInterval, "caribouMovement", "save", .last() + 1)
+      sim &lt;- scheduleEvent(sim, time(sim) + Par$.saveInterval, "caribouMovement", "save", .last() + 1)
 
     },
     warning(paste(
-      "Undefined event type: \'", events(sim)[1, "eventType", with = FALSE],
-      "\' in module \'", events(sim)[1, "moduleName", with = FALSE], "\'", sep = ""
-    ))
-  )</code></pre>
+      "Undefined event type: \'", events(sim)[1, "eventType", with = FALSE],</code></pre>
 </div>
 <div class="section level4">
 <h4 id="event-functions">Event functions<a class="anchor" aria-label="anchor" href="#event-functions"></a>
@@ -616,30 +633,30 @@ which defines the initialization of the module; however, this
 be a stub). As such, the <code>Init()</code> function is required for
 initialization. Modules may also include <code>"save"</code> and
 <code>"plot"</code> events, though these are optional.</p>
-<pre><code><span><span class="co">## sample Init event function from the default `caribouMovement` module</span></span>
-<span><span class="va">Init</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">yrange</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/xmin.html" class="external-link">ymin</a></span><span class="op">(</span><span class="va">sim</span><span class="op">[[</span><span class="fu">SpaDES.core</span><span class="fu">::</span><span class="fu"><a href="../reference/params.html">P</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">$</span><span class="va">stackName</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>              <span class="fu"><a href="https://rdrr.io/pkg/terra/man/xmin.html" class="external-link">ymax</a></span><span class="op">(</span><span class="va">sim</span><span class="op">[[</span><span class="fu">SpaDES.core</span><span class="fu">::</span><span class="fu"><a href="../reference/params.html">P</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">$</span><span class="va">stackName</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">xrange</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/xmin.html" class="external-link">xmin</a></span><span class="op">(</span><span class="va">sim</span><span class="op">[[</span><span class="fu">SpaDES.core</span><span class="fu">::</span><span class="fu"><a href="../reference/params.html">P</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">$</span><span class="va">stackName</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>              <span class="fu"><a href="https://rdrr.io/pkg/terra/man/xmin.html" class="external-link">xmax</a></span><span class="op">(</span><span class="va">sim</span><span class="op">[[</span><span class="fu">SpaDES.core</span><span class="fu">::</span><span class="fu"><a href="../reference/params.html">P</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">$</span><span class="va">stackName</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># initialize caribou agents</span></span>
-<span>  <span class="va">N</span> <span class="op">&lt;-</span> <span class="fu">SpaDES.core</span><span class="fu">::</span><span class="fu"><a href="../reference/params.html">P</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">$</span><span class="va">N</span></span>
-<span>  <span class="va">IDs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="va">N</span><span class="op">)</span></span>
-<span>  <span class="va">sex</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"female"</span>, <span class="st">"male"</span><span class="op">)</span>, <span class="va">N</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="va">age</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">N</span>, mean <span class="op">=</span> <span class="fl">8</span>, sd <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="va">x1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">N</span><span class="op">)</span></span>
-<span>  <span class="va">y1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="va">N</span><span class="op">)</span></span>
-<span>  <span class="va">starts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">cbind</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">xrange</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">xrange</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>,</span>
-<span>                  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="va">N</span>, <span class="va">yrange</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="va">yrange</span><span class="op">[</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># create the caribou agent object</span></span>
-<span>  <span class="va">sim</span><span class="op">$</span><span class="va">caribou</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/sp/man/SpatialPoints.html" class="external-link">SpatialPointsDataFrame</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="va">starts</span>,</span>
-<span>                                        data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="va">x1</span>, <span class="va">y1</span>, <span class="va">sex</span>, <span class="va">age</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/row.names.html" class="external-link">row.names</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">caribou</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">IDs</span> <span class="co"># alternatively, add IDs as column in data.frame above</span></span>
-<span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre>
+<pre><code>## sample Init event function from the default `caribouMovement` module
+}
+
+## event functions
+Init &lt;- function(sim) {
+  yrange &lt;- c(ymin(sim[[Par$stackName]]),
+              ymax(sim[[Par$stackName]]))
+  xrange &lt;- c(xmin(sim[[Par$stackName]]),
+              xmax(sim[[Par$stackName]]))
+
+  # initialize caribou agents
+  N &lt;- Par$N
+  IDs &lt;- as.character(1:N)
+  sex &lt;- sample(c("female", "male"), N, replace = TRUE)
+  age &lt;- round(rnorm(N, mean = 8, sd = 3))
+  x1 &lt;- rep(0, N)
+  y1 &lt;- rep(0, N)
+  starts &lt;- cbind(x = runif(N, xrange[1], xrange[2]),
+                  y = runif(N, yrange[1], yrange[2]))
+
+  # create the caribou agent object
+  sim$caribou &lt;- vect(cbind(starts, data.frame(IDs, x1, y1, sex, age)), geom = c("x", "y"))
+
+  return(invisible(sim))</code></pre>
 </div>
 <div class="section level4">
 <h4 id="event-diagram">Event diagram<a class="anchor" aria-label="anchor" href="#event-diagram"></a>
@@ -656,8 +673,8 @@ associated with a particular module’s event corresponds to the module’s
 timestep unit, not the event’s “duration”.</p>
 <pre><code><span><span class="co">## agg_png </span></span>
 <span><span class="co">##       2</span></span></code></pre>
-<div id="htmlwidget-1f05de1855471f93be8d" style="width:720px;height:1326px;" class="DiagrammeR html-widget "></div>
-<script type="application/json" data-for="htmlwidget-1f05de1855471f93be8d">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0-06-01,0-06-07\nsection  save \n init:done,save1,0-06-01,0-06-07\nsection  load \n init:done,load1,0-06-01,0-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0-06-01,0-06-07\nplot:crit,randomLandscapes2,0-06-01,0-06-07\nsection  fireSpread \n init:done,fireSpread1,0-06-01,0-06-07\nburn:active,fireSpread2,0-06-01,0-06-07\nstats:active,fireSpread3,0-06-01,0-06-07\nplot.init:active,fireSpread4,0-06-01,0-06-07\nburn:active,fireSpread5,1-06-01,1-06-07\nstats:active,fireSpread6,1-06-01,1-06-07\nburn:active,fireSpread7,2-06-01,2-06-07\nstats:active,fireSpread8,2-06-01,2-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0-06-01,0-06-07\nplot.init:active,caribouMovement2,0-07-01,0-07-07\nplot:crit,caribouMovement3,0-07-31,0-08-07\nplot:crit,caribouMovement4,0-08-31,0-09-06\nplot:crit,caribouMovement5,0-09-30,0-10-07\nplot:crit,caribouMovement6,0-10-31,0-11-06\nplot:crit,caribouMovement7,0-11-30,0-12-06\nplot:crit,caribouMovement8,0-12-31,1-01-06\nplot:crit,caribouMovement9,1-01-30,1-02-05\nplot:crit,caribouMovement10,1-03-01,1-03-08\nplot:crit,caribouMovement11,1-04-01,1-04-07\nplot:crit,caribouMovement12,1-05-01,1-05-08\nmove:active,caribouMovement13,1-06-01,1-06-07\nplot:crit,caribouMovement14,1-06-01,1-06-07\nmove:active,caribouMovement15,1-07-01,1-07-07\nplot:crit,caribouMovement16,1-07-01,1-07-07\nmove:active,caribouMovement17,1-08-01,1-08-07\nplot:crit,caribouMovement18,1-08-01,1-08-07\nmove:active,caribouMovement19,1-08-31,1-09-06\nplot:crit,caribouMovement20,1-08-31,1-09-06\nmove:active,caribouMovement21,1-10-01,1-10-07\nplot:crit,caribouMovement22,1-10-01,1-10-07\nmove:active,caribouMovement23,1-10-31,1-11-06\nplot:crit,caribouMovement24,1-10-31,1-11-06\nmove:active,caribouMovement25,1-11-30,1-12-07\nplot:crit,caribouMovement26,1-11-30,1-12-07\nmove:active,caribouMovement27,1-12-31,2-01-06\nplot:crit,caribouMovement28,1-12-31,2-01-06\nmove:active,caribouMovement29,2-01-30,2-02-06\nplot:crit,caribouMovement30,2-01-30,2-02-06\nmove:active,caribouMovement31,2-03-02,2-03-08\nplot:crit,caribouMovement32,2-03-02,2-03-08\nmove:active,caribouMovement33,2-04-01,2-04-07\nplot:crit,caribouMovement34,2-04-01,2-04-07\nmove:active,caribouMovement35,2-05-02,2-05-08\nplot:crit,caribouMovement36,2-05-02,2-05-08\nmove:active,caribouMovement37,2-06-01,2-06-07\nplot:crit,caribouMovement38,2-06-01,2-06-07\n"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-a09f642b275f29646098" style="width:720px;height:650px;" class="DiagrammeR html-widget "></div>
+<script type="application/json" data-for="htmlwidget-a09f642b275f29646098">{"x":{"diagram":"gantt\ndateFormat  YYYY-MM-DD\ntitle SpaDES event diagram\nsection  checkpoint \n init:done,checkpoint1,0-06-01,0-06-07\nsection  save \n init:done,save1,0-06-01,0-06-07\nsection  load \n init:done,load1,0-06-01,0-06-07\nsection  randomLandscapes \n init:done,randomLandscapes1,0-06-01,0-06-07\nplot:crit,randomLandscapes2,0-06-01,0-06-07\nsection  fireSpread \n init:done,fireSpread1,0-06-01,0-06-07\nburn:active,fireSpread2,0-06-01,0-06-07\nstats:active,fireSpread3,0-06-01,0-06-07\nplot.init:active,fireSpread4,0-06-01,0-06-07\nburn:active,fireSpread5,1-06-01,1-06-07\nstats:active,fireSpread6,1-06-01,1-06-07\nsection  caribouMovement \n init:done,caribouMovement1,0-06-01,0-06-07\nplot.init:active,caribouMovement2,0-07-01,0-07-07\nplot:crit,caribouMovement3,0-07-31,0-08-07\nplot:crit,caribouMovement4,0-08-31,0-09-06\nplot:crit,caribouMovement5,0-09-30,0-10-07\nplot:crit,caribouMovement6,0-10-31,0-11-06\nplot:crit,caribouMovement7,0-11-30,0-12-06\nplot:crit,caribouMovement8,0-12-31,1-01-06\nplot:crit,caribouMovement9,1-01-30,1-02-05\nplot:crit,caribouMovement10,1-03-01,1-03-08\nplot:crit,caribouMovement11,1-04-01,1-04-07\nplot:crit,caribouMovement12,1-05-01,1-05-08\nmove:active,caribouMovement13,1-06-01,1-06-07\nplot:crit,caribouMovement14,1-06-01,1-06-07\n"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div class="section level3">
@@ -697,7 +714,7 @@ subdirectory. Also included in this folder is a
 <code>CHECKSUMS.txt</code> file that contains the expected checksums for
 each data file. Checksums can be verified (and optionally written) using
 <code><a href="../reference/checksums.html">checksums()</a></code>.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## 1. specify your module here</span></span>
 <span><span class="va">moduleName</span> <span class="op">&lt;-</span> <span class="st">"my_module"</span></span>
 <span></span>
@@ -796,7 +813,7 @@ during module initialization.</p>
 B may depend on module A (for example to initialize a data object),
 without module A depending on module B.</p>
 <p>To view the dependencies for a simulation:</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed</span></span>
 <span><span class="co">#install.packages("SpaDES.taols")</span></span>
 <span><span class="co">#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")</span></span>
@@ -814,27 +831,29 @@ without module A depending on module B.</p>
 <span></span>
 <span><span class="co">## examine simulation module (object) dependencies</span></span>
 <span><span class="fu"><a href="../reference/depsEdgeList.html">depsEdgeList</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="cn">FALSE</span><span class="op">)</span>      <span class="co"># all object dependency relationships</span></span></code></pre></div>
-<pre><code><span><span class="co">##                from              to       objName               objClass</span></span>
-<span><span class="co">## 1:  caribouMovement caribouMovement       caribou SpatialPointsDataFrame</span></span>
-<span><span class="co">## 2:       fireSpread caribouMovement     landscape            RasterStack</span></span>
-<span><span class="co">## 3:       fireSpread      fireSpread     landscape            RasterStack</span></span>
-<span><span class="co">## 4:       fireSpread      fireSpread nPixelsBurned                numeric</span></span>
-<span><span class="co">## 5: randomLandscapes caribouMovement     landscape            RasterStack</span></span>
-<span><span class="co">## 6: randomLandscapes      fireSpread     landscape            RasterStack</span></span></code></pre>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/clearPlot.html" class="external-link">clearPlot</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>            <span class="co"># simplified visual representation of modules</span></span></code></pre></div>
-<p><img src="ii-modules_files/figure-html/module-object-diagrams-1.png" width="672"></p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">##                from              to       objName   objClass</span></span>
+<span><span class="co">## 1:  caribouMovement caribouMovement       caribou SpatVector</span></span>
+<span><span class="co">## 2:       fireSpread caribouMovement     landscape SpatRaster</span></span>
+<span><span class="co">## 3:       fireSpread      fireSpread     landscape SpatRaster</span></span>
+<span><span class="co">## 4:       fireSpread      fireSpread nPixelsBurned    numeric</span></span>
+<span><span class="co">## 5: randomLandscapes caribouMovement     landscape SpatRaster</span></span>
+<span><span class="co">## 6: randomLandscapes      fireSpread     landscape SpatRaster</span></span></code></pre>
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/clearPlot.html" class="external-link">clearPlot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="ii-modules_files/figure-html/module-object-diagrams-1.png" width="672"></p>
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>            <span class="co"># simplified visual representation of modules</span></span></code></pre></div>
 <p><img src="ii-modules_files/figure-html/module-object-diagrams-2.png" width="672"></p>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/clearPlot.html" class="external-link">clearPlot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="ii-modules_files/figure-html/module-object-diagrams-3.png" width="672"></p>
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/moduleDiagram.html">moduleDiagram</a></span><span class="op">(</span><span class="va">mySim</span>, showParents <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># similar, but showing parent module grouping</span></span>
 <span></span>
 <span><span class="co"># detailed visual representation of objects</span></span>
 <span><span class="fu"><a href="../reference/objectDiagram.html">objectDiagram</a></span><span class="op">(</span><span class="va">mySim</span>, width <span class="op">=</span> <span class="fl">720</span><span class="op">)</span></span></code></pre></div>
-<div id="htmlwidget-269fc3f92081413ebc3d" style="width:720px;height:432.632880098888px;" class="DiagrammeR html-widget "></div>
-<script type="application/json" data-for="htmlwidget-269fc3f92081413ebc3d">{"x":{"diagram":"sequenceDiagram\ncaribouMovement ->> caribouMovement : caribou\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing
+<div id="htmlwidget-4e84a60eff00875b16a3" style="width:720px;height:432.632880098888px;" class="DiagrammeR html-widget "></div>
+<script type="application/json" data-for="htmlwidget-4e84a60eff00875b16a3">{"x":{"diagram":"sequenceDiagram\ncaribouMovement ->> caribouMovement : caribou\nfireSpread ->> caribouMovement : landscape\nfireSpread ->> fireSpread : landscape\nfireSpread ->> fireSpread : nPixelsBurned\nrandomLandscapes ->> caribouMovement : landscape\nrandomLandscapes ->> fireSpread : landscape\n"},"evals":[],"jsHooks":[]}</script><p>The output of the <code>depsEdgeList</code> is an edgelist describing
 the relationships between each module. In the example above, line 2 of
 the output indicates that the <code>fireSpread</code> module relies on
 an object <code>landscape</code> provided by the
@@ -989,7 +1008,7 @@ to the simulation object as illustrated below. By default, checkpointing
 is not used unless the <code>interval</code> parameter is provided; the
 simulation checkpoint file (if one exists) is loaded if the
 <code>file</code> parameter is specified.</p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># initialize a new simulation, setting the checkpoint interval and filename.</span></span>
 <span><span class="va">times</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -1006,7 +1025,7 @@ simulation checkpoint file (if one exists) is loaded if the
 <span><span class="co"># retrieve the checkpoint params from the simulation object</span></span>
 <span><span class="fu"><a href="../reference/checkpoint.html">checkpointFile</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## NULL</span></span></code></pre>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/checkpoint.html">checkpointInterval</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] NA</span></span></code></pre>
 </div>
@@ -1015,7 +1034,7 @@ simulation checkpoint file (if one exists) is loaded if the
 <code>.progress</code> module<a class="anchor" aria-label="anchor" href="#progress-module"></a>
 </h3>
 <p>Schedule updates to the simulation progress bar.</p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># initialize a new simulation, setting the progress parameters</span></span>
 <span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0.0</span>, end <span class="op">=</span> <span class="fl">10.0</span><span class="op">)</span>,</span>
 <span>                 params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>.globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span>,</span>
@@ -1026,7 +1045,7 @@ simulation checkpoint file (if one exists) is loaded if the
 <span><span class="co"># retrieve the checkpoint params from the simulation object</span></span>
 <span><span class="fu"><a href="../reference/progress.html">progressType</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "text"</span></span></code></pre>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/progress.html">progressInterval</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 1</span></span></code></pre>
 </div>
@@ -1075,7 +1094,7 @@ scheduled:</p>
 </table>
 <div class="section level4">
 <h4 id="inputs-argument-to-siminit">
-<code>inputs</code> argument to simInit<a class="anchor" aria-label="anchor" href="#inputs-argument-to-siminit"></a>
+<code>inputs</code> argument to <code>simInit</code><a class="anchor" aria-label="anchor" href="#inputs-argument-to-siminit"></a>
 </h4>
 <p>Alternatively, objects can be read in during the <code>simInit</code>
 function call by passing a data.frame to the <code>input</code>
@@ -1168,7 +1187,7 @@ attempts and will be</td>
 </div>
 <div class="section level4">
 <h4 id="outputs-argument-to-siminit">
-<code>outputs</code> argument to simInit<a class="anchor" aria-label="anchor" href="#outputs-argument-to-siminit"></a>
+<code>outputs</code> argument to <code>simInit</code><a class="anchor" aria-label="anchor" href="#outputs-argument-to-siminit"></a>
 </h4>
 <p>Objects to be saved can be specified using the <code>output</code>
 argument, by passing a data.frame analogous to the <code>.load</code>
@@ -1229,7 +1248,7 @@ objects have been saved.</p>
 <code>fun</code> requires arguments to be passed to it, use
 <code><a href="../reference/simList-accessors-outputs.html">outputArgs()</a></code>, and it must be the same length as the
 <code><a href="../reference/simList-accessors-outputs.html">outputs()</a></code> <code>data.frame</code>.</p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># initialize a new simulation, setting the load and save parameters</span></span>
 <span><span class="va">outputDir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"simOutputs"</span><span class="op">)</span></span>
 <span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
@@ -1251,25 +1270,25 @@ objects have been saved.</p>
 <pre><code><span><span class="co">## [1] file       fun        package    objectName loadTime   loaded     arguments </span></span>
 <span><span class="co">## [8] intervals </span></span>
 <span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/simList-accessors-outputs.html">outputs</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>   <span class="co"># shows all files and objects that are "outputs"</span></span></code></pre></div>
 <pre><code><span><span class="co">##   objectName                                           file     fun package</span></span>
-<span><span class="co">## 1  landscape /tmp/RtmpSN6EAY/simOutputs/landscape_year5.rds saveRDS    base</span></span>
+<span><span class="co">## 1  landscape /tmp/RtmpX7oi2w/simOutputs/landscape_year5.rds saveRDS    base</span></span>
 <span><span class="co">##   saveTime saved arguments</span></span>
 <span><span class="co">## 1        5    NA        NA</span></span></code></pre>
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.saveInitialTime</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.saveInterval</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 2</span></span></code></pre>
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.saveObjects</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "landscape"</span></span></code></pre>
-<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.savePath</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "/tmp/RtmpSN6EAY/simOutputs/randomLandscapes"</span></span></code></pre>
-<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## [1] "/tmp/RtmpX7oi2w/simOutputs/randomLandscapes"</span></span></code></pre>
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ftmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"spades_vignetteOutputs"</span>, fileext <span class="op">=</span> <span class="st">".pdf"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf</a></span><span class="op">(</span><span class="va">ftmp</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/clearPlot.html" class="external-link">clearPlot</a></span><span class="op">(</span><span class="op">)</span></span>
@@ -1277,22 +1296,28 @@ objects have been saved.</p>
 <span></span>
 <span><span class="co"># More sophisticated, passing arguments to outputs()</span></span>
 <span><span class="fu"><a href="../reference/simList-accessors-outputs.html">outputs</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  objectName <span class="op">=</span> <span class="st">"landscape"</span>, fun <span class="op">=</span> <span class="st">"writeRaster"</span>, package <span class="op">=</span> <span class="st">"raster"</span>,</span>
+<span>  objectName <span class="op">=</span> <span class="st">"landscape"</span>, fun <span class="op">=</span> <span class="st">"writeRaster"</span>, package <span class="op">=</span> <span class="st">"terra"</span>,</span>
 <span>  saveTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">6</span><span class="op">)</span>, arguments <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>,<span class="fl">6</span><span class="op">)</span>, <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>datatype <span class="op">=</span> <span class="st">"FLT4S"</span>, format <span class="op">=</span> <span class="st">"raster"</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>datatype <span class="op">=</span> <span class="st">"FLT4S"</span>, filetype <span class="op">=</span> <span class="st">"GTiff"</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">mySim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">mySim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Warning in x@ptr$writeRaster(opt): GDAL Error 6:</span></span>
+<span><span class="co">## /tmp/RtmpX7oi2w/simOutputs/landscape_year3.tif, band 1: SetColorTable() not</span></span>
+<span><span class="co">## supported for multi-sample TIFF files.</span></span></code></pre>
+<pre><code><span><span class="co">## Warning: [writeRaster] change datatype to INT1U to write the color-table</span></span>
+<span><span class="co">## could not write the color table</span></span></code></pre>
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/grDevices/dev.html" class="external-link">dev.off</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## agg_png </span></span>
 <span><span class="co">##       2</span></span></code></pre>
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath</a></span><span class="op">(</span><span class="va">ftmp</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>Saving within a module – scheduling save events.</p>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">### WITHIN A MODULE:</span></span>
 <span></span>
 <span><span class="co"># schedule a recurring save event</span></span>
-<span><span class="va">nextSave</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.saveInterval</span></span>
+<span><span class="va">nextSave</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.saveInterval</span></span>
 <span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="va">nextSave</span>, <span class="st">"randomLandscapes"</span>, <span class="st">"save"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -1313,7 +1338,7 @@ scheduled.</li>
 <code>.plotInterval</code>: The interval at which objects will be
 plotted. Used to schedule plot events.</li>
 </ul>
-<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># initialize a new simulation, setting the load and save parameters</span></span>
 <span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/simInit.html">simInit</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">5</span><span class="op">)</span>,</span>
 <span>                 params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -1327,11 +1352,11 @@ plotted. Used to schedule plot events.</li>
 <span><span class="co"># retrieve the plotting params from the simulation object</span></span>
 <span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.plotInitialTime</span></span>
 <span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.plotInterval</span></span></code></pre></div>
-<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">### WITHIN A MODULE:</span></span>
 <span></span>
 <span><span class="co"># schedule a recurring plot event</span></span>
-<span><span class="va">nextPlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.plotInterval</span></span>
+<span><span class="va">nextPlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/terra/man/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.plotInterval</span></span>
 <span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="va">nextPlot</span>, <span class="st">"randomLandscapes"</span>, <span class="st">"save"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
@@ -1371,7 +1396,7 @@ get the path to the <code>sampleModules</code> directory. To view the
 contents of a module, use the <code>openModules</code> function. Note
 that you should not edit the sample modules directly, but save them as a
 copy in another location.</p>
-<div class="sourceCode" id="cb61"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/openModules.html">openModules</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span>, <span class="st">"moduleName"</span><span class="op">)</span></span></code></pre></div>
 <ol style="list-style-type: decimal">
 <li><p><code>randomLandscapes</code>: Generate <code>RasterStack</code>
@@ -1398,7 +1423,7 @@ containing a <code>RasterLayer</code> named
 <p><strong>Website:</strong> <a href="https://github.com/PredictiveEcology/SpaDES-modules" class="external-link">https://github.com/PredictiveEcology/SpaDES-modules</a></p>
 <p>Modules from this (or another suitable GitHub repository) can be
 downloaded using:</p>
-<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span><span class="op">(</span><span class="st">"moduleName"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved
 to the directory specified by the <code>spades.modulesPath</code>. An
@@ -1432,7 +1457,7 @@ editing.</p>
 option (<em>e.g.</em>, in their <code>.Rprofile</code> to automatically
 supply a default module author). See <code>package?devtools</code> for
 more details.</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create a new module called "randomLandscape" in the "custom-modules" subdirectory</span></span>
 <span><span class="co"># and open the resulting file immediately for editing.</span></span>
 <span><span class="fu"><a href="../reference/newModule.html">newModule</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"randomLandscapes"</span>, path <span class="op">=</span> <span class="st">"custom-modules"</span>, open <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -1457,7 +1482,7 @@ modules as “children”:</p>
 <p>Module groups make loading multiple modules easier: only the name of
 the module group needs to be specified in the <code>simInit</code> call,
 which will then initialize the simulation with the child modules.</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb75"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rich-iannone/DiagrammeR" class="external-link">DiagrammeR</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span>
 <span></span>
@@ -1490,7 +1515,7 @@ which will then initialize the simulation with the child modules.</p>
 <span><span class="fu"><a href="../reference/simList-accessors-modules.html">modules</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="co"># note the child modules are initialized</span></span></code></pre></div>
 <p>Module groups can also be used to simplify the download of multiple
 modules:</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span><span class="op">(</span><span class="st">"SpaDES_sampleModules"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">

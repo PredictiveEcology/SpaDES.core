@@ -32,7 +32,7 @@ to proceed in getting and assigning its default value."><!-- mathjax --><script 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -118,7 +118,7 @@ to proceed in getting and assigning its default value.</p>
 
 
 <dt>where</dt>
-<dd><p>Character vector with one to three of "sim", "user", or "initEvent".
+<dd><p>Character vector with one to three of <code>"sim"</code>, <code>"user"</code>, or <code>"initEvent"</code>.
 Default is all three. Partial matching is used. See details.</p></dd>
 
 
@@ -127,6 +127,12 @@ Default is all three. Partial matching is used. See details.</p></dd>
 3 logical should be returned, or a logical of length one</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>logical</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p><code>where</code> indicates which of three places to search, either <code>"sim"</code> i.e.,
@@ -139,10 +145,9 @@ the present one <strong>will</strong> create it as part of its outputs (i.e., as
 <code>createsOutputs</code> in that module's metadata). There is a caveat to this test,
 however; if that other event also has the object as an <code>expectsInput</code>, then
 it would fail this test, as it <em>also</em> needs it as an input.
-This final one (<code>"initEvent"</code>)
-does not explicitly test that the object will be created in the "init" event, only that
-it is in the outputs of that module, and that it is a module that is loaded prior to
-this one.</p>
+This final one (<code>"initEvent"</code>) does not explicitly test that the object will be created
+in the "init" event, only that it is in the outputs of that module, and that it is a module
+that is loaded prior to this one.</p>
     </div>
 
     <div id="ref-examples">
@@ -150,11 +155,11 @@ this one.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmppEYNhs/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmppEYNhs/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmppEYNhs/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmppEYNhs/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmppEYNhs/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp5bqwIr/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp5bqwIr/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp5bqwIr'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp5bqwIr/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span><span class="fu">suppliedElsewhere</span><span class="op">(</span><span class="st">"test"</span>, <span class="va">mySim</span><span class="op">)</span> <span class="co"># FALSE</span></span></span>
@@ -172,24 +177,24 @@ this one.</p>
 <span class="r-in"><span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"test"</span> <span class="op">=</span> <span class="va">test</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmppEYNhs/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmppEYNhs/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmppEYNhs/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmppEYNhs/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmppEYNhs/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp5bqwIr/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp5bqwIr/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp5bqwIr'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp5bqwIr/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span><span class="fu">suppliedElsewhere</span><span class="op">(</span><span class="st">"test"</span>, <span class="va">mySim</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="co"># Example with prepInputs</span></span></span>
 <span class="r-in"><span><span class="co"># Put chunks like this in your .inputObjects</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu">suppliedElsewhere</span><span class="op">(</span><span class="st">"test"</span>, <span class="va">mySim</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">sim</span><span class="op">$</span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fu"><a href="robustDigest.html">Cache</a></span><span class="op">(</span><span class="va">prepInputs</span>, <span class="st">"raster.tif"</span>, <span class="st">"downloadedArchive.zip"</span>,</span></span>
 <span class="r-in"><span>                    destinationPath <span class="op">=</span> <span class="fu"><a href="simList-accessors-paths.html">dataPath</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span>, studyArea <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">studyArea</span>,</span></span>
 <span class="r-in"><span>                    rasterToMatch <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">otherRasterTemplate</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>

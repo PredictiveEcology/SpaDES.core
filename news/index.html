@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -76,34 +76,59 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="1.1.1" id="spadescore-111">SpaDES.core 1.1.1<a class="anchor" aria-label="anchor" href="#spadescore-111"></a></h2>
+<h2 class="page-header" data-toc-text="2.0.0" id="spadescore-200">SpaDES.core 2.0.0<a class="anchor" aria-label="anchor" href="#spadescore-200"></a></h2>
 <div class="section level3">
-<h3 id="enhancements-1-1-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-1-1-1"></a></h3>
-<ul><li>updates to handle upstream changes in <code>Require</code> and <code>reproducible</code>, including renaming <code>cacheRepo</code> to <code>cachePath</code> in some inherited functions.</li>
-<li>updates to sample modules to use <code><a href="https://spades-tools.predictiveecology.org/reference/neutralLandscapeMap.html" class="external-link">SpaDES.tools::neutralLandscapeMap</a></code> instead of <code>NLMR</code> package directly</li>
-<li>begin migration to use <code>terra</code> and <code>sf</code> instead of <code>raster</code>, <code>sp</code>, <code>rgeos</code>, and <code>rgdal</code>
+<h3 id="enhancements-2-0-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-2-0-0"></a></h3>
+<ul><li>
+<code>options(spades.futureEvents = TRUE)</code> has been reworked and now works under a wider array of conditions.</li>
+<li>
+<code>Copy</code>, <code>.wrap</code>, <code>wrap</code> and <code>unwrap</code> all have fairly robust methods for <code>simList</code> class. The generics are in <code>reproducible</code> or <code>terra</code>
 </li>
+<li>updated <code>sampleModules</code> to use <code>Plots</code> and <code>.plot</code> parameter.</li>
+<li>new function: <code>registerOutputs</code> can be used by a developer to add saved files to the <code>outputs(sim)</code> data.frame.</li>
+<li>messaging during nested <code>simInit</code> or <code>spades</code> calls will now not duplicate time prefix</li>
+<li>
+<code>params</code> and <code>.globals</code> were previously not expected to change during <code>Cache</code>d events. Thus returned cached values were always the same as input as <code>params</code> and <code>.globals</code>. They are now assessed and returned as part of the <code>Cache</code>, as expected.</li>
+<li>updates to handle upstream changes in <code>Require</code> and <code>reproducible</code>, including renaming <code>cacheRepo</code> to <code>cachePath</code> in some inherited functions.</li>
+<li>updates to sample modules to use <code><a href="https://spades-tools.predictiveecology.org/reference/neutralLandscapeMap.html" class="external-link">SpaDES.tools::neutralLandscapeMap</a></code> instead of <code>NLMR</code> package directly</li>
+<li>migration complete to use <code>terra</code> and <code>sf</code> instead of <code>raster</code>, <code>sp</code>, <code>rgeos</code>, and <code>rgdal</code> as defaults. Attempts have been made to maintain backwards compatibility in all cases.</li>
 <li>
 <code>moduleMetadata</code> now handles multiple module paths</li>
 <li>updates to <code>memoryUse</code>
 </li>
+<li>new option: setting <code>options("spades.allowInitDuringSimInit" = TRUE)</code>, a user will have <code>init</code> events of <em>one ore more</em> modules run during the <code>simInit</code> call, but only if they have no upstream dependencies, i.e., their <code>expectsInputs</code> cannot be supplied by another module’s <code>createsOutputs</code>. <code>simInit</code> will determine which modules have no upstream dependencies and <em>only</em> these will be selected for running <em>only</em> their <code>init</code> events. This can be useful e.g., if there is a module that <code>createsOutputs</code> for a <code>studyArea</code>.</li>
 <li>
-<code>.plots</code> arg in <code>spades</code> can be set to <code>NA</code> to turn of all plotting. This can also be set with an <code>option(spades.plots = NA)</code>,</li>
+<code>.plots</code> arg in <code>spades</code> can be set to <code>NA</code> to turn of all plotting. This can also be set with <code>option(spades.plots = NA)</code>,</li>
 <li>minor bugfixes</li>
 <li>
 <code>moduleMetadata</code> no longer runs <code>.inputObjects</code>. In addition to being unnecessary and slow, it was also failing with <code>reproducible (==1.2.16)</code> because it was trying to run <code>Cache</code>, which had a bug for this case. Now, <code>moduleMetadata</code> no longer runs the <code>.inputObjects</code> internally, so this bug is no longer relevant.</li>
 <li>two new options – <code>spades.loadReqdPkgs</code>, so a user can turn off loading of packages, and <code>spades.dotInputObjects</code>, so a user can omit running of the <code>.inputObjects</code> function in modules during <code>simInit</code>. These are updated in <code>spadesOptions</code>.</li>
 <li>some tests and examples have been shortened, to fit within the CRAN guidelines</li>
+<li>improved documentation</li>
+<li>new hidden function <code>runScheduleEventsOnly</code> will extract only the <code>scheduleEvents</code> call; needed for <code>options(spades.futureEvents = TRUE)</code>
+</li>
+<li>new option: <code>spades.saveFileExtensions</code> which allows users to use the <code>outputs(sim)</code> mechanism for saving, for file extensions that are not already supported by <code><a href="../reference/loadFiles.html">.saveFileExtensions()</a></code>
+</li>
+<li>many issues addressed and closed</li>
 </ul></div>
 <div class="section level3">
-<h3 id="dependency-changes-1-1-1">Dependency Changes<a class="anchor" aria-label="anchor" href="#dependency-changes-1-1-1"></a></h3>
-<ul><li>removed <code>googledrive</code> Suggests;</li>
+<h3 id="dependency-changes-2-0-0">Dependency Changes<a class="anchor" aria-label="anchor" href="#dependency-changes-2-0-0"></a></h3>
+<ul><li>drop support for R 4.0 as dependency packages no longer support it;</li>
+<li>require <code>reproducible</code> v2.0.5 or higher;</li>
+<li>require <code>quickPlot</code> v1.0.2 or higher;</li>
+<li>removed <code>googledrive</code> from Suggests.</li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-1-1-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-1-1"></a></h3>
+<h3 id="bug-fixes-2-0-0">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-0-0"></a></h3>
 <ul><li>several minor, e.g., <code>Plots</code> when not specifying <code>fn</code>, but <code>usePlot = FALSE</code>
 </li>
 <li>many examples that were protected behind <code>\dontrun</code> or <code>\donttest</code> were stale; these have been updated</li>
+<li>
+<code>saveFiles</code> bugfix: multiple objects names can now be passed to <code>.saveOuputs</code> module parameters.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="deprecated-defunct-and-removed-features-2-0-0">Deprecated, Defunct, and Removed Features<a class="anchor" aria-label="anchor" href="#deprecated-defunct-and-removed-features-2-0-0"></a></h3>
+<ul><li>several previously-deprecated functions have been made defunct: <code><a href="../reference/remoteFileSize.html">remoteFileSize()</a></code>, <code><a href="../reference/updateList.html">updateList()</a></code>. These will be removed by mid-2023.</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -151,11 +176,12 @@
 <li>Fixed caching of <code>simList</code> objects where changes to functions appeared to be undetected, and so a Cache call would return a stale module with function code from the Cached <code>simList</code>, which was incorrect.</li>
 <li>fix recovery mode bug: use scratch directory specified by the user via <code>options(spades.scratchPath)</code> (see above).</li>
 <li>
-<code>objSize</code> could have infinite recursion problem if there are simLists inside simLists. Fixed with new <code><a href="https://reproducible.predictiveecology.org/reference/objSize.html" class="external-link">reproducible::objSize</a></code>, which uses <code><a href="https://lobstr.r-lib.org/reference/obj_size.html" class="external-link">lobstr::obj_size</a></code>.</li>
+<code>objSize</code> could have infinite recursion problem if there are <code>simList</code> objects inside <code>simList</code> objects. Fixed with new <code><a href="https://reproducible.predictiveecology.org/reference/objSize.html" class="external-link">reproducible::objSize</a></code>, which uses <code><a href="https://lobstr.r-lib.org/reference/obj_size.html" class="external-link">lobstr::obj_size</a></code>.</li>
 <li>several minor fixes, including in <code>Plots</code>
 </li>
 <li>fixes to <code>saveFiles</code> related to <code>data.table</code> assignment and use in <code>outputs(sim)</code>
 </li>
+<li>fix to <code>paramCheckOtherMods</code> to deal with <code>call</code> parameters</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -165,7 +191,7 @@
 <ul><li>
 <strong>experimental new feature</strong> <code>SpaDES</code> modules can now be R packages. The simplest way to convert a module to a package is using the new function <code>convertToPackage</code>. Benefits of doing this are so that a SpaDES module can benefit from the infrastructure of an R package (e.g., <code>devtools::document</code>, <code>devtools::check</code>, setting up Continuous Integration systems etc.). Any documentation written using <code>#'</code> i.e., <code>roxygen2</code> will be copied immediately above the function where it was sitting.</li>
 <li>
-<code>newModule</code> now correctly places the <code>SpaDES.core</code> package dependency in the <code>reqdPkgs</code> element of the metadata, instead of <code># SpaDES.core</code>. It will put the full Github reference if SpaDES.core was installed directly from GitHub.</li>
+<code>newModule</code> now correctly places the <code>SpaDES.core</code> package dependency in the <code>reqdPkgs</code> element of the metadata, instead of <code># SpaDES.core</code>. It will put the full GitHub reference if SpaDES.core was installed directly from GitHub.</li>
 <li>There is a bug in <code>qs</code> package: either <code>qsave</code> or <code>qread</code> converts <code>data.table</code> objects to <code>list</code> objects. <code>loadSimList</code> has a work around internally to convert these objects back to <code>data.table</code>, if the metadata indicate that the objects should be <code>data.table</code> objects.</li>
 <li>new function: <code>paramCheckOtherMods</code>. Can be used within a module to assert that a parameter has the same value as the same parameter in other modules. This is therefore a check of a parameter that might be considered a <code>.global</code> and passed within <code>simInit(..., params = list(.globals = list(someParam = "someValue")))</code>, but the user did not do that.</li>
 <li>now <code>spades</code> messaging when e.g., <code>debug = 1</code> can correctly accommodate nested <code>spades</code> calls, i.e., a SpaDES module calling <code>spades</code> internally.</li>
@@ -293,7 +319,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-1-0-6">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-1-0-6"></a></h3>
-<ul><li>use <code><a href="https://rdrr.io/r/base/try.html" class="external-link">try()</a></code> with <code><a href="https://rdrr.io/pkg/igraph/man/communities.html" class="external-link">communities()</a></code> to skip tests on systems without <code>igraph</code> GLPK support.</li>
+<ul><li>use <code><a href="https://rdrr.io/r/base/try.html" class="external-link">try()</a></code> with <code><a href="https://r.igraph.org/reference/communities.html" class="external-link">communities()</a></code> to skip tests on systems without <code>igraph</code> GLPK support.</li>
 <li>prevent package (re)installation during examples, tests, vignettes.</li>
 <li>fix failures on R-devel caused by <code>RandomFields</code> being unavailable.</li>
 <li>minor bug fixes</li>
@@ -447,7 +473,7 @@
 <div class="section level3">
 <h3 id="enhancements-0-2-7">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-2-7"></a></h3>
 <ul><li>memory and peak memory estimation is now available for *nix-type systems, when <code>future</code> is installed. See new vignette <code>iv-advanced</code> and <code><a href="../reference/memoryUse.html">?memoryUse</a></code>.</li>
-<li>new function and capacity: <code>restartR</code>. Restarts R mid-stream to deal with apparent memory leaks in R. In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <a href="https://github.com/r-lib/fastmap" class="external-link uri">https://github.com/r-lib/fastmap</a>). This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the simList, restarting R, resets the memory consumption back to levels near the start of a simulation. The new functionality allows a user who is hitting this memory leak issue to restart R as a work around. See <code><a href="../reference/restartR.html">?restartR</a></code> for instructions.</li>
+<li>new function and capacity: <code>restartR</code>. Restarts R mid-stream to deal with apparent memory leaks in R. In our experience with large projects that have long time horizons, there appears to be a memory leak at a low level in R (identified here: <a href="https://github.com/r-lib/fastmap" class="external-link uri">https://github.com/r-lib/fastmap</a>). This has prevented projects from running to completion. Without diagnosing the root cause of the memory inflation, we have noticed that interrupting a simulation, saving the <code>simList</code>, restarting R, resets the memory consumption back to levels near the start of a simulation. The new functionality allows a user who is hitting this memory leak issue to restart R as a work around. See <code><a href="../reference/restartR.html">?restartR</a></code> for instructions.</li>
 <li>new function <code>newProject</code> to initialize a SpaDES project with subdirectories <code>cache/</code>, <code>inputs/</code>, <code>modules/</code>, and <code>outputs/</code>, and <code><a href="../reference/setPaths.html">setPaths()</a></code> accordingly.</li>
 </ul></div>
 <div class="section level3">
@@ -512,17 +538,21 @@
 <h3 id="package-dependencies-0-2-4">package dependencies<a class="anchor" aria-label="anchor" href="#package-dependencies-0-2-4"></a></h3>
 <ul><li>
 <code>archivist</code> and <code>devtools</code> added to Suggests because they are used in vignettes</li>
-<li>minimium <code>reproducible</code> # SpaDES.core 0.2.6</li>
+<li>minimum <code>reproducible</code>
+</li>
 </ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.6" id="spadescore-026-1">SpaDES.core 0.2.6<small>2019-09-13</small><a class="anchor" aria-label="anchor" href="#spadescore-026-1"></a></h2>
 <div class="section level3">
-<h3 id="enhancements-0-2-4">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-2-4"></a></h3>
+<h3 id="enhancements-0-2-6-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-0-2-6-1"></a></h3>
 <ul><li><p>new vignette on caching <code>SpaDES</code> simulations moved from <code>SpaDES</code> package.</p></li>
 <li>
 <p><code>simList</code> environment now has <code><a href="https://rdrr.io/r/base/environment.html" class="external-link">emptyenv()</a></code> as its <code>parent.env</code>. The biggest user-facing changes are:</p>
 <ul><li>functions placed in the <code>envir(sim)</code> (unusual, but may occur) won’t find objects in the <code>.GlobalEnv</code>;</li>
 <li>lighter memory footprint, as functions take RAM due to the objects in the <code>parent.env</code> in which they are defined (little know fact identified here: <a href="http://adv-r.had.co.nz/memory.html#gc" class="external-link uri">http://adv-r.had.co.nz/memory.html#gc</a> identified as a possible source of memory leaks).</li>
 </ul></li>
-<li><p>module’s function environment in the simList now has its parent <code>asNamespace("SpaDES.core")</code> instead of the <code>envir(sim)</code> (as mentioned above), i.e,. <code>parent.env(sim[[currentModule(sim)]])</code> is <code>asNamespace("SpaDES.core")</code>. The main user-noticeable changes of this are that module functions will not accidentally find objects in the <code>simList</code> unless they are actually passed in explicitly as arguments.</p></li>
+<li><p>module’s function environment in the <code>simList</code> now has its parent <code>asNamespace("SpaDES.core")</code> instead of the <code>envir(sim)</code> (as mentioned above), i.e,. <code>parent.env(sim[[currentModule(sim)]])</code> is <code>asNamespace("SpaDES.core")</code>. The main user-noticeable changes of this are that module functions will not accidentally find objects in the <code>simList</code> unless they are actually passed in explicitly as arguments.</p></li>
 <li><p>New active binding, <code>mod</code> that works as a module-specific variable, similar to a private object, <em>i.e.</em>, <code>mod$a</code> is a local object inside the module that persists across events. It is a pointer to <code>sim[[currentModule(sim)]]$a</code></p></li>
 <li><p>New function <code>scheduleConditionalEvent</code>, which allows an event to be scheduled based on a condition. Still experimental.</p></li>
 <li><p>An experimental new function and feature, <code>objectSynonyms</code>, which will create active bindings of two names to a single object</p></li>
@@ -531,11 +561,11 @@
 <li><p><code>simInit</code> and <code>spades</code> now call <code>setPaths(paths)</code> or <code>setPaths(sim$paths)</code>, unsetting them <code>on.exit</code> internally to make the paths used for functions e.g., <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> to use the correct path</p></li>
 <li><p>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</p></li>
 <li><p>improved default path settings in <code>.inputObjects</code> (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/83" class="external-link">#83</a>)</p></li>
-<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on simList objects)</p></li>
+<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on <code>simList</code> objects)</p></li>
 <li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-0-2-4">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-4"></a></h3>
+<h3 id="bug-fixes-0-2-6-1">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-6-1"></a></h3>
 <ul><li>fix to work with latest <code>data.table</code> v1.12.0 (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/85" class="external-link">#85</a>, <a href="https://github.com/mattdowle" class="external-link">@mattdowle</a>)</li>
 <li>several minor, including to <code>Copy</code> (error existed because function inheritance persisted even though the location of the function was moved)</li>
 </ul></div>
@@ -554,7 +584,7 @@
 <li>
 <code>debug</code> arg in <code>spades</code> call can now take numeric, currently 1 or 2, giving a few pre-packaged informative messaging each event</li>
 <li>new function <code>elapsedTime</code> which gives a summary of the clock time used by each module or event</li>
-<li>most metadata entries now have accessor of same name, e.g., inputObjects(sim) returns the inputObjects data.frame.</li>
+<li>most metadata entries now have accessor of same name, e.g., <code>inputObjects(sim)</code> returns the <code>inputObjects</code> data.frame.</li>
 <li>new function <code>citation</code> replaces <code><a href="https://rdrr.io/r/utils/citation.html" class="external-link">utils::citation</a></code> with an S4 generic. If <code>package</code> arg is a <code>character</code>, it dispatches <code><a href="https://rdrr.io/r/utils/citation.html" class="external-link">utils::citation</a></code>; if a <code>simList</code>, it gives the citation for the module(s)</li>
 <li>improved messaging when GLPK not installed (<em>e.g.</em>, on macOS)</li>
 <li>
@@ -566,7 +596,7 @@
 <ul><li>resolved <code>.inputObjects()</code> name conflict (internal <code>.inputObjects</code> renamed to <code>._inputObjectsDF</code>; <code>.outputObjects</code> renamed to <code>._outputObjectsDF</code>)</li>
 <li>module <code>.inputObjects</code> evaluated based on module load order (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/72" class="external-link">#72</a>)</li>
 <li>
-<code>.robustDigest</code> fix for simLists – needed to omit <code>._startClockTime</code> and <code>.timestamp</code>
+<code>.robustDigest</code> fix for <code>simList</code> objects – needed to omit <code>._startClockTime</code> and <code>.timestamp</code>
 </li>
 </ul></div>
 </div>
@@ -633,7 +663,7 @@
 <li><p>option <code>spades.debug</code> set to <code>TRUE</code> by default, instead of <code>FALSE</code>. This is better for new users.</p></li>
 <li><p><code>moduleMetadata</code> argument order changed, so <code>sim</code> is first, more consistent with all other <code>simList</code> accessors.</p></li>
 <li><p><code>downloadData</code> has changed dramatically, now it is a wrapper around <code><a href="https://reproducible.predictiveecology.org/reference/prepInputs.html" class="external-link">reproducible::prepInputs</a></code> which does more checking.</p></li>
-<li><p><code>extractURL</code> will extract the sourceURL from metadata, given an object name.</p></li>
+<li><p><code>extractURL</code> will extract the <code>sourceURL</code> from metadata, given an object name.</p></li>
 <li><p><code>makeMemoiseable</code> and <code>unmakeMemoisable</code>, new methods, each the inverse of the other, to deal with imperfect memoised returns under some cases of <code>simList</code>.</p></li>
 <li><p>new option, <code>spades.keepCompleted</code>, <code>TRUE</code> by default, which can be useful for dramatically speeding up the DES when there are many (&gt;10,000) events.</p></li>
 </ul></div>
@@ -662,7 +692,7 @@
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.1" id="spadescore-011">SpaDES.core 0.1.1<small>2018-01-29</small><a class="anchor" aria-label="anchor" href="#spadescore-011"></a></h2>
-<ul><li><p>uses <code>reproducible::Require</code> instead of <code><a href="../reference/loadPackages.html">SpaDES.core::loadPackages</a></code> to load required packages. Currently, does not use # SpaDES.core control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a github package, e.g,. <code>achubaty/amc@development</code></p></li>
+<ul><li><p>uses <code>reproducible::Require</code> instead of <code><a href="../reference/deprecated.html">SpaDES.core::loadPackages</a></code> to load required packages. Currently, does not use SpaDES.core control for packages, but does use installing (from CRAN or GitHub), and loading (via require). This means a module can indicate a GitHub package, e.g,. <code>achubaty/amc@development</code></p></li>
 <li>
 <p>environments in modules are now as follows:</p>
 <ul><li>Functions defined in a module are sourced into an environment located here: <code>sim@.envir$&lt;moduleName&gt;</code>, and it is a is a child of <code>sim@.envir</code>. Functions can be found in this environment, but prefixing functions is not necessary, because modules functions are within this environment already.</li>
@@ -678,7 +708,7 @@
 </ul></li>
 <li>
 <p>speed improvements:</p>
-<ul><li>the core DES is now built around lists, rather than <code>data.table</code> objects. For small objects (e.g., the eventQueue) that have fewer than 200 objects, lists are faster. Accessors (e.g., <code>events(sim)</code>, <code>completed(sim)</code>) of the event queues still show <code>data.table</code> objects, but these are made on the fly.</li>
+<ul><li>the core DES is now built around lists, rather than <code>data.table</code> objects. For small objects (e.g., the event queue) that have fewer than 200 objects, lists are faster. Accessors (e.g., <code>events(sim)</code>, <code>completed(sim)</code>) of the event queues still show <code>data.table</code> objects, but these are made on the fly.</li>
 <li>
 <code>.parseModule</code> and <code>.parseModuePartial</code> now put their parsed content into a temporary environment (<code>sim@.envir$.parsedFiles$&lt;Full Filename&gt;)</code> during the <code>simInit</code>, which gets re-used. Previously, files were parsed multiple times in a given <code>simInit</code> call. Several functions now have <code>envir</code> argument to pass this through (including <code>module# SpaDES.core</code>, <code>packages</code>, <code>checkParams</code>)</li>
 </ul></li>
@@ -693,9 +723,9 @@
 <li>
 <p>bug fixes:</p>
 <ul><li>in <code>zipModule</code> that omitted the checksum file from being included when <code>data = FALSE</code> (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/3" class="external-link">#3</a>)</li>
-<li>caching of <code>.inputObjects</code> functions was evaluating outputObjects instead of inputObjects. Now corrected.</li>
+<li>caching of <code>.inputObjects</code> functions was evaluating <code>outputObjects</code> instead of <code>inputObjects</code>. Now corrected.</li>
 </ul></li>
-<li><p>If <code>.inputObjects</code> contains arguments other than just sim, these will be evaluated as function inputs by the Cache mechanism (via .useCache), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in <code>asPath</code>, then any change to the underlying file will cause a re-cache. e.g., <code>.inputObjects &lt;- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }</code></p></li>
+<li><p>If <code>.inputObjects</code> contains arguments other than just <code>sim</code>, these will be evaluated as function inputs by the Cache mechanism (via <code>.useCache</code>), therefore correctly assessing when those inputs changed, e.g., if they are files and the arg is wrapped in <code>asPath</code>, then any change to the underlying file will cause a re-cache. e.g., <code>.inputObjects &lt;- function(sim, importantFile = asPath(file.path(inputPath(sim), "theFile.rdata"))) { ... }</code></p></li>
 <li><p>default <code>debug</code> option in <code><a href="../reference/spades.html">spades()</a></code> now uses the package option <code>spades.debug</code> and default is set to <code>FALSE</code> (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/5" class="external-link">#5</a>)</p></li>
 <li><p>various other speed improvements and bug fixes</p></li>
 <li><p>convert <code>P</code> to a function, rather than S4 generic and method, for speed.</p></li>
@@ -703,7 +733,7 @@
 <li><p>new function <code>remoteFileSize</code> to check the size of remote files</p></li>
 <li><p>new namespaced function <code>dataPath</code> will return <code>file.path(modulePath(sim), currentModule(sim), "data")</code>, which will return a different path, depending on which module it is placed inside.</p></li>
 <li><p>add crayon to imports – now messages are more colour coded</p></li>
-<li><p>bug fix in ‘inputs’ for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same simList object</p></li>
+<li><p>bug fix in ‘inputs’ for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same <code>simList</code> object</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="spadescore-010">SpaDES.core 0.1.0<small>2017-08-30</small><a class="anchor" aria-label="anchor" href="#spadescore-010"></a></h2>

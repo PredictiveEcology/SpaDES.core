@@ -94,6 +94,9 @@
     <loc>https://spades-core.predictiveecology.org/reference/checksums.html</loc>
   </url>
   <url>
+    <loc>https://spades-core.predictiveecology.org/reference/citation.html</loc>
+  </url>
+  <url>
     <loc>https://spades-core.predictiveecology.org/reference/classFilter.html</loc>
   </url>
   <url>
@@ -110,6 +113,9 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/createsOutput.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org/reference/dealWithClass.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/defineEvent.html</loc>
@@ -140,6 +146,9 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/dot-cleanPkgs.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org/reference/dot-findObjects.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/dot-guessPkgFun.html</loc>
@@ -187,9 +196,6 @@
     <loc>https://spades-core.predictiveecology.org/reference/findModuleName.html</loc>
   </url>
   <url>
-    <loc>https://spades-core.predictiveecology.org/reference/findObjects.html</loc>
-  </url>
-  <url>
     <loc>https://spades-core.predictiveecology.org/reference/findSimList.html</loc>
   </url>
   <url>
@@ -227,9 +233,6 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/loadFiles.html</loc>
-  </url>
-  <url>
-    <loc>https://spades-core.predictiveecology.org/reference/loadPackages.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/loadSimList.html</loc>
@@ -412,7 +415,7 @@
     <loc>https://spades-core.predictiveecology.org/reference/simInit.html</loc>
   </url>
   <url>
-    <loc>https://spades-core.predictiveecology.org/reference/simInitAnd.html</loc>
+    <loc>https://spades-core.predictiveecology.org/reference/simInitAndSpades.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/simList-accessors-envir.html</loc>
@@ -452,6 +455,9 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/spadesTime.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org/reference/sub-simList-character-ANY-method.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/suppliedElsewhere.html</loc>

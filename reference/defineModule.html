@@ -25,7 +25,7 @@ values set to defaults"><!-- mathjax --><script src="https://cdnjs.cloudflare.co
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -94,8 +94,7 @@ values set to defaults</p>
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>sim</dt>
-<dd><p>A <code>simList</code> object from which to extract element(s) or
-in which to replace element(s).</p></dd>
+<dd><p>A <code>simList</code> object from which to extract element(s) or in which to replace element(s).</p></dd>
 
 
 <dt>x</dt>
@@ -133,9 +132,9 @@ if a character or numeric are supplied).
 The module developer should update manually this with each change
 that is made to the module. See <a href="https://semver.org/" class="external-link">https://semver.org/</a>
 for a widely accepted standard for version numbering.</td></tr><tr><td><code>spatialExtent</code></td><td>The spatial extent of the module supplied via
-<code><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">raster::extent</a></code>. This is currently unimplemented.
+<code><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">terra::ext</a></code>. This is currently unimplemented.
 Once implemented, this should define what spatial region this
-module is scientifically reasonable to be used in.</td></tr><tr><td><code>timeframe</code></td><td>Vector (length 2) of POSIXt dates specifying the temporal extent
+module is scientifically reasonable to be used in.</td></tr><tr><td><code>timeframe</code></td><td>Vector (length 2) of <code>POSIXt</code> dates specifying the temporal extent
 of the module. Currently unimplemented.
 Once implemented, this should define what time frame this
 module is scientifically reasonable to be used for.</td></tr><tr><td><code>timeunit</code></td><td>Time scale of the module (e.g., "day", "year"). If this is
@@ -150,13 +149,23 @@ Alternatively, a list of filenames of <code>.bib</code> or similar files.
 This is currently not parsed by SpaDES;
 it is for human readers only.</td></tr><tr><td><code>documentation</code></td><td>List of filenames referring to module documentation sources.
 This is currently not parsed by SpaDES;
-it is for human readers only.</td></tr><tr><td></td><td><code>reqdPkgs</code></td></tr><tr><td>List of R package names required by the module. These
+it is for human readers only.</td></tr><tr><td><code>loadOrder</code></td><td>Named list of length 0, 1, or 2, with names being <code>after</code> and <code>before</code>.
+Each element should be a character string/vector naming 1 or more
+modules that will be loaded <code>after</code> or <code>before</code> this module.
+<code>after</code> and <code>before</code> are used from the current module's
+perspective. So, <code>list(after = c("Biomass_core"))</code> means that
+this module must come <em>after</em> <code>"Biomass_core"</code>. This should only
+be used when there are cyclic dependencies (2 or more modules
+have 1 or more objects that is in both <code>inputObjects</code> and
+<code>outputObjects</code> of both/all modules) between this module
+and other modules. In cases where the dependencies are not cyclic,
+SpaDES is able to resolve the order correctly.</td></tr><tr><td><code>reqdPkgs</code></td><td>List of R package names required by the module. These
 packages will be loaded when <code>simInit</code> is called.
 <code><a href="https://Require.predictiveecology.org/reference/Require.html" class="external-link">Require::Require()</a></code> will be used internally
 to load if available, and install if not available.
 Because <code><a href="https://Require.predictiveecology.org/reference/Require.html" class="external-link">Require::Require()</a></code> can also download from
 GitHub.com, these packages can specify package names stored
-on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td><td><code>parameters</code></td></tr><tr><td>A data.frame specifying the parameters used in the module.
+on GitHub, e.g., <code>"PredictiveEcology/SpaDES.core@development"</code>.</td></tr><tr><td><code>parameters</code></td><td>A data.frame specifying the parameters used in the module.
 Usually produced by <code>rbind</code>-ing the outputs of multiple
 <code><a href="defineParameter.html">defineParameter()</a></code> calls. These parameters indicate
 the default values that will be used unless a module user
@@ -164,14 +173,14 @@ overrides them with the <code>params</code> argument in the
 <code><a href="simInit.html">simInit()</a></code> call. The minimum and maximum are
 currently used by the <code>SpaDES.shiny::shine</code> function and the
 <code>POM</code> function, and they should indicate the range
-of values that are reasonable scientifically.</td><td><code>inputObjects</code></td></tr><tr><td>A <code>data.frame</code> specifying the data objects expected as
+of values that are reasonable scientifically.</td></tr><tr><td><code>inputObjects</code></td><td>A <code>data.frame</code> specifying the data objects expected as
 inputs to the module,
 with columns <code>objectName</code> (class <code>character</code>),
 <code>objectClass</code> (class <code>character</code>),
 <code>sourceURL</code> (class <code>character</code>), and <code>other</code>
 (currently spades does nothing with this column).
 This data.frame identifies the objects that are expected,
-but does not do any loading of that object into the simList.
+but does not do any loading of that object into the <code>simList</code>.
 The <code>sourceURL</code> gives the developer the opportunity
 to identify the source of a data file that can be used
 with the model. This URL will be
@@ -183,17 +192,17 @@ function will be run during the <code>simInit</code> call. The
 developer should ensure that if the object is supplied
 by the module user as an argument in the <code>simInit</code>, then
 the <code>.inputObjects</code> should not be run, i.e., use an
-<code>(is.null(sim$xxx)))</code>.</td><td><code>outputObjects</code></td></tr><tr><td>A <code>data.frame</code> specifying the data objects output by
+<code>(is.null(sim$xxx)))</code>.</td></tr><tr><td><code>outputObjects</code></td><td>A <code>data.frame</code> specifying the data objects output by
 the module, with columns identical to those in
 <code>inputObjects</code>. Like <code>inputObjects</code> above,
 this only identifies the objects that this module will output
 into the <code>simList</code>.
 The module developer must create the necessary functions
 that will cause these objects to be put into the
-<code>simList</code>.</td><td></td></tr></table></div>
+<code>simList</code>.</td></tr></table></div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p>moduleDefaults <code><a href="defineEvent.html">defineEvent()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="moduleDefaults.html">moduleDefaults()</a></code>, <code><a href="defineEvent.html">defineEvent()</a></code></p></div>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -202,13 +211,19 @@ that will cause these objects to be put into the
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span>  <span class="co">## a default version of the defineModule is created with a call to newModule</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="newModule.html">newModule</a></span><span class="op">(</span><span class="st">"test"</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp5bqwIr</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in </span><span style="color: #BBBB00;">test.R</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in </span><span style="color: #BBBB00;">tests/</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in </span><span style="color: #BBBB00;">test.Rmd</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing </span><span style="color: #BBBB00;">citation.bib</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see </span><span style="color: #BBBB00;">LICENSE.md</span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">## view the resulting module file</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/file.edit.html" class="external-link">file.edit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"test"</span>, <span class="st">"test.R"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

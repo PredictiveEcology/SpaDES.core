@@ -26,7 +26,7 @@ and optionally has desired attributes."><!-- mathjax --><script src="https://cdn
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -88,19 +88,13 @@ and optionally has desired attributes.</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, <span class="va">name</span>, <span class="va">object</span>, <span class="va">layer</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,missing,Raster,character</span></span>
+<span><span class="co"># S4 method for simList,ANY,ANY</span></span>
 <span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, <span class="va">name</span>, <span class="va">object</span>, <span class="va">layer</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,missing,ANY,missing</span></span>
+<span><span class="co"># S4 method for simList,character,missing</span></span>
 <span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, <span class="va">name</span>, <span class="va">object</span>, <span class="va">layer</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,character,missing,missing</span></span>
-<span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, <span class="va">name</span>, <span class="va">object</span>, <span class="va">layer</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for simList,character,missing,character</span></span>
-<span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, <span class="va">name</span>, <span class="va">object</span>, <span class="va">layer</span>, <span class="va">...</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for missing,ANY,missing,ANY</span></span>
+<span><span class="co"># S4 method for missing,ANY,ANY</span></span>
 <span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, <span class="va">name</span>, <span class="va">object</span>, <span class="va">layer</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -143,6 +137,39 @@ because it will fail if the object does not exist.</p></dd>
     <p>Alex Chubaty and Eliot McIntire</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp5bqwIr/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp5bqwIr/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp5bqwIr/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp5bqwIr/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp5bqwIr/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-in"><span><span class="va">sim</span><span class="op">$</span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span><span class="va">sim</span><span class="op">$</span><span class="va">b</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>d <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sim</span><span class="op">$</span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">0</span>,<span class="fl">2</span><span class="op">)</span>, res <span class="op">=</span> <span class="fl">1</span>, vals <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">sim</span><span class="op">$</span><span class="va">s</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">r</span>, <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">2</span>,<span class="fl">0</span>,<span class="fl">2</span><span class="op">)</span>, res <span class="op">=</span> <span class="fl">1</span>, vals <span class="op">=</span> <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sim</span><span class="op">$</span><span class="va">s</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"r1"</span>, <span class="st">"r2"</span><span class="op">)</span> <span class="co"># give layer names</span></span></span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, name <span class="op">=</span> <span class="st">"a"</span><span class="op">)</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, name <span class="op">=</span> <span class="st">"b"</span>, layer <span class="op">=</span> <span class="st">"d"</span><span class="op">)</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, name <span class="op">=</span> <span class="st">"d"</span><span class="op">)</span><span class="op">)</span> <span class="co"># FALSE</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> object does not exist.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, name <span class="op">=</span> <span class="st">"r"</span><span class="op">)</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, object <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">s</span><span class="op">)</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="op">(</span><span class="fu">checkObject</span><span class="op">(</span><span class="va">sim</span>, object <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">s</span>, layer <span class="op">=</span> <span class="st">"r1"</span><span class="op">)</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

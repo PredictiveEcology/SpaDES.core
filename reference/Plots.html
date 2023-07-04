@@ -36,7 +36,7 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -182,6 +182,12 @@ e.g., plotting a <code>RasterLayer</code>.</p></dd>
 <dd><p>Anything needed by <code>fn</code>, all named.</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>Called for its side effect of plot creation.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     
@@ -221,56 +227,75 @@ the file(s) that is/are saved will be appended to the <code>outputs</code> slot 
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span><span class="co"># Note: if this is used inside a SpaDES module, do not define this</span></span></span>
-<span class="r-in"><span><span class="co">#  function inside another function. Put it outside in a normal</span></span></span>
-<span class="r-in"><span><span class="co">#  module script. Otherwise, it will cause a memory leak.</span></span></span>
-<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://ggplot2.tidyverse.org" class="external-link">"ggplot2"</a></span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"please install ggplot2"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: ggplot2</span>
-<span class="r-in"><span><span class="va">fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">d</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span>  <span class="co"># Note: if this is used inside a SpaDES module, do not define this</span></span></span>
+<span class="r-in"><span>  <span class="co">#  function inside another function. Put it outside in a normal</span></span></span>
+<span class="r-in"><span>  <span class="co">#  module script. Otherwise, it will cause a memory leak.</span></span></span>
+<span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggplot2"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="va">fn</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">d</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">d</span>, <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>      <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_histogram.html" class="external-link">geom_histogram</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="va">sim</span><span class="op">$</span><span class="va">something</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="fu">Plots</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">something</span>, fn <span class="op">=</span> <span class="va">fn</span>,</span></span>
+<span class="r-in"><span>          types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"png"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          .plotInitialTime <span class="op">=</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span>          <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># plot to active device and to png</span></span></span>
+<span class="r-in"><span>    <span class="fu">Plots</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">something</span>, fn <span class="op">=</span> <span class="va">fn</span>,</span></span>
+<span class="r-in"><span>          types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"png"</span>, <span class="st">"screen"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          .plotInitialTime <span class="op">=</span> <span class="fl">1</span></span></span>
+<span class="r-in"><span>          <span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># Can also be used like quickPlot::Plot, but with control over output type</span></span></span>
+<span class="r-in"><span>    <span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span>,<span class="fl">0</span>,<span class="fl">10</span><span class="op">)</span>, vals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, size <span class="op">=</span> <span class="fl">100</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="fu">Plots</span><span class="op">(</span><span class="va">r</span>, types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"screen"</span>, <span class="st">"png"</span><span class="op">)</span>, deviceArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">700</span>, height <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>          usePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="co"># with ggplotify, Plots can also be used to plot/save</span></span></span>
+<span class="r-in"><span>    <span class="co"># non-ggplot objects:</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>    <span class="kw">if</span> <span class="op">(</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://github.com/GuangchuangYu/ggplotify" class="external-link">"ggplotify"</a></span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>      <span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">require</a></span><span class="op">(</span><span class="st"><a href="https://lattice.r-forge.r-project.org/" class="external-link">"lattice"</a></span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"please install lattice"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>      <span class="va">plotFile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>      <span class="va">p1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/lattice/man/histogram.html" class="external-link">densityplot</a></span><span class="op">(</span><span class="op">~</span><span class="va">mpg</span><span class="op">|</span><span class="va">cyl</span>, data<span class="op">=</span><span class="va">mtcars</span><span class="op">)</span></span></span>
+<span class="r-in"><span>      <span class="fu">Plots</span><span class="op">(</span>data <span class="op">=</span> <span class="va">p1</span>, fn <span class="op">=</span> <span class="va">as.ggplot</span>, filename <span class="op">=</span> <span class="va">plotFile</span>,</span></span>
+<span class="r-in"><span>            ggsaveArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">5</span>, height <span class="op">=</span> <span class="fl">4</span>, dpi <span class="op">=</span> <span class="fl">300</span>, bg <span class="op">=</span> <span class="st">"white"</span>, units <span class="op">=</span> <span class="st">"in"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>            types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"screen"</span>, <span class="st">"png"</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">}</span></span></span>
+<span class="r-in"><span>  <span class="op">}</span> <span class="co"># end ggplot</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: ggplot2</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmppEYNhs/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmppEYNhs/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmppEYNhs/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmppEYNhs/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmppEYNhs/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp5bqwIr/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp5bqwIr/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp5bqwIr/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp5bqwIr/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp5bqwIr/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-in"><span><span class="va">sim</span><span class="op">$</span><span class="va">something</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>a <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">Plots</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">something</span>, fn <span class="op">=</span> <span class="va">fn</span>,</span></span>
-<span class="r-in"><span>      types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"png"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      .plotInitialTime <span class="op">=</span> <span class="fl">1</span></span></span>
-<span class="r-in"><span>      <span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmppEYNhs/file22977d3f7348.png</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># plot to active device and to png</span></span></span>
-<span class="r-in"><span><span class="fu">Plots</span><span class="op">(</span>data <span class="op">=</span> <span class="va">sim</span><span class="op">$</span><span class="va">something</span>, fn <span class="op">=</span> <span class="va">fn</span>,</span></span>
-<span class="r-in"><span>      types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"png"</span>, <span class="st">"screen"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="st">"figures"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      filename <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      .plotInitialTime <span class="op">=</span> <span class="fl">1</span></span></span>
-<span class="r-in"><span>      <span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp5bqwIr/file90b7216eefb8.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmppEYNhs/file2297a2d7208.png</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Can also be used like quickPlot::Plot, but with control over output type</span></span></span>
-<span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/raster.html" class="external-link">raster</a></span><span class="op">(</span><span class="fu">raster</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/raster/man/extent.html" class="external-link">extent</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">10</span>,<span class="fl">0</span>,<span class="fl">10</span><span class="op">)</span>, vals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, size <span class="op">=</span> <span class="fl">100</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">Plots</span><span class="op">(</span><span class="va">r</span>, types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"screen"</span>, <span class="st">"png"</span><span class="op">)</span>, deviceArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>width <span class="op">=</span> <span class="fl">700</span>, height <span class="op">=</span> <span class="fl">500</span><span class="op">)</span>, usePlot <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmppEYNhs/file22973ccfcc48.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp5bqwIr/file90b77acb4a02.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp5bqwIr/file90b75c48c69b.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: ggplotify</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: lattice</span>
 <span class="r-plt img"><img src="Plots-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp5bqwIr/file90b7b4c89fb.png</span>
+<span class="r-plt img"><img src="Plots-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># } # end of dontrun</span></span></span>
 </code></pre></div>
     </div>

@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -94,15 +94,13 @@
 
 
 <dt>modules</dt>
-<dd><p>Character vector, specifying the name or
-vector of names of module(s)</p></dd>
+<dd><p>Character vector, specifying the name or vector of names of module(s)</p></dd>
 
 
 <dt>paths</dt>
-<dd><p>Character vector, specifying the name or
-vector of names of paths(s) for those modules. If path not specified,
-it will be taken from getOption("spades.modulePath"), which is set
-with <code>setPaths</code>)</p></dd>
+<dd><p>Character vector, specifying the name or vector of names of paths(s) for
+those modules. If path not specified, it will be taken from
+<code>getOption("spades.modulePath")</code>, which is set with <code><a href="setPaths.html">setPaths()</a></code>)</p></dd>
 
 
 <dt>filenames</dt>
@@ -114,15 +112,14 @@ combined path &amp; module. If this is specified, then <code>modules</code> and
 <dt>envir</dt>
 <dd><p>Optional environment in which to store parsed code. This may be
 useful if the same file is being parsed multiple times. This
-function will check in that envir for the parsed file before
-parsing again. If the <code>envir</code> is transient, then this will
-have no effect.</p></dd>
+function will check in that environment for the parsed file before
+parsing again. If the <code>envir</code> is transient, then this will have no effect.</p></dd>
 
 
 <dt>clean</dt>
 <dd><p>Optional logical. If <code>TRUE</code>, it will scrub any references to
-github repositories, e.g., "PredictiveEcology/reproducible" will be
-returned as "reproducible"</p></dd>
+GitHub repositories, e.g., "PredictiveEcology/reproducible" will be
+returned as "reproducible".</p></dd>
 
 
 <dt>...</dt>
@@ -139,7 +136,7 @@ returned as "reproducible"</p></dd>
     <h2>See also</h2>
     <div class="dont-index"><p>Other functions to access elements of a 'simList' object: 
 <code><a href="addDepends.html">.addDepends</a>()</code>,
-<code><a href="checkpoint.html">doEvent.checkpoint</a>()</code>,
+<code><a href="checkpoint.html">checkpointFile</a>()</code>,
 <code><a href="simList-accessors-envir.html">envir</a>()</code>,
 <code><a href="simList-accessors-events.html">events</a>()</code>,
 <code><a href="globals.html">globals</a>()</code>,

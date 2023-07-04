@@ -35,7 +35,7 @@ attr(time, "unit"), then it simply returns input time.'><!-- mathjax --><script 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -156,7 +156,7 @@ input numeric. See Details.</p></dd>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Because of R scoping, if <code>envir</code> is a simList environment, then
+    <p>Because of R scoping, if <code>envir</code> is a <code>simList</code> environment, then
 this function will search there first, then up the current <code><a href="https://rdrr.io/r/base/search.html" class="external-link">search()</a></code> path.
 Thus, it will find a user defined or module defined unit before a SpaDES unit.
 This means that a user can override the <code>dyear</code> given in SpaDES, for example,

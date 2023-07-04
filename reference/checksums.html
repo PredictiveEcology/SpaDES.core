@@ -27,7 +27,7 @@ wrapper around digest::digest."><!-- mathjax --><script src="https://cdnjs.cloud
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -122,7 +122,7 @@ because of differences in the checksum hash values on Windows and Unix-like
 platforms. Recent versions use a different (faster) algorithm and only require
 one checksum value per file.
 To update your <code class="file">CHECKSUMS.txt</code> files using the new algorithm:</p><ol><li><p>specify your module (<code>moduleName &lt;- "my_module"</code>);</p></li>
-<li><p>use a temp dir to ensure all modules get fresh copies of the data
+<li><p>use a temporary location to ensure all modules get fresh copies of the data
 (<code>tmpdir &lt;- file.path(tempdir(), "SpaDES_modules")</code>);</p></li>
 <li><p>download your module's data to the temp dir (<code>downloadData(moduleName, tmpdir)</code>);</p></li>
 <li><p>initialize a dummy simulation to ensure any 'data prep' steps in the

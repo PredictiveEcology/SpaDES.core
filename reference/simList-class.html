@@ -25,7 +25,7 @@ Various slot accessor methods (i.e., get and set functions) are provided
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -193,9 +193,8 @@ categorized into separate help pages:</p><table class="table table"><tr><td><cod
     
 
 
-<p>The main event list is a sorted data.table (keyed) on eventTime, and eventPriority.
-The completed event list is an ordered list in the exact order that the events
-were executed.
+<p>The main event list is a sorted <code>data.table</code> (keyed) on <code>eventTime</code>, and <code>eventPriority.</code>
+The completed event list is an ordered list in the exact order that the events were executed.
 Each event is represented by a <code>data.table()</code> row consisting of:</p><table class="table table"><tr><td><code>eventTime</code></td><td>The time the event is to occur.</td></tr><tr><td><code>moduleName</code></td><td>The module from which the event is taken.</td></tr><tr><td><code>eventType</code></td><td>A character string for the programmer-defined event type.</td></tr><tr><td><code>eventPriority</code></td><td>The priority given to the event.</td></tr></table></div>
     <div id="references">
     <h2>References</h2>

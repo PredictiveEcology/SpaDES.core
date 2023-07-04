@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -111,9 +111,8 @@ Default is to use the <code>spades.modulePath</code> option.</p></dd>
 <dt>envir</dt>
 <dd><p>Optional environment in which to store parsed code. This may be
 useful if the same file is being parsed multiple times. This
-function will check in that envir for the parsed file before
-parsing again. If the <code>envir</code> is transient, then this will
-have no effect.</p></dd>
+function will check in that environment for the parsed file before
+parsing again. If the <code>envir</code> is transient, then this will have no effect.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -136,7 +135,7 @@ have no effect.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># using filepath</span></span></span>
 <span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">moduleVersion</span><span class="op">(</span><span class="st">"caribouMovement"</span>, <span class="va">path</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘1.6.0’</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘1.6.1’</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># using simList</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.useRequire"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
@@ -157,22 +156,24 @@ have no effect.</p></dd>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmppEYNhs/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmppEYNhs/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmppEYNhs/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmppEYNhs/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp5bqwIr/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp5bqwIr/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp5bqwIr/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp5bqwIr/SpaDES/outputs'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmppEYNhs/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp5bqwIr/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmppEYNhs/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmp5bqwIr/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">caribouMovement: module code: landscape, caribou are declared in metadata inputObjects, but no default(s) are provided in .inputObjects</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">caribouMovement: inputObjects: habitatQuality is used from sim inside Move, but is not declared in metadata inputObjects</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">caribouMovement: module code: landscape is declared in metadata inputObjects, but is not used in the module</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">caribouMovement: inputObjects: Par$stackName is used from sim inside Init, but is not declared in metadata inputObjects</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">caribouMovement: inputObjects: Par$stackName is used from sim inside Move, but is not declared in metadata inputObjects</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">            module    global</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB0000;">1: caribouMovement stackName</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan12 22:40:02 simInit:       Global parameter(s) not used in any module: burnStats.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘1.6.0’</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>             module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1: caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul04 23:02:52 simInit:       Global parameter(s) not used in any module: burnStats.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘1.6.1’</span>
 </code></pre></div>
     </div>
   </div>

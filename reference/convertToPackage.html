@@ -33,7 +33,7 @@ simInit and spades.'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/a
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -115,20 +115,19 @@ In other words, this should cause no changes to running the module code via
 
 
 <dt>path</dt>
-<dd><p>Character string of modulePath. Defaults to
-<code>getOption("spades.modulePath")</code></p></dd>
+<dd><p>Character string of <code>modulePath</code>. Defaults to  <code>getOption("spades.modulePath")</code>.</p></dd>
 
 
 <dt>buildDocuments</dt>
 <dd><p>A logical. If <code>TRUE</code>, the default, then the documentation
-will be built, if any exists, using <code><a href="https://roxygen2.r-lib.org/reference/roxygenize.html" class="external-link">roxygen2::roxygenise</a></code></p></dd>
+will be built, if any exists, using <code><a href="https://roxygen2.r-lib.org/reference/roxygenize.html" class="external-link">roxygen2::roxygenise</a></code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>This is run for its side effects. There will be a new or modified
+<p>Invoked for its side effects. There will be a new or modified
 <code>DESCRIPTION</code> file in the root directory of the module. Any functions that
 were in the main module script (i.e., the .R file whose filename is the name of
 the module and is in the root directory of the module) will be moved to individual
@@ -142,6 +141,9 @@ build documentation via <code><a href="https://roxygen2.r-lib.org/reference/roxy
 This means that any modifications to source code
 will be read in during the <code>simInit</code> call, as is the practice when a module
 is not a package.</p>
+
+
+<p>invoked for the side effect of converting a module to a package</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -213,6 +215,32 @@ simply use the <code>devtools::install(pathToModuleRoot)</code>. Even if it is i
 <code>spades</code> call will be using the current source code.</p>
     </div>
 
+    <div id="ref-examples">
+    <h2>Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"ggplot2"</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"pkgload"</span><span class="op">)</span> <span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="va">tmpdir</span> <span class="op">&lt;-</span> <span class="fu">tempdir2</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="newModule.html">newModule</a></span><span class="op">(</span><span class="st">"test"</span>, <span class="va">tmpdir</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">convertToPackage</span><span class="op">(</span><span class="st">"test"</span>, path <span class="op">=</span> <span class="va">tmpdir</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">pkgload</span><span class="fu">::</span><span class="fu"><a href="https://pkgload.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tmpdir</span>, <span class="st">"test"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">pkgload</span><span class="fu">::</span><span class="fu"><a href="https://pkgload.r-lib.org/reference/unload.html" class="external-link">unload</a></span><span class="op">(</span><span class="st">"test"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp5bqwIr/reproducible/pJI462RQ</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in </span><span style="color: #BBBB00;">test.R</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in </span><span style="color: #BBBB00;">tests/</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in </span><span style="color: #BBBB00;">test.Rmd</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing </span><span style="color: #BBBB00;">citation.bib</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see </span><span style="color: #BBBB00;">LICENSE.md</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> New/updated DESCRIPTION file is: /tmp/Rtmp5bqwIr/reproducible/pJI462RQ/test/DESCRIPTION</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Building documentation</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> First time using roxygen2. Upgrading automatically...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting `RoxygenNote` to "7.2.3"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Loading <span style="color: #0000BB;">test</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing <span style="color: #0000BB;">NAMESPACE</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Writing <span style="color: #0000BB;">NAMESPACE</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Loading <span style="color: #0000BB;">test</span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top"><h2 data-toc-skip>Contents</h2>

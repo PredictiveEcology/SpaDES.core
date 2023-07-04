@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -125,15 +125,14 @@
 
 <dt>defineModuleElement</dt>
 <dd><p>Character string indicating which of the list
-elements in defineModule should be extracted</p></dd>
+elements in <code>defineModule</code> should be extracted</p></dd>
 
 
 <dt>envir</dt>
 <dd><p>Optional environment in which to store parsed code. This may be
 useful if the same file is being parsed multiple times. This
-function will check in that envir for the parsed file before
-parsing again. If the <code>envir</code> is transient, then this will
-have no effect.</p></dd>
+function will check in that environment for the parsed file before
+parsing again. If the <code>envir</code> is transient, then this will have no effect.</p></dd>
 
 
 <dt>userSuppliedObjNames</dt>
@@ -145,7 +144,7 @@ then the <code>.inputObjects</code> code will be skipped.</p></dd>
 
 
 <dt>notOlderThan</dt>
-<dd><p>Passed to <code>Cache</code> that may be used for .inputObjects function call.</p></dd>
+<dd><p>Passed to <code>Cache</code> that may be used for <code>.inputObjects</code> function call.</p></dd>
 
 
 <dt>...</dt>

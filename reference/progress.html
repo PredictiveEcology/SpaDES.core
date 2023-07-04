@@ -25,7 +25,7 @@ Second, at the spades() call itself, which can be simpler. See examples."><!-- m
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">1.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
       </span>
     </div>
 
@@ -80,7 +80,7 @@ Second, at the spades() call itself, which can be simpler. See examples."><!-- m
 
     <div class="ref-description">
     <p>The progress bar can be set in two ways in SpaDES. First, by setting values
-in the .progress list element in the params list element passed to <code><a href="simInit.html">simInit()</a></code>.
+in the <code>.progress</code> list element in the params list element passed to <code><a href="simInit.html">simInit()</a></code>.
 Second, at the <code><a href="spades.html">spades()</a></code> call itself, which can be simpler. See examples.</p>
     </div>
 
@@ -109,14 +109,20 @@ Second, at the <code><a href="spades.html">spades()</a></code> call itself, whic
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>sim</dt>
-<dd><p>A <code>simList</code> object from which to extract element(s) or
-in which to replace element(s).</p></dd>
+<dd><p>A <code>simList</code> object from which to extract element(s) or in which to replace element(s).</p></dd>
 
 
 <dt>value</dt>
 <dd><p>The parameter value to be set (in the corresponding <code>module</code> and <code>param</code>).</p></dd>
 
 </dl></div>
+    <div id="value">
+    <h2>Value</h2>
+    
+
+<p>for <code>progressInterval</code>, a numeric corresponding to the progress update interval;
+for <code>progressInterval&lt;-</code>, an updated <code>simList</code> object.</p>
+    </div>
     <div id="details">
     <h2>Details</h2>
     <p>Progress Bar:
@@ -130,7 +136,7 @@ See examples.</p>
     <h2>See also</h2>
     <div class="dont-index"><p>Other functions to access elements of a 'simList' object: 
 <code><a href="addDepends.html">.addDepends</a>()</code>,
-<code><a href="checkpoint.html">doEvent.checkpoint</a>()</code>,
+<code><a href="checkpoint.html">checkpointFile</a>()</code>,
 <code><a href="simList-accessors-envir.html">envir</a>()</code>,
 <code><a href="simList-accessors-events.html">events</a>()</code>,
 <code><a href="globals.html">globals</a>()</code>,
@@ -145,7 +151,7 @@ See examples.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"SpaDES.tools"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"NLMR"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.moduleCodeChecks"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># not necessary for example</span></span></span>
@@ -172,7 +178,26 @@ See examples.</p>
 <span class="r-in"><span><span class="fu"><a href="checkpoint.html">checkpointInterval</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="co"># 10</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">opts</span><span class="op">)</span> <span class="co"># reset</span></span></span>
-<span class="r-in"><span><span class="op">}</span><span class="op">}</span></span></span>
+<span class="r-in"><span><span class="op">}</span><span class="co"># }</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp5bqwIr/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp5bqwIr/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp5bqwIr/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp5bqwIr/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp5bqwIr/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmp5bqwIr/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>              module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> 1: randomLandscapes stackName</span>
 </code></pre></div>
     </div>
   </div>
