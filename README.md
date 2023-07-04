@@ -10,7 +10,7 @@
 
 Core functionality for Spatial Discrete Event Simulation (SpaDES)
 
-**Website:** [https://SpaDES.PredictiveEcology.org](https://SpaDES.PredictiveEcology.org)
+**Website:** [https://SpaDES-core.PredictiveEcology.org](https://SpaDES-core.PredictiveEcology.org)
 
 **Wiki:** [https://github.com/PredictiveEcology/SpaDES/wiki](https://github.com/PredictiveEcology/SpaDES/wiki)
 
