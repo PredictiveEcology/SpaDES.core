@@ -2827,11 +2827,12 @@ setMethod(
 #'
 #' @keywords internal
 .cleanPkgs <- function(pkgs) {
-  pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
-  pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
-  pkgs <- sub("[[:space:]]*\\(>=.*", "", pkgs)
-
-  return(pkgs)
+  Require::extractPkgName(pkgs)
+  # pkgs <- gsub(".*\\/+(.+)(@.*)",  "\\1", pkgs)
+  # pkgs <- gsub(".*\\/+(.+)",  "\\1", pkgs)
+  # pkgs <- sub("[[:space:]]*\\(>=.*", "", pkgs)
+  #
+  # return(pkgs)
 }
 
 ################################################################################
