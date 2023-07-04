@@ -18,6 +18,15 @@
 #' The following options are likely of interest to most users
 #' \tabular{lcl}{
 #'   *OPTION* \tab *DEFAULT VALUE* \tab *DESCRIPTION* \cr
+#'   `spades.allowInitDuringSimInit` \tab `FALSE`
+#'      \tab New feature as of `SpaDES.core > 1.1.1.9001`; If set to `TRUE`,
+#'      `simInit` will
+#'      evaluate the dependencies in the metadata objects and determine whether
+#'      there are modules whose `init` events can be run safely prior to
+#'      the `.inputObjects` of other modules, i.e., if a module's `expectsInput`
+#'      is not being supplied by any other module's `createsOutput`. \cr
+#'
+#'
 #'   `spades.browserOnError` \tab `FALSE` \tab If `TRUE`, the default, then any
 #'   error rerun the same event with `debugonce` called on it to allow editing
 #'   to be done. When that browser is continued (e.g., with 'c'), then it will save it
@@ -57,7 +66,9 @@
 #'
 #'   `spades.loadReqdPkgs`
 #'      \tab Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
-#'      or `require`. If `FALSE`, no package loading will occur.  \cr
+#'      or `require`. If `FALSE`, no package loading will occur. This will mean that
+#'      modules must prefix every function call from a package with that package name
+#'      with double colon (::).  \cr
 #'
 #'   `spades.lowMemory` \tab `FALSE`
 #'     \tab If true, some functions will use more memory
@@ -81,11 +92,12 @@
 #'   during `simInit`. These are passed to codetools::checkUsage.
 #'   Default is given by the function, plus these: \cr
 #'
-#'   `moduleDocument` \tab  `NULL`
+#'   `spades.moduleDocument` \tab  `TRUE`
 #'     \tab  When a module is an R package e.g., via `convertToPackage`,
-#'     it will not, by default, rebuild documentation during `simInit`.
-#'     If the user would like this to happen on every call to `simInit`,
-#'     set this option to `TRUE` \cr
+#'     it will, by default, rebuild documentation and reparse during `simInit`.
+#'     Since rebuilding documentation (from the roxygen2 tags) can be time consuming,
+#'     a user may wish to prevent this from happening each `simInit` call. If so,
+#'     set this option to `FALSE` \cr
 #'
 #'   `spades.modulePath` \tab `file.path(tempdir(), "SpaDES", "modules")`)
 #'     \tab The default local directory where modules and data will be downloaded and stored.
@@ -122,10 +134,26 @@
 #'   and the differences can be seen in a hidden object in the stashed `simList`.
 #'   There is a message which describes how to find that. \cr
 #'
+#'   `spades.saveFileExtensions` \tab `NULL` \tab
+#'   a `data.frame` with 3 columns, "exts", "fun", and "package" indicating which
+#'   file extension, and which function from which package will be used when
+#'   using the `outputs` mechanism for saving files during a `spades` call. e.g.,
+#'   `options(spades.saveFileExtensions = data.frame(exts = "shp", fun = "st_write",
+#'   package = "sf")`.
+#'   Then specify e.g.,
+#'   `simInit(outputs = data.frame(objectName = "caribou", fun = "st_write", package = "sf"))`
+#'   \cr
+#'
 #'   `spades.scratchPath` \tab `file.path(tempdir(), "SpaDES", "scratch")`)
 #'     \tab The default local directory where transient files from modules and data will written.
 #'     This includes temporary `raster` and `terra` files, as well as SpaDES recovery mode files.
 #'     Default is a temporary directory. \cr
+#'
+#'   `spades.sessionInfo` \tab `TRUE`)
+#'     \tab Assigns the [utils::sessionInfo()] to the `simList` during `simInit` with
+#'     the name `sim$._sessionInfo`. This takes about 75 milliseconds, which may be
+#'     undesireable for some situations where speed is critical. If `FALSE`, then
+#'     this is not assigned to the `simList`.\cr
 #'
 #'   `spades.switchPkgNamespaces` \tab `FALSE` to keep computational
 #'   overhead down. \tab Should the search path be modified
@@ -158,7 +186,9 @@
 #'
 spadesOptions <- function() {
   list( # nolint
+    spades.allowInitDuringSimInit = FALSE,
     spades.browserOnError = FALSE,
+    spades.compressionLevel = 1L,
     #spades.cachePath = reproCachePath,
     spades.debug = 1, # TODO: is this the best default? see discussion in #5
     spades.dotInputObjects = TRUE,
@@ -179,7 +209,7 @@ spadesOptions <- function() {
     ),
     spades.modulePath = file.path(.spadesTempDir(), "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
-    spades.moduleDocument = NULL,
+    spades.moduleDocument = TRUE,
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir(), "outputs"),
     spades.plots = NULL,
@@ -189,8 +219,11 @@ spadesOptions <- function() {
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",
     spades.restartR.restartDir = file.path(.spadesTempDir(), "outputs"),
+    spades.saveFileExtensions = data.frame(exts = character(), fun = character(),
+                                           package = character()),
     spades.saveSimOnExit = TRUE,
     spades.scratchPath = file.path(.spadesTempDir(), "scratch"),
+    spades.sessionInfo = TRUE,
     spades.switchPkgNamespaces = FALSE,
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,

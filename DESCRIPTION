@@ -30,8 +30,8 @@ Authors@R: c(
   )
 Depends:
     R (>= 4.1),
-    quickPlot (>= 0.1.4),
-    reproducible (>= 2.0.2)
+    quickPlot (>= 1.0.2),
+    reproducible (>= 2.0.5)
 Imports:
     crayon,
     data.table (>= 1.11.0),
@@ -39,12 +39,14 @@ Imports:
     lobstr,
     methods,
     qs (>= 0.21.1),
-    raster (>= 2.5-8),
     Require (>= 0.2.6),
     stats,
+    terra,
     utils,
     whisker
 Suggests:
+    archive,
+    CircStats,
     codetools,
     covr,
     DiagrammeR (>= 0.8.2),
@@ -63,17 +65,19 @@ Suggests:
     pkgload,
     png,
     RColorBrewer (>= 1.1-2),
-    rgdal,
+    raster (>= 2.5-8),
     rmarkdown,
     roxygen2,
+    RSQLite,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 1.0.1),
+    SpaDES.tools (>= 2.0.0),
     tcltk,
-    terra,
-    testthat (>= 1.0.2)
+    testthat (>= 1.0.2),
+    withr
 Remotes:
-    ropensci/NLMR
+    ropensci/NLMR,
+    predictiveecology/reproducible@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
@@ -82,12 +86,14 @@ VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
 ByteCompile: yes
 Collate: 
-    'Plots.R'
     'module-dependencies-class.R'
     'misc-methods.R'
     'environment.R'
     'helpers.R'
     'simList-class.R'
+    'times.R'
+    'simList-accessors.R'
+    'Plots.R'
     'cache.R'
     'check.R'
     'priority.R'
@@ -111,8 +117,7 @@ Collate:
     'moduleMetadata.R'
     'objectSynonyms.R'
     'options.R'
-    'times.R'
-    'simList-accessors.R'
+    'paths.R'
     'plotting-diagrams.R'
     'plotting.R'
     'progress.R'

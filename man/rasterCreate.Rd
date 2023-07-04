@@ -7,6 +7,7 @@
 \alias{rasterCreate.RasterLayer}
 \alias{rasterCreate.RasterStack}
 \alias{rasterCreate.Raster}
+\alias{rasterCreate.SpatRaster}
 \title{Simple wrapper to load any \verb{Raster*} object}
 \usage{
 rasterCreate(x, ...)
@@ -20,6 +21,8 @@ rasterCreate(x, ...)
 \method{rasterCreate}{RasterStack}(x, ...)
 
 \method{rasterCreate}{Raster}(x, ...)
+
+\method{rasterCreate}{SpatRaster}(x, ...)
 }
 \arguments{
 \item{x}{An object, notably a \verb{Raster*} object. All others will simply
@@ -47,5 +50,7 @@ allowing a single function to be used to create a new object of the same class a
 
 \item \code{rasterCreate(Raster)}: Uses \code{raster::raster} when one of the other,
 less commonly used \verb{Raster*} classes, e.g., \code{RasterLayerSparse}
+
+\item \code{rasterCreate(SpatRaster)}: Uses \code{terra::rast} when a layer is \code{SpatRast},
 
 }}

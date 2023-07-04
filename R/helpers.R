@@ -105,7 +105,7 @@ setMethod(
 #' @param x  Not used. Should be missing.
 #'
 #' @author Alex Chubaty
-#' @importFrom raster extent
+#' @importFrom terra ext
 #' @include simList-class.R
 #' @keywords internal
 #' @rdname emptyMetadata
@@ -125,7 +125,7 @@ setMethod(
       childModules = moduleDefaults[["childModules"]],
       authors = moduleDefaults[["authors"]],
       version = moduleDefaults[["version"]],
-      spatialExtent = raster::extent(rep(NA_real_, 4)), ## match up with moduleDefaults
+      spatialExtent = terra::ext(rep(0, 4)), ## match up with moduleDefaults
       timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
       timeunit = moduleDefaults[["timeunit"]],
       citation = moduleDefaults[["citation"]],
@@ -151,8 +151,6 @@ setMethod(
 #' @author Eliot McIntire
 #' @importFrom reproducible .grepSysCalls
 #' @keywords internal
-#' @name findObjects
-#' @rdname findObjects
 .findObjects <- function(objects, functionCall = "simInit") {
   scalls <- sys.calls()
   grep1 <- .grepSysCalls(scalls, functionCall)
@@ -288,6 +286,7 @@ all.equal.simList <- function(target, current, ...) {
   objsTarget <- mget(objNamesTarget, envir = envir(target))
   objsCurrent <- mget(objNamesCurrent, envir = envir(current))
   on.exit({
+    # put them back on.exit
     list2env(objsTarget, envir = envir(target))
     list2env(objsCurrent, envir = envir(current))
   })
@@ -300,7 +299,9 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  all.equal.default(target, current, check.environment = FALSE)
+  target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  all.equal.default(target1, current1, check.environment = FALSE)
 }
 
 needInstall <- function(
@@ -312,8 +313,9 @@ needInstall <- function(
   if (!requireNamespace(pkg, quietly = TRUE)) {
     need <- TRUE
   } else {
-    if (isTRUE(packageVersion(pkg) < minVersion))
-      need <- TRUE
+    if (!is.null(minVersion))
+      if (isTRUE(packageVersion(pkg) < minVersion))
+        need <- TRUE
   }
   if (need) {
     stop(messageStart,
@@ -321,6 +323,5 @@ needInstall <- function(
   }
 }
 
-isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 
 .moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))

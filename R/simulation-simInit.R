@@ -181,11 +181,13 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'                     Setting `notOlderThan = Sys.time()` will cause the
 #'                     cached versions of `.inputObjects` to be refreshed,
 #'                     i.e., rerun.
+#' @param ... An alternative way to pass `objects`, i.e., they can just be named
+#'   arguments rather than in a `objects = list(...)`
 #'
 #' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied.
 #'
-#' @seealso [spades()],
+#' @seealso [spades()], [defineModule()] to get help on metadata elements,
 #' [times()], [params()], [objs()], [paths()],
 #' [modules()], [inputs()], [outputs()]
 #'
@@ -234,27 +236,25 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' outSim <- spades(mySim)
 #'
 #' # A little more complicated with inputs and outputs
-#' if (requireNamespace("rgdal", quietly = TRUE)) {
-#'  mapPath <- system.file("maps", package = "quickPlot")
-#'  mySim <- simInit(
-#'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
-#'    params = list(
-#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-#'    ),
-#'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#'                 outputPath = tempdir()),
-#'    inputs = data.frame(
-#'      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-#'      functions = "raster",
-#'      package = "raster",
-#'      loadTime = 1,
-#'      stringsAsFactors = FALSE),
-#'    outputs = data.frame(
-#'      expand.grid(objectName = c("caribou","landscape"),
-#'      saveTime = 1:2,
-#'      stringsAsFactors = FALSE))
-#'  )
+#' mapPath <- system.file("maps", package = "quickPlot")
+#' mySim <- simInit(
+#'   times = list(start = 0.0, end = 2.0, timeunit = "year"),
+#'   params = list(
+#'     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+#'   ),
+#'   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+#'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'                outputPath = tempdir()),
+#'   inputs = data.frame(
+#'     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+#'     functions = "rast",
+#'     package = "terra",
+#'     loadTime = 1,
+#'     stringsAsFactors = FALSE),
+#'   outputs = data.frame(
+#'     expand.grid(objectName = c("caribou","landscape"),
+#'     saveTime = 1:2,
+#'     stringsAsFactors = FALSE)))
 #'
 #'  # Use accessors for inputs, outputs
 #'  mySim2 <- simInit(
@@ -270,8 +270,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'  # add by accessor is equivalent
 #'  inputs(mySim2) <- data.frame(
 #'      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-#'      functions = "raster",
-#'      package = "raster",
+#'      functions = "rast",
+#'      package = "terra",
 #'      loadTime = 1,
 #'      stringsAsFactors = FALSE)
 #'  outputs(mySim2) <- data.frame(
@@ -291,8 +291,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'                 outputPath = tempdir()),
 #'    inputs = data.frame(
 #'      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-#'      functions = "raster",
-#'      package = "raster",
+#'      functions = "rast",
+#'      package = "terra",
 #'      loadTime = 1,
 #'      stringsAsFactors = FALSE),
 #'    outputs = data.frame(
@@ -313,15 +313,15 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'  events(mySim) # load event is at time 1 year
 #'  events(mySim2) # load event is at time 1 month, reported in years because of
 #'                 #   update to times above
-#' }
 #' options(opts)
+#'
 #' }
 #' }
 #'
 setGeneric(
   "simInit",
   function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
-           notOlderThan = NULL) {
+           notOlderThan = NULL, ...) {
     standardGeneric("simInit")
 })
 
@@ -346,7 +346,7 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
 
     opt <- options("encoding" = "UTF-8")
     on.exit(options(opt), add = TRUE)
@@ -355,6 +355,8 @@ setMethod(
       checkPath(p, create = TRUE)
     )
 
+    if (length(...names()))
+      objects <- append(objects, list(...))
     objNames <- names(objects)
     if (length(objNames) != length(objects)) {
       stop(
@@ -379,10 +381,11 @@ setMethod(
     }
 
     # add project/session info -- use list to allow subsequent addition (e.g., git, spatial libs)
-    sim@.xData[["._sessionInfo"]] <- list(
-      sessionInfo = utils::sessionInfo(),
-      timestamp = Sys.time()
-    )
+    if (getOption("spades.sessionInfo", TRUE))
+      sim@.xData[["._sessionInfo"]] <- list(
+        sessionInfo = utils::sessionInfo(),
+        timestamp = Sys.time()
+      )
 
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
@@ -397,6 +400,7 @@ setMethod(
     paths(sim) <- paths #paths accessor does important stuff
 
     names(modules) <- unlist(modules)
+    adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 
     # Check that modules exist in paths$modulePath
     modulePaths <- .checkModuleDirsAndFiles(modules = modules, modulePath = sim@paths$modulePath)
@@ -533,23 +537,7 @@ setMethod(
 
     # push globals onto parameters within each module
     if (length(sim@params$.globals)) {
-      globalsUsed <- globalsUsedInModules <- NULL
-      globalsDF <- list()
-      for (mod in ls(sim@params)) { # don't include the dot params; just non hidden
-        common <- intersect(names(sim@params[[mod]]), names(sim@params$.globals))
-        if (length(common)) {
-          globalsUsed <- paste(common, sep = ", ")
-          globalsUsedInModules <- rep(mod, length(common))
-          globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
-          sim@params[[mod]][common] <- sim@params$.globals[common]
-        }
-      }
-      if (!is.null(globalsUsed)) {
-        globalsDF <- rbindlist(globalsDF)
-        setkeyv(globalsDF, c("global", "module"))
-        message("The following .globals were used:")
-        reproducible::messageDF(globalsDF)
-      }
+      sim <- updateParamsFromGlobals(sim)
     }
     # From here, capture messaging and prepend it
     withCallingHandlers({
@@ -585,11 +573,15 @@ setMethod(
       })
       sim@params <- tmp
 
-      ## check user-supplied load order
+      ## check user-supplied load order & init dependencies
+      sim@.xData$._ranInitDuringSimInit <- character()
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
-        loadOrder <- depsGraph(sim, plot = FALSE) %>% .depsLoadOrder(sim, .)
+        sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs)
+        if (length(sim@completed))
+          sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$module, .coreModules())
+        loadOrder <- unlist(unname(sim@modules))
       }
 
       mBase <- basename2(unlist(sim@modules))
@@ -621,31 +613,39 @@ setMethod(
       for (m in loadOrder) {
         mFullPath <- loadOrderNames[match(m, loadOrder)]
 
-        ## run .inputObjects() for each module
-        if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
-          if (is.character(getOption("spades.covr", FALSE))  ) {
-            mod <- getOption("spades.covr")
-            tf <- tempfile();
-            if (is.null(notOlderThan)) notOlderThan <- "NULL"
-            cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
-                                  '", notOlderThan = ', notOlderThan,')'))
-            # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-            # unlockBinding(mod, sim$.mods)
-            if (length(objects))
-              list2env(objects, envir(sim))
-            sim$.mods[[mod]]$sim <- sim
-            aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
-            sim <- sim$.mods[[mod]]$sim
-            rm(list = "sim", envir = sim$.mods[[mod]])
-            if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
-            .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-          } else {
-            sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
-          }
+        needInitAndInputObjects <- TRUE
+        if (length(sim@.xData$._ranInitDuringSimInit)) {
+          if (m %in% sim@.xData$._ranInitDuringSimInit)
+            needInitAndInputObjects <- FALSE
         }
 
+        ## run .inputObjects() for each module
+        if (needInitAndInputObjects)
+          if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
+            if (is.character(getOption("spades.covr", FALSE))  ) {
+              mod <- getOption("spades.covr")
+              tf <- tempfile();
+              if (is.null(notOlderThan)) notOlderThan <- "NULL"
+              cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
+                                    '", notOlderThan = ', notOlderThan,')'))
+              # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
+              # unlockBinding(mod, sim$.mods)
+              if (length(objects))
+                list2env(objects, envir(sim))
+              sim$.mods[[mod]]$sim <- sim
+              aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
+              sim <- sim$.mods[[mod]]$sim
+              rm(list = "sim", envir = sim$.mods[[mod]])
+              if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+              .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+            } else {
+              sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+            }
+          }
+
         ## schedule each module's init event:
-        sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+        if (needInitAndInputObjects)
+          sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
 
         ### add module name to the loaded list
         names(m) <- mFullPath
@@ -774,8 +774,10 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
     namesMatchCall <- names(match.call())
+    namesMatchCall <- setdiff(namesMatchCall, ...names())
+
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
     # find the simInit call that was responsible for this, get the objects
@@ -790,7 +792,7 @@ setMethod(
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
                    outputs = li$outputs, loadOrder = li$loadOrder,
-                   notOlderThan = li$notOlderThan)
+                   notOlderThan = li$notOlderThan, ...)
 
     # sim <- do.call("simInit", args = li, quote = TRUE)
 
@@ -819,8 +821,9 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
     namesMatchCall <- names(match.call())
+    namesMatchCall <- setdiff(namesMatchCall, ...names())
 
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
@@ -832,7 +835,7 @@ setMethod(
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
                    outputs = li$outputs, loadOrder = li$loadOrder,
-                   notOlderThan = li$notOlderThan)
+                   notOlderThan = li$notOlderThan, ...)
 
     return(invisible(sim))
   }
@@ -860,9 +863,11 @@ setMethod(
                         inputs,
                         outputs,
                         loadOrder,
-                        notOlderThan) {
+                        notOlderThan, ...) {
     # browser(expr = exists("._simInit_1"))
     namesMatchCall <- names(match.call())
+    namesMatchCall <- setdiff(namesMatchCall, ...names())
+
     li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
     names(li) <- namesMatchCall[-1]
 
@@ -985,7 +990,7 @@ setMethod(
                    modules = li$modules, objects = li$objects,
                    paths = li$paths, inputs = li$inputs,
                    outputs = li$outputs, loadOrder = li$loadOrder,
-                   notOlderThan = li$notOlderThan)
+                   notOlderThan = li$notOlderThan, ...)
 
     # sim2 <- do.call("simInit", args = li, quote = TRUE)
 
@@ -1030,7 +1035,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                  modules = objsSimInit$modules, objects = objsSimInit$objects,
                  paths = objsSimInit$paths, inputs = objsSimInit$inputs,
                  outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
-                 notOlderThan = objsSimInit$notOlderThan)
+                 notOlderThan = objsSimInit$notOlderThan, ...)
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
@@ -1160,6 +1165,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       }
 
       message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
+
+      debug <- getDebug() # from options first, then override if in a simInitAndSpades
+
+      if (!(FALSE %in% debug || any(is.na(debug))) )
+        objsIsNullBefore <- objsAreNull(sim)
+
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1204,6 +1215,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             isTRUE(sim@params[[mBase]][[".showSimilar"]])
           }
 
+          if (any(".inputObjects" %in% debug))
+            debugonce(.inputObjects)
+
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
@@ -1211,8 +1225,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                        quick = getOption("reproducible.quick", FALSE),
                        cachePath = sim@paths$cachePath,
                        classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                                            params = sim@params[[mBase]],
-                                            modules = mBase),
+                                           params = sim@params[[mBase]],
+                                           .globals = sim@params[[".globals"]],
+                                           modules = mBase),
                        showSimilar = showSimilar,
                        userTags = c(paste0("module:", mBase),
                                     "eventType:.inputObjects",
@@ -1225,9 +1240,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           sim <- .inputObjects(sim)
         }
       }
+      if (!(FALSE %in% debug || any(is.na(debug))) )
+        objectsCreatedPost(sim, objsIsNullBefore)
+
     }
   } else {
-    message("All required input Objects provided; skipping .inputObjects")
+    message(crayon::green("All required inputObjects for ",mBase, " provided; skipping .inputObjects"))
   }
 
   sim@current <- list()
@@ -1258,8 +1276,10 @@ simInitDefaults <- function() {
 
 .fillInSimInit <- function(li, namesMatchCall) {
 
-  isMissing <- !formalArgs(simInit) %in% namesMatchCall[-1]
-  formalsTF <- formalArgs(simInit)
+  fa <- formalArgs(simInit)
+  fa <- fa[!fa %in% "..."]
+  isMissing <- !fa %in% namesMatchCall[-1]
+  formalsTF <- fa
 
   names(isMissing) <- formalsTF
 
@@ -1393,15 +1413,215 @@ loadPkgs <- function(reqdPkgs) {
       allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
 
     # Check for SpaDES.core minimum version
+    checkSpaDES.coreMinVersion(allPkgs)
+    allPkgs <- grep("^SpaDES.core\\>", allPkgs, value = TRUE, invert = TRUE)
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, standAlone = FALSE, upgrade = FALSE) # basically don't change anything
+      Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
+      # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      checkSpaDES.coreMinVersion(allPkgs)
 
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
     }
   }
 
+}
+
+#' @importFrom quickPlot whereInStack
+resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
+  # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
+  depsGr <- depsGraph(sim, plot = FALSE)
+  depsGrDF <- (depsEdgeList(sim, FALSE) %>% .depsPruneEdges())
+  if (getOption("spades.allowInitDuringSimInit", TRUE)) {
+    cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
+    hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
+    canSafelyRunInit <- setdiff(hasUnresolvedInputs, cannotSafelyRunInit)
+    shouldRunAltSimInit <- !all(sim@modules %in% canSafelyRunInit)
+  }
+
+  loadOrder <- .depsLoadOrder(sim, depsGr)
+  sim@modules <- sim@modules[match(loadOrder, sim@modules)]
+
+  if (getOption("spades.allowInitDuringSimInit", TRUE)) {
+    if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
+      verbose <- getOption("reproducible.verbose")
+      messageVerbose(crayon::yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
+      messageVerbose(crayon::yellow("as their outputs are needed by the other modules and ",
+                                    "can be safely run"), verbose = verbose)
+      safeToRunModules <- paste(canSafelyRunInit, collapse = ", ")
+      messageVerbose(crayon::yellow(safeToRunModules), verbose = verbose)
+      stripNchars <- getOption("spades.messagingNumCharsModule") - 5
+      stripNcharsSpades <- 2 #stripNchars + 2
+      stripNcharsSimInit <- stripNchars + 5
+      debug <- getDebug() # from options first, then override if in a simInitAndSpades
+      squash <- withCallingHandlers({
+        simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
+                          objects = objects, inputs = inputs, outputs = outputs)
+        messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
+        simAltOut <- spades(simAlt, events = "init", debug = debug)
+      })#,
+      # message = function(m) {
+      #   if (all(!grepl("setDTthreads|Setting:", m$message))) {
+      #     if (nchar(m$message) > stripNchars && !startsWith(prefix = "\033", m$message) &&
+      #         !startsWith(prefix = "The following .globals", m$message)) {
+      #       if (grepl("simInit:", m$message))
+      #         stripNchars <- stripNcharsSimInit
+      #       else
+      #         stripNchars <- stripNcharsSpades
+      #     } else {
+      #       stripNchars <- 0
+      #     }
+      #     message(substr(m$message, start = stripNchars, stop = nchar(m$message)))
+      #   }
+      #   invokeRestart("muffleMessage")
+      # })
+
+      Map(mod = canSafelyRunInit, function(mod) {
+        objEnv <- simAltOut$.mods[[mod]]$.objects
+        objsNames <- ls(objEnv, all.names = TRUE)
+        objs <- mget(objsNames, objEnv)
+        list2env(objs, sim$.mods[[mod]]$.objects)
+      })
+      globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
+      list2env(objs(simAltOut), envir(sim))
+      loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
+      list2env(as.list(simAltOut@completed), sim@completed)
+
+      # don't double up on outputs
+      outpts <- outputs(simAltOut)
+      evnts <- events(simAltOut)
+      if (NROW(outpts)) {
+        ouptEvents <- which(evnts$moduleName %in% "save" & evnts$eventType != "init")
+        whTRUE <- evnts[ouptEvents, ]$eventTime %in% outpts$saveTime
+        if (any(whTRUE)) {
+          for(oo in rev(ouptEvents[whTRUE]))
+            simAltOut@events[[oo]] <- NULL
+        }
+      }
+
+      if (length(simAltOut@events))
+        sim@events <- append(sim@events, simAltOut@events)
+    }
+  }
+  # sim@modules <- sim@modules[match(loadOrder, sim@modules)]
+  sim
+}
+
+updateParamsFromGlobals <- function(sim) {
+  sim@params <- updateParamsSlotFromGlobals(sim@params)
+  sim
+}
+
+updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
+  if (missing(paramsWithUpdates)) {
+    paramsWithUpdates <- paramsOrig
+  }
+  globalsUsed <- globalsUsedInModules <- NULL
+  globalsDF <- list()
+  knownParamsWOdotPlotInitialTime <- setdiff(.knownDotParams, ".plotInitialTime")
+  for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
+    modParams <- names(paramsOrig[[mod]])
+    modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
+    common <- intersect(modParams, names(paramsWithUpdates$.globals))
+    if (length(common)) {
+      globalsUsed <- paste(common, sep = ", ")
+      globalsUsedInModules <- rep(mod, length(common))
+      globalsDF[[mod]] <- list(module = globalsUsedInModules, global = globalsUsed)
+      paramsOrig[[mod]][common] <- paramsWithUpdates$.globals[common]
+    }
+  }
+  if (!is.null(globalsUsed)) {
+    globalsDF <- rbindlist(globalsDF)
+    setkeyv(globalsDF, c("global", "module"))
+    message("The following .globals were used:")
+    reproducible::messageDF(globalsDF)
+  }
+  paramsOrig
+}
+
+
+objectsCreatedPost <- function(sim, objsIsNullBefore) {
+  objsIsNullAfter <- objsAreNull(sim)
+  newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
+  if (length(newObjs)) {
+    df <- data.frame(`New objects created:` = names(newObjs))
+    messageColoured("New objects created:", colour = "yellow")
+    messageDF(df, colour = "yellow", colnames = FALSE)
+  }
+}
+
+objsAreNull <- function(sim) {
+  mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
+                         ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
+                    envir = envir(sim)), function(obj) is.null(obj))
+}
+
+
+adjustModuleNameSpacing <- function(modNames) {
+  nchar <- getOption("spades.messagingNumCharsModule") - loggingMessagePrefixLength
+  if (length(modNames)) {
+    for(i in seq(nchar, max(nchar(modNames)))) {
+      modName8Chars <- mapply(modName = unname(modNames),
+                              MoreArgs = list(ncm = i),
+                              function(modName, ncm)
+                                moduleNameStripped(modName, numCharsMax = ncm)
+      )
+      if (all(!duplicated(modName8Chars))) {
+        options("spades.messagingNumCharsModule" = i + loggingMessagePrefixLength)
+        break
+      }
+    }
+  }
+}
+
+RequireWithHandling <- function(allPkgs, standAlone = FALSE, upgrade = FALSE) {
+  # alreadyLoadedMess <- c()
+  withCallingHandlers(
+    Require(allPkgs, standAlone = standAlone, upgrade = upgrade) # basically don't change anything
+    , message = function(m) {
+      if (any(grepl("Error: package or namespace", m$message))) {
+        pkg <- gsub("^.+namespace \u2018(.+)\u2019 .+ is already loaded.+$", "\\1", m$message)
+        message(m)
+        stop(stopMessForRequireFail(pkg))
+      }
+    }
+    , warning = function(w) {
+      warnMess <- "^.+ersion .+ of \u2018(.+)\u2019 masked by .+$"
+      if (any(grepl(warnMess, w$message))) {
+        pkg <- gsub(warnMess, "\\1", w$message)
+        warning(w)
+        stop(stopMessForRequireFail(pkg))
+      }
+    }
+  )
+}
+
+stopMessForRequireFail <- function(pkg) {
+  paste0("\nThe above error(s) likely mean(s) you must restart R and run again.",
+  "\nIf this/these occur(s) again, your session likely ",
+  "pre-loads old packages from e.g., your personal library. ",
+  "The best thing to do is try to\n",
+  crayon::yellow("restart R without loading any packages."),
+  "\n\nIf that is not easy to do, you can try to update it in that location with (for a CRAN package) e.g., :\n",
+  crayon::yellow("restart R "),
+  crayon::blue(paste0("\ninstall.packages(c('", pkg, "'))")),
+  crayon::yellow("\nrestart R"),
+  "\n\nIf that does not work (including non-CRAN packages), perhaps removing the old one...",
+  crayon::yellow("\nrestart R "),
+  crayon::blue(paste0("\nremove.packages(c('", pkg, "'))")),
+  crayon::yellow("\nrestart R"),
+  "\nThis should trigger a re-installation, or allow ",
+  "for a manual install.packages ...")
+}
+
+getDebug <- function() {
+  hasDebug <- tryCatch(whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+  debug <- getOption("spades.debug")
+  if (!isFALSE(hasDebug)) {
+    newDebug <- try(get("debug", hasDebug), silent = TRUE)
+    if (!is(newDebug, "try-error"))
+      debug <- newDebug
+  }
+  debug
 }

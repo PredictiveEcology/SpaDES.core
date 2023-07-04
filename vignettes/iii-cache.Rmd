@@ -59,7 +59,7 @@ This will have the effect of eliminating any stochasticity in the model as the o
 This is likely most useful in situations where reproducibility is more important than "new" stochasticity (*e.g.*, building decision support systems, apps, final version of a manuscript).
 
 ```{r examples, echo=TRUE, message=FALSE}
-library(raster)
+library(terra)
 library(reproducible)
 library(SpaDES.core)
 
@@ -162,7 +162,7 @@ to
 `Cache(projectRaster, raster, crs = crs(newRaster))`.
 
 ```{r function-level, echo=TRUE}
-ras <- raster(extent(0, 1e3, 0, 1e3), res = 1)
+ras <- terra::rast(terra::ext(0, 1e3, 0, 1e3), res = 1, vals = 1)
 system.time({
   map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
                cachePath = cachePath(mySim),
@@ -170,14 +170,14 @@ system.time({
                notOlderThan = Sys.time())
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
                      cachePath = cachePath(mySim),
                      userTags = "neutralLandscapeMap")
 })
 
-all.equal(map, mapCached) 
+all.equal(map[], mapCached[]) # note --> can't use all.equal on SpatRaster -- they are pointers 
 ```
 
 ## Working with the Cache manually
@@ -190,7 +190,7 @@ Also, one can access cached items manually (rather than simply rerunning the sam
 cacheDB <- showCache(mySim, userTags = "neutralLandscapeMap")
 
 ## get the RasterLayer that was produced with neutralLandscapeMap()
-map <- loadFromCache(cacheId = cacheDB$cacheId)
+map <- loadFromCache(cacheId = cacheDB$cacheId, cachePath = cachePath(mySim))
 
 clearPlot()
 Plot(map)

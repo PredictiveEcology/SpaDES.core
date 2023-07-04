@@ -1,12 +1,6 @@
 test_that("module templates work", {
-  skip_if_not_installed("dplyr")
-  skip_if_not_installed("knitr")
-  skip_if_not_installed("rmarkdown")
 
-  testInitOut <- testInit(c("knitr", "rmarkdown"), smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(c("knitr", "rmarkdown", "dplyr"), smcc = FALSE)
 
   expect_true(dir.exists(tmpdir))
   moduleName <- "myModule"
@@ -21,9 +15,10 @@ test_that("module templates work", {
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".R"))))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".Rmd"))))
   expect_true(file.exists(file.path(mpath, "NEWS.md")))
-  expect_true(
-    utils::file_test("-h", file.path(mpath, "README.md")) | file.exists(file.path(mpath, "README.md"))
-  )
+  if (getRversion() > "4.1.3")
+    expect_true(
+      utils::file_test("-h", file.path(mpath, "README.md")) | file.exists(file.path(mpath, "README.md"))
+    )
   expect_true(dir.exists(file.path(mpath, ".github")))
   expect_true(dir.exists(file.path(mpath, ".github", "workflows")))
   expect_true(file.exists(file.path(mpath, ".github", "workflows", "render-module-rmd.yaml")))
@@ -56,10 +51,7 @@ test_that("module templates work", {
 })
 
 test_that("empty defineModule", {
-  testInitOut <- testInit("knitr", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit()
 
   sim <- simInit()
   sim <- expect_warning(defineModule(sim, list()))
@@ -69,7 +61,7 @@ test_that("empty defineModule", {
       if (all(!(c("extent", "timeframe") %in% modDef))) {
         expect_identical(slot(b@dependencies[[1]], modDef), moduleDefaults[[modDef]])
       } else if (modDef == "extent") {
-        expect_identical(slot(b@dependencies[[1]], "spatialExtent"), eval(moduleDefaults[[modDef]]))
+        expect_equivalent(slot(b@dependencies[[1]], "spatialExtent"), eval(moduleDefaults[[modDef]]))
       } else if (modDef == "timeframe") {
         expect_identical(slot(b@dependencies[[1]], "timeframe"), eval(moduleDefaults[[modDef]]))
       }

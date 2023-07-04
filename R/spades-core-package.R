@@ -246,7 +246,7 @@
 #'   Several `SpaDES.tools` functions assist with these:
 #'
 #'   \tabular{ll}{
-#'     [SpaDES.tools::adj()] \tab An optimized (i.e., faster) version of [raster::adjacent()]\cr
+#'     [SpaDES.tools::adj()] \tab An optimized (i.e., faster) version of [terra::adjacent()]\cr
 #'     [SpaDES.tools::cir()] \tab Identify pixels in a circle around a [`SpatialPoints*()`][sp::SpatialPoints-class] object\cr
 #'     [`directionFromEachPoint()`][SpaDES.tools::distanceFromEachPoint] \tab Fast calculation of direction and distance surfaces\cr
 #'     [SpaDES.tools::distanceFromEachPoint()] \tab Fast calculation of distance surfaces\cr
@@ -272,7 +272,7 @@
 #'
 #' \subsection{5.3 GIS operations}{
 #'   In addition to the vast amount of GIS operations available in R (mostly from
-#'   contributed packages such as `sp`, `raster`, `maps`, `maptools`
+#'   contributed packages such as `sf`, `terra`, (also `sp`, `raster`), `maps`, `maptools`
 #'   and many others), we provide the following GIS-related functions:
 #'
 #'   \tabular{ll}{
@@ -317,7 +317,7 @@
 #'
 #'   \tabular{ll}{
 #'     [checkObject()] \tab Check for a existence of an object within a `simList` \cr
-#'     [Require::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
+#'     [reproducible::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
 #'   }
 #' }
 #'

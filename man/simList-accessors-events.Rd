@@ -99,7 +99,7 @@ Each event is represented by a \code{\link[=data.table]{data.table()}} row consi
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{globals}()},
 \code{\link{inputs}()},

@@ -72,10 +72,10 @@ sim1 <- loadFiles(filelist = filelist) # loads all the maps to sim1 simList
 #  specifically, when add "native = TRUE" as an argument to the raster function
 files = dir(system.file("maps", package = "quickPlot"),
             full.names = TRUE, pattern = "tif")
-arguments = I(rep(list(native = TRUE), length(files)))
+arguments = I(rep(list(lyrs = 1), length(files)))
 filelist = data.frame(
    files = files,
-   functions = "raster::raster",
+   functions = "terra::rast",
    objectName = NA,
    arguments = arguments,
    loadTime = 0,

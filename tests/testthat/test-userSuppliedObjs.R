@@ -1,8 +1,5 @@
 test_that("test userSuppliedObj", {
-  testInitOut <- testInit("raster", smcc = TRUE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(c("terra", "ggplot2"), smcc = TRUE)
 
   m <- "test"
   newModule(m, tmpdir, open = FALSE)

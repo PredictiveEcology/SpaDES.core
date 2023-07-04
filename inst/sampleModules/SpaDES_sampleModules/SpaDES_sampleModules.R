@@ -7,15 +7,15 @@ defineModule(sim, list(
   childModules = c("caribouMovement", "fireSpread", "randomLandscapes"),
   version = list(SpaDES_sampleModules = "2.0.0", fireSpread = "2.0.0", caribouMovement = "2.0.0",
                  randomLandscapes = "2.0.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = NA_character_, # e.g., "year"
   citation = list(),
   documentation = list("SpaDES_sampleModules.Rmd"),
   reqdPkgs = list(),
   parameters = rbind(
-    defineParameter(".plotInitialTime", "numeric", NA_real_, NA, NA,
-                    "This describes the simulation time at which the first plot event should occur"),
+    defineParameter(".plots", "character", NA, NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA,
                     "This describes the simulation time at which the first save event should occur")
   ),

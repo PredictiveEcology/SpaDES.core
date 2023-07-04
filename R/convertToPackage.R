@@ -96,6 +96,15 @@
 #' @return invoked for the side effect of converting a module to a package
 #'
 #' @export
+#' @examples
+#' if (requireNamespace("ggplot2") && requireNamespace("pkgload") ) {
+#'   tmpdir <- tempdir2()
+#'   newModule("test", tmpdir, open = FALSE)
+#'   convertToPackage("test", path = tmpdir)
+#'   pkgload::load_all(file.path(tmpdir, "test"))
+#'   pkgload::unload("test")
+#' }
+#'
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
                              buildDocuments = TRUE) {
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
@@ -116,45 +125,91 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
   parseWithRoxygen <- gpd[grep("#'", gpd$text), ]
   linesWithRoxygen <- parseWithRoxygen[, "line1"]
+  nextElement <- c(whNotDefModule[-1], Inf)
 
-  fileNames <- lapply(whNotDefModule, function(element) {
-    fn <- aa[[element]][[2]]
-    filePath <- filenameFromFunction(packageFolderName, fn, "R")
-    fnCh <- as.character(fn)
-    parseWithFn <- gpd[which(gpd$text == fnCh & gpd$token == "SYMBOL"),]
-    lineWithFn <- parseWithFn[, "line1"]
-    wh <- which((lineWithFn - linesWithRoxygen) == 1) # is the roxygen next to function
-    if (length(wh)) {
-      # This means there is a roxygen block for this function -- must keep it with the function code
-      lastRoxygenLine <- lineWithFn - 1 == linesWithRoxygen
-      ff <- diff(linesWithRoxygen)
-      ff[ff == 1] <- 0
-      ff[ff > 0] <- 1
-      ff <- cumsum(ff)
-      ff <- c(0, ff)
-      roxygenLinesForThisFn <- linesWithRoxygen[ff == ff[lastRoxygenLine]]
+  fileNames <- Map(element = whNotDefModule, nextElement = nextElement,
+                   function(element, nextElement) {
+                     i <- 0
+                     fn <- filePath <- fnCh <- parseWithFn<- lineWithFn <- list()
+                     for (elem in c(element, nextElement)) {
+                       i <- i + 1
+                       if (is.infinite(elem)) {
+                         lineWithFn[[i]] <- length(rlaa) + 1
+                         break
+                       }
+                       fn[[i]] <- aa[[elem]][[2]]
+                       filePath[[i]] <- filenameFromFunction(packageFolderName, fn[[i]], "R")
+                       fnCh[[i]] <- as.character(fn[[i]])
+                       gpdLines <- which(gpd$text == fnCh[[i]] & gpd$token == "SYMBOL")
+                       if (length(gpdLines) > 1)
+                         for (gl in gpdLines) {
+                           line1 <- gpd[gl, "line1"]
+                           isTop <- any(gpd[gpd[, "line1"] == line1, "parent"] == 0)
+                           if (isTRUE(isTop)) {
+                             gpdLines <- gl
+                             break
+                           }
+                         }
+                       parseWithFn[[i]] <- gpd[gpdLines,]
+                       lineWithFn[[i]] <- parseWithFn[[i]][, "line1"]
+                       if (length(lineWithFn[[i]]) > 1) {
+                         if (i == 1) {
+                           if (length(lineWithFn[[1]]))
+                             browser()
+                           lineWithFn[[1]] <- lineWithFn[[1]][1]
+                         } else {
+                           whAfterLine1 <- which(lineWithFn[[2]] > lineWithFn[[1]])
+                           if (length(whAfterLine1))
+                             lineWithFn[[2]] <- lineWithFn[[2]][whAfterLine1[1]]
+                         }
+                       }
 
-      # This removes lines if they are put into a file. That means, if there are
-      #   any left over at the end, we will put them into their own file
-      linesWithRoxygen <<- setdiff(linesWithRoxygen, roxygenLinesForThisFn)
-      cat(rlaa[roxygenLinesForThisFn], file = filePath, sep = "\n", append = FALSE)
-    }
+                     }
+                     wh <- which((lineWithFn[[1]] - linesWithRoxygen) == 1) # is the roxygen next to function
+                     whPrev <- which((lineWithFn[[2]] - linesWithRoxygen) == 1) # is the roxygen next to function
 
-    if (isTRUE(grepl("^doEvent", fn))) {
-      if (!any(grepl("@export", aa[[element]][[3]])))
-        cat("#' @export", file = filePath, sep = "\n", append = TRUE)
-    }
+                     if (length(wh) || length(whPrev)) {
+                       iAll <- if(length(wh) > 0) c(1, if (length(whPrev) > 0)  2 else NULL) else 2
+                       for (i in rev(iAll)) {
+                         # This means there is a roxygen block for this function -- must keep it with the function code
+                         lastRoxygenLine <- lineWithFn[[i]] - 1 == linesWithRoxygen
+                         ff <- if (length(linesWithRoxygen) == 1) 0 else
+                           diff(linesWithRoxygen)
+                         ff[ff == 1] <- 0
+                         ff[ff > 0] <- 1
+                         ff <- cumsum(ff)
+                         ff <- c(0, ff)
 
-    cat(format(aa[[element]]), file = filePath, sep = "\n", append = TRUE)
-  })
+                         # This removes lines if they are put into a file. That means, if there are
+                         #   any left over at the end, we will put them into their own file
+                         roxygenLinesForThisFn <- linesWithRoxygen[ff == ff[lastRoxygenLine]]
+                         if (i == 1) {
+                           linesWithRoxygen <<- setdiff(linesWithRoxygen, roxygenLinesForThisFn)
+                           cat(rlaa[roxygenLinesForThisFn], file = filePath[[1]], sep = "\n", append = FALSE)
+                         } else {
+                           lineWithFn[[2]] <- min(roxygenLinesForThisFn) - 1
+                         }
+                       }
+
+                     }
+
+                     if (isTRUE(grepl("^doEvent", fn[[1]]))) {
+                       if (!any(grepl("@export", aa[[element]][[3]])))
+                         cat("#' @export", file = filePath[[1]], sep = "\n", append = TRUE)
+                     }
+
+                     cat(format(rlaa[lineWithFn[[1]]:(lineWithFn[[2]] - 1)]), file = filePath[[1]], sep = "\n", append = TRUE)
+                     # cat(format(aa[[element]]), file = filePath[[1]], sep = "\n", append = TRUE)
+                     return(filePath[[1]])
+                   })
 
   otherStuffFn <- filenameFromFunction(packageFolderName, "other", "R")
   cat("
 makeActiveBinding('mod', SpaDES.core:::activeModBindingFunction, ",
-paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
+      paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
 
 makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
-paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
+      paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
 
 ", file = otherStuffFn)
 
@@ -163,7 +218,7 @@ paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
             "a function; it is being saved in R/documentation.R ... please confirm that ",
             "the documentation is correct.")
     cat(rlaa[linesWithRoxygen], file = filenameFromFunction(packageFolderName, "documentation", "R")
-          , sep = "\n", append = FALSE)
+        , sep = "\n", append = FALSE)
     linesWithRoxygen <- character()
   }
 

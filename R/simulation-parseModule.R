@@ -246,12 +246,13 @@ setMethod(
 
         if (.isPackage(m, sim)) {
           if (!requireNamespace("pkgload")) stop("Please install.packages(c('pkgload', 'roxygen2'))")
-          if (isTRUE(getOption("spades.moduleDocument", NULL))) {
+          if (!requireNamespace("roxygen2")) stop("Please install.packages(c('roxygen2'))")
+          namespaceFile <- dir(m, pattern = "NAMESPACE")
+          if (isTRUE(getOption("spades.moduleDocument", NULL)) || length(namespaceFile) == 0) {
+            message(crayon::blue("    To skip rebuilding documentation, set options('spades.moduleDocument' = FALSE)"))
             roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
             pkgload::dev_topic_index_reset(m)
             pkgload::unload(.moduleNameNoUnderscore(mBase)) # so, unload here before reloading without exporting
-          } else {
-            message(crayon::blue("    To rebuild documentation, set options('spades.moduleDocument' = TRUE)"))
           }
           pkgload::load_all(m, export_all = FALSE)
 
@@ -354,9 +355,10 @@ setMethod(
             try(mess)
         })
 
-        mess <- capture.output({
+        #mess <- capture.output({
           out <- try(eval(pf, envir = env))
-        }, type = "message")
+        #}, type = "message")
+          mess <- NULL
         if (is(out, "try-error")) stop(out)
         opt <- getOption("spades.moduleCodeChecks")
         if (length(mess) && (isTRUE(opt) || length(names(opt)) > 1)) {

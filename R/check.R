@@ -22,6 +22,20 @@
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
+#' @examples
+#' sim <- simInit()
+#' sim$a <- 1
+#' sim$b <- list(d = 1)
+#' sim$r <- terra::rast(terra::ext(0,2,0,2), res = 1, vals = 2)
+#' sim$s <- c(sim$r, terra::rast(terra::ext(0,2,0,2), res = 1, vals = 3))
+#' names(sim$s) <- c("r1", "r2") # give layer names
+#' (checkObject(sim, name = "a")) # TRUE
+#' (checkObject(sim, name = "b", layer = "d")) # TRUE
+#' (checkObject(sim, name = "d")) # FALSE
+#' (checkObject(sim, name = "r")) # TRUE
+#' (checkObject(sim, object = sim$s)) # TRUE
+#' (checkObject(sim, object = sim$s, layer = "r1")) # TRUE
+#'
 #' @importFrom quickPlot .objectNames
 #' @include simList-class.R
 #' @rdname checkObject
@@ -33,81 +47,50 @@ setGeneric("checkObject", function(sim, name, object, layer, ...) {
 #' @rdname checkObject
 setMethod(
   "checkObject",
-  signature(sim = "simList", name = "missing", object = "Raster", layer = "character"),
+  signature(sim = "simList", object = "ANY"),
   definition = function(sim, object, layer, ...) {
-    if (exists(deparse(substitute(object)), envir = sim@.xData)) {
-      if (!is.na(match(layer, names(object)))) {
-        return(invisible(TRUE))
-      } else {
-        message(paste(deparse(substitute(object, env = sim@.xData)),
-                      "exists, but", layer, "is not a layer"))
-        return(FALSE)
+    ret <- TRUE # set default
+    # if (exists(deparse(substitute(object)), envir = sim@.xData)) { # can't use sim@.xData because it has parent of emptyenv
+    obj <- tryCatch(
+      eval(parse(text = deparse(substitute(object))),
+           envir = parent.frame()), # envir needs to be inside the function
+      silent = TRUE, error = function(x) FALSE)
+    if (!isFALSE(obj) && !is.null(obj)) {
+      if (!missing(layer)) {
+        if (is.na(match(layer, names(object)))) {
+          message(paste(deparse(substitute(object, env = sim@.xData)),
+                        "exists, but", layer, "is not a layer"))
+          ret <- FALSE
+        }
       }
+
     } else {
       message(paste(deparse(substitute(object, env = sim@.xData)),
                     "does not exist."))
-      return(FALSE)
+      ret <- FALSE
     }
+    return(invisible(ret))
 })
+
+
 
 #' @export
 #' @rdname checkObject
 setMethod(
   "checkObject",
-  signature(sim = "simList", name = "missing", object = "ANY", layer = "missing"),
-  definition = function(sim, name, object, ...) {
-    if (exists(deparse(substitute(object)), envir = sim@.xData)) {
-      return(invisible(TRUE))
-    } else {
-      message(paste(deparse(substitute(object, env = sim@.xData)),
-                    "does not exist"))
-      return(FALSE)
-    }
-})
-
-#' @export
-#' @rdname checkObject
-setMethod(
-  "checkObject",
-  signature(sim = "simList", name = "character", object = "missing", layer = "missing"),
-  definition = function(sim, name, ...) {
-    if (exists(name, envir = sim@.xData)) {
-      return(invisible(TRUE))
-    } else {
-      simName <- .objectNames("spades", "simList", "sim")[[1]]$objs
-      message(paste(name, "does not exist in", simName))
-      return(FALSE)
-    }
-})
-
-#' @export
-#' @rdname checkObject
-setMethod(
-  "checkObject",
-  signature(sim = "simList", name = "character", object = "missing", layer = "character"),
+  signature(sim = "simList", name = "character", object = "missing"),
   definition = function(sim, name, layer, ...) {
-    if (exists(name, envir = sim@.xData)) {
-      if (is(sim[[name]], "Raster")) {
-        if (!is(sim[[name]][[layer]], "Raster")) {
-          message(paste("The object \"", name, "\" exists, but is not
-                        a Raster, so layer is ignored", sep = ""))
-          return(invisible(TRUE))
-        }
-      }
-    } else {
-      message(
-        paste(name, "does not exist in", deparse(substitute(sim)))
-      )
-      return(FALSE)
-    }
+    object <- get0(name, envir = sim@.xData)
+    ret <- checkObject(sim, object = object, layer = layer, ...)
+    return(invisible(ret))
 })
 
 #' @export
 #' @rdname checkObject
 setMethod(
   "checkObject",
-  signature(sim = "missing", name = "ANY", object = "missing", layer = "ANY"),
-  definition = function(name, object, layer, ...) {
+  signature(sim = "missing"),
+  definition = function(name, ...) {
     stop(paste("Must provide a simList object"))
     return(FALSE)
 })
@@ -132,7 +115,6 @@ setMethod(
 #'
 #' @author Alex Chubaty
 #'
-# igraph exports %>% from magrittr
 setGeneric("checkParams", function(sim, coreParams, ...) {
   standardGeneric("checkParams")
 })
@@ -183,6 +165,10 @@ setMethod(
 
         # check user params
         userParams <- params[[uM]][-which(names(params[[uM]]) %in% coreParams)]
+        anyKnown <- names(userParams) %in% .knownDotParams
+        if (any(anyKnown %in% TRUE)) {
+          userParams <- userParams[!anyKnown]
+        }
         collapsedSrc <- paste(readFile[[uM]], collapse = "");
         isInCode <- sapply(names(userParams), function(pp) grepl(pp, collapsedSrc, fixed = TRUE))
         if (any(!isInCode)) {
@@ -191,17 +177,6 @@ setMethod(
             message(paste("Parameter", uP, "is not used in module", uM)))
         }
 
-        #
-        # #if (length(userParams) > 0) {
-        #   for (i in seq(userParams)) {
-        #     uP <- names(userParams[i])
-        #     result <- grep(uP, readFile[[uM]], value = FALSE, fixed = TRUE)
-        #     if (length(result) <= 0) {
-        #       allFound <- FALSE
-        #       message(paste("Parameter", uP, "is not used in module", uM))
-        #     }
-        #   }
-        # #}
       }
 
       globalsFound <- unique(globalsFound)

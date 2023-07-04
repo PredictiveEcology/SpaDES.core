@@ -43,7 +43,7 @@ but it is a \code{.globals} element in the \code{params} slot of the \code{simLi
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{events}()},
 \code{\link{inputs}()},

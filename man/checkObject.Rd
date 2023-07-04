@@ -2,25 +2,19 @@
 % Please edit documentation in R/check.R
 \name{checkObject}
 \alias{checkObject}
-\alias{checkObject,simList,missing,Raster,character-method}
-\alias{checkObject,simList,missing,ANY,missing-method}
-\alias{checkObject,simList,character,missing,missing-method}
-\alias{checkObject,simList,character,missing,character-method}
-\alias{checkObject,missing,ANY,missing,ANY-method}
+\alias{checkObject,simList,ANY,ANY-method}
+\alias{checkObject,simList,character,missing-method}
+\alias{checkObject,missing,ANY,ANY-method}
 \title{Check for existence of object(s) referenced by a \code{objects} slot of a
 \code{simList} object}
 \usage{
 checkObject(sim, name, object, layer, ...)
 
-\S4method{checkObject}{simList,missing,Raster,character}(sim, name, object, layer, ...)
+\S4method{checkObject}{simList,ANY,ANY}(sim, name, object, layer, ...)
 
-\S4method{checkObject}{simList,missing,ANY,missing}(sim, name, object, layer, ...)
+\S4method{checkObject}{simList,character,missing}(sim, name, object, layer, ...)
 
-\S4method{checkObject}{simList,character,missing,missing}(sim, name, object, layer, ...)
-
-\S4method{checkObject}{simList,character,missing,character}(sim, name, object, layer, ...)
-
-\S4method{checkObject}{missing,ANY,missing,ANY}(sim, name, object, layer, ...)
+\S4method{checkObject}{missing,ANY,ANY}(sim, name, object, layer, ...)
 }
 \arguments{
 \item{sim}{A \code{\link[=simList]{simList()}} object.}
@@ -41,6 +35,21 @@ Invisibly return \code{TRUE} indicating object exists; \code{FALSE} if not.
 \description{
 Check that a named object exists in the provide \code{simList} environment slot,
 and optionally has desired attributes.
+}
+\examples{
+sim <- simInit()
+sim$a <- 1
+sim$b <- list(d = 1)
+sim$r <- terra::rast(terra::ext(0,2,0,2), res = 1, vals = 2)
+sim$s <- c(sim$r, terra::rast(terra::ext(0,2,0,2), res = 1, vals = 3))
+names(sim$s) <- c("r1", "r2") # give layer names
+(checkObject(sim, name = "a")) # TRUE
+(checkObject(sim, name = "b", layer = "d")) # TRUE
+(checkObject(sim, name = "d")) # FALSE
+(checkObject(sim, name = "r")) # TRUE
+(checkObject(sim, object = sim$s)) # TRUE
+(checkObject(sim, object = sim$s, layer = "r1")) # TRUE
+
 }
 \seealso{
 \code{\link[=library]{library()}}.
