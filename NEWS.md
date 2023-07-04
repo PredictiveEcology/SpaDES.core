@@ -26,9 +26,10 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * many issues addressed and closed
 
 ## Dependency Changes
-* drop support for R 4.0 as dependency packages no longer support it
-* require `reproducible` v2.0.2 or higher
-* removed `googledrive` from Suggests;
+* drop support for R 4.0 as dependency packages no longer support it;
+* require `reproducible` v2.0.5 or higher;
+* require `quickPlot` v1.0.2 or higher;
+* removed `googledrive` from Suggests.
 
 ## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`
