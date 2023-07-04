@@ -104,7 +104,7 @@ if (requireNamespace("NLMR", quietly = TRUE) &&
 }
 }
 \seealso{
-\code{?SpaDES.core-package}, specifically the section 1.2.1 on Simulation parameters.
+\link{SpaDES.core-package}, specifically the section 1.2.1 on Simulation parameters.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},

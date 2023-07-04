@@ -115,12 +115,12 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.8 on `simList` environment.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.8 on `simList` environment.
 #'
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
 #' @export
-#' @family functions to access elements of a `simList` object
+#' @family functions to access elements of a \code{simList} object
 #' @include simList-class.R
 #' @rdname simList-accessors-envir
 #'
@@ -172,8 +172,8 @@ setReplaceMethod("envir",
 #'
 #' @return Returns or sets a list of objects in the `simList` environment.
 #'
-#' @family functions to access elements of a `simList` object
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.1 on Simulation Parameters.
+#' @family functions to access elements of a \code{simList} object
+#' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -251,8 +251,8 @@ setReplaceMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @family functions to access elements of a `simList` object
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.7 on Modules and dependencies.
+#' @family functions to access elements of a \code{simList} object
+#' @seealso [SpaDES.core-package], specifically the section 1.2.7 on Modules and dependencies.
 #'
 #' @aliases simList-accessors-modules
 #' @author Alex Chubaty
@@ -422,8 +422,8 @@ setMethod(
 #' Note: the important part for speed (e.g., 2-4x faster) is specifying the `moduleName`.
 #' Specifying the parameter name is <5% faster.
 #'
-#' @family functions to access elements of a `simList` object
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.1 on Simulation parameters.
+#' @family functions to access elements of a \code{simList} object
+#' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation parameters.
 #'
 #' @aliases parameters
 #' @aliases simList-accessors-params
@@ -624,8 +624,8 @@ P.simList <- function(sim, param, module) {
 #'
 #' @inheritParams params
 #'
-#' @family functions to access elements of a `simList` object
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.1 on Simulation Parameters.
+#' @family functions to access elements of a \code{simList} object
+#' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -773,7 +773,7 @@ setMethod("parameters",
 #' @export
 #' @include simList-class.R
 #' @rdname checkpoint
-#' @family functions to access elements of a `simList` object
+#' @family functions to access elements of a \code{simList} object
 #'
 setGeneric("checkpointFile", function(sim) {
   standardGeneric("checkpointFile")
@@ -863,7 +863,7 @@ setReplaceMethod("checkpointInterval",
 #'         for `progressInterval<-`, an updated `simList` object.
 #'
 #' @export
-#' @family functions to access elements of a `simList` object
+#' @family functions to access elements of a \code{simList} object
 #' @include simList-class.R
 #' @rdname progress
 #'
@@ -1055,8 +1055,8 @@ setReplaceMethod("progressType",
 #' @return Returns or sets the value(s) of the `input` or `output` slots
 #' in the `simList` object.
 #'
-#' @family functions to access elements of a `simList` object
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.2 on loading and saving.
+#' @family functions to access elements of a \code{simList} object
+#' @seealso [SpaDES.core-package], specifically the section 1.2.2 on loading and saving.
 #'
 #' @include simList-class.R
 #' @importFrom data.table is.data.table
@@ -1608,8 +1608,8 @@ setReplaceMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @family functions to access elements of a `simList` object
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.4 on Simulation Paths.
+#' @family functions to access elements of a \code{simList} object
+#' @seealso [SpaDES.core-package], specifically the section 1.2.4 on Simulation Paths.
 #'
 #' @include simList-class.R
 #' @importFrom stats na.omit
@@ -2082,13 +2082,13 @@ setMethod("dataPath",
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.5 on Simulation times;
+#' @seealso [SpaDES.core-package], specifically the section 1.2.5 on Simulation times;
 #'   [elapsedTime()],
 #'
 #' @aliases simList-accessors-times
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
-#' @family functions to access elements of a `simList` object
+#' @family functions to access elements of a \code{simList} object
 #' @include simList-class.R
 #' @include times.R
 #' @rdname simList-accessors-times
@@ -2482,11 +2482,11 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso `?SpaDES.core-package`, specifically the section 1.2.6 on Simulation event queues.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.6 on Simulation event queues.
 #'
 #' @aliases simList-accessors-events
 #' @export
-#' @family functions to access elements of a `simList` object
+#' @family functions to access elements of a \code{simList} object
 #' @importFrom data.table := copy data.table
 #' @importFrom stats setNames
 #' @include simList-class.R
@@ -2794,7 +2794,7 @@ setReplaceMethod(
 #' @return A `simList` object.
 #'
 #' @include simList-class.R
-#' @family functions to access elements of a `simList` object
+#' @family functions to access elements of a \code{simList} object
 #' @keywords internal
 #' @rdname addDepends
 #'
@@ -2857,7 +2857,7 @@ setMethod(
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @include simList-class.R
-#' @family functions to access elements of a `simList` object
+#' @family functions to access elements of a \code{simList} object
 #' @rdname packages
 #'
 # igraph exports %>% from magrittr

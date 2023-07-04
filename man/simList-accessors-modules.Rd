@@ -51,7 +51,7 @@ These are included for advanced users.
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \seealso{
-\code{?SpaDES.core-package}, specifically the section 1.2.7 on Modules and dependencies.
+\link{SpaDES.core-package}, specifically the section 1.2.7 on Modules and dependencies.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
