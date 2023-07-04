@@ -1,10 +1,5 @@
 test_that("timeunit works correctly", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(sampleModReqdPkgs)
 
   times <- list(start = 0.0, end = 10)
   params <- list(
@@ -19,30 +14,6 @@ test_that("timeunit works correctly", {
   mySim <- simInit(times, params, modules, objects = list(), paths = paths)
 
   expect_equal(maxTimeunit(sim = mySim), "year")
-
-  # x1 <- list(
-  #   name = "testModule",
-  #   description = "this is a test.",
-  #   keywords = c("test"),
-  #   authors = c(person(c("Alex", "M"), "Chubaty",
-  #                      email = "alexander.chubaty@canada.ca",
-  #                      role = c("aut", "cre"))),
-  #   version = list(testModule = "0.0.1"),
-  #   spatialExtent = raster::extent(rep(NA_real_, 4)),
-  #   timeframe = as.POSIXlt(c(NA, NA)),
-  #   timeunit = NA_character_,
-  #   citation = list(),
-  #   reqdPkgs = list("grid", "raster", "sp"),
-  #   parameters = rbind(
-  #     defineParameter("dummyVal", "numeric", 1.0, NA, NA, "vague description")
-  #   ),
-  #   inputObjects = bindrows(
-  #     expectsInput(objectName = "testInput", objectClass = "list", sourceURL = "", desc = NA_character_)
-  #   ),
-  #   outputObjects = bindrows(
-  #     createsOutput(objectName = "testOutput", objectClass = "list", desc = NA_character_)
-  #   )
-  # )
 
   # Test for numerics, or character strings that are not recognized
   expect_message(timeunit(mySim) <- 1, "^unknown timeunit provided:")
@@ -109,11 +80,7 @@ test_that("timeunit works correctly", {
 test_that("timeunits with child and parent modules work correctly", {
   skip_on_cran()
 
-  m <- testInit("igraph", smcc = TRUE)
-  options("spades.memoryUseInterval" = 0)
-  on.exit({
-    testOnExit(m)
-  }, add = TRUE)
+  m <- testInit("ggplot2", smcc = TRUE, opts = list("spades.memoryUseInterval" = 0))
 
   newModule("grandpar1", tmpdir, type = "parent", children = c("child1", "child2", "par1"), open = FALSE)
   newModule("par1", tmpdir, type = "parent", children = c("child4", "child3"), open = FALSE)

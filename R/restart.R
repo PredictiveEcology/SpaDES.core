@@ -31,7 +31,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' Restart an interrupted simulation
 #'
 #' This is very experimental and has not been thoroughly tested. Use with caution.
-#' This function will reparse a single module (currently) into the `simList`
+#' This function will re-parse a single module (currently) into the `simList`
 #' where its source code should reside, and then optionally restart a simulation
 #' that stopped on an error, presumably after the developer has modified the
 #' source code of the module that caused the break.
@@ -47,30 +47,35 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' earliest event recovered, thereby returning to the exact stochastic simulation
 #' trajectory.
 #'
-#' @note
-#' This will only work reliably
+#' @note This will only work reliably
 #' *if the `simList` was not modified yet during the event which caused the error*.
 #' The `simList` will be in the state it was at the time of the error.
 #'
-#' @param sim A simList. If not supplied (the default), this will take the sim from
+#' @param sim A `simList.` If not supplied (the default), this will take the `sim` from
 #'    `SpaDES.core:::.pkgEnv$.sim`, i.e., the one that was interrupted
+#'
 #' @param module A character string length one naming the module that caused the error and
-#'   whose source code was fixed. This module will be reparsed and placed into the simList
+#'   whose source code was fixed. This module will be re-parsed and placed into the `simList`
+#'
 #' @param restart Logical. If `TRUE`, then the call to `spades` will be made, i.e.,
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
 #'   with the module code parsed into the `simList`
+#'
 #' @param numEvents Numeric. Default is Inf (i.e., all available). In the `simList`, if
 #'   `options('spades.recoveryMode')` is set to `TRUE` or a numeric, then
 #'   there will be a list in the `simList` called `.recoverableObjs`. These will be
-#'   replayed backwards in time to reproduce the initial state of the simList before
+#'   replayed backwards in time to reproduce the initial state of the `simList` before
 #'   the event that is `numEvents` back from the first event in `events(sim)`.
+#'
 #' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
-#' @return
-#' A simList as if `spades` had been called on a simList.
+#'
+#' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
+#' @importFrom crayon blue
+#'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # options("spades.recoveryMode" = 1) # now the default
 #' s <- simInit()
 #' s <- spades(s) # if this is interrupted or fails
@@ -226,32 +231,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' e.g., `sim <- SpaDES.core:::.pkgEnv$.sim`.
 #' This is stated in a message.
 #'
-#' @param sim Required. A `simList` to be retained through the restart
-#' @param reloadPkgs Logical. If `TRUE`, it will attempt to reload all the packages
-#'    as they were in previous session, in the same order. If `FALSE`, it will
-#'    load no packages beyond normal R startup. Default `TRUE`
-#' @param .First A function to save to \file{~/.qs} which will
-#'    be loaded at restart from \file{~/.qs} and run. Default is `NULL`,
-#'    meaning it will use the non-exported `SpaDES.core:::First`. If a
-#'    user wants to make a custom `First` file, it should built off that one.
-#' @param .RDataFile A filename for saving the `simList`.
-#'     Defaults to `getOption("spades.restartR.filename")`, and the directory will
-#'     be in `restartDir`. The simulation time will be mid-pended to this
-#'     name, as in: `basename(file), "_time",`
-#'     `paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))`
-#'
-#' @param restartDir A character string indicating root directory to
-#'     save `simList` and other ancillary files during restart.
-#'     Defaults to `getOption("spades.restartR.restartDir", NULL)`.
-#'     If `NULL`, then it will try, in order, `outputPath(sim)`,
-#'     `modulePath(sim)`, `inputPath(sim)`, `cachePath(sim)`,
-#'     taking the first one that is not inside the `tempdir()`, which will
-#'     disappear during restart of R.
-#'     The actual directory for a given `spades` call that is restarting will be:
-#'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
-#'     The random string is to prevent parallel processes that started at the same clock
-#'     time from colliding.
-#'
 #' @details
 #' The process responds to several options. Though under most cases,
 #' the default behaviour should suffice. These are of 3 types: `restartRInterval`
@@ -279,6 +258,37 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #'
 #' To keep the saved `simList`, use `options("spades.restartR.clearFiles" = TRUE)`.
 #' The default is to treat these files as temporary files and so will be removed.
+#'
+#' @param sim Required. A `simList` to be retained through the restart
+#'
+#' @param reloadPkgs Logical. If `TRUE`, it will attempt to reload all the packages
+#'    as they were in previous session, in the same order. If `FALSE`, it will
+#'    load no packages beyond normal R startup. Default `TRUE`
+#'
+#' @param .First A function to save to \file{~/.qs} which will
+#'    be loaded at restart from \file{~/.qs} and run. Default is `NULL`,
+#'    meaning it will use the non-exported `SpaDES.core:::First`. If a
+#'    user wants to make a custom `First` file, it should built off that one.
+#'
+#' @param .RDataFile A filename for saving the `simList`.
+#'     Defaults to `getOption("spades.restartR.filename")`, and the directory will
+#'     be in `restartDir`. The simulation time will be mid-pended to this
+#'     name, as in: `basename(file), "_time",`
+#'     `paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))`
+#'
+#' @param restartDir A character string indicating root directory to
+#'     save `simList` and other ancillary files during restart.
+#'     Defaults to `getOption("spades.restartR.restartDir", NULL)`.
+#'     If `NULL`, then it will try, in order, `outputPath(sim)`,
+#'     `modulePath(sim)`, `inputPath(sim)`, `cachePath(sim)`,
+#'     taking the first one that is not inside the `tempdir()`, which will
+#'     disappear during restart of R.
+#'     The actual directory for a given `spades` call that is restarting will be:
+#'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
+#'     The random string is to prevent parallel processes that started at the same clock
+#'     time from colliding.
+#'
+#' @return invoked for side effect of restarting the R session
 #'
 #' @export
 #' @importFrom crayon bgBlue white
@@ -315,6 +325,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
 
   sim$._restartRList$opts <- options()
   if ("raster" %in% attached) {
+    browser() # convert raster
     invisible(capture.output({
       sim$._restartRList$optsRaster <- raster::rasterOptions()
     }))
@@ -327,6 +338,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
 
   ## ensure correct file extension
+  browser() # this next function will add or swap -- tools::file_ext doesn't swap
   sim$._restartRList$simFilename <- raster::extension(sim$._restartRList$simFilename, ".qs")
 
   # sim$._restartRList$endOrig <- end(sim)
@@ -398,6 +410,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   }
 }
 
+#' @keywords internal
 FirstFromR <- function(...) {
   ca <- commandArgs()
   .rndString <- ca[4]
@@ -405,6 +418,8 @@ FirstFromR <- function(...) {
   First(.rndString = .rndString)
 }
 
+#' @importFrom crayon green
+#' @keywords internal
 First <- function(...) {
   # From Rstudio, it gets all the correct, session-specific files.
   #   From R, it does not. Only has the commandArgs -- must rebuild objects
@@ -426,8 +441,10 @@ First <- function(...) {
   do.call(Sys.setenv, sim$._restartRList$envvars)
 
   do.call(options, sim$._restartRList$opts)
-  if ("raster" %in% attached)
+  if ("raster" %in% attached) {
+    browser()
     do.call(raster::rasterOptions, sim$._restartRList$optsRaster)
+  }
 
   sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
     if (!dir.exists(p)) {

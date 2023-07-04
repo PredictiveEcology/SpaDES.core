@@ -9,11 +9,14 @@
 \arguments{
 \item{object}{Any R object returned from a function}
 }
+\value{
+character vector corresponding to the names of objects stored in the \code{.xData} slot
+}
 \description{
 Takes a snapshot of \code{simList} objects.
 }
 \details{
-See \link[reproducible:exportedMethods]{reproducible::.preDigestByClass}.
+See \code{\link[reproducible:exportedMethods]{reproducible::.preDigestByClass()}}.
 }
 \seealso{
 \link[reproducible:exportedMethods]{reproducible::.preDigestByClass}

@@ -14,14 +14,6 @@ utils::globalVariables(c("objName", "V1"))
 #' This function can be used as a check to determine whether the module needs
 #' to proceed in getting and assigning its default value.
 #'
-#' @param object Character vector
-#' @param sim A `simList` in which to evaluated whether the object is supplied elsewhere
-#' @param where Character vector with one to three of "sim", "user", or "initEvent".
-#'        Default is all three. Partial matching is used. See details.
-#' @param returnWhere Logical, default `FALSE`, whether the vector of length
-#'   3 logical should be returned, or a logical of length one
-#' @export
-#'
 #' @details
 #'
 #' `where` indicates which of three places to search, either `"sim"` i.e.,
@@ -34,10 +26,19 @@ utils::globalVariables(c("objName", "V1"))
 #' `createsOutputs` in that module's metadata). There is a caveat to this test,
 #' however; if that other event also has the object as an `expectsInput`, then
 #' it would fail this test, as it *also* needs it as an input.
-#' This final one (`"initEvent"`)
-#' does not explicitly test that the object will be created in the "init" event, only that
-#' it is in the outputs of that module, and that it is a module that is loaded prior to
-#' this one.
+#' This final one (`"initEvent"`) does not explicitly test that the object will be created
+#' in the "init" event, only that it is in the outputs of that module, and that it is a module
+#' that is loaded prior to this one.
+#'
+#' @param object Character vector
+#' @param sim A `simList` in which to evaluated whether the object is supplied elsewhere
+#' @param where Character vector with one to three of `"sim"`, `"user"`, or `"initEvent"`.
+#'        Default is all three. Partial matching is used. See details.
+#' @param returnWhere Logical, default `FALSE`, whether the vector of length
+#'   3 logical should be returned, or a logical of length one
+#'
+#' @return logical
+#' @export
 #'
 #' @examples
 #' mySim <- simInit()
@@ -54,7 +55,7 @@ utils::globalVariables(c("objName", "V1"))
 #' mySim <- simInit(objects = list("test" = test))
 #' suppliedElsewhere("test", mySim) # TRUE
 #'
-#' \dontrun{
+#' \donttest{
 #' # Example with prepInputs
 #' # Put chunks like this in your .inputObjects
 #' if (!suppliedElsewhere("test", mySim))
@@ -94,8 +95,15 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # Equivalent to !is.null(sim$xxx)
   inPrevDotInputObjects <- if ("s" %in% forms$where) {
-    match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
-
+    out <- match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
+    # check not in because it is just declared as a objectSynonym
+    if (isTRUE(out)) {
+      if (!is.null(sim$objectSynonyms)) {
+        if (is.null(sim[[objDeparsed]]) && (objDeparsed %in% unlist(sim$objectSynonyms)))
+          out <- FALSE
+      }
+    }
+    out
   } else {
     FALSE
   }

@@ -10,7 +10,7 @@
 \alias{.fileTableOut,missing-method}
 \alias{.fileTableOutCols}
 \alias{.fileTableOutDF}
-\title{Create empty fileTable for inputs and outputs}
+\title{Create empty \code{fileTable} for inputs and outputs}
 \format{
 An object of class \code{character} of length 8.
 
@@ -41,11 +41,11 @@ An object of class \code{data.frame} with 0 rows and 7 columns.
 \item{x}{Not used (should be missing)}
 }
 \value{
-An empty data.frame with structure needed for input/output fileTable.
+An empty data.frame with structure needed for input/output \code{fileTable.}
 }
 \description{
 Internal functions.
-Returns an empty fileTable to be used with inputs and outputs.
+Returns an empty \code{fileTable} to be used with inputs and outputs.
 }
 \keyword{datasets}
 \keyword{internal}

@@ -7,16 +7,16 @@
 restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
 }
 \arguments{
-\item{sim}{A simList. If not supplied (the default), this will take the sim from
+\item{sim}{A \code{simList.} If not supplied (the default), this will take the \code{sim} from
 \code{SpaDES.core:::.pkgEnv$.sim}, i.e., the one that was interrupted}
 
 \item{module}{A character string length one naming the module that caused the error and
-whose source code was fixed. This module will be reparsed and placed into the simList}
+whose source code was fixed. This module will be re-parsed and placed into the \code{simList}}
 
 \item{numEvents}{Numeric. Default is Inf (i.e., all available). In the \code{simList}, if
 \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then
 there will be a list in the \code{simList} called \code{.recoverableObjs}. These will be
-replayed backwards in time to reproduce the initial state of the simList before
+replayed backwards in time to reproduce the initial state of the \code{simList} before
 the event that is \code{numEvents} back from the first event in \code{events(sim)}.}
 
 \item{restart}{Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
@@ -26,11 +26,11 @@ with the module code parsed into the \code{simList}}
 \item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
 }
 \value{
-A simList as if \code{spades} had been called on a simList.
+A \code{simList} as if \code{spades} had been called on a \code{simList}.
 }
 \description{
 This is very experimental and has not been thoroughly tested. Use with caution.
-This function will reparse a single module (currently) into the \code{simList}
+This function will re-parse a single module (currently) into the \code{simList}
 where its source code should reside, and then optionally restart a simulation
 that stopped on an error, presumably after the developer has modified the
 source code of the module that caused the break.
@@ -52,7 +52,7 @@ This will only work reliably
 The \code{simList} will be in the state it was at the time of the error.
 }
 \examples{
-\dontrun{
+\donttest{
 # options("spades.recoveryMode" = 1) # now the default
 s <- simInit()
 s <- spades(s) # if this is interrupted or fails

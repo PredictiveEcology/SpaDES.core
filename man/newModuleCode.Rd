@@ -24,6 +24,9 @@ or \code{"parent"}.}
 \item{children}{Required when \code{type = "parent"}. A character vector
 specifying the names of child modules.}
 }
+\value{
+Nothing is returned. Invoked for its side effect of creating new module code files.
+}
 \description{
 Create new module code file
 }

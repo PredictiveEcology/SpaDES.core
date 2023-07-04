@@ -54,7 +54,7 @@ the most recent version will be retrieved.)}
 \item{repo}{GitHub repository name, specified as \code{"username/repo"}.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.
-Only \code{master} branches can be used at this point.}
+Only \code{master}/\code{main} branches can be used at this point.}
 
 \item{data}{Logical. If \code{TRUE}, then the data that is identified in the
 module metadata will be downloaded, if possible. Default \code{FALSE}.}

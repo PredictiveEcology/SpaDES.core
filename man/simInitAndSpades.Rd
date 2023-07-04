@@ -124,16 +124,14 @@ each of the named modules. With the \code{list} form, all unspecified modules
 will run \emph{all} their events, including internal spades modules, e.g., \code{save},
 that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
 
-\item{...}{Arguments passed to simInit and spades}
+\item{...}{Arguments passed to \code{simInit()} and \code{spades()}}
 }
 \value{
 Same as \code{\link[=spades]{spades()}} (a \code{simList}) or
 }
 \description{
-These functions are convenience wrappers that may allow for
-more efficient Caching.
-Passes all arguments to \code{simInit}, then passes the created \code{simList}
-to \code{spades}.
+These functions are convenience wrappers that may allow for more efficient caching.
+Passes all arguments to \code{simInit()}, then passes the created \code{simList} to \code{spades()}.
 }
 \seealso{
 \code{\link[=simInit]{simInit()}}, \code{\link[=spades]{spades()}}

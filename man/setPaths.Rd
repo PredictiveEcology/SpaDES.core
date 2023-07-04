@@ -53,7 +53,7 @@ that may contribute to excessive disk usage.
 \item{scratchPath}{The default local directory in which to save transient files.
 If not specified, defaults to \code{getOption("spades.scratchPath")}.}
 
-\item{terraPath}{The default local directory in which to save transient terra files.
+\item{terraPath}{The default local directory in which to save transient \code{terra} files.
 If not specified, defaults to
 \code{file.path(getOption("spades.scratchPath"), "terra")}.
 \emph{Important note:} this location may not be cleaned up automatically,
@@ -63,7 +63,7 @@ that may contribute to excessive disk usage.}
 \item{silent}{Logical. Should the messaging occur.}
 }
 \value{
-Returns a named list of the user's default working directories.
+\code{getPaths} returns a named list of the user's default working directories.
 \code{setPaths} is invoked for the side effect of setting these directories.
 }
 \description{
@@ -72,7 +72,7 @@ Note: there is an active binding made to \code{Paths}, so a user can use
 \code{Paths$cachePath} for example instead of \code{getPaths()$cachePath}
 }
 \examples{
-\dontrun{
+\donttest{
 getPaths()                       ## returns the current default working paths
 
 ## set individual custom paths

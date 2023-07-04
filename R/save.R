@@ -41,83 +41,100 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' The files are saved as `.rds` files, meaning, only one object gets
 #' saved per file.
 #'
-#'
 #' For objects saved using this function, the module developer must create save
 #' events that schedule a call to `saveFiles`.
 #'
 #' If this function is used outside of a module, it will save all files in the
-#' outputs(sim) that are scheduled to be saved at the current time in the simList.
+#' `outputs(sim)` that are scheduled to be saved at the current time in the `simList.`
 #'
-#' There are 3 ways to save objects using `SpaDES`.
+#' There are several ways to save objects using `SpaDES`.
 #'
-#' @noMd
-#' @section 1. Model-level saving:
+#' @section Model-level saving:
 #'
 #' Using the `outputs` slot in the [simInit()] call.
 #' See example in [simInit()].
 #' This can be convenient because it gives overall control of many modules at a
-#' time, and it gets automatically scheduled during the
-#' [simInit()] call.
+#' time, and it gets automatically scheduled during the [simInit()] call.
 #'
-#' @section 2. Module-level saving:
+#' @section Module-level saving:
 #'
 #' Using the `saveFiles` function inside a module.
-#' This must be accompanied by a `.saveObjects` list element in the
+#' This must be accompanied by a `.saveObjects` vector or list element in the
 #' `params` slot in the [simList()].
-#' Usually a module developer will create this method for future users of
-#' their module.
+#' Usually a module developer will create this method for future users of their module.
 #'
-#' @section 3. Custom saving:
+#' @section Custom saving:
 #'
 #' A module developer can save any object at any time inside their module, using
 #' standard R functions for saving R objects (e.g., `save` or `saveRDS`).
 #' This is the least modular approach, as it will happen whether a module user
 #' wants it or not.
 #'
-#' @author Eliot McIntire
-#' @author Alex Chubaty
 #' @note It is not possible to schedule separate saving events for each object
 #' that is listed in the `.saveObjects`.
 #'
 #' @param sim A `simList` simulation object.
 #'
-#' @importFrom data.table data.table
+#' @return (invisibly) the modified `sim` object.
+#'         invoked for side effect of saving the simulation to file.
+#'
 #' @export
+#' @author Eliot McIntire and Alex Chubaty
+#' @importFrom data.table data.table
 #' @rdname saveFiles
 #'
 #' @examples
-#' \dontrun{
-#'
+#' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
-#' #' # This will save the "caribou" object at the save interval of 1 unit of time
-#' #  in the outputPath location
-#' outputPath <- file.path(tempdir(), "test_save")
-#' times <- list(start = 0, end = 6, "month")
-#' parameters <- list(
-#'   .globals = list(stackName = "landscape"),
-#'   caribouMovement = list(
-#'     .saveObjects = "caribou",
-#'     .saveInitialTime = 1, .saveInterval = 1
-#'   ),
-#'   randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
+#' ## This will save the "caribou" object at the save interval of 1 unit of time
+#' ## in the outputPath location
+#'   outputPath <- file.path(tempdir(), "test_save")
+#'   times <- list(start = 0, end = 1, "month")
+#'   parameters <- list(
+#'     .globals = list(stackName = "landscape"),
+#'     caribouMovement = list(
+#'       .saveObjects = "caribou",
+#'       .saveInitialTime = 1, .saveInterval = 1,
+#'       .plots = NA
+#'     ),
+#'     randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
 #'
-#' modules <- list("randomLandscapes", "caribouMovement")
-#' paths <- list(
-#'   modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#'   outputPath = outputPath
-#' )
-#' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
-#' mySim <- simInit(times = times, params = parameters, modules = modules,
+#'   modules <- list("randomLandscapes", "caribouMovement")
+#'   paths <- list(
+#'     modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'     outputPath = outputPath
+#'   )
+#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+#'   mySim <- simInit(times = times, params = parameters, modules = modules,
+#'                    paths = paths)
+#'
+#'   # The caribou module has a saveFiles(sim) call, so it will save caribou
+#'   spades(mySim)
+#'   dir(outputPath)
+#'
+#'   # remove the files
+#'   file.remove(dir(outputPath, full.names = TRUE))
+#'
+#'   ## save multiple outputs
+#'   parameters <- list(
+#'     .globals = list(stackName = "landscape"),
+#'     caribouMovement = list(
+#'       .saveObjects = c("caribou", "habitatQuality"),
+#'       .saveInitialTime = 1, .saveInterval = 1,
+#'       .plots = NA
+#'     ),
+#'     randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
+#'
+#'   mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #'
-#' # The caribou module has a saveFiles(sim) call, so it will save caribou
-#' spades(mySim)
-#' dir(outputPath)
+#'   spades(mySim)
+#'   dir(outputPath)
+#'   # remove the files
+#'   file.remove(dir(outputPath, full.names = TRUE))
 #'
-#' # remove the files
-#' file.remove(dir(outputPath, full.names = TRUE))
-#' options(opts) # clean up
+#'   options(opts) # clean up
 #'
 #' }}
 saveFiles <- function(sim) {
@@ -135,40 +152,46 @@ saveFiles <- function(sim) {
   if (moduleName != "save") {
     # i.e., a module driven save event
     toSave <- lapply(params(sim), function(y) return(y$.saveObjects))[[moduleName]] %>%
-      data.frame(objectName = ., saveTime = curTime, file = ., stringsAsFactors = FALSE)
+      unlist() %>%
+      data.table(objectName = ., saveTime = curTime, file = ., stringsAsFactors = FALSE) %>%
+      as.data.frame()
     toSave <- .fillOutputRows(toSave)
     outputs(sim) <- rbind(outputs(sim), toSave)
 
     # don't need to save exactly same thing more than once - use data.table here because distinct
     # from dplyr does not do as expected
-    outputs(sim) <- data.table(outputs(sim)) %>%
-      unique(., by = c("objectName", "saveTime", "file", "fun", "package")) %>%
-      data.frame(.)
+    outputs(sim) <- data.table(outputs(sim)) |>
+      unique(by = c("objectName", "saveTime", "file", "fun", "package")) |>
+      data.frame()
   }
 
   if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
-      if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
-        args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
-                            file = outputs(sim)[["file"]][i]),
-                       outputArgs(sim)[[i]])
-        args <- args[!sapply(args, is.null)]
-        args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
-          isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
-        }))])
+      objExists <- exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)
+      isSimList <- identical(outputs(sim)[["objectName"]][i], "sim")
+      if (objExists || isSimList) {
+        if (objExists) {
+          args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
+                              file = outputs(sim)[["file"]][i]),
+                         outputArgs(sim)[[i]])
+          args <- args[!sapply(args, is.null)]
+          args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
+            isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
+          }))])
 
-        # The actual save line
-        do.call(outputs(sim)[["fun"]][i], args = args,
-                envir = getNamespace(outputs(sim)[["package"]][i]))
+          # The actual save line
+          do.call(outputs(sim)[["fun"]][i], args = args,
+                  envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        ## using @ works when outputs is a DT
+          ## using @ works when outputs is a DT
+        } else {
+          saveSimList(sim, filename = outputs(sim)[["file"]][i])
+        }
         outputs(sim)[["saved"]][i] <- TRUE
-        # sim@outputs[["saved"]][i] <- TRUE
       } else {
-        warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
+        warning(paste(outputs(sim)[["objectName"]][i], "is not an object in the simList. Cannot save."))
         outputs(sim)[["saved"]][i] <- FALSE
-        # sim@outputs[["saved"]][i] <- FALSE
       }
     }
   }
@@ -204,6 +227,8 @@ saveFiles <- function(sim) {
 #'   \item `package`: the package from which to load `fun`.
 #' }
 #'
+#' @return `data.frame`
+#'
 #' @export
 #' @importFrom data.table setnames
 #' @rdname loadFiles
@@ -214,22 +239,38 @@ saveFiles <- function(sim) {
     "qs", "qsave", "qs",
     "txt", "write.table", "utils",
     "csv", "write.csv", "utils",
-    "grd", "writeRaster", "raster"
+    "grd", "writeRaster", "raster",
+    "shp", "writeVector", "terra",
+    "tif", "writeRaster", "terra"
   )), stringsAsFactors = FALSE)
   setnames(.sFE, new = c("exts", "fun", "package"), old = paste0("X", 1:3))
   .sFE <- .sFE[order(.sFE$package, .sFE$fun), ]
+  if (NROW(getOption("spades.saveFileExtensions")) > 0) {
+    if (!identical(colnames(.sFE), colnames(getOption("spades.saveFileExtensions")))) {
+      stop("The column names of `getOption('spades.saveFileExtensions') must be: ",
+           paste(colnames(.sFE), collapse = ", "), "; they are currently ",
+           paste(collapse = ", ", colnames(getOption("spades.saveFileExtensions"))))
+    }
+    # remove initial dot
+    .sFE <- rbind(getOption("spades.saveFileExtensions"), .sFE)
+    .sFE[["exts"]] <- gsub("^\\.", "", .sFE[["exts"]])
+    # remove if there are 2 extensions for same fun and package
+    dups <- duplicated(.sFE[, c("fun", "package")])
+    .sFE <- .sFE[!dups, ]
+  }
   return(.sFE)
 }
 
 #' Generate simulation file name
 #'
-#' Assists with saving and retrieving simulations
-#' (e.g., with `saveSimList` and `loadSimList`).
+#' Assists with saving and retrieving simulations (e.g., with `saveSimList` and `loadSimList`).
 #'
 #' @param name Object name (e.g., `"mySimOut"`)
 #' @param path Directory location in where the file will be located (e.g., an `outputPath`).
 #' @param time Optional simulation time to use as filename suffix. Default `NULL`.
 #' @param ext  The file extension to use (default `"rds"`).
+#'
+#' @return character string giving a file path for a simulation file
 #'
 #' @export
 #' @importFrom reproducible normPath

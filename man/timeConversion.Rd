@@ -61,7 +61,7 @@ If the units passed to argument \code{units} are the same as
 \code{attr(time, "unit")}, then it simply returns input \code{time}.
 }
 \details{
-Because of R scoping, if \code{envir} is a simList environment, then
+Because of R scoping, if \code{envir} is a \code{simList} environment, then
 this function will search there first, then up the current \code{search()} path.
 Thus, it will find a user defined or module defined unit before a SpaDES unit.
 This means that a user can override the \code{dyear} given in SpaDES, for example,

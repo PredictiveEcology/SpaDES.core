@@ -10,7 +10,7 @@
 \item{item}{The item to accord conjugation with. If length 1, then "is" else "are".}
 }
 \value{
-"is" or "are"
+character string "is" or "are".
 }
 \description{
 Chose verb conjugation for "to be"

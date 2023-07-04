@@ -15,7 +15,9 @@ simFile(name, path, time = NULL, ext = "rds")
 
 \item{ext}{The file extension to use (default \code{"rds"}).}
 }
+\value{
+character string giving a file path for a simulation file
+}
 \description{
-Assists with saving and retrieving simulations
-(e.g., with \code{saveSimList} and \code{loadSimList}).
+Assists with saving and retrieving simulations (e.g., with \code{saveSimList} and \code{loadSimList}).
 }

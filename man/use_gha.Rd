@@ -11,6 +11,9 @@ use_gha(name, path)
 
 \item{path}{module path}
 }
+\value{
+Invoked for its side effect of creating new GitHub Actions workflow files.
+}
 \description{
 See corresponding vignette for more information.
 }

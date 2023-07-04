@@ -2,11 +2,11 @@
 % Please edit documentation in R/helpers.R
 \name{.tryCatch}
 \alias{.tryCatch}
-\title{tryCatch that keeps warnings, errors and value (result)}
+\title{\code{tryCatch} that keeps warnings, errors and value (result)}
 \usage{
 .tryCatch(expr)
 }
 \description{
-This is from https://stackoverflow.com/a/24569739/3890027
+From \url{https://stackoverflow.com/a/24569739/3890027}
 }
 \keyword{internal}

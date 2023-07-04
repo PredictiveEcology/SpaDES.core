@@ -9,6 +9,8 @@
 #' @param open  Logical. Should the new project file be opened after creation?
 #'              Default `TRUE` in an interactive session.
 #'
+#' @return invoked for side effect of project file creation
+#'
 #' @export
 #' @rdname newProject
 #'
@@ -65,6 +67,8 @@ setMethod(
 #' Create new module code file
 #'
 #' @inheritParams newProject
+#'
+#' @return invoked for side effect of project file creation
 #'
 #' @author Alex Chubaty
 #' @export

@@ -8,11 +8,12 @@ paramCheckOtherMods(
   sim,
   paramToCheck,
   moduleToUse = "all",
-  ifSetButDifferent = c("error", "warning", "message", "silent")
+  ifSetButDifferent = c("error", "warning", "message", "silent"),
+  verbose = getOption("reproducible.verbose")
 )
 }
 \arguments{
-\item{sim}{A simList}
+\item{sim}{A \code{simList} object}
 
 \item{paramToCheck}{A character string, length one, of a parameter name to
 check and compare between the current module and one or more or all others}
@@ -20,17 +21,25 @@ check and compare between the current module and one or more or all others}
 \item{moduleToUse}{A character vector of module names to check against. This can be
 \code{"all"} which will compare against all other modules.}
 
-\item{ifSetButDifferent}{A character string indicating whether to \code{"error"}
-the default, or send a \code{"warning"}, \code{message} or just silently continue
-(any other value).}
+\item{ifSetButDifferent}{A character string indicating whether to \code{"error"} the default,
+or send a \code{"warning"}, \code{message} or just silently continue (any other value).}
+
+\item{verbose}{Logical or Numeric, follows \code{reproducible.verbose} value by default.}
 }
 \value{
 If the value of the \code{paramToCheck} in the current module is either \code{NULL} or
 \code{"default"}, and there is only one other value across all modules named in \code{moduleToUse},
 then this will return a character string with the value of the single parameter value
-in the other module(s). It will return the current value if there are no other modules
-with the same parameter.
-
+in the other module(s).
+It will return the current value if there are no other modules with the same parameter.
+}
+\description{
+This function is intended to be part of module code and will test whether
+the value of a parameter within the current module matches the value of the
+same parameter in other modules. This is a test for parameters that might expect
+to be part of a \code{params = list(.globals = list(someParam = "test"))} passed to \code{simInit}.
+}
+\details{
 It is considered a "fail" under several conditions:
 \enumerate{
 \item current module has a value that is not \code{NULL} or \code{"default"} and another module
@@ -39,13 +48,5 @@ has a different value;
 so it is ambiguous which one to return.
 }
 
-\code{} either the current module is different than other modules,
-unless it is "default" or NULL.
-}
-\description{
-This function is intended to be part of module code and will test whether
-the value of a parameter within the current module matches the value of the
-same parameter in other modules. This is a test for parameters that might expect
-to be part of a \code{params = list(.globals = list(someParam = "test"))} passed
-to the \code{simInit}
+Either the current module is different than other modules, unless it is "default" or NULL.
 }

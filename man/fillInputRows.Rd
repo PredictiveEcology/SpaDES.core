@@ -2,16 +2,16 @@
 % Please edit documentation in R/module-define.R
 \name{.fillInputRows}
 \alias{.fillInputRows}
-\title{An internal function for coercing a data.frame to inputs()}
+\title{An internal function for coercing a data.frame to \code{inputs()}}
 \usage{
 .fillInputRows(inputDF, startTime)
 }
 \arguments{
-\item{inputDF}{A data.frame with partial columns to pass to inputs<-}
+\item{inputDF}{A data.frame with partial columns to pass to \verb{inputs<-}}
 
-\item{startTime}{Numeric time. The start(sim).}
+\item{startTime}{Numeric time. The \code{start(sim)}.}
 }
 \description{
-An internal function for coercing a data.frame to inputs()
+An internal function for coercing a data.frame to \code{inputs()}
 }
 \keyword{internal}

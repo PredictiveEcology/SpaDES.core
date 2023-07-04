@@ -17,8 +17,7 @@ envir(sim) <- value
 \S4method{envir}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{value}{The object to be stored at the slot.}
 }
@@ -35,11 +34,11 @@ These are included for advanced users.
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \seealso{
-\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.8 on simList environment.
+\link{SpaDES.core-package}, specifically the section 1.2.8 on \code{simList} environment.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{events}()},
 \code{\link{globals}()},
 \code{\link{inputs}()},

@@ -16,11 +16,11 @@ return. This is only relevant for list, environment (or similar) objects}
 
 \item{preDigestByClass}{A list, usually from \code{.preDigestByClass}}
 }
-\description{
-See \link[reproducible:exportedMethods]{reproducible::.addTagsToOutput}.
+\value{
+modified \code{object}, with attributes added
 }
-\seealso{
-\link[reproducible:exportedMethods]{reproducible::.addTagsToOutput}
+\description{
+See \code{\link[reproducible:exportedMethods]{reproducible::.addTagsToOutput()}}.
 }
 \author{
 Eliot McIntire

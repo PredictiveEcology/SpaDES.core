@@ -9,8 +9,7 @@
 #' @param defineModuleListItems A vector of metadata entries to return values
 #'   about.
 #'
-#' @return A list of module metadata, matching the structure in
-#'         [defineModule()].
+#' @return A list of module metadata, matching the structure in [defineModule()].
 #'
 #' @author Alex Chubaty
 #' @export
@@ -58,13 +57,12 @@ setMethod(
     #   that is only functions, but old SpaDES modules (e.g., LCC2005 and family)
     #   have a line stopifnot(packageVersion("SpaDES") >= "1.2.0.9009"),
     #   which fails using the simInit approach, so need the .parseModulePartial
-    suppressMessages(sim <- try(simInit(modules = module,
-                                        paths = list(modulePath = path)),
-                                silent = TRUE)) # any failure will just pass to next try
+    suppressMessages({
+      sim <- try(simInit(modules = module, paths = list(modulePath = path)), silent = TRUE)
+    }) # any failure will just pass to next try
 
     if (!is(sim, "try-error")) {
       metadata <- moduleMetadata(sim)[defineModuleListItems]
-
     } else {
       metadata <- lapply(defineModuleListItems, function(xx) {
         pmp <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),

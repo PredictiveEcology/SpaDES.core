@@ -26,7 +26,7 @@ Modules listed here will be loaded with this module.}
 Semantic versioning is assumed \url{https://semver.org/}.}
 
 \item{\code{spatialExtent}}{Specifies the module's spatial extent as an
-\code{\link[=Extent]{Extent()}} object. Default is \code{NA}.}
+\code{Raster::Extent} or \code{terra::SpatExtent} object. Default is \code{NA}.}
 
 \item{\code{timeframe}}{Specifies the valid timeframe for which the module was
 designed to simulate. Must be a \code{\link[=POSIXt]{POSIXt()}}
@@ -42,6 +42,14 @@ Alternatively, list of filenames of \code{.bib} or similar files.
 Defaults to \code{NA_character_}.}
 
 \item{\code{documentation}}{List of filenames referring to module documentation sources.}
+
+\item{\code{loadOrder}}{An optional list of up to 2 named character vectors, named
+"before" and "after". If specified, then SpaDES.core will
+use this information to help disentangle ambiguous module
+load order estimation. Any module that is specified
+in the "before" element will have its "init" event scheduled
+before this module; any module specified in the "after"
+element will have its "init" event scheduled after this module.}
 
 \item{\code{reqdPkgs}}{Character vector of R package names to be loaded.
 Defaults to \code{NA_character_}.}

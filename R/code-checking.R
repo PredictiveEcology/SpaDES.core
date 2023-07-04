@@ -26,8 +26,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 
 #' Find all references to `sim$`
 #'
-#' @param envToFindSim An environment where sim is defined. This is used when
-#'                     the element accessing the simList is actually a call, e.g.,
+#' @param envToFindSim An environment where `sim` is defined. This is used when
+#'                     the element accessing the `simList` is actually a call, e.g.,
 #'                     `sim[[P(sim)$stackName]]`
 #'
 #' @param moduleEnv The environment where the module functions are.
@@ -35,9 +35,9 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @param type Either "get", "assign", or "globals". See details.
 #'
 #' @details
-#' `.findElementsInEnv` is a wrapper around `.findElements`. It will convert
-#' function code to a call, and then pass it to `.findElements`. It also does
-#' some cleaning for duplications, `NA` values, and cases where the element
+#' `.findElementsInEnv` is a wrapper around `.findElements`.
+#' It will convert function code to a call, and then pass it to `.findElements`.
+#' It also does some cleaning for duplications, `NA` values, and cases where the element
 #' inside a `sim[["xxx"]]` is a variable that should be evaluated, rather than
 #' simply taken verbatim (e.g., `sim[[P(sim)$stackName]])`.
 #'
@@ -45,11 +45,10 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' the RHS of an assignment operator or when there is no assignment. When
 #' **`type = "assign"`**, the function scans for `sim$xxx` or `sim[["xxx"]]` on the
 #' LHS of an assignment operator. When **`type = "globals"`**, the function
-#' scans for all functions (i.e., "globals") being used. This is similar to
-#' `codetools::findGlobals`, but faster.
+#' scans for all functions (i.e., "globals") being used.
+#' This is similar to `codetools::findGlobals()`, but faster.
 #'
-#' @return
-#' A character string with all sim objects found
+#' @return A character string with all `sim` objects found.
 #'
 #' @author Eliot McIntire
 #' @keywords internal
@@ -125,13 +124,12 @@ cantCodeCheckMessage <- ": line could not be checked "
   return(out)
 }
 
-#' @param x A call in which to search for sim
+#' @param x A call in which to search for `sim`
 #'
 #' @details
-#' `.findElement` will omit whatever it finds inside a `is.null`, when
-#' `type = "assign"`. Usually this is a test of existence of that object, in
-#' order to assign to that object. It is only reading it to determine whether or
-#' not it should write to it.
+#' `.findElement` will omit whatever it finds inside a `is.null()`, when `type = "assign"`.
+#' Usually this is a test of existence of that object, in order to assign to that object.
+#' It is only reading it to determine whether or not it should write to it.
 #'
 #' @keywords internal
 #' @rdname findElements
@@ -243,20 +241,19 @@ cantCodeCheckMessage <- ": line could not be checked "
   }
 }
 
-#' Runs a series of code checks during simInit
+#' Runs a series of code checks during `simInit()`
 #'
-#' This uses custom tools and some optional tools in `codetools`
-#' package to check for function collisions with known,
-#' common function collisions (raster::stack, raster::scale).
+#' This uses custom tools and some optional tools in the `codetools` package to check for function
+#' collisions with known, common function collisions (`raster::stack`, `raster::scale`).
 #' All outputs will be sent as messages.
 #'
-#' @param sim simList
+#' @param sim a `simList` object
 #' @param m module name
 #' @param message rest of message
 #' @param hadPrevMessage
 #'
-#' @return
-#' A message with that starts with paste0(m, ":", message)
+#' @return NULL (invisibly); invoked for side effect of generating message with that starts with
+#' `paste0(m, ":", message)`.
 #'
 #' @keywords internal
 #' @rdname runCodeChecks
@@ -544,9 +541,10 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @param m module name
 #' @param message rest of message
 #'
-#' @return
-#' A message with that starts with paste0(m, ":", message)
+#' @return returns `TRUE`; invoked for side effect of generating message with that starts with
+#' `paste0(m, ":", message)`.
 #'
+#' @importFrom crayon magenta
 #' @keywords internal
 #' @rdname parseMessage
 .parseMessage <- function(m, problem, message) {
@@ -572,8 +570,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #'
 #' @param item The item to accord conjugation with. If length 1, then "is" else "are".
 #'
-#' @return
-#' "is" or "are"
+#' @return character string "is" or "are".
 #'
 #' @keywords internal
 #' @rdname verb
@@ -581,7 +578,7 @@ cantCodeCheckMessage <- ": line could not be checked "
   c("is", "are")[1 + as.numeric(length(item) > 1)]
 }
 
-#' `.parsingSim` will pull out the various ways to use sim, e.g.,
+#' `.parsingSim` will pull out the various ways to use `sim`, e.g.,
 #' `sim$xxx`, `sim[["xxx"]]`, `sim[[P(sim)$xxx]]`
 #'
 #' @keywords internal

@@ -23,11 +23,11 @@ canonical object, e.g., they would be at \code{envir[[synonym[[1]][1]]]} and
 \description{
 This will create active bindings amongst the synonyms. To minimize copying,
 the first one that exists in the character vector will become the "canonical"
-object. All others named in the character vector will be activeBindings to
+object. All others named in the character vector will be \code{activeBindings} to
 that canonical one.  This synonym list will be assigned to the \code{envir},
 as an object named \code{objectSynonyms}. That object will have an attribute
 called, \code{bindings} indicating which one is the canonical one and which
-is/are the activeBindings. EXPERIMENTAL: If the objects are removed during a
+is/are the \code{activeBindings.} EXPERIMENTAL: If the objects are removed during a
 \code{spades} call by, say, a module, then at the end of the event, the
 \code{spades} call will replace the bindings. In other words, if a module
 deletes the object, it will "come back". This may not always be desired.
@@ -39,8 +39,8 @@ to our issues tracker)
 
 This function will append any new \code{objectSynonym} to any pre-existing
 \code{objectSynonym} in the \code{envir}. Similarly, this function assumes
-transitivity, i.e., if age and ageMap are synonyms, and ageMap and timeSinceFire
-are synonyms, then age and timeSinceFire must be synonyms.
+transitivity, i.e., if \code{age} and \code{ageMap} are synonyms, and \code{ageMap} and \code{timeSinceFire}
+are synonyms, then \code{age} and \code{timeSinceFire} must be synonyms.
 }
 \examples{
 sim <- simInit()

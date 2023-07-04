@@ -1,16 +1,14 @@
 ##  SpaDES.core/R/SpaDES-core-package.R by Alex M Chubaty and Eliot J B McIntire
-##  Copyright (C) 2015-2022 Her Majesty the Queen in Right of Canada,
-##   as represented by the Minister of Natural Resources Canada
+##  Copyright (C) 2015-2023 His Majesty the Queen in Right of Canada,
+##  as represented by the Minister of Natural Resources Canada
 ##
 
 #' Categorized overview of the `SpaDES.core` package
 #'
-#' @noMd
-#' @description
-#'
 #' \if{html}{\figure{SpaDES.png}{options: width=100 alt="SpaDES logo" style="float: right;"}}
 #' \if{latex}{\figure{SpaDES.png}{options: width=0.5in}}
 #'
+#' @description
 #' This package allows implementation a variety of simulation-type models,
 #' with a focus on spatially explicit models.
 #' The core simulation components are built upon a discrete event simulation
@@ -31,7 +29,6 @@
 #'
 #' Wiki: <https://github.com/PredictiveEcology/SpaDES/wiki>
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 1 Spatial discrete event simulation (`SpaDES`):
 #'
 #' A collection of top-level functions for doing spatial discrete event simulation.
@@ -66,10 +63,9 @@
 #' All `SpaDES` simulations operate on this object class.
 #'
 #' \tabular{ll}{
-#'   [simList()] \tab The 'simList' class\cr
+#'   [simList()] \tab The `simList` class\cr
 #' }
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 3 `simList` methods:
 #'
 #' Collections of commonly used functions to retrieve or set slots (and their elements)
@@ -94,7 +90,7 @@
 #' \subsection{3.3 objects in the `simList`}{
 #'   \tabular{ll}{
 #'      [ls()], [objects()] \tab Names of objects referenced by the simulation environment.\cr
-#'      [ls.str()] \tab List the structure of the simList objects.\cr
+#'      [ls.str()] \tab List the structure of the `simList` objects.\cr
 #'      [objs()] \tab List of objects referenced by the simulation environment.\cr
 #'   }
 #' }
@@ -157,8 +153,8 @@
 #'   within that slot. Sometimes, this not desired, and a true copy is required.
 #'
 #'   \tabular{ll}{
-#'      [envir()] \tab Access the environment of the simList directly (advanced)\cr
-#'      [copy()] \tab Deep copy of a simList. (advanced)\cr
+#'      [envir()] \tab Access the environment of the `simList` directly (advanced)\cr
+#'      [copy()] \tab Deep copy of a `simList.` (advanced)\cr
 #'   }
 #' }
 #'
@@ -177,7 +173,6 @@
 #'   }
 #' }
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 4 Module operations:
 #'
 #' \subsection{4.1 Creating, distributing, and downloading modules}{
@@ -225,7 +220,7 @@
 #'
 #' \subsection{4.3 Module dependencies}{
 #'   Once a set of modules have been chosen, the dependency information is automatically
-#'   calculated once simInit is run. There are several functions to assist with dependency
+#'   calculated once `simInit` is run. There are several functions to assist with dependency
 #'   information:
 #'
 #'   \tabular{ll}{
@@ -234,7 +229,6 @@
 #'   }
 #' }
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 5 Module functions:
 #'
 #' *A collection of functions that help with making modules can be found in
@@ -246,7 +240,7 @@
 #'   Several `SpaDES.tools` functions assist with these:
 #'
 #'   \tabular{ll}{
-#'     [SpaDES.tools::adj()] \tab An optimized (i.e., faster) version of [raster::adjacent()]\cr
+#'     [SpaDES.tools::adj()] \tab An optimized (i.e., faster) version of [terra::adjacent()]\cr
 #'     [SpaDES.tools::cir()] \tab Identify pixels in a circle around a [`SpatialPoints*()`][sp::SpatialPoints-class] object\cr
 #'     [`directionFromEachPoint()`][SpaDES.tools::distanceFromEachPoint] \tab Fast calculation of direction and distance surfaces\cr
 #'     [SpaDES.tools::distanceFromEachPoint()] \tab Fast calculation of distance surfaces\cr
@@ -265,14 +259,14 @@
 #'     [SpaDES.tools::crw()] \tab Simple correlated random walk function\cr
 #'     [SpaDES.tools::heading()] \tab Determines the heading between `SpatialPoints*`\cr
 #'     [quickPlot::makeLines()] \tab Makes `SpatialLines` object for, e.g., drawing arrows\cr
-#'     [`move()`][SpaDES.tools::crw] \tab A meta function that can currently only take "crw"\cr
-#'     [`specificNumPerPatch()`][SpaDES.tools::specnumperpatch-probs] \tab Initiate a specific number of agents per patch\cr
+#'     [`move()`][SpaDES.tools::move] \tab A meta function that can currently only take "crw"\cr
+#'     [`specificNumPerPatch()`][SpaDES.tools::specificNumPerPatch] \tab Initiate a specific number of agents per patch\cr
 #'   }
 #' }
 #'
 #' \subsection{5.3 GIS operations}{
 #'   In addition to the vast amount of GIS operations available in R (mostly from
-#'   contributed packages such as `sp`, `raster`, `maps`, `maptools`
+#'   contributed packages such as `sf`, `terra`, (also `sp`, `raster`), `maps`, `maptools`
 #'   and many others), we provide the following GIS-related functions:
 #'
 #'   \tabular{ll}{
@@ -290,12 +284,12 @@
 #'   }
 #' }
 #'
-#' \subsection{5.5 Colors in `Raster*` objects}{
+#' \subsection{5.5 Colours in `Raster*` objects}{
 #'   We likely will not want the default colours for every map.
-#'   Here are several helper functions to add to, set and get colors of `Raster*` objects:
+#'   Here are several helper functions to add to, set and get colours of `Raster*` objects:
 #'
 #'   \tabular{ll}{
-#'     [`setColors()`][quickPlot::getSetColors] \tab Set colours for plotting `Raster*` objects\cr
+#'     [`setColors()`][quickPlot::setColors] \tab Set colours for plotting `Raster*` objects\cr
 #'     [getColors()] \tab Get colours in a `Raster*` objects\cr
 #'     [divergentColors()] \tab Create a colour palette with diverging colours around a middle\cr
 #'   }
@@ -317,7 +311,7 @@
 #'
 #'   \tabular{ll}{
 #'     [checkObject()] \tab Check for a existence of an object within a `simList` \cr
-#'     [Require::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
+#'     [reproducible::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
 #'   }
 #' }
 #'
@@ -327,11 +321,11 @@
 #'   You must know how to use SELES for these to be useful:
 #'
 #'   \tabular{ll}{
-#'     [`agentLocation()`][SpaDES.tools::SELESagentLocation] \tab Agent location\cr
+#'     [`agentLocation()`][SpaDES.tools::agentLocation] \tab Agent location\cr
 #'     [SpaDES.tools::initiateAgents()] \tab Initiate agents into a `SpatialPointsDataFrame`\cr
-#'     [`numAgents()`][SpaDES.tools::SELESnumAgents] \tab Number of agents\cr
-#'     [`probInit()`][SpaDES.tools::SELESprobInit] \tab Probability of initiating an agent or event\cr
-#'     [`transitions()`][SpaDES.tools::SELEStransitions] \tab Transition probability\cr
+#'     [`numAgents()`][SpaDES.tools::numAgents] \tab Number of agents\cr
+#'     [`probInit()`][SpaDES.tools::probInit] \tab Probability of initiating an agent or event\cr
+#'     [`transitions()`][SpaDES.tools::transitions] \tab Transition probability\cr
 #'   }
 #' }
 #'
@@ -339,14 +333,13 @@
 #'   Functions that may be useful within a `SpaDES` context:
 #'
 #'   \tabular{ll}{
-#'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range [a,b]\cr
+#'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range `[a,b]`\cr
 #'     [layerNames()] \tab Get layer names for numerous object classes\cr
 #'     [numLayers()] \tab Return number of layers\cr
 #'     [paddedFloatToChar()] \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
 #'   }
 #' }
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 6 Caching simulations and simulation components:
 #'
 #' *Simulation caching uses the `reproducible` package.*
@@ -360,19 +353,18 @@
 #' See example in [spades()], achieved by using `cache = TRUE` argument.
 #'
 #' \tabular{ll}{
-#'   [reproducible::Cache()] \tab Caches a function, but often accessed as arg in [spades()]\cr
-#'   [`showCache()`][reproducible::cache-tools] \tab Shows information about the objects in the cache\cr
-#'   [`clearCache()`][reproducible::cache-tools] \tab Removes objects from the cache\cr
-#'   [`keepCache()`][reproducible::cache-tools] \tab Keeps only the objects described\cr
+#'   [reproducible::Cache()] \tab Caches a function, but often accessed as argument in [spades()]\cr
+#'   [reproducible::showCache()] \tab Shows information about the objects in the cache\cr
+#'   [reproducible::clearCache()] \tab Removes objects from the cache\cr
+#'   [reproducible::keepCache()] \tab Keeps only the objects described\cr
 #' }
 #'
 #' A module developer can build caching into their module by creating cached versions of their
 #' functions.
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 7 Plotting:
 #'
-#' \emph{Much of the underlying plotting functionality is provided by \pkg{quickPlot}.}
+#' **Much of the underlying plotting functionality is provided by \pkg{quickPlot}.**
 #'
 #' There are several user-accessible plotting functions that are optimized for modularity
 #' and speed of plotting:
@@ -397,22 +389,20 @@
 #'   [clickCoordinates()] \tab Get the coordinates, in map units, under mouse click\cr
 #'   [dev()] \tab Specify which device to plot on, making a non-RStudio one as default\cr
 #'   [newPlot()] \tab Open a new default plotting device\cr
-#'   [rePlot()] \tab Replots all elements of device for refreshing or moving plot\cr
+#'   [rePlot()] \tab Re-plots all elements of device for refreshing or moving plot\cr
 #' }
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 8 File operations:
 #'
 #' In addition to R's file operations, we have added several here to aid in bulk
 #' loading and saving of files for simulation purposes:
 #'
 #' \tabular{ll}{
-#'   [loadFiles()] \tab Load simulation objects according to a filelist\cr
+#'   [loadFiles()] \tab Load simulation objects according to a file list\cr
 #'   [rasterToMemory()] \tab Read a raster from file to RAM\cr
-#'   [saveFiles()] \tab Save simulation objects according to outputs and params\cr
+#'   [saveFiles()] \tab Save simulation objects according to outputs and parameters\cr
 #' }
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 9 Sample modules included in package:
 #'
 #' Several dummy modules are included for testing of functionality.
@@ -424,7 +414,6 @@
 #'   `fireSpread` \tab A simple model of a spatial spread process\cr
 #' }
 #'
-#' ------------------------------------------------------------------------------------------
 #' @section 10 Package options:
 #'
 #' `SpaDES` packages use the following [options()] to configure behaviour:
@@ -433,9 +422,9 @@
 #'   \item `spades.browserOnError`: If `TRUE`, the default, then any
 #'   error rerun the same event with `debugonce` called on it to allow editing
 #'   to be done. When that browser is continued (e.g., with 'c'), then it will save it
-#'   reparse it into the simList and rerun the edited version. This may allow a spades
+#'   reparse it into the `simList` and rerun the edited version. This may allow a spades
 #'   call to be recovered on error, though in many cases that may not be the correct
-#'   behaviour. For example, if the simList gets updated inside that event in an iterative
+#'   behaviour. For example, if the `simList` gets updated inside that event in an iterative
 #'   manner, then each run through the event will cause that iteration to occur.
 #'   When this option is `TRUE`, then the event will be run at least 3 times: the
 #'   first time makes the error, the second time has `debugonce` and the third time
@@ -456,7 +445,7 @@
 #'     efficient (but slower) algorithms. Default `FALSE`.
 #'
 #'   \item `spades.moduleCodeChecks`: Should the various code checks be run
-#'   during `simInit`. These are passed to codetools::checkUsage.
+#'   during `simInit`. These are passed to `codetools::checkUsage()`.
 #'   Default is given by the function, plus these :`list(suppressParamUnused = FALSE,
 #'   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
 #'   skipWith = TRUE)`.
@@ -476,15 +465,15 @@
 #'   save simulation outputs.
 #'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/outputs`).
 #'
-#'   \item `spades.recoveryMode`: If this a numeric > 0 or TRUE, then the
-#'   discrete event simulator will take a snapshot of the objects in the simList
+#'   \item `spades.recoveryMode`: If this a numeric greater than 0 or TRUE, then the
+#'   discrete event simulator will take a snapshot of the objects in the `simList`
 #'   that might change (based on metadata `outputObjects` for that module), prior to
 #'   initiating every event. This will allow the
 #'   user to be able to recover in case of an error or manual interruption (e.g., `Esc`).
-#'   If this is numeric, a copy of that number of "most
-#'   recent events" will be maintained so that the user can recover and restart
-#'   > 1 event in the past, i.e., redo some of the "completed" events. Default is
-#'   `TRUE`, i.e., it will keep the state of the `simList`
+#'   If this is numeric, a copy of that number of "most recent events" will be
+#'   maintained so that the user can recover and restart more than one event in the past,
+#'   i.e., redo some of the "completed" events.
+#'   Default is `TRUE`, i.e., it will keep the state of the `simList`
 #'   at the start of the current event. This can be recovered with `restartSpades`
 #'   and the differences can be seen in a hidden object in the stashed `simList.`
 #'   There is a message which describes how to find that.

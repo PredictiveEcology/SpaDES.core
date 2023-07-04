@@ -2,18 +2,9 @@
 % Please edit documentation in R/module-define.R
 \name{defineParameter}
 \alias{defineParameter}
-\alias{defineParameter,character,character,ANY,ANY,ANY,character-method}
-\alias{defineParameter,character,character,ANY,missing,missing,character-method}
-\alias{defineParameter,missing,missing,missing,missing,missing,missing-method}
 \title{Define a parameter used in a module}
 \usage{
 defineParameter(name, class, default, min, max, desc, ...)
-
-\S4method{defineParameter}{character,character,ANY,ANY,ANY,character}(name, class, default, min, max, desc, ...)
-
-\S4method{defineParameter}{character,character,ANY,missing,missing,character}(name, class, default, min, max, desc, ...)
-
-\S4method{defineParameter}{missing,missing,missing,missing,missing,missing}()
 }
 \arguments{
 \item{name}{Character string giving the parameter name.}
@@ -45,7 +36,7 @@ having to use \code{paste}; any character strings after \code{desc}
 will be \code{paste}d together with \code{desc}.}
 }
 \value{
-data.frame
+a \code{data.frame}
 }
 \description{
 Used to specify a parameter's name, value, and set a default. The \code{min} and
@@ -77,7 +68,7 @@ parameters = rbind(
 
 )
 
-\dontrun{
+\donttest{
 # Create a new module, then access parameters using `P`
 tmpdir <- file.path(tempdir(), "test")
 checkPath(tmpdir, create = TRUE)
@@ -90,6 +81,11 @@ if (interactive()) file.edit(file.path(tmpdir, "testModule", "testModule.R"))
 
 # initialize the simList
 if (requireNamespace("ggplot2", quietly = TRUE)) {
+  # Some things not necessary in this example, if not interactive (like plotting)
+  opts <- if (!interactive()) list() else
+    options(spades.plot = NA,
+                    spades.useRequire = FALSE,
+                    spades.moduleCodeChecks = FALSE)
   mySim <- simInit(modules = "testModule",
                    paths = list(modulePath = tmpdir))
 
@@ -99,13 +95,13 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   P(mySim, module = "testModule") # gets all params in a module
   P(mySim, ".useCache", "testModule") # just one param
 }
+options(opts)
 unlink(tmpdir, recursive = TRUE)
 }
 
 }
 \seealso{
-\code{\link[=P]{P()}}, \code{\link[=params]{params()}} for accessing these parameters in
-a module.
+\code{\link[=P]{P()}}, \code{\link[=params]{params()}} for accessing these parameters in a module.
 }
 \author{
 Alex Chubaty and Eliot McIntire

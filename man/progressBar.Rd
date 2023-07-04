@@ -12,6 +12,9 @@ setProgressBar(sim)
 \arguments{
 \item{sim}{A \code{simList} simulation object.}
 }
+\value{
+invoked for side effect of creating progress bar
+}
 \description{
 Shows a progress bar that is scaled to simulation end time.
 }

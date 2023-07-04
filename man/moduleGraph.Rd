@@ -24,17 +24,16 @@ Default is \code{FALSE}.}
 \item{...}{Arguments passed to \code{Plot}}
 }
 \value{
-A list with 2 elements, an \code{\link[=igraph]{igraph()}} object and an \code{igraph}
-communities object.
+A list with 2 elements, an \code{\link[=igraph]{igraph()}} object and an \code{igraph} communities object.
 }
 \description{
 This is still experimental, but this will show the hierarchical structure of
-parent and children modules and return a list with an igraph object
-and an igraph communities object, showing the groups.
+parent and children modules and return a list with an \code{igraph} object
+and an \code{igraph} communities object, showing the groups.
 Currently only tested with relatively simple structures.
 }
 \seealso{
-moduleDiagram
+\code{\link[=moduleDiagram]{moduleDiagram()}}
 }
 \author{
 Eliot McIntire

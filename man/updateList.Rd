@@ -17,7 +17,7 @@ The values of matching elements in list \code{y}
 replace the values in list \code{x}.
 }
 \description{
-Being deprecated. Use \code{\link[utils:modifyList]{utils::modifyList()}} (which can not handle NULL) or
+Defunct. Use \code{\link[utils:modifyList]{utils::modifyList()}} (which can not handle NULL) or
 \code{\link[Require:modifyList2]{Require::modifyList2()}} for case with >2 lists and can handle NULL lists.
 }
 \author{

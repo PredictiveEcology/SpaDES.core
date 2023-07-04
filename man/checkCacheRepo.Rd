@@ -11,8 +11,11 @@
 
 \item{create}{Logical. If TRUE, then it will create the path for cache.}
 }
+\value{
+character string representing a directory path to the cache repo
+}
 \description{
-See \link[reproducible:exportedMethods]{reproducible::.checkCacheRepo}.
+See \code{\link[reproducible:exportedMethods]{reproducible::.checkCacheRepo()}}.
 }
 \seealso{
 \link[reproducible:exportedMethods]{reproducible::.checkCacheRepo}

@@ -22,7 +22,7 @@ so that only a single arrow is drawn connecting the modules.
 Default is \code{FALSE}.}
 }
 \value{
-An \code{\link[=igraph]{igraph()}} object.
+An \code{igraph()} object.
 }
 \description{
 Build a module dependency graph

@@ -10,8 +10,7 @@ defineModule(sim, x)
 \S4method{defineModule}{simList,list}(sim, x)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{x}{A list with a number of named elements, referred to as the metadata. See details.}
 }
@@ -53,10 +52,10 @@ The module developer should update manually this with each change
 that is made to the module. See \url{https://semver.org/}
 for a widely accepted standard for version numbering.\cr
 \code{spatialExtent} \tab The spatial extent of the module supplied via
-\code{raster::extent}. This is currently unimplemented.
+\code{terra::ext}. This is currently unimplemented.
 Once implemented, this should define what spatial region this
 module is scientifically reasonable to be used in.\cr
-\code{timeframe} \tab Vector (length 2) of POSIXt dates specifying the temporal extent
+\code{timeframe} \tab Vector (length 2) of \code{POSIXt} dates specifying the temporal extent
 of the module. Currently unimplemented.
 Once implemented, this should define what time frame this
 module is scientifically reasonable to be used for.\cr
@@ -74,7 +73,18 @@ This is currently not parsed by SpaDES;
 it is for human readers only.\cr
 \code{documentation} \tab List of filenames referring to module documentation sources.
 This is currently not parsed by SpaDES;
-it is for human readers only.\cr\cr
+it is for human readers only.\cr
+\code{loadOrder} \tab Named list of length 0, 1, or 2, with names being \code{after} and \code{before}.
+Each element should be a character string/vector naming 1 or more
+modules that will be loaded \code{after} or \code{before} this module.
+\code{after} and \code{before} are used from the current module's
+perspective. So, \code{list(after = c("Biomass_core"))} means that
+this module must come \emph{after} \code{"Biomass_core"}. This should only
+be used when there are cyclic dependencies (2 or more modules
+have 1 or more objects that is in both \code{inputObjects} and
+\code{outputObjects} of both/all modules) between this module
+and other modules. In cases where the dependencies are not cyclic,
+SpaDES is able to resolve the order correctly.\cr
 \code{reqdPkgs} \tab List of R package names required by the module. These
 packages will be loaded when \code{simInit} is called.
 \code{\link[Require:Require]{Require::Require()}} will be used internally
@@ -98,7 +108,7 @@ with columns \code{objectName} (class \code{character}),
 \code{sourceURL} (class \code{character}), and \code{other}
 (currently spades does nothing with this column).
 This data.frame identifies the objects that are expected,
-but does not do any loading of that object into the simList.
+but does not do any loading of that object into the \code{simList}.
 The \code{sourceURL} gives the developer the opportunity
 to identify the source of a data file that can be used
 with the model. This URL will be
@@ -123,7 +133,7 @@ that will cause these objects to be put into the
 }
 
 \examples{
-\dontrun{
+\donttest{
   ## a default version of the defineModule is created with a call to newModule
   newModule("test", path = tempdir(), open = FALSE)
 
@@ -133,7 +143,7 @@ that will cause these objects to be put into the
 
 }
 \seealso{
-moduleDefaults \code{\link[=defineEvent]{defineEvent()}}
+\code{\link[=moduleDefaults]{moduleDefaults()}}, \code{\link[=defineEvent]{defineEvent()}}
 }
 \author{
 Alex Chubaty

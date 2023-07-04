@@ -102,7 +102,7 @@ plotFun <- function(sim) {
   # ! ----- EDIT BELOW ----- ! #
   # do stuff for this event
   sampleData <- data.frame("TheSample" = sample(1:10, replace = TRUE))
-  Plots(sampleData, fn = ggplotFn)
+  Plots(sampleData, fn = ggplotFn) # needs ggplot2
 
   # ! ----- STOP EDITING ----- ! #
   return(invisible(sim))
@@ -156,8 +156,8 @@ Event2 <- function(sim) {
 }
 
 ggplotFn <- function(data, ...) {
-  ggplot(data, aes(TheSample)) +
-    geom_histogram(...)
+  ggplot2::ggplot(data, ggplot2::aes(TheSample)) +
+    ggplot2::geom_histogram(...)
 }
 
 ### add additional events as needed by copy/pasting from above

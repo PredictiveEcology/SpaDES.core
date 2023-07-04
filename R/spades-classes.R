@@ -5,7 +5,7 @@
 #'
 #' @section Simulation classes:
 #' \tabular{ll}{
-#'   [simList()] \tab The 'simList' class\cr
+#'   [simList()] \tab The `simList` class\cr
 #'   [.moduleDeps()] \tab Descriptor object for specifying `SpaDES` module dependencies\cr
 #'   [.simDeps()] \tab Defines all simulation dependencies for all modules within a `SpaDES` simulation\cr
 #'   --------------------------- \tab ------------------------------------------------------------------------------------------ \cr

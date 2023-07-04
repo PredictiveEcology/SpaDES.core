@@ -153,7 +153,7 @@ attributes(monthsInSeconds)$unit <- "second"
 #' @param skipChecks For speed, the internal checks for classes and missingness can be skipped.
 #'                   Default `FALSE`.
 #'
-#' @details Because of R scoping, if `envir` is a simList environment, then
+#' @details Because of R scoping, if `envir` is a `simList` environment, then
 #' this function will search there first, then up the current `search()` path.
 #' Thus, it will find a user defined or module defined unit before a SpaDES unit.
 #' This means that a user can override the `dyear` given in SpaDES, for example,

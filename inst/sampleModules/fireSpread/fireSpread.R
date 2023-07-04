@@ -1,4 +1,4 @@
-SpaDES.core.version <- "1.0.7"
+SpaDES.core.version <- "2.0.0"
 if (utils::packageVersion("SpaDES.core") < SpaDES.core.version) {
   stop("This 'fireSpread' module was built with 'SpaDES.core' version",
        SpaDES.core.version, ".\n",
@@ -18,16 +18,16 @@ defineModule(sim, list(
   childModules = character(),
   authors = c(
     person(c("Alex", "M"), "Chubaty", email = "achubaty@for-cast.ca", role = c("aut", "cre")),
-    person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+    person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     person("Steve", "Cumming", email = "Steve.Cumming@sbf.ulaval.ca", role = c("aut"))
   ),
-  version = list(fireSpread = "1.6.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  version = list(fireSpread = "2.0.0"),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("methods", "raster", "RColorBrewer", "SpaDES.tools"),
+  reqdPkgs = list("methods", "RColorBrewer", "SpaDES.tools (>= 2.0.0)", "terra"),
   parameters = rbind(
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
     defineParameter("nFires", "numeric", 10L, 1L, 100L, "number of fires to initiate"),
@@ -36,7 +36,10 @@ defineModule(sim, list(
     defineParameter("returnInterval", "numeric", 1.0, 1.0, 1.0, "fire return interval"),
     defineParameter("spreadprob", "numeric", 0.225, 0.05, 0.5, "probability of fire spreading into a pixel"),
     defineParameter("startTime", "numeric", start(sim) + 1, 0, end(sim), "time of initial fire ignition"),
-    defineParameter(".plotInitialTime", "numeric", start(sim), start(sim), end(sim) + 1, "time to schedule first plot event"),
+    defineParameter(".plots", "character", "screen", NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
+    defineParameter(".plotInitialTime", "numeric", start(sim), start(sim), end(sim) + 1,
+                    "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", 1, 1, 1, "time interval between plot events"),
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time to schedule first save event"),
     defineParameter(".saveInterval", "numeric", NA_real_, NA, NA, "time interval between save events"),
@@ -46,14 +49,14 @@ defineModule(sim, list(
                           "for the `init` event only."))
   ),
   inputObjects = bindrows(
-    expectsInput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName, objectClass = "RasterStack",
-                 desc = NA_character_, sourceURL = NA_character_),
+    expectsInput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName,
+                 objectClass = "SpatRaster", desc = NA_character_, sourceURL = NA_character_),
     expectsInput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
                  desc = NA_character_, sourceURL = NA_character_)
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName, objectClass = "RasterStack",
-                  desc = NA_character_, other = NA_character_),
+    createsOutput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName,
+                  objectClass = "SpatRaster", desc = NA_character_, other = NA_character_),
     createsOutput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
                   desc = NA_character_, other = NA_character_)
   )
@@ -61,12 +64,13 @@ defineModule(sim, list(
 
 ## event types
 doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
+
   switch(
     eventType,
     init = {
       ### check for more object dependencies:
       ### (use `checkObject` or similar)
-      SpaDES.core::checkObject(sim, SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
+      SpaDES.core::checkObject(sim, Par$stackName, layer = "habitatQuality")
 
       if (is.null(sim[[SpaDES.core::globals(sim)$burnStats]])) {
         sim[[SpaDES.core::globals(sim)$burnStats]] <- numeric()
@@ -79,9 +83,9 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
       sim <- Init(sim)
 
       # schedule the next events
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$startTime, "fireSpread", "burn")
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.saveInterval, "fireSpread", "save", .last())
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.plotInitialTime, "fireSpread", "plot.init", .last())
+      sim <- scheduleEvent(sim, Par$startTime, "fireSpread", "burn")
+      sim <- scheduleEvent(sim, Par$.saveInterval, "fireSpread", "save", .last())
+      sim <- scheduleEvent(sim, Par$.plotInitialTime, "fireSpread", "plot.init", .last())
     },
     burn = {
       # do stuff for this event
@@ -89,7 +93,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
 
       # schedule the next events
       sim <- scheduleEvent(sim, time(sim), "fireSpread", "stats") # do stats immediately following burn
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$returnInterval, "fireSpread", "burn")
+      sim <- scheduleEvent(sim, time(sim) + Par$returnInterval, "fireSpread", "burn")
     },
     stats = {
       # do stuff for this event
@@ -100,7 +104,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot.init = {
       # do stuff for this event
-      setColors(sim[[SpaDES.core::P(sim)$stackName]], n = c(Fires = 10)) <- list(
+      coltab(sim[[Par$stackName]]) <- list(
         DEM = brewer.pal(9, "YlOrBr"),
         forestAge = brewer.pal(9, "BuGn"),
         habitatQuality = brewer.pal(8, "Spectral"),
@@ -108,23 +112,21 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
         Fires = c("white", rev(heat.colors(9)))
       )
 
-      clearPlot()
-      stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long names -- create local variable
-      Plot(sim[[stackName]],
-           legendRange = list(0:maxValue(sim[[SpaDES.core::P(sim)$stackName]]$DEM), 0:100,
-                              c(0, 1), 0:100, 0:10))
+      # clearPlot()
+      Plots(sim[[Par$stackName]],
+           legendRange = list(0:maxFn(sim[[Par$stackName]]$DEM), 0:100,
+                              c(0, 1), 0:100, 0:10), new = TRUE, usePlot = TRUE)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval,
+      sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval,
                            "fireSpread", "plot", .last())
     },
     plot = {
       # do stuff for this event
-      stackName <- SpaDES.core::P(sim)$stackName # Plot doesn't like long names -- create local variable
-      Plot(sim[[stackName]]$Fires, new = FALSE)
+      Plots(sim[[Par$stackName]]$Fires, new = FALSE, usePlot = TRUE)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval,
+      sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval,
                            "fireSpread", "plot", .last())
     },
     save = {
@@ -132,7 +134,7 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
       sim <- saveFiles(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.saveInterval,
+      sim <- scheduleEvent(sim, time(sim) + Par$.saveInterval,
                            "fireSpread", "save", .last() + 1)
     },
     warning(paste(
@@ -146,40 +148,39 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
 
 ## event functions
 Init <- function(sim) {
-  landscapes <- sim[[SpaDES.core::P(sim)$stackName]]
+  landscapes <- sim[[Par$stackName]]
 
   ### create burn map that tracks fire locations over time
-  Fires <- raster(extent(landscapes), ncol = ncol(landscapes),
-                  nrow = nrow(landscapes), vals = 0)
+  Fires <- rast(ext(landscapes), ncol = ncol(landscapes), nrow = nrow(landscapes), vals = 0)
   names(Fires) <- "Fires"
-  setColors(Fires) <- c("white", rev(heat.colors(9)))
   Fires <- setValues(Fires, 0)
+  coltab(Fires) <- c("white", rev(heat.colors(9)))
 
   # add Fires map to global$stackName stack
   landscapes$Fires <- Fires
-  sim[[SpaDES.core::P(sim)$stackName]] <- landscapes
+  sim[[Par$stackName]] <- landscapes
 
   return(invisible(sim))
 }
 
 Burn <- function(sim) {
-  landscapes <- sim[[SpaDES.core::P(sim)$stackName]]
+  landscapes <- sim[[Par$stackName]]
 
   Fires <- spread(landscapes[[1]],
-                  loci = as.integer(sample(1:ncell(landscapes), SpaDES.core::P(sim)$nFires)),
-                  spreadProb = SpaDES.core::P(sim)$spreadprob,
-                  persistance = SpaDES.core::P(sim)$persistprob,
+                  loci = as.integer(sample(1:ncell(landscapes), Par$nFires)),
+                  spreadProb = Par$spreadprob,
+                  persistance = Par$persistprob,
                   mask = NULL,
                   maxSize = 1e8,
                   directions = 8,
-                  iterations = SpaDES.core::P(sim)$its,
+                  iterations = Par$its,
                   plot.it = FALSE,
                   id = TRUE)
   names(Fires) <- "Fires"
-  setColors(Fires) <- c("white", rev(heat.colors(9)))
+  coltab(Fires) <- c("white", rev(heat.colors(9)))
   landscapes$Fires <- Fires
 
-  sim[[SpaDES.core::P(sim)$stackName]] <- landscapes
+  sim[[Par$stackName]] <- landscapes
 
   return(invisible(sim))
 }
@@ -187,9 +188,9 @@ Burn <- function(sim) {
 Stats <- function(sim) {
   npix <- sim[[SpaDES.core::globals(sim)$burnStats]]
 
-  landscapes <- sim[[SpaDES.core::P(sim)$stackName]]
+  landscapes <- sim[[Par$stackName]]
 
-  sim[[SpaDES.core::globals(sim)$burnStats]] <- c(npix, length(which(raster::values(landscapes$Fires) > 0)))
+  sim[[SpaDES.core::globals(sim)$burnStats]] <- c(npix, length(which(values(landscapes$Fires) > 0)))
 
   return(invisible(sim))
 }

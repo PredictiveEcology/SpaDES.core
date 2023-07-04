@@ -2,16 +2,16 @@
 % Please edit documentation in R/module-define.R
 \name{.fillOutputRows}
 \alias{.fillOutputRows}
-\title{An internal function for coercing a data.frame to outputs()}
+\title{An internal function for coercing a data.frame to \code{outputs()}}
 \usage{
 .fillOutputRows(outputDF, endTime)
 }
 \arguments{
-\item{outputDF}{A data.frame with partial columns to pass to outputs<-}
+\item{outputDF}{A data.frame with partial columns to pass to \verb{outputs<-}}
 
-\item{endTime}{Numeric time. The end(sim).}
+\item{endTime}{Numeric time. The \code{end(sim)}.}
 }
 \description{
-An internal function for coercing a data.frame to outputs()
+An internal function for coercing a data.frame to \code{outputs()}
 }
 \keyword{internal}

@@ -28,8 +28,7 @@ G(sim) <- value
 \S4method{G}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
@@ -39,11 +38,11 @@ in the \code{simList}. This currently is not an explicit slot in the \code{simLi
 but it is a \code{.globals} element in the \code{params} slot of the \code{simList}.
 }
 \seealso{
-\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.1 on Simulation Parameters.
+\link{SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{events}()},
 \code{\link{inputs}()},

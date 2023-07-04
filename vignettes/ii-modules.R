@@ -1,5 +1,5 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr")
+SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
 hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
@@ -18,7 +18,7 @@ cat(c(
   ), sep = "\n")
 
 ## ----passing-params, echo=TRUE------------------------------------------------
-library(SpaDES.core)
+  library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 5.0)
@@ -89,8 +89,10 @@ parameters <- list(
 ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
+
+# run just 1 year for vignette
 mySim <- simInitAndSpades(
-  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+  times = list(start = 0.0, end = 1.0, timeunit = "year"),
   params = parameters,
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),
@@ -214,9 +216,9 @@ mySim2 <- spades(mySim)
 
 # More sophisticated, passing arguments to outputs()
 outputs(mySim) <- data.frame(
-  objectName = "landscape", fun = "writeRaster", package = "raster",
+  objectName = "landscape", fun = "writeRaster", package = "terra",
   saveTime = c(3,6), arguments = I(lapply(c(3,6), function(x) {
-    list(datatype = "FLT4S", format = "raster", overwrite = TRUE)
+    list(datatype = "FLT4S", filetype = "GTiff", overwrite = TRUE)
 })))
 mySim2 <- spades(mySim)
 dev.off()

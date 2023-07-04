@@ -8,9 +8,22 @@
 
 # SpaDES.core
 
-Core functionality for Spatial Discrete Event Simulation (SpaDES)
+Core functionality for Spatial Discrete Event System (SpaDES).
 
-**Website:** [https://SpaDES.PredictiveEcology.org](https://SpaDES.PredictiveEcology.org)
+This package provides the core framework for a discrete event system to 
+    implement a complete data-to-decisions, reproducible workflow
+    (e.g., McIntire et al. (2022) <doi:10.1111/ele.13994>,
+    Barros et al. (2022) <doi:10.1111/2041-210X.14034>).
+    The core components facilitate the development of modular pieces, 
+    and enable the user to include additional functionality by running user-built modules.
+    Includes conditional scheduling, restart after interruption, packaging of
+    reusable modules, tools for developing arbitrary automated workflows,
+    automated interweaving of modules of different temporal resolution,
+    and tools for visualizing and understanding the within-project dependencies. 
+    The suggested package 'NLMR' can be installed from the repository 
+    (<https://PredictiveEcology.r-universe.dev>).
+
+**Website:** [https://SpaDES-core.PredictiveEcology.org](https://SpaDES-core.PredictiveEcology.org)
 
 **Wiki:** [https://github.com/PredictiveEcology/SpaDES/wiki](https://github.com/PredictiveEcology/SpaDES/wiki)
 

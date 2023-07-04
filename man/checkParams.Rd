@@ -3,14 +3,14 @@
 \name{checkParams}
 \alias{checkParams}
 \alias{checkParams,simList,list-method}
-\title{Check use and existence of params passed to simulation.}
+\title{Check use and existence of parameters passed to simulation.}
 \usage{
 checkParams(sim, coreParams, ...)
 
 \S4method{checkParams}{simList,list}(sim, coreParams, ...)
 }
 \arguments{
-\item{sim}{A simList simulation object.}
+\item{sim}{A \code{simList} simulation object.}
 
 \item{coreParams}{List of default core parameters.}
 
@@ -18,7 +18,7 @@ checkParams(sim, coreParams, ...)
 }
 \value{
 Invisibly return \code{TRUE} indicating object exists; \code{FALSE} if not.
-Sensible messages are be produced identifying missing parameters.
+Sensible messages are produced identifying missing parameters.
 }
 \description{
 Checks that all parameters passed are used in a module,
