@@ -94,8 +94,8 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   #  we can omit the module name
   P(mySim, module = "testModule") # gets all params in a module
   P(mySim, ".useCache", "testModule") # just one param
+  options(opts)
 }
-options(opts)
 unlink(tmpdir, recursive = TRUE)
 }
 
