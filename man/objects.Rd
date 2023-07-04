@@ -67,7 +67,7 @@ path <- system.file("sampleModules", package = "SpaDES.core")
 findObjects(path = path, module = dir(path), objects = "caribou")
 }
 \seealso{
-\link{SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.
+\code{?SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},

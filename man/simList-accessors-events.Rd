@@ -94,7 +94,7 @@ Each event is represented by a \code{\link[=data.table]{data.table()}} row consi
 }
 }
 \seealso{
-\link{SpaDES.core-package}, specifically the section 1.2.6 on Simulation event queues.
+\code{?SpaDES.core-package}, specifically the section 1.2.6 on Simulation event queues.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},

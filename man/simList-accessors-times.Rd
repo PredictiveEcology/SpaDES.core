@@ -161,7 +161,7 @@ elapsedTime(s2)
 elapsedTime(s2, units = "mins")
 }
 \seealso{
-\link{SpaDES.core-package}, specifically the section 1.2.5 on Simulation times;
+\code{?SpaDES.core-package}, specifically the section 1.2.5 on Simulation times;
 \code{\link[=elapsedTime]{elapsedTime()}},
 
 Other functions to access elements of a \code{simList} object: 

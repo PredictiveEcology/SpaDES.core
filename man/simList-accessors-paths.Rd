@@ -153,7 +153,7 @@ If no paths are specified, the defaults are as follows:
 }
 }
 \seealso{
-\link{SpaDES.core-package}, specifically the section 1.2.4 on Simulation Paths.
+\code{?SpaDES.core-package}, specifically the section 1.2.4 on Simulation Paths.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},

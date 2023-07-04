@@ -38,7 +38,7 @@ in the \code{simList}. This currently is not an explicit slot in the \code{simLi
 but it is a \code{.globals} element in the \code{params} slot of the \code{simList}.
 }
 \seealso{
-\link{SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.
+\code{?SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},

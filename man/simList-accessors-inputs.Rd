@@ -201,7 +201,7 @@ identical(a2, a$a)
 unlink(tmpdir, recursive = TRUE)
 }
 \seealso{
-\link{SpaDES.core-package}, specifically the section 1.2.2 on loading and saving.
+\code{?SpaDES.core-package}, specifically the section 1.2.2 on loading and saving.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},

@@ -13,14 +13,14 @@
 \item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{x}{A named list containing the parameters used to construct a new
-\href{moduleDeps-class}{.moduleDeps} object.}
+\code{.moduleDeps} object.}
 }
 \value{
 A \code{simList} object.
 }
 \description{
 Internal function.
-Adds a \href{moduleDeps-class}{.moduleDeps} object to the simulation dependency list.
+Adds a \code{.moduleDeps} object to the simulation dependency list.
 }
 \seealso{
 Other functions to access elements of a \code{simList} object: 
