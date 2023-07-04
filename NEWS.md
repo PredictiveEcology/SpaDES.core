@@ -23,6 +23,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * improved documentation
 * new hidden function `runScheduleEventsOnly` will extract only the `scheduleEvents` call; needed for `options(spades.futureEvents = TRUE)`
 * new option: `spades.saveFileExtensions` which allows users to use the `outputs(sim)` mechanism for saving, for file extensions that are not already supported by `.saveFileExtensions()`
+* many issues addressed and closed
 
 ## Dependency Changes
 * drop support for R 4.0 as dependency packages no longer support it

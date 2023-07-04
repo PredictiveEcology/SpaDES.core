@@ -125,7 +125,8 @@
 #'
 #'     # Can also be used like quickPlot::Plot, but with control over output type
 #'     r <- terra::rast(terra::ext(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
-#'     Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
+#'     Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500),
+#'           usePlot = TRUE)
 #'
 #'     # with ggplotify, Plots can also be used to plot/save
 #'     # non-ggplot objects:
