@@ -33,10 +33,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
                     useFuture = getOption("spades.futureEvents", FALSE),
                     events = NULL,
                     ...) {
-  #if (missing(debug)) debug <- FALSE
-  #if (!inherits(sim, "simList")) stop("sim must be a simList")
-  #if (!is(sim, "simList")) stop("sim must be a simList")
-  if (!inherits(sim, "simList")) {  ## July 2022: R 4.2 flags against using class()
+  if (!inherits(sim, "simList")) {
     stop("doEvent can only accept a simList object")
   }
 
@@ -47,24 +44,43 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     # Check here if resolved
     curForFuture <- sim@events[[1]]
     if (!curForFuture[["moduleName"]] %in% .pkgEnv$.coreModulesMinusSave) {
-      if (length(sim$simFuture)) {
-        modInFuture <- modNameInFuture(sim$simFuture)
+      if (length(sim$.simFuture)) {
+        modInFuture <- modNameInFuture(sim$.simFuture)
         futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                      curModName = modInFuture)#sim$simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
+                                      curModName = modInFuture[1])#sim$.simFuture[[1]]$thisModOutputs$dontAllowModules)#curForFuture[["moduleName"]])
         canProceed <- if (length(futureNeeds)) {
           # with the assumption that the "unresolved" future could schedule itself,
           # must block any module who's outputs are needed by the same module as the
           # unresolved future module
-          !any(names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules] %in% curForFuture$moduleName) #&&
-            #modInFuture != curForFuture[["moduleName"]]
+          nextScheduledEvent <- curForFuture$moduleName
+          if (nextScheduledEvent %in% "save") {
+            outs <- outputs(sim)
+            objsNeeded <- outs$objectName[outs$saveTime == events(sim)$eventTime[1]]
+            nOtherFutures <- length(sim$.simFuture) - 1
+            futureNeedsOther <- lapply(seq(nOtherFutures) + 1, function(i)
+              getFutureNeeds(deps = sim@depends@dependencies,
+                             curModName = modInFuture[i]))
+            futureNeedsOther <- append(list(futureNeeds), futureNeedsOther)
+            futureNeedsOtherDAM <- lapply(futureNeedsOther, function(fno) fno$dontAllowModules)
+            futureNeeds$dontAllowModules <- colSums(Reduce(rbind, futureNeedsOtherDAM)) > 0
+          }
+          immediateDownstream <- names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]
+
+          if (length(immediateDownstream) && !nextScheduledEvent %in% "save")
+            immediateDownstream <- immediateDownstream[immediateDownstream %in% curForFuture$moduleName]#&&
+          length(immediateDownstream) == 0
         } else {
           TRUE
         }
-        if (!canProceed || curForFuture$moduleName == "save" || future::resolved(sim$simFuture[[1]][[1]])) {
-          cause <- if (!canProceed) paste0(curForFuture$moduleName, " requires outputs from ", modInFuture)
+
+
+        if (!canProceed || future::resolved(sim$.simFuture[[1]][[1]])) {
+          cause <- if (!canProceed) paste0(curForFuture$moduleName, " requires outputs from ", modInFuture[1])
           else if (curForFuture$moduleName == "save") paste0("Current event is 'save'; so resolving all")
-          else paste0(modInFuture, " finished running")
+          else paste0(modInFuture[1], " finished running")
+
           sim <- resolveFutureNow(sim, cause = cause)
+          return(invisible(sim))
         }
 
       }
@@ -214,10 +230,40 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
                                         curModName = cur[["moduleName"]])
 
-          if (!any(futureNeeds$thisModOutputs %in% futureNeeds$anyModInputs)) {
-            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+          # In general... allow a spawning, unless it is literally next event
+          #   This is just a heuristic because other events could be inserted before
+          #    the next event ... but this is a decent guess
+          # don't use cur from above because it is "seconds" which mess with future
+
+          # by running scheduleEvents first, we can see what the "next" event will actually
+          #   be so we can determine what inputs will be needed.
+          simNext <- runScheduleEventsOnly(sim, currnt = cur) # run the scheduleEvents only
+          nextScheduledEvent <- simNext@events[[1]]$moduleName
+
+          objsNeeded <- NULL
+          if (nextScheduledEvent %in% "save") {
+            outs <- outputs(sim)
+            objsNeeded <- outs$objectName[outs$saveTime == events(sim)$eventTime[1]]
+          }
+          objsNeededForNextMod <- futureNeeds$anyModInputs[[nextScheduledEvent]]
+          # selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
+          objsNeeded <- na.omit(unique(c(objsNeeded, objsNeededForNextMod)))#, selfObjects)))
+          if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
+            spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
+            messageVerbose(
+              crayon::magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
+                            "next module (", nextScheduledEvent, ")")),
+              verbose = 1 - (debug %in% FALSE))
+            simFuture <- sim$.simFuture
+            sim$.simFuture <- list()
+            cur2 <- unlist(current(sim))
+            cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
+            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur2, notOlderThan,
                                    showSimilar = showSimilar, .pkgEnv, envir = environment(),
                                    futureNeeds = futureNeeds)
+            sim$.simFuture <- append(simFuture, sim$.simFuture)
+            # sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
+            sim@events <- simNext@events
             skipEvent <- TRUE
           }
         }
@@ -257,7 +303,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           }
         }
       }
-        # }
 
         # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
@@ -291,9 +336,16 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           assign(as.character(attr(sim, "completedCounter")), value = cur, envir = sim@completed)
           #sim@completed[[as.character(attr(sim, "completedCounter"))]] <- cur
         } else {
-          attr(sim, "completedCounter") <- 1
-          attr(sim, "completedSize") <- 2
-          sim@completed[["1"]] <- cur
+          if (!isFALSE(sim@.xData$._ranInitDuringSimInit)) {
+            cc <- NROW(sim@completed) + 1
+            cs <- cc * 2
+          } else {
+            cc <- 1
+            cs <- 2
+          }
+          attr(sim, "completedCounter") <- cc
+          attr(sim, "completedSize") <- cs
+          sim@completed[[as.character(cc)]] <- cur
         }
       }
 
@@ -379,8 +431,6 @@ scheduleEvent <- function(sim,
                           eventType,
                           eventPriority = .pkgEnv$.normalVal,
                           .skipChecks = FALSE) {
-  #if (!inherits(sim, "simList")) stop("sim must be a simList")
-  #if (!is(sim, "simList")) stop("sim must be a simList")
 
   if (missing(moduleName)) moduleName <- currentModule(sim)
 
@@ -402,7 +452,6 @@ scheduleEvent <- function(sim,
     }
     if (!is.character(eventType)) stop("eventType must be a character")
     if (!is.character(moduleName)) stop("moduleName must be a character")
-    #if (missing(eventPriority)) eventPriority <- .pkgEnv$.normalVal
     if (!is.numeric(eventPriority)) stop("eventPriority must be a numeric")
 
   }
@@ -813,12 +862,14 @@ scheduleConditionalEvent <- function(sim,
 #' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #'     requireNamespace("NLMR", quietly = TRUE)) {
-#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+#'   # some options are not necessary for example
+#'   opts <- options("spades.moduleCodeChecks" = FALSE, spades.useRequire = FALSE)
 #'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
 #'   mySim <- simInit(
 #'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
 #'    params = list(
-#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned",
+#'                      .plots = NA) # plotting off --> not relevant for example
 #'    ),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
@@ -827,13 +878,12 @@ scheduleConditionalEvent <- function(sim,
 #'
 #'   # Different debug options (overrides the package option 'spades.debug')
 #'   spades(mySim, debug = TRUE) # Fastest
-#'   spades(mySim, debug = "simList")
 #'   spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
 #'   # To get a combination -- use list(debug = list(..., ...))
 #'   spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
 #'
-#'   # Can turn off plotting, and inspect the output simList instead
-#'   out <- spades(mySim, .plots = NA) # much faster
+#'   # Can turn off plotting at spades call, and inspect the output simList instead
+#'   out <- spades(mySim, .plots = NA)
 #'   completed(out) # shows completed events
 #'
 #'   # use cache -- simInit should generally be rerun each time a spades call is made
@@ -848,14 +898,14 @@ scheduleConditionalEvent <- function(sim,
 #'      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'    )
-#'    print(system.time(out <- spades(mySim, cache = TRUE)))
+#'    print(system.time(out <- spades(mySim, cache = TRUE, .plots = NA)))
 #'   }
 #'
 #'   # E.g., with only the init events
 #'   outInitsOnly <- spades(mySim, events = "init")
 #'
 #'   # or more fine grained control
-#'   outSomeEvents <- spades(mySim,
+#'   outSomeEvents <- spades(mySim, .plots = NA,
 #'           events = list(randomLandscapes = c("init"),
 #'                         fireSpread = c("init", "burn")))
 #'
@@ -870,7 +920,7 @@ scheduleConditionalEvent <- function(sim,
 #'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
 #'   )
 #'   # This will print a message saying that caribouMovement will run its events
-#'   outSomeEvents <- spades(mySim,
+#'   outSomeEvents <- spades(mySim, .plots = NA,
 #'           events = list(randomLandscapes = c("init"),
 #'                         fireSpread = c("init", "burn"),
 #'                         save = "init"))
@@ -910,7 +960,6 @@ setMethod(
       tf <- tempfile();
       on.exit(unlink(tf))
       cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-      # unlockBinding(modNam, sim$.mods)
       sim$.mods[[modNam]]$sim <- sim
       opts <- options("spades.covr2" = FALSE) # turn off this chunk 2nd time through
       on.exit(options(opts), add = TRUE)
@@ -933,8 +982,6 @@ setMethod(
         useNormalMessaging <- !newDebugging ||
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
       } else {
-        warning("debug cannot be a list unless logging package is installed: install.packages('logging')\n",
-                "setting debug to non-list using unlist(debug)")
         debug <- unlist(debug)
 
       }
@@ -988,9 +1035,9 @@ setMethod(
         if (!useChkpnt)
           unspecifiedEvents <- setdiff(unspecifiedEvents, "checkpoint")
         if (length(unspecifiedEvents)) {
-          message("NOTE: ", paste(unspecifiedEvents, collapse = ", "), " not specified in events argument. ",
-                  "This means all events the module(s) will run. You may have intended to add e.g., list(",
-                  unspecifiedEvents[1], "= 'init')")
+          message("NOTE: ", paste(unspecifiedEvents, collapse = ", "), " not specified in events argument. ")
+          message("This means all events in the module(s) will run. You may have intended to add e.g.,")
+          message(" list(", unspecifiedEvents[1], "= 'init')")
         }
       }
 
@@ -1073,17 +1120,18 @@ setMethod(
         if (is.null(.plotInitialTime) && !any(.plots %in% "screen"))
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_integer_, ".plotInitialTime",
-            needClass = "numeric")
-        if (!is.null(.plotInitialTime)) {
+            needClass = "integer")
+        if (!is.null(.plotInitialTime) && !is.na(.plotInitialTime)) {
           message("Both .plots and .plotInitialTime are supplied; using .plots")
+          if (!is.numeric(.plotInitialTime) && is.na(.plotInitialTime))
+            .plotInitialTime <- start(sim)
         }
-        .plotInitialTime <- .plots ## TODO: .plotInitialTime is numeric, not character! fails check below
       }
 
       if (!is.null(.plotInitialTime)) {
         sim@params <- updateParamSlotInAllModules(
           sim@params, .plotInitialTime, ".plotInitialTime",
-          needClass = "numeric") ## TODO: fails if .plotInitialTime takes .plots value above
+          needClass = "numeric")
         if (is.na(.plotInitialTime))
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_character_, ".plots",
@@ -1119,7 +1167,7 @@ setMethod(
 
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
         .pkgEnv[[".spadesDebugFirst"]] <- TRUE
-        .pkgEnv[[".spadesDebugWidth"]] <- c(9, 10, 9, 13)
+        sim[[".spadesDebugWidth"]] <- c(9, 10, 9, 13)
       }
 
       sim@.xData[["._firstEventClockTime"]] <- Sys.time()
@@ -1131,12 +1179,14 @@ setMethod(
       if (length(sim@completed)) {
         existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
         prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
-        prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
-        if (length(.grepSysCalls(sys.calls(), "restartSpades")) == 0)
-          if (start(sim, unit = attr(prevStart[["eventTime"]], "unit")) <= prevStart[["eventTime"]] &&
-              (time(sim, unit = attr(prevStart[["eventTime"]], "unit")) ==
-               start(sim, unit = attr(prevStart[["eventTime"]], "unit"))))
+        # prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
+        if (length(.grepSysCalls(sys.calls(), "restartSpades")) == 0 &&
+            length(sim@.xData$._ranInitDuringSimInit) == 0)  { # don't crop off completed events if Init(s) ran during simInit
+          prevEvUnit <- attr(prevStart[["eventTime"]], "unit")
+          stTime <- start(sim, unit = prevEvUnit)
+          if (stTime <= prevStart[["eventTime"]] && (time(sim, unit = prevEvUnit) == stTime))
             sim@completed <- new.env(parent = emptyenv())
+        }
       }
 
       if (recoverMode > 0) {
@@ -1149,11 +1199,12 @@ setMethod(
         if (!requireNamespace("future", quietly = TRUE))
           stop("To use 'spades.futureEvents', please run \ninstall.packages('future') ")
 
-        message("useFuture is set to TRUE; this will attempt to spawn events in a separate process, ",
-                "if their outputs are not needed by other events. STILL EXPERIMENTAL. Use cautiously.",
-                "User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))")
+        message(crayon::magenta("useFuture is set to TRUE; this will attempt to spawn events"))
+        message(crayon::magenta("  in a separate process, if their outputs are not needed immediately"))
+        message(crayon::magenta("  STILL EXPERIMENTAL. Use cautiously."))
+        message(crayon::magenta("  User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))"))
         sim$.futureEventsSkipped <- 0
-        sim$simFuture <- list()
+        sim$.simFuture <- list()
       }
 
       # There are some edge cases where there is an event scheduled before current time,
@@ -1201,23 +1252,23 @@ setMethod(
             }
           }
         }
-        if (useFuture) {
-          if (length(sim$simFuture) > 1) {
-            for (simFut in seq_along(sim$simFuture)) {
-              if (future::resolved(sim$simFuture[[1]][[1]])) {
-                sim <- resolveFutureNow(sim, cause = paste0(modNameInFuture(sim$simFuture[1]), " finished running"))
-              }
-            }
-          }
-        }
+        # if (useFuture) {
+        #   if (length(sim$.simFuture) > 1) {
+        #     for (simFut in seq_along(sim$.simFuture)) {
+        #       if (future::resolved(sim$.simFuture[[1]][[1]])) {
+        #         sim <- resolveFutureNow(sim, cause = paste0(modNameInFuture(sim$.simFuture[1]), " finished running"))
+        #       }
+        #     }
+        #   }
+        # }
       }
       if (useFuture) {
-        if (length(sim$simFuture)) {
-          for (simFut in seq_along(sim$simFuture)) {
+        if (length(sim$.simFuture)) {
+          for (simFut in seq_along(sim$.simFuture)) {
             sim <- resolveFutureNow(sim, cause = "End of simulation")
           }
         }
-        message(crayon::magenta(sim$.futureEventsSkipped, " events ran while events ran in futures"))
+        message(crayon::magenta(sim$.futureEventsSkipped, " events ran in futures"))
       }
       sim@simtimes[["current"]] <- sim@simtimes[["end"]]
 
@@ -1350,32 +1401,39 @@ setMethod(
       classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                            paths = FALSE, outputs = FALSE,
                            params = sim@params[[cur[["moduleName"]]]],
+                           .globals = sim@params[[".globals"]],
                            modules = cur[["moduleName"]])
     }
   }
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
     expression(Cache(FUN = modCall,
-                sim = sim,
+                     sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
                      .objects = moduleSpecificObjects,
                      notOlderThan = notOlderThan,
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
-                showSimilar = showSimilar,
-                     cachePath = sim@paths[["cachePath"]]))
+                     showSimilar = showSimilar,
+                     cachePath = sim@paths[["cachePath"]],
+                     .functionName = moduleCall))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,
                    envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
+  if (!(FALSE %in% debug || any(is.na(debug))) )
+    objsIsNullBefore <- objsAreNull(sim)
+
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
-    #fnEnv[[moduleCall]](sim, cur[["eventTime"]], cur[["eventType"]])
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
+  if (!(FALSE %in% debug || any(is.na(debug))) )
+    objectsCreatedPost(sim, objsIsNullBefore)
+
   # Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
     if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects))
@@ -1385,7 +1443,7 @@ setMethod(
                                             knownObjects = sim@.xData$._knownObjects)
   }
 
-  return(sim)
+  return(sim) # TEMPORARY THIS IS FOR TESTING DEBUGGING IN FUTURE
 }
 
 #' @keywords internal
@@ -1642,22 +1700,28 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
 resolveFutureNow <- function(sim, cause = "") {
 
   futureRunning <- sim@events[[1]]
-  futureRunning[1:4] <- as.list(strsplit(names(sim$simFuture)[1], split = "_")[[1]])
-  futureRunning[["eventTime"]] <- as.numeric(futureRunning[[1]])
+  futureRunning[1:4] <- as.list(strsplit(names(sim$.simFuture)[1], split = "_")[[1]])
+  futureRunning[["eventTime"]] <- as.numeric(futureRunning[["eventTime"]])
   futureRunning[["eventPriority"]] <- as.numeric(futureRunning[["eventPriority"]])
   futureRunningSimTU <- futureRunning
-  futureRunningSimTU[["eventTime"]] <- convertTimeunit(as.numeric(futureRunningSimTU[[1]]), unit = timeunit(sim))
   setDT(futureRunningSimTU)
   setDT(futureRunning)
-  message(crayon::magenta("        -- Resolving", capture.output(print(futureRunningSimTU, row.names = FALSE, col.names = "none"))))
-  message(crayon::magenta("           ", cause))
+  spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
 
-  tmpSim <- future::value(sim$simFuture[[1]][[1]])
-  simMetadata <- sim$simFuture[[1]][[2]]
+  outMess <- debugMessTRUE(sim, events = futureRunningSimTU)
+
+  # # If it had no outputs, then skip -- wait -- comment out for now ... the "events" stuff; but that may be unnecessary
+  #   because of the runScheduleEventsOnly, which "should" have found all the events.
+  # if (length(sim$.simFuture[[1]]$thisModOutputs$objects)) {
+  tmpSim <- future::value(sim$.simFuture[[1]][[1]])
+  tmpSim <- .unwrap(tmpSim)
+  simMetadata <- sim$.simFuture[[1]][[2]]
 
   # objects
   list2env(mget(simMetadata$objects, envir = envir(tmpSim)), envir = envir(sim))
-
+  # }
+  message(crayon::magenta(paste0(" Resolved: ", outMess)))
+  message(crayon::magenta("   ", spacing, "because", cause))
   allCols <- c("eventTime", "moduleName", "eventTime", "eventPriority")
   # events
   evntsFut <- events(tmpSim, unit = "seconds")
@@ -1665,15 +1729,17 @@ resolveFutureNow <- function(sim, cause = "") {
   evntsNormal <- rbindlist(list(compltd, current(sim, unit = "seconds"), events(sim, unit = "seconds")))
   newEvents <- evntsFut[!evntsNormal, on = allCols]
 
-  sim$.futureEventsSkipped <- sim$.futureEventsSkipped + NROW(compltd) - futureRunning[compltd, whi := .I, on = allCols]$wh
   if (NROW(newEvents)) {
+    warning("Seeing this message means that the runScheduleEventsOnly did not find all events; ",
+            "please use `switch` and `scheduleEvent` inside the doEvent.", currentModule(tmpSim),
+            " function")
     newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
     slot(sim, "events", check = FALSE) <- append(sim@events, newEvents)
     ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
                  unlist(lapply(sim@events, function(x) x$eventPriority)))
     slot(sim, "events") <- sim@events[ord]
   }
-  sim$simFuture <- sim$simFuture[-1]
+  sim$.simFuture <- sim$.simFuture[-1]
 
   sim
 }
@@ -1706,35 +1772,59 @@ getFutureNeeds <- function(deps, curModName) {
       function(modu)
         modu@outputObjects$objectName
     )
-    out$dontAllowModules <- unlist(lapply(out$anyModOutputs, function(x) any(x %in% out$thisModsInputs)))
+    out$anyModInputs <- lapply(
+      deps,
+      function(modu)
+        modu@inputObjects$objectName
+    )
+    out$dontAllowModules <- unlist(lapply(out$anyModInputs, function(x) any(x %in% out$thisModOutputs)))
   }
   out
 }
 
 .runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
-  message(crayon::magenta("        -- Spawning in a future"))
+  spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1]), collapse = "")
+  message(crayon::magenta(spacing, "-- Spawning in a future"))
+  sim$.futureEventsSkipped <- sim$.futureEventsSkipped + 1
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
   objsToGet <- grep("^\\._", ls(envir = modEnv, all.names = TRUE), value = TRUE, invert = TRUE)
   modObjs <- mget(objsToGet, envir = modEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
-  sim$simFuture[[paste(unlist(cur), collapse = "_")]] <-
-    list(sim = future::future(getFromNamespace(".runEvent", "SpaDES.core")(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                                                      showSimilar = showSimilar, .pkgEnv),
+  objsKepts <- na.omit(inputObjects(sim, module = currentModule(sim))[["objectName"]])
+  globs <- list(sim = .wrap(sim[objsKepts]), cacheIt, debug, moduleCall, fnEnv, cur,
+                notOlderThan, showSimilar, .pkgEnv)# names(modObjs))
+  names(globs) <- c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
+                    "showSimilar", ".pkgEnv") #names(modObjs))
 
-                              globals = c("sim", "cacheIt", "debug", "moduleCall", "fnEnv", "cur", "notOlderThan",
-                                          "showSimilar", ".pkgEnv", names(modObjs)),
-                              packages = c("SpaDES.core", pkgs),
-                              envir = envir, seed = TRUE),
-         thisModOutputs = list(moduleName = cur[["moduleName"]],
-                               objects = futureNeeds$thisModOutputs,
-                               dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
+  # When a name begins with a number, touchy to access it. Here reverse 1st 2 so character is first
+  futureListLabel <- paste(unlist(cur), collapse = "_")
+  sim$.simFuture[[futureListLabel]] <-
+    list(sim = future::future(
+      getFromNamespace(".runForFutureWrapper", "SpaDES.core")(sim, cacheIt = cacheIt,
+                                                              debug = debug, moduleCall = moduleCall,
+                                                              fnEnv = fnEnv, cur = cur, notOlderThan = notOlderThan,
+                                                              showSimilar = showSimilar, .pkgEnv = .pkgEnv),
+      globals = globs,
+      packages = c("SpaDES.core", pkgs),
+      # envir = envir,
+      seed = TRUE),
+      thisModOutputs = list(moduleName = cur[["moduleName"]],
+                            objects = futureNeeds$thisModOutputs,
+                            dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
   sim
 }
 
+.runForFutureWrapper <- function(sim, ...) {
+  sim <- .unwrap(sim)
+  sim <- .runEvent(sim, ...)
+  .wrap(sim)
+}
+
+
 modNameInFuture <- function(simFuture) {
-  gsub("^[[:digit:]]+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
+  gsub("^.+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
 }
 
 isListedEvent <- function(eventQueue, eventsToDo) {
@@ -1769,6 +1859,8 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 #' @importFrom crayon green
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
+  if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else isTRUE(x), FUN.VALUE = logical(1))))
+    debug <- append(list(1L), debug)
   for (i in seq_along(debug)) {
     if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
       if (length(cur) > 0) {
@@ -1776,32 +1868,12 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
           if (interactive())
             readline("Press any key to continue...")
         }
-
-        evnts1 <- data.frame(current(sim))
-        evnts1new <- data.frame(current(sim))
-        widths <- unname(unlist(lapply(format(evnts1), nchar)))
-        .pkgEnv[[".spadesDebugWidth"]] <- pmax(widths, .pkgEnv[[".spadesDebugWidth"]])
-        evnts1[1L, ] <- sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), evnts1)
-        if (.pkgEnv[[".spadesDebugFirst"]]) {
-          evnts2 <- evnts1
-          evnts2 <- evnts1
-          evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), names(evnts2)),
-                                   sprintf(paste0("%-",.pkgEnv[[".spadesDebugWidth"]],"s"), evnts2))
-
-          outMess <- paste(unname(evnts2[1, ]), collapse = ' ')
-          outMess <- c(outMess, paste(unname(evnts2[2, ]), collapse = ' '))
-          # write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)
-          .pkgEnv[[".spadesDebugFirst"]] <- FALSE
-        } else {
-          colnames(evnts1) <- NULL
-          # write.table(evnts1, quote = FALSE, row.names = FALSE)
-          outMess <- paste(unname(evnts1), collapse = ' ')
-        }
+        outMess <- debugMessTRUE(sim)
       }
-    } else if (identical(debug[[i]], 1)) {
+    } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 1 else isTRUE(debug[[i]]))) {
       outMess <- paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
-    } else if (identical(debug[[i]], 2)) {
+    } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 2 else isTRUE(debug[[i]]))) {
       compareTime <- if (is.null(attr(sim, "completedCounter")) ||
                          attr(sim, "completedCounter") == 1) {
         sim@.xData$._startClockTime
@@ -1827,10 +1899,13 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
         }
       } else if (!any(debug[[i]] %in% c("browser"))) { # any other
         if (!is.function(debug[[i]])) {
-          outMess <- try(do.call(debug[[i]], list(sim)))
+          outMess <- tryCatch(do.call(debug[[i]], list(sim)), silent = TRUE,
+                              error = function(e) NULL)
         } else  {
           outMess <- try(debug[[i]](sim))
         }
+      } else {
+        outMess <- NULL
       }
     }
     if (is.data.frame(outMess)) {
@@ -1860,11 +1935,13 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
   paramsList
 }
 
+loggingMessagePrefixLength <- 15
+
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   st <- Sys.time()
   stForm1 <- "%h%d"
   stForm2 <- paste(stForm1, "%H:%M:%S")
-  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - 15)
+  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
   if (numCharsMax > 0) {
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
     simEnv <- whereInStack("sim")
@@ -1880,34 +1957,39 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     }
 
     if (length(sim@current)) {
-      modName <- sim@current$moduleName
-
+      modName <- sim@current$moduleName # only defined if in doEvent
       if (is.null(modName)) modName <- sim@events[[1]]$moduleName
-      nchr <- nchar(modName)
-      tooManyVowels <- nchr - numCharsMax
-      numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
-      tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
-      modName8Chars <-
-        paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
-                                       tooFewVowels,",",tooManyVowels,"}"), "",
-                                modName, perl=TRUE), 1, numCharsMax))
-      if (nchr < numCharsMax)
-        modName8Chars <- paste0(modName8Chars,
-                                paste(collapse = "", rep(" ", numCharsMax - nchr)))
+
+      modName8Chars <- moduleNameStripped(modName, numCharsMax)
+      # nchr <- nchar(modName)
+      # tooManyVowels <- nchr - numCharsMax
+      # numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+      # tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
+      # modName8Chars <-
+      #   paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
+      #                                  tooFewVowels,",",tooManyVowels,"}"), "",
+      #                           modName, perl=TRUE), 1, numCharsMax))
+      # if (nchr < numCharsMax)
+      #   modName8Chars <- paste0(modName8Chars,
+      #                           paste(collapse = "", rep(" ", numCharsMax - nchr)))
     }
   } else {
     modName8Chars <- ""
   }
-  if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
-  if (!is.null(suffix))
-    modName8Chars <- paste0(modName8Chars, suffix)
-  if (!is.null(prefix))
-    modName8Chars <- paste0(prefix, modName8Chars)
+  prependTime <- strftime(st, format = stForm2)
+  if (grepl(prependTime, mess)) { # spades or simInit inside a spades or simInit
+    prependTime <- " -- "
+  } else {
+    if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
+    if (!is.null(suffix))
+      modName8Chars <- paste0(modName8Chars, suffix)
+    if (!is.null(prefix))
+      modName8Chars <- paste0(prefix, modName8Chars)
 
-  mess <- paste0(modName8Chars, mess)
+    mess <- paste0(modName8Chars, mess)
+  }
   mess <- gsub("\\n", "", mess)
-
-  paste0(strftime(st, format = stForm2), mess)
+  paste0(prependTime, mess)
 }
 
 
@@ -2026,3 +2108,76 @@ makeEventFn <- function(curModuleName, eventType) {
 
 eventFnElement <- function() ".eventFnDigest"
 eventFnElementEnvir <- function() ".eventFnEnvir"
+
+moduleNameStripped <- function(modName, numCharsMax) {
+  nchr <- nchar(modName)
+  tooManyVowels <- nchr - numCharsMax
+  numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+  tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
+  modName8Chars <-
+    paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
+                                   tooFewVowels,",",tooManyVowels,"}"), "",
+                            modName, perl=TRUE), 1, numCharsMax))
+  if (nchr < numCharsMax)
+    modName8Chars <- paste0(modName8Chars,
+                            paste(collapse = "", rep(" ", numCharsMax - nchr)))
+  modName8Chars
+}
+
+debugMessTRUE <- function(sim, events) {
+  if (missing(events))
+    events <- current(sim)
+  evnts1 <- data.frame(events)
+  widths <- unname(unlist(lapply(format(evnts1), nchar)))
+  sim[[".spadesDebugWidth"]] <- pmax(widths, sim[[".spadesDebugWidth"]])
+  evnts1[1L, ] <- sprintf(paste0("%-", sim[[".spadesDebugWidth"]],"s"), evnts1)
+  evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
+  evnts1[1L, 1L] <- sprintf(paste0("%-", sim[[".spadesDebugWidth"]][1L],"s"), evnts1[1L, 1L])
+  if (.pkgEnv[[".spadesDebugFirst"]]) {
+    evnts2 <- evnts1
+    evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",sim[[".spadesDebugWidth"]],"s"), names(evnts2)),
+                             sprintf(paste0("%-",sim[[".spadesDebugWidth"]],"s"), evnts2))
+
+    outMess <- paste(unname(evnts2[1, ]), collapse = ' ')
+    outMess <- c(outMess, paste(unname(evnts2[2, ]), collapse = ' '))
+    # write.table(evnts2, quote = FALSE, row.names = FALSE, col.names = FALSE)
+    .pkgEnv[[".spadesDebugFirst"]] <- FALSE
+  } else {
+    colnames(evnts1) <- NULL
+    # write.table(evnts1, quote = FALSE, row.names = FALSE)
+    outMess <- paste(unname(evnts1), collapse = ' ')
+  }
+  outMess
+}
+
+
+runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"), currnt) {
+
+  if (missing(currnt)) {
+    currnt <- unlist(current(sim))
+    currnt[["eventTime"]] <- as.numeric(currnt[["eventTime"]])
+  }
+
+  if (missing(fn)) {
+    fn <- parse(text = deparse(sim$.mods[[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]]))[[1]]
+    env <- environment(sim$.mods[[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]])
+  }
+  num <- grep(wh[1], fn)
+  if (wh[1] != "scheduleEvent") {
+    if (num == 1) {
+      num <- which(names(fn) %in% currnt[["eventType"]])
+      wh <- wh[-1]
+    }
+    sim <- runScheduleEventsOnly(sim = sim, fn = fn[[num]], env = env, wh = wh, currnt = currnt)
+  } else {
+    env2 <- new.env(parent = env)
+    env2$sim <- sim
+    for (i in num) {
+      sim <- eval(fn[[i]], envir = env2)
+    }
+  }
+  sim
+
+
+
+}

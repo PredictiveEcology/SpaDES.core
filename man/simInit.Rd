@@ -18,7 +18,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{list,list,list,list,list,data.frame,data.frame,character}(
@@ -30,7 +31,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{ANY,ANY,ANY,character,ANY,ANY,ANY,ANY}(
@@ -42,7 +44,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{ANY,ANY,character,ANY,ANY,ANY,ANY,ANY}(
@@ -54,7 +57,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 \S4method{simInit}{ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(
@@ -66,7 +70,8 @@ simInit(
   inputs,
   outputs,
   loadOrder,
-  notOlderThan = NULL
+  notOlderThan = NULL,
+  ...
 )
 
 simInitDefaults()
@@ -133,6 +138,9 @@ then the \code{.inputObjects} will be cached.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
+
+\item{...}{An alternative way to pass \code{objects}, i.e., they can just be named
+arguments rather than in a \code{objects = list(...)}}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
@@ -288,27 +296,25 @@ mySim <- simInit(
 outSim <- spades(mySim)
 
 # A little more complicated with inputs and outputs
-if (requireNamespace("rgdal", quietly = TRUE)) {
- mapPath <- system.file("maps", package = "quickPlot")
- mySim <- simInit(
-   times = list(start = 0.0, end = 2.0, timeunit = "year"),
-   params = list(
-     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-   ),
-   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
-                outputPath = tempdir()),
-   inputs = data.frame(
-     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-     functions = "raster",
-     package = "raster",
-     loadTime = 1,
-     stringsAsFactors = FALSE),
-   outputs = data.frame(
-     expand.grid(objectName = c("caribou","landscape"),
-     saveTime = 1:2,
-     stringsAsFactors = FALSE))
- )
+mapPath <- system.file("maps", package = "quickPlot")
+mySim <- simInit(
+  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+  params = list(
+    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
+  ),
+  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+               outputPath = tempdir()),
+  inputs = data.frame(
+    files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
+    functions = "rast",
+    package = "terra",
+    loadTime = 1,
+    stringsAsFactors = FALSE),
+  outputs = data.frame(
+    expand.grid(objectName = c("caribou","landscape"),
+    saveTime = 1:2,
+    stringsAsFactors = FALSE)))
 
  # Use accessors for inputs, outputs
  mySim2 <- simInit(
@@ -324,8 +330,8 @@ if (requireNamespace("rgdal", quietly = TRUE)) {
  # add by accessor is equivalent
  inputs(mySim2) <- data.frame(
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-     functions = "raster",
-     package = "raster",
+     functions = "rast",
+     package = "terra",
      loadTime = 1,
      stringsAsFactors = FALSE)
  outputs(mySim2) <- data.frame(
@@ -345,8 +351,8 @@ if (requireNamespace("rgdal", quietly = TRUE)) {
                 outputPath = tempdir()),
    inputs = data.frame(
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-     functions = "raster",
-     package = "raster",
+     functions = "rast",
+     package = "terra",
      loadTime = 1,
      stringsAsFactors = FALSE),
    outputs = data.frame(
@@ -367,8 +373,8 @@ if (requireNamespace("rgdal", quietly = TRUE)) {
  events(mySim) # load event is at time 1 year
  events(mySim2) # load event is at time 1 month, reported in years because of
                 #   update to times above
-}
 options(opts)
+
 }
 }
 
@@ -379,7 +385,7 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link[=spades]{spades()}},
+\code{\link[=spades]{spades()}}, \code{\link[=defineModule]{defineModule()}} to get help on metadata elements,
 \code{\link[=times]{times()}}, \code{\link[=params]{params()}}, \code{\link[=objs]{objs()}}, \code{\link[=paths]{paths()}},
 \code{\link[=modules]{modules()}}, \code{\link[=inputs]{inputs()}}, \code{\link[=outputs]{outputs()}}
 }

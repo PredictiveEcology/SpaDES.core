@@ -362,7 +362,7 @@ setMethod(
     ### Make README file
     filenameMd <- paste0(tools::file_path_sans_ext(filenameRmd), ".md")
     success <- tryCatch({
-      file.symlink(filenameMd, filenameREADME)
+      linkOrCopy(filenameMd, filenameREADME, verbose = FALSE)
     }, error = function(e) FALSE)
     if (isFALSE(success)) {
       ReadmeTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "README.template"))
@@ -502,7 +502,6 @@ setMethod(
 #'
 #' @author Eliot McIntire
 #' @export
-#' @importFrom raster extension
 #' @importFrom reproducible checkPath
 #' @rdname openModules
 #'
@@ -523,7 +522,7 @@ setMethod(
   signature = c(name = "character", path = "character"),
   definition = function(name, path) {
     basedir <- checkPath(path, create = FALSE)
-    fileExtension <- sub(extension(name), pattern = ".", replacement = "")
+    fileExtension <- tools::file_ext(name)
     if (length(unique(fileExtension)) > 1) {
       stop("Can only open one file type at a time.")
     }

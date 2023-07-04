@@ -15,12 +15,12 @@ defineModule(sim, list(
   authors = c(person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
                      role = c("aut", "cre"))),
   version = list(caribouMovement = "1.6.1"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "month",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("grid", "terra", "sp", "stats", "SpaDES.tools (>= 2.0.0)"),
+  reqdPkgs = list("grid", "terra", "sf", "stats", "SpaDES.tools (>= 2.0.0)"),
   parameters = rbind(
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
     defineParameter("moveInitialTime", "numeric", start(sim) + 1, start(sim) + 1, end(sim),
@@ -30,6 +30,8 @@ defineModule(sim, list(
     defineParameter("N", "numeric", 100L, 10L, 1000L, "initial number of caribou"),
     defineParameter("torus", "logical", FALSE, FALSE, TRUE,
                     "should the map wrap around like a torus?"),
+    defineParameter(".plots", "character", "screen", NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
     defineParameter(".plotInitialTime", "numeric", start(sim), -Inf, Inf,
                     "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", 1, -Inf, Inf,
@@ -66,17 +68,17 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
     init = {
       ### check for more detailed object dependencies:
       ### (use `checkObject` or similar)
-      SpaDES.core::checkObject(sim, name = SpaDES.core::P(sim)$stackName, layer = "habitatQuality")
+      checkObject(sim, name = Par$stackName, layer = "habitatQuality")
 
       # do stuff for this event
       sim <- Init(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$moveInitialTime,
+      sim <- scheduleEvent(sim, Par$moveInitialTime,
                            "caribouMovement", "move")
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.plotInitialTime,
+      sim <- scheduleEvent(sim, Par$.plotInitialTime,
                            "caribouMovement", "plot.init", .last())
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.saveInitialTime,
+      sim <- scheduleEvent(sim, Par$.saveInitialTime,
                            "caribouMovement", "save", .last() + 1)
     },
     move = {
@@ -84,38 +86,30 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
       sim <- Move(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$moveInterval, "caribouMovement", "move")
+      sim <- scheduleEvent(sim, time(sim) + Par$moveInterval, "caribouMovement", "move")
     },
     plot.init = {
-      # do stuff for this event
-      ## TODO: restore plotting
-      ##   Error: could not find function "$"
-      # Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
-      #      new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6))
+      # If this is scheduled because .plotInitialTime is not NA, it may not do anything
+      #   if Par$.plots is not "screen", "png" or another type.
+      Plots(sim$caribou, addTo = paste("sim", Par$stackName, "habitatQuality", sep = "$"),
+           new = FALSE, size = 0.2, pch = 19, gp = gpar(cex = 0.6), usePlot = TRUE)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
+      sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval, "caribouMovement", "plot", .last())
     },
     plot = {
-      # do stuff for this event
-      ## TODO: restore plotting
-      ##   Error: could not find function "$"
-      # Plot(sim$caribou, addTo = paste("sim", SpaDES.core::P(sim)$stackName, "habitatQuality", sep = "$"),
-      #      new = FALSE, pch = 19, size = 0.2, gp = gpar(cex = 0.6))
-
-      ## TODO: restore plotting
-      ## Error: [subset] invalid name(s)
-      # Plot(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6))
+      Plots(sim$caribou, new = FALSE, pch = 19, size = 0.1, gp = gpar(cex = 0.6),
+            usePlot = TRUE)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.plotInterval, "caribouMovement", "plot", .last())
+      sim <- scheduleEvent(sim, time(sim) + Par$.plotInterval, "caribouMovement", "plot", .last())
     },
     save = {
       # do stuff for this event
       sim <- saveFiles(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.saveInterval, "caribouMovement", "save", .last() + 1)
+      sim <- scheduleEvent(sim, time(sim) + Par$.saveInterval, "caribouMovement", "save", .last() + 1)
 
     },
     warning(paste(
@@ -128,13 +122,13 @@ doEvent.caribouMovement <- function(sim, eventTime, eventType, debug = FALSE) {
 
 ## event functions
 Init <- function(sim) {
-  yrange <- c(ymin(sim[[SpaDES.core::P(sim)$stackName]]),
-              ymax(sim[[SpaDES.core::P(sim)$stackName]]))
-  xrange <- c(xmin(sim[[SpaDES.core::P(sim)$stackName]]),
-              xmax(sim[[SpaDES.core::P(sim)$stackName]]))
+  yrange <- c(ymin(sim[[Par$stackName]]),
+              ymax(sim[[Par$stackName]]))
+  xrange <- c(xmin(sim[[Par$stackName]]),
+              xmax(sim[[Par$stackName]]))
 
   # initialize caribou agents
-  N <- SpaDES.core::P(sim)$N
+  N <- Par$N
   IDs <- as.character(1:N)
   sex <- sample(c("female", "male"), N, replace = TRUE)
   age <- round(rnorm(N, mean = 8, sd = 3))
@@ -151,10 +145,10 @@ Init <- function(sim) {
 
 Move <- function(sim) {
   # crop any caribou that went off maps
-  sim$caribou <- crop(sim$caribou, sim[[SpaDES.core::P(sim)$stackName]])
+  sim$caribou <- crop(sim$caribou, sim[[Par$stackName]])
   if (length(sim$caribou) == 0) stop("All agents are off map")
 
-  habitatQuality <- sim[[SpaDES.core::P(sim)$stackName]][["habitatQuality"]]
+  habitatQuality <- sim[[Par$stackName]][["habitatQuality"]]
 
   # find out what pixels the individuals are on now
   ex <- cellFromXY(habitatQuality, crds(sim$caribou))
@@ -166,9 +160,9 @@ Move <- function(sim) {
   sd <- 30 # could be specified globally in params
 
   sim$caribou <- move("crw", agent = sim$caribou,
-                      extent = ext(sim[[SpaDES.core::P(sim)$stackName]]),
+                      extent = ext(sim[[Par$stackName]]),
                       stepLength = ln, stddev = sd, lonlat = FALSE,
-                      torus = SpaDES.core::P(sim)$torus) ## TODO: crw() is dropping attributes!
+                      torus = Par$torus) ## TODO: crw() is dropping attributes!
 
   ## export habitat quality
   sim$habitatQuality <- habitatQuality

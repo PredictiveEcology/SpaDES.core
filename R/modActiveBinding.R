@@ -1,5 +1,8 @@
 makeSimListActiveBindings <- function(sim) {
-  lapply(modules(sim), function(mod) {
+  mods <- modules(sim)
+  mods <- mods[mods %in% ls(sim@.xData$.mods)]
+  #browser()
+  lapply(mods, function(mod) {
     makeModActiveBinding(sim = sim, mod = mod)
     makeParActiveBinding(sim = sim, mod = mod)
   })
@@ -54,6 +57,7 @@ activeModBindingFunction <- function(value) {
       }
     }
   } else {
+    browser()
     stop("Can't overwrite mod")
   }
   return(ret)

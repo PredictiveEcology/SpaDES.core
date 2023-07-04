@@ -325,6 +325,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
 
   sim$._restartRList$opts <- options()
   if ("raster" %in% attached) {
+    browser() # convert raster
     invisible(capture.output({
       sim$._restartRList$optsRaster <- raster::rasterOptions()
     }))
@@ -337,6 +338,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
 
   ## ensure correct file extension
+  browser() # this next function will add or swap -- tools::file_ext doesn't swap
   sim$._restartRList$simFilename <- raster::extension(sim$._restartRList$simFilename, ".qs")
 
   # sim$._restartRList$endOrig <- end(sim)
@@ -439,8 +441,10 @@ First <- function(...) {
   do.call(Sys.setenv, sim$._restartRList$envvars)
 
   do.call(options, sim$._restartRList$opts)
-  if ("raster" %in% attached)
+  if ("raster" %in% attached) {
+    browser()
     do.call(raster::rasterOptions, sim$._restartRList$optsRaster)
+  }
 
   sim@paths <- Map(p = paths(sim), n = names(paths(sim)), function(p,n) {
     if (!dir.exists(p)) {

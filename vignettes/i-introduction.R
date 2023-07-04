@@ -1,11 +1,20 @@
 ## ----setup, include=FALSE-----------------------------------------------------
+SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "knitr")
+hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
+useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
+
+knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
+
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
+
 
 ## ----SpaDES-demo, eval=FALSE, echo=TRUE---------------------------------------
 #  ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
 #  #install.packages("SpaDES.taols")
 #  #install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
+#  
+#  knitr::opts_chunk$set(eval = requireNamespace("SpaDES.tools") && !requireNamespace("NLMR"))
 #  
 #  library(SpaDES.core)
 #  

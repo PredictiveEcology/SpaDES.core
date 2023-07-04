@@ -72,52 +72,54 @@ wants it or not.
 
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 requireNamespace("NLMR", quietly = TRUE)) {
-#' # This will save the "caribou" object at the save interval of 1 unit of time
+# # This will save the "caribou" object at the save interval of 1 unit of time
 #  in the outputPath location
-outputPath <- file.path(tempdir(), "test_save")
-times <- list(start = 0, end = 6, "month")
-parameters <- list(
-  .globals = list(stackName = "landscape"),
-  caribouMovement = list(
-    .saveObjects = "caribou",
-    .saveInitialTime = 1, .saveInterval = 1
-  ),
-  randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
+  outputPath <- file.path(tempdir(), "test_save")
+  times <- list(start = 0, end = 1, "month")
+  parameters <- list(
+    .globals = list(stackName = "landscape"),
+    caribouMovement = list(
+      .saveObjects = "caribou",
+      .saveInitialTime = 1, .saveInterval = 1,
+      .plots = NA
+    ),
+    randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
 
-modules <- list("randomLandscapes", "caribouMovement")
-paths <- list(
-  modulePath = system.file("sampleModules", package = "SpaDES.core"),
-  outputPath = outputPath
-)
-opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
-mySim <- simInit(times = times, params = parameters, modules = modules,
+  modules <- list("randomLandscapes", "caribouMovement")
+  paths <- list(
+    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    outputPath = outputPath
+  )
+  opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+  mySim <- simInit(times = times, params = parameters, modules = modules,
+                   paths = paths)
+
+  # The caribou module has a saveFiles(sim) call, so it will save caribou
+  spades(mySim)
+  dir(outputPath)
+
+  # remove the files
+  file.remove(dir(outputPath, full.names = TRUE))
+
+  ## save multiple outputs
+  parameters <- list(
+    .globals = list(stackName = "landscape"),
+    caribouMovement = list(
+      .saveObjects = c("caribou", "habitatQuality"),
+      .saveInitialTime = 1, .saveInterval = 1,
+      .plots = NA
+    ),
+    randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
+
+  mySim <- simInit(times = times, params = parameters, modules = modules,
                  paths = paths)
 
-# The caribou module has a saveFiles(sim) call, so it will save caribou
-spades(mySim)
-dir(outputPath)
+  spades(mySim)
+  dir(outputPath)
+  # remove the files
+  file.remove(dir(outputPath, full.names = TRUE))
 
-# remove the files
-file.remove(dir(outputPath, full.names = TRUE))
-
-## save multiple outputs
-parameters <- list(
-  .globals = list(stackName = "landscape"),
-  caribouMovement = list(
-    .saveObjects = c("caribou", "habitatQuality"),
-    .saveInitialTime = 1, .saveInterval = 1
-  ),
-  randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
-
-mySim <- simInit(times = times, params = parameters, modules = modules,
-                 paths = paths)
-
-spades(mySim)
-dir(outputPath)
-# remove the files
-file.remove(dir(outputPath, full.names = TRUE))
-
-options(opts) # clean up
+  options(opts) # clean up
 
 }}
 }

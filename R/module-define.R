@@ -22,11 +22,12 @@ moduleDefaults <- list(
   },
   childModules = character(0),
   version = "0.0.0.9000", ## numeric_versions don't deparse well
-  extent = quote(raster::extent(rep(NA_real_, 4))),
+  extent = quote(terra::ext(rep(0, 4))),
   timeframe = quote(as.POSIXlt(c(NA, NA))),
   citation = list("citation.bib"),
   documentation = list(),
-  reqdPkgs = list("ggplot2", "raster")
+  loadOrder = list(after = NULL, before = NULL),
+  reqdPkgs = list("ggplot2") # used in newModule template ggplotFn
 )
 
 ################################################################################
@@ -65,7 +66,7 @@ moduleDefaults <- list(
 #'                        that is made to the module. See <https://semver.org/>
 #'                        for a widely accepted standard for version numbering.\cr
 #'    `spatialExtent` \tab The spatial extent of the module supplied via
-#'                              `raster::extent`. This is currently unimplemented.
+#'                              `terra::ext`. This is currently unimplemented.
 #'                              Once implemented, this should define what spatial region this
 #'                              module is scientifically reasonable to be used in.\cr
 #'    `timeframe` \tab Vector (length 2) of POSIXt dates specifying the temporal extent
@@ -86,7 +87,18 @@ moduleDefaults <- list(
 #'                         it is for human readers only.\cr
 #'    `documentation` \tab List of filenames referring to module documentation sources.
 #'                              This is currently not parsed by SpaDES;
-#'                              it is for human readers only.\cr\cr
+#'                              it is for human readers only.\cr
+#'    `loadOrder` \tab Named list of length 0, 1, or 2, with names being `after` and `before`.
+#'                     Each element should be a character string/vector naming 1 or more
+#'                     modules that will be loaded `after` or `before` this module.
+#'                     `after` and `before` are used from the current module's
+#'                     perspective. So, `list(after = c("Biomass_core"))` means that
+#'                     this module must come *after* `"Biomass_core"`. This should only
+#'                     be used when there are cyclic dependencies (2 or more modules
+#'                     have 1 or more objects that is in both `inputObjects` and
+#'                     `outputObjects` of both/all modules) between this module
+#'                     and other modules. In cases where the dependencies are not cyclic,
+#'                     SpaDES is able to resolve the order correctly.\cr
 #'    `reqdPkgs` \tab List of R package names required by the module. These
 #'                         packages will be loaded when `simInit` is called.
 #'                         [Require::Require()] will be used internally
@@ -141,7 +153,7 @@ moduleDefaults <- list(
 #'
 #' @author Alex Chubaty
 #' @export
-#' @importFrom raster extent
+#' @importFrom terra ext
 #' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
@@ -171,7 +183,8 @@ setMethod(
     metadataProvided <- metadataRequired %in% names(x)
     metadataMissing <- metadataRequired[!metadataProvided]
 
-    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation")
+    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation",
+                     "loadOrder")
     if (!all(metadataProvided)) {
       # inputObjects and outputObjects are dealt with differently in parseModule
       #   don't trigger a warning here.
@@ -220,14 +233,14 @@ setMethod(
     }
     x$version <- as.numeric_version(x$version)
 
-    x$spatialExtent <- if (!is(x$spatialExtent, "Extent")) {
+    x$spatialExtent <- if (!isExtents(x$spatialExtent)) {
       if (is.null(x$spatialExtent)) {
         eval(moduleDefaults$extent)
       } else {
         if (is.na(x$spatialExtent)) {
           moduleDefaults$extent
         } else {
-          extent(x$spatialExtent)
+          ext(x$spatialExtent)
         }
       }
     }
@@ -415,80 +428,56 @@ setMethod(
 #' unlink(tmpdir, recursive = TRUE)
 #' }
 #'
-#' @rdname defineParameter
-setGeneric("defineParameter", function(name, class, default, min, max, desc, ...) {
-  standardGeneric("defineParameter")
-})
-
-#' @rdname defineParameter
-setMethod("defineParameter",
-          signature(name = "character", class = "character", default = "ANY",
-                    min = "ANY", max = "ANY", desc = "character"),
-          definition = function(name, class, default, min, max, desc, ...) {
-            # for non-NA values warn if `default`, `min`, and `max` aren't the specified type
-            # we can't just coerece these because it wouldn't allow for character,
-            #  e.g., start(sim)
-            anyNAs <- suppressWarnings(c(is.na(default), is.na(min), is.na(max)))
-            if (!all(anyNAs)) {
-              # if some or all are NA -- need to check
-              wrongClass <- lapply(class, function(cla)
-                # Note c() doesn't always produce a vector -- e.g., functions, calls -- need lapply
-                lapply(c(default, min, max)[!anyNAs], function(val)
-                  is(val, cla)))
-              classWrong <- all(!unlist(wrongClass))
-              if (classWrong) {
-                # any messages here are captured if this is run from .parseModule
-                #   It will append module name
-                message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
-                                        class, "'.", sep = ""))
-              }
-            }
-
-            desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
-
-            # previously used `substitute()` instead of `I()`,
-            # but it did not allow for a vector to be passed with `c()`
-            df <- data.frame(
-              paramName = name, paramClass = I(list(class)), default = I(list(default)),
-              min = I(list(min)), max = I(list(max)), paramDesc = desc,
-              stringsAsFactors = FALSE)
-            return(df)
-})
-
-#' @rdname defineParameter
-setMethod("defineParameter",
-          signature(name = "character", class = "character",
-                    default = "ANY", min = "missing", max = "missing",
-                    desc = "character"),
-          definition = function(name, class, default, desc, ...) {
-            NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
-            if (class %in% NAtypes) {
-              # coerce `min` and `max` to same type as `default`
-              min <- as(NA, class)
-              max <- as(NA, class)
-            } else {
-              min <- NA
-              max <- NA
-            }
-            df <- defineParameter(name = name, class = class, default = default,
-                            min = min, max = max, desc = desc, ...)
-
-            return(df)
-})
-
-#' @rdname defineParameter
-setMethod(
-  "defineParameter",
-  signature(name = "missing", class = "missing", default = "missing",
-            min = "missing", max = "missing", desc = "missing"),
-  definition = function() {
-    df <- data.frame(
+defineParameter <- function(name, class, default, min, max, desc, ...) {
+  if (missing(name) && missing(class) && missing(default) && missing(min) && missing(max) && missing(desc))
+    return(data.frame(
       paramName = character(0), paramClass = character(0),
       default = I(list()), min = I(list()), max = I(list()),
-      paramDesc = character(0), stringsAsFactors = FALSE)
-    return(df)
-})
+      paramDesc = character(0), stringsAsFactors = FALSE))
+  if (is.character(name) && is.character(class) && missing(min) && missing(max)) {
+    NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
+    if (class %in% NAtypes) {
+      # coerce `min` and `max` to same type as `default`
+      min <- as(NA, class)
+      max <- as(NA, class)
+    } else {
+      min <- NA
+      max <- NA
+    }
+  }
 
+  anyNAs <- suppressWarnings(c(is.na(default), is.na(min), is.na(max)))
+  if (!all(anyNAs)) {
+    # if some or all are NA -- need to check
+    wrongClass <- lapply(class, function(cla)
+      # Note c() doesn't always produce a vector -- e.g., functions, calls -- need lapply
+      lapply(c(default, min, max)[!anyNAs], function(val)
+        is(val, cla)))
+    classWrong <- all(!unlist(wrongClass))
+    if (classWrong) {
+      # any messages here are captured if this is run from .parseModule
+      #   It will append module name
+      message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
+                              class, "'.", sep = ""))
+    }
+  }
+
+  desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
+
+  # previously used `substitute()` instead of `I()`,
+  # but it did not allow for a vector to be passed with `c()`
+  # df <- data.table::setDF(list(
+  #   paramName = name, paramClass = I(list(class)), default = I(list(default)),
+  #   min = I(list(min)), max = I(list(max)), paramDesc = desc))
+  df <- data.frame(
+    paramName = name, paramClass = I(list(class)), default = I(list(default)),
+    min = I(list(min)), max = I(list(max)), paramDesc = desc,
+    stringsAsFactors = FALSE)
+  # if (!identical(df, df1)) browser()
+  return(df)
+
+
+}
 ################################################################################
 #' Define an input object that the module expects.
 #'
@@ -739,30 +728,35 @@ setMethod(
     outputDF$fun[usesSemiColon] <- sapply(splitPackFun, function(x) x[2])
   }
 
-  if (any(is.na(outputDF[, "fun"]))) {
+  if (any(!outputDF$saved %in% TRUE)) {
     .fileExts <- .saveFileExtensions()
-    fl <- outputDF$file
-    exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
-      outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$fun[1]
-    }
-    if (any(is.na(outputDF[, "fun"]))) {
-      extsAvail <- checkKnownExts(exts, .fileExts)
-      outputDF$fun[is.na(outputDF$fun)] <- .fileExts[extsAvail, "fun"]
-    }
-  }
+    fileExtFromReproducible <- getOption("reproducible.cacheSaveFormat", "rds")
+    rowInDotFileExts <- which(.fileExts$exts %in% fileExtFromReproducible)
 
-  if (any(is.na(outputDF[, "package"]))) {
-    .fileExts <- .saveFileExtensions()
-    fl <- outputDF$file
-    exts <- fileExt(fl)
-    if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
-      outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[1]
-    }
-    if (any(is.na(outputDF[, "package"]))) {
+    if (any(is.na(outputDF[, "fun"]))) {
+      fl <- outputDF$file
       exts <- fileExt(fl)
-      extsAvail <- checkKnownExts(exts, .fileExts)
-      outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
+      if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+        outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <-
+          .fileExts$fun[rowInDotFileExts]
+      }
+      if (any(is.na(outputDF[, "fun"]))) {
+        extsAvail <- checkKnownExts(exts, .fileExts)
+        outputDF$fun[is.na(outputDF$fun)] <- .fileExts[extsAvail, "fun"]
+      }
+    }
+
+    if (any(is.na(outputDF[, "package"]))) {
+      fl <- outputDF$file
+      exts <- fileExt(fl)
+      if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+        outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[rowInDotFileExts]
+      }
+      if (any(is.na(outputDF[, "package"]))) {
+        exts <- fileExt(fl)
+        extsAvail <- checkKnownExts(exts, .fileExts)
+        outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
+      }
     }
   }
   return(outputDF)

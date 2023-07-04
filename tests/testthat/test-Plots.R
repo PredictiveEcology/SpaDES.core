@@ -2,10 +2,7 @@ test_that("Plots function 1", {
   skip_on_cran()
   skip_if_not_installed("ggplot2")
 
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit()
 
   newModule("test", tmpdir, open = FALSE)
 
@@ -33,7 +30,7 @@ test_that("Plots function 1", {
     authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     childModules = character(0),
     version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-    spatialExtent = raster::extent(rep(NA_real_, 4)),
+    spatialExtent = terra::ext(rep(0, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = "year",
     citation = list("citation.bib"),
@@ -64,9 +61,9 @@ test_that("Plots function 1", {
     return(invisible(sim))
     }
     fn1 <- function(d1, bins, ...) {
-        ggplot(d1, aes(a)) +
-        geom_histogram(bins = bins, ...) +
-        labs(title = "hello")
+        ggplot2::ggplot(d1, ggplot2::aes(a)) +
+        ggplot2::geom_histogram(bins = bins, ...) +
+        ggplot2::labs(title = "hello")
       }
 
 
@@ -100,9 +97,9 @@ test_that("Plots function 1", {
   if (interactive()) {
     something <- data.frame(a = sample(1:10, replace = TRUE))
     fn1 <- function(d1, bins, title = "hello", ...) {
-      ggplot(d1, aes(a)) +
-        geom_histogram(bins = bins, ...) +
-        labs(title = title)
+      ggplot2::ggplot(d1, ggplot2::aes(a)) +
+        ggplot2::geom_histogram(bins = bins, ...) +
+        ggplot2::labs(title = title)
     }
     # Should add next 2 plots to same windows
     Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run1")
@@ -117,19 +114,15 @@ test_that("Plots function 1", {
 })
 
 test_that("testing .plotInitialTime & .plots", {
-  skip_if_not_installed("NLMR")
+  testInit(sampleModReqdPkgs)
 
   if (interactive()) {
-    testInitOut <- testInit()
-    on.exit({
-      testOnExit(testInitOut)
-    }, add = TRUE)
 
     times <- list(start = 0.0, end = 1, timeunit = "year")
     params <- list(
       .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
       randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-      caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+      # caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
       fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
     )
     modules <- list("randomLandscapes", #"caribouMovement",
@@ -140,23 +133,24 @@ test_that("testing .plotInitialTime & .plots", {
 
     mySim@params$randomLandscapes$.plotInitialTime <- 0
     mySim@params$fireSpread$.plotInitialTime <- 0
-    mySim@params$caribouMovement$.plotInitialTime <- 0
 
     # Makes plots
-    spades(mySim)
+    expect_no_error(spades(mySim))
+    .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
+    expect_true(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
     # Makes no plots
+    clearPlot()
     spades(mySim, .plots = NA)
+    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
     spades(mySim, .plotInitialTime = NA)
+    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
   }
 })
 
 test_that("Plots function 2", {
   skip_if_not_installed("ggplot2")
 
-  testInitOut <- testInit()
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit()
 
   newModule("test", tmpdir, open = FALSE)
 
@@ -169,7 +163,7 @@ test_that("Plots function 2", {
     authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     childModules = character(0),
     version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-    spatialExtent = raster::extent(rep(NA_real_, 4)),
+    spatialExtent = terra::ext(rep(0, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = "year",
     citation = list("citation.bib"),
@@ -193,8 +187,8 @@ test_that("Plots function 2", {
     return(invisible(sim))
     }
     fn1 <- function(d, bins, ...) {
-        ggplot(d, aes(a)) +
-        geom_histogram(bins = bins, ...)
+        ggplot2::ggplot(d, ggplot2::aes(a)) +
+        ggplot2::geom_histogram(bins = bins, ...)
       }
 ', fill = TRUE)
   expect_error({
@@ -206,42 +200,55 @@ test_that("Plots function 2", {
 
 test_that("Plots function 3 - use as Plot", {
   if (interactive()) {
-    testInitOut <- testInit("raster", opts = list(spades.PlotsUsePlot = TRUE))
-    on.exit({
-      testOnExit(testInitOut)
-    }, add = TRUE)
-    ras <- raster(extent(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
-    stk1 <- raster::stack(ras, ras)
-    stk2 <- raster::stack(ras, ras)
+    testInit("terra", opts = list(spades.PlotsUsePlot = TRUE))
+    packages <- c("raster", "terra")
+    functions <- cbind(c("raster", "extent", "stack", "nlayers"),
+                       c("rast", "ext", "rast", "nlyr"))
+    if (!requireNamespace("raster", quietly = TRUE)) {
+      functions <- functions[, 2,drop = FALSE]
+      packages <- packages[2]
+    }
+    for (i in seq(packages)) {
+      read <- getFromNamespace(functions[1, i], ns = packages[i])
+      ext <- getFromNamespace(functions[2, i], ns = packages[i])
+      if (packages[i] %in% "raster") {
+        stk <- getFromNamespace(functions[3, i], ns = packages[i])
+      } else {
+        stk <- c
+      }
+      nlyr <- getFromNamespace(functions[4, i], ns = packages[i])
 
-    clearPlot()
-    Plots(data = stk1, types = "screen")
-    stk1[1:10] <- 0.5
-    stk1 <- raster::stack(stk1)
-    Plots(data = stk1, types = "screen") # should show both plots with top row at 0.5
-    stk1[[1]][1:10] <- 0.25
-    stk1 <- raster::stack(stk1)
-    Plot(stk1) # should show first row on left plot only as lower -- 0.25
 
-    Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
-    stk2[[2]][1:10] <- 0.25
-    stk2 <- raster::stack(stk2)
-    Plots(data = stk2, types = "screen") # should add 2 plots, with original data, not updated
-    stk2[[2]][11:20] <- 0.6
-    stk2 <- raster::stack(stk2)
-    Plot(stk2) # should show first row on left plot only as lower -- 0.25
+      ras <- read(ext(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
+      stk1 <- stk(ras, lyr2 = ras)
+      stk2 <- stk(ras, lyr2 = ras)
 
-    clearPlot()
-    # should show plots as a using raster::plot
-    Plots(data = stk1, types = "screen", usePlot = FALSE, fn = raster::plot)
+      clearPlot()
+      expect_no_error(Plots(data = stk1, types = "screen"))
+      stk1[1:10] <- 0.5
+      stk1 <- stk(stk1)
+      expect_no_error(Plots(data = stk1, types = "screen")) # should show both plots with top row at 0.5
+      stk1[[1]][1:10] <- 0.25
+      stk1 <- stk(stk1)
+      expect_no_error(Plot(stk1)) # should show first row on left plot only as lower -- 0.25
+
+      expect_no_error(Plots(data = stk2, types = "screen")) # should add 2 plots, with original data, not updated
+      stk2[[2]][1:10] <- 0.25
+      stk2 <- stk(stk2)
+      expect_no_error(Plots(data = stk2, types = "screen")) # should add 2 plots, with original data, not updated
+      stk2[[2]][11:20] <- 0.6
+      stk2 <- stk(stk2)
+      expect_no_error(Plot(stk2)) # should show first row on left plot only as lower -- 0.25
+
+      clearPlot()
+      # should show plots as a using terra::plot
+      expect_no_error(Plots(data = stk1, types = "screen", usePlot = FALSE, fn = terra::plot))
+    }
   }
 })
 
 test_that("Plots test .guessPkgFun", {
-  testInitOut <- testInit("raster")
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit("raster")
 
   pkgFun <- sapply(baseClassesCanHandle, SpaDES.core:::.guessPkgFun)
   test <- sapply(pkgFun, function(x) {

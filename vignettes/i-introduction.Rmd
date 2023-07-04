@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{01 Introduction to `SpaDES`}
-  %\VignetteDepends{SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{SpaDES.core, SpaDES.tools, NLMR}
   %\VignetteKeyword{discrete event simulation, spatial simulation models}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,10 +20,19 @@ editor_options:
   chunk_output_type: console
 ---
 
+
 ```{r setup, include=FALSE}
+SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "knitr")
+hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
+useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
+
+knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
+
 options("spades.moduleCodeChecks" = FALSE,
         "spades.useRequire" = FALSE)
+
 ```
+
 
 # Introduction to `SpaDES`
 
@@ -134,6 +143,8 @@ These sample modules, respectively, highlight several keys features of the packa
 ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
 #install.packages("SpaDES.taols")
 #install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
+
+knitr::opts_chunk$set(eval = requireNamespace("SpaDES.tools") && !requireNamespace("NLMR"))
 
 library(SpaDES.core)
 

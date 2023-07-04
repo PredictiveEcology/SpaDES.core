@@ -1,19 +1,28 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
-# SpaDES.core 1.1.2
+# SpaDES.core 2.0.0
 
 ## Enhancements
+* `options(spades.futureEvents = TRUE)` has been reworked and now works under a wider array of conditions. 
+* `Copy`, `.wrap`, `wrap` and `unwrap` all have fairly robust methods for `simList` class. The generics are in `reproducible` or `terra`
+* updated `sampleModules` to use `Plots` and `.plot` parameter.
+* new function: `registerOutputs` can be used by a developer to add saved files to the `outputs(sim)` data.frame.
+* messaging during nested `simInit` or `spades` calls will now not duplicate time prefix
+* `params` and `.globals` were previously not expected to change during `Cache`d events. Thus returned cached values were always the same as input as `params` and `.globals`. They are now assessed and returned as part of the `Cache`, as expected.
 * updates to handle upstream changes in `Require` and `reproducible`, including renaming `cacheRepo` to `cachePath` in some inherited functions.
 * updates to sample modules to use `SpaDES.tools::neutralLandscapeMap` instead of `NLMR` package directly
-* begin migration to use `terra` and `sf` instead of `raster`, `sp`, `rgeos`, and `rgdal`
+* migration complete to use `terra` and `sf` instead of `raster`, `sp`, `rgeos`, and `rgdal` as defaults. Attemps have been made to maintain backwards compatibility in all cases.
 * `moduleMetadata` now handles multiple module paths
 * updates to `memoryUse`
+* new option: setting `options("spades.allowInitDuringSimInit" = TRUE)`, a user will have `init` events of *one ore more* modules run during the `simInit` call, but only if they have no upstream dependencies, i.e., their `expectsInputs` cannot be supplied by another module's `createsOutputs`. `simInit` will determine which modules have no upstream dependencies and *only* these will be selected for running *only* their `init` events. This can be useful e.g., if there is a module that `createsOutputs` for a `studyArea`.
 * `.plots` arg in `spades` can be set to `NA` to turn of all plotting. This can also be set with `option(spades.plots = NA)`, 
 * minor bugfixes
 * `moduleMetadata` no longer runs `.inputObjects`. In addition to being unnecessary and slow, it was also failing with `reproducible (==1.2.16)` because it was trying to run `Cache`, which had a bug for this case. Now, `moduleMetadata` no longer runs the `.inputObjects` internally, so this bug is no longer relevant.
 * two new options -- `spades.loadReqdPkgs`, so a user can turn off loading of packages, and `spades.dotInputObjects`, so a user can omit running of the `.inputObjects` function in modules during `simInit`. These are updated in `spadesOptions`.
 * some tests and examples have been shortened, to fit within the CRAN guidelines
 * improved documentation
+* new hidden function `runScheduleEventsOnly` will extract only the `scheduleEvents` call; needed for `options(spades.futureEvents = TRUE)`
+* new option: `spades.saveFileExtensions` which allows users to use the `outputs(sim)` mechanism for saving, for file extensions that are not already supported by `.saveFileExtensions()`
 
 ## Dependency Changes
 * drop support for R 4.0 as dependency packages no longer support it
