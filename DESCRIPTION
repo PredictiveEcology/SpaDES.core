@@ -40,6 +40,7 @@ Imports:
     qs (>= 0.21.1),
     Require (>= 0.3.1),
     stats,
+    terra,
     utils,
     whisker
 Suggests:
@@ -70,7 +71,6 @@ Suggests:
     sp,
     SpaDES.tools (>= 2.0.0),
     tcltk,
-    terra,
     testthat (>= 1.0.2),
     withr
 Additional_repositories: https://predictiveecology.r-universe.dev/
