@@ -120,48 +120,49 @@ the file(s) that is/are saved will be appended to the \code{outputs} slot of the
 
 \examples{
 \donttest{
-# Note: if this is used inside a SpaDES module, do not define this
-#  function inside another function. Put it outside in a normal
-#  module script. Otherwise, it will cause a memory leak.
-if (requireNamespace("ggplot2")) {
-fn <- function(d)
-  ggplot2::ggplot(d, ggplot2::aes(a)) +
-  ggplot2::geom_histogram()
-sim <- simInit()
-sim$something <- data.frame(a = sample(1:10, replace = TRUE))
+  # Note: if this is used inside a SpaDES module, do not define this
+  #  function inside another function. Put it outside in a normal
+  #  module script. Otherwise, it will cause a memory leak.
+  if (requireNamespace("ggplot2")) {
+    fn <- function(d)
+      ggplot2::ggplot(d, ggplot2::aes(a)) +
+      ggplot2::geom_histogram()
+    sim <- simInit()
+    sim$something <- data.frame(a = sample(1:10, replace = TRUE))
 
-Plots(data = sim$something, fn = fn,
-      types = c("png"),
-      path = file.path("figures"),
-      filename = tempfile(),
-      .plotInitialTime = 1
-      )
+    Plots(data = sim$something, fn = fn,
+          types = c("png"),
+          path = file.path("figures"),
+          filename = tempfile(),
+          .plotInitialTime = 1
+          )
 
-# plot to active device and to png
-Plots(data = sim$something, fn = fn,
-      types = c("png", "screen"),
-      path = file.path("figures"),
-      filename = tempfile(),
-      .plotInitialTime = 1
-      )
+    # plot to active device and to png
+    Plots(data = sim$something, fn = fn,
+          types = c("png", "screen"),
+          path = file.path("figures"),
+          filename = tempfile(),
+          .plotInitialTime = 1
+          )
 
-# Can also be used like quickPlot::Plot, but with control over output type
-r <- terra::rast(terra::ext(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
-Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
+    # Can also be used like quickPlot::Plot, but with control over output type
+    r <- terra::rast(terra::ext(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
+    Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
 
-# with ggplotify, Plots can also be used to plot/save
-# non-ggplot objects:
+    # with ggplotify, Plots can also be used to plot/save
+    # non-ggplot objects:
 
 
-if (require("ggplotify")) {
-  if (!require("lattice")) stop("please install lattice")
+    if (require("ggplotify")) {
+      if (!require("lattice")) stop("please install lattice")
 
-  plotFile <- tempfile()
+      plotFile <- tempfile()
 
-  p1 <- densityplot(~mpg|cyl, data=mtcars)
-  Plots(data = p1, fn = as.ggplot, filename = plotFile,
-        ggsaveArgs = list(width = 5, height = 4, dpi = 300, bg = "white", units = "in"),
-        types = c("screen", "png"), .plotInitialTime = 1)
-}
+      p1 <- densityplot(~mpg|cyl, data=mtcars)
+      Plots(data = p1, fn = as.ggplot, filename = plotFile,
+            ggsaveArgs = list(width = 5, height = 4, dpi = 300, bg = "white", units = "in"),
+            types = c("screen", "png"), .plotInitialTime = 1)
+    }
+  } # end ggplot
 } # end of dontrun
 }
