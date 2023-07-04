@@ -87,8 +87,8 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
-#' # # This will save the "caribou" object at the save interval of 1 unit of time
-#' #  in the outputPath location
+#' ## This will save the "caribou" object at the save interval of 1 unit of time
+#' ## in the outputPath location
 #'   outputPath <- file.path(tempdir(), "test_save")
 #'   times <- list(start = 0, end = 1, "month")
 #'   parameters <- list(

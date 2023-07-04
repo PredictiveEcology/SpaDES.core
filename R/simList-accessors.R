@@ -115,7 +115,7 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.8 on `simList` environment.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.8 on `simList` environment.
 #'
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
@@ -173,7 +173,7 @@ setReplaceMethod("envir",
 #' @return Returns or sets a list of objects in the `simList` environment.
 #'
 #' @family functions to access elements of a `simList` object
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation Parameters.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -252,7 +252,7 @@ setReplaceMethod(
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @family functions to access elements of a `simList` object
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.7 on Modules and dependencies.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.7 on Modules and dependencies.
 #'
 #' @aliases simList-accessors-modules
 #' @author Alex Chubaty
@@ -423,7 +423,7 @@ setMethod(
 #' Specifying the parameter name is <5% faster.
 #'
 #' @family functions to access elements of a `simList` object
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation parameters.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation parameters.
 #'
 #' @aliases parameters
 #' @aliases simList-accessors-params
@@ -625,7 +625,7 @@ P.simList <- function(sim, param, module) {
 #' @inheritParams params
 #'
 #' @family functions to access elements of a `simList` object
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.1 on Simulation Parameters.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
 #' @include simList-class.R
@@ -1056,7 +1056,7 @@ setReplaceMethod("progressType",
 #' in the `simList` object.
 #'
 #' @family functions to access elements of a `simList` object
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.2 on loading and saving.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.2 on loading and saving.
 #'
 #' @include simList-class.R
 #' @importFrom data.table is.data.table
@@ -1609,7 +1609,7 @@ setReplaceMethod(
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
 #' @family functions to access elements of a `simList` object
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.4 on Simulation Paths.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.4 on Simulation Paths.
 #'
 #' @include simList-class.R
 #' @importFrom stats na.omit
@@ -2082,7 +2082,7 @@ setMethod("dataPath",
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.5 on Simulation times;
+#' @seealso [SpaDES.core-package], specifically the section 1.2.5 on Simulation times;
 #'   [elapsedTime()],
 #'
 #' @aliases simList-accessors-times
@@ -2482,7 +2482,7 @@ setMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @seealso [SpaDES.core-package()], specifically the section 1.2.6 on Simulation event queues.
+#' @seealso [SpaDES.core-package], specifically the section 1.2.6 on Simulation event queues.
 #'
 #' @aliases simList-accessors-events
 #' @export
@@ -2784,12 +2784,12 @@ setReplaceMethod(
 #' Add simulation dependencies
 #'
 #' Internal function.
-#' Adds a [.moduleDeps()] object to the simulation dependency list.
+#' Adds a [.moduleDeps](moduleDeps-class) object to the simulation dependency list.
 #'
 #' @inheritParams objs
 #'
 #' @param x   A named list containing the parameters used to construct a new
-#'            [.moduleDeps()] object.
+#'            [.moduleDeps](moduleDeps-class) object.
 #'
 #' @return A `simList` object.
 #'
@@ -3404,7 +3404,7 @@ findObjects <- function(objects, sim, module, path) {
 setMethod(
   "[",
   signature = list(x = "simList", i = "character"),
-  function (x, i, ...) {
+  function(x, i, ...) {
     x2 <- Copy(x, objects = 2)
     list2env(Copy(mget(i, envir = envir(x))), envir = envir(x2))
     x2

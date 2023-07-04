@@ -162,7 +162,7 @@ Move <- function(sim) {
   sim$caribou <- move("crw", agent = sim$caribou,
                       extent = ext(sim[[Par$stackName]]),
                       stepLength = ln, stddev = sd, lonlat = FALSE,
-                      torus = Par$torus) ## TODO: crw() is dropping attributes!
+                      torus = Par$torus)
 
   ## export habitat quality
   sim$habitatQuality <- habitatQuality
