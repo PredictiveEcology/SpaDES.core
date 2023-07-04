@@ -93,8 +93,6 @@ Likewise, numerous upgrades to R, including minimizing object copying since `R` 
 
 [^julia]: https://julialang.org
 
-[^benchmarks]: https://PredictiveEcology.org/benchmarking/
-
 ## Discrete event simulation and `SpaDES`
 
 Discrete event simulation (DES) as implemented here is 'event driven', meaning that an activity changes the state of the system at particular times (called events).
