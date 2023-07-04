@@ -57,7 +57,6 @@ doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @export
 #' @include environment.R
 #' @rdname progressBar
-#'
 newProgressBar <- function(sim) {
   if (exists(".pb", envir = .pkgEnv)) {
     close(get(".pb", envir = .pkgEnv))

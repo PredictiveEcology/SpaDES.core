@@ -21,7 +21,7 @@
 #'
 #' @return Returns the modified `simList` object.
 #'
-#' @seealso [.Random.seed()].
+#' @seealso [.Random.seed].
 #'
 #' @author Alex Chubaty
 #'

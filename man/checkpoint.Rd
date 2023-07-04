@@ -65,7 +65,7 @@ RNG save code adapted from:
 and \url{https://stackoverflow.com/q/13997444/1380598}
 }
 \seealso{
-\code{\link[=.Random.seed]{.Random.seed()}}.
+\link{.Random.seed}.
 
 Other functions to access elements of a \code{simList} object: 
 \code{\link{.addDepends}()},
