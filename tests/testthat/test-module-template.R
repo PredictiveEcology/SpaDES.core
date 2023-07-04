@@ -1,9 +1,6 @@
 test_that("module templates work", {
-  skip_if_not_installed("dplyr")
-  skip_if_not_installed("knitr")
-  skip_if_not_installed("rmarkdown")
 
-  testInit(c("knitr", "rmarkdown"), smcc = FALSE)
+  testInit(c("knitr", "rmarkdown", "dplyr"), smcc = FALSE)
 
   expect_true(dir.exists(tmpdir))
   moduleName <- "myModule"
@@ -18,9 +15,10 @@ test_that("module templates work", {
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".R"))))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".Rmd"))))
   expect_true(file.exists(file.path(mpath, "NEWS.md")))
-  expect_true(
-    utils::file_test("-h", file.path(mpath, "README.md")) | file.exists(file.path(mpath, "README.md"))
-  )
+  if (getRversion() > "4.1.3")
+    expect_true(
+      utils::file_test("-h", file.path(mpath, "README.md")) | file.exists(file.path(mpath, "README.md"))
+    )
   expect_true(dir.exists(file.path(mpath, ".github")))
   expect_true(dir.exists(file.path(mpath, ".github", "workflows")))
   expect_true(file.exists(file.path(mpath, ".github", "workflows", "render-module-rmd.yaml")))
