@@ -41,7 +41,7 @@ A sorted character vector of package names.
 Get module or simulation package dependencies
 }
 \seealso{
-Other functions to access elements of a \code{simList} object: 
+Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -58,4 +58,4 @@ Other functions to access elements of a \code{simList} object:
 \author{
 Alex Chubaty & Eliot McIntire
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}

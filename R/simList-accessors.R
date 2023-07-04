@@ -120,7 +120,7 @@ setMethod(
 #' @aliases simList-accessors-envir
 #' @author Alex Chubaty
 #' @export
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @include simList-class.R
 #' @rdname simList-accessors-envir
 #'
@@ -172,7 +172,7 @@ setReplaceMethod("envir",
 #'
 #' @return Returns or sets a list of objects in the `simList` environment.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
@@ -251,7 +251,7 @@ setReplaceMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.7 on Modules and dependencies.
 #'
 #' @aliases simList-accessors-modules
@@ -422,7 +422,7 @@ setMethod(
 #' Note: the important part for speed (e.g., 2-4x faster) is specifying the `moduleName`.
 #' Specifying the parameter name is <5% faster.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation parameters.
 #'
 #' @aliases parameters
@@ -624,7 +624,7 @@ P.simList <- function(sim, param, module) {
 #'
 #' @inheritParams params
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
 #'
 #' @export
@@ -773,7 +773,7 @@ setMethod("parameters",
 #' @export
 #' @include simList-class.R
 #' @rdname checkpoint
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #'
 setGeneric("checkpointFile", function(sim) {
   standardGeneric("checkpointFile")
@@ -863,7 +863,7 @@ setReplaceMethod("checkpointInterval",
 #'         for `progressInterval<-`, an updated `simList` object.
 #'
 #' @export
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @include simList-class.R
 #' @rdname progress
 #'
@@ -1055,7 +1055,7 @@ setReplaceMethod("progressType",
 #' @return Returns or sets the value(s) of the `input` or `output` slots
 #' in the `simList` object.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.2 on loading and saving.
 #'
 #' @include simList-class.R
@@ -1608,7 +1608,7 @@ setReplaceMethod(
 #'
 #' @return Returns or sets the value of the slot from the `simList` object.
 #'
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.4 on Simulation Paths.
 #'
 #' @include simList-class.R
@@ -2088,7 +2088,7 @@ setMethod("dataPath",
 #' @aliases simList-accessors-times
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @include simList-class.R
 #' @include times.R
 #' @rdname simList-accessors-times
@@ -2486,7 +2486,7 @@ setMethod(
 #'
 #' @aliases simList-accessors-events
 #' @export
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @importFrom data.table := copy data.table
 #' @importFrom stats setNames
 #' @include simList-class.R
@@ -2794,7 +2794,7 @@ setReplaceMethod(
 #' @return A `simList` object.
 #'
 #' @include simList-class.R
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @keywords internal
 #' @rdname addDepends
 #'
@@ -2857,7 +2857,7 @@ setMethod(
 #' @author Alex Chubaty & Eliot McIntire
 #' @export
 #' @include simList-class.R
-#' @family functions to access elements of a \code{simList} object
+#' @family functions to access elements of a 'simList' object
 #' @rdname packages
 #'
 # igraph exports %>% from magrittr

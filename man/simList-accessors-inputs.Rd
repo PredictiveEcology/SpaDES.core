@@ -203,7 +203,7 @@ unlink(tmpdir, recursive = TRUE)
 \seealso{
 \link{SpaDES.core-package}, specifically the section 1.2.2 on loading and saving.
 
-Other functions to access elements of a \code{simList} object: 
+Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -217,4 +217,4 @@ Other functions to access elements of a \code{simList} object:
 \code{\link{progressInterval}()},
 \code{\link{times}()}
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}

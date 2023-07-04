@@ -53,7 +53,7 @@ Currently, only get and set methods are defined. Subset methods are not.
 \seealso{
 \link{SpaDES.core-package}, specifically the section 1.2.7 on Modules and dependencies.
 
-Other functions to access elements of a \code{simList} object: 
+Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -70,4 +70,4 @@ Other functions to access elements of a \code{simList} object:
 \author{
 Alex Chubaty
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}

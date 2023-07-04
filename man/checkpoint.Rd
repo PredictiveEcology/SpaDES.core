@@ -67,7 +67,7 @@ and \url{https://stackoverflow.com/q/13997444/1380598}
 \seealso{
 \link{.Random.seed}.
 
-Other functions to access elements of a \code{simList} object: 
+Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
 \code{\link{envir}()},
 \code{\link{events}()},
@@ -84,4 +84,4 @@ Other functions to access elements of a \code{simList} object:
 \author{
 Alex Chubaty
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}

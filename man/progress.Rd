@@ -80,7 +80,7 @@ options(opts) # reset
 }}
 }
 \seealso{
-Other functions to access elements of a \code{simList} object: 
+Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
@@ -94,4 +94,4 @@ Other functions to access elements of a \code{simList} object:
 \code{\link{paths}()},
 \code{\link{times}()}
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}

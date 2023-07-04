@@ -23,7 +23,7 @@ Internal function.
 Adds a \code{.moduleDeps} object to the simulation dependency list.
 }
 \seealso{
-Other functions to access elements of a \code{simList} object: 
+Other functions to access elements of a 'simList' object: 
 \code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{events}()},
@@ -40,5 +40,5 @@ Other functions to access elements of a \code{simList} object:
 \author{
 Alex Chubaty
 }
-\concept{functions to access elements of a \code{simList} object}
+\concept{functions to access elements of a 'simList' object}
 \keyword{internal}
