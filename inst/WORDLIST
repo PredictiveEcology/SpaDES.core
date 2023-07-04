@@ -17,6 +17,7 @@ Etienne
 GDAL
 GLPK
 Gantt
+GitHub
 Github
 GoogleDrive
 IBMs
@@ -25,6 +26,7 @@ Landis
 Matloff
 MiB
 Modularity
+NLMR
 Namespaced
 Namespacing
 NetLogo
@@ -53,12 +55,15 @@ SpatialPoints
 SpatialPointsDataFrame
 StackOverflow
 Sys
+Versioned
+Workflow
 XXXX
 activeBindings
 addTagsToOutput
 ageMap
 agentLocation
 al
+allowInitDuringSimInit
 amongst
 aren
 arg
@@ -70,6 +75,7 @@ browserOnError
 bsf
 bugfix
 bugfixes
+cacheId
 cacheMessage
 cachePath
 caribouMovement
@@ -80,6 +86,7 @@ checkUsage
 checkpointFile
 checkpointInterval
 checkpointing
+checksum
 checksums
 childModule
 choosealicense
@@ -134,7 +141,7 @@ eventTime
 eventType
 expectsInput
 experiment2
-fastmap
+exts
 feedbacks
 fileTable
 filelist
@@ -168,6 +175,7 @@ lingua
 loadFiles
 loadOrder
 loadReqdPkgs
+login
 lowMemory
 macOS
 makeLines
@@ -207,9 +215,11 @@ numAgents
 numLayers
 objSize
 objectDiagram
+objectName
 objs
 oldrel
 openModules
+optimizations
 outputObjects
 outputPath
 overplot
@@ -237,6 +247,7 @@ rds
 rePlot
 recache
 recoveryMode
+relativized
 removeEvent
 reparse
 reparsed
@@ -245,9 +256,9 @@ reproducibility
 reproducibly
 reqdPkgs
 restartSpades
-rmarkdown
-rstudio
+roxygen2
 sampleModules
+saveFileExtensions
 saveFiles
 saveObjects
 saveRDS
@@ -255,9 +266,12 @@ scalable
 scheduleConditionalEvent
 scheduleEvent
 scratchPath
+sessionInfo
 setColors
 setDTthreads
 showCache
+shp
+sim
 sim1
 sim2
 sim2gantt
@@ -275,6 +289,8 @@ spread2
 startDate
 stochasticity
 str
+studyArea
+studyAreaLarge
 submodules
 suppressNoLocalFun
 suppressParamUnused
@@ -293,6 +309,7 @@ timeunits
 timezones
 tmp
 tolower
+undesireable
 unevaluated
 unparsed
 unsetting
@@ -301,7 +318,12 @@ useRequire
 userSuppliedObjNames
 useragent
 v1
+v2
 vectorized
+versa
+versioning
+workflow
+workflows
 www
 xData
 zipModule
