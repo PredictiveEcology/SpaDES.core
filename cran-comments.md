@@ -22,7 +22,7 @@ This is a new submission of a package that was archived from CRAN due to removal
 * Windows                 (win-builder), R 4.3.1
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2023-07-03 r84633 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2023-07-03 r84633)
 * Windows                      (GitHub), R-devel (2023-07-03 r84633 ucrt)
 * Windows                 (win-builder), R-devel (2023-07-03 r84633 ucrt)
 * Windows                       (local), R-devel (2023-07-03 r84633 ucrt)
