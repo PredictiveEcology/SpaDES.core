@@ -14,7 +14,7 @@ defineModule(sim, list(
   timeframe = {{{timeframe}}},
   timeunit = {{{timeunit}}},
   citation = {{{citation}}},
-  documentation = list("README.md", {{{RmdName}}}), ## same file
+  documentation = list("NEWS.md", "README.md", {{{RmdName}}}),
 {{{otherMetadata}}}
 ))
 

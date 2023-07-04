@@ -4,22 +4,27 @@ if (!isGeneric("Copy")) {
   })
 }
 
-#' Copy for simList class objects
+#' Copy for `simList` class objects
 #'
-#' Because a simList works with an environment to hold all objects,
-#' all objects within that slot are pass-by-reference. That means
-#' it is not possible to simply copy an object with an assignment operator:
-#' the two objects will share the same objects. As one simList object changes
-#' so will the other. when this is not the desired behaviour, use this function.
-#' NOTE: use capital C, to limit confusion with `data.table::copy()`
-#' See [reproducible::Copy()].
+#' Because a `simList` works with an environment to hold all objects,
+#' all objects within that slot are pass-by-reference.
+#' That means it is not possible to simply copy an object with an assignment operator:
+#' the two objects will share the same objects.
+#' As one `simList` object changes so will the other.
+#' When this is not the desired behaviour, use this function.
+#'
+#' @note uses capital C, to limit confusion with e.g., `data.table::copy()`.
+#'
+#' @seealso [reproducible::Copy()]
 #'
 #' @inheritParams reproducible::Copy
-#' @param objects  Whether the objects contained within the simList environment
+#'
+#' @param objects  Whether the objects contained within the `simList` environment
 #'                 should be copied. Default `TRUE`, which may be slow.
-#' @param queues Logical. Should the events queues (`events`,
-#'               `current`, `completed`) be deep copied via
-#'               `data.table::copy`
+#' @param queues Logical. Should the events queues (`events`, `current`, `completed`)
+#'               be deep copied via `data.table::copy()`
+#'
+#' @return a copy of `object`
 #'
 #' @details
 #' `simList` objects can contain a lot of information, much of which could be
@@ -41,13 +46,6 @@ setMethod("Copy",
           signature(object = "simList"),
           definition = function(object,
                                 objects, queues, ...) {
-            # if (missing(filebackedDir)) {
-            #   if (!missing(objects)) {
-            #     if (isTRUE(objects)) {
-            #       filebackedDir <- tempdir2(rndstr(1, 8))
-            #     }
-            #   }
-            # }
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             sim_ <- object
@@ -69,7 +67,14 @@ setMethod("Copy",
               sim_ <- newEnvsByModule(sim_, modNam)
             }
 
-            if (objects) {
+            if (objects == 2) {
+              dotObjsNotDotMods <- grep("\\.mods", ls(object@.xData, pattern = "^\\.", all.names = TRUE),
+                                        invert = TRUE, value = TRUE)
+              list2env(Copy(mget(dotObjsNotDotMods, envir = object@.xData)),
+                       envir = sim_@.xData)
+            }
+            if (objects > 0) {
+
               # browser(expr = exists("._Copy_6"))
               objNames <- ls(object@.xData$.mods, all.names = TRUE)
               names(objNames) <- objNames
@@ -78,9 +83,12 @@ setMethod("Copy",
                                        is.environment(get(obj, envir = object@.xData$.mods))))
               # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
 
-              # Copy the whole environment, recursively through environments
-              sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
+              if (objects == 1) {
+                # Copy the whole environment, recursively through environments
+                sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
+              }
 
+              # browser()
               # This chunk makes the environment of each function in a module,
               #   the module itself. This is unique to functions in `simList` objs
               #   i.e., can't rely on generic reproducible::Copy
@@ -97,41 +105,16 @@ setMethod("Copy",
 
               # Copy .objects
               lapply(modules(sim_), function(mod) {
-                rm(list = ".objects", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
-                sim_@.xData$.mods[[mod]]$.objects <- new.env(parent = emptyenv())
-                list2env(as.list(object@.xData$.mods[[mod]]$.objects, all.names = TRUE),
-                         envir = sim_@.xData$.mods[[mod]]$.objects)
+                if (exists(mod, envir = sim_@.xData$.mods, inherits = FALSE)) {
+                  rm(list = ".objects", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
+                  sim_@.xData$.mods[[mod]]$.objects <- new.env(parent = emptyenv())
+                  list2env(as.list(object@.xData$.mods[[mod]]$.objects, all.names = TRUE),
+                           envir = sim_@.xData$.mods[[mod]]$.objects)
+                }
               })
 
               # Deal with activeBindings
               makeSimListActiveBindings(sim_)
-              # lapply(modules(sim_), function(mod) {
-              #   makeModActiveBinding(sim = sim_, mod = mod)
-              #   makeParActiveBinding(sim = sim_, mod = mod)
-              # })
-
-
-
-              # lapply(objNames[isEnv], function(mod) {
-              #   if (exists("mod", object@.xData$.mods[[mod]], inherits = FALSE)) {
-              #     if (bindingIsActive("mod", object@.xData$.mods[[mod]])) {
-              #       rm(list = "mod", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
-              #       rm(list = ".objects", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
-              #       sim_@.xData$.mods[[mod]]$.objects <- new.env(parent = emptyenv())
-              #       list2env(as.list(object@.xData$.mods[[mod]]$.objects, all.names = TRUE),
-              #                envir = sim_@.xData$.mods[[mod]]$.objects)
-              #
-              #       makeModActiveBinding(sim = sim_, mod = mod)
-              #     }
-              #   }
-              # })
-              # lapply(modules(sim_), function(mod) {
-              #   if (exists("mod", object@.xData$.mods[[mod]], inherits = FALSE)) {
-              #     if (bindingIsActive("mod", object@.xData$.mods[[mod]])) {
-              #       rm(list = "Par", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
-              #       makeParActiveBinding(sim = sim_, mod = mod)
-              #     }}
-              # })
             }
             sim_@.envir <- sim_@.xData
             return(sim_)

@@ -4,21 +4,23 @@ utils::globalVariables(c("fun", "loadTime", "package"))
 #'
 #' How to load various types of files in R.
 #'
+#' @return `data.frame` of file extension, package, and function mappings
+#'
 #' @export
 #' @rdname loadFiles
 .fileExtensions <- function() {
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
-    "asc", "raster", "raster",
+    "asc", "terra", "rast",
     "csv", "read.csv", "utils",
-    "png", "raster", "raster",
+    "png", "terra", "rast",
     "qs", "qread", "qs",
     "Rdata", "load", "base",
     "rdata", "load", "base",
     "RData", "load", "base",
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
-    "shp", "readOGR", "rgdal",
-    "tif", "raster", "raster",
+    "shp", "terra", "vect",
+    "tif", "terra", "rast",
     "txt", "read.table", "utils"
     )),
     stringsAsFactors = FALSE)
@@ -48,9 +50,11 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 ###############################################################################
 #' Load simulation objects according to `filelist`
 #'
-#' This function has two roles: 1) to proceed with the loading of files that
-#' are in a simList or 2) as a short cut to simInit(inputs = filelist). Generally
-#' not to be used by a user.
+#' This function has two roles:
+#' 1. to proceed with the loading of files that are in a `simList`; or
+#' 2. as a shortcut to `simInit(inputs = filelist)`.
+#'
+#' @note Generally not intended to be used by users.
 #'
 #' @seealso [inputs()]
 #'
@@ -61,18 +65,18 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #'
 #' @param ...      Additional arguments.
 #'
+#' @return the modified `sim`, invisibly.
+#'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @importFrom data.table := data.table rbindlist
-#' @importFrom raster inMemory
+#' @importFrom terra inMemory
 #' @importFrom utils getFromNamespace
 #' @include simulation-simInit.R
-#' @name loadFiles
 #' @rdname loadFiles
 #'
 #' @examples
-#' \dontrun{
-#'
+#' \donttest{
 #' # Load random maps included with package
 #' filelist <- data.frame(
 #'     files = dir(system.file("maps", package = "quickPlot"),
@@ -87,10 +91,10 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' #  specifically, when add "native = TRUE" as an argument to the raster function
 #' files = dir(system.file("maps", package = "quickPlot"),
 #'             full.names = TRUE, pattern = "tif")
-#' arguments = I(rep(list(native = TRUE), length(files)))
+#' arguments = I(rep(list(lyrs = 1), length(files)))
 #' filelist = data.frame(
 #'    files = files,
-#'    functions = "raster::raster",
+#'    functions = "terra::rast",
 #'    objectName = NA,
 #'    arguments = arguments,
 #'    loadTime = 0,
@@ -227,20 +231,13 @@ setMethod(
             }
             filelist[y, "loaded"] <- TRUE
 
-            if (loadFun[y] == "raster") {
-              message(paste0(
-                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y], # nolint
-                "(inMemory=", inMemory(sim[[filelist[y, "objectName"]]]), ")",
-                ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
-                       paste("\n  at time", filelist[y, "loadTime"]), "")
-              ))
-            } else {
-              message(paste0(
-                filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y], # nolint
-                ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
-                       paste("\n   at time", filelist[y, "loadTime"]), "")
-              ))
+            mess <- paste0(filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y])
+            if (loadFun[y] %in% c("raster", "rast")) {
+                mess <- paste0(mess, "(inMemory=", inMemory(sim[[filelist[y, "objectName"]]]), ")")
             }
+            mess <- paste0(mess, paste0(ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
+                                               paste("\n   at time", filelist[y, "loadTime"]), "")))
+            message(mess)
           }
         } # end y
         # add new rows of files to load based on filelistDT$Interval
@@ -294,38 +291,34 @@ setMethod("loadFiles",
 #'
 #' @param x An object passed directly to the function raster (e.g., character string of a filename).
 #'
-#' @param ... Additional arguments to `raster::raster`, `raster::stack`,
-#' or `raster::brick`.
+#' @param ... Additional arguments to `raster::raster`, `raster::stack`, or `raster::brick`.
 #'
 #' @return A raster object whose values are stored in memory.
 #'
-#' @seealso [raster()].
-#'
-#' @name rasterToMemory
-#' @importFrom raster getValues raster setValues
-#' @export
-#' @rdname rasterToMemory
+#' @seealso `raster()`, [terra::rast()].
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#'
+#' @export
+#' @importFrom terra values rast
+#' @rdname rasterToMemory
 setGeneric("rasterToMemory", function(x, ...) {
   standardGeneric("rasterToMemory")
 })
 
-#' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "Raster"),
-          definition = function(x, ...) {
-            if (any(nchar(Filenames(x)) > 0)) {
-              r <- rasterCreate(x, ...)
-              r[] <- getValues(x)
-              if (is(x, "RasterStack") && !is(r, "RasterStack")) {
-                r <- raster::stack(r, ...)
-              }
-              x <- r
-            }
-            return(x)
-})
+# # @rdname rasterToMemory
+# setMethod("rasterToMemory",
+#           signature = c(x = "Raster"),
+#           definition = function(x, ...) {
+#             if (any(nchar(Filenames(x)) > 0)) {
+#               r <- rasterCreate(x, ...)
+#               r[] <- terra::values(r)
+#               if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+#                 r <- raster::stack(r, ...)
+#               }
+#               x <- r
+#             }
+#             return(x)
+# })
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
@@ -336,8 +329,34 @@ setMethod("rasterToMemory",
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
+          signature = c(x = "character"),
+          definition = function(x, ...) {
+            rasterToMemory(terra::rast(x, ...))
+          })
+
+#' @rdname rasterToMemory
+setMethod("rasterToMemory",
           signature = c(x = "ANY"),
           definition = function(x, ...) {
+
+            if (isRaster(x)) {
+              if (any(nchar(Filenames(x)) > 0)) {
+                r <- rasterCreate(x, ...)
+                r[] <- terra::values(r)
+                if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+                  r <- raster::stack(r, ...)
+                }
+                x <- r
+              }
+
+            } else if (isSpat(x)) {
+              if (any(nchar(Filenames(x)) > 0)) {
+                r <- rasterCreate(x, ...)
+                r[] <- terra::values(x)
+                x <- r
+              }
+
+            }
             x
 })
 
@@ -352,19 +371,19 @@ setMethod("rasterToMemory",
 
 
 #' Simple wrapper to load any `Raster*` object
-#' This wraps either `raster::raster`, `raster::stack`,
-#' or `raster::brick`, allowing a single function to be used
-#' to create a new object of the same class as a template.
 #'
-#' @export
+#' This wraps either `raster::raster`, `raster::stack`, or `raster::brick`,
+#' allowing a single function to be used to create a new object of the same class as a template.
+#'
 #' @param x An object, notably a `Raster*` object. All others will simply
 #'   be passed through with no effect.
+#'
 #' @param ... Passed to `raster::raster`, `raster::stack`,
 #' or `raster::brick`
 #'
-#' @details
-#' A new (empty) object of same class as the original.
+#' @return  a new (empty) object of same class as the original.
 #'
+#' @export
 rasterCreate <- function(x, ...) {
   UseMethod("rasterCreate")
 }
@@ -395,3 +414,7 @@ rasterCreate.Raster <- function(x, ...) {
   raster::raster(x, ...)
 }
 
+#' @describeIn rasterCreate Uses `terra::rast` when a layer is `SpatRast`,
+rasterCreate.SpatRaster <- function(x, ...) {
+  terra::rast(x, ...)
+}

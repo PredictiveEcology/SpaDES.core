@@ -10,7 +10,7 @@
 \item{object}{Any R object returned from a function}
 }
 \description{
-See \link[reproducible:exportedMethods]{reproducible::.tagsByClass}. Adds current \code{moduleName},
+See \code{\link[reproducible:exportedMethods]{reproducible::.tagsByClass()}}. Adds current \code{moduleName},
 \code{eventType}, \code{eventTime}, and \verb{function:spades} as \code{userTags}.
 }
 \seealso{

@@ -29,8 +29,7 @@ inputArgs(sim) <- value
 \S4method{inputArgs}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{value}{The object to be stored at the slot. See Details.}
 }
@@ -75,7 +74,7 @@ directory information.\cr
 load that file. Defaults to the known extensions in \code{SpaDES} (found by
 examining \code{.fileExtensions()}). The \code{package} and \code{fun} can be
 jointly specified here as \code{"packageName::functionName"}, e.g.,
-\code{"raster::raster"}.\cr
+\code{"terra::rast"}.\cr
 
 \code{package} \tab optional character string indicating the package in
 which to find the \code{fun});\cr
@@ -112,10 +111,10 @@ This is useful if there is something required before simulation to produce the m
 object dependencies, including such things as downloading default datasets, e.g.,
 \code{downloadData('LCC2005', modulePath(sim))}.
 Nothing should be created here that does not create an named object in \code{inputObjects}.
-Any other initiation procedures should be put in the "init" eventType of the doEvent function.
-Note: the module developer can use 'sim$.userSuppliedObjNames' inside the function to
-selectively skip unnecessary steps because the user has provided those inputObjects in the
-simInit call. e.g., the following code would look to see if the user had passed \code{defaultColor}
+Any other initiation procedures should be put in the "init" \code{eventType} of the \code{doEvent} function.
+Note: the module developer can use \code{sim$.userSuppliedObjNames} inside the function to
+selectively skip unnecessary steps because the user has provided those \code{inputObjects} in the
+\code{simInit} call. e.g., the following code would look to see if the user had passed \code{defaultColor}
 into during \code{simInit}. If the user had done this, then this function would not override
 that value with 'red'. If the user has not passed in a value for \code{defaultColor}, then
 the module will get it here:
@@ -134,9 +133,8 @@ the module will get it here:
 sim <- simInit()
 
 test <- 1:10
-library(igraph) # for \%>\%
 library(reproducible) # for checkPath
-tmpdir <- file.path(tempdir(), "inputs") \%>\% checkPath(create = TRUE)
+tmpdir <- file.path(tempdir(), "inputs") |> checkPath(create = TRUE)
 tmpFile <- file.path(tmpdir, "test.rds")
 saveRDS(test, file = tmpFile)
 inputs(sim) <- data.frame(file = tmpFile) # using only required column, "file"
@@ -151,35 +149,33 @@ allTifs <- dir(system.file("maps", package = "quickPlot"),
 
 # next: .objectNames are taken from the filenames (without the extension)
 # This will load all 5 tifs in the SpaDES sample directory, using
-#   the raster fuction in the raster package, all at time = 0
-if (require("rgdal", quietly = TRUE)) {
-  sim <- simInit(
-    inputs = data.frame(
-      files = allTifs,
-      functions = "raster",
-      package = "raster",
-      loadTime = 0,
-      stringsAsFactors = FALSE)
-    )
+#   the rast fuction in the terra package, all at time = 0
+sim <- simInit(
+  inputs = data.frame(
+    files = allTifs,
+    functions = "rast",
+    package = "terra",
+    loadTime = 0,
+    stringsAsFactors = FALSE)
+)
 
-  ##############################
-  #A fully described inputs object, including arguments:
-  files <- dir(system.file("maps", package = "quickPlot"),
-               full.names = TRUE, pattern = "tif")
-  # arguments must be a list of lists. This may require I() to keep it as a list
-  #   once it gets coerced into the data.frame.
-  arguments = I(rep(list(native = TRUE), length(files)))
-  filelist = data.frame(
-     objectName = paste0("Maps", 1:5),
-     files = files,
-     functions = "raster::raster",
-     arguments = arguments,
-     loadTime = 0,
-     intervals = c(rep(NA, length(files) - 1), 10)
-  )
-  inputs(sim) <- filelist
-  spades(sim)
-}
+##############################
+#A fully described inputs object, including arguments:
+files <- dir(system.file("maps", package = "quickPlot"),
+             full.names = TRUE, pattern = "tif")
+# arguments must be a list of lists. This may require I() to keep it as a list
+#   once it gets coerced into the data.frame.
+# arguments = I(rep(list(native = TRUE), length(files)))
+filelist <- data.frame(
+  objectName = paste0("Maps", 1:5),
+  files = files,
+  functions = "terra::rast",
+  # arguments = arguments,
+  loadTime = 0,
+  intervals = c(rep(NA, length(files) - 1), 10)
+)
+inputs(sim) <- filelist
+spades(sim)
 
 # Example showing loading multiple objects from global environment onto the
 #   same object in the simList, but at different load times
@@ -205,11 +201,11 @@ identical(a2, a$a)
 unlink(tmpdir, recursive = TRUE)
 }
 \seealso{
-\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.2 on loading and saving.
+\link{SpaDES.core-package}, specifically the section 1.2.2 on loading and saving.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{events}()},
 \code{\link{globals}()},

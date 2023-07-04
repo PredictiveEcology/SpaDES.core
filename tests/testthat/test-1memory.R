@@ -2,18 +2,12 @@ test_that("testing memoryUse", {
   # Needs to run first or else memory use test fails
   skip_on_cran()
 
-  skip_if_not_installed("future")
-  skip_if_not_installed("future.callr")
-  skip_if_not_installed("NLMR")
-
-  rm(list = ls())
-  testInitOut <- testInit(c("raster", "future.callr", "future"),
+  testInit(c(sampleModReqdPkgs, "future", "future.callr"),
                           opts = list(spades.moduleCodeChecks = FALSE,
                                       spades.memoryUseInterval = 0.2,
                                       spades.futurePlan = "callr"))
   oldPlan <- future::plan()
   on.exit({
-    testOnExit(testInitOut)
     if (!identical(future::plan(), oldPlan)) {
       future::plan(oldPlan)
     }
@@ -23,7 +17,7 @@ test_that("testing memoryUse", {
 
   #set.seed(42)
 
-  for (i in 1:10) gc()
+  # for (i in 1:10) gc()
   times <- list(start = 0.0, end = if (isWindows()) 60 else 30, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),

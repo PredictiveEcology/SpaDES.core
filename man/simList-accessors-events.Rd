@@ -59,14 +59,13 @@ completed(sim) <- value
 \S4method{completed}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{unit}{Character. One of the time units used in \code{SpaDES}.}
 
 \item{value}{The object to be stored at the slot.}
 
-\item{times}{Logical. Should this function report the clockTime}
+\item{times}{Logical. Should this function report the \code{clockTime}.}
 }
 \value{
 Returns or sets the value of the slot from the \code{simList} object.
@@ -95,11 +94,11 @@ Each event is represented by a \code{\link[=data.table]{data.table()}} row consi
 }
 }
 \seealso{
-\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.6 on Simulation event queues.
+\link{SpaDES.core-package}, specifically the section 1.2.6 on Simulation event queues.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{globals}()},
 \code{\link{inputs}()},

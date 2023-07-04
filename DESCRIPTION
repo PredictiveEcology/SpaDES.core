@@ -1,34 +1,36 @@
 Package: SpaDES.core
 Type: Package
 Title: Core Utilities for Developing and Running Spatially Explicit Discrete Event Models
-Description: Provides the core framework for a discrete event system (DES) to 
+Description: Provides the core framework for a discrete event system to 
     implement a complete data-to-decisions, reproducible workflow.
-    The core DES components facilitate modularity, and easily enable the user
-    to include additional functionality by running user-built modules.
+    The core components facilitate the development of modular pieces, 
+    and enable the user to include additional functionality by running user-built modules.
     Includes conditional scheduling, restart after interruption, packaging of
     reusable modules, tools for developing arbitrary automated workflows,
     automated interweaving of modules of different temporal resolution,
-    and tools for visualizing and understanding the DES project.
+    and tools for visualizing and understanding the within-project dependencies. 
+    The suggested package 'NLMR' can be installed from the repository 
+    (<https://PredictiveEcology.r-universe.dev>).
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2023-01-11
-Version: 1.1.1
+Date: 2023-07-04
+Version: 2.0.0
 Authors@R: c(
-    person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut", "cre"),
+    person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
-    person("Eliot J B", "McIntire", , "eliot.mcintire@canada.ca", role = "aut",
+    person("Eliot J B", "McIntire", , "eliot.mcintire@canada.ca", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6914-8316")),
     person("Yong", "Luo", , "Yong.Luo@gov.bc.ca", role = "ctb"),
     person("Steve", "Cumming", , "Steve.Cumming@sbf.ulaval.ca", role = "ctb"),
-    person("Ceres", "Barros", , "cbarros@mail.ubc.ca", role = "ctb",
+    person("Ceres", "Barros", , "ceres.barros@ubc.ca", role = "ctb",
            comment = c(ORCID = "0000-0003-4036-977X")),
     person("His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada", role = "cph")
   )
 Depends:
-    R (>= 4.0),
-    quickPlot (>= 0.1.4),
-    reproducible (>= 1.2.15)
+    R (>= 4.1),
+    quickPlot (>= 1.0.2),
+    reproducible (>= 2.0.5)
 Imports:
     crayon,
     data.table (>= 1.11.0),
@@ -36,12 +38,13 @@ Imports:
     lobstr,
     methods,
     qs (>= 0.21.1),
-    raster (>= 2.5-8),
-    Require (>= 0.2.6),
+    Require (>= 0.3.1),
     stats,
     utils,
     whisker
 Suggests:
+    archive,
+    CircStats,
     codetools,
     covr,
     DiagrammeR (>= 0.8.2),
@@ -49,23 +52,27 @@ Suggests:
     future,
     future.callr,
     ggplot2,
+    ggplotify,
     httr,
     knitr,
+    lattice,
     logging,
     magrittr,
     NLMR (>= 1.1.1),
     pkgload,
     png,
     RColorBrewer (>= 1.1-2),
-    rgdal,
+    raster (>= 2.5-8),
     rmarkdown,
     roxygen2,
+    RSQLite,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 1.0.1),
+    SpaDES.tools (>= 2.0.0),
     tcltk,
     terra,
-    testthat (>= 1.0.2)
+    testthat (>= 1.0.2),
+    withr
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
@@ -74,12 +81,14 @@ VignetteBuilder: knitr, rmarkdown
 BugReports: https://github.com/PredictiveEcology/SpaDES.core/issues
 ByteCompile: yes
 Collate: 
-    'Plots.R'
     'module-dependencies-class.R'
     'misc-methods.R'
     'environment.R'
     'helpers.R'
     'simList-class.R'
+    'times.R'
+    'simList-accessors.R'
+    'Plots.R'
     'cache.R'
     'check.R'
     'priority.R'
@@ -103,8 +112,7 @@ Collate:
     'moduleMetadata.R'
     'objectSynonyms.R'
     'options.R'
-    'times.R'
-    'simList-accessors.R'
+    'paths.R'
     'plotting-diagrams.R'
     'plotting.R'
     'progress.R'

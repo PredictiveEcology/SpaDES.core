@@ -12,7 +12,7 @@ An object of class \code{logical} of length 1.
 }
 \description{
 A variable that can be use by module developers and model users to switch between
-a quick check of functions like downloadData, Cache.
+a quick check of functions like \code{downloadData}, \code{Cache.}
 The module developer must actually use this in their code.
 }
 \keyword{datasets}

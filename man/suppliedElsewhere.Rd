@@ -16,11 +16,14 @@ suppliedElsewhere(
 
 \item{sim}{A \code{simList} in which to evaluated whether the object is supplied elsewhere}
 
-\item{where}{Character vector with one to three of "sim", "user", or "initEvent".
+\item{where}{Character vector with one to three of \code{"sim"}, \code{"user"}, or \code{"initEvent"}.
 Default is all three. Partial matching is used. See details.}
 
 \item{returnWhere}{Logical, default \code{FALSE}, whether the vector of length
 3 logical should be returned, or a logical of length one}
+}
+\value{
+logical
 }
 \description{
 When loading objects into a \code{simList}, especially during the
@@ -45,10 +48,9 @@ the present one \strong{will} create it as part of its outputs (i.e., as indicat
 \code{createsOutputs} in that module's metadata). There is a caveat to this test,
 however; if that other event also has the object as an \code{expectsInput}, then
 it would fail this test, as it \emph{also} needs it as an input.
-This final one (\code{"initEvent"})
-does not explicitly test that the object will be created in the "init" event, only that
-it is in the outputs of that module, and that it is a module that is loaded prior to
-this one.
+This final one (\code{"initEvent"}) does not explicitly test that the object will be created
+in the "init" event, only that it is in the outputs of that module, and that it is a module
+that is loaded prior to this one.
 }
 \examples{
 mySim <- simInit()
@@ -65,7 +67,7 @@ test <- 1
 mySim <- simInit(objects = list("test" = test))
 suppliedElsewhere("test", mySim) # TRUE
 
-\dontrun{
+\donttest{
 # Example with prepInputs
 # Put chunks like this in your .inputObjects
 if (!suppliedElsewhere("test", mySim))

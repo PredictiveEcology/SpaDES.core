@@ -19,6 +19,9 @@ Note: the module name should correspond to the R source file from which the modu
 Example: a module named "caribou" will be sourced form the file \file{caribou.R},
 located at the specified \code{modulePath(simList)} (see below).}
 }
+\value{
+character vector of file paths.
+}
 \description{
 This can be used e.g., for Caching, to identify which files have changed.
 }

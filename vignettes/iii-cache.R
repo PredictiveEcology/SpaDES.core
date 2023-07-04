@@ -10,7 +10,7 @@ options("spades.moduleCodeChecks" = FALSE,
         "spades.loadReqdPkgs" = FALSE)
 
 ## ----examples, echo=TRUE, message=FALSE---------------------------------------
-library(raster)
+library(terra)
 library(reproducible)
 library(SpaDES.core)
 
@@ -71,7 +71,7 @@ system.time({
 })
 
 ## ----function-level, echo=TRUE------------------------------------------------
-ras <- raster(extent(0, 1e3, 0, 1e3), res = 1)
+ras <- terra::rast(terra::ext(0, 1e3, 0, 1e3), res = 1, vals = 1)
 system.time({
   map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
                cachePath = cachePath(mySim),
@@ -79,20 +79,20 @@ system.time({
                notOlderThan = Sys.time())
 })
 
-# vastly faster the second time
+# faster the second time
 system.time({
   mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
                      cachePath = cachePath(mySim),
                      userTags = "neutralLandscapeMap")
 })
 
-all.equal(map, mapCached) 
+all.equal(map[], mapCached[]) # note --> can't use all.equal on SpatRaster -- they are pointers 
 
 ## ----manual-cache-------------------------------------------------------------
 cacheDB <- showCache(mySim, userTags = "neutralLandscapeMap")
 
 ## get the RasterLayer that was produced with neutralLandscapeMap()
-map <- loadFromCache(cacheId = cacheDB$cacheId)
+map <- loadFromCache(cacheId = cacheDB$cacheId, cachePath = cachePath(mySim))
 
 clearPlot()
 Plot(map)

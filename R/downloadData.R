@@ -78,7 +78,7 @@ setMethod(
 #' To update your \file{CHECKSUMS.txt} files using the new algorithm:
 #' \enumerate{
 #'   \item specify your module (`moduleName <- "my_module"`);
-#'   \item use a temp dir to ensure all modules get fresh copies of the data
+#'   \item use a temporary location to ensure all modules get fresh copies of the data
 #'         (`tmpdir <- file.path(tempdir(), "SpaDES_modules")`);
 #'   \item download your module's data to the temp dir (`downloadData(moduleName, tmpdir)`);
 #'   \item initialize a dummy simulation to ensure any 'data prep' steps in the
@@ -111,17 +111,17 @@ checksums <- function(module, path, ...) {
 
 #' Determine the size of a remotely hosted file
 #'
-#' Deprecated.
+#' Defunct. Will be removed by mid-2023.
 #'
 #' @param url  The url of the remote file.
 #'
 #' @return A numeric indicating the size of the remote file in bytes.
 #'
 #' @author Eliot McIntire and Alex Chubaty
-#' @export
 #'
+#' @export
 remoteFileSize <- function(url) {
-  .Deprecated()
+  .Defunct()
   # contentLength <- vapply(url, function(u) {
   #   header <- RCurl::url.exists(u, .header = TRUE)
   #   status <- tryCatch(as.numeric(header[["status"]]), error = function(e) 0)
@@ -134,8 +134,6 @@ remoteFileSize <- function(url) {
   #
   # return(contentLength)
 }
-
-
 
 ################################################################################
 #' Download module data
@@ -204,7 +202,7 @@ remoteFileSize <- function(url) {
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # In metadata, each expectsInput has a sourceURL; downloadData will look for
 #' # that and download if it defined; however this sample module has all
 #' # NAs for sourceURL, so nothing to download

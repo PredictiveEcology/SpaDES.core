@@ -1,12 +1,7 @@
 if (interactive()) library(testthat)
 
 test_that("simulation runs with simInit and spades", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit(opts = list(spades.moduleCodeChecks = FALSE))
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(sampleModReqdPkgs, opts = list(spades.moduleCodeChecks = FALSE))
 
   set.seed(42)
 
@@ -36,10 +31,10 @@ test_that("simulation runs with simInit and spades", {
     name = "test",
     description = "insert module description here",
     keywords = c("insert key words here"),
-    authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+    authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     childModules = character(0),
     version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-    spatialExtent = raster::extent(rep(NA_real_, 4)),
+    spatialExtent = terra::ext(rep(0, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = "year",
     citation = list("citation.bib"),

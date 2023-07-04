@@ -3,7 +3,7 @@
 \name{ganttStatus}
 \alias{ganttStatus}
 \alias{ganttStatus,character-method}
-\title{ganttStatus}
+\title{\code{ganttStatus}}
 \usage{
 ganttStatus(eventType)
 
@@ -16,11 +16,9 @@ ganttStatus(eventType)
 A character vector.
 }
 \description{
-Internal function assign the "status" of each event to be passed to
-\code{DiagrammeR::mermaid} to make a Gantt chart representing the
-events in a completed simulation.
-'init' events are set as "done"; 'plot' events as "critical"; and all others
-as "active".
+Internal function assign the "status" of each event to be passed to \code{DiagrammeR::mermaid()}
+to make a Gantt chart representing the events in a completed simulation.
+\code{init} events are set as "done"; \code{plot} events as "critical"; and all others as "active".
 }
 \author{
 Alex Chubaty

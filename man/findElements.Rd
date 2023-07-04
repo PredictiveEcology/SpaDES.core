@@ -17,29 +17,29 @@
 .parsingSim(x, type)
 }
 \arguments{
-\item{envToFindSim}{An environment where sim is defined. This is used when
-the element accessing the simList is actually a call, e.g.,
+\item{envToFindSim}{An environment where \code{sim} is defined. This is used when
+the element accessing the \code{simList} is actually a call, e.g.,
 \code{sim[[P(sim)$stackName]]}}
 
 \item{moduleEnv}{The environment where the module functions are.}
 
 \item{type}{Either "get", "assign", or "globals". See details.}
 
-\item{x}{A call in which to search for sim}
+\item{x}{A call in which to search for \code{sim}}
 }
 \value{
-A character string with all sim objects found
+A character string with all \code{sim} objects found.
 }
 \description{
 Find all references to \verb{sim$}
 
-\code{.parsingSim} will pull out the various ways to use sim, e.g.,
+\code{.parsingSim} will pull out the various ways to use \code{sim}, e.g.,
 \code{sim$xxx}, \code{sim[["xxx"]]}, \code{sim[[P(sim)$xxx]]}
 }
 \details{
-\code{.findElementsInEnv} is a wrapper around \code{.findElements}. It will convert
-function code to a call, and then pass it to \code{.findElements}. It also does
-some cleaning for duplications, \code{NA} values, and cases where the element
+\code{.findElementsInEnv} is a wrapper around \code{.findElements}.
+It will convert function code to a call, and then pass it to \code{.findElements}.
+It also does some cleaning for duplications, \code{NA} values, and cases where the element
 inside a \code{sim[["xxx"]]} is a variable that should be evaluated, rather than
 simply taken verbatim (e.g., \verb{sim[[P(sim)$stackName]])}.
 
@@ -47,13 +47,12 @@ When \strong{\code{type = "get"}}, the function scans for \code{sim$xxx} or \ver
 the RHS of an assignment operator or when there is no assignment. When
 \strong{\code{type = "assign"}}, the function scans for \code{sim$xxx} or \code{sim[["xxx"]]} on the
 LHS of an assignment operator. When \strong{\code{type = "globals"}}, the function
-scans for all functions (i.e., "globals") being used. This is similar to
-\code{codetools::findGlobals}, but faster.
+scans for all functions (i.e., "globals") being used.
+This is similar to \code{codetools::findGlobals()}, but faster.
 
-\code{.findElement} will omit whatever it finds inside a \code{is.null}, when
-\code{type = "assign"}. Usually this is a test of existence of that object, in
-order to assign to that object. It is only reading it to determine whether or
-not it should write to it.
+\code{.findElement} will omit whatever it finds inside a \code{is.null()}, when \code{type = "assign"}.
+Usually this is a test of existence of that object, in order to assign to that object.
+It is only reading it to determine whether or not it should write to it.
 }
 \author{
 Eliot McIntire

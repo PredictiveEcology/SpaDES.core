@@ -16,8 +16,7 @@ eventDiagram(sim, n, startDate, ...)
 \S4method{eventDiagram}{simList,missing,missing}(sim, n, startDate, ...)
 }
 \arguments{
-\item{sim}{A \code{simList} object (typically corresponding to a
-completed simulation).}
+\item{sim}{A \code{simList} object (typically corresponding to a completed simulation).}
 
 \item{n}{The number of most recently completed events to plot.}
 
@@ -35,14 +34,14 @@ This event diagram is constructed using the completed event list
 To change the number of events shown, provide an \code{n} argument.
 }
 \details{
-Simulation time is presented on the x-axis, starting at date 'startDate'.
-Each module appears in a color-coded row, within which each event for that
+Simulation time is presented on the x-axis, starting at date \code{startDate}.
+Each module appears in a colour-coded row, within which each event for that
 module is displayed corresponding to the sequence of events for that module.
 Note that only the start time of the event is meaningful is these figures:
 the width of the bar associated with a particular module's event DOES NOT
 correspond to an event's "duration".
 
-Based on this StackOverflow answer: \url{https://stackoverflow.com/a/29999300/1380598}.
+Based on this Stack Overflow answer: \url{https://stackoverflow.com/a/29999300/1380598}.
 }
 \note{
 A red vertical line corresponding to the current date may appear on the figure.

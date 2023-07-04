@@ -10,7 +10,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building `SpaDES` modules}
-  %\VignetteDepends{data.table, DiagrammeR, igraph, magrittr, raster, RColorBrewer, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{data.table, DiagrammeR, igraph, magrittr, terra, RColorBrewer, SpaDES.core, SpaDES.tools, CircStats}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -19,7 +19,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr")
+SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
 hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
@@ -93,8 +93,9 @@ A module consists of a collection of files and folders that ...
           |_ CHECKSUMS.txt      # contains checksums for data files
       |_ tests/                 # contains unit tests for module code
       |_ citation.bib           # bibtex citation for the module
-      |_ LICENSE.txt            # describes module's legal usage
-      |_ README.txt             # provide overview of key aspects
+      |_ LICENSE.md             # describes module's legal usage
+      |_ NEWS.md                # log of changes made to module code
+      |_ README.md              # symlink to rendered documentation file (moduleName.md)
       |_ moduleName.R           # module code file (incl. metadata)
       |_ moduleName.Rmd         # documentation, usage info, etc.
       |_ moduleName_x.y.z.zip   # zip archive of previous versions
@@ -171,7 +172,7 @@ A module's metadata defines default values for module-specific parameters, and t
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
 
 ```{r passing-params, echo=TRUE}
-library(SpaDES.core)
+  library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 5.0)
@@ -273,8 +274,10 @@ parameters <- list(
 ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
 clearPlot()
+
+# run just 1 year for vignette
 mySim <- simInitAndSpades(
-  times = list(start = 0.0, end = 2.0, timeunit = "year"),
+  times = list(start = 0.0, end = 1.0, timeunit = "year"),
   params = parameters,
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),
@@ -500,7 +503,7 @@ Modules are not required to have the following parameters set, but when using `n
 &nbsp;                  | Used to schedule save events.
 **`.saveObjects`**      | Character vector naming the objects to be saved.
 
-### `inputs` argument to simInit
+### `inputs` argument to `simInit`
 Alternatively, objects can be read in during the `simInit` function call by passing a data.frame to the `input` argument. 
 For `inputs()`, the `data.frame` must consist of, minimally, a column named `file` listing the absolute or relative filepaths of the files to be loaded.
 Additional columns can also be provided:
@@ -522,7 +525,7 @@ Additional columns can also be provided:
 &nbsp;          | If there is only one list, then it is assumed to apply to all load attempts and will be
 &nbsp;          | repeated for each load function.
 
-### `outputs` argument to simInit
+### `outputs` argument to `simInit`
 
 Objects to be saved can be specified using the `output` argument, by passing a data.frame analogous to the `.load` module. 
 This `data.frame` is passed via the `outputs` argument in the `simInit` call or via a `outputs(mySim) <- data.frame()`.
@@ -576,9 +579,9 @@ mySim2 <- spades(mySim)
 
 # More sophisticated, passing arguments to outputs()
 outputs(mySim) <- data.frame(
-  objectName = "landscape", fun = "writeRaster", package = "raster",
+  objectName = "landscape", fun = "writeRaster", package = "terra",
   saveTime = c(3,6), arguments = I(lapply(c(3,6), function(x) {
-    list(datatype = "FLT4S", format = "raster", overwrite = TRUE)
+    list(datatype = "FLT4S", filetype = "GTiff", overwrite = TRUE)
 })))
 mySim2 <- spades(mySim)
 dev.off()

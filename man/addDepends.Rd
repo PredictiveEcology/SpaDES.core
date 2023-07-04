@@ -10,22 +10,21 @@
 \S4method{.addDepends}{simList,.moduleDeps}(sim, x)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{x}{A named list containing the parameters used to construct a new
-\code{\link[=.moduleDeps]{.moduleDeps()}} object.}
+\code{.moduleDeps} object.}
 }
 \value{
 A \code{simList} object.
 }
 \description{
 Internal function.
-Adds a \code{\link[=.moduleDeps]{.moduleDeps()}} object to the simulation dependency list.
+Adds a \code{.moduleDeps} object to the simulation dependency list.
 }
 \seealso{
 Other functions to access elements of a 'simList' object: 
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{events}()},
 \code{\link{globals}()},

@@ -9,12 +9,12 @@ writeEventInfo(sim, file = "events.txt", append = FALSE)
 \arguments{
 \item{sim}{A \code{simList} object.}
 
-\item{file}{Character specifying the filename (default \file{"events.txt"}).}
+\item{file}{Character specifying the file name (default \file{"events.txt"}).}
 
 \item{append}{Logical indicating whether to append to the file (default \code{FALSE}).}
 }
 \value{
-Nothing returned. Invoked for its side-effect of writing to file.
+Nothing returned. Invoked for its side effect of writing to file.
 }
 \description{
 Useful for debugging.

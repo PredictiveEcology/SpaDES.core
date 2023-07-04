@@ -2,17 +2,17 @@
 % Please edit documentation in R/load.R
 \name{rasterToMemory}
 \alias{rasterToMemory}
-\alias{rasterToMemory,Raster-method}
 \alias{rasterToMemory,list-method}
+\alias{rasterToMemory,character-method}
 \alias{rasterToMemory,ANY-method}
 \alias{rasterToMemory,simList-method}
 \title{Read raster to memory}
 \usage{
 rasterToMemory(x, ...)
 
-\S4method{rasterToMemory}{Raster}(x, ...)
-
 \S4method{rasterToMemory}{list}(x, ...)
+
+\S4method{rasterToMemory}{character}(x, ...)
 
 \S4method{rasterToMemory}{ANY}(x, ...)
 
@@ -21,8 +21,7 @@ rasterToMemory(x, ...)
 \arguments{
 \item{x}{An object passed directly to the function raster (e.g., character string of a filename).}
 
-\item{...}{Additional arguments to \code{raster::raster}, \code{raster::stack},
-or \code{raster::brick}.}
+\item{...}{Additional arguments to \code{raster::raster}, \code{raster::stack}, or \code{raster::brick}.}
 }
 \value{
 A raster object whose values are stored in memory.
@@ -34,7 +33,7 @@ just a pass through, so this can be safely used on large complex objects,
 recursively, e.g., a \code{simList}.
 }
 \seealso{
-\code{\link[=raster]{raster()}}.
+\code{raster()}, \code{\link[terra:rast]{terra::rast()}}.
 }
 \author{
 Eliot McIntire and Alex Chubaty

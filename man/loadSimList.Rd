@@ -5,13 +5,26 @@
 \alias{unzipSimList}
 \title{Load a saved \code{simList} and ancillary files}
 \usage{
-loadSimList(filename, paths = getPaths(), otherFiles = "")
+loadSimList(
+  filename,
+  projectPath = getwd(),
+  tempPath = tempdir(),
+  paths = NULL,
+  otherFiles = "",
+  verbose = getOption("reproducible.verbose")
+)
 
 unzipSimList(zipfile, load = TRUE, paths = getPaths(), ...)
 }
 \arguments{
 \item{filename}{Character giving the name of a saved simulation file.
 Currently, only file types \code{.qs} or \code{.rds} are supported.}
+
+\item{projectPath}{An optional path for the project within which the \code{simList}
+exists. This is used to identify relative paths for saving and loading the \code{simList}.}
+
+\item{tempPath}{A character string specifying the new base directory for the
+temporary paths maintained in a \code{simList}.}
 
 \item{paths}{A list of character vectors for all the \code{simList} paths. When
 loading a \code{simList}, this will replace the paths of everything to
@@ -23,19 +36,23 @@ incorrect paths in \code{Filenames(sim)} if the the \code{file} being read in is
 a different computer, path, or drive. This could be the output from \code{unzipSimList}
 (which is calls \code{loadSimList} internally, passing the unzipped filenames)}
 
-\item{zipfile}{Filename of a zipped simList}
+\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 
-\item{load}{Logical. If \code{TRUE}, the default, then the simList will
+\item{zipfile}{Filename of a zipped \code{simList}}
+
+\item{load}{Logical. If \code{TRUE}, the default, then the \code{simList} will
 also be loaded into R.}
 
 \item{...}{passed to \code{unzip}}
 }
 \value{
-\itemize{
-\item \code{\link[=loadSimList]{loadSimList()}}: A \code{simList} object.
-\item \code{\link[=unzipSimList]{unzipSimList()}}: Either a character vector of file names unzipped (if \code{load = FALSE}),
-or a \code{simList} object.
-}
+For \code{\link[=loadSimList]{loadSimList()}}, a \code{simList} object.
+For \code{\link[=unzipSimList]{unzipSimList()}}, either a character vector of file names unzipped
+(if \code{load = FALSE}), or a \code{simList} object.
 }
 \description{
 Loading a \code{simList} from file can be problematic as there are non-standard

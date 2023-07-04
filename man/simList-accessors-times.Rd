@@ -161,12 +161,12 @@ elapsedTime(s2)
 elapsedTime(s2, units = "mins")
 }
 \seealso{
-\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.5 on Simulation times;
+\link{SpaDES.core-package}, specifically the section 1.2.5 on Simulation times;
 \code{\link[=elapsedTime]{elapsedTime()}},
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{events}()},
 \code{\link{globals}()},

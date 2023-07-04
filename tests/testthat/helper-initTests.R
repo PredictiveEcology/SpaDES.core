@@ -15,128 +15,168 @@ cleanMessage <- function(mm) {
 # loads and libraries indicated plus testthat,
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
-testInit <- function(libraries, smcc = FALSE, debug = FALSE, ask = FALSE, setPaths = TRUE,
-                     opts = list(), tmpFileExt = "") {
-  startTime <- Sys.time()
-  data.table::setDTthreads(2L)
-  a <- list(reproducible.inputPaths = NULL,
-            reproducible.showSimilar = FALSE,
-            reproducible.useNewDigestAlgorithm = 2,
-            spades.DTthreads = 2L,
-            spades.moduleCodeChecks = smcc,
-            spades.useRequire = FALSE)
-  a[names(opts)] <- opts
-  opts1 <- a
+# puts tmpdir, tmpCache, tmpfile (can be vectorized with length >1 tmpFileExt),
+#   optsAsk in this environment,
+# loads and libraries indicated plus testthat,
+# sets options("reproducible.ask" = FALSE) if ask = FALSE
+testInit <- function(libraries = character(), ask = FALSE, verbose,
+                     debug = FALSE, tmpFileExt = "",
+                     opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE) {
 
-  optsDebug <- if (!debug)
-    list(spades.debug = debug)
-  else
-    list()
+  set.randomseed()
 
-  if (length(optsDebug)) {
-    opts1 <- append( opts1, optsDebug)
-  }
+  pf <- parent.frame()
 
-  optsAsk <- if (!ask)
-    list(reproducible.ask = ask)
-  else
-    list()
-  if (length(optsAsk)) {
-    opts1 <- append(opts1, optsAsk)
-  }
-  opts <- options(opts1)
+  if (isTRUE(needGoogleDriveAuth))
+    libraries <- c(libraries, "googledrive")
+  if (length(libraries)) {
+    libraries <- unique(libraries)
+    loadedAlready <- vapply(libraries, function(pkg)
+      any(grepl(paste0("package:", pkg), search())), FUN.VALUE = logical(1))
+    libraries <- libraries[!loadedAlready]
 
-  if (missing(libraries)) libraries <- list()
-  libraries <- unique(append(list("igraph"), libraries)) # need %>% is a lot of places
-  unlist(lapply(libraries, require, character.only = TRUE))
-  require("testthat")
-  tmpdir <- file.path(tempdir(), rndstr(1, 6))
-  if (setPaths)
-    setPaths(cachePath = tmpdir)
-
-
-  checkPath(tmpdir, create = TRUE)
-  origDir <- setwd(tmpdir)
-  tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
-  try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
-  try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
-
-  if (!is.null(tmpFileExt)) {
-    ranfiles <- unlist(lapply(tmpFileExt, function(x) paste0(rndstr(1, 7), ".", x)))
-    tmpfile <- file.path(tmpdir, ranfiles)
-    tmpfile <- gsub(pattern = "\\.\\.", tmpfile, replacement = "\\.")
-    file.create(tmpfile)
-    tmpfile <- normPath(tmpfile)
-  }
-
-  outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
-                  origDir = origDir, libs = libraries,
-                  tmpCache = tmpCache, optsAsk = optsAsk,
-                  tmpfile = tmpfile, startTime = startTime)
-  list2env(outList, envir = parent.frame())
-  return(outList)
-}
-
-testOnExit <- function(testInitOut) {
-  if (length(testInitOut$optsVerbose))
-    options("reproducible.verbose" = testInitOut$optsVerbose[[1]])
-  if (length(testInitOut$optsAsk))
-    options("reproducible.ask" = testInitOut$optsAsk[[1]])
-  if (length(testInitOut$opts))
-    options(testInitOut$opts)
-  setwd(testInitOut$origDir)
-  unlink(testInitOut$tmpdir, recursive = TRUE)
-  endTime <- Sys.time()
-
-  if (grepl("W-VIC-", Sys.info()["nodename"])) {
-    thisFilename <- NULL
-    wis <- try(whereInStack("test_paths"), silent = TRUE)
-    if (!is(wis, "try-error"))
-      thisFilename <- get0("test_paths", wis)
-    if (is.null(thisFilename)) {
-      wis <- try(whereInStack("tf"), silent = TRUE)
-      if (!is(wis, "try-error"))
-        thisFilename <- basename(get0("tf", wis))
-    }
-
-    sc <- sys.calls();
-    aa <- grep("test_that", sc);
-    if (length(aa)) {
-      skipOnCRAN <- any(grepl("skip_on_cran", sc[[tail(aa, 1)]]))
-      timingsFileBase <- "timings.rds"
-      timingsFile <- if (isWindows())
-        file.path("c:/Eliot/GitHub/SpaDES.core", timingsFileBase)
-      else
-        file.path("/home/emcintir/GitHub/SpaDES.core", timingsFileBase)
-      if (file.exists(timingsFile))
-        timings <- readRDS(timingsFile)
-      else
-        timings <- list()
-      desc <- get("desc", whereInStack("desc"))
-      timingsNew <- data.table(filename = thisFilename,
-                               desc = desc,
-                               skipOnCRAN = skipOnCRAN,
-                               elapsed = as.numeric(format(as.numeric(
-                                 difftime(endTime, testInitOut$startTime, units = "secs")))))
-      timings[[desc]] <- timingsNew
-      saveRDS(timings, file = timingsFile)
+    if (length(libraries)) {
+      pkgsLoaded <- unlist(lapply(libraries, requireNamespace, quietly = TRUE))
+      if (!all(pkgsLoaded)) {
+        lapply(libraries[!pkgsLoaded], skip_if_not_installed)
+      }
+      suppressWarnings(lapply(libraries, withr::local_package, .local_envir = pf))
     }
   }
 
-  # lapply(testInitOut$libs, function(lib) {
-  #   try(detach(paste0("package:", lib), character.only = TRUE), silent = TRUE)}
-  # )
+
+  # skip_gauth <- identical(Sys.getenv("SKIP_GAUTH"), "true") # only set in setup.R for covr
+  # if (isTRUE(needGoogleDriveAuth) ) {
+  #   if (!skip_gauth) {
+  #     if (interactive()) {
+  #       if (!googledrive::drive_has_token()) {
+  #         getAuth <- FALSE
+  #         if (is.null(getOption("gargle_oauth_email"))) {
+  #           possLocalCache <- "c:/Eliot/.secret"
+  #           cache <- if (file.exists(possLocalCache))
+  #             possLocalCache else TRUE
+  #           switch(Sys.info()["user"],
+  #                  emcintir = {options(gargle_oauth_email = "eliotmcintire@gmail.com",
+  #                                      gargle_oauth_cache = cache)},
+  #                  NULL)
+  #         }
+  #         if (is.null(getOption("gargle_oauth_email"))) {
+  #           if (.isRstudioServer()) {
+  #             .requireNamespace("httr", stopOnFALSE = TRUE)
+  #             options(httr_oob_default = TRUE)
+  #           }
+  #         }
+  #         getAuth <- TRUE
+  #         if (isTRUE(getAuth))
+  #           googledrive::drive_auth()
+  #       }
+  #     }
+  #   }
+  #   skip_if_no_token()
+  # }
+
+  out <- list()
+  withr::local_options("reproducible.ask" = ask, .local_envir = pf)
+  withr::local_options("spades.debug" = debug, .local_envir = pf)
+  withr::local_options("spades.moduleCodeChecks" = smcc, .local_envir = pf)
+  withr::local_options("spades.recoveryMode" = FALSE, .local_envir = pf)
+  withr::local_options("reproducible.verbose" = FALSE, .local_envir = pf)
+  withr::local_options("spades.useRequire" = FALSE, .local_envir = pf)
+  withr::local_options("spades.sessionInfo" = FALSE, .local_envir = pf)
+
+  if (!missing(verbose))
+    withr::local_options("reproducible.verbose" = verbose, .local_envir = pf)
+  if (!is.null(opts))
+    withr::local_options(opts, .local_envir = pf)
+  tmpdir <- normPath(withr::local_tempdir(tmpdir = tempdir2(), .local_envir = pf))
+  tmpCache <- normPath(withr::local_tempdir(tmpdir = tmpdir, .local_envir = pf))
+  if (isTRUE(any(nzchar(tmpFileExt)))) {
+    dotStart <- startsWith(tmpFileExt, ".")
+    if (any(!dotStart))
+      tmpFileExt[!dotStart] <- paste0(".", tmpFileExt)
+    out$tmpfile <- normPath(withr::local_tempfile(tmpdir = tmpdir, fileext = tmpFileExt))
+  }
+  withr::local_dir(tmpdir, .local_envir = pf)
+
+  out <- append(out, list(tmpdir = tmpdir, tmpCache = tmpCache))
+  list2env(out, envir = pf)
+  return(invisible(out))
+
+#
+#
+#   startTime <- Sys.time()
+#   data.table::setDTthreads(2L)
+#   a <- list(reproducible.inputPaths = NULL,
+#             reproducible.showSimilar = FALSE,
+#             reproducible.useNewDigestAlgorithm = 2,
+#             spades.DTthreads = 2L,
+#             spades.moduleCodeChecks = smcc,
+#             spades.useRequire = FALSE)
+#   a[names(opts)] <- opts
+#   opts1 <- a
+#
+#   optsDebug <- if (!debug)
+#     list(spades.debug = debug)
+#   else
+#     list()
+#
+#   if (length(optsDebug)) {
+#     opts1 <- append( opts1, optsDebug)
+#   }
+#
+#   optsAsk <- if (!ask)
+#     list(reproducible.ask = ask)
+#   else
+#     list()
+#   if (length(optsAsk)) {
+#     opts1 <- append(opts1, optsAsk)
+#   }
+#   opts <- options(opts1)
+#
+#   if (missing(libraries)) libraries <- list()
+#   libraries <- unique(append(list("igraph"), libraries)) # need %>% is a lot of places
+#   unlist(lapply(libraries, require, character.only = TRUE))
+#   require("testthat")
+#   tmpdir <- file.path(tempdir(), rndstr(1, 6))
+#   if (setPaths)
+#     setPaths(cachePath = tmpdir)
+#
+#
+#   checkPath(tmpdir, create = TRUE)
+#   origDir <- setwd(tmpdir)
+#   tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
+#   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
+#   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
+#
+#   if (!is.null(tmpFileExt)) {
+#     ranfiles <- unlist(lapply(tmpFileExt, function(x) paste0(rndstr(1, 7), ".", x)))
+#     tmpfile <- file.path(tmpdir, ranfiles)
+#     tmpfile <- gsub(pattern = "\\.\\.", tmpfile, replacement = "\\.")
+#     file.create(tmpfile)
+#     tmpfile <- normPath(tmpfile)
+#   }
+#
+#   outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
+#                   origDir = origDir, libs = libraries,
+#                   tmpCache = tmpCache, optsAsk = optsAsk,
+#                   tmpfile = tmpfile, startTime = startTime)
+#   list2env(outList, envir = parent.frame())
+#   return(outList)
 }
+
+sampleModReqdPkgs <- c("NLMR", # Only randomLandscapes
+                       "terra", "SpaDES.tools", "RColorBrewer", # randomLandscapes & fireSpread
+                       "sf", "CircStats") # caribouMovement
 
 testCode <- '
       defineModule(sim, list(
       name = "test",
       description = "insert module description here",
       keywords = c("insert key words here"),
-      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      spatialExtent = terra::ext(rep(0, 4)),
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),
@@ -184,10 +224,10 @@ test2Code <- '
       name = "test2",
       description = "insert module description here",
       keywords = c("insert key words here"),
-      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@canada.ca", role = c("aut", "cre")),
+      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
       childModules = character(0),
       version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
-      spatialExtent = raster::extent(rep(NA_real_, 4)),
+      spatialExtent = terra::ext(rep(0, 4)),
       timeframe = as.POSIXlt(c(NA, NA)),
       timeunit = "second",
       citation = list("citation.bib"),

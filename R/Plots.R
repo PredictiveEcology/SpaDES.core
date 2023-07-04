@@ -31,13 +31,11 @@
 #'       \item To disk as a \file{.png} or other image file, e.g., \file{.pdf}
 #'     }
 #'
-#'
 #' To turn off plotting both to screen and disk, set both
 #' `.plotInititalTime = NA` and `.plots = NA` or any other
 #' value that will not trigger a TRUE with a `grepl` with the `types`
 #' argument (e.g., `""` will omit all saving).
 #'
-#' @export
 #' @param data An (optional) arbitrary data object. If supplied, it will be passed as
 #'   the first argument to `Plot` function, and should contain all the data
 #'   required for the inner plotting. If passing a `RasterLayer`,
@@ -70,10 +68,7 @@
 #'
 #' @param ... Anything needed by `fn`, all named.
 #'
-#' @importFrom grDevices dev.off dev.cur
-#' @importFrom qs qsave
-#' @importFrom raster writeRaster
-#' @importFrom quickPlot clearPlot Plot whereInStack
+#' @return Called for its side effect of plot creation.
 #'
 #' @details
 #'
@@ -94,38 +89,60 @@
 #' `simList` of the module. This will, therefore, keep a record of figures saved
 #' *within* the `simList`
 #'
+#' @export
+#' @include simList-accessors.R
+#' @importFrom grDevices dev.off dev.cur
+#' @importFrom qs qsave
+#' @importFrom terra writeRaster
+#' @importFrom quickPlot clearPlot Plot whereInStack
+#'
 #' @examples
-#'
 #' \donttest{
-#' # Note: if this is used inside a SpaDES module, do not define this
-#' #  function inside another function. Put it outside in a normal
-#' #  module script. Otherwise, it will cause a memory leak.
-#' if (!require("ggplot2")) stop("please install ggplot2")
-#' fn <- function(d)
-#'   ggplot(d, aes(a)) +
-#'   geom_histogram()
-#' sim <- simInit()
-#' sim$something <- data.frame(a = sample(1:10, replace = TRUE))
+#'   # Note: if this is used inside a SpaDES module, do not define this
+#'   #  function inside another function. Put it outside in a normal
+#'   #  module script. Otherwise, it will cause a memory leak.
+#'   if (requireNamespace("ggplot2")) {
+#'     fn <- function(d)
+#'       ggplot2::ggplot(d, ggplot2::aes(a)) +
+#'       ggplot2::geom_histogram()
+#'     sim <- simInit()
+#'     sim$something <- data.frame(a = sample(1:10, replace = TRUE))
 #'
-#' Plots(data = sim$something, fn = fn,
-#'       types = c("png"),
-#'       path = file.path("figures"),
-#'       filename = tempfile(),
-#'       .plotInitialTime = 1
-#'       )
+#'     Plots(data = sim$something, fn = fn,
+#'           types = c("png"),
+#'           path = file.path("figures"),
+#'           filename = tempfile(),
+#'           .plotInitialTime = 1
+#'           )
 #'
-#' # plot to active device and to png
-#' Plots(data = sim$something, fn = fn,
-#'       types = c("png", "screen"),
-#'       path = file.path("figures"),
-#'       filename = tempfile(),
-#'       .plotInitialTime = 1
-#'       )
+#'     # plot to active device and to png
+#'     Plots(data = sim$something, fn = fn,
+#'           types = c("png", "screen"),
+#'           path = file.path("figures"),
+#'           filename = tempfile(),
+#'           .plotInitialTime = 1
+#'           )
 #'
-#' # Can also be used like quickPlot::Plot, but with control over output type
-#' r <- raster::raster(raster::extent(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
-#' Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500), usePlot = TRUE)
+#'     # Can also be used like quickPlot::Plot, but with control over output type
+#'     r <- terra::rast(terra::ext(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
+#'     Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500),
+#'           usePlot = TRUE)
 #'
+#'     # with ggplotify, Plots can also be used to plot/save
+#'     # non-ggplot objects:
+#'
+#'
+#'     if (require("ggplotify")) {
+#'       if (!require("lattice")) stop("please install lattice")
+#'
+#'       plotFile <- tempfile()
+#'
+#'       p1 <- densityplot(~mpg|cyl, data=mtcars)
+#'       Plots(data = p1, fn = as.ggplot, filename = plotFile,
+#'             ggsaveArgs = list(width = 5, height = 4, dpi = 300, bg = "white", units = "in"),
+#'             types = c("screen", "png"), .plotInitialTime = 1)
+#'     }
+#'   } # end ggplot
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
@@ -191,21 +208,31 @@ Plots <- function(data, fn, filename,
     if (isTRUE(usePlot)) {
       fn <- Plot
     } else {
-      fn <- plot
+      if (inherits(data, c("SpatRaster", "SpatVector", "sf", "Raster", "sp")))
+        fn <- terra::plot
+      else
+        fn <- plot
     }
   }
   fnIsPlot <- identical(fn, Plot)
   if (fnIsPlot) {
     # make dummies
     gg <- 1
-    objNamePassedToData <- deparse1(substitute(data))
+    objNamePassedToData1 <- substitute(data)
     origEnv <- parent.frame()
+    objNamePassedToData <- evalAttempt(objNamePassedToData1, origEnv)
+    if (!is.character(objNamePassedToData))
+      objNamePassedToData <- deparse1(objNamePassedToData)
 
     # Try to see if the object is in the parent.frame(). If it isn't, default back to here.
     if (!objNamePassedToData %in% ls(origEnv))
       origEnv <- environment()
-    ggListToScreen <- list(data)
-    names(ggListToScreen) <- objNamePassedToData
+    if (!(is(data, "list") && length(names(data)) == length(data))) {
+      ggListToScreen <- list(data)
+      names(ggListToScreen) <- objNamePassedToData
+    } else {
+      ggListToScreen <- data
+    }
   } else {
     if ( (needScreen || needSave) ) {
       if (missing(data)) {
@@ -225,8 +252,11 @@ Plots <- function(data, fn, filename,
   }
 
   if (needScreen) {
+
     if (fnIsPlot) {
-      if (is.list(data) || !is(data, "RasterStack") || !is(data, "RasterBrick")) {
+      if (is.list(data)){# || is(data, "RasterStack") || is(data, "RasterBrick") ||
+      #    (is(data, "SpatRaster") || is(data, "SpatVector")) && nlayers2(data) > 1)
+      #  {
         dataListToScreen <- data
       } else {
         dataListToScreen <- list(data)
@@ -238,22 +268,36 @@ Plots <- function(data, fn, filename,
           dataListToScreen[[1]]$labels$title <- NULL
         }
       } else {
-        if (!is.null(names(data))) {
-          dataListToScreen <- setNames(dataListToScreen, names(data))
+        if (!is.null(objNamePassedToData)) {
+          dataListToScreen <- setNames(dataListToScreen, objNamePassedToData)
         } else {
-          dataListToScreen <- setNames(dataListToScreen, "data")
+          if (!is.null(names(data))) {
+            dataListToScreen <- setNames(dataListToScreen, names(data))
+          } else {
+            dataListToScreen <- setNames(dataListToScreen, "data")
+          }
         }
       }
 
-      gg <- fn(ggListToScreen, ...)
-      .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
-      qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
-      objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
-      objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
-      curPlotDev <- paste0("quickPlot", dev.cur())
-      ignore <- lapply(objNamesInQuickPlotObj, function(x) {
-        slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
-      })
+      # Necessary for inheritance -- pass the environment with correct inheritance
+      if (!is.null(simIsIn)) {
+        newEnv <- new.env(parent = simIsIn)
+      } else {
+        newEnv <- environment()
+      }
+      newEnv$dataListToScreen <- dataListToScreen
+      gg <- fn(dataListToScreen, ..., env = newEnv)
+
+      if (FALSE) {
+        .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
+        qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
+        objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
+        objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
+        curPlotDev <- paste0("quickPlot", dev.cur())
+        ignore <- lapply(objNamesInQuickPlotObj, function(x) {
+          slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
+        })
+      }
     } else {
       if (is(gg, "gg"))
         if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
@@ -291,19 +335,17 @@ Plots <- function(data, fn, filename,
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(rasterFilename)),
-                                     file = rasterFilename, fun = "terra::writeRaster", args = NA,  ...)
-
+                                     file = rasterFilename, fun = "terra::writeRaster", ...)
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                      objectName = filePathSansExt(basename(rawFilename)),
-                                     file = rawFilename, fun = "qs::qsave", args = NA,  ...)
+                                     file = rawFilename, fun = "qs::qsave", ...)
     }
-
   }
 
   if (needSave) {
@@ -326,9 +368,9 @@ Plots <- function(data, fn, filename,
         if (!is(plotted, "try-error")) {
           if (exists("sim", inherits = FALSE)) {
             pkgAndFn <- .guessPkgFun(bsf)
-            sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+            sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                          objectName = filePathSansExt(basename(theFilename)),
-                                         file = theFilename, fun = pkgAndFn, args = NA,  ...)
+                                         file = theFilename, fun = pkgAndFn, ...)
           }
           message("Saved figure to: ", theFilename)
         }
@@ -345,10 +387,11 @@ Plots <- function(data, fn, filename,
           args <- modifyList2(args, ggsaveArgs)
         }
         do.call(ggplot2::ggsave, args = args)
+
         if (exists("sim", inherits = FALSE))
-          sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
+          sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
                                        objectName = filePathSansExt(basename(theFilename)),
-                                       file = theFilename, fun = "ggplot2::ggsave", args = NA,  ...)
+                                       file = theFilename, fun = "ggplot2::ggsave", ...)
         message("Saved figure to: ", theFilename)
       }
     }
@@ -356,28 +399,22 @@ Plots <- function(data, fn, filename,
     if (any(grepl("object", types))) {
       filename11 <- file.path(path, paste0(filename, "_gg.qs"))
       qs::qsave(gg, file = filename11)
-      if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, endTime = end(sim),
-                                     objectName = filePathSansExt(basename(filename11)),
-                                     file = filename11, fun = "qs::qsave", args = NA,  ...)
-    }
 
+      if (exists("sim", inherits = FALSE))
+        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
+                                     objectName = filePathSansExt(basename(filename11)),
+                                     file = filename11, fun = "qs::qsave", ...)
+    }
   }
+
   if (exists("sim", inherits = FALSE))
     assign("sim", sim, envir = simIsIn)
+
   return(invisible(NULL))
 }
 
-outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
-  outs <- .fillOutputRows(data.frame(objectName = objectName, file = file, fun = fun,
-                                     saved = TRUE, arguments = I(args)),
-                          endTime = endTime)
-  if (!is(outputs[["arguments"]], "AsIs"))
-    outputs[["arguments"]] <- I(outputs[["arguments"]])
-  rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
-}
 
-#' Test whether there should be any plotting from `.plot` parameter
+#' Test whether there should be any plotting from `.plots` module parameter
 #'
 #' This will do all the various tests needed to determine whether
 #' plotting of one sort or another will occur.
@@ -386,6 +423,8 @@ outputsAppend <- function(outputs, endTime, objectName, file, fun, args, ...) {
 #'
 #' @param .plots Usually will be the `P(sim)$.plots` is used within
 #'   a module.
+#'
+#' @return logical of length 1
 #'
 #' @export
 anyPlotting <- function(.plots) {
@@ -406,9 +445,29 @@ filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
 #'
 #' @param bsf character. A function name
 #'
-#' @return character. The package and function name as "pkg::bsf"
-
+#' @return character. The package and function name as `"pkg::bsf"`
 .guessPkgFun <- function(bsf) {
   pkgName <- eval(parse(text = paste0("environmentName(environment(", bsf, "))")))
   return(paste0(pkgName, "::", bsf))
+}
+
+evalAttempt <- function(subs, envir) {
+  if (length(subs) > 2) {
+    subsOrig <- subs
+    out <- try(eval(subs[[3]], envir = envir), silent = TRUE)
+    if (is(out, "try-error"))
+      subs <- subsOrig
+    else
+      subs[[3]] <- out
+
+    if (is.call(subs[[2]])) {
+      out <- try(evalAttempt(subs[[2]], envir = envir), silent = TRUE)
+      if (!is(out, "try-error"))
+        subs[[2]] <- out
+
+    }
+    if (is(out, "try-error"))
+      subs <- subsOrig
+  }
+  subs
 }

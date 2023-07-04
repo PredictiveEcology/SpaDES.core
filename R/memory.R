@@ -31,13 +31,14 @@ ongoingMemoryThisPid <- function(seconds = 1000,
 
 #' Estimate memory used with `system("ps")`
 #'
-#' This will give a slightly different estimate than `pryr::mem_used`,
-#' which uses `gc()` internally. The purpose of this function is
-#' to allow continuous monitoring, external to the R session.
+#' This will give a slightly different estimate than `pryr::mem_used`, which uses `gc()` internally.
+#' The purpose of this function is to allow continuous monitoring, external to the R session.
 #' Normally, this is run in a different session.
 #'
-#' @param thisPid Numeric or integer, the PID of the process. If omitted, it will
-#'   be found with `Sys.getpid()`
+#' @param thisPid Numeric or integer, the `PID` of the process.
+#'                If omitted, it will be found with `Sys.getpid()`.
+#'
+#' @return estimated memory use in MiB
 #'
 #' @export
 #' @rdname memoryUse
@@ -88,18 +89,23 @@ futureOngoingMemoryThisPid <- function(outputFile = NULL,
 
 #' Show memory use
 #'
-#' This will only work if the user has specified before running
-#' the `spades` call, set the interval, in seconds, that ps is
-#' run with `options("spades.memoryUseInterval" = 0.5)`, will assess
-#' memory use every 0.5 seconds. The default is `0`, meaning no interval, "off".
+#' This will only work if the user has specified before running the `spades` call,
+#' set the interval, in seconds, that `ps` is run.
+#' E.g., `options("spades.memoryUseInterval" = 0.5)`, will assess memory use every 0.5 seconds.
+#' The default is `0`, meaning no interval, "off".
 #'
 #' @note The suggested `future` and `future.callr` packages must be available.
 #'
-#' @export
 #' @param sim A completed `simList`
+#'
 #' @param max Logical. If TRUE, then it the return value will be summarized by
 #'   module/event, showing the maximum memory used. If `FALSE`, then
 #'   the raw memory used during each event will be shown.
+#'
+#' @return `data.table` summarizing the estimated memory use (in MiB) for each event type,
+#' for each module, during the simulation.
+#'
+#' @export
 #' @seealso The `vignette("iv-modules")`
 memoryUse <- function(sim, max = TRUE) {
   compl <- Copy(completed(sim))

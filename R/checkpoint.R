@@ -16,22 +16,21 @@
 #' @param eventType      A character string specifying the type of event: one of
 #'                       either `"init"`, `"load"`, or `"save"`.
 #'
-#' @param debug         Optional logical flag determines whether sim debug info
+#' @param debug         Optional logical flag determines whether `sim` debug info
 #'                      will be printed (default `debug = FALSE`).
 #'
 #' @return Returns the modified `simList` object.
 #'
-#' @seealso [.Random.seed()].
+#' @seealso [.Random.seed].
 #'
 #' @author Alex Chubaty
 #'
-#' @include environment.R
-#' @include priority.R
+#' @export
 #' @importFrom quickPlot .objectNames
 #' @importFrom reproducible checkPath
-#' @export
+#' @include environment.R
+#' @include priority.R
 #' @rdname checkpoint
-#'
 doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
   ### determine whether to use checkpointing
   ### default is not to use checkpointing if unspecified
@@ -80,15 +79,18 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 #' @param file The checkpoint file.
-#' @rdname checkpoint
+#'
 #' @export
-#' @importFrom raster extension
+#' @importFrom tools file_ext
+#' @rdname checkpoint
 checkpointLoad <- function(file) {
-  stopifnot(raster::extension(file) == ".qs")
+  stopifnot(tools::file_ext(file) == "qs")
+  # stopifnot(raster::extension(file) == ".qs")
 
   # check for previous checkpoint files
-  if (file.exists(file)) {
-    sim <- loadSimList(file)
+  file <- checkArchiveAlternative(file)
+  if (file.exists(file[1])) {
+    sim <- loadSimList(file[1])
 
     do.call("RNGkind", as.list(sim$._rng.kind))
     assign(".Random.seed", sim$._rng.state, envir = .GlobalEnv)
@@ -99,8 +101,8 @@ checkpointLoad <- function(file) {
   }
 }
 
-#' @rdname checkpoint
 #' @importFrom stats runif
+#' @rdname checkpoint
 .checkpointSave <- function(sim, file) {
   sim$._timestamp <- Sys.time() # nolint
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
@@ -110,8 +112,12 @@ checkpointLoad <- function(file) {
   tmpEnv <- new.env(parent = emptyenv())
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
+  if (file.exists(file[1])) {
+    if (length(file) > 1) browser()
+    unlink(file)
+  }
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
-              filename = file, fileBackend = 1, envir = tmpEnv)
+              filename = file, envir = tmpEnv)
 
   invisible(TRUE) # return "success" invisibly
 }

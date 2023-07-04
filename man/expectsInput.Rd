@@ -31,8 +31,7 @@ default is \code{NA}.}
 \item{...}{Other specifications of the input object.}
 }
 \value{
-A \code{data.frame} suitable to be passed to \code{inputObjects} in a
-module's metadata.
+A \code{data.frame} suitable to be passed to \code{inputObjects} in a module's metadata.
 }
 \description{
 Used to specify an input object's name, class, description, source url and

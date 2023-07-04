@@ -71,7 +71,7 @@ are opened in an overlaid window rather than a new tab.
 A message with the correct lines to copy and paste is provided.
 }
 \examples{
-\dontrun{
+\donttest{
   tmpdir <- tempdir2("exampleNewModule")
   ## create a "myModule" module in the "modules" subdirectory.
   newModule("myModule", tmpdir)

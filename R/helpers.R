@@ -105,7 +105,7 @@ setMethod(
 #' @param x  Not used. Should be missing.
 #'
 #' @author Alex Chubaty
-#' @importFrom raster extent
+#' @importFrom terra ext
 #' @include simList-class.R
 #' @keywords internal
 #' @rdname emptyMetadata
@@ -125,7 +125,7 @@ setMethod(
       childModules = moduleDefaults[["childModules"]],
       authors = moduleDefaults[["authors"]],
       version = moduleDefaults[["version"]],
-      spatialExtent = raster::extent(rep(NA_real_, 4)), ## match up with moduleDefaults
+      spatialExtent = terra::ext(rep(0, 4)), ## match up with moduleDefaults
       timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
       timeunit = moduleDefaults[["timeunit"]],
       citation = moduleDefaults[["citation"]],
@@ -140,19 +140,17 @@ setMethod(
 
 #' Find objects if passed as character strings
 #'
-#' Objects are passed into simList via `simInit` call or `objects(simList)`
+#' Objects are passed into `simList` via `simInit` call or `objects(simList)`
 #' assignment. This function is an internal helper to find those objects from their
 #' environments by searching the call stack.
 #'
 #' @param objects A character vector of object names
 #' @param functionCall A character string identifying the function name to be
-#' searched in the call stack. Default is "simInit"
+#' searched in the call stack. Default is `"simInit"`.
 #'
 #' @author Eliot McIntire
 #' @importFrom reproducible .grepSysCalls
 #' @keywords internal
-#' @name findObjects
-#' @rdname findObjects
 .findObjects <- function(objects, functionCall = "simInit") {
   scalls <- sys.calls()
   grep1 <- .grepSysCalls(scalls, functionCall)
@@ -233,18 +231,17 @@ setMethod(
 }
 
 #' @keywords internal
-.corePackages <- c(".GlobalEnv","Autoloads","SpaDES.core","base","grDevices",
-                   "rstudio","devtools_shims",
-                   "methods","utils","graphics","datasets","stats", "testthat") # nolint
+.corePackages <- c(".GlobalEnv", "Autoloads", "SpaDES.core", "base", "grDevices",
+                   "rstudio", "devtools_shims",
+                   "methods", "utils", "graphics", "datasets", "stats", "testthat") # nolint
 .corePackagesGrep <- paste(.corePackages, collapse = "|")
 
 # .pkgEnv$corePackagesVec <- unlist(strsplit(.corePackagesGrep, split = "\\|"))
-.corePackagesVec <- c(.corePackages[(1:2)],
-                      paste0("package:", .corePackages[-(1:2)]))
+.corePackagesVec <- c(.corePackages[(1:2)], paste0("package:", .corePackages[-(1:2)]))
 
-#' tryCatch that keeps warnings, errors and value (result)
+#' `tryCatch` that keeps warnings, errors and value (result)
 #'
-#' This is from https://stackoverflow.com/a/24569739/3890027
+#' From <https://stackoverflow.com/a/24569739/3890027>
 #'
 #' @keywords internal
 #' @rdname tryCatch
@@ -261,17 +258,17 @@ setMethod(
   list(value = value, warning = warn, error = err)
 }
 
-#' All equal method for simLists
+#' All equal method for `simList` objects
 #'
 #' This function removes a few attributes that are added internally
-#' by SpaDES.core and are not relevant to the `all.equal`. One
-#' key element removed is any time stamps, as these are guaranteed
-#' to be different.
+#' by \pkg{SpaDES.core} and are not relevant to the `all.equal`.
+#' One key element removed is any time stamps, as these are guaranteed to be different.
 #'
 #' @inheritParams base::all.equal
+#'
+#' @return See [base::all.equal()]
+#'
 #' @export
-#' @return
-#' See [base::all.equal()]
 all.equal.simList <- function(target, current, ...) {
   attr(target, ".Cache")$newCache <- NULL
   attr(current, ".Cache")$newCache <- NULL
@@ -289,6 +286,7 @@ all.equal.simList <- function(target, current, ...) {
   objsTarget <- mget(objNamesTarget, envir = envir(target))
   objsCurrent <- mget(objNamesCurrent, envir = envir(current))
   on.exit({
+    # put them back on.exit
     list2env(objsTarget, envir = envir(target))
     list2env(objsCurrent, envir = envir(current))
   })
@@ -301,24 +299,29 @@ all.equal.simList <- function(target, current, ...) {
   # suppressWarnings(rm(".timestamp", envir = envir(target)))
   # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
-  all.equal.default(target, current, check.environment = FALSE)
+  target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  all.equal.default(target1, current1, check.environment = FALSE)
 }
 
-needInstall <- function(pkg = "methods", minVersion = NULL,
-                        messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"), " is required. Try: ")) {
+needInstall <- function(
+    pkg = "methods",
+    minVersion = NULL,
+    messageStart = paste0(pkg, if (!is.null(minVersion)) paste0("(>=", minVersion, ")"),
+                          " is required. Try: ")) {
   need <- FALSE
   if (!requireNamespace(pkg, quietly = TRUE)) {
     need <- TRUE
   } else {
-    if (isTRUE(packageVersion(pkg) < minVersion))
-      need <- TRUE
+    if (!is.null(minVersion))
+      if (isTRUE(packageVersion(pkg) < minVersion))
+        need <- TRUE
   }
   if (need) {
     stop(messageStart,
-         "install.packages('",pkg,"')")
+         "install.packages('", pkg, "')")
   }
 }
 
-isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 
 .moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))

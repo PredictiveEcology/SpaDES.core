@@ -113,13 +113,12 @@ dataPath(sim)
 \S4method{dataPath}{simList}(sim)
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList} object from which to extract element(s) or in which to replace element(s).}
 
 \item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 
 \item{module}{The optional character string of the module(s) whose
-paths are desired. If omitted, will return all modulePaths,
+paths are desired. If omitted, will return all module paths,
 if more than one exist.}
 }
 \value{
@@ -154,11 +153,11 @@ If no paths are specified, the defaults are as follows:
 }
 }
 \seealso{
-\code{\link[=SpaDES.core-package]{SpaDES.core-package()}}, specifically the section 1.2.4 on Simulation Paths.
+\link{SpaDES.core-package}, specifically the section 1.2.4 on Simulation Paths.
 
 Other functions to access elements of a 'simList' object: 
 \code{\link{.addDepends}()},
-\code{\link{doEvent.checkpoint}()},
+\code{\link{checkpointFile}()},
 \code{\link{envir}()},
 \code{\link{events}()},
 \code{\link{globals}()},

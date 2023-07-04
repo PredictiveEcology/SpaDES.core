@@ -5,6 +5,7 @@
 \alias{outputs,simList-method}
 \alias{outputs<-}
 \alias{outputs<-,simList-method}
+\alias{registerOutputs}
 \alias{outputArgs}
 \alias{outputArgs,simList-method}
 \alias{outputArgs<-}
@@ -19,6 +20,8 @@ outputs(sim) <- value
 
 \S4method{outputs}{simList}(sim) <- value
 
+registerOutputs(filename, sim, ...)
+
 outputArgs(sim)
 
 \S4method{outputArgs}{simList}(sim)
@@ -28,13 +31,34 @@ outputArgs(sim) <- value
 \S4method{outputArgs}{simList}(sim) <- value
 }
 \arguments{
-\item{sim}{A \code{simList} object from which to extract element(s) or
-in which to replace element(s).}
+\item{sim}{A \code{simList}. If missing, then the function will search in the call
+stack, so it will find it if it is in a \code{SpaDES} module.}
 
 \item{value}{The object to be stored at the slot. See Details.}
+
+\item{filename}{The filename to register in the \code{outputs(sim)} data.frame. If
+missing, an attempt will be made to search for either a \code{file} or \code{filename}
+argument in the call itself. This means that this function can be used with
+the pipe, as long as the returned return from the upstream pipe function is
+a filename or if it is \code{NULL} (e.g., \code{saveRDS}), then it will find the \code{file}
+argument and use that.}
+
+\item{...}{Not used.}
+}
+\value{
+A \code{simList} which will be the \code{sim} passed in with a new object registered
+in the \code{outputs(sim)}
 }
 \description{
 Accessor functions for the \code{outputs} slots in a \code{simList} object.
+
+If a module saves a file to disk during events, it can be useful to keep track
+of the files that are saved e.g., for \code{\link[=saveSimList]{saveSimList()}} so that all files can
+be added to the archive. In addition to setting \code{outputs} at the \code{simInit}
+stage, a module developer can also put this in a using any saving mechanism that
+is relevant (e.g., \code{qs::qsave}, \code{saveRDS} etc.). When a module event does this
+it can be useful to register that saved file. \code{registerOutputs} offers an additional
+mechanism to do this. See examples.
 }
 \details{
 These functions are one of three mechanisms to add information about which output files to save.
@@ -48,6 +72,12 @@ default data sets for your model.
 }
 
 See below for more details.
+
+Note using \code{registerOutputs}: a user can pass any other
+arguments to \code{registerOutputs} that are in the
+\code{outputs(sim)} data.frame, such as \code{objectName}, \code{fun}, \code{package}, though these
+will not be used to save the files as this function is only about
+registering an output that has already been saved.
 }
 \note{
 The automatic file type handling only adds the correct extension from a given
@@ -95,8 +125,7 @@ See the modules vignette for more details (\code{browseVignettes("SpaDES.core")}
 # outputs
 #######################
 
-library(igraph) # for \%>\%
-tmpdir <- file.path(tempdir(), "outputs") \%>\% checkPath(create = TRUE)
+tmpdir <- file.path(tempdir(), "outputs") |> checkPath(create = TRUE)
 tmpFile <- file.path(tmpdir, "temp.rds")
 tempObj <- 1:10
 
@@ -139,25 +168,44 @@ newObj
 # To see current ones SpaDES can do
 .saveFileExtensions()
 
-library(raster)
-if (require(rgdal)) {
-  ras <- raster(ncol = 4, nrow = 5)
-  ras[] <- 1:20
+library(terra)
+ras <- rast(ncol = 4, nrow = 5)
+ras[] <- 1:20
 
-  sim <- simInit(objects = c("ras"), paths = list(outputPath = tmpdir))
-  outputs(sim) = data.frame(
-    file = "test",
-    fun = "writeRaster",
-    package = "raster",
-    objectName = "ras",
-    stringsAsFactors = FALSE)
+sim <- simInit(objects = c("ras"), paths = list(outputPath = tmpdir))
+outputs(sim) = data.frame(
+  file = "test",
+  fun = "writeRaster",
+  package = "terra",
+  objectName = "ras",
+  stringsAsFactors = FALSE)
 
-  outputArgs(sim)[[1]] <- list(format = "GTiff") # see ?raster::writeFormats
-  simOut <- spades(sim)
-  outputs(simOut)
-  newRas <- raster(dir(tmpdir, full.name = TRUE, pattern = ".tif")[1])
-  all.equal(newRas, ras) # Should be TRUE
-}
+# outputArgs(sim)[[1]] <- list(format = "GTiff") # see ?raster::writeFormats
+simOut <- spades(sim)
+outputs(simOut)
+newRas <- rast(dir(tmpdir, full.name = TRUE, pattern = ".tif")[1])
+all.equal(newRas, ras) # Should be TRUE
 # Clean up after
 unlink(tmpdir, recursive = TRUE)
+# For `registerOutputs`
+sim <- simInit()
+# This would normally be a save call, e.g., `writeRaster`
+tf <- reproducible::tempfile2(fileext = ".tif")
+sim <- registerOutputs(sim, filename = tf)
+
+# Using a pipe
+tf <- reproducible::tempfile2(fileext = ".rds")
+sim$a <- 1
+sim <- saveRDS(sim$a, tf) |> registerOutputs()
+# confirm:
+outputs(sim) # has object --> saved = TRUE
+
+}
+\seealso{
+\code{\link[=registerOutputs]{registerOutputs()}} which enables files that are saved to be added to
+the \code{simList} using the \code{outputs(sim)} mechanism, so the files that are saved
+during a module event can be tracked at the \code{simList} level. \code{\link[=saveSimList]{saveSimList()}}
+which will optionally add all the outputs that are tracked into an archive.
+
+\code{\link[=Plots]{Plots()}}, \code{\link[=outputs]{outputs()}}
 }
