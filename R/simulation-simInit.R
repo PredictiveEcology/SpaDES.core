@@ -212,7 +212,10 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' \donttest{ # Tests take several seconds
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
-#' opts <- options("spades.moduleCodeChecks" = FALSE) # not needed for example
+#' opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
+#' if (!interactive()) opts <- append(opts, options("spades.plots" = NA,
+#'                                                  "spades.debug" = FALSE))
+#'
 #' mySim <- simInit(
 #'  times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'  params = list(
@@ -260,7 +263,10 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'  mySim2 <- simInit(
 #'    times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'    params = list(.globals = list(stackName = "landscape", burnStats = "nPixelsBurned")),
+#'    params = list(
+#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+#'      randomLandscapes = list(nx = 10, ny = 10)
+#'      ),
 #'    paths = list(
 #'      modulePath = system.file("sampleModules", package = "SpaDES.core"),
 #'      outputPath = tempdir()

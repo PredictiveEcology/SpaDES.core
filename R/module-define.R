@@ -416,6 +416,11 @@ setMethod(
 #'
 #' # initialize the simList
 #' if (requireNamespace("ggplot2", quietly = TRUE)) {
+#'   # Some things not necessary in this example, if not interactive (like plotting)
+#'   opts <- if (!interactive()) list() else
+#'     options(spades.plot = NA,
+#'                     spades.useRequire = FALSE,
+#'                     spades.moduleCodeChecks = FALSE)
 #'   mySim <- simInit(modules = "testModule",
 #'                    paths = list(modulePath = tmpdir))
 #'
@@ -425,6 +430,7 @@ setMethod(
 #'   P(mySim, module = "testModule") # gets all params in a module
 #'   P(mySim, ".useCache", "testModule") # just one param
 #' }
+#' options(opts)
 #' unlink(tmpdir, recursive = TRUE)
 #' }
 #'

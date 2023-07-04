@@ -231,12 +231,14 @@ with the one just edited. There may be some unexpected consequences if the
 \donttest{
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
     requireNamespace("NLMR", quietly = TRUE)) {
-  # some options are not necessary for example
+  # some options are not necessary when not interactive
   opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
-  if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
+  if (!interactive()) opts <- append(opts, options("spades.plots" = NA,
+                                                   "spades.debug" = FALSE))
   mySim <- simInit(
    times = list(start = 0.0, end = 1.0, timeunit = "year"),
    params = list(
+     randomLandscapes = list(nx = 10, ny = 10),
      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned",
                      .plots = NA) # plotting off --> not relevant for example
    ),
@@ -262,6 +264,7 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
    mySim <- simInit(
      times = list(start = 0.0, end = 1.0, timeunit = "year"),
      params = list(
+       randomLandscapes = list(nx = 10, ny = 10),
        .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
      ),
      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
@@ -282,6 +285,7 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
   mySim <- simInit(
    times = list(start = 0.0, end = 1.0, timeunit = "year"),
    params = list(
+     randomLandscapes = list(nx = 10, ny = 10),
      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
    ),
    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
