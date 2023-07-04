@@ -1,15 +1,14 @@
 test_that("downloadData downloads and unzips module data", {
   skip_on_cran()
-  skip_if_not_installed("googledrive")
 
-  if (Sys.info()["sysname"] == "Windows") {
-    options(download.file.method = "auto")
+  opts <- list(reproducible.inputPaths = NULL)
+  if (isWindows()) {
+    opts <- append(opts, list(download.file.method = "auto"))
   } else {
-    options(download.file.method = "curl", download.file.extra = "-L")
+    opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
 
-  testInitOut <- testInit(smcc = FALSE, opts = list(reproducible.inputPaths = NULL))
-  on.exit(testOnExit(testInitOut), add = TRUE)
+  testInit(c("googledrive", "terra"), opts = opts)
 
   m <- "test"
   datadir <- file.path(tmpdir, m, "data") %>% checkPath(create = TRUE)
@@ -66,19 +65,17 @@ test_that("downloadData downloads and unzips module data", {
 
     # if files are there with correct names, but wrong content
     library(raster); on.exit(detach("package:raster"), add = TRUE)
-    if (require(rgdal, quietly = TRUE)) {
-      on.exit(detach("package:rgdal"), add = TRUE)
-      ras <- raster(file.path(datadir, filenames[2]))
-      ras[5] <- maxValue(ras) + 1
-      suppressWarnings({
-        ## TODO: remove suppressWarnings after raster package fixes/updates
-        writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
-      })
-      a <- capture.output({
-        dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7)
-      })
-      expect_true(all(dwnload$result %in% "OK"))
-      expect_true(all(file.exists(file.path(datadir, filenames))))
-    }
+    ras <- raster(file.path(datadir, filenames[2]))
+    ras[5] <- maxValue(ras) + 1
+    suppressWarnings({
+      ## TODO: remove suppressWarnings after raster package fixes/updates
+      writeRaster(ras, filename = file.path(datadir, filenames[2]), overwrite = TRUE)
+    })
+    a <- capture.output({
+      dwnload <- downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL, overwrite = TRUE, purge = 7)
+    })
+    expect_true(all(dwnload$result %in% "OK"))
+    expect_true(all(file.exists(file.path(datadir, filenames))))
+
   }
 })

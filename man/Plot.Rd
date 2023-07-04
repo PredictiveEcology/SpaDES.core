@@ -27,7 +27,8 @@
   zero.color = NULL,
   length = NULL,
   arr = NULL,
-  plotFn = "plot"
+  plotFn = "plot",
+  verbose = getOption("quickPlot.verbose")
 )
 }
 \arguments{
@@ -129,6 +130,9 @@ let Plot function do it automatically.}
 
 \item{plotFn}{An optional function name to do the plotting internally, e.g.,
 "barplot" to get a barplot() call. Default "plot".}
+
+\item{verbose}{Numeric or logical. If \code{TRUE} or \verb{>0}, then messages will be
+shown. If \code{FALSE} or \code{0}, most messages will be suppressed.}
 }
 \value{
 invoked for side effect of plotting

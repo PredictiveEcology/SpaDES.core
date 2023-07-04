@@ -2,7 +2,7 @@
 % Please edit documentation in R/Plots.R
 \name{anyPlotting}
 \alias{anyPlotting}
-\title{Test whether there should be any plotting from \code{.plot} parameter}
+\title{Test whether there should be any plotting from \code{.plots} module parameter}
 \usage{
 anyPlotting(.plots)
 }

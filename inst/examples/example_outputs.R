@@ -2,8 +2,7 @@
 # outputs
 #######################
 
-library(igraph) # for %>%
-tmpdir <- file.path(tempdir(), "outputs") %>% checkPath(create = TRUE)
+tmpdir <- file.path(tempdir(), "outputs") |> checkPath(create = TRUE)
 tmpFile <- file.path(tmpdir, "temp.rds")
 tempObj <- 1:10
 
@@ -46,24 +45,22 @@ newObj
 # To see current ones SpaDES can do
 .saveFileExtensions()
 
-library(raster)
-if (require(rgdal)) {
-  ras <- raster(ncol = 4, nrow = 5)
-  ras[] <- 1:20
+library(terra)
+ras <- rast(ncol = 4, nrow = 5)
+ras[] <- 1:20
 
-  sim <- simInit(objects = c("ras"), paths = list(outputPath = tmpdir))
-  outputs(sim) = data.frame(
-    file = "test",
-    fun = "writeRaster",
-    package = "raster",
-    objectName = "ras",
-    stringsAsFactors = FALSE)
+sim <- simInit(objects = c("ras"), paths = list(outputPath = tmpdir))
+outputs(sim) = data.frame(
+  file = "test",
+  fun = "writeRaster",
+  package = "terra",
+  objectName = "ras",
+  stringsAsFactors = FALSE)
 
-  outputArgs(sim)[[1]] <- list(format = "GTiff") # see ?raster::writeFormats
-  simOut <- spades(sim)
-  outputs(simOut)
-  newRas <- raster(dir(tmpdir, full.name = TRUE, pattern = ".tif")[1])
-  all.equal(newRas, ras) # Should be TRUE
-}
+# outputArgs(sim)[[1]] <- list(format = "GTiff") # see ?raster::writeFormats
+simOut <- spades(sim)
+outputs(simOut)
+newRas <- rast(dir(tmpdir, full.name = TRUE, pattern = ".tif")[1])
+all.equal(newRas, ras) # Should be TRUE
 # Clean up after
 unlink(tmpdir, recursive = TRUE)

@@ -1,10 +1,5 @@
 test_that("simList object initializes correctly (1)", {
-  skip_if_not_installed("NLMR")
-
-  testInitOut <- testInit(smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(sampleModReqdPkgs)
 
   defaults <- .coreModules() %>% unname()
   times <- list(start = 1.0, end = 10)
@@ -40,7 +35,7 @@ test_that("simList object initializes correctly (1)", {
   options(width = 100L)
   out <- utils::capture.output(show(mySim))
 
-  expect_equal(length(out), 73)
+  expect_equal(length(out), 76)
   options(width = w); rm(w)
 
   ### SLOT .xData
@@ -172,7 +167,7 @@ test_that("simList object initializes correctly (1)", {
   expect_equal("second", attr(mySim@simtimes$current, "unit"))
 
   ### required packages
-  pkgs <- c("grid", "methods", "NLMR", "raster", "RColorBrewer", "sp",
+  pkgs <- c("grid", "methods", "NLMR", "terra", "reproducible", "RColorBrewer", "sf",
             "SpaDES.core", "SpaDES.tools", "stats")
   expect_equal(sort(packages(mySim, clean = TRUE)), sort(pkgs))
 
@@ -200,14 +195,10 @@ test_that("simList object initializes correctly (1)", {
 })
 
 test_that("simList object initializes correctly (2)", {
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(c("terra", "ggplot2"), smcc = FALSE)
   ## test with outputs
-  abundRasters <- list(raster(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
+  abundRasters <- list(terra::rast(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
 
   tmpdir <- tempdir()
   newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
@@ -220,17 +211,15 @@ test_that("simList object initializes correctly (2)", {
                      modules = list("test"), paths = paths,
                      objects = obj)
     }))
-  expect_length(grep("was built under R version", aa, invert = TRUE), 0)
+  expect_equivalent(grep("was built under R version", aa, invert = TRUE, value = TRUE), character())
 })
 
 test_that("simList test all signatures", {
   skip_on_cran()
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE)
+  testInit(sampleModReqdPkgs, opts = list(spades.useRequire = FALSE))
 
   on.exit({
-    testOnExit(testInitOut)
     if (!curPathIsPkgPath) {
       setPaths(modulePath = origDir)
     }
@@ -263,81 +252,77 @@ test_that("simList test all signatures", {
   # inputs
   filelist <- data.frame(
     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
-    functions = "raster",
-    package = "raster",
+    functions = "rast",
+    package = "terra",
     loadTime = c(0, 3),
     stringsAsFactors = FALSE
   )
 
-  if (require(rgdal)) {
-    on.exit(detach("package:rgdal"), add = TRUE)
 
-    # objects
-    layers <- lapply(filelist$files, rasterToMemory)
-    DEM <- layers[[1]]
-    forestAge <- layers[[2]]
-    objects <- list(DEM = "DEM", forestAge = "forestAge")
-    objectsChar <- c("DEM", "forestAge")
+  # objects
+  layers <- lapply(filelist$files, rasterToMemory)
+  DEM <- layers[[1]]
+  forestAge <- layers[[2]]
+  objects <- list(DEM = "DEM", forestAge = "forestAge")
+  objectsChar <- c("DEM", "forestAge")
 
-    # outputs
-    outputs <- data.frame(
-      expand.grid(objectName = c("caribou", "landscape"),
-                  saveTime = 1:2,
-                  stringsAsFactors = FALSE)
+  # outputs
+  outputs <- data.frame(
+    expand.grid(objectName = c("caribou", "landscape"),
+                saveTime = 1:2,
+                stringsAsFactors = FALSE)
+  )
+
+  # parameters
+  parameters <- list(
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  )
+
+  # loadOrder
+  loadOrder <- c("randomLandscapes")#, "caribouMovement", "fireSpread")
+
+  # test all argument combinations to simInit
+  N <- 256L
+  successes <- logical(N)
+  argsTested <- vector("list", length = N)
+  #setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
+  for (i in 1L:N) {
+    li <- list(
+      {if (i %% 2 ^ 1 == 0) times = times},                   # nolint
+      {if (ceiling(i / 2) %% 2 == 0) params = parameters},    # nolint
+      {if (ceiling(i / 4) %% 2 == 0) modules = modules},      # nolint
+      {if (ceiling(i / 8) %% 2 == 0) objects = objects},      # nolint
+      {if (ceiling(i / 16) %% 2 == 0) paths = paths},         # nolint
+      {if (ceiling(i / 32) %% 2 == 0) inputs = filelist},     # nolint
+      {if (ceiling(i / 64) %% 2 == 0) outputs = outputs},     # nolint
+      {if (ceiling(i / 128) %% 2 == 0) loadOrder = loadOrder} # nolint
     )
-
-    # parameters
-    parameters <- list(
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
-    )
-
-    # loadOrder
-    loadOrder <- c("randomLandscapes")#, "caribouMovement", "fireSpread")
-
-    # test all argument combinations to simInit
-    N <- 256L
-    successes <- logical(N)
-    argsTested <- vector("list", length = N)
-    #setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
-    for (i in 1L:N) {
-      li <- list(
-        {if (i %% 2 ^ 1 == 0) times = times},                   # nolint
-        {if (ceiling(i / 2) %% 2 == 0) params = parameters},    # nolint
-        {if (ceiling(i / 4) %% 2 == 0) modules = modules},      # nolint
-        {if (ceiling(i / 8) %% 2 == 0) objects = objects},      # nolint
-        {if (ceiling(i / 16) %% 2 == 0) paths = paths},         # nolint
-        {if (ceiling(i / 32) %% 2 == 0) inputs = filelist},     # nolint
-        {if (ceiling(i / 64) %% 2 == 0) outputs = outputs},     # nolint
-        {if (ceiling(i / 128) %% 2 == 0) loadOrder = loadOrder} # nolint
-      )
-      argNames <- c("times", "params", "modules", "objects", "paths", "inputs",
-                    "outputs", "loadOrder")
-      names(li) <- argNames
-      li <- li[!sapply(li, is.null)]
-      messes <- capture_messages(successes[i] <- tryCatch(
-        is(suppressMessages(do.call(simInit, args = li)), "simList"),
-        error = function(e) { FALSE },
-        warning = function(w) { TRUE }
-      ))
-      argsTested[[i]] <- names(li)
-    }
-
-    # needs paths and params; many defaults are fine
-    expect_equal(sum(successes, na.rm = TRUE), 256)
-    if (FALSE) {
-      dt <- data.table(lapply(argsTested, paste, collapse = "_"), successes)
-    }
+    argNames <- c("times", "params", "modules", "objects", "paths", "inputs",
+                  "outputs", "loadOrder")
+    names(li) <- argNames
+    li <- li[!sapply(li, is.null)]
+    messes <- capture_messages(successes[i] <- tryCatch(
+      is(suppressMessages(do.call(simInit, args = li)), "simList"),
+      error = function(e) { FALSE },
+      warning = function(w) { TRUE }
+    ))
+    if (isFALSE(successes[i])) browser()
+    argsTested[[i]] <- names(li)
   }
+
+  # needs paths and params; many defaults are fine
+  expect_equal(sum(successes, na.rm = TRUE), 256)
+  if (FALSE) {
+    dt <- data.table(lapply(argsTested, paste, collapse = "_"), successes)
+  }
+  #  }
 })
 
 test_that("childModule bug test -- created infinite loop of 'Duplicated...'", {
   skip_on_cran()
   ## Test resulting from bug found by Greg Paradis April 7, 2019
-  testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(c("terra", "ggplot2"), smcc = FALSE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   newModule(childModName, tmpdir, type = "child", open = FALSE)
@@ -355,10 +340,7 @@ test_that("test that module directory exists, but not files", {
   skip_on_cran()
 
   ## Test resulting from bug found by Eliot McIntire April 28, 2019
-  testInitOut <- testInit("raster", smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit("terra", smcc = FALSE)
   setPaths(modulePath = tmpdir)
   childModName <- "child_module"
   parentModName <- "parent_module"
@@ -395,12 +377,8 @@ test_that("test that module directory exists, but not files", {
 })
 
 test_that("inputObjects on module arg not sim", {
-  skip_if_not_installed("NLMR")
 
-  testInitOut <- testInit(smcc = FALSE)
-  on.exit({
-    testOnExit(testInitOut)
-  }, add = TRUE)
+  testInit(sampleModReqdPkgs)
 
   defaults <- .coreModules() %>% unname()
   times <- list(start = 1.0, end = 10)

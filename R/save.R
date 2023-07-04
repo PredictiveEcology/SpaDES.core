@@ -92,52 +92,54 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #' requireNamespace("NLMR", quietly = TRUE)) {
-#' #' # This will save the "caribou" object at the save interval of 1 unit of time
+#' # # This will save the "caribou" object at the save interval of 1 unit of time
 #' #  in the outputPath location
-#' outputPath <- file.path(tempdir(), "test_save")
-#' times <- list(start = 0, end = 6, "month")
-#' parameters <- list(
-#'   .globals = list(stackName = "landscape"),
-#'   caribouMovement = list(
-#'     .saveObjects = "caribou",
-#'     .saveInitialTime = 1, .saveInterval = 1
-#'   ),
-#'   randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
+#'   outputPath <- file.path(tempdir(), "test_save")
+#'   times <- list(start = 0, end = 1, "month")
+#'   parameters <- list(
+#'     .globals = list(stackName = "landscape"),
+#'     caribouMovement = list(
+#'       .saveObjects = "caribou",
+#'       .saveInitialTime = 1, .saveInterval = 1,
+#'       .plots = NA
+#'     ),
+#'     randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
 #'
-#' modules <- list("randomLandscapes", "caribouMovement")
-#' paths <- list(
-#'   modulePath = system.file("sampleModules", package = "SpaDES.core"),
-#'   outputPath = outputPath
-#' )
-#' opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
-#' mySim <- simInit(times = times, params = parameters, modules = modules,
+#'   modules <- list("randomLandscapes", "caribouMovement")
+#'   paths <- list(
+#'     modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'     outputPath = outputPath
+#'   )
+#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
+#'   mySim <- simInit(times = times, params = parameters, modules = modules,
+#'                    paths = paths)
+#'
+#'   # The caribou module has a saveFiles(sim) call, so it will save caribou
+#'   spades(mySim)
+#'   dir(outputPath)
+#'
+#'   # remove the files
+#'   file.remove(dir(outputPath, full.names = TRUE))
+#'
+#'   ## save multiple outputs
+#'   parameters <- list(
+#'     .globals = list(stackName = "landscape"),
+#'     caribouMovement = list(
+#'       .saveObjects = c("caribou", "habitatQuality"),
+#'       .saveInitialTime = 1, .saveInterval = 1,
+#'       .plots = NA
+#'     ),
+#'     randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
+#'
+#'   mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #'
-#' # The caribou module has a saveFiles(sim) call, so it will save caribou
-#' spades(mySim)
-#' dir(outputPath)
+#'   spades(mySim)
+#'   dir(outputPath)
+#'   # remove the files
+#'   file.remove(dir(outputPath, full.names = TRUE))
 #'
-#' # remove the files
-#' file.remove(dir(outputPath, full.names = TRUE))
-#'
-#' ## save multiple outputs
-#' parameters <- list(
-#'   .globals = list(stackName = "landscape"),
-#'   caribouMovement = list(
-#'     .saveObjects = c("caribou", "habitatQuality"),
-#'     .saveInitialTime = 1, .saveInterval = 1
-#'   ),
-#'   randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20))
-#'
-#' mySim <- simInit(times = times, params = parameters, modules = modules,
-#'                  paths = paths)
-#'
-#' spades(mySim)
-#' dir(outputPath)
-#' # remove the files
-#' file.remove(dir(outputPath, full.names = TRUE))
-#'
-#' options(opts) # clean up
+#'   options(opts) # clean up
 #'
 #' }}
 saveFiles <- function(sim) {
@@ -171,26 +173,30 @@ saveFiles <- function(sim) {
   if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
     wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
     for (i in wh) {
-      if (exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)) {
-        args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
-                            file = outputs(sim)[["file"]][i]),
-                       outputArgs(sim)[[i]])
-        args <- args[!sapply(args, is.null)]
-        args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
-          isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
-        }))])
+      objExists <- exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)
+      isSimList <- identical(outputs(sim)[["objectName"]][i], "sim")
+      if (objExists || isSimList) {
+        if (objExists) {
+          args <- append(list(get(outputs(sim)[["objectName"]][i], envir = sim@.xData),
+                              file = outputs(sim)[["file"]][i]),
+                         outputArgs(sim)[[i]])
+          args <- args[!sapply(args, is.null)]
+          args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
+            isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
+          }))])
 
-        # The actual save line
-        do.call(outputs(sim)[["fun"]][i], args = args,
-                envir = getNamespace(outputs(sim)[["package"]][i]))
+          # The actual save line
+          do.call(outputs(sim)[["fun"]][i], args = args,
+                  envir = getNamespace(outputs(sim)[["package"]][i]))
 
-        ## using @ works when outputs is a DT
+          ## using @ works when outputs is a DT
+        } else {
+          saveSimList(sim, filename = outputs(sim)[["file"]][i])
+        }
         outputs(sim)[["saved"]][i] <- TRUE
-        # sim@outputs[["saved"]][i] <- TRUE
       } else {
-        warning(paste(outputs(sim)$obj[i], "is not an object in the simList. Cannot save."))
+        warning(paste(outputs(sim)[["objectName"]][i], "is not an object in the simList. Cannot save."))
         outputs(sim)[["saved"]][i] <- FALSE
-        # sim@outputs[["saved"]][i] <- FALSE
       }
     }
   }
@@ -239,10 +245,24 @@ saveFiles <- function(sim) {
     "txt", "write.table", "utils",
     "csv", "write.csv", "utils",
     "grd", "writeRaster", "raster",
+    "shp", "writeVector", "terra",
     "tif", "writeRaster", "terra"
   )), stringsAsFactors = FALSE)
   setnames(.sFE, new = c("exts", "fun", "package"), old = paste0("X", 1:3))
   .sFE <- .sFE[order(.sFE$package, .sFE$fun), ]
+  if (NROW(getOption("spades.saveFileExtensions")) > 0) {
+    if (!identical(colnames(.sFE), colnames(getOption("spades.saveFileExtensions")))) {
+      stop("The column names of `getOption('spades.saveFileExtensions') must be: ",
+           paste(colnames(.sFE), collapse = ", "), "; they are currently ",
+           paste(collapse = ", ", colnames(getOption("spades.saveFileExtensions"))))
+    }
+    # remove initial dot
+    .sFE <- rbind(getOption("spades.saveFileExtensions"), .sFE)
+    .sFE[["exts"]] <- gsub("^\\.", "", .sFE[["exts"]])
+    # remove if there are 2 extensions for same fun and package
+    dups <- duplicated(.sFE[, c("fun", "package")])
+    .sFE <- .sFE[!dups, ]
+  }
   return(.sFE)
 }
 

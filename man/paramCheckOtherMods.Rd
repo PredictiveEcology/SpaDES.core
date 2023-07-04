@@ -8,7 +8,8 @@ paramCheckOtherMods(
   sim,
   paramToCheck,
   moduleToUse = "all",
-  ifSetButDifferent = c("error", "warning", "message", "silent")
+  ifSetButDifferent = c("error", "warning", "message", "silent"),
+  verbose = getOption("reproducible.verbose")
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ check and compare between the current module and one or more or all others}
 
 \item{ifSetButDifferent}{A character string indicating whether to \code{"error"} the default,
 or send a \code{"warning"}, \code{message} or just silently continue (any other value).}
+
+\item{verbose}{Logical or Numeric, follows \code{reproducible.verbose} value by default.}
 }
 \value{
 If the value of the \code{paramToCheck} in the current module is either \code{NULL} or

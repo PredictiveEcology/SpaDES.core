@@ -61,7 +61,6 @@ updateList <- function(x, y) {
 #' @rdname append_attr
 #'
 #' @examples
-#' library(igraph) # igraph exports magrittr's pipe operator
 #' tmp1 <- list("apple", "banana")
 #' tmp1 <- lapply(tmp1, `attributes<-`, list(type = "fruit"))
 #' tmp2 <- list("carrot")
@@ -466,7 +465,6 @@ Paths <- .paths()
 #' @param silent Logical. Should the messaging occur.
 #'
 #' @export
-#' @importFrom raster tmpDir
 #' @importFrom reproducible checkPath
 #' @rdname setPaths
 setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,
@@ -521,6 +519,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     scratchPath = scratchPath,
     terraPath = terraPath
   ), checkPath, create = TRUE)
+  newPaths <- as.list(normPath(newPaths))
 
   ## set the new paths via options
   options(
@@ -638,6 +637,7 @@ moduleCodeFiles <- function(paths, modules) {
 #'   `"all"` which will compare against all other modules.
 #' @param ifSetButDifferent A character string indicating whether to `"error"` the default,
 #'   or send a `"warning"`, `message` or just silently continue (any other value).
+#' @param verbose Logical or Numeric, follows `reproducible.verbose` value by default.
 #'
 #' @return If the value of the `paramToCheck` in the current module is either `NULL` or
 #' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
@@ -648,7 +648,8 @@ moduleCodeFiles <- function(paths, modules) {
 #' @export
 #' @rdname paramCheckOtherMods
 paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
-                                ifSetButDifferent = c("error", "warning", "message", "silent")) {
+                                ifSetButDifferent = c("error", "warning", "message", "silent"),
+                                verbose = getOption("reproducible.verbose")) {
   currentModule <- currentModule(sim)
   paramsInSim <- params(sim)
   paramInCurrentMod <- P(sim)[[paramToCheck]]
@@ -696,6 +697,13 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
       }
     }
     if (isTRUE(fail)) {
+      dfThis <- data.frame(module = currentModule, value = paramInThisMod, row.names = NULL)
+      dfOther <- data.frame(module = names(paramToUpdateValInOtherMods), value = paramToUpdateValInOtherMods, row.names = NULL)
+      messageVerbose("This module", verbose = verbose)
+      messageDF(dfThis, colour = "green", verbose = verbose)
+      messageVerbose("Other modules", verbose = verbose)
+      messageDF(dfOther, verbose = verbose)
+
       if (identical(ifSetButDifferent[1], "error")) stop(mess)
       if (identical(ifSetButDifferent[1], "warning")) warning(mess)
       if (identical(ifSetButDifferent[1], "message")) message(mess)

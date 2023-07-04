@@ -128,6 +128,8 @@ setMethod(
 
     # don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
+    object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
+
     if (NROW(object@inputs))
       object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
     deps <- object@depends@dependencies
@@ -142,11 +144,10 @@ setMethod(
       }
     }
 
-    # Sort the params and .list with dots first, to allow Linux and Windows to be compatible
-    if (!is.null(classOptions$params)) if (length(classOptions$params)) {
-      object@params <- list(classOptions$params)
-      names(object@params) <- classOptions$modules
+    if (!is.null(classOptions$.globals)) {
+      newGlobals <- object@params$.globals
     }
+
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
@@ -160,6 +161,12 @@ setMethod(
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
+
+    # Deal with globals
+    if (!is.null(classOptions$.globals)) {
+      object@params <- append(list(.globals = newGlobals), object@params)
+    }
+
 
     nonDotList <- grep(".list|.Data", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
@@ -192,8 +199,12 @@ setMethod(
     # outputs --> should not be treated like inputs; if they change, it is OK, so just outputs as a data.frame,
     #   not files
     nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
-    obj[nonDotListNoOutputs] <- lapply(nonDotListNoOutputs, function(x) .robustDigest(slot(object, x), algo = algo))
-    obj["outputs"] <- .robustDigest(object@outputs, quick = TRUE)
+    dependsSeparate <- setdiff(nonDotListNoOutputs, "depends")
+    obj[dependsSeparate] <- lapply(dependsSeparate, function(x)
+      .robustDigest(slot(object, x), algo = algo))
+    obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
+    obj <- .sortDotsUnderscoreFirst(obj)
+    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
     if (!is.null(classOptions$events))
       if (FALSE %in% classOptions$events) obj$events <- NULL
     if (!is.null(classOptions$current))
@@ -300,6 +311,7 @@ setMethod(
           message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module\n"))
         }
       } else {
+        if (exists("aaaa")) browser()
         if (isTRUE(fromMemoise)) {
           message(crayon::blue("     loaded memoised copy of", cur$eventType, "event in",
                            cur$moduleName, "module\n"))
@@ -397,11 +409,9 @@ setMethod(
     dots <- list(...)
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
 
-    # browser(expr = exists("._addChangedAttr_5"))
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
-      .setSubAttrInList(object, ".Cache", "newCache", NULL)
-      #attr(object, ".Cache")$newCache <- NULL
+      object <- .setSubAttrInList(object, ".Cache", "newCache", NULL)
 
       if (!identical(attr(object, ".Cache")$newCache, NULL))
         stop("attributes on the cache object are not correct - 4")
@@ -424,8 +434,12 @@ setMethod(
       }
 
       # remove all functions from the module environment; they aren't allowed to be redefined within a function
-      out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
-                                   preDigest[[whSimList]]$.list[[whSimList2]])
+      if (length(preDigest[[whSimList]]$.list)) {
+        out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
+                                     preDigest[[whSimList]]$.list[[whSimList2]])
+      } else {
+        out <- postDigest$.list[[whSimList2]]
+      }
       for (modNam in modules(object)) {
         isModElement <- names(out) == modNam
         if (any(isModElement)) {
@@ -437,25 +451,13 @@ setMethod(
 
       changedObjs <- out[lengths(out) > 0] # remove empty elements
 
-      # isNewObj <- !names(postDigest$.list[[whSimList2]]) %in%
-      #   names(preDigest[[whSimList]]$.list[[whSimList2]])
-      # # if (sum(isNewObj)) {
-      # newObjs <- names(postDigest$.list[[whSimList2]])[isNewObj]
-      # newObjs <- newObjs[!startsWith(newObjs, "._")]
-      # existingObjs <- names(postDigest$.list[[whSimList2]])[!isNewObj]
-      # post <- lapply(postDigest$.list[[whSimList2]][existingObjs], .robustDigest)
-      # pre <- lapply(preDigest[[whSimList]]$.list[[whSimList2]][existingObjs], .robustDigest)
-      # changedObjs <- setdiffNamedRecursive(post, pre)
-      changed <- changedObjs #append(list(changedObjs = newObjs), changedObjs)
-      # } else {
-      #   changed <- character()
-      # }
+      changed <- changedObjs
       changed
     } else {
       character()
     }
 
-    .setSubAttrInList(object, ".Cache", "changed", changed)
+    object <- .setSubAttrInList(object, ".Cache", "changed", changed)
     #attr(object, ".Cache")$changed <- changed
     if (!identical(attr(object, ".Cache")$changed, changed))
       stop("attributes on the cache object are not correct - 5")
@@ -562,6 +564,22 @@ setMethod(
         # Step 1 -- copy the non-simEnv slots
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
 
+        # This was unnecessary if the parameters never change; but they can
+        #  -- but draw from Cache only from this module -- other modules may have
+        #     changed during this simInit/spades call --> don't want their cached copies
+        #   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
+        #   cached copy of other modules
+        simPost@params[currModules] <- simFromCache@params[currModules]
+        anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
+
+        # if ("TriSect_SpringPredator" %in% current(simPost)$moduleName)
+        #  browser()
+        if (length(anyNewGlobals)) {
+          suppressMessages(
+            simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
+        }
+        # simPost@params <- simFromCache@params
+
         # Step 2 -- copy the objects that are in simPre to simPost
         # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
         # objsInPre <- grep("^\\._", objsInPre, value = TRUE, invert = TRUE)
@@ -642,7 +660,6 @@ setMethod(
         # Deal with .mods objects
         if (!is.null(simFromCache@.xData$.mods)) {
           # These are the unchanged objects
-          # browser()
           for (modNam in currModules) {
             objs <-
               setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T), changedModEnvObjs[[modNam]]$.objects)
@@ -698,6 +715,8 @@ setMethod(
         }
         simPost@current <- simFromCache@current
 
+
+
         # This is for objects that are not in the return environment yet because they are unrelated to the
         #   current module -- these need to be copied over
         lsSimPreOrigEnv <- ls(simPreOrigEnv, all.names = TRUE)
@@ -725,6 +744,9 @@ setMethod(
           rm(list = attr(simFromCache, "removedObjs"), envir = simPost@.xData)
         }
       }
+
+      # Need the .Cache attributes from the recovered simFromCache
+      attr(simPost, ".Cache") <- attr(simFromCache, ".Cache")
 
       attrsToGrab <- setdiff(names(attributes(simFromCache)), names(attributes(simPost)))
       for (atts in attrsToGrab) {
@@ -889,20 +911,71 @@ if (!exists("objSize")) {
 #' utils::object.size(a)
 objSize.simList <- function(x, quick = TRUE, ...) {
 
-  varName <- deparse(substitute(x))
+  total <- obj_size(x, quick = TRUE)
   aa <- objSize(x@.xData, quick = quick, ...)
 
   simSlots <- grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE)
   names(simSlots) <- simSlots
   otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
 
-  total <- obj_size(x, quick = TRUE)
   if (!quick)
     attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
                                     other = attr(otherParts, "objSize"))
 
   return(total)
 }
+
+
+
+#' Methods for .wrap and .unwrap
+#'
+#'
+#' @return The same obj as passed into the function, but dealt with so that it can be
+#' saved to disk.
+#'
+#' @param conn A `DBIConnection` object, as returned by `dbConnect()`.
+#' @param drv an object that inherits from `DBIDriver`, or an existing
+#'            `DBIConnection` object (in order to clone an existing connection).
+#' @inheritParams reproducible::clearCache
+#' @inheritParams reproducible::.wrap
+#' @importFrom reproducible .wrap
+#' @include simList-class.R
+#' @export
+#' @rdname dealWithClass
+.wrap.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", NULL),
+                                       conn = getOption("reproducible.conn", NULL),
+                                       verbose = getOption("reproducible.verbose")) {
+  # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
+  objTmp <- Copy(obj, objects = 2, drv = drv, conn = conn, verbose = verbose)
+  # Deal with the potentially large things -- convert to list -- not a copy
+  obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
+  # Now the individual objects
+  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+
+  # for (objName in names(out)) obj[[objName]] <- NULL
+  list2env(out, envir = envir(objTmp))
+  objTmp
+
+}
+
+
+#' @export
+#' @inheritParams reproducible::.unwrap
+#' @importFrom reproducible .unwrap
+#' @rdname dealWithClass
+.unwrap.simList <- function(obj, cachePath, cacheId,
+                                                 drv = getOption("reproducible.drv", NULL),
+                                                 conn = getOption("reproducible.conn", NULL)) {
+
+  # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
+  objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
+
+  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn)
+  list2env(outList, envir = envir(obj))
+  obj
+
+}
+
 
 #' Make `simList` correctly work with `memoise`
 #'
@@ -972,9 +1045,7 @@ if (!isGeneric("clearCache")) {
 #'
 #' This will take the `cachePath(object)` and pass
 #'
-#' @param conn A `DBIConnection` object, as returned by `dbConnect()`.
-#' @param drv an object that inherits from `DBIDriver`, or an existing
-#'            `DBIConnection` object (in order to clone an existing connection).
+#' @inheritParams .wrap.simList
 #' @inheritParams reproducible::clearCache
 #'
 #' @return A `data.table` object showing the subset of items in the cache, located at `cachePath`
@@ -991,7 +1062,7 @@ setMethod(
   signature = "simList",
   definition = function(x, userTags, after = NULL, before = NULL, ask, useCloud = FALSE,
                         cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
-                        drv = getOption("reproducible.drv", RSQLite::SQLite()),
+                        drv = getOption("reproducible.drv", NULL),
                         conn = getOption("reproducible.conn", NULL), ...) {
     x <- x@paths$cachePath
     clearCache(x = x, userTags = userTags, after = after, before = before,

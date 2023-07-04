@@ -23,7 +23,7 @@ defineModule(sim, list(
            role = c("aut", "cre"))
   ),
   version = list(randomLandscapes = "1.7.0"),
-  spatialExtent = raster::extent(rep(NA_real_, 4)),
+  spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list(),
@@ -35,6 +35,8 @@ defineModule(sim, list(
     defineParameter("nx", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the x dimension"),
     defineParameter("ny", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the y dimension"),
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
+    defineParameter(".plots", "character", "screen", NA, NA,
+                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
     defineParameter(".plotInitialTime", "numeric", start(sim), start(sim), NA, "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", NA_real_, NA, NA, "time interval between plot events"),
     defineParameter(".saveInitialTime", "numeric", NA_real_, NA, NA, "time to schedule first save event"),
@@ -67,20 +69,19 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
       sim <- Init(sim)
 
       # schedule the next events
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.plotInitialTime, "randomLandscapes", "plot", .last())
-      sim <- scheduleEvent(sim, SpaDES.core::P(sim)$.saveInitialTime, "randomLandscapes", "save", .last() + 1)
+      sim <- scheduleEvent(sim, Par$.plotInitialTime, "randomLandscapes", "plot", .last())
+      sim <- scheduleEvent(sim, Par$.saveInitialTime, "randomLandscapes", "save", .last() + 1)
     },
     plot = {
       # do stuff for this event
-      stackName <- SpaDES.core::P(sim)$stackName ## Plot doesn't like long variables
-      Plot(sim[[stackName]])
+      Plots(sim[[Par$stackName]], usePlot = TRUE)
     },
     save = {
       # do stuff for this event
       sim <- saveFiles(sim)
 
       # schedule the next event
-      sim <- scheduleEvent(sim, time(sim) + SpaDES.core::P(sim)$.saveInterval, "randomLandscapes",
+      sim <- scheduleEvent(sim, time(sim) + Par$.saveInterval, "randomLandscapes",
                            "save", .last() + 1)
     },
     warning(paste(
@@ -93,15 +94,15 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
 
 ## event functions
 Init <- function(sim) {
-  if (is.null(SpaDES.core::P(sim)$inRAM)) {
+  if (is.null(Par$inRAM)) {
     inMemory <- FALSE
   } else {
-    inMemory <- SpaDES.core::P(sim)$inRAM
+    inMemory <- Par$inRAM
   }
 
   ## Give dimensions of dummy raster
-  nx <- SpaDES.core::P(sim)$nx
-  ny <- SpaDES.core::P(sim)$ny
+  nx <- Par$nx
+  ny <- Par$ny
   template <- rast(nrows = ny, ncols = nx, xmin = -nx / 2, xmax = nx / 2, ymin = -ny / 2, ymax = ny / 2)
 
   ## Make dummy maps for testing of models
@@ -149,6 +150,6 @@ Init <- function(sim) {
                            forestAge = brewer.pal(9, "BuGn"),
                            habitatQuality = brewer.pal(8, "Spectral"),
                            percentPine = brewer.pal(9, "Greens"))
-  sim[[SpaDES.core::P(sim)$stackName]] <- mapStack
+  sim[[Par$stackName]] <- mapStack
   return(invisible(sim))
 }
