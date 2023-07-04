@@ -166,7 +166,7 @@ files <- dir(system.file("maps", package = "quickPlot"),
 # arguments must be a list of lists. This may require I() to keep it as a list
 #   once it gets coerced into the data.frame.
 # arguments = I(rep(list(native = TRUE), length(files)))
-filelist = data.frame(
+filelist <- data.frame(
   objectName = paste0("Maps", 1:5),
   files = files,
   functions = "terra::rast",
