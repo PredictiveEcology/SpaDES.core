@@ -74,6 +74,7 @@ Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 * `objSize` could have infinite recursion problem if there are simLists inside simLists. Fixed with new `reproducible::objSize`, which uses `lobstr::obj_size`.
 * several minor fixes, including in `Plots`
 * fixes to `saveFiles` related to `data.table` assignment and use in `outputs(sim)`
+* fix to `paramCheckOtherMods` to deal with `call` parameters
 
 # SpaDES.core 1.0.10
 

@@ -513,8 +513,6 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(sum(grepl("loaded cached copy of .inputObjects", mess10)) == 1)
   expect_true(exists("newFun", envir = mySim$.mods$test))
 
-
-
   # Test 2 in the "capture failed Cache"...
   # This should not recover the cache because it has a new .inputObjects function
   cat(xxx1[[1]][1:(lineWithInputObjects - 1)], "
