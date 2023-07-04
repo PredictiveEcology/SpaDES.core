@@ -333,7 +333,7 @@
 #'   Functions that may be useful within a `SpaDES` context:
 #'
 #'   \tabular{ll}{
-#'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range [a,b]\cr
+#'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range `[a,b]`\cr
 #'     [layerNames()] \tab Get layer names for numerous object classes\cr
 #'     [numLayers()] \tab Return number of layers\cr
 #'     [paddedFloatToChar()] \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr

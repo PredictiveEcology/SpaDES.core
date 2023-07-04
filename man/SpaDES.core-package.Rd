@@ -343,7 +343,7 @@ You must know how to use SELES for these to be useful:
 Functions that may be useful within a \code{SpaDES} context:
 
 \tabular{ll}{
-\code{\link[SpaDES.tools:inRange]{SpaDES.tools::inRange()}} \tab Test whether a number lies within range \link{a,b}\cr
+\code{\link[SpaDES.tools:inRange]{SpaDES.tools::inRange()}} \tab Test whether a number lies within range \verb{[a,b]}\cr
 \code{\link[=layerNames]{layerNames()}} \tab Get layer names for numerous object classes\cr
 \code{\link[=numLayers]{numLayers()}} \tab Return number of layers\cr
 \code{\link[=paddedFloatToChar]{paddedFloatToChar()}} \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
