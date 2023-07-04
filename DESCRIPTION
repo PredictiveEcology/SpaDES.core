@@ -73,6 +73,8 @@ Suggests:
     tcltk,
     testthat (>= 1.0.2),
     withr
+Remotes:
+    PredictiveEcology/SpaDES.tools@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
