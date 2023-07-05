@@ -390,32 +390,38 @@ rasterCreate <- function(x, ...) {
 }
 
 #' @describeIn rasterCreate Simply passes through argument with no effect
+#' @export
 rasterCreate.default <- function(x, ...) {
   x
 }
 
 #' @describeIn rasterCreate Uses `raster::brick`
+#' @export
 rasterCreate.RasterBrick <- function(x, ...) {
   raster::brick(x, ...)
 }
 
 #' @describeIn rasterCreate Uses `raster::raster`
+#' @export
 rasterCreate.RasterLayer <- function(x, ...) {
   raster::raster(x, ...)
 }
 
 #' @describeIn rasterCreate Uses `raster::stack`
+#' @export
 rasterCreate.RasterStack <- function(x, ...) {
   raster::stack(x, ...)
 }
 
 #' @describeIn rasterCreate Uses `raster::raster` when one of the other,
 #'   less commonly used `Raster*` classes, e.g., `RasterLayerSparse`
+#' @export
 rasterCreate.Raster <- function(x, ...) {
   raster::raster(x, ...)
 }
 
 #' @describeIn rasterCreate Uses `terra::rast` when a layer is `SpatRast`,
+#' @export
 rasterCreate.SpatRaster <- function(x, ...) {
   terra::rast(x, ...)
 }
