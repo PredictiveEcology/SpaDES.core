@@ -373,8 +373,9 @@ setMethod("rasterToMemory",
 
 #' Simple wrapper to load any `Raster*` object
 #'
-#' This wraps either `raster::raster`, `raster::stack`, or `raster::brick`,
+#' This wraps either `raster::raster`, `raster::stack`, `raster::brick`, or `terra::rast`,
 #' allowing a single function to be used to create a new object of the same class as a template.
+#' This works for all `Raster*` and `SpatRaster` class templates.
 #'
 #' @param x An object, notably a `Raster*` object. All others will simply
 #'   be passed through with no effect.
@@ -392,36 +393,18 @@ rasterCreate <- function(x, ...) {
 #' @describeIn rasterCreate Simply passes through argument with no effect
 #' @export
 rasterCreate.default <- function(x, ...) {
+  if (inherits(x, "Raster")) {
+    if (!requireNamespace("raster")) stop("Please install.packages('raster')")
+    if (inherits(x, "RasterStack")) {
+      x <- raster::stack(x, ...)
+    } else if (inherits(x, "RasterBrick")) {
+      x <- raster::brick(x, ...)
+    } else {
+      x <- raster::raster(x, ...)
+    }
+  } else if (inherits(x, "SpatRaster")) {
+    x <- terra::rast(x, ...)
+  }
   x
 }
 
-#' @describeIn rasterCreate Uses `raster::brick`
-#' @export
-rasterCreate.RasterBrick <- function(x, ...) {
-  raster::brick(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `raster::raster`
-#' @export
-rasterCreate.RasterLayer <- function(x, ...) {
-  raster::raster(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `raster::stack`
-#' @export
-rasterCreate.RasterStack <- function(x, ...) {
-  raster::stack(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `raster::raster` when one of the other,
-#'   less commonly used `Raster*` classes, e.g., `RasterLayerSparse`
-#' @export
-rasterCreate.Raster <- function(x, ...) {
-  raster::raster(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `terra::rast` when a layer is `SpatRast`,
-#' @export
-rasterCreate.SpatRaster <- function(x, ...) {
-  terra::rast(x, ...)
-}
