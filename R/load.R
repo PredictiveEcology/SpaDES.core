@@ -77,11 +77,13 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #'
 #' @examples
 #' \donttest{
+#' library(SpaDES.core)
+#'
 #' # Load random maps included with package
 #' filelist <- data.frame(
-#'     files = dir(system.file("maps", package = "quickPlot"),
-#'             full.names = TRUE, pattern = "tif"),
-#'     functions = "rasterToMemory", package = "SpaDES.core"
+#'   files = dir(getMapPath(tempdir()), full.names = TRUE),
+#'   functions = "rasterToMemory",
+#'   package = "SpaDES.core"
 #' )
 #' sim1 <- loadFiles(filelist = filelist) # loads all the maps to sim1 simList
 #'
@@ -89,10 +91,9 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' #  at time = 10 and 20 (via "intervals").
 #' # Also, pass the single argument as a list to all functions...
 #' #  specifically, when add "native = TRUE" as an argument to the raster function
-#' files = dir(system.file("maps", package = "quickPlot"),
-#'             full.names = TRUE, pattern = "tif")
-#' arguments = I(rep(list(lyrs = 1), length(files)))
-#' filelist = data.frame(
+#' files <- dir(getMapPath(tempdir()), full.names = TRUE)
+#' arguments <- I(rep(list(lyrs = 1), length(files)))
+#' filelist <- data.frame(
 #'    files = files,
 #'    functions = "terra::rast",
 #'    objectName = NA,
@@ -372,8 +373,9 @@ setMethod("rasterToMemory",
 
 #' Simple wrapper to load any `Raster*` object
 #'
-#' This wraps either `raster::raster`, `raster::stack`, or `raster::brick`,
+#' This wraps either `raster::raster`, `raster::stack`, `raster::brick`, or `terra::rast`,
 #' allowing a single function to be used to create a new object of the same class as a template.
+#' This works for all `Raster*` and `SpatRaster` class templates.
 #'
 #' @param x An object, notably a `Raster*` object. All others will simply
 #'   be passed through with no effect.
@@ -389,32 +391,20 @@ rasterCreate <- function(x, ...) {
 }
 
 #' @describeIn rasterCreate Simply passes through argument with no effect
+#' @export
 rasterCreate.default <- function(x, ...) {
+  if (inherits(x, "Raster")) {
+    if (!requireNamespace("raster")) stop("Please install.packages('raster')")
+    if (inherits(x, "RasterStack")) {
+      x <- raster::stack(x, ...)
+    } else if (inherits(x, "RasterBrick")) {
+      x <- raster::brick(x, ...)
+    } else {
+      x <- raster::raster(x, ...)
+    }
+  } else if (inherits(x, "SpatRaster")) {
+    x <- terra::rast(x, ...)
+  }
   x
 }
 
-#' @describeIn rasterCreate Uses `raster::brick`
-rasterCreate.RasterBrick <- function(x, ...) {
-  raster::brick(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `raster::raster`
-rasterCreate.RasterLayer <- function(x, ...) {
-  raster::raster(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `raster::stack`
-rasterCreate.RasterStack <- function(x, ...) {
-  raster::stack(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `raster::raster` when one of the other,
-#'   less commonly used `Raster*` classes, e.g., `RasterLayerSparse`
-rasterCreate.Raster <- function(x, ...) {
-  raster::raster(x, ...)
-}
-
-#' @describeIn rasterCreate Uses `terra::rast` when a layer is `SpatRast`,
-rasterCreate.SpatRaster <- function(x, ...) {
-  terra::rast(x, ...)
-}

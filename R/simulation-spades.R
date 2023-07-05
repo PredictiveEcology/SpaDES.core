@@ -874,7 +874,7 @@ scheduleConditionalEvent <- function(sim,
 #'                      .plots = NA) # plotting off --> not relevant for example
 #'    ),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#'    paths = list(modulePath = getSampleModules(tempdir()))
 #'   )
 #'   spades(mySim)
 #'
@@ -899,7 +899,7 @@ scheduleConditionalEvent <- function(sim,
 #'        .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
 #'      ),
 #'      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#'      paths = list(modulePath = getSampleModules(tempdir()))
 #'    )
 #'    print(system.time(out <- spades(mySim, cache = TRUE, .plots = NA)))
 #'   }
@@ -921,7 +921,7 @@ scheduleConditionalEvent <- function(sim,
 #'    ),
 #'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
 #'    outputs = data.frame(objectName = "landscape", saveTime = 0:2),
-#'    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#'    paths = list(modulePath = getSampleModules(tempdir()))
 #'   )
 #'   # This will print a message saying that caribouMovement will run its events
 #'   outSomeEvents <- spades(mySim, .plots = NA,

@@ -38,7 +38,7 @@ setMethod(
   signature(sim = "simList", plot = "logical"),
   definition = function(sim, plot) {
     deps <- sim@depends
-    DT <- .depsEdgeListMem(deps, plot)
+    DT <- .depsEdgeList(deps, plot)
     return(DT)
 })
 
@@ -49,7 +49,7 @@ setMethod("depsEdgeList",
             depsEdgeList(sim, plot = FALSE)
 })
 
-
+#' @importFrom data.table as.data.table data.table rbindlist setkeyv setorder
 .depsEdgeList <- function(deps, plot) {
   sim.in <- sim.out <- data.table(objectName = character(0),
                                   objectClass = character(0),
@@ -90,7 +90,6 @@ setMethod("depsEdgeList",
   setorder(DT, "from", "to", "objName")
 }
 
-.depsEdgeListMem <- memoise::memoise(.depsEdgeList)
 
 ################################################################################
 #' Build a module dependency graph

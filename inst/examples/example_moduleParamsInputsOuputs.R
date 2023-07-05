@@ -1,6 +1,6 @@
 \donttest{
 ## easily include these tables in Rmd files using knitr
-path <- system.file("sampleModules", package = "SpaDES.core")
+path <- getSampleModules(tempdir())
 sampleModules <- dir(path)
 
 p <- moduleParams(sampleModules[3], path = path)

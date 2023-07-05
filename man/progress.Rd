@@ -60,7 +60,8 @@ mySim <- simInit(
   .progress = list(type = "text", interval = 10),
   checkpoint = list(interval = 10, file = "chkpnt.RData")),
   modules = list("randomLandscapes"),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
+  paths = list(modulePath = getSampleModules(tempdir()))
+)
 
 # progress bar
 progressType(mySim) # "text"

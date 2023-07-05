@@ -102,7 +102,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #'   modules <- list("randomLandscapes", "caribouMovement")
 #'   paths <- list(
-#'     modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#'     modulePath = getSampleModules(tempdir()),
 #'     outputPath = outputPath
 #'   )
 #'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example

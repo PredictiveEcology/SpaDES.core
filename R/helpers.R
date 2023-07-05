@@ -325,3 +325,31 @@ needInstall <- function(
 
 
 .moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))
+
+#' Get copies of sample files for examples and tests
+#'
+#' @param tmpdir character specifying the path to a temporary directory (e.g., `tempdir()`)
+#'
+#' @return character vector of filepaths to the copied files
+#'
+#' @export
+#' @rdname getSampleFiles
+getMapPath <- function(tmpdir) {
+  mapPath <- system.file("maps", package = "quickPlot")
+  mapPathTmp <- checkPath(file.path(tmpdir, "maps"), create = TRUE)
+  file.copy(dir(mapPath, full.names = TRUE), mapPathTmp)
+  mapPathTmp
+}
+
+#' @export
+#' @rdname getSampleFiles
+getSampleModules <- function(tmpdir) {
+  sampModPath <- system.file("sampleModules", package = "SpaDES.core")
+  sampModPathTmp <- checkPath(file.path(tmpdir, "sampleModules"), create = TRUE)
+  allFiles <- dir(sampModPath, recursive = TRUE, full.names = TRUE)
+  allFilesRel <- dir(sampModPath, recursive = TRUE)
+  allNewFiles <- file.path(sampModPathTmp, allFilesRel)
+  checkPath(unique(dirname(allNewFiles)), create = TRUE)
+  out <- file.copy(allFiles, file.path(sampModPathTmp, allFilesRel))
+  sampModPathTmp
+}

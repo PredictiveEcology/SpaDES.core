@@ -22,7 +22,7 @@ mySim <- simInit(
     fireSpread = list(.plotInitialTime = NA)
   ),
   modules = list("randomLandscapes", "fireSpread"),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths = list(modulePath = getSampleModules(tempdir()))
 )
 
 ## ----spades-------------------------------------------------------------------

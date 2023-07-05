@@ -4,7 +4,7 @@ library("revdepcheck")
 options(repos = c(CRAN = 'https://cloud.r-project.org'))
 
 revdepcheck::revdep_reset()
-revdepcheck::revdep_check(num_workers = getOption("Ncpus", 4), timeout = 30*60) ## 30 mins
+revdepcheck::revdep_check(num_workers = getOption("Ncpus", 8), quiet = FALSE, timeout = 30*60) ## 30 mins
 revdepcheck::revdep_report_cran() ## update cran-comments with this output
 
 ### email maintainers of revdep packages (need to edit: `revdep/email.yml`)

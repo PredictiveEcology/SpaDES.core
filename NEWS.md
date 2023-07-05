@@ -1,5 +1,16 @@
 Known issues: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 
+# SpaDES.core 2.0.0.9000 (development version)
+
+## Enhancements
+* none
+
+## Dependency Changes
+* none
+
+## Bug fixes
+* new helpers for getting copies of sample files (`getSampleModules()` and `getMapPath()` ) now used throughout examples, vignettes, and tests to avoid writing files in package installation directories.
+
 # SpaDES.core 2.0.0
 
 ## Enhancements

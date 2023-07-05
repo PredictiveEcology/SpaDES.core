@@ -6,7 +6,6 @@
 sim <- simInit()
 
 test <- 1:10
-library(reproducible) # for checkPath
 tmpdir <- file.path(tempdir(), "inputs") |> checkPath(create = TRUE)
 tmpFile <- file.path(tmpdir, "test.rds")
 saveRDS(test, file = tmpFile)
@@ -17,8 +16,7 @@ inputs(simOut) # confirm it was loaded
 simOut$test
 
 # can put data.frame for inputs directly inside simInit call
-allTifs <- dir(system.file("maps", package = "quickPlot"),
-               full.names = TRUE, pattern = "tif")
+allTifs <- dir(getMapPath(tempdir()), full.names = TRUE)
 
 # next: .objectNames are taken from the filenames (without the extension)
 # This will load all 5 tifs in the SpaDES sample directory, using
@@ -34,8 +32,8 @@ sim <- simInit(
 
 ##############################
 #A fully described inputs object, including arguments:
-files <- dir(system.file("maps", package = "quickPlot"),
-             full.names = TRUE, pattern = "tif")
+files <- dir(getMapPath(tempdir()), full.names = TRUE)
+
 # arguments must be a list of lists. This may require I() to keep it as a list
 #   once it gets coerced into the data.frame.
 # arguments = I(rep(list(native = TRUE), length(files)))

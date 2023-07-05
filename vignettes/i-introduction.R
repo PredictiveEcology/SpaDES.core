@@ -37,7 +37,7 @@ options("spades.moduleCodeChecks" = FALSE,
 #        .plotInitialTime = 0, .plotInterval = 10
 #      )
 #    ),
-#    path = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#    path = list(modulePath = getSampleModules(tempdir()))
 #  ))
 #  spades(demoSim)
 

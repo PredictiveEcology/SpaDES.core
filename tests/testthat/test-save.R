@@ -274,7 +274,6 @@ test_that("saveSimList with file backed objs", {
   mapPath <- getMapPath(tmpdir)
   modules <- getSampleModules(tmpdir)
 
-
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
   inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
 
