@@ -36,6 +36,7 @@ Imports:
     data.table (>= 1.11.0),
     igraph (>= 1.0.1),
     lobstr,
+    memoise,
     methods,
     qs (>= 0.21.1),
     Require (>= 0.3.1),
