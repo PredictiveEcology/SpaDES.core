@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.1</span>
       </span>
     </div>
 
@@ -158,11 +158,11 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp7PF6uB/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp7PF6uB/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp7PF6uB/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp7PF6uB/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp7PF6uB/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpIGyWBD/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpIGyWBD/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpIGyWBD/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpIGyWBD/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpIGyWBD/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">scheduleEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span>, <span class="st">"fireSpread"</span>, <span class="st">"burn"</span><span class="op">)</span> <span class="co"># default priority</span></span></span>
