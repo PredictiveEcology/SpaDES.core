@@ -27,7 +27,7 @@ create the other files."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0.9000</span>
       </span>
     </div>
 
@@ -185,10 +185,10 @@ A message with the correct lines to copy and paste is provided.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
-<span class="r-in"><span>  <span class="va">tmpdir</span> <span class="op">&lt;-</span> <span class="fu">tempdir2</span><span class="op">(</span><span class="st">"exampleNewModule"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">tmpdir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/tempdir2.html" class="external-link">tempdir2</a></span><span class="op">(</span><span class="st">"exampleNewModule"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="co">## create a "myModule" module in the "modules" subdirectory.</span></span></span>
 <span class="r-in"><span>  <span class="fu">newModule</span><span class="op">(</span><span class="st">"myModule"</span>, <span class="va">tmpdir</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpCXaugC/reproducible/exampleNewModule</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp7PF6uB/reproducible/exampleNewModule</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in </span><span style="color: #BBBB00;">myModule.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in </span><span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in </span><span style="color: #BBBB00;">myModule.Rmd</span></span>
@@ -197,7 +197,7 @@ A message with the correct lines to copy and paste is provided.</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">## create a new parent module in the "modules" subdirectory.</span></span></span>
 <span class="r-in"><span>  <span class="fu">newModule</span><span class="op">(</span><span class="st">"myParentModule"</span>, <span class="va">tmpdir</span>, type <span class="op">=</span> <span class="st">"parent"</span>, children <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"child1"</span>, <span class="st">"child2"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myParentModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpCXaugC/reproducible/exampleNewModule</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myParentModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp7PF6uB/reproducible/exampleNewModule</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in </span><span style="color: #BBBB00;">myParentModule.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in </span><span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in </span><span style="color: #BBBB00;">myParentModule.Rmd</span></span>

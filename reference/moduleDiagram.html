@@ -25,7 +25,7 @@ plotting the depsEdgeList directly with objectDiagram()."><!-- mathjax --><scrip
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0.9000</span>
       </span>
     </div>
 
@@ -150,13 +150,13 @@ parent and children module structure.</p></div>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">modules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"caribouMovement"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  modulePath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  modulePath <span class="op">=</span> <span class="fu"><a href="getSampleFiles.html">getSampleModules</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Set some options so example runs faster</span></span></span>
 <span class="r-in"><span><span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>spades.moduleCodeChecks <span class="op">=</span> <span class="cn">FALSE</span>, spades.loadReqdPkgs <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>times <span class="op">=</span> <span class="va">times</span>, params <span class="op">=</span> <span class="va">parameters</span>, modules <span class="op">=</span> <span class="va">modules</span>,</span></span>
-<span class="r-in"><span>                 paths <span class="op">=</span> <span class="va">paths</span><span class="op">)</span></span></span>
+<span class="r-in"><span>               paths <span class="op">=</span> <span class="va">paths</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">opts</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">moduleDiagram</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># Can also use default base::plot</span></span></span>
@@ -172,7 +172,6 @@ parent and children module structure.</p></div>
 <span class="r-in"><span><span class="va">edgeList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">edgeList</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">ig</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://r.igraph.org/reference/graph_from_data_frame.html" class="external-link">graph_from_data_frame</a></span><span class="op">(</span><span class="va">edgeList</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">from</span>, <span class="va">to</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">ig</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Attaching package: ‘igraph’</span>
@@ -190,18 +189,18 @@ parent and children module structure.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     union</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp7PF6uB/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpCXaugC/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpCXaugC/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpCXaugC/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpCXaugC/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpCXaugC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp7PF6uB/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp7PF6uB/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp7PF6uB/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp7PF6uB/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp7PF6uB/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp7PF6uB/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpCXaugC/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmp7PF6uB/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>

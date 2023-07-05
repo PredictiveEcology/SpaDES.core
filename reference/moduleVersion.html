@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0.9000</span>
       </span>
     </div>
 
@@ -133,7 +133,7 @@ parsing again. If the <code>envir</code> is transient, then this will have no ef
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># using filepath</span></span></span>
-<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"sampleModules"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">path</span> <span class="op">&lt;-</span> <span class="fu"><a href="getSampleFiles.html">getSampleModules</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">moduleVersion</span><span class="op">(</span><span class="st">"caribouMovement"</span>, <span class="va">path</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘1.6.1’</span>
 <span class="r-in"><span></span></span>
@@ -152,18 +152,18 @@ parsing again. If the <code>envir</code> is transient, then this will have no ef
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp7PF6uB/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpCXaugC/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpCXaugC/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpCXaugC/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpCXaugC/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/home/runner/work/_temp/Library/SpaDES.core/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpCXaugC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp7PF6uB/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp7PF6uB/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp7PF6uB/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp7PF6uB/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp7PF6uB/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp7PF6uB/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpCXaugC/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmp7PF6uB/SpaDES/scratch/terra'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">caribouMovement: module code: landscape, caribou are declared in metadata inputObjects, but no default(s) are provided in .inputObjects</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">caribouMovement: module code: landscape is declared in metadata inputObjects, but is not used in the module</span></span>
@@ -172,7 +172,7 @@ parsing again. If the <code>envir</code> is transient, then this will have no ef
 <span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>             module    global</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> 1: caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:29 simInit:       Global parameter(s) not used in any module: burnStats.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:45 simInit:       Global parameter(s) not used in any module: burnStats.</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] ‘1.6.1’</span>
 </code></pre></div>
     </div>

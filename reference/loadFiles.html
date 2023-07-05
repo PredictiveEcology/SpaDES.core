@@ -35,7 +35,7 @@ package: the package from which to load fun.
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.0.9000</span>
       </span>
     </div>
 
@@ -160,36 +160,37 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Load random maps included with package</span></span></span>
 <span class="r-in"><span><span class="va">filelist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"maps"</span>, package <span class="op">=</span> <span class="st">"quickPlot"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>            full.names <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">"tif"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    functions <span class="op">=</span> <span class="st">"rasterToMemory"</span>, package <span class="op">=</span> <span class="st">"SpaDES.core"</span></span></span>
+<span class="r-in"><span>  files <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="fu"><a href="getSampleFiles.html">getMapPath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  functions <span class="op">=</span> <span class="st">"rasterToMemory"</span>,</span></span>
+<span class="r-in"><span>  package <span class="op">=</span> <span class="st">"SpaDES.core"</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># loads all the maps to sim1 simList</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpCXaugC/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpCXaugC/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpCXaugC/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpCXaugC/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpCXaugC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp7PF6uB/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp7PF6uB/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp7PF6uB/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp7PF6uB/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp7PF6uB/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       DEM read from /home/runner/work/_temp/Library/quickPlot/maps/DEM.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       forestAge read from /home/runner/work/_temp/Library/quickPlot/maps/forestAge.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       forestCover read from /home/runner/work/_temp/Library/quickPlot/maps/forestCover.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       habitatQuality read from /home/runner/work/_temp/Library/quickPlot/maps/habitatQuality.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       percentPine read from /home/runner/work/_temp/Library/quickPlot/maps/percentPine.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       DEM read from /tmp/Rtmp7PF6uB/maps/DEM.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       forestAge read from /tmp/Rtmp7PF6uB/maps/forestAge.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       forestCover read from /tmp/Rtmp7PF6uB/maps/forestCover.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       habitatQuality read from /tmp/Rtmp7PF6uB/maps/habitatQuality.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       percentPine read from /tmp/Rtmp7PF6uB/maps/percentPine.tif using rasterToMemory</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded</span></span></span>
 <span class="r-in"><span><span class="co">#  at time = 10 and 20 (via "intervals").</span></span></span>
 <span class="r-in"><span><span class="co"># Also, pass the single argument as a list to all functions...</span></span></span>
 <span class="r-in"><span><span class="co">#  specifically, when add "native = TRUE" as an argument to the raster function</span></span></span>
-<span class="r-in"><span><span class="va">files</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"maps"</span>, package <span class="op">=</span> <span class="st">"quickPlot"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>            full.names <span class="op">=</span> <span class="cn">TRUE</span>, pattern <span class="op">=</span> <span class="st">"tif"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">arguments</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lyrs <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">filelist</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span><span class="va">files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="fu"><a href="getSampleFiles.html">getMapPath</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">arguments</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/AsIs.html" class="external-link">I</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>lyrs <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">files</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">filelist</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>   files <span class="op">=</span> <span class="va">files</span>,</span></span>
 <span class="r-in"><span>   functions <span class="op">=</span> <span class="st">"terra::rast"</span>,</span></span>
 <span class="r-in"><span>   objectName <span class="op">=</span> <span class="cn">NA</span>,</span></span>
@@ -201,27 +202,27 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># only does the time = 0 loading; see next</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpCXaugC/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpCXaugC/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpCXaugC/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpCXaugC/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpCXaugC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp7PF6uB/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp7PF6uB/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp7PF6uB/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp7PF6uB/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp7PF6uB/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       DEM read from /home/runner/work/_temp/Library/quickPlot/maps/DEM.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       forestAge read from /home/runner/work/_temp/Library/quickPlot/maps/forestAge.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       forestCover read from /home/runner/work/_temp/Library/quickPlot/maps/forestCover.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:16 simInit:       habitatQuality read from /home/runner/work/_temp/Library/quickPlot/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 simInit:       percentPine read from /home/runner/work/_temp/Library/quickPlot/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       DEM read from /tmp/Rtmp7PF6uB/maps/DEM.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       forestAge read from /tmp/Rtmp7PF6uB/maps/forestAge.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       forestCover read from /tmp/Rtmp7PF6uB/maps/forestCover.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       habitatQuality read from /tmp/Rtmp7PF6uB/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:40 simInit:       percentPine read from /tmp/Rtmp7PF6uB/maps/percentPine.tif using rast(inMemory=FALSE)</span>
 <span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="co"># loads the object at time 10</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 chckpn <span style="color: #00BB00;"> total elpsd: 0.0011 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 save   <span style="color: #00BB00;"> total elpsd: 0.003 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 prgrss <span style="color: #00BB00;"> total elpsd: 0.005 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 load   <span style="color: #00BB00;"> total elpsd: 0.0068 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 load   <span style="color: #00BB00;"> total elpsd: 0.0085 secs | 10 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 load   percentPine read from /home/runner/work/_temp/Library/quickPlot/maps/percentPine.tif using rast(inMemory=FALSE)   at time 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 chckpn <span style="color: #00BB00;"> total elpsd: 0.00082 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 save   <span style="color: #00BB00;"> total elpsd: 0.0023 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 prgrss <span style="color: #00BB00;"> total elpsd: 0.0039 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 load   <span style="color: #00BB00;"> total elpsd: 0.0053 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 load   <span style="color: #00BB00;"> total elpsd: 0.0066 secs | 10 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 load   percentPine read from /tmp/Rtmp7PF6uB/maps/percentPine.tif using rast(inMemory=FALSE)   at time 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -231,9 +232,9 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="co">#  interval = 10</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="co"># loads the percentPine map 2 more times, once at 10, once at 20</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 load   <span style="color: #00BB00;"> total elpsd: 0.034 secs | 20 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 00:06:17 load   percentPine read from /home/runner/work/_temp/Library/quickPlot/maps/percentPine.tif using rast(inMemory=FALSE)   at time 20</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 load   <span style="color: #00BB00;"> total elpsd: 0.026 secs | 20 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:12:41 load   percentPine read from /tmp/Rtmp7PF6uB/maps/percentPine.tif using rast(inMemory=FALSE)   at time 20</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
