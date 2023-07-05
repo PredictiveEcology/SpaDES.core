@@ -90,7 +90,6 @@ setMethod("depsEdgeList",
   setorder(DT, "from", "to", "objName")
 }
 
-#' @importFrom memoise memoise
 .depsEdgeListMem <- memoise::memoise(.depsEdgeList)
 
 ################################################################################
