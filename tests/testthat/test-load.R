@@ -337,8 +337,7 @@ test_that("more tests", {
 
   # Test for incremental loading via intervals
 
-    files <- dir(getMapPath(tmpdir),
-                full.names = TRUE, pattern = "tif")
+    files <- dir(getMapPath(tmpdir), full.names = TRUE)
     arguments <- I(rep(list(native = TRUE), length(files)))
     filelist <- data.frame(
        files = files,
@@ -417,7 +416,7 @@ test_that("Filenames for simList", {
   testInit(c("terra"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),
                           opts = list("reproducible.ask" = FALSE))
 
-  mapPath <- mapPath <- getMapPath(tmpdir)
+  mapPath <- getMapPath(tmpdir)
 
   s <- simInit()
   packages <- c("raster", "terra")

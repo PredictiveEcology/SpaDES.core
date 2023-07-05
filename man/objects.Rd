@@ -63,7 +63,7 @@ the simulation environment.
 }
 \examples{
 # findObjects
-path <- system.file("sampleModules", package = "SpaDES.core")
+path <- getSampleModules(tempdir())
 findObjects(path = path, module = dir(path), objects = "caribou")
 }
 \seealso{

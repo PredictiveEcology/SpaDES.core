@@ -282,7 +282,7 @@ mySim <- simInit(
    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
  ),
  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
- paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+ paths = list(modulePath = getSampleModules(tempdir()))
 )
 spades(mySim) # shows plotting
 
@@ -294,7 +294,7 @@ mySim <- simInit(
    fireSpread = list(.plotInitialTime = NA)
  ),
  modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
- paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+ paths = list(modulePath = getSampleModules(tempdir()))
 )
 outSim <- spades(mySim)
 
@@ -306,7 +306,7 @@ mySim <- simInit(
     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
   ),
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+  paths = list(modulePath = getSampleModules(tempdir()),
                outputPath = tempdir()),
   inputs = data.frame(
     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
@@ -328,7 +328,7 @@ mySim <- simInit(
      randomLandscapes = list(nx = 10, ny = 10)
      ),
    paths = list(
-     modulePath = system.file("sampleModules", package = "SpaDES.core"),
+     modulePath = getSampleModules(tempdir()),
      outputPath = tempdir()
    )
  )
@@ -353,7 +353,7 @@ mySim <- simInit(
      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
    ),
    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+   paths = list(modulePath = getSampleModules(tempdir()),
                 outputPath = tempdir()),
    inputs = data.frame(
      files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],

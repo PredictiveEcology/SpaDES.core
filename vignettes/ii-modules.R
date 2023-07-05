@@ -38,7 +38,7 @@ parameters <- list(
 )
 modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
 objects <- list()
-paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+paths <- list(modulePath = getSampleModules(tempdir()),
               outputPath = outputDir)
 
 mySim <- simInit(times = times, params = parameters, modules = modules,
@@ -96,7 +96,7 @@ mySim <- simInitAndSpades(
   params = parameters,
   modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
   objects = list(),
-  paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths = list(modulePath = getSampleModules(tempdir()))
 )
 dev.off()
 unlink(normalizePath(ftmp))
@@ -139,7 +139,7 @@ parameters <- list(
   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
 )
 modules <- list("SpaDES_sampleModules")
-paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+paths <- list(modulePath = getSampleModules(tempdir()))
 
 mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths)
 
@@ -163,7 +163,7 @@ parameters <- list(
 )
 modules <- list("randomLandscapes", "caribouMovement")
 paths <- list(
-  modulePath = system.file("sampleModules", package = "SpaDES.core")
+  modulePath = getSampleModules(tempdir())
 )
 
 mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths)
@@ -178,7 +178,7 @@ mySim <- simInit(times = list(start = 0.0, end = 10.0),
                  params = list(.globals = list(stackName = "landscape"),
                                .progress = list(type = "text", interval = 1)),
                  modules = list("randomLandscapes"),
-                 paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
+                 paths = list(modulePath = getSampleModules(tempdir())))
 
 # retrieve the checkpoint params from the simulation object
 progressType(mySim)
@@ -196,7 +196,7 @@ mySim <- simInit(times = list(start = 0, end = 5),
                      .savePath = file.path(outputDir, "randomLandscapes"))
                    ),
                  modules = list("randomLandscapes"),
-                 paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+                 paths = list(modulePath = getSampleModules(tempdir()),
                               outputPath = outputDir),
                  outputs = data.frame(objectName = "landscape")
 )
@@ -239,7 +239,7 @@ unlink(normalizePath(ftmp))
 #                     randomLandscapes = list(.plotInitialTime = 0, .plotInterval = 1)
 #                   ),
 #                   modules = list("randomLandscapes"),
-#                   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#                   paths = list(modulePath = getSampleModules(tempdir()))
 #  )
 #  
 #  # retrieve the plotting params from the simulation object
@@ -254,7 +254,7 @@ unlink(normalizePath(ftmp))
 #  mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "save")
 
 ## ----caribouMovement, echo=TRUE, eval=FALSE-----------------------------------
-#  openModules(system.file("sampleModules", package = "SpaDES.core"), "moduleName")
+#  openModules(getSampleModules(tempdir()), "moduleName")
 
 ## ----download-module, echo=TRUE, eval=FALSE-----------------------------------
 #  downloadModule("moduleName")
@@ -287,7 +287,7 @@ unlink(normalizePath(ftmp))
 #  modules <- list("SpaDES_sampleModules")
 #  objects <- list()
 #  paths <- list(
-#    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+#    modulePath = getSampleModules(tempdir()),
 #    outputPath = outputDir
 #  )
 #  

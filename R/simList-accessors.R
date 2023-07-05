@@ -713,7 +713,7 @@ setReplaceMethod("G",
 #'     requireNamespace("SpaDES.tools", quietly = TRUE)) {
 #'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 #'   modules <- list("randomLandscapes")
-#'   paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#'   paths <- list(modulePath = getSampleModules(tempdir()))
 #'   mySim <- simInit(modules = modules, paths = paths,
 #'                    params = list(.globals = list(stackName = "landscape")))
 #'
@@ -878,7 +878,8 @@ setReplaceMethod("checkpointInterval",
 #'   .progress = list(type = "text", interval = 10),
 #'   checkpoint = list(interval = 10, file = "chkpnt.RData")),
 #'   modules = list("randomLandscapes"),
-#'   paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core")))
+#'   paths = list(modulePath = getSampleModules(tempdir()))
+#' )
 #'
 #' # progress bar
 #' progressType(mySim) # "text"
@@ -3096,7 +3097,7 @@ setMethod("outputObjectNames",
 #' @examples
 #' \donttest{
 #' # set modulePath
-#' setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+#' setPaths(modulePath = getSampleModules(tempdir()))
 #' # use Require and reqdPkgs
 #' pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
 #' }
@@ -3368,7 +3369,7 @@ moduleObjects <- function(sim, module, path) {
 #' @importFrom data.table set rbindlist
 #' @examples
 #' # findObjects
-#' path <- system.file("sampleModules", package = "SpaDES.core")
+#' path <- getSampleModules(tempdir())
 #' findObjects(path = path, module = dir(path), objects = "caribou")
 findObjects <- function(objects, sim, module, path) {
   mo <- moduleObjects(sim, module, path)

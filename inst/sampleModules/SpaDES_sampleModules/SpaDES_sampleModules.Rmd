@@ -30,7 +30,7 @@ parameters <- list(
 )
 modules <- list("SpaDES_sampleModules")
 objects <- list()
-paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+paths <- list(modulePath = getSampleModules(tempdir()),
               outputPath = outputDir)
 
 mySim <- simInit(times = times, params = parameters, modules = modules,

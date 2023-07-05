@@ -36,7 +36,7 @@ Parse and extract a module's version
 }
 \examples{
 # using filepath
-path <- system.file("sampleModules", package = "SpaDES.core")
+path <- getSampleModules(tempdir())
 moduleVersion("caribouMovement", path)
 
 # using simList

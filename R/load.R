@@ -77,11 +77,13 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #'
 #' @examples
 #' \donttest{
+#' library(SpaDES.core)
+#'
 #' # Load random maps included with package
 #' filelist <- data.frame(
-#'     files = dir(system.file("maps", package = "quickPlot"),
-#'             full.names = TRUE, pattern = "tif"),
-#'     functions = "rasterToMemory", package = "SpaDES.core"
+#'   files = dir(getMapPath(tempdir()), full.names = TRUE),
+#'   functions = "rasterToMemory",
+#'   package = "SpaDES.core"
 #' )
 #' sim1 <- loadFiles(filelist = filelist) # loads all the maps to sim1 simList
 #'
@@ -89,10 +91,9 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' #  at time = 10 and 20 (via "intervals").
 #' # Also, pass the single argument as a list to all functions...
 #' #  specifically, when add "native = TRUE" as an argument to the raster function
-#' files = dir(system.file("maps", package = "quickPlot"),
-#'             full.names = TRUE, pattern = "tif")
-#' arguments = I(rep(list(lyrs = 1), length(files)))
-#' filelist = data.frame(
+#' files <- dir(getMapPath(tempdir()), full.names = TRUE)
+#' arguments <- I(rep(list(lyrs = 1), length(files)))
+#' filelist <- data.frame(
 #'    files = files,
 #'    functions = "terra::rast",
 #'    objectName = NA,

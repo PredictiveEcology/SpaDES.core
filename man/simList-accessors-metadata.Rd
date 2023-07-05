@@ -68,7 +68,7 @@ in a \code{simList} if not specified.
 \examples{
 \donttest{
 # set modulePath
-setPaths(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+setPaths(modulePath = getSampleModules(tempdir()))
 # use Require and reqdPkgs
 pkgs <- reqdPkgs(module = c("caribouMovement", "randomLandscapes", "fireSpread"))
 }

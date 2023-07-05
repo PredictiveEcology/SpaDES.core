@@ -76,7 +76,7 @@ if (requireNamespace("NLMR", quietly = TRUE) &&
     requireNamespace("SpaDES.tools", quietly = TRUE)) {
   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
   modules <- list("randomLandscapes")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tempdir()))
   mySim <- simInit(modules = modules, paths = paths,
                    params = list(.globals = list(stackName = "landscape")))
 

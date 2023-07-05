@@ -311,13 +311,13 @@ setMethod(
 #'
 #' modules <- list("randomLandscapes", "caribouMovement")
 #' paths <- list(
-#'   modulePath = system.file("sampleModules", package = "SpaDES.core")
+#'   modulePath = getSampleModules(tempdir())
 #' )
 #'
 #' # Set some options so example runs faster
 #' opts <- options(spades.moduleCodeChecks = FALSE, spades.loadReqdPkgs = FALSE)
 #' sim <- simInit(times = times, params = parameters, modules = modules,
-#'                  paths = paths)
+#'                paths = paths)
 #' options(opts)
 #' moduleDiagram(sim)
 #' # Can also use default base::plot
@@ -333,7 +333,6 @@ setMethod(
 #' edgeList <- unique(edgeList)
 #' ig <- graph_from_data_frame(edgeList[, list(from, to)])
 #' plot(ig)
-#'
 #' }
 #' }
 #'
