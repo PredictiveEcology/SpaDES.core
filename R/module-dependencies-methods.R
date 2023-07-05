@@ -49,7 +49,7 @@ setMethod("depsEdgeList",
             depsEdgeList(sim, plot = FALSE)
 })
 
-
+#' @importFrom data.table as.data.table data.table rbindlist setkeyv setorder
 .depsEdgeList <- function(deps, plot) {
   sim.in <- sim.out <- data.table(objectName = character(0),
                                   objectClass = character(0),
