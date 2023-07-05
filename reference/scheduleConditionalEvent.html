@@ -178,11 +178,11 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpnzk5qk/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpnzk5qk/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpnzk5qk/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpnzk5qk/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpnzk5qk/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp5BUHM8/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp5BUHM8/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp5BUHM8/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp5BUHM8/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp5BUHM8/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-in"><span>  <span class="va">condition</span> <span class="op">&lt;-</span> <span class="st">"sim$age &gt; 1"</span> <span class="co"># provide as string</span></span></span>
@@ -193,11 +193,11 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
 <span class="r-out co"><span class="r-pr">#&gt;</span>      condition minEventTime maxEventTime moduleName eventType eventPriority</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1: sim$age &gt; 1            0            2 firemodule      burn             5</span>
 <span class="r-in"><span>  <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># no changes to sim$age, i.e., it is absent</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:51:50       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:51:50 chckpn <span style="color: #00BB00;"> total elpsd: 0.0011 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:51:50 save   <span style="color: #00BB00;"> total elpsd: 0.0031 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:51:50 prgrss <span style="color: #00BB00;"> total elpsd: 0.005 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:51:50 load   <span style="color: #00BB00;"> total elpsd: 0.0069 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 16:19:14       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 16:19:14 chckpn <span style="color: #00BB00;"> total elpsd: 0.00088 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 16:19:14 save   <span style="color: #00BB00;"> total elpsd: 0.0025 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 16:19:14 prgrss <span style="color: #00BB00;"> total elpsd: 0.0041 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 16:19:14 load   <span style="color: #00BB00;"> total elpsd: 0.0055 secs | 0 load init 0</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -205,8 +205,8 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
 <span class="r-out co"><span class="r-pr">#&gt;</span> Null data.table (0 rows and 0 cols)</span>
 <span class="r-in"><span>  <span class="va">sim</span><span class="op">$</span><span class="va">age</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="co"># change the value</span></span></span>
 <span class="r-in"><span>  <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># Run spades, the condition is now true, so event is</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:51:50       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 15:51:50        Conditional Event -- sim$age &gt; 1 is true. Scheduling for now</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 16:19:14       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul05 16:19:14        Conditional Event -- sim$age &gt; 1 is true. Scheduling for now</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
