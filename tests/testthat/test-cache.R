@@ -6,7 +6,7 @@ test_that("test event-level cache & memory leaks", {
                        spades.memoryUseInterval = NULL))
   opts <- options("reproducible.cachePath" = tmpdir)
 
-  modPath <- system.file("sampleModules", package = "SpaDES.core")
+  modPath <- getSampleModules(tmpdir)
 
   mods <- c("caribouMovement", "randomLandscapes", "fireSpread")
   pkgs <- reqdPkgs(module = mods, modulePath = modPath)
@@ -176,7 +176,7 @@ test_that("test module-level cache", {
       randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE)
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    paths = list(modulePath = getSampleModules(tmpdir),
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     # Save final state of landscape and caribou
@@ -227,7 +227,8 @@ test_that("test .prepareOutput", {
   opts <- options("reproducible.cachePath" = tmpdir)
 
   times <- list(start = 0.0, end = 1, timeunit = "year")
-  mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- getMapPath(tmpdir)
+
   filelist <- data.frame(
     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[-3],
     stringsAsFactors = FALSE
@@ -245,7 +246,7 @@ test_that("test .prepareOutput", {
       caribouMovement = list(.plotInitialTime = NA)
     ),
     modules = list("fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    paths = list(modulePath = getSampleModules(tmpdir),
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     objects = c("landscape")
@@ -568,7 +569,7 @@ test_that("test showSimilar", {
     times = list(start = 0.0, end = 1.0, timeunit = "year"),
     param = params,
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-    paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    paths = list(modulePath = getSampleModules(tmpdir),
                  outputPath = tmpdir,
                  cachePath = tmpdir),
     # Save final state of landscape and caribou

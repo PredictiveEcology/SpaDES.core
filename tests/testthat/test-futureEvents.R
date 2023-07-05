@@ -5,7 +5,7 @@ test_that("test spades.futureEvents", {
            opts = list("reproducible.useMemoise" = FALSE,
                        "spades.futureEvents" = TRUE))
   # tmpdir <- tempdir2(.rndstr())
-  modPath <- system.file("sampleModules", package = "SpaDES.core")
+  modPath <- getSampleModules(tmpdir)
   origFiles <- dir(modPath, full.names = TRUE, recursive = TRUE)
   tmpFiles <- file.path(tmpdir, dir(modPath, recursive = TRUE))
   checkPath(unique(dirname(tmpFiles)), create = TRUE)

@@ -33,7 +33,7 @@ test_that("saving files (and memoryUse)", {
 
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modulePath = getSampleModules(tmpdir),
     outputPath = tmpdir
   )
 
@@ -161,8 +161,8 @@ test_that("saveSimList does not work correctly", {
            opts = list(reproducible.verbose = 0))
   unlink(tmpfile[5])
   unlink(tmpfile[6])
-  mapPath <- system.file("maps", package = "quickPlot")
-  modules <- system.file("sampleModules", package = "SpaDES.core")
+  mapPath <- getMapPath(tmpdir)
+  modules <- getSampleModules(tmpdir)
 
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
@@ -271,8 +271,8 @@ test_that("saveSimList does not work correctly", {
 test_that("saveSimList with file backed objs", {
   testInit(sampleModReqdPkgs,
            tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
-  mapPath <- system.file("maps", package = "quickPlot")
-  modules <- system.file("sampleModules", package = "SpaDES.core")
+  mapPath <- getMapPath(tmpdir)
+  modules <- getSampleModules(tmpdir)
 
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
@@ -295,7 +295,7 @@ test_that("saveSimList with file backed objs", {
     inputPath = inputPath,
     outputPath = tmpdir
   )
-  # mapPath <- system.file("maps", package = "quickPlot")
+  # mapPath <- getMapPath(tmpdir)
   #
   # times <- list(start = 0, end = 1)
   # parameters <- list(
@@ -305,7 +305,7 @@ test_that("saveSimList with file backed objs", {
   # )
   # modules <- list("randomLandscapes", "caribouMovement")
   # paths <- list(
-  #   modulePath = system.file("sampleModules", package = "SpaDES.core"),
+  #   modulePath = getSampleModules(tmpdir),
   #   inputPath = mapPath,
   #   outputPath = tmpdir
   # )
@@ -350,7 +350,7 @@ test_that("restart does not work correctly", {
   testNum = 3
   if (testNum == 1) {
     interval = 1
-    mapPath <- system.file("maps", package = "quickPlot")
+    mapPath <- getMapPath(tmpdir)
 
     times <- list(start = 0, end = 1)
     parameters <- list(
@@ -360,7 +360,7 @@ test_that("restart does not work correctly", {
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
-      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      modulePath = getSampleModules(tmpdir),
       inputPath = mapPath,
       outputPath = tmpdir
     )
@@ -382,7 +382,7 @@ test_that("restart does not work correctly", {
         randomLandscapes = list(.plotInitialTime = NA)
       ),
       modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-      paths = list(modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      paths = list(modulePath = getSampleModules(tmpdir),
                    outputPath = file.path("~", "outputs"),
                    cachePath = tmpdir),
       # Save final state of landscape and caribou
@@ -393,7 +393,7 @@ test_that("restart does not work correctly", {
     mySim <- spades(mySim, debug = 1)
   } else if (testNum == 3) {
     interval = 1
-    mapPath <- system.file("maps", package = "quickPlot")
+    mapPath <- getMapPath(tmpdir)
 
     times <- list(start = 0, end = 1)
     parameters <- list(
@@ -403,7 +403,7 @@ test_that("restart does not work correctly", {
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
-      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      modulePath = getSampleModules(tmpdir),
       inputPath = mapPath,
       outputPath = tmpdir
     )
@@ -437,7 +437,7 @@ test_that("restart with logging", {
   tmpdir <- "~"
   testNum = 3
     interval = 1
-    mapPath <- system.file("maps", package = "quickPlot")
+    mapPath <- getMapPath(tmpdir)
 
     times <- list(start = 0, end = 1)
     parameters <- list(
@@ -447,7 +447,7 @@ test_that("restart with logging", {
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
-      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      modulePath = getSampleModules(tmpdir),
       inputPath = mapPath,
       outputPath = tmpdir
     )

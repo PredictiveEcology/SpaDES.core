@@ -21,7 +21,7 @@ test_that("test objectSynonyms", {
     randomLandscapes = list(inRAM = TRUE, nx = 15, ny = 15)
   )
   modules <- list("randomLandscapes", "caribouMovement")
-  paths <- list(modulePath = system.file("sampleModules", package = "SpaDES.core"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
 
   sim <- simInit(times, params, modules, objects = list(), paths)
   sim <- objectSynonyms(sim, list(c("caribou", "caribouObj")))

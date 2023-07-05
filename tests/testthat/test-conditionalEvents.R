@@ -6,7 +6,7 @@ test_that("simulation runs with simInit and spades", {
 
   set.seed(42)
 
-  sysFiles <- system.file("sampleModules", package = "SpaDES.core")
+  sysFiles <- getSampleModules(tmpdir)
   modules <- list("randomLandscapes", "caribouMovement")
   files <- dir(sysFiles, recursive = TRUE, full.names = TRUE)
   rootPth1 <- file.path(tmpdir, modules[[1]]) %>%

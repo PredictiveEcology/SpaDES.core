@@ -344,3 +344,22 @@ runTestsWithTimings <- function(pkgPath = ".",
   data.table::setorderv(gg, c("skipOnCRAN", "elapsed"), order = c(1L, -1L))
   gg[]
 }
+
+
+getMapPath <- function(tmpdir) {
+  mapPath <- system.file("maps", package = "quickPlot")
+  mapPathTmp <- checkPath(file.path(tmpdir, "maps"), create = TRUE)
+  file.copy(dir(mapPath, full.names = TRUE), mapPathTmp)
+  mapPathTmp
+}
+
+getSampleModules <- function(tmpdir) {
+  sampModPath <- system.file("sampleModules", package = "SpaDES.core")
+  sampModPathTmp <- checkPath(file.path(tmpdir, "sampleModules"), create = TRUE)
+  allFiles <- dir(sampModPath, recursive = TRUE, full.names = TRUE)
+  allFilesRel <- dir(sampModPath, recursive = TRUE)
+  allNewFiles <- file.path(sampModPathTmp, allFilesRel)
+  checkPath(unique(dirname(allNewFiles)), create = TRUE)
+  out <- file.copy(allFiles, file.path(sampModPathTmp, allFilesRel))
+  sampModPathTmp
+}

@@ -1,7 +1,7 @@
 test_that("loading inputs does not work correctly", {
   testInit(c(sampleModReqdPkgs, "quickPlot"))
 
-  mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- getMapPath(tmpdir)
 
   functions <- c("raster", "rast")
   packages <- c("raster", "terra")
@@ -21,7 +21,7 @@ test_that("loading inputs does not work correctly", {
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
-      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      modulePath = getSampleModules(tmpdir),
       inputPath = mapPath,
       outputPath = tmpdir
     )
@@ -72,7 +72,7 @@ test_that("loading inputs does not work correctly", {
     sim1 <- loadFiles(
       filelist = filelist,
       paths = list(
-        modulePath = system.file("sampleModules", package = "SpaDES.core"),
+        modulePath = getSampleModules(tmpdir),
         inputPath = mapPath,
         outputPath = file.path(tmpdir, rndstr()))
     )
@@ -120,7 +120,7 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
   #  at time = 10 and 20 (via "intervals").
   # Also, pass the single argument as a list to all functions...
   #  specifically, when add "native = TRUE" as an argument to the raster function
-  mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- getMapPath(tmpdir)
   files <- dir(file.path(mapPath), full.names = TRUE, pattern =  "tif")[1:4]
   parameters <- list(
     .globals = list(stackName = "landscape"),
@@ -129,7 +129,7 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
-    modulePath = system.file("sampleModules", package = "SpaDES.core"),
+    modulePath = getSampleModules(tmpdir),
     inputPath = mapPath,
     outputPath = tmpdir
   )
@@ -204,7 +204,7 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
 test_that("passing objects to simInit does not work correctly", {
   testInit(c(sampleModReqdPkgs, "quickPlot"))
 
-  mapPath <- mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- mapPath <- getMapPath(tmpdir)
 
   # test object passing directly
   functions <- c("raster", "rast")
@@ -233,7 +233,7 @@ test_that("passing objects to simInit does not work correctly", {
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
-      modulePath = system.file("sampleModules", package = "SpaDES.core"),
+      modulePath = getSampleModules(tmpdir),
       inputPath = mapPath,
       outputPath = tmpdir
     )
@@ -282,7 +282,7 @@ test_that("passing objects to simInit does not work correctly", {
 test_that("passing nearly empty file to simInit does not work correctly", {
   testInit(c("terra", "quickPlot"))
 
-  mapPath <- mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- mapPath <- getMapPath(tmpdir)
 
   # test object passing directly
   functions <- c("raster", "rast")
@@ -294,7 +294,7 @@ test_that("passing nearly empty file to simInit does not work correctly", {
 
   for (i in seq(functions)) {
 
-    mapPath <- system.file("maps", package = "quickPlot")
+    mapPath <- getMapPath(tmpdir)
 
     # test object passing directly
     filelist <- data.frame(
@@ -337,7 +337,7 @@ test_that("more tests", {
 
   # Test for incremental loading via intervals
 
-    files <- dir(system.file("maps", package = "quickPlot"),
+    files <- dir(getMapPath(tmpdir),
                 full.names = TRUE, pattern = "tif")
     arguments <- I(rep(list(native = TRUE), length(files)))
     filelist <- data.frame(
@@ -417,7 +417,7 @@ test_that("Filenames for simList", {
   testInit(c("terra"), tmpFileExt = c(".tif", ".grd", ".tif", ".tif", ".grd"),
                           opts = list("reproducible.ask" = FALSE))
 
-  mapPath <- mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- mapPath <- getMapPath(tmpdir)
 
   s <- simInit()
   packages <- c("raster", "terra")
