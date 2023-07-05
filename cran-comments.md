@@ -1,6 +1,6 @@
 ## Release information
 
-This is a new submission of a package that was archived from CRAN due to removal of dependency package `Require`, which has now been restored to CRAN. There are many large changes that have occurred, including very important decreases in number of package dependencies, reducing the probability that future archivals will affect this package. See `NEWS.md` for a full list of changes. The Suggested package that is not on the standard CRAN repositories is supplied with `Additional_repositories`, with instructions provided in the DESCRIPTION.
+This is a new submission of a package that was archived from CRAN due to removal of dependency package `Require`, which has now been restored to CRAN. There are many large changes that have occurred, including very important decreases in number of package dependencies, reducing the probability that future archivals will affect this package. See `NEWS.md` for a full list of changes. The Suggested package that is not on the standard CRAN repositories is supplied with `Additional_repositories`, with instructions provided in the DESCRIPTION. There were minor changes to address CRAN submission NOTEs.
 
 ## Test environments
 
