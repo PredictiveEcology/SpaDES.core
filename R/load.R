@@ -333,13 +333,12 @@ setMethod("rasterToMemory",
           signature = c(x = "character"),
           definition = function(x, ...) {
             rasterToMemory(terra::rast(x, ...))
-          })
+})
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
           signature = c(x = "ANY"),
           definition = function(x, ...) {
-
             if (isRaster(x)) {
               if (any(nchar(Filenames(x)) > 0)) {
                 r <- rasterCreate(x, ...)
@@ -356,7 +355,6 @@ setMethod("rasterToMemory",
                 r[] <- terra::values(x)
                 x <- r
               }
-
             }
             x
 })
@@ -369,7 +367,6 @@ setMethod("rasterToMemory",
             list2env(obj, envir = envir(x))
             return(x)
 })
-
 
 #' Simple wrapper to load any `Raster*` object
 #'
