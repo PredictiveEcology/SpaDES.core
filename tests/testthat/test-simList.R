@@ -40,8 +40,8 @@ test_that("simList object initializes correctly (1)", {
   rm(w)
 
   ## test path accessors
-  expect_identical(figurePath(mySim), file.path(outputPath(mySim), "figures"))
-  expect_identical(logPath(mySim), file.path(outputPath(mySim), "log"))
+  expect_identical(figurePath(mySim), normalizePath(file.path(outputPath(mySim), "figures")))
+  expect_identical(logPath(mySim), normalizePath(file.path(outputPath(mySim), "log")))
 
   ### SLOT .xData
   expect_is(envir(mySim), "environment")
