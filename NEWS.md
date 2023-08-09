@@ -1,7 +1,7 @@
 # SpaDES.core (development version)
 
 ## Enhancements
-* none
+* new accessor function `figurePath()` to get the directory of a module's output figures, which is now uses a separate subdirectory per module (i.e., `file.path(outputPath(sim), "figures", <moduleName>)`); `Plots()` defaults to using this path, and module developers are encouraged to update their module code to use `figurePath(sim)` where `Plots()` is not being used.
 
 ## Dependency Changes
 * none

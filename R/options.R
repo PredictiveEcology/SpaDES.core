@@ -58,6 +58,10 @@
 #'     In some cases, this will speed up simulations, by running some events in parallel.
 #'     Still VERY experimental. Use cautiously. \cr
 #'
+#'   `spades.logPath`
+#'      \tab Defaults to a subdirectory (`logs/`) of the simulation output directory.
+#'      \tab The default local directory in which to look for simulation inputs.  \cr
+#'
 #'   `spades.inputPath`
 #'      \tab Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`)
 #'      \tab The default local directory in which to look for simulation inputs.  \cr

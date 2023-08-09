@@ -77,7 +77,7 @@ test_that("paths file does not work correctly", {
   # missing paths
   oldPaths <- getPaths()
   do.call(setPaths, paths)
-  on.exit({do.call(setPaths, oldPaths)}, add = TRUE)
+  on.exit(do.call(setPaths, oldPaths), add = TRUE)
   mySim1 <- simInit(times, params, modules, objects = list())
   expect_equal(lapply(paths(mySim), normPath), lapply(paths(mySim1), normPath))
 

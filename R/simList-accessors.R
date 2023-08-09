@@ -513,13 +513,12 @@ P.simList <- function(sim, param, module) {
         modFilePaths <- checkPath(names(mods))
 
         scalls <- sys.calls();
-        whereInSC <-  .grepSysCalls(scalls, "^P\\(")
+        whereInSC <- .grepSysCalls(scalls, "^P\\(")
         while (whereInSC > 1) {
           poss <- scalls[whereInSC - 1]
           fn <- as.character(poss[[1]][[1]])
           fn <- try(get(fn, envir = sys.frames()[whereInSC - 1][[1]]), silent = TRUE)
           if (!is(fn, "try-error")) {
-
             modulePath <- getSrcFilename(fn, full.names = TRUE)
             if (length(modulePath) > 0) {
               module1 <- lapply(modFilePaths, function(x) grep(pattern = x, checkPath(modulePath)))
@@ -536,11 +535,13 @@ P.simList <- function(sim, param, module) {
     }
   }
 
-  reversalMessage <- paste0("P has changed the order of its parameters, with 'param' now second to ",
-                            " allow for easier access to specific parameters inside a module. ",
-                            "It looks like this call to P is still using the old order with 'module' second. ",
-                            "Returning the old behaviour for now; this may not reliably work in the future. ",
-                            "Please change the order")
+  reversalMessage <- paste0(
+    "P has changed the order of its parameters, with 'param' now second to ",
+    " allow for easier access to specific parameters inside a module. ",
+    "It looks like this call to P is still using the old order with 'module' second. ",
+    "Returning the old behaviour for now; this may not reliably work in the future. ",
+    "Please change the order"
+  )
   # This is to catch cases of reverse order -- order of args changed to sim, params, then module
   if (!missing(param)) {
     if (param %in% names(sim@params)) {# test if the param is a module name
@@ -1814,6 +1815,32 @@ setReplaceMethod(
     }
     validObject(sim)
     return(sim)
+})
+
+#' @inheritParams paths
+#' @include simList-class.R
+#' @export
+#' @aliases simList-accessors-paths
+#' @rdname simList-accessors-paths
+#'
+setGeneric("figurePath", function(sim) {
+  standardGeneric("figurePath")
+})
+
+#' @export
+#' @rdname simList-accessors-paths
+#' @aliases simList-accessors-paths
+setMethod("figurePath",
+          signature = "simList",
+          definition = function(sim) {
+            moduleName <- current(sim)[["moduleName"]]
+            fp <- if (length(moduleName) == 0) {
+              file.path(sim@paths$outputPath, "figures")
+            } else {
+              file.path(sim@paths$outputPath, "figures", moduleName)
+            }
+            fp <- checkPath(fp, create = TRUE)
+            return(fp)
 })
 
 #' @inheritParams paths
