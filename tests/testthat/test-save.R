@@ -316,7 +316,7 @@ test_that("saveSimList with file backed objs", {
                           basename(tmpfile[3]))
   coltab(mySim$landscape$DEM) <- NULL
   Map(nam = names(mySim$landscape), i = seq(nlyr(mySim$landscape)), function(nam, i)
-    mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i+1], datatype = "FLT4S")
+    mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
   )
 
   # With file backed
@@ -330,9 +330,6 @@ test_that("saveSimList with file backed objs", {
   mySim$landscape <- mySim$landscape[]
   mySimOut$landscape <- mySimOut$landscape[]
   expect_equivalent(mySim, mySimOut)
-
-  #### zipSimList test
-
 })
 
 test_that("restart does not work correctly", {

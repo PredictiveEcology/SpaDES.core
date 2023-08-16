@@ -74,7 +74,7 @@ test_that("Plots function 1", {
     mess <- capture_messages({
       simOut <- spades(sim, debug = TRUE)
     })
-    files <- dir(file.path(outputPath(sim), "figures"), full.names = TRUE)
+    files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
     expect_true(all(grepl(fn, files)))
     if (iii == 5) {
       expect_true(length(files) == 0L)

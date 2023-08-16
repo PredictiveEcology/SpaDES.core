@@ -11,7 +11,7 @@ test_that("simList object initializes correctly (1)", {
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
 
-  # Test metadata accessors
+  ## test metadata accessors
   expect_true(length(inputObjects(mySim)) == 3)
   expect_true(NROW(inputObjects(mySim, "fireSpread")) == 2)
   expect_true(is.data.frame(inputObjects(mySim, "fireSpread")))
@@ -36,7 +36,12 @@ test_that("simList object initializes correctly (1)", {
   out <- utils::capture.output(show(mySim))
 
   expect_equal(length(out), 76)
-  options(width = w); rm(w)
+  options(width = w)
+  rm(w)
+
+  ## test path accessors
+  expect_identical(figurePath(mySim), normPath(file.path(outputPath(mySim), "figures")))
+  expect_identical(logPath(mySim), normPath(file.path(outputPath(mySim), "log")))
 
   ### SLOT .xData
   expect_is(envir(mySim), "environment")
@@ -147,12 +152,13 @@ test_that("simList object initializes correctly (1)", {
   expect_equivalent(start(mySim), 1)
   expect_equivalent(time(mySim),  1)
 
-  # Test explicit unit passing to end and start -- was a bug introduced in converting end & start to S3
+  ## explicitly test unit passing to end and start;
+  ## was a bug introduced in converting end & start to S3
   expect_equivalent(end(mySim, "seconds"), as.numeric(dmonth(10)))
   expect_equivalent(start(mySim, "seconds"), as.numeric(dmonth(1)))
 
-  expect_equivalent(end(mySim, "year"), as.numeric(dmonth(1)/dyear(1)*10))
-  expect_equivalent(start(mySim, "year"), as.numeric(dmonth(1)/dyear(1)))
+  expect_equivalent(end(mySim, "year"), as.numeric(dmonth(1) / dyear(1) * 10))
+  expect_equivalent(start(mySim, "year"), as.numeric(dmonth(1) / dyear(1)))
 
   expect_equivalent(end(mySim)   <- 20, 20.0)
   expect_equivalent(start(mySim) <- 10, 10.0)
@@ -195,10 +201,10 @@ test_that("simList object initializes correctly (1)", {
 })
 
 test_that("simList object initializes correctly (2)", {
-
   testInit(c("terra", "ggplot2"), smcc = FALSE)
   ## test with outputs
-  abundRasters <- list(terra::rast(system.file("extdata", "abundRaster.tif", package = "SpaDES.core")))
+  abundRasters <- list(terra::rast(system.file("extdata", "abundRaster.tif",
+                                               package = "SpaDES.core")))
 
   tmpdir <- tempdir()
   newModule(name = "test", path = file.path(tmpdir, "modules"), open = FALSE)
@@ -210,7 +216,7 @@ test_that("simList object initializes correctly (2)", {
     mySim <- simInit(times = list(start = 1.0, end = 2.0),
                      modules = list("test"), paths = paths,
                      objects = obj)
-    }))
+  }))
   expect_equivalent(grep("was built under R version", aa, invert = TRUE, value = TRUE), character())
 })
 
@@ -258,7 +264,6 @@ test_that("simList test all signatures", {
     stringsAsFactors = FALSE
   )
 
-
   # objects
   layers <- lapply(filelist$files, rasterToMemory)
   DEM <- layers[[1]]
@@ -286,7 +291,7 @@ test_that("simList test all signatures", {
   N <- 256L
   successes <- logical(N)
   argsTested <- vector("list", length = N)
-  #setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
+  # setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
   for (i in 1L:N) {
     li <- list(
       {if (i %% 2 ^ 1 == 0) times = times},                   # nolint
@@ -377,7 +382,6 @@ test_that("test that module directory exists, but not files", {
 })
 
 test_that("inputObjects on module arg not sim", {
-
   testInit(sampleModReqdPkgs)
 
   defaults <- .coreModules() %>% unname()
