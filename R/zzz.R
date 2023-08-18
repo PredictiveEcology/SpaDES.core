@@ -54,7 +54,6 @@
   invisible()
 }
 
-#' @importFrom reproducible normPath
 #' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
   if (interactive()) {
