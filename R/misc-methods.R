@@ -661,8 +661,12 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
   paramInThisMod <- paramsInSim[[currentModule]][[paramToCheck]]
   params <- paramsInSim[setdiff(moduleToUse, currentModule)]
 
-  paramToUpdateValInOtherMods <- unlist(lapply(params, function(p) p[[paramToCheck]]))
-  paramInOtherMods <- unique(paramToUpdateValInOtherMods)
+  ## preserve list for parameters composed of several values - will this work with lists of lists?
+  ## may need a Reduce(..., identical)?
+  paramToUpdateValInOtherMods <- lapply(params, function(p) p[[paramToCheck]])
+  ## remove NULLs
+  paramToUpdateValInOtherMods <- paramToUpdateValInOtherMods[!sapply(paramToUpdateValInOtherMods, is.null)]
+  paramInOtherMods <- unique(paramToUpdateValInOtherMods)  ## again, preserve list -- if there is only one entry, all definitions are identical
 
   messSuff <- paste0("); they should not. Perhaps pass params = list(.globals = list(",
                      paramToCheck, " = '", paramInOtherMods[1], "')) in the simInit call?")
@@ -680,7 +684,7 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
   if (!test) {
     if (is.null(paramInThisMod) || identical("default", paramInThisMod)) {
       if (length(paramInOtherMods) == 1) {
-        newVal <- paramInOtherMods
+        newVal <- unlist(paramInOtherMods) ## can unlist here
         message(paramToCheck, " in ", currentModule," is set to 'default' or NULL;")
         message("... setting to '", newVal,
                 "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
