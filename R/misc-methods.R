@@ -703,8 +703,17 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
       }
     }
     if (isTRUE(fail)) {
-      dfThis <- data.frame(module = currentModule, value = paramInThisMod, row.names = NULL)
-      dfOther <- data.frame(module = names(paramToUpdateValInOtherMods), value = paramToUpdateValInOtherMods, row.names = NULL)
+      if (is.null(paramInThisMod)) {
+        paramInThisMod <- "NULL"  ## avoid failure below due to 0 length
+      }
+
+      # dfThis <- data.frame(module = currentModule, value = paramInThisMod, row.names = NULL)
+      # dfOther <- data.frame(module = names(paramToUpdateValInOtherMods),
+      #                       value = paramToUpdateValInOtherMods, row.names = NULL)
+      ## this works better when the parameter has length()>1 :
+      dfThis <- data.frame(modName = paramInThisMod, row.names = NULL)
+      names(dfThis) <- currentModule
+      dfOther <- as.data.frame(paramToUpdateValInOtherMods, row.names = NULL)
       messageVerbose("This module", verbose = verbose)
       messageDF(dfThis, colour = "green", verbose = verbose)
       messageVerbose("Other modules", verbose = verbose)
