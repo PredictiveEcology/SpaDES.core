@@ -79,9 +79,7 @@ setMethod(
       out1 <- try(eval(out), silent = TRUE)
       if (is(out1, "try-error")) {
         if (any(grepl("bind_rows", out))) { # historical artifact
-          if (!require("dplyr", quietly = TRUE))
-            stop("To read module: '", gsub("\\.R", "", basename(filename)),
-                 "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '", .libPaths()[1], "')")
+          bind_rows <- bindrows
           out1 <- eval(out)
         }
         if (is(out1, "try-error")) {
