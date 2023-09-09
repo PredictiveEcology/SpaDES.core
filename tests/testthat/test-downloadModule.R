@@ -112,7 +112,7 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
     opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
 
-  testInit(c("httr", "dplyr"), opts = opts)
+  testInit(c("httr"), opts = opts)
   m <- "test"
 
   skipMessReGoogledrive <-

@@ -1,6 +1,6 @@
 test_that("module templates work", {
 
-  testInit(c("knitr", "rmarkdown", "dplyr"), smcc = FALSE)
+  testInit(c("knitr", "rmarkdown"), smcc = FALSE)
 
   expect_true(dir.exists(tmpdir))
   moduleName <- "myModule"
