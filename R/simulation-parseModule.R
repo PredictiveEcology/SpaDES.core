@@ -80,7 +80,13 @@ setMethod(
       if (is(out1, "try-error")) {
         if (any(grepl("bind_rows", out))) { # historical artifact
           bind_rows <- bindrows
-          out1 <- eval(out)
+          out1 <- try(eval(out), silent = TRUE)
+          if (is(out1, "try-error")) {
+            out2 <- as.list(out)
+            wh <- grep("bind_rows", out2)
+            out2[wh]  <- lapply(wh, function(x) substitute(bindrows))
+            out1 <- as.call(out2)
+          }
         }
         if (is(out1, "try-error")) {
           # possibly there was a sim that was not defined, e.g., with downloadData example, only "filename" provided.
