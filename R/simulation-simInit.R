@@ -1224,6 +1224,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           if (any(".inputObjects" %in% debug))
             debugonce(.inputObjects)
 
+          knowns <- c(".useCache") # don't change Caching based on .useCache
+                    # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
+
+          keepers <- setdiff(names(sim@params[[".globals"]]), knowns)
+          globsWoKnowns <- sim@params[[".globals"]][keepers]
+          keepersPar <- setdiff(names(sim@params[[mBase]]), knowns)
+          paramsWoKnowns <- sim@params[[mBase]][keepersPar]
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
@@ -1231,8 +1238,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                        quick = getOption("reproducible.quick", FALSE),
                        cachePath = sim@paths$cachePath,
                        classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                                           params = sim@params[[mBase]],
-                                           .globals = sim@params[[".globals"]],
+                                           params = paramsWoKnowns,
+                                           .globals = globsWoKnowns,
                                            modules = mBase),
                        showSimilar = showSimilar,
                        userTags = c(paste0("module:", mBase),
