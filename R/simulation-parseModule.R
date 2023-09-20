@@ -359,7 +359,13 @@ setMethod(
         })
 
         #mess <- capture.output({
-          out <- try(eval(pf, envir = env))
+        # if (mBase == "fireSense_dataPrepFit") browser()
+        out <- tryCatch(eval(pf, envir = env), silent = TRUE,
+                                   error = function(e) {
+                                     # convert errors to warnings # so can capture them outside
+                                     warning(e$message)
+                                   })
+          # out <- try(eval(pf, envir = env))
         #}, type = "message")
           mess <- NULL
         if (is(out, "try-error")) stop(out)
