@@ -1,13 +1,12 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-SuggestedPkgsNeeded <- c("NLMR", "SpaDES.tools", "knitr")
+SuggestedPkgsNeeded <- c("knitr", "NLMR", "SpaDES.tools")
 hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
 knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
-options("spades.moduleCodeChecks" = FALSE,
-        "spades.useRequire" = FALSE)
-
+options(spades.moduleCodeChecks = FALSE,
+        spades.useRequire = FALSE)
 
 ## ----SpaDES-demo, eval=FALSE, echo=TRUE---------------------------------------
 #  ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed

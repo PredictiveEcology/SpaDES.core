@@ -1,13 +1,15 @@
-# SpaDES.core (development version)
+# SpaDES.core 2.0.3
 
 ## Enhancements
 * new accessor function `figurePath()` to get the directory of a module's output figures, which is now uses a separate subdirectory per module (i.e., `file.path(outputPath(sim), "figures", <moduleName>)`); `Plots()` defaults to using this path, and module developers are encouraged to update their module code to use `figurePath(sim)` where `Plots()` is not being used.
+* re-Caching of a simList no longer triggers on changes to `.useCache` parameter, when it doesn't pertain to the event or module in question.
+* many historical modules used `bind_rows` from `dplyr` within `expectsInput` or `createsOutput`. Now, if a module uses `bind_rows` and doesn't have `dplyr` installed, `SpaDES.core` will intercept and use `SpaDES.core::bindrows`.
 
 ## Dependency Changes
-* none
+* `dplyr` is removed (again)
 
 ## Bug fixes
-* none
+* `coltab<-` from `terra` changed how it deals with multi-layer `SpatRasters`. Two sample modules have been modified to set colors on these multi-layer `SpatRasters`
 
 # SpaDES.core 2.0.2
 
