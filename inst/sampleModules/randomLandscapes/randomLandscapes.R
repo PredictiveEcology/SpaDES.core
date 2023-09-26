@@ -45,8 +45,9 @@ defineModule(sim, list(
                     paste("Named list of seeds to use for each event (names).",
                           "E.g., `list('init' = 123)` will `set.seed(123)`",
                           "for the `init` event only.")),
-    defineParameter(".useCache", "logical", FALSE, c("init", "plot"), NA,
-                    "should the module result be cached for future use")
+    defineParameter(".useCache", "logical", FALSE, NA, NA,
+                    "Should the module (or it's events) be cached for future use? Accepts logical",
+                    "or a vector of events to cache.")
   ),
   inputObjects = bindrows(
     expectsInput(objectName = NA_character_, objectClass = NA_character_,
