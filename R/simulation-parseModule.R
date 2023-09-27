@@ -360,6 +360,11 @@ setMethod(
 
         #mess <- capture.output({
         # if (mBase == "fireSense_dataPrepFit") browser()
+        numExptedArgs <- length(formalArgs(defineModule)) + 1
+        if (length(pf[[1]]) > (numExptedArgs)) {
+          warning("It looks like there may be an extra argument, i.e., a trailing comma, in `defineModule`")
+          pf[[1]] <- pf[[1]][1:numExptedArgs]
+        }
         out <- tryCatch(eval(pf, envir = env), silent = TRUE,
                                    error = function(e) {
                                      # convert errors to warnings # so can capture them outside
