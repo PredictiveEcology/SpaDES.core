@@ -543,7 +543,7 @@ setMethod(
     if (isTRUE(opt) || length(names(opt)) > 1) {
       tmp[["._parsedData"]] <- getParseData(tmp[["parsedFile"]], TRUE)
     }
-    tmp[["defineModuleItem"]] <- grepl(pattern = "defineModule", tmp[["parsedFile"]])
+    tmp[["defineModuleItem"]] <- grepl(pattern = "^defineModule", tmp[["parsedFile"]])
     tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
   }
   return(tmp)
