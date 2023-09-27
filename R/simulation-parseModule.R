@@ -360,6 +360,11 @@ setMethod(
 
         #mess <- capture.output({
         # if (mBase == "fireSense_dataPrepFit") browser()
+        numExptedArgs <- length(formalArgs(defineModule)) + 1
+        if (length(pf[[1]]) > (numExptedArgs)) {
+          warning("It looks like there may be an extra argument, i.e., a trailing comma, in `defineModule`")
+          pf[[1]] <- pf[[1]][1:numExptedArgs]
+        }
         out <- tryCatch(eval(pf, envir = env), silent = TRUE,
                                    error = function(e) {
                                      # convert errors to warnings # so can capture them outside
@@ -538,7 +543,7 @@ setMethod(
     if (isTRUE(opt) || length(names(opt)) > 1) {
       tmp[["._parsedData"]] <- getParseData(tmp[["parsedFile"]], TRUE)
     }
-    tmp[["defineModuleItem"]] <- grepl(pattern = "defineModule", tmp[["parsedFile"]])
+    tmp[["defineModuleItem"]] <- grepl(pattern = "^defineModule", tmp[["parsedFile"]])
     tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
   }
   return(tmp)
