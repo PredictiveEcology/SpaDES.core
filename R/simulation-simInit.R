@@ -1453,8 +1453,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
     shouldRunAltSimInit <- !all(sim@modules %in% canSafelyRunInit)
   }
 
-  loadOrder <- .depsLoadOrder(sim, depsGr)
-  sim@modules <- sim@modules[match(loadOrder, sim@modules)]
+  loadOrder <- .depsLoadOrder(sim, depsGr) # brings up the loadOrder metadata -- so can add modules that aren't being used
+  sim@modules <- sim@modules[na.omit(match(loadOrder, sim@modules))] # na.omit is for loadOrder metadata ones
 
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
     if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
