@@ -232,7 +232,6 @@ test_that("saveSimList does not work correctly", {
   # mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
-
   # loses the raster landscape
   saveSimList(sim, filename = tmpfile[3])
   sim <- loadSimList(file = tmpfile[3])
@@ -263,7 +262,6 @@ test_that("saveSimList does not work correctly", {
   expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
   # test file-backed raster is gone
   expect_error(mySim$landscape$DEM[])
-
 })
 
 test_that("saveSimList with file backed objs", {
