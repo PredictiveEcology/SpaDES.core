@@ -1,6 +1,6 @@
 test_that("saving files (and memoryUse)", {
   skip_on_cran()
-#   skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+  # skip_on_os("windows") ## TODO: memoryUse() hanging on windows
   skip_on_covr() ## issue with memoryUseSetup
 
   testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
@@ -155,7 +155,6 @@ test_that("saving csv files does not work correctly", {
 })
 
 test_that("saveSimList does not work correctly", {
-
   testInit(sampleModReqdPkgs,
            tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
            opts = list(reproducible.verbose = 0))
@@ -163,7 +162,6 @@ test_that("saveSimList does not work correctly", {
   unlink(tmpfile[6])
   mapPath <- getMapPath(tmpdir)
   modules <- getSampleModules(tmpdir)
-
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
   inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
