@@ -310,10 +310,10 @@ test_that("saveSimList with file backed objs", {
   mySim <- spades(mySim, debug = FALSE)
   tmpfile[3] <- file.path(checkPath(file.path(dirname(tmpfile[3]), .rndstr(1)), create = TRUE),
                           basename(tmpfile[3]))
-  coltab(mySim$landscape$DEM) <- NULL
-  Map(nam = names(mySim$landscape), i = seq(nlyr(mySim$landscape)), function(nam, i)
+  Map(nam = names(mySim$landscape), i = seq(nlyr(mySim$landscape)), function(nam, i) {
+    coltab(mySim$landscape[[nam]]) <- NULL ## can't use colour table with FLT4S (#261)
     mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
-  )
+  })
 
   # With file backed
   saveSimList(mySim, filename = tmpfile[1], verbose = FALSE)
