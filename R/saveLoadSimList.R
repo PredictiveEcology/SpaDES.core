@@ -143,8 +143,10 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
   }
 
-  # This forces it to be qs instead of zip or tar.gz or rds
-  filename <- archiveConvertFileExt(filename, "qs")
+  ## This forces it to be qs  (if not rds) instead of zip or tar.gz
+  if (tools::file_ext(filename) != "rds") {
+    filename <- archiveConvertFileExt(filename, "qs")
+  }
 
   paths(sim) <- as.list(relativizePaths(paths(sim)))
 
