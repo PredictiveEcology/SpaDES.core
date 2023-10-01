@@ -38,35 +38,36 @@ this if nested within this.}
 \item{inputs}{Logical. If \code{TRUE}, all files identified in
 \code{inputs(sim)} will be included in the zip.}
 
-\item{cache}{Logical. Not yet implemented. If \code{TRUE}, all files in \code{cachePath(sim)} will be included in the
-zip archive. Defaults to \code{FALSE} as this could be large, and may include many
-out of date elements. See Details.}
+\item{cache}{Logical. Not yet implemented. If \code{TRUE}, all files in \code{cachePath(sim)}
+will be included in the archive.
+Defaults to \code{FALSE} as this could be large, and may include many out of date elements.
+See Details.}
 
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can be found.}
 
-\item{...}{passed to \code{\link[=saveSimList]{saveSimList()}}, including non-optional ones such as \code{filename}.
-Also see \code{fileBackend} and \code{filebackedDir} arguments in that function.}
+\item{...}{Not used.}
 
 \item{zipfile}{A character string indicating the filename for the zip file. Passed to \code{zip}.}
 }
 \value{
-For \code{\link[=saveSimList]{saveSimList()}}, a saved \code{.qs} file in \code{filename} location or
-a \code{.tar.gz} (non-Windows) or \code{.zip} (Windows).
-
-invoked for side effect of zip archive creation
+Invoked for side effects of saving a \code{.qs} or \code{.rds} file,
+or a \code{.tar.gz} (non-Windows) or \code{.zip} (Windows).
 }
 \description{
-Saving a \code{simList} may not work using the standard approaches (e.g.,
-\code{save}, \code{saveRDS}, and \code{qs::qsave}). There are 2 primary reasons why this doesn't
-work as expected: the \code{activeBindings} that are in place within modules (these
-allow the \code{mod} and \code{Par} to exist), and file-backed objects, such as \code{SpatRaster}
-and \verb{Raster*}. Because of these, a user should use \code{saveSimList} and \code{loadSimList}.
+Saving a \code{simList} may not work using the standard approaches
+(e.g., \code{save}, \code{saveRDS}, and \code{qs::qsave}).
+There are 2 primary reasons why this doesn't work as expected:
+the \code{activeBindings} that are in place within modules
+(these allow the \code{mod} and \code{Par} to exist), and file-backed objects,
+such as \code{SpatRaster} and \verb{Raster*}.
+Because of these, a user should use \code{saveSimList} and \code{loadSimList}.
 These will save the object and recover the object using the \code{filename} supplied,
-if there are no file-backed objects. If there are file-backed objects, then it
-will save an archive (default is \code{.tar.gz} using the \code{archive} package for non-Windows
-and \code{\link[=zip]{zip()}} if using Windows, as there is currently an unidentified bug in \verb{archive*}
-on Windows). The user does not need to specify the filename any differently,
+if there are no file-backed objects.
+If there are file-backed objects, then it will save an archive
+(default is \code{.tar.gz} using the \code{archive} package for non-Windows and \code{\link[=zip]{zip()}}
+if using Windows, as there is currently an unidentified bug in \verb{archive*} on Windows).
+The user does not need to specify the filename any differently,
 as the code will search based on the filename without the file extension.
 
 \code{zipSimList} will save the \code{simList} and file-backed \verb{Raster*} objects, plus,
@@ -78,49 +79,6 @@ This uses \code{Copy} under the hood, to not affect the original \code{simList}.
 There is a family of 2 functions that are mutually useful for saving and
 loading \code{simList} objects and their associated files (e.g., file-backed
 \verb{Raster*}, \code{inputs}, \code{outputs}, \code{cache}) \code{\link[=saveSimList]{saveSimList()}}, \code{\link[=loadSimList]{loadSimList()}}.
-
-\subsection{Save - Move - Load}{
-
-There are 3 different workflows for "save - move files - load" that work in our tests:
-\enumerate{
-\item \code{fileBackend = 0}: No renaming of file-backed rasters. This is unlikely to
-work for most use-cases as the original file paths are left intact. Recovery
-of this saved \code{simList} will only work if the file-backed objects' files are
-present and in the exact same paths.
-
-This approach is attempting to emulate a "relative filenames" approach,
-i.e., attempt to treat the file-backed raster file names as if they were
-relative (which they are not -- raster package forces absolute file
-paths). To do this, all the renaming occurs within \code{loadSimList}.
-These function will use the \code{paths} argument to rewrite
-the paths of the files that are identified with \code{Filenames(sim)} so that
-they are in the equivalent (relative) position as they were. This will
-only work if all files were in one of the \code{paths} of the original
-\code{simList}, so that they can be matched up with the new \code{paths} passed in
-\code{loadSimList}. This is not guaranteed to work correctly, though it works
-in a wide array of testing.
-\item \code{fileBackend = 1}: On-the-fly renaming of file-backed rasters;
-\enumerate{
-\item Save the \code{sim} object with a filename, e.g.,  \code{file},
-\item make a copy of all file-backed rasters to \code{fileBackedDir},
-\item update all the pointers to those files so that they are correct in the raster metadata
-}
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{saveSimList(sim, file = "sim.qs", fileBackend = 1, fileBackedDir = "here")
-simNew <- loadSimList(file = "sim.qs")
-}\if{html}{\out{</div>}}
-\item \code{fileBackend = 2}: On-the-fly bringing to memory of all rasters
-
-All rasters are brought to memory, and then saved into \code{sim.qs}
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{saveSimList(sim, file = "sim.qs", fileBackend = 2)
-simNew <- loadSimList(file = "sim.qs")
-}\if{html}{\out{</div>}}
-}
-
-If \code{cache} is used, it is likely that it should be trimmed before
-zipping, to include only cache elements that are relevant.
-}
 }
 \seealso{
 \code{\link[=loadSimList]{loadSimList()}}

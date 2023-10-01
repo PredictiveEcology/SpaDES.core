@@ -1,15 +1,18 @@
 #' Save a whole `simList` object to disk
 #'
-#' Saving a `simList` may not work using the standard approaches (e.g.,
-#' `save`, `saveRDS`, and `qs::qsave`). There are 2 primary reasons why this doesn't
-#' work as expected: the `activeBindings` that are in place within modules (these
-#' allow the `mod` and `Par` to exist), and file-backed objects, such as `SpatRaster`
-#' and `Raster*`. Because of these, a user should use `saveSimList` and `loadSimList`.
+#' Saving a `simList` may not work using the standard approaches
+#' (e.g., `save`, `saveRDS`, and `qs::qsave`).
+#' There are 2 primary reasons why this doesn't work as expected:
+#' the `activeBindings` that are in place within modules
+#' (these allow the `mod` and `Par` to exist), and file-backed objects,
+#' such as `SpatRaster` and `Raster*`.
+#' Because of these, a user should use `saveSimList` and `loadSimList`.
 #' These will save the object and recover the object using the `filename` supplied,
-#' if there are no file-backed objects. If there are file-backed objects, then it
-#' will save an archive (default is `.tar.gz` using the `archive` package for non-Windows
-#' and [zip()] if using Windows, as there is currently an unidentified bug in `archive*`
-#' on Windows). The user does not need to specify the filename any differently,
+#' if there are no file-backed objects.
+#' If there are file-backed objects, then it will save an archive
+#' (default is `.tar.gz` using the `archive` package for non-Windows and [zip()]
+#' if using Windows, as there is currently an unidentified bug in `archive*` on Windows).
+#' The user does not need to specify the filename any differently,
 #' as the code will search based on the filename without the file extension.
 #'
 #' @details
@@ -34,20 +37,20 @@
 #' @param inputs Logical. If `TRUE`, all files identified in
 #'    `inputs(sim)` will be included in the zip.
 #'
-#' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)` will be included in the
-#'    zip archive. Defaults to `FALSE` as this could be large, and may include many
-#'    out of date elements. See Details.
+#' @param cache Logical. Not yet implemented. If `TRUE`, all files in `cachePath(sim)`
+#'    will be included in the archive.
+#'    Defaults to `FALSE` as this could be large, and may include many out of date elements.
+#'    See Details.
 #'
 #' @param projectPath Should be the "top level" or project path for the `simList`.
 #'    Defaults to `getwd()`. All other paths will be made relative with respect to
 #'    this if nested within this.
 #'
-#' @param ... Not used. If a user passes previous arguments that are now deprecated,
-#'   they will be passed into this `...`.
+#' @param ... Not used.
 #'
 #' @return
-#' For [saveSimList()], a saved `.qs` file in `filename` location or
-#' a `.tar.gz` (non-Windows) or `.zip` (Windows).
+#' Invoked for side effects of saving a `.qs` or `.rds` file,
+#' or a `.tar.gz` (non-Windows) or `.zip` (Windows).
 #'
 #' @aliases saveSim
 #' @export
@@ -75,9 +78,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   }
 
   # clean up misnamed arguments
-  if (!is.null(dots$fileBackedDir)) if (is.null(filebackedDir)) {
-    filebackedDir <- dots$fileBackedDir
-    dots$fileBackedDir <- NULL
+  if (!is.null(dots$fileBackedDir)) {
+    if (is.null(filebackedDir)) {
+      filebackedDir <- dots$fileBackedDir
+      dots$fileBackedDir <- NULL
+    }
   }
   if (!is.null(dots$filebackend))
     if (is.null(dots$fileBackend)) {
@@ -207,60 +212,12 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 #' This uses `Copy` under the hood, to not affect the original `simList`.
 #' **VERY experimental**.
 #'
-#' @param ... passed to [saveSimList()], including non-optional ones such as `filename`.
-#'            Also see `fileBackend` and `filebackedDir` arguments in that function.
-#'
 #' @param zipfile A character string indicating the filename for the zip file. Passed to `zip`.
-#'
-#' @return invoked for side effect of zip archive creation
 #'
 #' @export
 #' @md
 #' @rdname saveSimList
 #' @seealso [loadSimList()]
-#' @details
-#' ## Save - Move - Load
-#'
-#' There are 3 different workflows for "save - move files - load" that work in our tests:
-#'
-#' 3. `fileBackend = 0`: No renaming of file-backed rasters. This is unlikely to
-#'     work for most use-cases as the original file paths are left intact. Recovery
-#'     of this saved `simList` will only work if the file-backed objects' files are
-#'     present and in the exact same paths.
-#'
-#'     This approach is attempting to emulate a "relative filenames" approach,
-#'     i.e., attempt to treat the file-backed raster file names as if they were
-#'     relative (which they are not -- raster package forces absolute file
-#'     paths). To do this, all the renaming occurs within `loadSimList`.
-#'     These function will use the `paths` argument to rewrite
-#'     the paths of the files that are identified with `Filenames(sim)` so that
-#'     they are in the equivalent (relative) position as they were. This will
-#'     only work if all files were in one of the `paths` of the original
-#'     `simList`, so that they can be matched up with the new `paths` passed in
-#'     `loadSimList`. This is not guaranteed to work correctly, though it works
-#'     in a wide array of testing.
-#'
-#' 1. `fileBackend = 1`: On-the-fly renaming of file-backed rasters;
-#'
-#'     1. Save the `sim` object with a filename, e.g.,  `file`,
-#'     2. make a copy of all file-backed rasters to `fileBackedDir`,
-#'     3. update all the pointers to those files so that they are correct in the raster metadata
-#'
-#'     ```
-#'     saveSimList(sim, file = "sim.qs", fileBackend = 1, fileBackedDir = "here")
-#'     simNew <- loadSimList(file = "sim.qs")
-#'     ```
-#' 2. `fileBackend = 2`: On-the-fly bringing to memory of all rasters
-#'
-#'     All rasters are brought to memory, and then saved into `sim.qs`
-#'
-#'     ```
-#'     saveSimList(sim, file = "sim.qs", fileBackend = 2)
-#'     simNew <- loadSimList(file = "sim.qs")
-#'     ```
-#'
-#' If `cache` is used, it is likely that it should be trimmed before
-#' zipping, to include only cache elements that are relevant.
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
   .Deprecated("saveSimList")
   saveSimList(sim, filename = zipfile)
