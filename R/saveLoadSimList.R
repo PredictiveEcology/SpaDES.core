@@ -319,7 +319,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
-    sim <- readRDS(filename)
+    sim <- readRDS(filename[1])
   } else if (tolower(tools::file_ext(filename[1])) == "qs") {
     sim <- qs::qread(filename[1], nthreads = getOption("spades.qsThreads", 1))
   }
@@ -383,7 +383,6 @@ checkArchiveAlternative <- function(filename) {
   }
   filename
 }
-
 
 archiveExts <- "(tar$|tar\\.gz$|zip$|gz$)"
 
