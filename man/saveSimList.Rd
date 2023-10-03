@@ -3,7 +3,6 @@
 \name{saveSimList}
 \alias{saveSimList}
 \alias{saveSim}
-\alias{zipSimList}
 \title{Save a whole \code{simList} object to disk}
 \usage{
 saveSimList(
@@ -16,8 +15,6 @@ saveSimList(
   envir,
   ...
 )
-
-zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE)
 }
 \arguments{
 \item{sim}{Either a \code{simList} or a character string of the name
@@ -47,8 +44,6 @@ See Details.}
 It is the environment where the object named \code{sim} can be found.}
 
 \item{...}{Not used.}
-
-\item{zipfile}{A character string indicating the filename for the zip file. Passed to \code{zip}.}
 }
 \value{
 Invoked for side effects of saving a \code{.qs} or \code{.rds} file,
@@ -69,11 +64,6 @@ If there are file-backed objects, then it will save an archive
 if using Windows, as there is currently an unidentified bug in \verb{archive*} on Windows).
 The user does not need to specify the filename any differently,
 as the code will search based on the filename without the file extension.
-
-\code{zipSimList} will save the \code{simList} and file-backed \verb{Raster*} objects, plus,
-optionally, files identified in \code{outputs(sim)} and \code{inputs(sim)}.
-This uses \code{Copy} under the hood, to not affect the original \code{simList}.
-\strong{VERY experimental}.
 }
 \details{
 There is a family of 2 functions that are mutually useful for saving and

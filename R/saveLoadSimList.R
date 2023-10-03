@@ -59,6 +59,7 @@
 #' @importFrom Require messageVerbose
 #' @importFrom tools file_ext
 #' @rdname saveSimList
+#' @seealso [loadSimList()]
 saveSimList <- function(sim, filename, projectPath = getwd(),
                         outputs = TRUE, inputs = TRUE, cache = FALSE, envir,
                         ...) {
@@ -200,14 +201,12 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 #' `zipSimList` will save the `simList` and file-backed `Raster*` objects, plus,
 #' optionally, files identified in `outputs(sim)` and `inputs(sim)`.
 #' This uses `Copy` under the hood, to not affect the original `simList`.
-#' **VERY experimental**.
 #'
+#' @inheritParams saveSimList
 #' @param zipfile A character string indicating the filename for the zip file. Passed to `zip`.
 #'
 #' @export
-#' @md
-#' @rdname saveSimList
-#' @seealso [loadSimList()]
+#' @rdname deprecated
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
   .Deprecated("saveSimList")
   saveSimList(sim, filename = zipfile)
