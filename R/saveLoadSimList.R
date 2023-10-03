@@ -100,23 +100,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     fileBackend <- 0
   }
 
-
   if (is.character(sim)) {
     simName <- sim
     sim <- get(simName, envir = envir)
   }
 
-  # if (isTRUE(fileBackend[1] == 2)) {
-  #   sim <- rasterToMemory(sim)
-  # } else if (isTRUE(fileBackend[1] == 1)) {
-  #   mess <- capture.output(type = "message", {
-  #     sim <- do.call(Copy, append(list(sim, filebackedDir = filebackedDir), dots))
-  #   })
-  #   mess <- grep("Hardlinked version", mess, invert = TRUE)
-  #   if (length(mess))
-  #     lapply(mess, message)
-  #
-  # }
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   sim@.xData$._rng.kind <- RNGkind()

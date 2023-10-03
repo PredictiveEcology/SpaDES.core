@@ -23,8 +23,6 @@ makeModActiveBinding <- function(sim, mod) {
 
   if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
     browser()
-
-
 }
 
 #' @include helpers.R
