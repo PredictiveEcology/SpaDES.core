@@ -68,6 +68,13 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
   dots <- list(...)
 
+  ## user can explicitly override archiving files if FALSE
+  files <- if (isFALSE(dots$files)) {
+    FALSE
+  } else {
+    TRUE
+  }
+
   verbose <- if (is.null(dots$verbose)) {
     if (is.null(dots$quiet)) {
       getOption("reproducible.verbose")
@@ -117,19 +124,16 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     assign(simName, sim, envir = tmpEnv)
     sim <- get(simName, envir = tmpEnv)
   }
-  # if (tolower(tools::file_ext(filename)) == "rds") {
-  #   save(list = simName, envir = tmpEnv, file = filename)
-  # } else if (tolower(tools::file_ext(filename)) == "qs") {
-  #   qs::qsave(get(simName, envir = tmpEnv), file = filename)
-  # }
-  # } else {
-  fns <- Filenames(sim)
-  sim <- .wrap(sim, cachePath = projectPath) # makes a copy of filebacked object files
-  sim@current <- list() # it is presumed that this event should be considered finished prior to saving
-  empties <- nchar(fns) == 0
-  if (any(empties)) {
-    fns <- fns[!empties]
-    fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
+
+  if (isTRUE(files)) {
+    fns <- Filenames(sim)
+    sim <- .wrap(sim, cachePath = projectPath) # makes a copy of filebacked object files
+    sim@current <- list() # it is presumed that this event should be considered finished prior to saving
+    empties <- nchar(fns) == 0
+    if (any(empties)) {
+      fns <- fns[!empties]
+      fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
+    }
   }
 
   ## This forces it to be qs  (if not rds) instead of zip or tar.gz
@@ -147,50 +151,51 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     qs::qsave(sim, file = filename, nthreads = getOption("spades.qsThreads", 1))
   }
 
-  srcFiles <- mapply(mod = modules(sim), mp = modulePath(sim),
-                 function(mod, mp) {
-                   files <- dir(file.path(mp, mod), recursive = TRUE, full.names = TRUE)
-                   files <- grep("^\\<data\\>", invert = TRUE, value = TRUE, files)
-                 })
-  srcFilesRel <- makeRelative(srcFiles, absoluteBase = projectPath)
-  if (any(isAbsolutePath(srcFilesRel))) {# means not inside the projectPath
-    # try modulePath first
-    srcFilesRel <- makeRelative(srcFiles, absoluteBase = dirname(modulePath(sim)))
-    tmpSrcFiles <- file.path(projectPath, srcFilesRel)
-    linkOrCopy(srcFiles, tmpSrcFiles, verbose = verbose - 1)
-    on.exit(unlink(tmpSrcFiles))
-    srcFiles <- tmpSrcFiles
-  }
-
-  if (length(fns)) {
-    fileToDelete <- filename
-
-    otherFns <- c()
-    if (isTRUE(outputs)) {
-      os <- outputs(sim)
-      if (NROW(os)) {
-        outputFNs <- os[os$saved %in% TRUE]$file
-        otherFns <- c(otherFns, outputFNs)
-      }
-    }
-    inputFNs <- NULL
-    if (isTRUE(inputs)) {
-      ins <- inputs(sim)
-      if (NROW(ins)) {
-        ins[ins$loaded %in% TRUE]$file
-        otherFns <- c(otherFns, inputFNs)
-      }
+  if (isTRUE(files)) {
+    srcFiles <- mapply(mod = modules(sim), mp = modulePath(sim),
+                   function(mod, mp) {
+                     files <- dir(file.path(mp, mod), recursive = TRUE, full.names = TRUE)
+                     files <- grep("^\\<data\\>", invert = TRUE, value = TRUE, files)
+                   })
+    srcFilesRel <- makeRelative(srcFiles, absoluteBase = projectPath)
+    if (any(isAbsolutePath(srcFilesRel))) {# means not inside the projectPath
+      # try modulePath first
+      srcFilesRel <- makeRelative(srcFiles, absoluteBase = dirname(modulePath(sim)))
+      tmpSrcFiles <- file.path(projectPath, srcFilesRel)
+      linkOrCopy(srcFiles, tmpSrcFiles, verbose = verbose - 1)
+      on.exit(unlink(tmpSrcFiles))
+      srcFiles <- tmpSrcFiles
     }
 
-    allFns <- c(fns, otherFns, srcFilesRel)
+    if (length(fns)) {
+      fileToDelete <- filename
 
-    relFns <- makeRelative(c(fileToDelete, allFns), absoluteBase = projectPath)
+      otherFns <- c()
+      if (isTRUE(outputs)) {
+        os <- outputs(sim)
+        if (NROW(os)) {
+          outputFNs <- os[os$saved %in% TRUE]$file
+          otherFns <- c(otherFns, outputFNs)
+        }
+      }
+      inputFNs <- NULL
+      if (isTRUE(inputs)) {
+        ins <- inputs(sim)
+        if (NROW(ins)) {
+          ins[ins$loaded %in% TRUE]$file
+          otherFns <- c(otherFns, inputFNs)
+        }
+      }
 
-    archiveWrite(filename, relFns, verbose)
+      allFns <- c(fns, otherFns, srcFilesRel)
 
-    unlink(fileToDelete)
+      relFns <- makeRelative(c(fileToDelete, allFns), absoluteBase = projectPath)
+
+      archiveWrite(filename, relFns, verbose)
+
+      unlink(fileToDelete)
+    }
   }
-
   messageVerbose("    ... saved!", verbose = verbose)
 
   return(invisible())
@@ -296,41 +301,41 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   if (grepl(archiveExts, tolower(tools::file_ext(filename)))) {
     td <- tempdir2(sub = .rndstr())
     filename <- archiveExtract(filename, exdir = td)
-    filenameRel <- gsub(paste0(td, "/"), "", filename[-1])
+    filenameRel <- gsub(paste0(td, "/"), "", filename[-1])  ## TODO: WRONG!
 
     # This will put the files to relative path of getwd()
     newFns <- file.path(projectPath, filenameRel)
     linkOrCopy(filename[-1], newFns, verbose = verbose - 1)
   } else {
-    filenameRel <- gsub(paste0(projectPath, "/"), "", filename)
+    filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
-    sim <- readRDS(filename[1])
+    tmpsim <- readRDS(filename[1])
   } else if (tolower(tools::file_ext(filename[1])) == "qs") {
-    sim <- qs::qread(filename[1], nthreads = getOption("spades.qsThreads", 1))
+    tmpsim <- qs::qread(filename[1], nthreads = getOption("spades.qsThreads", 1))
   }
-  paths(sim) <- absolutizePaths(paths(sim), projectPath, tempPath)
+  paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
   if (!is.null(paths)) {
     paths <- lapply(paths, normPath)
   } else {
     paths <- list()
   }
-  paths(sim) <- modifyList2(paths(sim), paths)
+  paths(tmpsim) <- modifyList2(paths(tmpsim), paths)
 
-  sim <- .unwrap(sim, cachePath = projectPath) # convert e.g., PackedSpatRaster
+  tmpsim <- .unwrap(tmpsim, cachePath = projectPath) # convert e.g., PackedSpatRaster
 
   # Work around for bug in qs that recovers data.tables as lists
-  sim <- recoverDataTableFromQs(sim)
+  tmpsim <- recoverDataTableFromQs(tmpsim)
 
-  mods <- setdiff(sim@modules, .coreModules())
+  mods <- setdiff(tmpsim@modules, .coreModules())
 
   # Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {
-    .dealWithRasterBackends(sim) # no need to assign to sim b/c uses list2env
+    .dealWithRasterBackends(tmpsim) # no need to assign to sim b/c uses list2env
   }
 
-  return(sim)
+  return(tmpsim)
 }
 
 
@@ -355,7 +360,6 @@ unzipSimList <- function(zipfile, load = TRUE, paths = getPaths(), ...) {
   .Deprecated("loadSimList")
   sim <- loadSimList(zipfile, ...)
   return(sim)
-
 }
 
 checkArchiveAlternative <- function(filename) {
