@@ -157,10 +157,10 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
                      files <- dir(file.path(mp, mod), recursive = TRUE, full.names = TRUE)
                      files <- grep("^\\<data\\>", invert = TRUE, value = TRUE, files)
                    })
-    srcFilesRel <- makeRelative(srcFiles, absoluteBase = projectPath)
+    srcFilesRel <- makeRelative(srcFiles, projectPath)
     if (any(isAbsolutePath(srcFilesRel))) {# means not inside the projectPath
       # try modulePath first
-      srcFilesRel <- makeRelative(srcFiles, absoluteBase = dirname(modulePath(sim)))
+      srcFilesRel <- makeRelative(srcFiles, dirname(modulePath(sim)))
       tmpSrcFiles <- file.path(projectPath, srcFilesRel)
       linkOrCopy(srcFiles, tmpSrcFiles, verbose = verbose - 1)
       on.exit(unlink(tmpSrcFiles))
@@ -189,7 +189,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
       allFns <- c(fns, otherFns, srcFilesRel)
 
-      relFns <- makeRelative(c(fileToDelete, allFns), absoluteBase = projectPath)
+      relFns <- makeRelative(c(fileToDelete, allFns), projectPath)
 
       archiveWrite(filename, relFns, verbose)
 

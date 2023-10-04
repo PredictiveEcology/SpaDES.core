@@ -44,9 +44,9 @@ test_that("test checkpointing", {
 
 test_that("test checkpointing with disk-backed raster", {
   skip_on_cran()
+  skip_if_not_installed("magrittr") ## using tee pipe (`%T>%`)
 
-  testInit(sampleModReqdPkgs,
-                          opts = list(spades.recoveryMode = FALSE))
+  testInit(sampleModReqdPkgs, opts = list(spades.recoveryMode = FALSE))
 
   file <- file.path("chkpnt.qs")
 
@@ -67,7 +67,7 @@ test_that("test checkpointing with disk-backed raster", {
   simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
   simA$ras <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1)
   tmpRasFilename <- tempfile("tmpRas", fileext = ".grd") %T>%
-    file.create() %>%
+    file.create() |>
     normPath()
   if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
   simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
