@@ -56,6 +56,7 @@
 #' @export
 #' @importFrom qs qsave
 #' @importFrom stats runif
+#' @importFrom reproducible makeRelative
 #' @importFrom Require messageVerbose
 #' @importFrom tools file_ext
 #' @rdname saveSimList
@@ -522,6 +523,7 @@ archiveConvertFileExt <- function(filename, convertTo = "tar.gz") {
   filename
 }
 
+#' @importFrom reproducible makeRelative
 relativizePaths <- function(paths) {
   p <- normPath(paths)
   projectPath <- dirname(p["modulePath"])
