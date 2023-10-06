@@ -46,7 +46,7 @@ test_that("test checkpointing with disk-backed raster", {
   skip_on_cran()
   skip_if_not_installed("magrittr") ## using tee pipe (`%T>%`)
 
-  testInit(sampleModReqdPkgs, opts = list(spades.recoveryMode = FALSE))
+  testInit(c(sampleModReqdPkgs, "magrittr"), opts = list(spades.recoveryMode = FALSE))
 
   file <- file.path("chkpnt.qs")
 
