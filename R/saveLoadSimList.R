@@ -316,13 +316,15 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   } else if (tolower(tools::file_ext(filename[1])) == "qs") {
     tmpsim <- qs::qread(filename[1], nthreads = getOption("spades.qsThreads", 1))
   }
-  paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
   if (!is.null(paths)) {
     paths <- lapply(paths, normPath)
   } else {
     paths <- list()
   }
   paths(tmpsim) <- modifyList2(paths(tmpsim), paths)
+
+  # paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
+  paths(tmpsim) <- fs::path_abs(paths(tmpsim), projectPath)
 
   tmpsim <- .unwrap(tmpsim, cachePath = projectPath) # convert e.g., PackedSpatRaster
 
