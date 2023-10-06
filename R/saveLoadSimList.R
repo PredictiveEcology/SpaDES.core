@@ -126,10 +126,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     sim <- get(simName, envir = tmpEnv)
   }
 
+  sim <- .wrap(sim, cachePath = projectPath) # makes a copy of filebacked object files
+  sim@current <- list() # it is presumed that this event should be considered finished prior to saving
+
   if (isTRUE(files)) {
     fns <- Filenames(sim)
-    sim <- .wrap(sim, cachePath = projectPath) # makes a copy of filebacked object files
-    sim@current <- list() # it is presumed that this event should be considered finished prior to saving
     empties <- nchar(fns) == 0
     if (any(empties)) {
       fns <- fns[!empties]
