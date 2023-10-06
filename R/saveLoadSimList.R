@@ -323,8 +323,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
   paths(tmpsim) <- modifyList2(paths(tmpsim), paths)
 
-  # paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
-  paths(tmpsim) <- fs::path_abs(paths(tmpsim), projectPath)
+  paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
 
   tmpsim <- .unwrap(tmpsim, cachePath = projectPath) # convert e.g., PackedSpatRaster
 
@@ -534,12 +533,10 @@ relativizePaths <- function(paths) {
   p
 }
 
+#' @importFrom fs path_abs
 absolutizePaths <- function(paths, projectPath, tempdir = tempdir()) {
-  p <- normPath(unlist(paths))
-  isAbs <- isAbsolutePath(p)
-  nonAbsCorePaths <- intersect(names(isAbs)[!isAbs], corePaths)
-  nonAbsTmpPaths <- intersect(names(isAbs)[!isAbs], tmpPaths)
-  p[!isAbs][nonAbsCorePaths] <- makeAbsolute(p[!isAbs][nonAbsCorePaths], projectPath)
-  p[!isAbs][nonAbsTmpPaths] <- makeAbsolute(p[!isAbs][nonAbsTmpPaths], tempdir)
-  p
+  p <- unlist(paths)
+  p[corePaths] <- fs::path_abs(p[corePaths], projectPath)
+  p[tmpPaths] <- fs::path_abs(p[tmpPaths], tempdir)
+  normPath(p)
 }
