@@ -667,7 +667,7 @@ setMethod(
         for (x in dotParamsReal) {
           if (is.null(sim@params[[m]][[x]])) {
             sim@params[[m]][[x]] <- NA_real_
-          } else if (is.na(sim@params[[m]][[x]])) {
+          } else if (isTRUE(all(is.na(sim@params[[m]][[x]])))) {
             sim@params[[m]][[x]] <- NA_real_
           }
         }
