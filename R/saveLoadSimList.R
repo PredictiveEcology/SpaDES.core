@@ -525,12 +525,14 @@ archiveConvertFileExt <- function(filename, convertTo = "tar.gz") {
   filename
 }
 
-#' @importFrom reproducible makeRelative
+#' @importFrom reproducible getRelative makeRelative
 relativizePaths <- function(paths) {
   p <- normPath(paths)
   projectPath <- dirname(p["modulePath"])
-  p[corePaths] <- makeRelative(unlist(p)[corePaths], projectPath)
-  p[tmpPaths] <- makeRelative(unlist(p)[tmpPaths], p["scratchPath"])
+  # p[corePaths] <- makeRelative(unlist(p)[corePaths], projectPath)
+  # p[tmpPaths] <- makeRelative(unlist(p)[tmpPaths], p["scratchPath"])
+  p[corePaths] <- getRelative(unlist(p)[corePaths], projectPath)
+  p[tmpPaths] <- getRelative(unlist(p)[tmpPaths], p["scratchPath"])
   p
 }
 
