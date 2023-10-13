@@ -397,6 +397,9 @@ setMethod(
 #'
 #' @param scratchPath The default local directory in which to save transient files.
 #'                    If not specified, defaults to `getOption("spades.scratchPath")`.
+#'                    *Important note:* this location may not be cleaned up automatically,
+#'                    so be sure to monitor this directory and remove unnecessary temp files
+#'                    that may contribute to excessive disk usage.
 #'
 #' @param terraPath  The default local directory in which to save transient `terra` files.
 #'                   If not specified, defaults to
