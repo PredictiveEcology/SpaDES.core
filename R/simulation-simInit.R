@@ -182,7 +182,21 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'                     cached versions of `.inputObjects` to be refreshed,
 #'                     i.e., rerun.
 #' @param ... An alternative way to pass `objects`, i.e., they can just be named
-#'   arguments rather than in a `objects = list(...)`
+#'   arguments rather than in a `objects = list(...)`. It can also be any
+#'   `options` that begins with `spades`, `reproducible` or `Require`, i.e.,
+#'   those identified in `spadesOptions()`,
+#'   `reproducibleOptions()` or `RequireOptions()`.
+#'   These will be assigned to the equivalent option *during* the `simInit` and `spades`
+#'   calls only, i.e., they will revert after the `simInit` or `spades` calls
+#'   are complete. NOTE: these are not passed to the `simList` per se, i.e., they are
+#'   not be available in the `simList` during either
+#'   the `simInit` or `spades` calls via `sim$xxx`, though they will be returned to the `simList`
+#'   at the end of each of these calls (so that the next call to e.g., `spades` can
+#'   see them). For convenience, these can be supplied without their package prefix,
+#'   e.g., `lowMemory` can be specified instead of `spades.lowMemory`. In cases that
+#'   share option name (`reproducible.verbose` and `Require.verbose` both exist),
+#'   passing `verbose = FALSE` will set both. Obviously this may cause unexpected
+#'   problems if a module is also expecting a value.
 #'
 #' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied.
@@ -361,8 +375,24 @@ setMethod(
       checkPath(p, create = TRUE)
     )
 
-    if (length(...names()))
+    if (length(...names())) {
       objects <- append(objects, list(...))
+
+      # set the options; then set them back on exit
+      optsFromDots <- dealWithOptions(objects = objects, ...)
+      if (!is.null(optsFromDots$optsPrev)) {
+        # remove from `objects` as these should not be there
+        objects <- objects[optsFromDots$keepObjNames]
+        on.exit({
+          # reset options in session
+          options(optsFromDots$optsPrev)
+          # put them back in simList for reassessment during spades
+          if (exists("sim", inherits = FALSE))
+            list2env(optsFromDots$optionsAsProvided, envir = envir(sim))
+        }, add = TRUE)
+      }
+    }
+
     objNames <- names(objects)
     if (length(objNames) != length(objects)) {
       stop(
@@ -1638,3 +1668,90 @@ getDebug <- function() {
   }
   debug
 }
+
+dealWithOptions <- function(objects, ..., sim,
+                            thePkgs = c("SpaDES.core", "reproducible", "Require")) {
+  finished <- FALSE
+
+  thePkgsAsOptions <- gsub("SpaDES.core", "spades", thePkgs)
+  thePkgsGrep <- paste0(paste(thePkgsAsOptions, collapse = "\\.|"), "\\.")
+  fns <- paste0(thePkgsAsOptions, "Options")
+  allOptions <- Map(pkg = thePkgs, fn = fns, function(pkg, fn)
+    getFromNamespace(fn, ns = pkg)())
+
+  currOptionsLong <- names(unlist(unname(allOptions), recursive = FALSE))
+
+  currOptionsShort <- gsub(thePkgsGrep, "", currOptionsLong)
+  namesPoss <- if (is.null(...names()) && !missing(sim)) {
+    names(sim)
+  } else {
+    ...names()
+  }
+
+  optionsDotsShort <- currOptionsShort %in% namesPoss
+  optionsDotsLong <- currOptionsLong %in% namesPoss
+  optionsDots <- optionsDotsShort | optionsDotsLong
+
+  either <- optionsDotsShort | optionsDotsLong
+  optionsNamesShort <- currOptionsShort[either]
+  # theOrd2 <- match(so$short, optionsNamesShort)
+  optionsNamesShort <- optionsNamesShort
+  optionsNamesLong <- currOptionsLong[either]
+  optionsNamesLong <- optionsNamesLong
+  df <- data.frame(long = optionsNamesLong, short = optionsNamesShort)
+
+  suppliedOrder <- data.frame(namesPoss = namesPoss, order = seq(namesPoss),
+                              short = gsub(thePkgsGrep, "", namesPoss))
+  suppliedOrder <- merge(df, suppliedOrder)
+  theOrd <- order(suppliedOrder$order)
+  suppliedOrder <- suppliedOrder[theOrd, ]
+  nonOptionsDots <- setdiff(namesPoss, suppliedOrder$namesPoss)
+
+  optsPrev <-  NULL
+  optionsValsLong <- optionsVals <- list()
+  keepObjNames <- character()
+  if (any(optionsDots)) {
+    # optionsNamesLong <- paste0("spades.", optionsNamesShort)
+    optionsVals <- if (missing(objects)) {
+      mget(suppliedOrder$namesPoss, envir = envir(sim))
+    } else {
+      objects[suppliedOrder$namesPoss]
+    }
+    optionsValsLong <- optionsVals
+    names(optionsValsLong) <- suppliedOrder$long# optionsNamesLong
+    # clean up objects -- so no options are in the sim during
+    # simInit call
+    optsPrev <- options(optionsValsLong)
+    on.exit(if (isFALSE(finished)) {
+      options(optsPrev)
+    })
+
+    # deal with verbose
+    verboses <- grepl("\\.verbose", names(optionsValsLong))
+    verbose <- if (any(verboses)) {
+      tail(optionsVals[verboses], 1)[[1]]
+    } else {
+      getOption("reproducible.verbose")
+    }
+    newValue <- as.character(unname(unlist(optionsValsLong)))
+    oldValue <- as.character(unname(unlist(optsPrev)))
+    changed <- newValue != oldValue
+    if (any(changed )) {
+      messageVerbose("The following options have been changed temporarily (during this call)",
+                     verbose = verbose)
+      updates <- try(silent = TRUE,
+                     data.table::data.table(optionName = suppliedOrder$long[changed],
+                                            newValue = newValue[changed], oldValue = oldValue[changed]))
+      if (!is(updates, "try-error"))
+        messageDF(updates, verbose = verbose)
+    }
+
+    keepObjNames <- setdiff(namesPoss, names(optionsVals))
+  }
+
+  finished <- TRUE
+  return(list(options = optionsValsLong, # optionsShort = optionsVals,
+              optionsAsProvided = optionsVals,
+              optsPrev = optsPrev, keepObjNames = keepObjNames))
+}
+

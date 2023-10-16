@@ -956,6 +956,21 @@ setMethod(
                         .plots,
                         ...) {
 
+
+    # set the options; then set them back on exit
+    optsFromDots <- dealWithOptions(sim = sim)
+    if (!is.null(optsFromDots$optsPrev)) {
+      # remove from `sim` as these should not be there
+      rm(list = unique(names(optsFromDots$optionsAsProvided)), envir = envir(sim))
+      on.exit({
+        # reset options in session
+        options(optsFromDots$optsPrev)
+        # put them back in simList for reassessment during spades
+        if (exists("sim", inherits = FALSE))
+          list2env(optsFromDots$optionsAsProvided, envir = envir(sim))
+      }, add = TRUE)
+    }
+
     opt <- options("encoding" = "UTF-8")
     on.exit(options(opt), add = TRUE)
 

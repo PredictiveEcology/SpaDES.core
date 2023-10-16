@@ -140,7 +140,21 @@ cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
 
 \item{...}{An alternative way to pass \code{objects}, i.e., they can just be named
-arguments rather than in a \code{objects = list(...)}}
+arguments rather than in a \code{objects = list(...)}. It can also be any
+\code{options} that begins with \code{spades}, \code{reproducible} or \code{Require}, i.e.,
+those identified in \code{spadesOptions()},
+\code{reproducibleOptions()} or \code{RequireOptions()}.
+These will be assigned to the equivalent option \emph{during} the \code{simInit} and \code{spades}
+calls only, i.e., they will revert after the \code{simInit} or \code{spades} calls
+are complete. NOTE: these are not passed to the \code{simList} per se, i.e., they are
+not be available in the \code{simList} during either
+the \code{simInit} or \code{spades} calls via \code{sim$xxx}, though they will be returned to the \code{simList}
+at the end of each of these calls (so that the next call to e.g., \code{spades} can
+see them). For convenience, these can be supplied without their package prefix,
+e.g., \code{lowMemory} can be specified instead of \code{spades.lowMemory}. In cases that
+share option name (\code{reproducible.verbose} and \code{Require.verbose} both exist),
+passing \code{verbose = FALSE} will set both. Obviously this may cause unexpected
+problems if a module is also expecting a value.}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
