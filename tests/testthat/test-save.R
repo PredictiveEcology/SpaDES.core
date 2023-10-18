@@ -272,6 +272,19 @@ test_that("saveSimList with file backed objs", {
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
   inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
+  outputPath <- file.path(tmpdir, "outputs") ## don't create; will symlink on Unix-alike
+
+  if (identical(tolower(.Platform$OS.type), "windows")) {
+    ## don't use symlink on Windows
+    checkPath(outputPath, create = TRUE)
+    expect_true(dir.exists(outputPath))
+  } else {
+    ## use symlink if not Windows
+    linkedDir <- checkPath(file.path(tmpdir, "outputs_dir"), create = TRUE)
+    file.symlink(linkedDir, outputPath)
+    expect_true(dir.exists(outputPath))
+    expect_identical(Sys.readlink(outputPath), linkedDir)
+  }
 
   linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
   linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
@@ -288,7 +301,7 @@ test_that("saveSimList with file backed objs", {
   paths <- list(
     modulePath = modulePath,
     inputPath = inputPath,
-    outputPath = tmpdir
+    outputPath = outputPath
   )
   # mapPath <- getMapPath(tmpdir)
   #
@@ -315,12 +328,19 @@ test_that("saveSimList with file backed objs", {
     mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
   })
 
-  # With file backed
-  saveSimList(mySim, filename = tmpfile[1], verbose = FALSE)
+  ## with file backed
+  if (identical(tolower(.Platform$OS.type), "windows")) {
+    ## don't use symlink on Windows
+    saveSimList(mySim, filename = tmpfile[1], verbose = FALSE)
+  } else {
+    saveSimList(mySim, filename = tmpfile[1], verbose = FALSE, symlinks = list(outputPath = "outputs"))
+  }
 
   newTmpdir <- normPath(withr::local_tempdir(file.path("newTmp")))
   withr::local_dir(newTmpdir)
   mySimOut <- loadSimList(tmpfile[1])
+
+  expect_true(all(basename(Filenames(mySim)) %in% basename(Filenames(mySimOut))))
 
   # convert to matrix for all.equal --> the two objects have different paths now
   mySim$landscape <- mySim$landscape[]

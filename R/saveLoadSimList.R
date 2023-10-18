@@ -20,6 +20,15 @@
 #' loading `simList` objects and their associated files (e.g., file-backed
 #' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()].
 #'
+#' Additional arguments may be passed via `...`, including:
+#' - `files`: logical indicating whether files should be included in the archive.
+#'            if `FALSE`, will override `cache`, `inputs`, `outputs`, setting them to `FALSE`.
+#' - `symlinks`: a named list of paths corresponding to symlinks, which will be used to substitute
+#'               normalized absolute paths of files.
+#'               Names should correspond to the names in `paths()`;
+#'               values should be project-relative paths.
+#'               E.g., `list(cachePath = "cache", inputPath = "inputs", outputPath = "outputs")`.
+#'
 #' @param sim Either a `simList` or a character string of the name
 #'        of a `simList` that can be found in `envir`.
 #'        Using a character string will assign that object name to the saved
@@ -46,7 +55,7 @@
 #'    Defaults to `getwd()`. All other paths will be made relative with respect to
 #'    this if nested within this.
 #'
-#' @param ... Not used.
+#' @param ... Additional arguments. See Details.
 #'
 #' @return
 #' Invoked for side effects of saving a `.qs` or `.rds` file,
@@ -54,27 +63,30 @@
 #'
 #' @aliases saveSim
 #' @export
+#' @importFrom fs is_absolute_path path_common
 #' @importFrom qs qsave
 #' @importFrom stats runif
 #' @importFrom reproducible makeRelative
 #' @importFrom Require messageVerbose
 #' @importFrom tools file_ext
+#' @importFrom utils modifyList
 #' @rdname saveSimList
 #' @seealso [loadSimList()]
 saveSimList <- function(sim, filename, projectPath = getwd(),
-                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir,
-                        ...) {
-
+                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir, ...) {
   checkSimListExts(filename)
 
   dots <- list(...)
 
   ## user can explicitly override archiving files if FALSE
-  files <- if (isFALSE(dots$files)) {
-    FALSE
+  if (isFALSE(dots$files)) {
+    cache <- inputs <- outputs <- FALSE
+    files <- FALSE
   } else {
-    TRUE
+    files <- TRUE
   }
+
+  symlinks <- dots$symlinks
 
   verbose <- if (is.null(dots$verbose)) {
     if (is.null(dots$quiet)) {
@@ -134,7 +146,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     empties <- nchar(fns) == 0
     if (any(empties)) {
       fns <- fns[!empties]
-      fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns)
+      fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns) ## TODO: not used?
     }
   }
 
@@ -143,7 +155,17 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     filename <- archiveConvertFileExt(filename, "qs")
   }
 
-  paths(sim) <- as.list(relativizePaths(paths(sim)))
+  origPaths <- paths(sim)
+  if (is.null(symlinks)) {
+    paths(sim) <- origPaths |>
+      relativizePaths(projectPath) |>
+      as.list()
+  } else {
+    paths(sim) <- origPaths |>
+    modifyList(symlinks) |>
+    relativizePaths(projectPath) |>
+    as.list()
+  }
 
   # filename <- gsub(tools::file_ext(filename), "qs", filename)
   if (tolower(tools::file_ext(filename)) == "rds") {
@@ -160,9 +182,10 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
                      files <- grep("^\\<data\\>", invert = TRUE, value = TRUE, files)
                    })
     srcFilesRel <- makeRelative(srcFiles, projectPath)
-    if (any(isAbsolutePath(srcFilesRel))) {# means not inside the projectPath
-      # try modulePath first
-      srcFilesRel <- makeRelative(srcFiles, dirname(modulePath(sim)))
+    if (any(isAbsolutePath(srcFilesRel))) {
+      ## means not inside the projectPath
+      guessProjPath <- fs::path_common(origPaths["modulePath"]) |> unique() |> dirname()
+      srcFilesRel <- makeRelative(srcFiles, guessProjPath)
       tmpSrcFiles <- file.path(projectPath, srcFilesRel)
       linkOrCopy(srcFiles, tmpSrcFiles, verbose = verbose - 1)
       on.exit(unlink(tmpSrcFiles))
@@ -190,6 +213,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       }
 
       allFns <- c(fns, otherFns, srcFilesRel)
+      if (!is.null(symlinks)) {
+        for (p in seq_along(names(symlinks))) {
+          allFns <- gsub(origPaths[p], symlinks[p], allFns)
+        }
+      }
 
       relFns <- makeRelative(c(fileToDelete, allFns), projectPath)
 
@@ -526,13 +554,15 @@ archiveConvertFileExt <- function(filename, convertTo = "tar.gz") {
 }
 
 #' @importFrom reproducible getRelative makeRelative
-relativizePaths <- function(paths) {
+relativizePaths <- function(paths, projectPath = NULL) {
   p <- normPath(paths)
-  projectPath <- dirname(p["modulePath"])
-  # p[corePaths] <- makeRelative(unlist(p)[corePaths], projectPath)
-  # p[tmpPaths] <- makeRelative(unlist(p)[tmpPaths], p["scratchPath"])
-  p[corePaths] <- getRelative(unlist(p)[corePaths], projectPath)
-  p[tmpPaths] <- getRelative(unlist(p)[tmpPaths], p["scratchPath"])
+  if (is.null(projectPath)) {
+    projectPath <- fs::path_common(p[["modulePath"]]) |> unique() |> dirname()
+  }
+  p[corePaths] <- getRelative(p[corePaths], projectPath)
+  p[tmpPaths] <- makeRelative(p[tmpPaths], p[["scratchPath"]])
+
+  ## TODO: recombine paths, e.g. modulePath1, modulePath2 into modulePath
   p
 }
 

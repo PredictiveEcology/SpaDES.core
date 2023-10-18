@@ -43,7 +43,7 @@ See Details.}
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can be found.}
 
-\item{...}{Not used.}
+\item{...}{Additional arguments. See Details.}
 }
 \value{
 Invoked for side effects of saving a \code{.qs} or \code{.rds} file,
@@ -69,6 +69,17 @@ as the code will search based on the filename without the file extension.
 There is a family of 2 functions that are mutually useful for saving and
 loading \code{simList} objects and their associated files (e.g., file-backed
 \verb{Raster*}, \code{inputs}, \code{outputs}, \code{cache}) \code{\link[=saveSimList]{saveSimList()}}, \code{\link[=loadSimList]{loadSimList()}}.
+
+Additional arguments may be passed via \code{...}, including:
+\itemize{
+\item \code{files}: logical indicating whether files should be included in the archive.
+if \code{FALSE}, will override \code{cache}, \code{inputs}, \code{outputs}, setting them to \code{FALSE}.
+\item \code{symlinks}: a named list of paths corresponding to symlinks, which will be used to substitute
+normalized absolute paths of files.
+Names should correspond to the names in \code{paths()};
+values should be project-relative paths.
+E.g., \code{list(cachePath = "cache", inputPath = "inputs", outputPath = "outputs")}.
+}
 }
 \seealso{
 \code{\link[=loadSimList]{loadSimList()}}
