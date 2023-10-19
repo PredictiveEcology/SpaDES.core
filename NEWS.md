@@ -10,7 +10,7 @@
 * `dplyr` is removed (again)
 
 ## Bug fixes
-* `coltab<-` from `terra` changed how it deals with multi-layer `SpatRasters`. Two sample modules have been modified to set colors on these multi-layer `SpatRasters`
+* `coltab<-` from `terra` changed how it deals with multi-layer `SpatRasters`. Two sample modules have been modified to set colours on these multi-layer `SpatRasters`
 
 # SpaDES.core 2.0.2
 
