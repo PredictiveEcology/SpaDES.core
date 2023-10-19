@@ -1312,6 +1312,7 @@ setMethod(
       }
     },
     message = function(m) {
+      if (isTRUE(any(grepl("\n\n", m$message)))) browser()
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
@@ -1996,10 +1997,42 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     modName8Chars <- ""
   }
   prependTime <- strftime(st, format = stForm2)
-  if (grepl(prependTime, mess)) { # spades or simInit inside a spades or simInit
+
+  # need to remove final \n, but strsplit on any internal \n
+  slashN <- gregexpr("\n", mess)[[1]]
+  if (isTRUE(slashN[1] > 0)) {
+    # Eliot -- I tried various ways of doing this ... they are similar execution time; this is simplest
+    len <- length(slashN)
+    mess <- gsub(pattern = "\\n$", replacement = "", mess)
+    if (len > 1) {
+      mess <- strsplit(mess, "\n")[[1]]
+      mess[-len] <- paste0(mess[-len], "\n")
+    }
+  }
+
+  # Split long lines -- this is complicated because of prependTime, spacing, colours etc.
+  # nCharPrependTime <- nchar(prependTime)
+  # numChars <- nchar(mess) + nCharPrependTime
+  # wdth <- getOption("width") - 12 - nCharPrependTime
+  # if (any(numChars > wdth)) {
+  #   whereSpaces <- gregexpr(" ", mess)
+  #   breakAt <- lapply(whereSpaces, function(ws) ws[which(diff(ws %% wdth) < 0)])
+  #   # breakAt <- whereSpaces[which(diff(whereSpaces %% wdth) < 0)]
+  #   mess <- Map(m = mess, ba = breakAt, function(m, ba) {
+  #     m <- substring(rep(m, length(ba) + 1), c(1, ba + 1), c(ba - 1, 1e3))
+  #     len <- length(m)
+  #     if (len > 1)
+  #       m[-len] <- paste0(m[-len], "\n")
+  #     m
+  #     })
+  #   mess <- unlist(unname(mess))
+  # }
+
+  if (any(grepl(prependTime, mess))) { # spades or simInit inside a spades or simInit
     prependTime <- " -- "
   } else {
-    if (!startsWith(mess, " ")) mess <- paste0(" ", mess)
+    hasSpaceStart <- startsWith(mess, " ")
+    if (any(!hasSpaceStart)) mess <- paste0(" ", mess) # i.e., "tab" all lines
     if (!is.null(suffix))
       modName8Chars <- paste0(modName8Chars, suffix)
     if (!is.null(prefix))
@@ -2007,7 +2040,6 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 
     mess <- paste0(modName8Chars, mess)
   }
-  mess <- gsub("\\n", "", mess)
   paste0(prependTime, mess)
 }
 

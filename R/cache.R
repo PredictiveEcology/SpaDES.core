@@ -34,7 +34,6 @@ setMethod(
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
     # browser(expr = exists("._robustDigest_1"))
-
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
@@ -303,27 +302,27 @@ setMethod(
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
-          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module"))
         } else if (!is.na(fromMemoise)) {
           message(crayon::blue("     loaded cached copy of", cur$moduleName, "module\n",
-                           "adding to memoised copy\n"))
+                           "adding to memoised copy"))
         } else {
-          message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
         }
       } else {
         if (exists("aaaa")) browser()
         if (isTRUE(fromMemoise)) {
           message(crayon::blue("     loaded memoised copy of", cur$eventType, "event in",
-                           cur$moduleName, "module\n"))
+                           cur$moduleName, "module"))
 
         } else if (!is.na(fromMemoise)) {
           message(crayon::blue("     loaded cached copy of", cur$eventType, "event in",
                            cur$moduleName, "module. ",
-                           if (fromMemoise) "Adding to memoised copy.",
-                           "\n"))
+                           if (fromMemoise) "Adding to memoised copy."
+                           ))
         } else {
           message(crayon::blue("     loaded ", fromWhere," copy of", cur$eventType, "event in",
-                           cur$moduleName, "module\n"))
+                           cur$moduleName, "module"))
         }
 
       }
