@@ -1962,39 +1962,41 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   stForm1 <- "%h%d"
   stForm2 <- paste(stForm1, "%H:%M:%S")
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
+  modName8Chars <- ""
   if (numCharsMax > 0) {
+    # if (grepl("fireSense_dataPrepFit", mess)) browser()
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
     simEnv <- whereInStack("sim")
-    sim <- get("sim", simEnv, inherits = FALSE)
+    sim <- get0("sim", simEnv, inherits = FALSE)
+    if (!is.null(sim)) {
 
-    # If this is a nested spades call, then it will have a previous value in sim$._simPrevs
-    #  That will be sufficient
-    if (length(sim$._simPrevs)) {
-      if (startsWith(mess, strftime(st, format = "%h%d"))) {
-        mess <- gsub("^.{11,14} ", ": ", mess) # remove date
-        sim <- get("sim", sim$._simPrevs[[1]])
+      # If this is a nested spades call, then it will have a previous value in sim$._simPrevs
+      #  That will be sufficient
+      if (length(sim$._simPrevs)) {
+        if (startsWith(mess, strftime(st, format = "%h%d"))) {
+          mess <- gsub("^.{11,14} ", ": ", mess) # remove date
+          sim <- get("sim", sim$._simPrevs[[1]])
+        }
+      }
+
+      if (length(sim@current)) {
+        modName <- sim@current$moduleName # only defined if in doEvent
+        if (is.null(modName)) modName <- sim@events[[1]]$moduleName
+
+        modName8Chars <- moduleNameStripped(modName, numCharsMax)
+        # nchr <- nchar(modName)
+        # tooManyVowels <- nchr - numCharsMax
+        # numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+        # tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
+        # modName8Chars <-
+        #   paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
+        #                                  tooFewVowels,",",tooManyVowels,"}"), "",
+        #                           modName, perl=TRUE), 1, numCharsMax))
+        # if (nchr < numCharsMax)
+        #   modName8Chars <- paste0(modName8Chars,
+        #                           paste(collapse = "", rep(" ", numCharsMax - nchr)))
       }
     }
-
-    if (length(sim@current)) {
-      modName <- sim@current$moduleName # only defined if in doEvent
-      if (is.null(modName)) modName <- sim@events[[1]]$moduleName
-
-      modName8Chars <- moduleNameStripped(modName, numCharsMax)
-      # nchr <- nchar(modName)
-      # tooManyVowels <- nchr - numCharsMax
-      # numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
-      # tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
-      # modName8Chars <-
-      #   paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
-      #                                  tooFewVowels,",",tooManyVowels,"}"), "",
-      #                           modName, perl=TRUE), 1, numCharsMax))
-      # if (nchr < numCharsMax)
-      #   modName8Chars <- paste0(modName8Chars,
-      #                           paste(collapse = "", rep(" ", numCharsMax - nchr)))
-    }
-  } else {
-    modName8Chars <- ""
   }
   prependTime <- strftime(st, format = stForm2)
 
