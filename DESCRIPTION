@@ -30,7 +30,7 @@ Authors@R: c(
 Depends:
     R (>= 4.1),
     quickPlot (>= 1.0.2),
-    reproducible (>= 2.0.8.9005)
+    reproducible (>= 2.0.8.9008)
 Imports:
     crayon,
     data.table (>= 1.11.0),

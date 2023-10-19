@@ -162,9 +162,9 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       as.list()
   } else {
     paths(sim) <- origPaths |>
-    modifyList(symlinks) |>
-    relativizePaths(projectPath) |>
-    as.list()
+      modifyList(symlinks) |>
+      relativizePaths(projectPath) |>
+      as.list()
   }
 
   # filename <- gsub(tools::file_ext(filename), "qs", filename)
@@ -214,12 +214,12 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
       allFns <- c(fns, otherFns, srcFilesRel)
       if (!is.null(symlinks)) {
-        for (p in seq_along(names(symlinks))) {
-          allFns <- gsub(origPaths[p], symlinks[p], allFns)
+        for (p in names(symlinks)) {
+          allFns <- gsub(origPaths[[p]], symlinks[[p]], allFns)
         }
       }
 
-      relFns <- makeRelative(c(fileToDelete, allFns), projectPath)
+      relFns <- makeRelative(c(fileToDelete, allFns), projectPath) |> unname()
 
       archiveWrite(filename, relFns, verbose)
 
@@ -527,11 +527,17 @@ archiveExtract <- function(archiveName, exdir) {
 }
 
 archiveWrite <- function(archiveName, relFns, verbose) {
+  relFns <- unname(relFns)
+
   if (requireNamespace("archive") && !isWindows()) {
     archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
     # archiveName <- gsub(tools::file_ext(archiveName), "tar.gz", archiveName)
     compLev <- getOption("spades.compressionLevel", 1)
-    archive::archive_write_files(archiveName, relFns, options = paste0("compression-level=", compLev))
+    archive::archive_write_files(
+      archiveName,
+      relFns,
+      options = paste0("compression-level=", compLev)
+    )
     # archive::archive_write_files(archiveName, files = relFns)
   } else {
     archiveName <- archiveConvertFileExt(archiveName, "zip")
@@ -553,9 +559,11 @@ archiveConvertFileExt <- function(filename, convertTo = "tar.gz") {
   filename
 }
 
+#' @importFrom fs path_common path_norm
 #' @importFrom reproducible getRelative makeRelative
 relativizePaths <- function(paths, projectPath = NULL) {
-  p <- normPath(paths)
+  # p <- normPath(paths)
+  p <- sapply(paths, fs::path_norm, USE.NAMES = TRUE)
   if (is.null(projectPath)) {
     projectPath <- fs::path_common(p[["modulePath"]]) |> unique() |> dirname()
   }
