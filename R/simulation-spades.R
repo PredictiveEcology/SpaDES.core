@@ -1967,8 +1967,8 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     # if (grepl("fireSense_dataPrepFit", mess)) browser()
     modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
     simEnv <- whereInStack("sim")
-    sim <- get0("sim", simEnv, inherits = FALSE)
-    if (!is.null(sim)) {
+    sim <- try(get0("sim", simEnv, inherits = FALSE), silent = TRUE)
+    if (!is(sim, "try-error") && !is.null(sim)) {
 
       # If this is a nested spades call, then it will have a previous value in sim$._simPrevs
       #  That will be sufficient
