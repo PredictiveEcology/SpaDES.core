@@ -339,7 +339,8 @@ test_that("saveSimList with file backed objs", {
   mySimOut$landscape <- mySimOut$landscape[]
   expect_equivalent(mySim, mySimOut)
 
-  unlink(linkedDir, recursive = TRUE)
+  if (exists("linkedDir"))
+    unlink(linkedDir, recursive = TRUE)
 })
 
 test_that("restart does not work correctly", {
