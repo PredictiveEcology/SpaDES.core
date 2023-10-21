@@ -956,7 +956,6 @@ setMethod(
                         .plots,
                         ...) {
 
-
     # set the options; then set them back on exit
     optsFromDots <- dealWithOptions(sim = sim)
     if (!is.null(optsFromDots$optsPrev)) {
@@ -1312,7 +1311,7 @@ setMethod(
       }
     },
     message = function(m) {
-      if (isTRUE(any(grepl("\n\n", m$message)))) browser()
+      # if (isTRUE(any(grepl("\n\n", m$message)))) browser()
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
@@ -1410,7 +1409,7 @@ setMethod(
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     if (cacheIt) { # means that a module or event is to be cached
-      fns <- ls(fnEnv, all.names = TRUE)
+      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod")) # .inputObjects is not run in `spades`; mod is same as .objects
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
