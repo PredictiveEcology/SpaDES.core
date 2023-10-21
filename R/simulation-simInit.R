@@ -1500,9 +1500,12 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       debug <- getDebug() # from options first, then override if in a simInitAndSpades
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
-                          objects = objects, inputs = inputs, outputs = outputs)
+                          objects = objects, inputs = inputs, outputs = outputs,
+                          times = list(start = as.numeric(start(sim)),
+                                       end = as.numeric(start(sim)), timeunit = timeunit(sim)))
         messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
-        simAltOut <- spades(simAlt, events = "init", debug = debug)
+        simAltOut <- spades(simAlt, # events = "init",
+                            debug = debug)
       })#,
       # message = function(m) {
       #   if (all(!grepl("setDTthreads|Setting:", m$message))) {
