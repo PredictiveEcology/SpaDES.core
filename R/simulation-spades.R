@@ -1295,9 +1295,13 @@ setMethod(
       return(invisible(sim))
     },
     warning = function(w) {
+      w$message <- gsub("^In modCall\\(sim = sim.+\"]]\\): ", "", w$message)
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       }
+      warning(w)
+      tryCatch(invokeRestart("muffleWarning"), error = function(e) NULL)
+
     },
     error = function(e) {
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
