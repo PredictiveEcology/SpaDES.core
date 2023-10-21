@@ -1,6 +1,6 @@
 test_that("saving files (and memoryUse)", {
   skip_on_cran()
-#   skip_on_os("windows") ## TODO: memoryUse() hanging on windows
+  # skip_on_os("windows") ## TODO: memoryUse() hanging on windows
   skip_on_covr() ## issue with memoryUseSetup
 
   testInit(smcc = FALSE, opts = list("spades.memoryUseInterval" = 0.1),
@@ -155,7 +155,6 @@ test_that("saving csv files does not work correctly", {
 })
 
 test_that("saveSimList does not work correctly", {
-
   testInit(sampleModReqdPkgs,
            tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
            opts = list(reproducible.verbose = 0))
@@ -163,7 +162,6 @@ test_that("saveSimList does not work correctly", {
   unlink(tmpfile[6])
   mapPath <- getMapPath(tmpdir)
   modules <- getSampleModules(tmpdir)
-
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
   inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
@@ -234,7 +232,6 @@ test_that("saveSimList does not work correctly", {
   # mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
-
   # loses the raster landscape
   saveSimList(sim, filename = tmpfile[3])
   sim <- loadSimList(file = tmpfile[3])
@@ -265,7 +262,6 @@ test_that("saveSimList does not work correctly", {
   expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
   # test file-backed raster is gone
   expect_error(mySim$landscape$DEM[])
-
 })
 
 test_that("saveSimList with file backed objs", {
@@ -276,12 +272,27 @@ test_that("saveSimList with file backed objs", {
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
   inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
+  outputPath <- file.path(tmpdir, "outputs") ## don't create; will symlink on Unix-alike
+
+  tmpfile[-1] <- file.path(outputPath, basename(tmpfile[-1]))
+
+  if (identical(tolower(.Platform$OS.type), "windows")) {
+    ## don't use symlink on Windows
+    checkPath(outputPath, create = TRUE)
+    expect_true(dir.exists(outputPath))
+  } else {
+    ## use symlink if not Windows
+    linkedDir <- checkPath(file.path(tempdir(), "SpaDES.core_tests", "outputs_dir"), create = TRUE)
+    file.symlink(linkedDir, outputPath)
+    expect_true(dir.exists(outputPath))
+    expect_identical(Sys.readlink(outputPath), linkedDir)
+  }
 
   linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
   linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
              file.path(modulePath, dir(modules, recursive = TRUE)))
 
-  times <- list(start = 0, end = 1)
+  times <- list(start = 0, end = 5)
   parameters <- list(
     .globals = list(stackName = "landscape"),
     caribouMovement = list(.plotInitialTime = NA_integer_),
@@ -292,44 +303,44 @@ test_that("saveSimList with file backed objs", {
   paths <- list(
     modulePath = modulePath,
     inputPath = inputPath,
-    outputPath = tmpdir
+    outputPath = outputPath
   )
-  # mapPath <- getMapPath(tmpdir)
-  #
-  # times <- list(start = 0, end = 1)
-  # parameters <- list(
-  #   .globals = list(stackName = "landscape"),
-  #   caribouMovement = list(.plotInitialTime = NA_integer_),
-  #   randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
-  # )
-  # modules <- list("randomLandscapes", "caribouMovement")
-  # paths <- list(
-  #   modulePath = getSampleModules(tmpdir),
-  #   inputPath = mapPath,
-  #   outputPath = tmpdir
-  # )
 
   mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-                   outputs = data.frame(objectName = "landscape", saveTime = times$end))
+                   outputs = data.frame(objectName = "landscape",
+                                        saveTime = seq(times$start, times$end)))
   mySim <- spades(mySim, debug = FALSE)
-  tmpfile[3] <- file.path(checkPath(file.path(dirname(tmpfile[3]), .rndstr(1)), create = TRUE),
-                          basename(tmpfile[3]))
-  coltab(mySim$landscape$DEM) <- NULL
-  Map(nam = names(mySim$landscape), i = seq(nlyr(mySim$landscape)), function(nam, i)
-    mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
-  )
 
-  # With file backed
-  saveSimList(mySim, filename = tmpfile[1], verbose = FALSE)
+  Map(nam = names(mySim$landscape), i = seq(nlyr(mySim$landscape)), function(nam, i) {
+    coltab(mySim$landscape[[nam]]) <- NULL ## can't use colour table with FLT4S (#261)
+    mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
+  })
+
+  ## with file backed
+  if (identical(tolower(.Platform$OS.type), "windows")) {
+    ## don't use symlink on Windows
+    saveSimList(mySim, filename = tmpfile[1], verbose = FALSE)
+  } else {
+    saveSimList(mySim, filename = tmpfile[1], verbose = FALSE, symlinks = list(outputPath = "outputs"))
+  }
 
   newTmpdir <- normPath(withr::local_tempdir(file.path("newTmp")))
   withr::local_dir(newTmpdir)
   mySimOut <- loadSimList(tmpfile[1])
 
+  ## all files except .grd.aux.xml files are copied
+  expect_true(all(grep("[.]grd[.]aux[.]xml$", dir(outputPath), invert = TRUE, value = TRUE) %in%
+                    dir(outputPath(mySimOut))))
+  expect_true(all(grep("[.]grd[.]aux[.]xml$", dir(outputPath(mySim)), invert = TRUE, value = TRUE) %in%
+                    dir(outputPath(mySimOut))))
+
   # convert to matrix for all.equal --> the two objects have different paths now
   mySim$landscape <- mySim$landscape[]
   mySimOut$landscape <- mySimOut$landscape[]
   expect_equivalent(mySim, mySimOut)
+
+  if (exists("linkedDir"))
+    unlink(linkedDir, recursive = TRUE)
 })
 
 test_that("restart does not work correctly", {
