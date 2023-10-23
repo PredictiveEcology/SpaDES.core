@@ -56,8 +56,7 @@ metadata}
 \item{\code{outputs}}{a \code{data.frame}  or \code{data.table} of files and
 metadata}
 
-\item{\code{paths}}{Named list of \code{modulePath}, \code{inputPath},
-and \code{outputPath} paths. Partial matching is performed.}
+\item{\code{paths}}{Named list of paths. See \code{?.paths}. Partial matching is performed.}
 
 \item{\code{.xData}}{Environment referencing the objects used in the simulation.
 Several "shortcuts" to accessing objects referenced by this
