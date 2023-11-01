@@ -698,7 +698,8 @@ setMethod(
           if (is.null(sim@params[[m]][[x]])) {
             sim@params[[m]][[x]] <- NA_real_
           } else if (isTRUE(all(is.na(sim@params[[m]][[x]])))) {
-            sim@params[[m]][[x]] <- NA_real_
+            if (length(sim@params[[m]][[x]]) > 1)
+              sim@params[[m]][[x]] <- NA_real_
           }
         }
 
