@@ -11,6 +11,7 @@
 
 ## Bug fixes
 * `coltab<-` from `terra` changed how it deals with multi-layer `SpatRasters`. Two sample modules have been modified to set colours on these multi-layer `SpatRasters`
+* loading of `asc` raster-type files using `inputs` did not work; fixed.
 * fixed bug in `simInit` parameter checking
 
 # SpaDES.core 2.0.2

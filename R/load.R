@@ -10,9 +10,9 @@ utils::globalVariables(c("fun", "loadTime", "package"))
 #' @rdname loadFiles
 .fileExtensions <- function() {
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
-    "asc", "terra", "rast",
+    "asc", "rast", "terra",
     "csv", "read.csv", "utils",
-    "png", "terra", "rast",
+    "png", "rast", "terra",
     "qs", "qread", "qs",
     "Rdata", "load", "base",
     "rdata", "load", "base",
@@ -20,7 +20,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
     "shp", "terra", "vect",
-    "tif", "terra", "rast",
+    "tif", "rast", "terra",
     "txt", "read.table", "utils"
     )),
     stringsAsFactors = FALSE)
