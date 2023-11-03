@@ -116,7 +116,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
-  cur <<- sim@current
+  cur <- sim@current
   curModuleName <- cur[["moduleName"]]
   if  (length(cur) == 0) {
     # Test replacement for speed
