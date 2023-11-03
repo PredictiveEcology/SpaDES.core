@@ -940,7 +940,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.wrap.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", NULL),
+.wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
                                        conn = getOption("reproducible.conn", NULL),
                                        verbose = getOption("reproducible.verbose")) {
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
