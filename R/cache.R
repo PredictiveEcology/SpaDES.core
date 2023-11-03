@@ -247,7 +247,7 @@ setMethod(
         paste0("module:", cur$moduleName),
         paste0("eventType:", cur$eventType),
         paste0("eventTime:", cur$eventTime),
-        paste0("function:spades")
+        paste0("otherFunctions:spades")
       ) # add this because it will be an outer function, if there are events occurring
     } else {
       scalls <- sys.calls()
@@ -255,7 +255,7 @@ setMethod(
       if (!is.na(parseModuleFrameNum)) {
         inObj <- .grepSysCalls(scalls, pattern = "^.inputObjects")
         if (any(!is.na(inObj))) {
-          userTags <- c("function:.inputObjects")
+          userTags <- c("otherFunctions:.inputObjects")
           userTags1 <- tryCatch(paste0("module:", get("m", sys.frame(parseModuleFrameNum))),
                                 error = function(x) NULL)
           userTags <- c(userTags, userTags1)
