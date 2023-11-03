@@ -1255,13 +1255,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           if (any(".inputObjects" %in% debug))
             debugonce(.inputObjects)
 
-          knowns <- c(".useCache") # don't change Caching based on .useCache
-                    # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
+          modParams <- sim@params[[mBase]]
+          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in% paramsDontCacheOn
+          simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
+          paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
-          keepers <- setdiff(names(sim@params[[".globals"]]), knowns)
-          globsWoKnowns <- sim@params[[".globals"]][keepers]
-          keepersPar <- setdiff(names(sim@params[[mBase]]), knowns)
-          paramsWoKnowns <- sim@params[[mBase]][keepersPar]
           sim <- Cache(.inputObjects, sim,
                        .objects = objectsToEvaluateForCaching,
                        notOlderThan = notOlderThan,
@@ -1270,12 +1268,18 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                        cachePath = sim@paths$cachePath,
                        classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                                            params = paramsWoKnowns,
-                                           .globals = globsWoKnowns,
+                                           # .globals = globsWoKnowns,
                                            modules = mBase),
                        showSimilar = showSimilar,
                        userTags = c(paste0("module:", mBase),
-                                    "eventType:.inputObjects",
-                                    "function:.inputObjects"))
+                                    "eventType:.inputObjects"))
+
+          # put back the current values of params that were not cached on
+          if (sum(paramsDontCacheOnActual))
+            sim@params[[mBase]][paramsDontCacheOnActual] <- modParams[paramsDontCacheOnActual]
+
+
+
         }
       } else {
         .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)

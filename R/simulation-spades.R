@@ -1413,7 +1413,8 @@ setMethod(
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     if (cacheIt) { # means that a module or event is to be cached
-      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod")) # .inputObjects is not run in `spades`; mod is same as .objects
+
+      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par")) # .inputObjects is not run in `spades`; mod is same as .objects
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
@@ -1421,10 +1422,16 @@ setMethod(
       #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
       moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
+      # globalParams <- sim@params[[".globals"]]
+      modParams <- sim@params[[cur[["moduleName"]]]]
+      paramsDontCacheOnActual <- names(modParams) %in% paramsDontCacheOn
+      simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
+      modParams <- modParams[!paramsDontCacheOnActual]
+
       classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                            paths = FALSE, outputs = FALSE,
-                           params = sim@params[[cur[["moduleName"]]]],
-                           .globals = sim@params[[".globals"]],
+                           params = modParams,
+                           # .globals = globalParams,
                            modules = cur[["moduleName"]])
     }
   }
@@ -1454,6 +1461,14 @@ setMethod(
   } else {
     sim <- eval(fnCallAsExpr) # slower than more direct version just above
   }
+
+  # put back the current values of params that were not cached on
+  if (exists("modParams", inherits = FALSE))
+    if (sum(paramsDontCacheOnActual)) {
+      sim@params[[cur[["moduleName"]]]][paramsDontCacheOnActual] <- modParams[paramsDontCacheOnActual]
+    }
+
+
   if (!(FALSE %in% debug || any(is.na(debug))) )
     objectsCreatedPost(sim, objsIsNullBefore)
 
@@ -2236,3 +2251,6 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 
 }
+
+paramsDontCacheOn <- c(".useCache", ".useParallel") # don't change Caching based on .useCache
+                                                    # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
