@@ -3306,8 +3306,20 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
     ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy] #nolint
     a <- ret$elapsedTime
     if (identical(units, "auto")) {
+      unts <- "secs"
+      if (any(a > minutesInSeconds)) {
+        if (any(a > hoursInSeconds)) {
+          if (any(a > daysInSeconds)) {
+            unt = "days"
+          }
+        } else {
+          unt = "hours"
+        }
+      } else {
+        unt = "mins"
+      }
       st <- Sys.time()
-      a <- a + st - st # work around for forcing a non seconds unit, allowing "auto"
+      a <- round(difftime(a + st, st, units = unt), 3) # work around for forcing a non seconds unit, allowing "auto"
     } else {
       # This one won't allow "auto"
       units(a) <- units
