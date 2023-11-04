@@ -2,6 +2,7 @@
 % Please edit documentation in R/times.R
 \name{dhour}
 \alias{dhour}
+\alias{dmin}
 \alias{dday}
 \alias{dyears}
 \alias{dyears,numeric-method}
@@ -18,6 +19,8 @@
 \title{SpaDES time units}
 \usage{
 dhour(x)
+
+dmin(x)
 
 dday(x)
 
