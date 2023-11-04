@@ -368,8 +368,21 @@ setMethod(
                         loadOrder,
                         notOlderThan, ...) {
 
+    ._startClockTime <- Sys.time()
+    # create  <- List object for the simulation
+    sim <- new("simList")
+
+    # loggingMessage helpers
+    ._simNesting <- simNestingSetup(...)
+    sim[["._simNesting"]] <- ._simNesting
+
     opt <- options("encoding" = "UTF-8")
-    on.exit(options(opt), add = TRUE)
+    on.exit({ options(opt)
+      sim <- elapsedTimeInSimInit(._startClockTime, sim)
+      ._startClockTime <- Sys.time()
+      dt <- difftime(._startClockTime, ._startClockTime - sim$._simInitElapsedTime)
+      message("Elpsed time for simInit: ", format(dt, format = "auto"))
+    }, add = TRUE)
 
     paths <- lapply(paths, function(p)
       checkPath(p, create = TRUE)
@@ -379,7 +392,7 @@ setMethod(
       objects <- append(objects, list(...))
 
       # set the options; then set them back on exit
-      optsFromDots <- dealWithOptions(objects = objects, ...)
+      optsFromDots <- dealWithOptions(objects = objects, sim = sim, ...)
       if (!is.null(optsFromDots$optsPrev)) {
         # remove from `objects` as these should not be there
         objects <- objects[optsFromDots$keepObjNames]
@@ -405,16 +418,14 @@ setMethod(
     modulesLoaded <- list()
 
     # If this is being run inside a module, then it needs to know
-    simPrev <- .grepSysCalls(sys.calls(), ".runEvent")
+    sc <- sys.calls()
+    simPrev <- .grepSysCalls(sc, ".runEvent")
 
-    # create simList object for the simulation
-    sim <- new("simList")
-
-    if (length(simPrev) > 0) {
-      sim[["._simPrevs"]] <- append(sys.frames()[tail(simPrev, 1)], sim[["._simPrevs"]])
-    } else {
-      sim[["._simPrevs"]] <- list()
-    }
+    # if (length(simPrev) > 0) {
+    #   sim[["._simPrevs"]] <- append(sys.frames()[tail(simPrev, 1)], sim[["._simPrevs"]])
+    # } else {
+    #   sim[["._simPrevs"]] <- list()
+    # }
 
     # add project/session info -- use list to allow subsequent addition (e.g., git, spatial libs)
     if (getOption("spades.sessionInfo", TRUE))
@@ -485,98 +496,98 @@ setMethod(
                            envir = sim@.xData[[".parsedFiles"]])
       loadPkgs(reqdPkgs) # does unlist internally
     }
-
-    simDTthreads <- getOption("spades.DTthreads", 1L)
-    message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
-    origDTthreads <- setDTthreads(simDTthreads)
-    on.exit(setDTthreads(origDTthreads), add = TRUE)
-
-    allTimeUnits <- FALSE
-
-    ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
-    parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
-
-    timeunits <- findSmallestTU(sim, modulePaths, childModules)
-
-    if (!is.null(times$unit)) {
-      message(
-        paste0(
-          "times contains \'unit\', rather than \'timeunit\'. ",
-          "Using \"", times$unit, "\" as timeunit"
-        )
-      )
-      times$timeunit <- times$unit
-      times$unit <- NULL
-    }
-
-    ## Get correct time unit now that modules are loaded
-    timeunit(sim) <- if (!is.null(times$timeunit)) {
-      #sim@simtimes[["timeunit"]] <- if (!is.null(times$timeunit)) {
-      times$timeunit
-    } else {
-      minTimeunit(timeunits)
-    }
-
-    timestep <- inSeconds(sim@simtimes[["timeunit"]], sim@.xData)
-    times(sim) <- list(
-      current = times$start * timestep,
-      start = times$start * timestep,
-      end = times$end * timestep,
-      timeunit = sim@simtimes[["timeunit"]]
-    )
-
-    ## START OF simInit overrides for inputs, then objects
-    if (NROW(inputs)) {
-      inputs <- .fillInputRows(inputs, startTime = start(sim))
-    }
-
-    ## used to prevent .inputObjects from loading if object is passed in by user.
-    sim$.userSuppliedObjNames <- c(objNames, inputs$objectName)
-
-    ## for now, assign only some core & global params
-    sim@params$.globals <- params$.globals
-
-    # core modules
-    core <- .pkgEnv$.coreModules
-    # remove the restartR module if it is not used. This is easier than adding it because
-    #   the simInit is not run again during restarts, so it won't hit this again. That
-    #   is problematic for restartR situation, but not for "normal" situation.
-    if (is.null(params$.restartR$.restartRInterval) &&
-        getOption("spades.restartRInterval", 0) == 0) {
-      core <- setdiff(core, "restartR")
-      # .pkgEnv$.coreModules <- core
-    } else {
-      restartDir <- checkAndSetRestartDir(sim = sim)
-    }
-
-    ## add core module name to the loaded list (loaded with the package)
-    modulesLoaded <- append(modulesLoaded, core)
-
-    # ## source module metadata and code files
-    # lapply(names(modules(sim)), function(m) moduleVersion(m, sim = sim,
-    #                                                envir = sim@.xData[[".parsedFiles"]]))
-
-    ## do multi-pass if there are parent modules; first for parents, then for children
-    all_parsed <- FALSE
-    # browser(expr = exists("._simInit_5"))
-    while (!all_parsed) {
-      sim <- .parseModule(sim,
-                          as.list(sim@modules),
-                          userSuppliedObjNames = sim$.userSuppliedObjNames,
-                          envir = sim@.xData[[".parsedFiles"]],
-                          notOlderThan = notOlderThan, params = params,
-                          objects = objects, paths = paths)
-      if (length(.unparsed(sim@modules)) == 0) {
-        all_parsed <- TRUE
-      }
-    }
-
-    # push globals onto parameters within each module
-    if (length(sim@params$.globals)) {
-      sim <- updateParamsFromGlobals(sim)
-    }
     # From here, capture messaging and prepend it
     withCallingHandlers({
+
+      simDTthreads <- getOption("spades.DTthreads", 1L)
+      message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
+      origDTthreads <- setDTthreads(simDTthreads)
+      on.exit(setDTthreads(origDTthreads), add = TRUE)
+
+      allTimeUnits <- FALSE
+
+      ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
+      parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
+
+      timeunits <- findSmallestTU(sim, modulePaths, childModules)
+
+      if (!is.null(times$unit)) {
+        message(
+          paste0(
+            "times contains \'unit\', rather than \'timeunit\'. ",
+            "Using \"", times$unit, "\" as timeunit"
+          )
+        )
+        times$timeunit <- times$unit
+        times$unit <- NULL
+      }
+
+      ## Get correct time unit now that modules are loaded
+      timeunit(sim) <- if (!is.null(times$timeunit)) {
+        #sim@simtimes[["timeunit"]] <- if (!is.null(times$timeunit)) {
+        times$timeunit
+      } else {
+        minTimeunit(timeunits)
+      }
+
+      timestep <- inSeconds(sim@simtimes[["timeunit"]], sim@.xData)
+      times(sim) <- list(
+        current = times$start * timestep,
+        start = times$start * timestep,
+        end = times$end * timestep,
+        timeunit = sim@simtimes[["timeunit"]]
+      )
+
+      ## START OF simInit overrides for inputs, then objects
+      if (NROW(inputs)) {
+        inputs <- .fillInputRows(inputs, startTime = start(sim))
+      }
+
+      ## used to prevent .inputObjects from loading if object is passed in by user.
+      sim$.userSuppliedObjNames <- c(objNames, inputs$objectName)
+
+      ## for now, assign only some core & global params
+      sim@params$.globals <- params$.globals
+
+      # core modules
+      core <- .pkgEnv$.coreModules
+      # remove the restartR module if it is not used. This is easier than adding it because
+      #   the simInit is not run again during restarts, so it won't hit this again. That
+      #   is problematic for restartR situation, but not for "normal" situation.
+      if (is.null(params$.restartR$.restartRInterval) &&
+          getOption("spades.restartRInterval", 0) == 0) {
+        core <- setdiff(core, "restartR")
+        # .pkgEnv$.coreModules <- core
+      } else {
+        restartDir <- checkAndSetRestartDir(sim = sim)
+      }
+
+      ## add core module name to the loaded list (loaded with the package)
+      modulesLoaded <- append(modulesLoaded, core)
+
+      # ## source module metadata and code files
+      # lapply(names(modules(sim)), function(m) moduleVersion(m, sim = sim,
+      #                                                envir = sim@.xData[[".parsedFiles"]]))
+
+      ## do multi-pass if there are parent modules; first for parents, then for children
+      all_parsed <- FALSE
+      # browser(expr = exists("._simInit_5"))
+      while (!all_parsed) {
+        sim <- .parseModule(sim,
+                            as.list(sim@modules),
+                            userSuppliedObjNames = sim$.userSuppliedObjNames,
+                            envir = sim@.xData[[".parsedFiles"]],
+                            notOlderThan = notOlderThan, params = params,
+                            objects = objects, paths = paths)
+        if (length(.unparsed(sim@modules)) == 0) {
+          all_parsed <- TRUE
+        }
+      }
+
+      # push globals onto parameters within each module
+      if (length(sim@params$.globals)) {
+        sim <- updateParamsFromGlobals(sim)
+      }
 
       ## add name to depends
       if (!is.null(names(sim@depends@dependencies))) {
@@ -776,13 +787,23 @@ setMethod(
 
       ## check the parameters supplied by the user
       checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
+      sim <- elapsedTimeInSimInit(._startClockTime, sim)
+      ._startClockTime <- Sys.time()
 
     },
     message = function(m) {
-      message(loggingMessage(m$message, prefix = " simInit:"))
+      # if (exists("bbbb", envir = .GlobalEnv)) browser()
+
+      message(loggingMessage(m$message, prefix = prefixSimInit))
       # message(Sys.time(), " simInit::", gsub("\\n", "", m$message))
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+    },
+    warning = function(w) {
+      if (grepl("In .+:", w$message)) {
+        warningSplitOnColon(w)
+        invokeRestart("muffleWarning")
+      }
     }
     )
 
@@ -1178,7 +1199,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     eventType = ".inputObjects",
     eventPriority = .normal()
   )
-  # browser(expr = exists("._runModuleInputObjects_1"))
+
+  # loggingMessage helpers
+  simNestingRevert <- sim[["._simNesting"]]
+  on.exit(sim[["._simNesting"]] <- simNestingRevert, add = TRUE)
+  sim[["._simNesting"]] <- simNestingOverride(sim, mBase)
+  ._simNesting <- sim[["._simNesting"]]
 
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
@@ -1503,30 +1529,20 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       stripNcharsSpades <- 2 #stripNchars + 2
       stripNcharsSimInit <- stripNchars + 5
       debug <- getDebug() # from options first, then override if in a simInitAndSpades
+      len <- length(sim[["._simNesting"]])
+      ._simNesting <- sim[["._simNesting"]]
+      val <- "intsDrngSmInt"
+      ._simNesting[len] <- val
+
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                           objects = objects, inputs = inputs, outputs = outputs,
                           times = list(start = as.numeric(start(sim)),
                                        end = as.numeric(start(sim)), timeunit = timeunit(sim)))
         messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
-        simAltOut <- spades(simAlt, # events = "init",
+        simAltOut <- spades(simAlt, events = "init",
                             debug = debug)
-      })#,
-      # message = function(m) {
-      #   if (all(!grepl("setDTthreads|Setting:", m$message))) {
-      #     if (nchar(m$message) > stripNchars && !startsWith(prefix = "\033", m$message) &&
-      #         !startsWith(prefix = "The following .globals", m$message)) {
-      #       if (grepl("simInit:", m$message))
-      #         stripNchars <- stripNcharsSimInit
-      #       else
-      #         stripNchars <- stripNcharsSpades
-      #     } else {
-      #       stripNchars <- 0
-      #     }
-      #     message(substr(m$message, start = stripNchars, stop = nchar(m$message)))
-      #   }
-      #   invokeRestart("muffleMessage")
-      # })
+      })
 
       Map(mod = canSafelyRunInit, function(mod) {
         objEnv <- simAltOut$.mods[[mod]]$.objects
@@ -1536,6 +1552,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       })
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
       list2env(objs(simAltOut), envir(sim))
+
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
       list2env(as.list(simAltOut@completed), sim@completed)
 
@@ -1763,3 +1780,47 @@ dealWithOptions <- function(objects, ..., sim,
               optsPrev = optsPrev, keepObjNames = keepObjNames))
 }
 
+elapsedTimeInSimInit <- function(._startClockTime, sim) {
+  elapsed <- difftime(Sys.time(), ._startClockTime, unit = "sec")
+  if (is.null(sim@.xData[["._simInitElapsedTime"]])) {
+    sim@.xData[["._simInitElapsedTime"]] <- elapsed
+  } else {
+    sim@.xData[["._simInitElapsedTime"]] <- sim@.xData[["._simInitElapsedTime"]] + elapsed
+  }
+  sim
+}
+
+
+warningSplitOnColon <- function(w) {
+  mess <- strsplit(w$message, "\\): ")[[1]]
+  len <- length(mess)
+  mess[-len] <- paste0(mess[-len], "):")
+  mess <- Map(mes = mess, vec = rep("  ", length(mess)), tim = seq(length(mess)) - 1,
+              function(mes, vec, tim) paste(paste(rep(vec, tim), collapse = ""), mes))
+  lapply(mess, warning, call. = FALSE)
+}
+
+prefixSimInit <- " simInit:"
+
+spaceDashDashSpace <- " -- "
+
+
+simNestingSetup <- function(...) {
+  prevSimEnv <- tryCatch(whereInStack("._simNesting"), error = function(x) character())
+  if (is.environment(prevSimEnv)) {
+    prevSimEnv <- get0("._simNesting", envir = prevSimEnv, inherits = FALSE)
+  }
+  simNestingArg <- list(...)$._simNesting
+  messageTxt <- if (is.null(simNestingArg)) "simInit" else simNestingArg
+  c(prevSimEnv, messageTxt)
+}
+
+
+simNestingOverride <- function(sim, mBase) {
+  len <- length(sim[["._simNesting"]])
+  ._simNestingTail <- sim[["._simNesting"]][len]
+  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
+  modName8Chars <- moduleNameStripped(mBase, numCharsMax)
+  sim[["._simNesting"]][len] <- paste0(modName8Chars, ":", green(sim@current$eventType))
+  sim[["._simNesting"]]
+}

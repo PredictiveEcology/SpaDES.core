@@ -117,6 +117,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <- sim@current
+
+  # loggingMessage helpers
+  simNestingRevert <- sim[["._simNesting"]]
+  on.exit(sim[["._simNesting"]] <- simNestingRevert, add = TRUE)
+  sim[["._simNesting"]] <- simNestingOverride(sim, sim@current$moduleName)
+  ._simNesting <- sim[["._simNesting"]]
+
   curModuleName <- cur[["moduleName"]]
   if  (length(cur) == 0) {
     # Test replacement for speed
@@ -970,6 +977,10 @@ setMethod(
       }, add = TRUE)
     }
 
+    # loggingMessage helpers
+    ._simNesting <- simNestingSetup(...)
+    sim[["._simNesting"]] <- ._simNesting
+
     opt <- options("encoding" = "UTF-8")
     on.exit(options(opt), add = TRUE)
 
@@ -1103,9 +1114,9 @@ setMethod(
             }
             messageInterrupt1(recoverMode)
           } else {
-            message(crayon::magenta("simList saved in\n",
-                                    crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
-                                    "\nIt will be deleted at next spades() call."))
+            message(crayon::magenta("simList saved in"), "\n",
+                    crayon::blue("SpaDES.core:::.pkgEnv$.sim"), "\n",
+                    crayon::magenta("It will be deleted at next spades() call."))
           }
           .pkgEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
           .pkgEnv$.cleanEnd <- NULL
@@ -1242,6 +1253,7 @@ setMethod(
         if (recoverMode > 0) {
           rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
         }
+
         sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
                        events = events, ...)  # process the next event
 
@@ -1296,11 +1308,17 @@ setMethod(
     },
     warning = function(w) {
       w$message <- gsub("^In modCall\\(sim = sim.+\"]]\\): ", "", w$message)
+      if (grepl("NAs introduced by coercion", w$message))
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::logwarn(paste0(collapse = " ", c(names(w), w)))
       }
-      warning(w)
-      tryCatch(invokeRestart("muffleWarning"), error = function(e) NULL)
+      if (grepl("In .+:", w$message)) {
+        warningSplitOnColon(w)
+        invokeRestart("muffleWarning")
+      } else {
+        warning(w)
+        tryCatch(invokeRestart("muffleWarning"), error = function(e) NULL)
+      }
 
     },
     error = function(e) {
@@ -1635,9 +1653,10 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
 messageInterrupt1 <- function(recoverMode) {
   message(
     crayon::magenta("Because of an interrupted spades call, the sim object ",
-                    c("at the time of interruption ", "at the start of the interrupted event ")[(recoverMode > 0) + 1],
-                    "was saved in \n", crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
-                    "\nIt will be deleted on next call to spades"))
+                    c("at the time of interruption ",
+                      "at the start of the interrupted event ")[(recoverMode > 0) + 1],
+                    "was saved in"), "\n", crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
+                    "\n", magenta("It will be deleted on next call to spades"))
 }
 
 setupDebugger <- function(debug = getOption("spades.debug")) {
@@ -1909,7 +1928,9 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
         outMess <- debugMessTRUE(sim)
       }
     } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 1 else isTRUE(debug[[i]]))) {
-      outMess <- paste0(" total elpsd: ", format(Sys.time() - sim@.xData$._startClockTime, digits = 2),
+      totalDiff <- difftime(Sys.time(), sim@.xData$._startClockTime - sim$._simInitElapsedTime)
+
+      outMess <- paste0("total elpsd: ", format(totalDiff, digits = 2, unit = "auto"),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
     } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 2 else isTRUE(debug[[i]]))) {
       compareTime <- if (is.null(attr(sim, "completedCounter")) ||
@@ -1918,7 +1939,7 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
       } else {
         .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
       }
-      outMess <- paste0(" elpsd: ", format(Sys.time() - compareTime, digits = 2),
+      outMess <- paste0("elpsd: ", format(Sys.time() - compareTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
     } else {
       if (is(debug[[i]], "call")) {
@@ -1980,39 +2001,25 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   stForm1 <- "%h%d"
   stForm2 <- paste(stForm1, "%H:%M:%S")
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
-  modName8Chars <- ""
+  middleFix <- ""
+  noNew <- FALSE
   if (numCharsMax > 0) {
-    # if (grepl("fireSense_dataPrepFit", mess)) browser()
-    modName8Chars <- paste(rep(" ", numCharsMax), collapse = "")
-    simEnv <- whereInStack("sim")
-    sim <- try(get0("sim", simEnv, inherits = FALSE), silent = TRUE)
+    sim2 <- list() # don't put a `sim` here because whereInStack will find this one
+    while (!is(sim2, "simList")) {
+      simEnv <- try(whereInStack("sim"), silent = TRUE)
+      if (is(simEnv, "try-error"))
+        break
+      sim <- get0("sim", envir = simEnv, inherits = FALSE)
+      if (is(sim, "simList"))
+        sim2 <- sim
+    }
+
     if (!is(sim, "try-error") && !is.null(sim)) {
-
-      # If this is a nested spades call, then it will have a previous value in sim$._simPrevs
-      #  That will be sufficient
-      if (length(sim$._simPrevs)) {
-        if (startsWith(mess, strftime(st, format = "%h%d"))) {
-          mess <- gsub("^.{11,14} ", ": ", mess) # remove date
-          sim <- get("sim", sim$._simPrevs[[1]])
-        }
-      }
-
-      if (length(sim@current)) {
-        modName <- sim@current$moduleName # only defined if in doEvent
-        if (is.null(modName)) modName <- sim@events[[1]]$moduleName
-
-        modName8Chars <- moduleNameStripped(modName, numCharsMax)
-        # nchr <- nchar(modName)
-        # tooManyVowels <- nchr - numCharsMax
-        # numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
-        # tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
-        # modName8Chars <-
-        #   paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
-        #                                  tooFewVowels,",",tooManyVowels,"}"), "",
-        #                           modName, perl=TRUE), 1, numCharsMax))
-        # if (nchr < numCharsMax)
-        #   modName8Chars <- paste0(modName8Chars,
-        #                           paste(collapse = "", rep(" ", numCharsMax - nchr)))
+      # If this is a nested spades call, will have time already at start
+      if (startsWith(mess, strftime(st, format = "%h%d"))) {
+        noNew <- TRUE
+      } else {
+        middleFix <- paste(sim[["._simNesting"]], collapse = "/")
       }
     }
   }
@@ -2030,13 +2037,20 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     }
   }
 
+  messPoss <- paste0(middleFix, " ", mess)
+
   # Split long lines -- this is complicated because of prependTime, spacing, colours etc.
   # nCharPrependTime <- nchar(prependTime)
-  # numChars <- nchar(mess) + nCharPrependTime
-  # wdth <- getOption("width") - 12 - nCharPrependTime
+  # numChars <- nchar(messPoss) + nCharPrependTime
+  # wdth <- getOption("width")
   # if (any(numChars > wdth)) {
+  #   browser()
   #   whereSpaces <- gregexpr(" ", mess)
-  #   breakAt <- lapply(whereSpaces, function(ws) ws[which(diff(ws %% wdth) < 0)])
+  #   breakAt <- lapply(whereSpaces, function(ws) {
+  #     ba <- which(diff(ws %% wdth) < 0)
+  #     if (length(ba) == 0)
+  #       ba <- length(ws)
+  #     ws[ba]})
   #   # breakAt <- whereSpaces[which(diff(whereSpaces %% wdth) < 0)]
   #   mess <- Map(m = mess, ba = breakAt, function(m, ba) {
   #     m <- substring(rep(m, length(ba) + 1), c(1, ba + 1), c(ba - 1, 1e3))
@@ -2048,19 +2062,11 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   #   mess <- unlist(unname(mess))
   # }
 
-  if (any(grepl(prependTime, mess))) { # spades or simInit inside a spades or simInit
-    prependTime <- " -- "
-  } else {
-    hasSpaceStart <- startsWith(mess, " ")
-    if (any(!hasSpaceStart)) mess <- paste0(" ", mess) # i.e., "tab" all lines
-    if (!is.null(suffix))
-      modName8Chars <- paste0(modName8Chars, suffix)
-    if (!is.null(prefix))
-      modName8Chars <- paste0(prefix, modName8Chars)
-
-    mess <- paste0(modName8Chars, mess)
+  if (!isTRUE(noNew)) {
+    mess <- paste0(prependTime, " ", messPoss)
   }
-  paste0(prependTime, mess)
+
+  mess
 }
 
 
@@ -2180,18 +2186,25 @@ eventFnElement <- function() ".eventFnDigest"
 eventFnElementEnvir <- function() ".eventFnEnvir"
 
 moduleNameStripped <- function(modName, numCharsMax) {
-  nchr <- nchar(modName)
-  tooManyVowels <- nchr - numCharsMax
-  numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
-  tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else tooManyVowels
-  modName8Chars <-
-    paste0(" ", substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
-                                   tooFewVowels,",",tooManyVowels,"}"), "",
-                            modName, perl=TRUE), 1, numCharsMax))
-  if (nchr < numCharsMax)
-    modName8Chars <- paste0(modName8Chars,
-                            paste(collapse = "", rep(" ", numCharsMax - nchr)))
-  modName8Chars
+  if (!is.null(modName)) {
+    nchr <- nchar(modName)
+    tooManyVowels <- nchr - numCharsMax
+    numConsonnants <- nchar(gsub("[AEIOUaeiou]", "", modName))
+    tooFewVowels <- if (numConsonnants >= numCharsMax) 0 else min(tooManyVowels, numCharsMax - numConsonnants)
+    modName8Chars <-
+      paste0(substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
+                                tooFewVowels,",",tooManyVowels,"}"), "",
+                         modName, perl=TRUE), 1, numCharsMax))
+    nchr <- nchar(modName8Chars)
+    if (nchr < numCharsMax) {
+      modName8Chars <- paste0(modName8Chars,
+                              paste(collapse = "", rep(" ", numCharsMax - nchr)))
+    }
+    modName <- modName8Chars
+  } else {
+    modName <- ""
+  }
+  modName
 }
 
 debugMessTRUE <- function(sim, events) {
@@ -2254,3 +2267,4 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 paramsDontCacheOn <- c(".useCache", ".useParallel") # don't change Caching based on .useCache
                                                     # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
+
