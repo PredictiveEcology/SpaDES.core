@@ -8,6 +8,7 @@
 \method{.wrap}{simList}(
   obj,
   cachePath,
+  preDigest,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
   verbose = getOption("reproducible.verbose")
@@ -26,6 +27,8 @@
 
 \item{cachePath}{A repository used for storing cached objects.
 This is optional if \code{Cache} is used inside a SpaDES module.}
+
+\item{preDigest}{The list of \code{preDigest} that comes from \code{CacheDigest} of an object}
 
 \item{drv}{an object that inherits from \code{DBIDriver}, or an existing
 \code{DBIConnection} object (in order to clone an existing connection).}
