@@ -1781,7 +1781,7 @@ dealWithOptions <- function(objects, ..., sim,
 }
 
 elapsedTimeInSimInit <- function(._startClockTime, sim) {
-  elapsed <- difftime(Sys.time(), ._startClockTime, unit = "sec")
+  elapsed <- difftime(Sys.time(), ._startClockTime, units = "sec")
   if (is.null(sim@.xData[["._simInitElapsedTime"]])) {
     sim@.xData[["._simInitElapsedTime"]] <- elapsed
   } else {
