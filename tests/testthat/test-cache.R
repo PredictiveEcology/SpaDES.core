@@ -298,7 +298,8 @@ test_that("test .robustDigest for simLists", {
   mess1 <- capture_messages(do.call(simInit, args))
   msgGrep11 <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                    "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                   "There is no similar item in the cachePath", "Saving", "Done", sep = "|")
+                   "with user supplied tags",
+                   "There is no similar item in the cachePath", "Saving", "Done", "Elpsed time for", sep = "|")
   expect_true(all(grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -641,10 +642,13 @@ test_that("multifile cache saving", {
   randomPolyToDisk2 <- function(tmpfiles) {
     r <- terra::rast(ext(0, 10, 0, 10), vals = sample(1:30, size = 100, replace = TRUE))
     r2 <- terra::rast(ext(0, 10, 0, 10), vals = sample(1:30, size = 100, replace = TRUE))
-    .writeRaster(r, tmpfiles[1], overwrite = TRUE)
-    .writeRaster(r, tmpfiles[2], overwrite = TRUE)
+    terra::writeRaster(r, tmpfiles[1], overwrite = TRUE)
+    terra::writeRaster(r, tmpfiles[2], overwrite = TRUE)
     r <- c(terra::rast(tmpfiles[1]), terra::rast(tmpfiles[2]))
     r
   }
-  Cache(randomPolyToDisk2(tmpfile))
+  s <- simInit()
+  s$ras <- randomPolyToDisk2(tmpfile)
+  s2 <- Cache(spades(s))
+  expect_true(identical(Filenames(s2), Filenames(s)))
 })
