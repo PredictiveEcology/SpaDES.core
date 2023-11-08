@@ -22,3 +22,4 @@ extractInequality <- getFromNamespace("extractInequality", "Require")
 compareVersion2 <- getFromNamespace("compareVersion2", "Require")
 
 .addingToMemoisedMsg <- getFromNamespace(".addingToMemoisedMsg", "reproducible")
+remapFilenames <- getFromNamespace("remapFilenames", "reproducible")
