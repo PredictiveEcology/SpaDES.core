@@ -117,7 +117,7 @@ checkpointLoad <- function(file) {
     unlink(file)
   }
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
-              filename = file, envir = tmpEnv)
+              filename = file, envir = tmpEnv, paths = paths(sim))
 
   invisible(TRUE) # return "success" invisibly
 }
