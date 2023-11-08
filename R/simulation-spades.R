@@ -1333,7 +1333,6 @@ setMethod(
       }
     },
     message = function(m) {
-      # if (isTRUE(any(grepl("\n\n", m$message)))) browser()
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
@@ -1441,10 +1440,10 @@ setMethod(
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
       moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
       # globalParams <- sim@params[[".globals"]]
-      modParams <- sim@params[[cur[["moduleName"]]]]
-      paramsDontCacheOnActual <- names(modParams) %in% paramsDontCacheOn
-      simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
-      modParams <- modParams[!paramsDontCacheOnActual]
+      modParamsFull <- sim@params[[cur[["moduleName"]]]]
+      paramsDontCacheOnActual <- names(modParamsFull) %in% paramsDontCacheOn
+      simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
+      modParams <- modParamsFull[!paramsDontCacheOnActual]
 
       classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
                            paths = FALSE, outputs = FALSE,
@@ -1483,7 +1482,7 @@ setMethod(
   # put back the current values of params that were not cached on
   if (exists("modParams", inherits = FALSE))
     if (sum(paramsDontCacheOnActual)) {
-      sim@params[[cur[["moduleName"]]]][paramsDontCacheOnActual] <- modParams[paramsDontCacheOnActual]
+      sim@params[[cur[["moduleName"]]]][paramsDontCacheOnActual] <- modParamsFull[paramsDontCacheOnActual]
     }
 
 
