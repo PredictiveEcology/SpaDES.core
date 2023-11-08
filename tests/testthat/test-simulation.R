@@ -161,9 +161,10 @@ test_that("spades calls - diff't signatures", {
   expect_message(spades(a, debug = "simList", .plotInitialTime = NA), "Completed Events")
 
   if (interactive()) {
-    expect_output(spades(a, progress = "text", debug = TRUE), "10%")
-    expect_output(spades(a, progress = "text", debug = TRUE), "20%")
-    expect_output(spades(a, progress = "text"), "..........| 100%")
+    # warnings occur on Rstudio-server related to can't use display 0:, when using devtools::test() interactively
+    suppressWarnings(expect_output(spades(a, progress = "text", debug = TRUE), "10%"))
+    suppressWarnings(expect_output(spades(a, progress = "text", debug = TRUE), "20%"))
+    suppressWarnings(expect_output(spades(a, progress = "text"), "..........| 100%"))
   }
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_silent(expect_message(spades(a, debug = FALSE, progress = FALSE), "DTthreads"))
