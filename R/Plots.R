@@ -289,7 +289,7 @@ Plots <- function(data, fn, filename,
       gg <- fn(dataListToScreen, ..., env = newEnv)
 
       if (FALSE) {
-        .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
+        # .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
         qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
         objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
         objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
@@ -439,7 +439,7 @@ anyPlotting <- function(.plots) {
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 
-filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
+# filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
 
 #' Guess package of a function
 #'
