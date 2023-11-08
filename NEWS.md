@@ -5,6 +5,7 @@
 * re-Caching of a simList no longer triggers on changes to `.useCache` parameter, when it doesn't pertain to the event or module in question.
 * many historical modules used `bind_rows` from `dplyr` within `expectsInput` or `createsOutput`. Now, if a module uses `bind_rows` and doesn't have `dplyr` installed, `SpaDES.core` will intercept and use `SpaDES.core::bindrows`.
 * `saveSimList()` better handles relative paths and symbolic links (#263)
+* `saveSimList()` does an improved job at handling file-backed objects (previously, tests were passing because object was still there; now object is deleted, simList reloaded, and file-backed objects put back into place)
 * deal with upstream `reproducible` changes to `.wrap` 
 * deal with upstream `reproducible` changes to `Cache` messaging, specifically, remove cases where `function` was a userTag for an outer function call. Now these will display as `otherFunction`, so that individual functions can be more easily isolated.
 * overhaul of messaging during `simInit` and `spades` that allows for nested calls to `simInit` and/or `spades`
@@ -12,6 +13,9 @@
 * `elapsedTime` now displays the largest time unit, which may not be `secs`
 * some parts of any warning messages are now muffled for clarity: e.g., `In modCall...` is removed.
 * `options` that are either `RequireOptions()`, `spadesOptions()` or `reproducibleOptions()` can now be set during the `simInit` by passing them as arguments, e.g., `simInit(useMemoise = FALSE)`. See `?simInit`, specifically the `...` parameter description. This is not passed as an argument named `options`: these are just options. For convenience, user can omit the package prefix, e.g., `useMemoise` for `reproducible.useMemoise`
+* all necessary updates to deal with `reproducible` updates to exported methods
+* new function: `dmin` to go with the other `d*` SpaDES times.
+* updates to unit tests to accommodate all these changes.
 
 ## Dependency Changes
 * `dplyr` is removed (again)
