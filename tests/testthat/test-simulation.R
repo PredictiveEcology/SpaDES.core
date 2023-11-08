@@ -548,7 +548,7 @@ test_that("conflicting function types", {
                                            "Running .inputObjects|",
                                            "Setting:|Paths set to:|",
                                            "Using setDTthreads|",
-                                           m, ": using dataPath")))))
+                                           m, ": using dataPath|", "Elpsed")))))
 
   # assign to sim for functions like scheduleEvent
   lineWithScheduleEvent <- grep(xxx, pattern = "scheduleEvent")[1]
