@@ -2044,7 +2044,6 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   # numChars <- nchar(messPoss) + nCharPrependTime
   # wdth <- getOption("width")
   # if (any(numChars > wdth)) {
-  #   browser()
   #   whereSpaces <- gregexpr(" ", mess)
   #   breakAt <- lapply(whereSpaces, function(ws) {
   #     ba <- which(diff(ws %% wdth) < 0)

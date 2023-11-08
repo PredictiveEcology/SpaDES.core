@@ -941,14 +941,16 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @export
 #' @rdname dealWithClass
 .wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
-                                       conn = getOption("reproducible.conn", NULL),
-                                       verbose = getOption("reproducible.verbose")) {
+                          conn = getOption("reproducible.conn", NULL),
+                          verbose = getOption("reproducible.verbose"),
+                          ...) {
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
   objTmp <- Copy(obj, objects = 2, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose,
+               ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
@@ -963,12 +965,13 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @rdname dealWithClass
 .unwrap.simList <- function(obj, cachePath, cacheId,
                             drv = getOption("reproducible.drv", NULL),
-                            conn = getOption("reproducible.conn", NULL)) {
+                            conn = getOption("reproducible.conn", NULL), ...) {
 
   # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
-  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn)
+  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
+                     drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
   obj
 
