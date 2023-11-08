@@ -1,7 +1,6 @@
 makeSimListActiveBindings <- function(sim) {
   mods <- modules(sim)
   mods <- mods[mods %in% ls(sim@.xData$.mods)]
-  #browser()
   lapply(mods, function(mod) {
     makeModActiveBinding(sim = sim, mod = mod)
     makeParActiveBinding(sim = sim, mod = mod)
@@ -21,8 +20,6 @@ makeModActiveBinding <- function(sim, mod) {
                       env = env)
     }
 
-  if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
-    browser()
 }
 
 #' @include helpers.R
@@ -44,8 +41,6 @@ activeModBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {
     simEnv <- try(whereInStack("sim"), silent = TRUE)
-    if (exists("aaaaa", envir = .GlobalEnv, inherits = FALSE))
-      browser()
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
@@ -55,7 +50,6 @@ activeModBindingFunction <- function(value) {
       }
     }
   } else {
-    browser()
     stop("Can't overwrite mod")
   }
   return(ret)

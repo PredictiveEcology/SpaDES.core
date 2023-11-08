@@ -311,7 +311,6 @@ setMethod(
           message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
         }
       } else {
-        if (exists("aaaa")) browser()
         if (isTRUE(fromMemoise)) {
           message(crayon::blue("     loaded memoised copy of", cur$eventType, "event in",
                            cur$moduleName, "module"))
@@ -422,7 +421,6 @@ setMethod(
                                 algo = dots$algo,
                                 quick = dots$quick,
                                 classOptions = dots$classOptions)
-    if (exists("aaa", .GlobalEnv, inherits = FALSE)) browser()
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
@@ -572,8 +570,6 @@ setMethod(
         simPost@params[currModules] <- simFromCache@params[currModules]
         anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
 
-        # if ("TriSect_SpringPredator" %in% current(simPost)$moduleName)
-        #  browser()
         if (length(anyNewGlobals)) {
           suppressMessages(
             simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))

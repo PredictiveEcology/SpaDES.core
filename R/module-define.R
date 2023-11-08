@@ -484,7 +484,6 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
     paramName = name, paramClass = I(list(class)), default = I(list(default)),
     min = I(list(min)), max = I(list(max)), paramDesc = desc,
     stringsAsFactors = FALSE)
-  # if (!identical(df, df1)) browser()
   return(df)
 
 

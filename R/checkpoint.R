@@ -113,7 +113,6 @@ checkpointLoad <- function(file) {
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
 
   if (file.exists(file[1])) {
-    if (length(file) > 1) browser()
     unlink(file)
   }
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,

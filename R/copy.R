@@ -88,7 +88,6 @@ setMethod("Copy",
                 sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
               }
 
-              # browser()
               # This chunk makes the environment of each function in a module,
               #   the module itself. This is unique to functions in `simList` objs
               #   i.e., can't rely on generic reproducible::Copy

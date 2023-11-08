@@ -312,7 +312,6 @@ test_that("simList test all signatures", {
       error = function(e) { FALSE },
       warning = function(w) { TRUE }
     ))
-    if (isFALSE(successes[i])) browser()
     argsTested[[i]] <- names(li)
   }
 
