@@ -165,6 +165,8 @@ test_that("saveSimList does not work correctly", {
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
   inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
+  outputPath <- checkPath(file.path(tmpdir, "outputs"), create = TRUE)
+  cachePath <- checkPath(file.path(tmpdir, "cache"), create = TRUE)
 
   linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
   linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
@@ -179,9 +181,10 @@ test_that("saveSimList does not work correctly", {
 
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
+    cachePath = cachePath,
     modulePath = modulePath,
     inputPath = inputPath,
-    outputPath = tmpdir
+    outputPath = outputPath
   )
 
   mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
