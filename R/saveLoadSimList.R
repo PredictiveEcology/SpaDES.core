@@ -333,7 +333,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     filename <- archiveExtract(filename, exdir = td)
     filenameRel <- gsub(paste0(td, "/"), "", filename[-1])  ## TODO: WRONG!
 
-    # This will put the files to relative path of getwd()
+    # This will put the files to relative path of projectPath
     newFns <- file.path(projectPath, filenameRel)
     linkOrCopy(filename[-1], newFns, verbose = verbose - 1)
   } else {
@@ -354,7 +354,19 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
   paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
 
-  tmpsim <- .unwrap(tmpsim, cachePath = projectPath) # convert e.g., PackedSpatRaster
+  # need to remap all the file-backed objects --> their paths in the objects will point
+  #   to their old locations, but they are now at newFns, which is remapped to projectPath
+  oldFns <- Filenames(tmpsim, returnList = TRUE)
+  oldFns <- oldFns[lengths(oldFns) > 0]
+  for (nam in names(oldFns)) {
+    for (fn in seq(tmpsim[[nam]])) {
+      wh <- endsWith(tmpsim[[nam]][fn], filenameRel)
+      tmpsim[[nam]][fn] <- newFns[wh]
+    }
+  }
+
+
+  tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 
   # Work around for bug in qs that recovers data.tables as lists
   tmpsim <- recoverDataTableFromQs(tmpsim)
