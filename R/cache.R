@@ -304,8 +304,9 @@ setMethod(
         if (isTRUE(fromMemoise)) {
           message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module"))
         } else if (!is.na(fromMemoise)) {
-          message(crayon::blue("     loaded cached copy of", cur$moduleName, "module\n",
-                           "adding to memoised copy"))
+          message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
+                  "\n        ",
+                  crayon::blue(.addingToMemoisedMsg))
         } else {
           message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
         }
@@ -318,7 +319,7 @@ setMethod(
         } else if (!is.na(fromMemoise)) {
           message(crayon::blue("     loaded cached copy of", cur$eventType, "event in",
                            cur$moduleName, "module. ",
-                           if (fromMemoise) "Adding to memoised copy."
+                           if (fromMemoise) .addingToMemoisedMsg
                            ))
         } else {
           message(crayon::blue("     loaded ", fromWhere," copy of", cur$eventType, "event in",
