@@ -201,16 +201,17 @@ test_that("saveSimList does not work correctly", {
   sim <- loadSimList(file = tmpfile[2], projectPath = tmpCache)
   expect_true(all(basename(Filenames(sim)) %in% basename(Filenames(mySim))))
 
-  # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
 
   ## test using rds
-  # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[8])
-  sim <- loadSimList(file = tmpfile[8], paths = paths(mySim))
-  # on the saved/loaded one, it is there because it is not file-backed
+  fnsOrig <- Filenames(mySim)
+  pthsOrig <- paths(mySim)
+  rm(mySim)
+  unlink(fnsOrig)
+  sim <- loadSimList(file = tmpfile[8], projectPath = tmpCache, paths = pthsOrig)
   expect_true(is.numeric(sim$landscape$DEM[]))
-  expect_true(all(Filenames(sim) %in% Filenames(mySim)))
+  expect_true(all(Filenames(sim) %in% fnsOrig))
   sim$landscape[] <- sim$landscape[]
   sim$habitatQuality[] <- sim$habitatQuality[]
 
