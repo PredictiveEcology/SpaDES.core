@@ -181,8 +181,9 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       counterForMax <- counterForMax + 1
       message("\b.")
     }
-    if (counterForMax >= maxCounterForMax)
+    if (counterForMax >= maxCounterForMax) {
       stop("memoryUse encountered an error; perhaps logPath(sim) not writable?")
+    }
 
     if (initialFileDoesntExist)
       message("\bDone!")

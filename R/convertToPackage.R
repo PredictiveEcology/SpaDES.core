@@ -154,8 +154,6 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
                        lineWithFn[[i]] <- parseWithFn[[i]][, "line1"]
                        if (length(lineWithFn[[i]]) > 1) {
                          if (i == 1) {
-                           if (length(lineWithFn[[1]]))
-                             browser()
                            lineWithFn[[1]] <- lineWithFn[[1]][1]
                          } else {
                            whAfterLine1 <- which(lineWithFn[[2]] > lineWithFn[[1]])

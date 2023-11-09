@@ -165,6 +165,8 @@ test_that("saveSimList does not work correctly", {
 
   modulePath <- checkPath(file.path(tmpdir, "modules"), create = TRUE)
   inputPath <- checkPath(file.path(tmpdir, "inputs"), create = TRUE)
+  outputPath <- checkPath(file.path(tmpdir, "outputs"), create = TRUE)
+  cachePath <- checkPath(file.path(tmpdir, "cache"), create = TRUE)
 
   linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
   linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
@@ -179,9 +181,10 @@ test_that("saveSimList does not work correctly", {
 
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
+    cachePath = cachePath,
     modulePath = modulePath,
     inputPath = inputPath,
-    outputPath = tmpdir
+    outputPath = outputPath
   )
 
   mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
@@ -198,16 +201,17 @@ test_that("saveSimList does not work correctly", {
   sim <- loadSimList(file = tmpfile[2], projectPath = tmpCache)
   expect_true(all(basename(Filenames(sim)) %in% basename(Filenames(mySim))))
 
-  # on the saved/loaded one, it is there because it is not file-backed
   expect_true(is.numeric(sim$landscape$DEM[]))
 
   ## test using rds
-  # removes the file-backing, loading it into R as an inMemory object
   saveSimList(mySim, filename = tmpfile[8])
-  sim <- loadSimList(file = tmpfile[8], paths = paths(mySim))
-  # on the saved/loaded one, it is there because it is not file-backed
+  fnsOrig <- Filenames(mySim)
+  pthsOrig <- paths(mySim)
+  rm(mySim)
+  unlink(fnsOrig)
+  sim <- loadSimList(file = tmpfile[8], projectPath = tmpCache, paths = pthsOrig)
   expect_true(is.numeric(sim$landscape$DEM[]))
-  expect_true(all(Filenames(sim) %in% Filenames(mySim)))
+  expect_true(all(Filenames(sim) %in% fnsOrig))
   sim$landscape[] <- sim$landscape[]
   sim$habitatQuality[] <- sim$habitatQuality[]
 
@@ -282,7 +286,7 @@ test_that("saveSimList with file backed objs", {
     expect_true(dir.exists(outputPath))
   } else {
     ## use symlink if not Windows
-    linkedDir <- checkPath(file.path(tempdir(), "SpaDES.core_tests", "outputs_dir"), create = TRUE)
+    linkedDir <- checkPath(file.path(tmpdir, "SpaDES.core_tests", "outputs_dir"), create = TRUE)
     file.symlink(linkedDir, outputPath)
     expect_true(dir.exists(outputPath))
     expect_identical(Sys.readlink(outputPath), linkedDir)

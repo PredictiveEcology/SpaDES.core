@@ -181,7 +181,7 @@ test2Code <- '
             paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "silent")
       }
       if (isTRUE(!is.null(P(sim)$testRestartSpades))) {
-        stop("testing restartSpades")#browser()
+        stop("testing restartSpades")
       }
 
       mod$a <- 1 # should have mod$y here

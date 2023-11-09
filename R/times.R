@@ -35,6 +35,16 @@ dhour <- function(x) {
 hoursInSeconds <- as.numeric(dhour(1))    # 3600L
 attributes(hoursInSeconds)$unit <- "second"
 
+
+#' @export
+#' @rdname spadesTime
+dmin <- function(x) {
+  x * 60
+}
+
+minutesInSeconds <- as.numeric(dmin(1))    # 3600L
+attributes(minutesInSeconds)$unit <- "second"
+
 #' @export
 #' @rdname spadesTime
 dday <- function(x) {
