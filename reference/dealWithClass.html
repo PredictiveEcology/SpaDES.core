@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.3</span>
       </span>
     </div>
 
@@ -85,9 +85,11 @@
 <span><span class="fu">.wrap</span><span class="op">(</span></span>
 <span>  <span class="va">obj</span>,</span>
 <span>  <span class="va">cachePath</span>,</span>
+<span>  <span class="va">preDigest</span>,</span>
 <span>  drv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.drv"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>  conn <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.conn"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
-<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.verbose"</span><span class="op">)</span></span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.verbose"</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S3 method for simList</span></span>
@@ -96,7 +98,8 @@
 <span>  <span class="va">cachePath</span>,</span>
 <span>  <span class="va">cacheId</span>,</span>
 <span>  drv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.drv"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
-<span>  conn <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.conn"</span>, <span class="cn">NULL</span><span class="op">)</span></span>
+<span>  conn <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.conn"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -109,6 +112,10 @@
 <dt>cachePath</dt>
 <dd><p>A repository used for storing cached objects.
 This is optional if <code>Cache</code> is used inside a SpaDES module.</p></dd>
+
+
+<dt>preDigest</dt>
+<dd><p>The list of <code>preDigest</code> that comes from <code>CacheDigest</code> of an object</p></dd>
 
 
 <dt>drv</dt>
@@ -126,6 +133,16 @@ This is optional if <code>Cache</code> is used inside a SpaDES module.</p></dd>
 Default is 1. Above 3 will output much more information about the internals of
 Caching, which may help diagnose Caching challenges. Can set globally with an
 option, e.g., <code>options('reproducible.verbose' = 0) to reduce to minimal</code></p></dd>
+
+
+<dt>...</dt>
+<dd><p>Other arguments. Currently, <code>regexp</code>, a logical, can be provided.
+This must be <code>TRUE</code> if the use is passing a regular expression.
+Otherwise, <code>userTags</code> will need to be exact matches. Default is
+missing, which is the same as <code>TRUE</code>. If there are errors due
+to regular expression problem, try <code>FALSE</code>. For <code>cc</code>, it is
+passed to <code>clearCache</code>, e.g., <code>ask</code>, <code>userTags</code>. For <code>showCache</code>,
+it can also be <code>sorted = FALSE</code> to return the object unsorted.</p></dd>
 
 
 <dt>cacheId</dt>

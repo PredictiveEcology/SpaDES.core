@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.3</span>
       </span>
     </div>
 
@@ -75,6 +75,54 @@
       <small>Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="2.0.3" id="spadescore-203">SpaDES.core 2.0.3<a class="anchor" aria-label="anchor" href="#spadescore-203"></a></h2>
+<div class="section level3">
+<h3 id="enhancements-2-0-3">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-2-0-3"></a></h3>
+<ul><li>new accessor function <code><a href="../reference/simList-accessors-paths.html">figurePath()</a></code> to get the directory of a module’s output figures, which is now uses a separate subdirectory per module (i.e., <code>file.path(outputPath(sim), "figures", &lt;moduleName&gt;)</code>); <code><a href="../reference/Plots.html">Plots()</a></code> defaults to using this path, and module developers are encouraged to update their module code to use <code>figurePath(sim)</code> where <code><a href="../reference/Plots.html">Plots()</a></code> is not being used.</li>
+<li>re-Caching of a simList no longer triggers on changes to <code>.useCache</code> parameter, when it doesn’t pertain to the event or module in question.</li>
+<li>many historical modules used <code>bind_rows</code> from <code>dplyr</code> within <code>expectsInput</code> or <code>createsOutput</code>. Now, if a module uses <code>bind_rows</code> and doesn’t have <code>dplyr</code> installed, <code>SpaDES.core</code> will intercept and use <code><a href="../reference/bindrows.html">SpaDES.core::bindrows</a></code>.</li>
+<li>
+<code><a href="../reference/saveSimList.html">saveSimList()</a></code> better handles relative paths and symbolic links (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/263" class="external-link">#263</a>)</li>
+<li>
+<code><a href="../reference/saveSimList.html">saveSimList()</a></code> does an improved job at handling file-backed objects (previously, tests were passing because object was still there; now object is deleted, simList reloaded, and file-backed objects put back into place)</li>
+<li>deal with upstream <code>reproducible</code> changes to <code>.wrap</code>
+</li>
+<li>deal with upstream <code>reproducible</code> changes to <code>Cache</code> messaging, specifically, remove cases where <code>function</code> was a userTag for an outer function call. Now these will display as <code>otherFunction</code>, so that individual functions can be more easily isolated.</li>
+<li>overhaul of messaging during <code>simInit</code> and <code>spades</code> that allows for nested calls to <code>simInit</code> and/or <code>spades</code>
+</li>
+<li>elapsed time during <code>simInit</code> is now reported</li>
+<li>
+<code>elapsedTime</code> now displays the largest time unit, which may not be <code>secs</code>
+</li>
+<li>some parts of any warning messages are now muffled for clarity: e.g., <code>In modCall...</code> is removed.</li>
+<li>
+<code>options</code> that are either <code>RequireOptions()</code>, <code><a href="../reference/spadesOptions.html">spadesOptions()</a></code> or <code><a href="https://reproducible.predictiveecology.org/reference/reproducibleOptions.html" class="external-link">reproducibleOptions()</a></code> can now be set during the <code>simInit</code> by passing them as arguments, e.g., <code>simInit(useMemoise = FALSE)</code>. See <code><a href="../reference/simInit.html">?simInit</a></code>, specifically the <code>...</code> parameter description. This is not passed as an argument named <code>options</code>: these are just options. For convenience, user can omit the package prefix, e.g., <code>useMemoise</code> for <code>reproducible.useMemoise</code>
+</li>
+<li>all necessary updates to deal with <code>reproducible</code> updates to exported methods</li>
+<li>new function: <code>dmin</code> to go with the other <code>d*</code> SpaDES times.</li>
+<li>updates to unit tests to accommodate all these changes.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="dependency-changes-2-0-3">Dependency Changes<a class="anchor" aria-label="anchor" href="#dependency-changes-2-0-3"></a></h3>
+<ul><li>
+<code>dplyr</code> is removed (again)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-2-0-3">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-2-0-3"></a></h3>
+<ul><li>
+<code>coltab&lt;-</code> from <code>terra</code> changed how it deals with multi-layer <code>SpatRasters</code>. Two sample modules have been modified to set colours on these multi-layer <code>SpatRasters</code>
+</li>
+<li>loading of <code>asc</code> raster-type files using <code>inputs</code> did not work; fixed.</li>
+<li>fixed bug in <code>simInit</code> parameter checking</li>
+<li>A number of new edge cases dealt with for reducing false positive and false negative <code>Cache</code>ing of events and modules. Now, for example, a change to the parameter <code>.useCache = c("init")</code> to <code>.useCache = c("init", ".inputObjects")</code> will not trigger a rerun of the <code>init</code> event. Also, <code>.inputObjects</code> is no longer evaluated for <code>Cache</code>ing of <code>doEvent</code>
+</li>
+<li>
+<code>Error in if (is.na(sim@params[[m]][[x]]))</code> fixed.</li>
+<li>
+<code>asc</code> spatial map files were incorrectly loaded by <code>terra</code> package: fixed.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.0.2" id="spadescore-202">SpaDES.core 2.0.2<small>2023-07-06</small><a class="anchor" aria-label="anchor" href="#spadescore-202"></a></h2>
 <div class="section level3">

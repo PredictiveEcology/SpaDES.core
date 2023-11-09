@@ -36,7 +36,7 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.3</span>
       </span>
     </div>
 
@@ -112,7 +112,7 @@ See below and examples.</p>
 <span>  <span class="va">fn</span>,</span>
 <span>  <span class="va">filename</span>,</span>
 <span>  types <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="params.html">params</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">[[</span><span class="fu"><a href="namespacing.html">currentModule</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">.plots</span><span class="op">)</span>,</span>
-<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="simList-accessors-paths.html">outputPath</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span>, <span class="st">"figures"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="simList-accessors-paths.html">figurePath</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  .plotInitialTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/substitute.html" class="external-link">quote</a></span><span class="op">(</span><span class="fu"><a href="params.html">params</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">[[</span><span class="fu"><a href="namespacing.html">currentModule</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">.plotInitialTime</span><span class="op">)</span>,</span>
 <span>  ggsaveArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  usePlot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"spades.PlotsUsePlot"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
@@ -276,25 +276,26 @@ the file(s) that is/are saved will be appended to the <code>outputs</code> slot 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: ggplot2</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpmTr4Wk/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpmTr4Wk/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpmTr4Wk/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpmTr4Wk/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpm3EhAi/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpm3EhAi/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpm3EhAi/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpm3EhAi/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:24 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.05900288 secs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpmTr4Wk/file267078e6bcc9.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpm3EhAi/file94fa3d7036c2.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpmTr4Wk/file26702cb87278.png</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpmTr4Wk/file26707c0831f2.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpm3EhAi/file94fa23400d50.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpm3EhAi/file94fa2a488042.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: ggplotify</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: lattice</span>
 <span class="r-plt img"><img src="Plots-1.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpmTr4Wk/file2670210a3cee.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpm3EhAi/file94fa7709d529.png</span>
 <span class="r-plt img"><img src="Plots-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># } # end of dontrun</span></span></span>
 </code></pre></div>

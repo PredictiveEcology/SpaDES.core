@@ -25,7 +25,7 @@ instead of data.frame to implement the event queue (because it is much faster)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.3</span>
       </span>
     </div>
 
@@ -401,360 +401,362 @@ uses <code><a href="https://reproducible.predictiveecology.org/reference/Cache.h
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpmTr4Wk/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpmTr4Wk/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpmTr4Wk/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpmTr4Wk'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpmTr4Wk/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpm3EhAi/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpm3EhAi/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpm3EhAi/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpm3EhAi'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpm3EhAi/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpmTr4Wk/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>              module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1:  caribouMovement    .plots</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2:       fireSpread    .plots</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3: randomLandscapes    .plots</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 4:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 5:       fireSpread stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 6: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpm3EhAi/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit              module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit 1:  caribouMovement    .plots</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit 2:       fireSpread    .plots</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit 3: randomLandscapes    .plots</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit 4:  caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit 5:       fireSpread stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit 6: randomLandscapes stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.2181375 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:29 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">0         checkpoint init      0            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">0         save       init      0            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">0         progress   init      0            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">0         load       init      0            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">0         fireSpread       init      1            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">0         caribouMovement  init      1            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">1         caribouMovement  move      5            </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         caribouMovement  init      1            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">1         caribouMovement  move      5            </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;"> total elpsd: 0.52 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1 secs | 0 checkpoint init 0</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4  5  6  7  8  9 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 48  5  1  5  1  3 10 10  5  1 11 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">48</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 chckpn <span style="color: #00BB00;">11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;"> total elpsd: 0.53 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">48</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1 secs | 0 save init 0</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4  5  6  7  8  9 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 48  5  1  5  1  3 10 10  5  1 11 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">48</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 save   <span style="color: #00BB00;">11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;"> total elpsd: 0.54 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">48</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1 secs | 0 progress init 0</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4  5  6  7  8  9 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 48  5  1  5  1  3 10 10  5  1 11 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">48</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 prgrss <span style="color: #00BB00;">11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;"> total elpsd: 0.55 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">48</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.1 secs | 0 load init 0</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4  5  6  7  8  9 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 48  5  1  5  1  3 10 10  5  1 11 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">48</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 load   <span style="color: #00BB00;">11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;"> total elpsd: 0.56 secs | 0 randomLandscapes init </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">48</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.1 secs | 0 randomLandscapes init 1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4  5  6  7  8  9 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 48  5  1  5  1  3 10 10  5  1 11 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">48</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 rndmLn <span style="color: #00BB00;">11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;"> total elpsd: 0.69 secs | 0 fireSpread init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">48</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:30 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.3 secs | 0 fireSpread init 1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Error : [subset] invalid name(s)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">Error : [subset] invalid name(s)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;"> total elpsd: 0.73 secs | 0 caribouMovement init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">Error : [subset] invalid name(s)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">Nov09 16:16:31 frSprd:init</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.3 secs | 0 caribouMovement init 1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   0 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 100 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">100</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;"> total elpsd: 0.75 secs | 1 fireSpread burn 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">100</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 1.4 secs | 1 fireSpread burn 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   0 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 100 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">100</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;"> total elpsd: 0.78 secs | 1 caribouMovement move 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">100</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">total elpsd: 1.4 secs | 1 caribouMovement move 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4  5  6  7  8  9 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 22  6 16 28 12  2  7  1  1  3  2 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">22</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">16</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">28</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">12</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 crbMvm <span style="color: #00BB00;">2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;"> total elpsd: 0.81 secs | 1 fireSpread stats 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">22</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">6</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">16</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">28</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">12</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 1.5 secs | 1 fireSpread stats 5</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  0  1  2  3  4  5  6  7  8  9 10 </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 22  6 16 28 12  2  7  1  1  3  2 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">22</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">16</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">28</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">12</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:31 frSprd <span style="color: #00BB00;">2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">22</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">6</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">16</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">28</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">12</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> total elpsd: 0.86 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 1:    0   22</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 2:    1    6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 3:    2   16</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 4:    3   28</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 5:    4   12</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 6:    5    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 7:    6    7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 8:    7    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;"> 9:    8    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;">10:    9    3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 chckpn <span style="color: #00BB00;">11:   10    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> total elpsd: 0.89 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 1:    0   22</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 2:    1    6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 3:    2   16</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 4:    3   28</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 5:    4   12</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 6:    5    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 7:    6    7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 8:    7    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;"> 9:    8    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;">10:    9    3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 save   <span style="color: #00BB00;">11:   10    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> total elpsd: 0.9 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 1:    0   22</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 2:    1    6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 3:    2   16</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 4:    3   28</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 5:    4   12</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 6:    5    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 7:    6    7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 8:    7    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;"> 9:    8    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;">10:    9    3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 prgrss <span style="color: #00BB00;">11:   10    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> total elpsd: 0.92 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 1:    0   22</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 2:    1    6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 3:    2   16</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 4:    3   28</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 5:    4   12</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 6:    5    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 7:    6    7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 8:    7    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;"> 9:    8    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;">10:    9    3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 load   <span style="color: #00BB00;">11:   10    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> total elpsd: 0.93 secs | 0 randomLandscapes init </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 1:    0   22</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 2:    1    6</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 3:    2   16</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 4:    3   28</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 5:    4   12</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 6:    5    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 7:    6    7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 8:    7    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;"> 9:    8    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;">10:    9    3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 rndmLn <span style="color: #00BB00;">11:   10    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> total elpsd: 1.1 secs | 0 fireSpread init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.5 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 1:    0   22</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 2:    1    6</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 3:    2   16</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 4:    3   28</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 5:    4   12</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 6:    5    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 7:    6    7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 8:    7    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 9:    8    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10:    9    3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11:   10    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.6 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 1:    0   22</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 2:    1    6</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 3:    2   16</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 4:    3   28</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 5:    4   12</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 6:    5    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 7:    6    7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 8:    7    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 9:    8    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10:    9    3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11:   10    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.6 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 1:    0   22</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 2:    1    6</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 3:    2   16</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 4:    3   28</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 5:    4   12</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 6:    5    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 7:    6    7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 8:    7    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 9:    8    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10:    9    3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11:   10    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.6 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 1:    0   22</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 2:    1    6</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 3:    2   16</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 4:    3   28</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 5:    4   12</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 6:    5    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 7:    6    7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 8:    7    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 9:    8    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10:    9    3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11:   10    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.7 secs | 0 randomLandscapes init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 1:    0   22</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 2:    1    6</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 3:    2   16</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 4:    3   28</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 5:    4   12</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 6:    5    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 7:    6    7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 8:    7    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;"> 9:    8    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">10:    9    3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">11:   10    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.9 secs | 0 fireSpread init 1</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Error : [subset] invalid name(s)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;">Error : [subset] invalid name(s)</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> total elpsd: 1.1 secs | 0 caribouMovement init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;">1:    0  100</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> total elpsd: 1.1 secs | 1 fireSpread burn 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;">1:    0  100</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> total elpsd: 1.2 secs | 1 caribouMovement move 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 1:    0   32</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 2:    1    3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 3:    2    8</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 4:    3    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 5:    4   11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 6:    5    4</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 7:    6    7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 8:    7   23</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;"> 9:    8    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;">10:    9    8</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 crbMvm <span style="color: #00BB00;">11:   10    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> total elpsd: 1.2 secs | 1 fireSpread stats 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 1:    0   32</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 2:    1    3</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 3:    2    8</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 4:    3    1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 5:    4   11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 6:    5    4</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 7:    6    7</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 8:    7   23</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;"> 9:    8    2</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;">10:    9    8</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32 frSprd <span style="color: #00BB00;">11:   10    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">Error : [subset] invalid name(s)</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">Nov09 16:16:31 frSprd:init</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.9 secs | 0 caribouMovement init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">1:    0  100</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 2 secs | 1 fireSpread burn 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1:    0  100</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">total elpsd: 2 secs | 1 caribouMovement move 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 1:    0   32</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 2:    1    3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 3:    2    8</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 4:    3    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 5:    4   11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 6:    5    4</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 7:    6    7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 8:    7   23</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;"> 9:    8    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">10:    9    8</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">11:   10    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 2.1 secs | 1 fireSpread stats 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 1:    0   32</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 2:    1    3</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 3:    2    8</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 4:    3    1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 5:    4   11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 6:    5    4</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 7:    6    7</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 8:    7   23</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;"> 9:    8    2</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">10:    9    8</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">11:   10    1</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:32       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:31 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpmTr4Wk/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpmTr4Wk/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpmTr4Wk/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpmTr4Wk'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpmTr4Wk/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpm3EhAi/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpm3EhAi/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpm3EhAi/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpm3EhAi'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpm3EhAi/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpmTr4Wk/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>              module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2:       fireSpread stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:33       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpm3EhAi/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:32 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:32 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:32 simInit              module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:32 simInit 1:  caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:32 simInit 2:       fireSpread stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:32 simInit 3: randomLandscapes stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.22595 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:33 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">Saving large object (cacheId: e796b390e194e61e) to Cache: 82.8 Mb</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">Saving large object (fn: spades, cacheId: f9b10ba172649cde) to Cache: 83.9 Mb</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;"> Done!</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   3.165   0.096   3.268 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4.384   0.236   4.654 </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpmTr4Wk/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpmTr4Wk/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpmTr4Wk/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpmTr4Wk'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpmTr4Wk/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpm3EhAi/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpm3EhAi/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpm3EhAi/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpm3EhAi'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpm3EhAi/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpmTr4Wk/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>              module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2:       fireSpread stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">  ...(Object to retrieve (e796b390e194e61e.rds))</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpm3EhAi/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:37 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:37 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:37 simInit              module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:37 simInit 1:  caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:37 simInit 2:       fireSpread stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:37 simInit 3: randomLandscapes stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.1759148 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">  ...(Object to retrieve (fn: spades, f9b10ba172649cde.rds))</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">     loaded cached result from previous spades call</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    user  system elapsed </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   0.622   0.004   0.629 </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:37       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   0.919   0.009   0.931 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:39 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:37       NOTE: caribouMovement not specified in events argument. </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:37       This means all events in the module(s) will run. You may have intended to add e.g.,</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:37       list(caribouMovement= 'init')</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:37       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:39 simInit NOTE: caribouMovement not specified in events argument. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:39 simInit This means all events in the module(s) will run. You may have intended to add e.g.,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:39 simInit  list(caribouMovement= 'init')</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:39 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpmTr4Wk/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpmTr4Wk/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpmTr4Wk/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpmTr4Wk'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpmTr4Wk/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpmTr4Wk/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpm3EhAi/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpm3EhAi/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpm3EhAi/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpm3EhAi'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpm3EhAi/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpmTr4Wk/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">defineParameter: '.useCache' is not of specified type 'logical'.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>              module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 1:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 2:       fireSpread stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> 3: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:38       NOTE: caribouMovement not specified in events argument. </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:38       This means all events in the module(s) will run. You may have intended to add e.g.,</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:38       list(caribouMovement= 'init')</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jul08 01:56:38       Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpm3EhAi/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit              module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit 1:  caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit 2:       fireSpread stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit 3: randomLandscapes stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.1818385 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit NOTE: caribouMovement not specified in events argument. </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit This means all events in the module(s) will run. You may have intended to add e.g.,</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit  list(caribouMovement= 'init')</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:16:40 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;"> </span><span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span><span style="color: #BB00BB;"> </span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

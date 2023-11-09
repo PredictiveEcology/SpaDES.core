@@ -25,7 +25,7 @@ See Details below."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.3</span>
       </span>
     </div>
 
@@ -120,7 +120,7 @@ function will be run; if <code>FALSE</code>, then it will be skipped.</td></tr><
 See also <code><a href="https://Rdatatable.gitlab.io/data.table/reference/openmp-utils.html" class="external-link">?data.table::setDTthreads</a></code>.</td></tr><tr><td><code>spades.futureEvents</code></td><td><code>FALSE</code></td><td>If set to <code>TRUE</code>, the event simulator will attempt to spawn events
 whose outputs are not needed (by other events in the <code>simList</code>) into a future.
 In some cases, this will speed up simulations, by running some events in parallel.
-Still VERY experimental. Use cautiously.</td></tr><tr><td><code>spades.inputPath</code></td><td>Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/inputs</code>)</td><td>The default local directory in which to look for simulation inputs.</td></tr><tr><td><code>spades.loadReqdPkgs</code></td><td>Default is <code>TRUE</code> meaning that any <code>reqdPkgs</code> will be loaded via <code>Require</code>
+Still VERY experimental. Use cautiously.</td></tr><tr><td><code>spades.logPath</code></td><td>Defaults to a subdirectory (<code>logs/</code>) of the simulation output directory.</td><td>The default local directory in which to look for simulation inputs.</td></tr><tr><td><code>spades.inputPath</code></td><td>Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/inputs</code>)</td><td>The default local directory in which to look for simulation inputs.</td></tr><tr><td><code>spades.loadReqdPkgs</code></td><td>Default is <code>TRUE</code> meaning that any <code>reqdPkgs</code> will be loaded via <code>Require</code>
 or <code>require</code>. If <code>FALSE</code>, no package loading will occur. This will mean that
 modules must prefix every function call from a package with that package name
 with double colon (::).</td><td><code>spades.lowMemory</code></td></tr><tr><td><code>FALSE</code></td><td>If true, some functions will use more memory
