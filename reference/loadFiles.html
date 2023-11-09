@@ -171,19 +171,19 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># loads all the maps to sim1 simList</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpm3EhAi/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpm3EhAi/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpm3EhAi/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpm3EhAi/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpchrTJY/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpchrTJY/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpchrTJY/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpchrTJY/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpchrTJY/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit DEM read from /tmp/Rtmpm3EhAi/maps/DEM.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit forestAge read from /tmp/Rtmpm3EhAi/maps/forestAge.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit forestCover read from /tmp/Rtmpm3EhAi/maps/forestCover.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit habitatQuality read from /tmp/Rtmpm3EhAi/maps/habitatQuality.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit percentPine read from /tmp/Rtmpm3EhAi/maps/percentPine.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.2889893 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:25 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:25 simInit DEM read from /tmp/RtmpchrTJY/maps/DEM.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:25 simInit forestAge read from /tmp/RtmpchrTJY/maps/forestAge.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:25 simInit forestCover read from /tmp/RtmpchrTJY/maps/forestCover.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:25 simInit habitatQuality read from /tmp/RtmpchrTJY/maps/habitatQuality.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:25 simInit percentPine read from /tmp/RtmpchrTJY/maps/percentPine.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.251966 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded</span></span></span>
 <span class="r-in"><span><span class="co">#  at time = 10 and 20 (via "intervals").</span></span></span>
@@ -203,29 +203,29 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># only does the time = 0 loading; see next</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpm3EhAi/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpm3EhAi/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpm3EhAi/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpm3EhAi/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpm3EhAi/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpchrTJY/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpchrTJY/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpchrTJY/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpchrTJY/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpchrTJY/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit DEM read from /tmp/Rtmpm3EhAi/maps/DEM.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit forestAge read from /tmp/Rtmpm3EhAi/maps/forestAge.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit forestCover read from /tmp/Rtmpm3EhAi/maps/forestCover.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit habitatQuality read from /tmp/Rtmpm3EhAi/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:52 simInit percentPine read from /tmp/Rtmpm3EhAi/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.1154475 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit DEM read from /tmp/RtmpchrTJY/maps/DEM.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit forestAge read from /tmp/RtmpchrTJY/maps/forestAge.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit forestCover read from /tmp/RtmpchrTJY/maps/forestCover.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit habitatQuality read from /tmp/RtmpchrTJY/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit percentPine read from /tmp/RtmpchrTJY/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.09060836 secs</span>
 <span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="co"># loads the object at time 10</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.12 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.12 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.13 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.13 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.13 secs | 10 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/Rtmpm3EhAi/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 load  :<span style="color: #00BB00;">inputs</span>    at time 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.092 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.094 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.097 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.099 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 10 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/RtmpchrTJY/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 load  :<span style="color: #00BB00;">inputs</span>    at time 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -235,10 +235,10 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="co">#  interval = 10</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="co"># loads the percentPine map 2 more times, once at 10, once at 20</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.16 secs | 20 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/Rtmpm3EhAi/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:15:53 load  :<span style="color: #00BB00;">inputs</span>    at time 20</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.13 secs | 20 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/RtmpchrTJY/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov09 16:22:26 load  :<span style="color: #00BB00;">inputs</span>    at time 20</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
