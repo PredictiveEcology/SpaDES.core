@@ -249,7 +249,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #'
 #' @param sim a `simList` object
 #' @param m module name
-#' @param message rest of message
+#' @param k numeric index of module name in sim@depends@dependencies, should align with `m`
 #' @param hadPrevMessage
 #'
 #' @return NULL (invisibly); invoked for side effect of generating message with that starts with

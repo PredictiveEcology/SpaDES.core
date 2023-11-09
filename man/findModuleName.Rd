@@ -7,9 +7,9 @@
 .findModuleName(modList, recursive = 0)
 }
 \arguments{
-\item{recursive}{Numeric. The depth of recursion, where 0 is only top level, 1 is 1 level in etc.}
+\item{modList}{(Nested) Named list of module names}
 
-\item{modules}{(Nested) Named list of module names}
+\item{recursive}{Numeric. The depth of recursion, where 0 is only top level, 1 is 1 level in etc.}
 }
 \value{
 Character vector of modules names

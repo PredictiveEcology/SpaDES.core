@@ -1147,7 +1147,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' to proceed further. If not found, increment one more level of recursion, etc.
 #'
 #' @param recursive Numeric. The depth of recursion, where 0 is only top level, 1 is 1 level in etc.
-#' @param modules (Nested) Named list of module names
+#' @param modList (Nested) Named list of module names
 #' @return Character vector of modules names
 #'
 #' @keywords internal

@@ -1,6 +1,6 @@
 ## Release information
 
-This is a new submission of a package that was archived from CRAN due to removal of dependency package `Require`, which has now been restored to CRAN. There are many large changes that have occurred, including very important decreases in number of package dependencies, reducing the probability that future archivals will affect this package. See `NEWS.md` for a full list of changes. The Suggested package that is not on the standard CRAN repositories is supplied with `Additional_repositories`, with instructions provided in the DESCRIPTION. There were minor changes to address CRAN submission NOTEs.
+This is an update to deal with several minor bugfixes, plus to accommodate changes in upstream package dependencies with reproducible.
 
 ## Test environments
 
@@ -12,20 +12,18 @@ This is a new submission of a package that was archived from CRAN due to removal
 * Windows                 (win-builder), R 4.2.3
 
 ### Current R versions
-* macOS 12.6.3 Monterey        (GitHub), R 4.3.1
-* macOS (M2) 13.2.1 Ventura     (local), R 4.3.1
-* macOS (M1) Big Sur             (rhub), R 4.3.1
-* Ubuntu 20.04                 (GitHub), R 4.3.1
-* Ubuntu 20.04                  (local), R 4.3.1
-* Windows                      (GitHub), R 4.3.1
-* Windows                       (local), R 4.3.1
-* Windows                 (win-builder), R 4.3.1
+* macOS 12.6.3 Monterey        (GitHub), R 4.3.2
+* Ubuntu 20.04                 (GitHub), R 4.3.2
+* Ubuntu 20.04                  (local), R 4.3.2
+* Windows                      (GitHub), R 4.3.2
+* Windows                       (local), R 4.3.2
+* Windows                 (win-builder), R 4.3.2
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2023-07-03 r84633)
-* Windows                      (GitHub), R-devel (2023-07-03 r84633 ucrt)
-* Windows                 (win-builder), R-devel (2023-07-03 r84633 ucrt)
-* Windows                       (local), R-devel (2023-07-03 r84633 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2023-11-08 r85496)
+* Windows                      (GitHub), R-devel (2023-11-08 r85496 ucrt)
+* Windows                 (win-builder), R-devel (2023-11-08 r85496 ucrt)
+* Windows                       (local), R-devel (2023-11-08 r85496 ucrt)
 
 ## R CMD check results
 
