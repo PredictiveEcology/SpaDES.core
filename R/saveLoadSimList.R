@@ -361,7 +361,12 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   for (nam in names(oldFns)) {
     tags <- attr(tmpsim[[nam]], "tags")
     if (!is.null(tags)) {
-      newFiles <- reproducible:::remapFilenames(tags, cachePath = NULL, paths = paths(tmpsim))
+      if (identical(projectPath, getwd()))
+        pths <- paths(tmpsim)
+      else
+        pths <- list(projectPath = projectPath)
+      newFiles <- reproducible:::remapFilenames(tags, cachePath = NULL, paths = pths)
+
       tmpsim[[nam]][] <- newFiles$newName[]
     }
   }
