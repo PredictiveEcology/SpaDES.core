@@ -190,14 +190,11 @@ setMethod(
       }
       pth <- unique(pth)
       pth <- simEdgeList[pth, on = c("from", "to")]
-      #pth <- pth %>% inner_join(simEdgeList, by = c("from", "to"))
-      #if (!identical(pth, pth2)) browser()
 
       # what is not provided in modules, but needed
       # missingObjects <- simEdgeList %>% filter(from != to) %>%
       #   anti_join(pth, ., by = c("from", "to"))
       missingObjects <- pth[!simEdgeList[from != to], on = c("from", "to")]
-      # if (!identical(missingObjects, missingObjects2)) browser()
       if (nrow(missingObjects)) {
         warning("Problem resolving the module dependencies:\n",
                 paste(missingObjects), collapse = "\n")
@@ -208,7 +205,6 @@ setMethod(
       #   filter(from != to) %>%
       #   anti_join(pth, by = c("from", "to"))
       newEdgeList <- simEdgeList[from != to][!pth, on = c("from", "to")]
-      # if (!identical(newEdgeList, newEdgeList2)) browser()
 
     } else {
       newEdgeList <- simEdgeList
@@ -337,7 +333,7 @@ setMethod(".depsLoadOrder",
             return(loadOrder)
 })
 
-.rndstr <- function (n = 1, len = 8) {
+.rndstr <- function(n = 1, len = 8) {
   unlist(lapply(character(n), function(x) {
     x <- paste0(sample(c(0:9, letters, LETTERS), size = len,
                        replace = TRUE), collapse = "")

@@ -34,7 +34,6 @@ setMethod(
   definition = function(object, .objects, length, algo, quick, classOptions) {
 
     # browser(expr = exists("._robustDigest_1"))
-
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
@@ -248,7 +247,7 @@ setMethod(
         paste0("module:", cur$moduleName),
         paste0("eventType:", cur$eventType),
         paste0("eventTime:", cur$eventTime),
-        paste0("function:spades")
+        paste0("otherFunctions:spades")
       ) # add this because it will be an outer function, if there are events occurring
     } else {
       scalls <- sys.calls()
@@ -256,7 +255,7 @@ setMethod(
       if (!is.na(parseModuleFrameNum)) {
         inObj <- .grepSysCalls(scalls, pattern = "^.inputObjects")
         if (any(!is.na(inObj))) {
-          userTags <- c("function:.inputObjects")
+          userTags <- c("otherFunctions:.inputObjects")
           userTags1 <- tryCatch(paste0("module:", get("m", sys.frame(parseModuleFrameNum))),
                                 error = function(x) NULL)
           userTags <- c(userTags, userTags1)
@@ -303,27 +302,27 @@ setMethod(
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       if (isTRUE(useCacheVals[[whCurrent]])) {
         if (isTRUE(fromMemoise)) {
-          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module"))
         } else if (!is.na(fromMemoise)) {
-          message(crayon::blue("     loaded cached copy of", cur$moduleName, "module\n",
-                           "adding to memoised copy\n"))
+          message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
+                  "\n        ",
+                  crayon::blue(.addingToMemoisedMsg))
         } else {
-          message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module\n"))
+          message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
         }
       } else {
-        if (exists("aaaa")) browser()
         if (isTRUE(fromMemoise)) {
           message(crayon::blue("     loaded memoised copy of", cur$eventType, "event in",
-                           cur$moduleName, "module\n"))
+                           cur$moduleName, "module"))
 
         } else if (!is.na(fromMemoise)) {
           message(crayon::blue("     loaded cached copy of", cur$eventType, "event in",
                            cur$moduleName, "module. ",
-                           if (fromMemoise) "Adding to memoised copy.",
-                           "\n"))
+                           if (fromMemoise) .addingToMemoisedMsg
+                           ))
         } else {
           message(crayon::blue("     loaded ", fromWhere," copy of", cur$eventType, "event in",
-                           cur$moduleName, "module\n"))
+                           cur$moduleName, "module"))
         }
 
       }
@@ -422,7 +421,6 @@ setMethod(
                                 algo = dots$algo,
                                 quick = dots$quick,
                                 classOptions = dots$classOptions)
-    if (exists("aaa", .GlobalEnv, inherits = FALSE)) browser()
     changed <- if (length(postDigest$.list)) {
       internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
                                        function(x) !any(startsWith(names(x), "doEvent"))))
@@ -572,8 +570,6 @@ setMethod(
         simPost@params[currModules] <- simFromCache@params[currModules]
         anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
 
-        # if ("TriSect_SpringPredator" %in% current(simPost)$moduleName)
-        #  browser()
         if (length(anyNewGlobals)) {
           suppressMessages(
             simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
@@ -941,15 +937,17 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.wrap.simList <- function(obj, cachePath, drv = getOption("reproducible.drv", NULL),
-                                       conn = getOption("reproducible.conn", NULL),
-                                       verbose = getOption("reproducible.verbose")) {
+.wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
+                          conn = getOption("reproducible.conn", NULL),
+                          verbose = getOption("reproducible.verbose"),
+                          ...) {
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
   objTmp <- Copy(obj, objects = 2, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose,
+               ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
@@ -964,12 +962,13 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @rdname dealWithClass
 .unwrap.simList <- function(obj, cachePath, cacheId,
                             drv = getOption("reproducible.drv", NULL),
-                            conn = getOption("reproducible.conn", NULL)) {
+                            conn = getOption("reproducible.conn", NULL), ...) {
 
   # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
-  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn)
+  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
+                     drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
   obj
 

@@ -9,7 +9,7 @@ Plots(
   fn,
   filename,
   types = quote(params(sim)[[currentModule(sim)]]$.plots),
-  path = quote(file.path(outputPath(sim), "figures")),
+  path = quote(figurePath(sim)),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ggsaveArgs = list(),
   usePlot = getOption("spades.PlotsUsePlot", FALSE),

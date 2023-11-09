@@ -16,13 +16,11 @@ cleanMessage <- function(mm) {
 # sets options("spades.moduleCodeChecks" = FALSE) if smcc is FALSE,
 # sets options("spades.debug" = FALSE) if debug = FALSE
 # puts tmpdir, tmpCache, tmpfile (can be vectorized with length >1 tmpFileExt),
-#   optsAsk in this environment,
-# loads and libraries indicated plus testthat,
 # sets options("reproducible.ask" = FALSE) if ask = FALSE
+#   optsAsk in this environment,
 testInit <- function(libraries = character(), ask = FALSE, verbose,
                      debug = FALSE, tmpFileExt = "",
                      opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE) {
-
   set.randomseed()
 
   pf <- parent.frame()
@@ -44,45 +42,16 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
     }
   }
 
-
-  # skip_gauth <- identical(Sys.getenv("SKIP_GAUTH"), "true") # only set in setup.R for covr
-  # if (isTRUE(needGoogleDriveAuth) ) {
-  #   if (!skip_gauth) {
-  #     if (interactive()) {
-  #       if (!googledrive::drive_has_token()) {
-  #         getAuth <- FALSE
-  #         if (is.null(getOption("gargle_oauth_email"))) {
-  #           possLocalCache <- "c:/Eliot/.secret"
-  #           cache <- if (file.exists(possLocalCache))
-  #             possLocalCache else TRUE
-  #           switch(Sys.info()["user"],
-  #                  emcintir = {options(gargle_oauth_email = "eliotmcintire@gmail.com",
-  #                                      gargle_oauth_cache = cache)},
-  #                  NULL)
-  #         }
-  #         if (is.null(getOption("gargle_oauth_email"))) {
-  #           if (.isRstudioServer()) {
-  #             .requireNamespace("httr", stopOnFALSE = TRUE)
-  #             options(httr_oob_default = TRUE)
-  #           }
-  #         }
-  #         getAuth <- TRUE
-  #         if (isTRUE(getAuth))
-  #           googledrive::drive_auth()
-  #       }
-  #     }
-  #   }
-  #   skip_if_no_token()
-  # }
-
   out <- list()
-  withr::local_options("reproducible.ask" = ask, .local_envir = pf)
-  withr::local_options("spades.debug" = debug, .local_envir = pf)
-  withr::local_options("spades.moduleCodeChecks" = smcc, .local_envir = pf)
-  withr::local_options("spades.recoveryMode" = FALSE, .local_envir = pf)
-  withr::local_options("reproducible.verbose" = FALSE, .local_envir = pf)
-  withr::local_options("spades.useRequire" = FALSE, .local_envir = pf)
-  withr::local_options("spades.sessionInfo" = FALSE, .local_envir = pf)
+  withr::local_options(.new = list(
+    reproducible.ask = ask,
+    reproducible.verbose = FALSE,
+    spades.debug = debug,
+    spades.moduleCodeChecks = smcc,
+    spades.recoveryMode = FALSE,
+    spades.sessionInfo = FALSE,
+    spades.useRequire = FALSE
+  ), .local_envir = pf)
 
   if (!missing(verbose))
     withr::local_options("reproducible.verbose" = verbose, .local_envir = pf)
@@ -101,67 +70,6 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
   out <- append(out, list(tmpdir = tmpdir, tmpCache = tmpCache))
   list2env(out, envir = pf)
   return(invisible(out))
-
-#
-#
-#   startTime <- Sys.time()
-#   data.table::setDTthreads(2L)
-#   a <- list(reproducible.inputPaths = NULL,
-#             reproducible.showSimilar = FALSE,
-#             reproducible.useNewDigestAlgorithm = 2,
-#             spades.DTthreads = 2L,
-#             spades.moduleCodeChecks = smcc,
-#             spades.useRequire = FALSE)
-#   a[names(opts)] <- opts
-#   opts1 <- a
-#
-#   optsDebug <- if (!debug)
-#     list(spades.debug = debug)
-#   else
-#     list()
-#
-#   if (length(optsDebug)) {
-#     opts1 <- append( opts1, optsDebug)
-#   }
-#
-#   optsAsk <- if (!ask)
-#     list(reproducible.ask = ask)
-#   else
-#     list()
-#   if (length(optsAsk)) {
-#     opts1 <- append(opts1, optsAsk)
-#   }
-#   opts <- options(opts1)
-#
-#   if (missing(libraries)) libraries <- list()
-#   libraries <- unique(append(list("igraph"), libraries)) # need %>% is a lot of places
-#   unlist(lapply(libraries, require, character.only = TRUE))
-#   require("testthat")
-#   tmpdir <- file.path(tempdir(), rndstr(1, 6))
-#   if (setPaths)
-#     setPaths(cachePath = tmpdir)
-#
-#
-#   checkPath(tmpdir, create = TRUE)
-#   origDir <- setwd(tmpdir)
-#   tmpCache <- checkPath(file.path(tmpdir, "testCache"), create = TRUE)
-#   try(clearCache(tmpdir, ask = FALSE), silent = TRUE)
-#   try(clearCache(tmpCache, ask = FALSE), silent = TRUE)
-#
-#   if (!is.null(tmpFileExt)) {
-#     ranfiles <- unlist(lapply(tmpFileExt, function(x) paste0(rndstr(1, 7), ".", x)))
-#     tmpfile <- file.path(tmpdir, ranfiles)
-#     tmpfile <- gsub(pattern = "\\.\\.", tmpfile, replacement = "\\.")
-#     file.create(tmpfile)
-#     tmpfile <- normPath(tmpfile)
-#   }
-#
-#   outList <- list(opts = opts, optsDebug = optsDebug, tmpdir = tmpdir,
-#                   origDir = origDir, libs = libraries,
-#                   tmpCache = tmpCache, optsAsk = optsAsk,
-#                   tmpfile = tmpfile, startTime = startTime)
-#   list2env(outList, envir = parent.frame())
-#   return(outList)
 }
 
 sampleModReqdPkgs <- c("NLMR", # Only randomLandscapes
@@ -273,7 +181,7 @@ test2Code <- '
             paramCheckOtherMods(sim, "testCommonPar", ifSetButDifferent = "silent")
       }
       if (isTRUE(!is.null(P(sim)$testRestartSpades))) {
-        stop("testing restartSpades")#browser()
+        stop("testing restartSpades")
       }
 
       mod$a <- 1 # should have mod$y here

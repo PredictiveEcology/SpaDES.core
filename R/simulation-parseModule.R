@@ -79,10 +79,14 @@ setMethod(
       out1 <- try(eval(out), silent = TRUE)
       if (is(out1, "try-error")) {
         if (any(grepl("bind_rows", out))) { # historical artifact
-          if (!require("dplyr", quietly = TRUE))
-            stop("To read module: '", gsub("\\.R", "", basename(filename)),
-                 "', please install dplyr: \ninstall.packages('dplyr', lib.loc = '", .libPaths()[1], "')")
-          out1 <- eval(out)
+          bind_rows <- bindrows
+          out1 <- try(eval(out), silent = TRUE)
+          if (is(out1, "try-error")) {
+            out2 <- as.list(out)
+            wh <- grep("bind_rows", out2)
+            out2[wh]  <- lapply(wh, function(x) substitute(bindrows))
+            out1 <- as.call(out2)
+          }
         }
         if (is(out1, "try-error")) {
           # possibly there was a sim that was not defined, e.g., with downloadData example, only "filename" provided.
@@ -355,7 +359,17 @@ setMethod(
         })
 
         #mess <- capture.output({
-          out <- try(eval(pf, envir = env))
+        numExptedArgs <- length(formalArgs(defineModule)) + 1
+        if (length(pf[[1]]) > (numExptedArgs)) {
+          warning("It looks like there may be an extra argument, i.e., a trailing comma, in `defineModule`")
+          pf[[1]] <- pf[[1]][1:numExptedArgs]
+        }
+        out <- tryCatch(eval(pf, envir = env), silent = TRUE,
+                                   error = function(e) {
+                                     # convert errors to warnings # so can capture them outside
+                                     warning(e$message)
+                                   })
+          # out <- try(eval(pf, envir = env))
         #}, type = "message")
           mess <- NULL
         if (is(out, "try-error")) stop(out)
@@ -528,7 +542,7 @@ setMethod(
     if (isTRUE(opt) || length(names(opt)) > 1) {
       tmp[["._parsedData"]] <- getParseData(tmp[["parsedFile"]], TRUE)
     }
-    tmp[["defineModuleItem"]] <- grepl(pattern = "defineModule", tmp[["parsedFile"]])
+    tmp[["defineModuleItem"]] <- grepl(pattern = "^defineModule", tmp[["parsedFile"]])
     tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
   }
   return(tmp)

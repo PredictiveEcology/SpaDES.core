@@ -8,9 +8,11 @@
 \method{.wrap}{simList}(
   obj,
   cachePath,
+  preDigest,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
-  verbose = getOption("reproducible.verbose")
+  verbose = getOption("reproducible.verbose"),
+  ...
 )
 
 \method{.unwrap}{simList}(
@@ -18,7 +20,8 @@
   cachePath,
   cacheId,
   drv = getOption("reproducible.drv", NULL),
-  conn = getOption("reproducible.conn", NULL)
+  conn = getOption("reproducible.conn", NULL),
+  ...
 )
 }
 \arguments{
@@ -26,6 +29,8 @@
 
 \item{cachePath}{A repository used for storing cached objects.
 This is optional if \code{Cache} is used inside a SpaDES module.}
+
+\item{preDigest}{The list of \code{preDigest} that comes from \code{CacheDigest} of an object}
 
 \item{drv}{an object that inherits from \code{DBIDriver}, or an existing
 \code{DBIConnection} object (in order to clone an existing connection).}
@@ -37,6 +42,14 @@ This is optional if \code{Cache} is used inside a SpaDES module.}
 Default is 1. Above 3 will output much more information about the internals of
 Caching, which may help diagnose Caching challenges. Can set globally with an
 option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
+
+\item{...}{Other arguments. Currently, \code{regexp}, a logical, can be provided.
+This must be \code{TRUE} if the use is passing a regular expression.
+Otherwise, \code{userTags} will need to be exact matches. Default is
+missing, which is the same as \code{TRUE}. If there are errors due
+to regular expression problem, try \code{FALSE}. For \code{cc}, it is
+passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
+it can also be \code{sorted = FALSE} to return the object unsorted.}
 
 \item{cacheId}{Used strictly for messaging. This should be the cacheId of the object being recovered.}
 }

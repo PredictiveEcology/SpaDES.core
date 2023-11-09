@@ -298,7 +298,8 @@ test_that("test .robustDigest for simLists", {
   mess1 <- capture_messages(do.call(simInit, args))
   msgGrep11 <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                    "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                   "There is no similar item in the cachePath", "Saving", "Done", sep = "|")
+                   "with user supplied tags",
+                   "There is no similar item in the cachePath", "Saving", "Done", "Elpsed time for", sep = "|")
   expect_true(all(grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -595,4 +596,59 @@ test_that("test showSimilar", {
     out5 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
   expect_false(any(grepl("Cache of.*differs", mess)))
+})
+
+
+test_that("test multipart cache file", {
+
+  testInit(sampleModReqdPkgs, verbose = TRUE)
+  opts <- options("reproducible.cachePath" = tmpdir)
+
+  # Example of changing parameter values
+  params <- list(
+    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+    # Turn off interactive plotting
+    fireSpread = list(.plotInitialTime = NA),
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+  )
+
+  mySim <- simInit(
+    times = list(start = 0.0, end = 1.0, timeunit = "year"),
+    param = params,
+    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
+    paths = list(modulePath = getSampleModules(tmpdir),
+                 outputPath = tmpdir,
+                 cachePath = tmpdir),
+    # Save final state of landscape and caribou
+    outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
+  )
+
+  out1 <- Cache(spades(Copy(mySim)))
+  end(out1) <- 2
+  out2 <- Cache(spades(Copy(out1)))
+
+})
+
+test_that("multifile cache saving", {
+  skip_on_cran()
+  testInit("terra",
+           tmpFileExt = c(".tif", ".tif"),
+           opts = list(reproducible.useMemoise = FALSE)
+  )
+
+  nOT <- Sys.time()
+
+  randomPolyToDisk2 <- function(tmpfiles) {
+    r <- terra::rast(ext(0, 10, 0, 10), vals = sample(1:30, size = 100, replace = TRUE))
+    r2 <- terra::rast(ext(0, 10, 0, 10), vals = sample(1:30, size = 100, replace = TRUE))
+    terra::writeRaster(r, tmpfiles[1], overwrite = TRUE)
+    terra::writeRaster(r, tmpfiles[2], overwrite = TRUE)
+    r <- c(terra::rast(tmpfiles[1]), terra::rast(tmpfiles[2]))
+    r
+  }
+  s <- simInit()
+  s$ras <- randomPolyToDisk2(tmpfile)
+  s2 <- Cache(spades(s))
+  expect_true(identical(Filenames(s2), Filenames(s)))
 })

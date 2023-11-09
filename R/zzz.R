@@ -36,6 +36,9 @@
   }
   .pkgEnv[["unitConversions"]] <- as.matrix(as.data.frame(bbs))
 
+  # module template path
+  .pkgEnv[["templatePath"]] <- system.file("templates", package = "SpaDES.core")
+
   # Create active binding for "Paths"
   pkgEnv <- parent.env(environment())
   rm("Paths", envir = pkgEnv)
@@ -51,12 +54,8 @@
   invisible()
 }
 
-#' @importFrom reproducible normPath
 #' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
-  # module template path
-  .pkgEnv[["templatePath"]] <- system.file("templates", package = "SpaDES.core")
-
   if (interactive()) {
     packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
     a <- capture.output(setPaths(), type = "message")

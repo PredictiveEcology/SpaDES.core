@@ -44,9 +44,9 @@ test_that("test checkpointing", {
 
 test_that("test checkpointing with disk-backed raster", {
   skip_on_cran()
+  skip_if_not_installed("magrittr") ## using tee pipe (`%T>%`)
 
-  testInit(sampleModReqdPkgs,
-                          opts = list(spades.recoveryMode = FALSE))
+  testInit(c(sampleModReqdPkgs, "magrittr"), opts = list(spades.recoveryMode = FALSE))
 
   file <- file.path("chkpnt.qs")
 
@@ -62,12 +62,17 @@ test_that("test checkpointing with disk-backed raster", {
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
     modulePath = getSampleModules(tmpdir),
-    outputPath = tmpdir
+    outputPath = tmpdir,
+    inputPath = file.path(tmpdir, "inputs")
   )
   simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
   simA$ras <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1)
-  tmpRasFilename <- tempfile("tmpRas", fileext = ".grd") %T>%
-    file.create() %>%
+
+  # Can't create a temporary file because it is not inside projectPath
+  tmpRasFilename <- tempfile("tmpRas", fileext = ".grd") |>
+    basename() |>
+    (function(x) file.path(inputPath(simA), x))() %T>%
+    file.create() |>
     normPath()
   if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
   simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
@@ -81,13 +86,21 @@ test_that("test checkpointing with disk-backed raster", {
 
   # Eliot uncommented this next line Sept 17, 2019 b/c writeRaster next line newly failed
   # filenames of source and target should be different
-  tmpRasFilename <- tempfile("tmpRas", fileext = ".grd")
+  tmpRasFilename <- tempfile("tmpRas", fileext = ".grd") |>
+    basename() |>
+    (function(x) file.path(inputPath(simA), x))() %T>%
+    file.create() |>
+    normPath()
+
+  # tmpRasFilename <- tempfile("tmpRas", fileext = ".grd")
   if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
   simA$ras[] <- simA$ras[]
   simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
   end(simB) <- 1
   simB <- spades(simB)
+  fns <- Filenames(simB)
   rm(simB)
+  unlink(fns) # make sure the file-backed files are removed
 
   simB <- checkpointLoad(file = file.path(paths$outputPath, file))
   end(simB) <- 2

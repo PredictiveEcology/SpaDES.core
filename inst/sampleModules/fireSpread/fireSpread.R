@@ -104,13 +104,16 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot.init = {
       # do stuff for this event
-      coltab(sim[[Par$stackName]]) <- list(
+      cols <- list(
         DEM = brewer.pal(9, "YlOrBr"),
         forestAge = brewer.pal(9, "BuGn"),
         habitatQuality = brewer.pal(8, "Spectral"),
         percentPine = brewer.pal(9, "Greens"),
         Fires = c("white", rev(heat.colors(9)))
       )
+
+      for (i in seq(cols))
+        coltab(sim[[Par$stackName]], layer = i) <- cols[[i]]
 
       # clearPlot()
       Plots(sim[[Par$stackName]],

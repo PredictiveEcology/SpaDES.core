@@ -102,10 +102,12 @@ repo
 reproducibility
 reproducibly
 scalable
+se
 sim2gantt
 simList
 stochasticity
 submodules
+symlinks
 templating
 timeframe
 timeunit
@@ -114,6 +116,7 @@ timezones
 unevaluated
 unparsed
 unsetting
+userTag
 v1
 v2
 vectorized

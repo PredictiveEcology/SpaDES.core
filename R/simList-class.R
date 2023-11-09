@@ -55,8 +55,8 @@
 #' @slot outputs    a `data.frame`  or `data.table` of files and
 #'                  metadata
 #'
-#' @slot paths      Named list of `modulePath`, `inputPath`,
-#'                  and `outputPath` paths. Partial matching is performed.
+#' @slot paths      Named list of paths. See `?.paths`. Partial matching is performed.
+#'
 #' @slot .xData     Environment referencing the objects used in the simulation.
 #'                  Several "shortcuts" to accessing objects referenced by this
 #'                  environment are provided, and can be used on the

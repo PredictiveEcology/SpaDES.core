@@ -456,10 +456,16 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
     # if some or all are NA -- need to check
     wrongClass <- lapply(class, function(cla)
       # Note c() doesn't always produce a vector -- e.g., functions, calls -- need lapply
-      lapply(c(default, min, max)[!anyNAs], function(val)
-        is(val, cla)))
-    classWrong <- all(!unlist(wrongClass))
-    if (classWrong) {
+      lapply(c(default, min, max)[!anyNAs], function(val) {
+        a <- is(val, cla)
+        if (isFALSE(a))
+          if (is(val, "call"))
+            a <- NA
+        a
+        })
+      )
+    classWrong <- na.omit(all(!unlist(wrongClass)))
+    if (isTRUE(classWrong)) {
       # any messages here are captured if this is run from .parseModule
       #   It will append module name
       message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
@@ -478,7 +484,6 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
     paramName = name, paramClass = I(list(class)), default = I(list(default)),
     min = I(list(min)), max = I(list(max)), paramDesc = desc,
     stringsAsFactors = FALSE)
-  # if (!identical(df, df1)) browser()
   return(df)
 
 
@@ -792,7 +797,3 @@ addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
   returnDataframe
 }
 
-fileExt <- getFromNamespace("fileExt", "reproducible")
-filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
-extractInequality <- getFromNamespace("extractInequality", "Require")
-compareVersion2 <- getFromNamespace("compareVersion2", "Require")

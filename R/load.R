@@ -10,9 +10,9 @@ utils::globalVariables(c("fun", "loadTime", "package"))
 #' @rdname loadFiles
 .fileExtensions <- function() {
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
-    "asc", "terra", "rast",
+    "asc", "rast", "terra",
     "csv", "read.csv", "utils",
-    "png", "terra", "rast",
+    "png", "rast", "terra",
     "qs", "qread", "qs",
     "Rdata", "load", "base",
     "rdata", "load", "base",
@@ -20,7 +20,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
     "shp", "terra", "vect",
-    "tif", "terra", "rast",
+    "tif", "rast", "terra",
     "txt", "read.table", "utils"
     )),
     stringsAsFactors = FALSE)
@@ -333,13 +333,12 @@ setMethod("rasterToMemory",
           signature = c(x = "character"),
           definition = function(x, ...) {
             rasterToMemory(terra::rast(x, ...))
-          })
+})
 
 #' @rdname rasterToMemory
 setMethod("rasterToMemory",
           signature = c(x = "ANY"),
           definition = function(x, ...) {
-
             if (isRaster(x)) {
               if (any(nchar(Filenames(x)) > 0)) {
                 r <- rasterCreate(x, ...)
@@ -356,7 +355,6 @@ setMethod("rasterToMemory",
                 r[] <- terra::values(x)
                 x <- r
               }
-
             }
             x
 })
@@ -369,7 +367,6 @@ setMethod("rasterToMemory",
             list2env(obj, envir = envir(x))
             return(x)
 })
-
 
 #' Simple wrapper to load any `Raster*` object
 #'

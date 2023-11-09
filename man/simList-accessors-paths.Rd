@@ -18,6 +18,8 @@
 \alias{outputPath,simList-method}
 \alias{outputPath<-}
 \alias{outputPath<-,simList-method}
+\alias{figurePath}
+\alias{figurePath,simList-method}
 \alias{logPath}
 \alias{logPath,simList-method}
 \alias{modulePath}
@@ -71,6 +73,10 @@ outputPath(sim)
 outputPath(sim) <- value
 
 \S4method{outputPath}{simList}(sim) <- value
+
+figurePath(sim)
+
+\S4method{figurePath}{simList}(sim)
 
 logPath(sim)
 

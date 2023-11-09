@@ -11,9 +11,9 @@
 
 \item{m}{module name}
 
-\item{hadPrevMessage}{}
+\item{k}{numeric index of module name in sim@depends@dependencies, should align with \code{m}}
 
-\item{message}{rest of message}
+\item{hadPrevMessage}{}
 }
 \value{
 NULL (invisibly); invoked for side effect of generating message with that starts with

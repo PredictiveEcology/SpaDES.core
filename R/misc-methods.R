@@ -397,6 +397,9 @@ setMethod(
 #'
 #' @param scratchPath The default local directory in which to save transient files.
 #'                    If not specified, defaults to `getOption("spades.scratchPath")`.
+#'                    *Important note:* this location may not be cleaned up automatically,
+#'                    so be sure to monitor this directory and remove unnecessary temp files
+#'                    that may contribute to excessive disk usage.
 #'
 #' @param terraPath  The default local directory in which to save transient `terra` files.
 #'                   If not specified, defaults to
@@ -661,8 +664,12 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
   paramInThisMod <- paramsInSim[[currentModule]][[paramToCheck]]
   params <- paramsInSim[setdiff(moduleToUse, currentModule)]
 
-  paramToUpdateValInOtherMods <- unlist(lapply(params, function(p) p[[paramToCheck]]))
-  paramInOtherMods <- unique(paramToUpdateValInOtherMods)
+  ## preserve list for parameters composed of several values - will this work with lists of lists?
+  ## may need a Reduce(..., identical)?
+  paramToUpdateValInOtherMods <- lapply(params, function(p) p[[paramToCheck]])
+  ## remove NULLs
+  paramToUpdateValInOtherMods <- paramToUpdateValInOtherMods[!sapply(paramToUpdateValInOtherMods, is.null)]
+  paramInOtherMods <- unique(paramToUpdateValInOtherMods)  ## again, preserve list -- if there is only one entry, all definitions are identical
 
   messSuff <- paste0("); they should not. Perhaps pass params = list(.globals = list(",
                      paramToCheck, " = '", paramInOtherMods[1], "')) in the simInit call?")
@@ -680,7 +687,7 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
   if (!test) {
     if (is.null(paramInThisMod) || identical("default", paramInThisMod)) {
       if (length(paramInOtherMods) == 1) {
-        newVal <- paramInOtherMods
+        newVal <- unlist(paramInOtherMods) ## can unlist here
         message(paramToCheck, " in ", currentModule," is set to 'default' or NULL;")
         message("... setting to '", newVal,
                 "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
@@ -699,8 +706,17 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
       }
     }
     if (isTRUE(fail)) {
-      dfThis <- data.frame(module = currentModule, value = paramInThisMod, row.names = NULL)
-      dfOther <- data.frame(module = names(paramToUpdateValInOtherMods), value = paramToUpdateValInOtherMods, row.names = NULL)
+      if (is.null(paramInThisMod)) {
+        paramInThisMod <- "NULL"  ## avoid failure below due to 0 length
+      }
+
+      # dfThis <- data.frame(module = currentModule, value = paramInThisMod, row.names = NULL)
+      # dfOther <- data.frame(module = names(paramToUpdateValInOtherMods),
+      #                       value = paramToUpdateValInOtherMods, row.names = NULL)
+      ## this works better when the parameter has length()>1 :
+      dfThis <- data.frame(modName = paramInThisMod, row.names = NULL)
+      names(dfThis) <- currentModule
+      dfOther <- as.data.frame(paramToUpdateValInOtherMods, row.names = NULL)
       messageVerbose("This module", verbose = verbose)
       messageDF(dfThis, colour = "green", verbose = verbose)
       messageVerbose("Other modules", verbose = verbose)

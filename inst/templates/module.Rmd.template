@@ -25,11 +25,6 @@ always_allow_html: true
 ```{r setup-{{{name2}}}, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, eval = FALSE, results = "hold") ## change to eval = TRUE if all chunks are to be evaluated
 
-if (!require(dplyr)) {
-  install.packages("dplyr")
-  library(dplyr)
-}
-
 dir.create("figures", showWarnings = FALSE)
 
 download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.png",
