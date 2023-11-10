@@ -1,3 +1,8 @@
+# SpaDES.core 2.0.4
+## Enhancements
+## Dependency changes
+## Bug fixes
+
 # SpaDES.core 2.0.3
 
 ## Enhancements
