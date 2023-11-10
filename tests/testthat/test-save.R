@@ -286,7 +286,7 @@ test_that("saveSimList with file backed objs", {
     expect_true(dir.exists(outputPath))
   } else {
     ## use symlink if not Windows
-    linkedDir <- checkPath(file.path(tmpdir, "SpaDES.core_tests", "outputs_dir"), create = TRUE)
+    linkedDir <- checkPath(file.path(tempdir(), "SpaDES.core_tests", .rndstr(1)), create = TRUE)
     file.symlink(linkedDir, outputPath)
     expect_true(dir.exists(outputPath))
     expect_identical(Sys.readlink(outputPath), linkedDir)
