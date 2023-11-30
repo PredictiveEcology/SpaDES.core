@@ -268,7 +268,7 @@ setMethod(
 })
 
 if (!isGeneric(".cacheMessage")) {
-  setGeneric(".cacheMessage", function(object, functionName, fromMemoise) {
+  setGeneric(".cacheMessage", function(object, functionName, fromMemoise, verbose) {
     standardGeneric(".cacheMessage")
   })
 }
@@ -289,8 +289,11 @@ setMethod(
   ".cacheMessage",
   signature = "simList",
   definition = function(object, functionName,
-                        fromMemoise = getOption("reproducible.useMemoise", TRUE)) {
+                        fromMemoise = getOption("reproducible.useMemoise", TRUE),
+                        verbose = getOption("reproducible.verbose")) {
     cur <- current(object)
+    .cacheMessage(NULL, functionName, fromMemoise = fromMemoise, verbose = verbose)
+
     if (NROW(cur)) {
       whichCached <- grep(".useCache", object@params)
       useCacheVals <- lapply(whichCached, function(x) {
@@ -300,34 +303,23 @@ setMethod(
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
       if (is.na(fromMemoise)) fromMemoise <- FALSE
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
-      if (isTRUE(useCacheVals[[whCurrent]])) {
-        if (isTRUE(fromMemoise)) {
-          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module"))
-        } else if (!is.na(fromMemoise)) {
-          message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
-                  "\n        ",
-                  crayon::blue(.addingToMemoisedMsg))
-        } else {
-          message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
-        }
-      } else {
-        if (isTRUE(fromMemoise)) {
-          message(crayon::blue("     loaded memoised copy of", cur$eventType, "event in",
-                           cur$moduleName, "module"))
+      # if (isTRUE(useCacheVals[[whCurrent]])) {
+      #   if (isTRUE(fromMemoise)) {
+      #     message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module"))
+      #   } else if (!is.na(fromMemoise)) {
+      #     message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
+      #             "\n        ",
+      #             crayon::blue(.addingToMemoisedMsg))
+      #   } else {
+      #     message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
+      #   }
+      # } else {
+      Require::messageVerbose(crayon::blue("     for", cur$eventType, "event in",
+                           cur$moduleName, "module"), verbose = verbose)
 
-        } else if (!is.na(fromMemoise)) {
-          message(crayon::blue("     loaded cached copy of", cur$eventType, "event in",
-                           cur$moduleName, "module. ",
-                           if (fromMemoise) .addingToMemoisedMsg
-                           ))
-        } else {
-          message(crayon::blue("     loaded ", fromWhere," copy of", cur$eventType, "event in",
-                           cur$moduleName, "module"))
-        }
-
-      }
+      # }
     } else {
-      .cacheMessage(NULL, functionName, fromMemoise = fromMemoise)
+      messageCache("        ... from ", cur$moduleName, " module", verbose = verbose)
     }
 })
 

@@ -1452,6 +1452,7 @@ setMethod(
                            modules = cur[["moduleName"]])
     }
   }
+  verbose <- if (is.numeric(debug)) debug else !debug %in% FALSE
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
     expression(Cache(FUN = modCall,
@@ -1463,7 +1464,7 @@ setMethod(
                      classOptions = classOptions,
                      showSimilar = showSimilar,
                      cachePath = sim@paths[["cachePath"]],
-                     .functionName = moduleCall))
+                     .functionName = moduleCall, verbose = verbose))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,
