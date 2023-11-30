@@ -467,3 +467,52 @@ test_that("test sped-up Caching of sequentially cached events", {
 
 
 })
+
+
+test_that("test sped-up Caching of sequentially cached events", {
+  testInit(sampleModReqdPkgs, opts = list("spades.allowSequentialCaching" = TRUE))
+  opts <- options(reproducible.cachePath = tmpdir)
+  on.exit(opts)
+
+  defaults <- .coreModules() %>% unname()
+  times <- list(start = 1.0, end = 10)
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.useCache = c("init", ".inputObjects"),
+                            nx = 100, ny = 100),
+    fireSpread = list(.useCache = c("init", ".inputObjects")),
+    caribouMovement = list(.useCache = c("init", ".inputObjects"))
+
+  )
+  modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
+  paths <- list(modulePath = getSampleModules(tmpdir))
+
+  for (i in 2:3) {
+    fn <- file.path(paths$modulePath, modules[i], paste0(modules[i], ".R"))
+    xxx1 <- c(readLines(fn),
+              ".inputObjects <- function(sim) {",
+              "  a = asPath(file.path(inputPath(sim), \"test\")) ",
+              paste0("  if (!suppliedElsewhere(", params$.globals$stackName, "))"),
+              paste0("  sim[[", params$.globals$stackName, "]] <- sim[[", params$.globals$stackName, "]]"),
+              "sim",
+              "}")
+
+    cat(xxx1, file = fn, sep = "\n")
+  }
+
+  # Run first time to create the caches
+  for (i in 1:2) {
+    mess1 <- capture_messages(mySim <- simInit(times, params, modules, objects = list(), paths, debug = 1))
+    mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+    if (i == 1) {
+      expect_equal(sum(grepl("Skipped digest", mess)), 0)
+      expect_equal(sum(grepl("Skipped digest", mess1)), 0)
+    } else {
+      expect_equal(sum(grepl("Skipped digest", mess)), 3)
+      expect_equal(sum(grepl("Skipped digest", mess1)), 1)   # there is no .inputObjects for randomLandscapes
+    }
+
+
+  }
+
+})
