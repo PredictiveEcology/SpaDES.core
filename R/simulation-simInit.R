@@ -1283,19 +1283,32 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
-          sim <- Cache(.inputObjects, sim,
-                       .objects = objectsToEvaluateForCaching,
-                       notOlderThan = notOlderThan,
-                       outputObjects = moduleSpecificInputObjects,
-                       quick = getOption("reproducible.quick", FALSE),
-                       cachePath = sim@paths$cachePath,
-                       classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                                           params = paramsWoKnowns,
-                                           # .globals = globsWoKnowns,
-                                           modules = mBase),
-                       showSimilar = showSimilar,
-                       userTags = c(paste0("module:", mBase),
-                                    "eventType:.inputObjects"))
+          nextEvent <- NULL
+          runFnCallAsExpr <- TRUE
+          allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
+          if (allowSequentialCaching) {
+            sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debug)
+            runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
+          }
+          if (runFnCallAsExpr) {
+            sim <- Cache(.inputObjects, sim,
+                         .objects = objectsToEvaluateForCaching,
+                         notOlderThan = notOlderThan,
+                         outputObjects = moduleSpecificInputObjects,
+                         quick = getOption("reproducible.quick", FALSE),
+                         cachePath = sim@paths$cachePath,
+                         classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                                             params = paramsWoKnowns,
+                                             # .globals = globsWoKnowns,
+                                             modules = mBase),
+                         showSimilar = showSimilar,
+                         userTags = c(paste0("module:", mBase),
+                                      "eventType:.inputObjects"))
+          }
+          if (allowSequentialCaching) {
+            sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
+          }
+
 
           # put back the current values of params that were not cached on
           if (sum(paramsDontCacheOnActual))
@@ -1311,6 +1324,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           sim <- .inputObjects(sim)
         }
       }
+      if (allowSequentialCaching) {
+        sim <- allowSequentialCachingFinal(sim)
+      }
+
       if (!(FALSE %in% debug || any(is.na(debug))) )
         objectsCreatedPost(sim, objsIsNullBefore)
 

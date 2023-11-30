@@ -1476,7 +1476,24 @@ setMethod(
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
-    sim <- eval(fnCallAsExpr) # slower than more direct version just above
+    # if (any(grepl("canClimate", moduleCall))) browser()
+    nextEvent <- NULL
+    runFnCallAsExpr <- TRUE
+    allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
+    if (allowSequentialCaching) {
+      sim <- allowSequentialCaching1(sim, cacheIt, moduleCall, verbose)
+      runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
+    }
+    if (runFnCallAsExpr)
+      sim <- eval(fnCallAsExpr) # slower than more direct version just above
+
+    if (allowSequentialCaching) {
+        sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
+    }
+  }
+
+  if (allowSequentialCaching) {
+    sim <- allowSequentialCachingFinal(sim)
   }
 
   # put back the current values of params that were not cached on
@@ -2266,3 +2283,49 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 paramsDontCacheOn <- c(".useCache", ".useParallel") # don't change Caching based on .useCache
                                                     # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
 
+
+allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
+  attr(sim, "runFnCallAsExpr") <- NULL
+  if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
+    sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
+    nextEvent <- extractFromCache(sc, "NextEvent")
+    if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
+      simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
+      if (!is(simSkip, "try-error")) {
+        attr(sim, "runFnCallAsExpr") <- FALSE
+        sim <- .prepareOutput(simSkip, cachePath(sim), sim)
+        Require::messageVerbose(blue("     Skipped digest of simList because sequential Cache calls of events"),
+                                verbose = verbose)
+        .cacheMessage(sim, functionName = moduleCall, verbose = verbose)
+        attr(sim, "tags") <- paste0("cacheId:", nextEvent)
+      }
+    }
+
+  }
+  sim
+}
+
+allowSequentialCachingUpdateTags <- function(sim, cacheIt) {
+  if (!isTRUE(cacheIt)) {
+    attr(sim, "tags") <- NULL
+    attr(sim, ".Cache") <- NULL
+    sim[["._prevCache"]] <- NULL
+    attr(sim, "runFnCallAsExpr") <- NULL
+
+  }
+
+  sim
+}
+
+allowSequentialCachingFinal <- function(sim) {
+  wasFromCache <- !is.null(attr(sim, "tags"))
+  if (wasFromCache) {
+    thisCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
+    if (!is.null(sim[["._prevCache"]]))
+      reproducible:::.updateTagsRepo(cacheId = sim[["._prevCache"]],
+                                     tagKey = "NextEvent", tagValue = thisCacheId,
+                                     cachePath = cachePath(sim), add = TRUE)
+    sim[["._prevCache"]] <- thisCacheId
+  }
+  sim
+}

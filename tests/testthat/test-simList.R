@@ -404,3 +404,66 @@ test_that("inputObjects on module arg not sim", {
     expect_true(all.equal(setDF(io[[m]][, -1]), io1[[m]][, -1]))
   })
 })
+
+
+test_that("test sped-up Caching of sequentially cached events", {
+  testInit(sampleModReqdPkgs, opts = list("spades.allowSequentialCaching" = TRUE))
+  opts <- options(reproducible.cachePath = tmpdir)
+  on.exit(opts)
+
+  defaults <- .coreModules() %>% unname()
+  times <- list(start = 1.0, end = 10)
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.useCache = c("init", ".inputObjects"),
+                            nx = 100, ny = 100),
+    fireSpread = list(.useCache = c("init", ".inputObjects")),
+    caribouMovement = list(.useCache = c("init", ".inputObjects"))
+
+  )
+  modules <- list("randomLandscapes", "fireSpread", "caribouMovement")
+  paths <- list(modulePath = getSampleModules(tmpdir))
+
+  mySim <- simInit(times, params, modules, objects = list(), paths)
+  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  expect_false(any(grepl("Skipped digest", mess)))
+
+  # Rerun with Cached copies being recovered
+  mySim <- simInit(times, params, modules, objects = list(), paths)
+  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  expect_true(sum(grepl("Skipped digest", mess)) == 2)
+
+  # If they are not sequential, shouldn't do it
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.useCache = c("init", ".inputObjects")),
+    caribouMovement = list(.useCache = c("init", ".inputObjects"))
+
+  )
+  mySim <- simInit(times, params, modules, objects = list(), paths)
+  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  expect_false(any(grepl("Skipped digest", mess)))
+
+  mySim <- simInit(times, params, modules, objects = list(), paths)
+  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  expect_false(any(grepl("Skipped digest", mess)))
+
+
+  # If they are different sequential, should do it
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.useCache = c("init", ".inputObjects")),
+    fireSpread = list(.useCache = c("init", ".inputObjects"))
+    # caribouMovement = list(.useCache = c("init", ".inputObjects"))
+
+  )
+  mySim <- simInit(times, params, modules, objects = list(), paths)
+  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  expect_false(sum(grepl("Skipped digest", mess)) == 1)
+
+  mySim <- simInit(times, params, modules, objects = list(), paths)
+  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  expect_true(sum(grepl("Skipped digest", mess)) == 1)
+
+
+})
