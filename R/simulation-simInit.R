@@ -1231,6 +1231,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       if (!(FALSE %in% debug || any(is.na(debug))) )
         objsIsNullBefore <- objsAreNull(sim)
 
+      allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1285,7 +1286,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           nextEvent <- NULL
           runFnCallAsExpr <- TRUE
-          allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
           if (allowSequentialCaching) {
             sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debug)
             runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
