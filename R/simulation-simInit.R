@@ -1303,7 +1303,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                              modules = mBase),
                          showSimilar = showSimilar,
                          userTags = c(paste0("module:", mBase),
-                                      "eventType:.inputObjects"))
+                                      "eventType:.inputObjects"), verbose = debug)
           }
           if (allowSequentialCaching) {
             sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
