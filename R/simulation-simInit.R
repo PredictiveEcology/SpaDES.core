@@ -1284,7 +1284,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
-          nextEvent <- NULL
+          # nextEvent <- NULL
           runFnCallAsExpr <- TRUE
           if (allowSequentialCaching) {
             sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debug)
@@ -1567,6 +1567,9 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
       list2env(objs(simAltOut), envir(sim))
 
+      dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
+      list2env(mget(dotUnderscoreObjs, envir = envir(simAltOut)), envir(sim))
+
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
       list2env(as.list(simAltOut@completed), sim@completed)
 
@@ -1584,6 +1587,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
 
       if (length(simAltOut@events))
         sim@events <- append(sim@events, simAltOut@events)
+
     }
   }
   # sim@modules <- sim@modules[match(loadOrder, sim@modules)]

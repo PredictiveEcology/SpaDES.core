@@ -1478,7 +1478,7 @@ setMethod(
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
     # if (any(grepl("canClimate", moduleCall))) browser()
-    nextEvent <- NULL
+    # nextEvent <- NULL
     runFnCallAsExpr <- TRUE
     allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
     if (allowSequentialCaching) {
@@ -2288,17 +2288,34 @@ paramsDontCacheOn <- c(".useCache", ".useParallel") # don't change Caching based
 allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
   attr(sim, "runFnCallAsExpr") <- NULL
   if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
-    sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
-    nextEvent <- extractFromCache(sc, "NextEvent")
+    sc <- showCacheFast(sim[["._prevCache"]])
+    # sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
+    nextEvent <- extractFromCache(sc, paste0(sequentialCacheText, "NextEventCacheId"))
+    if (length(nextEvent) > 1) {
+      nextEventName <- extractFromCache(sc, paste0(sequentialCacheText, "NextEvent"))
+      nextModuleName <- extractFromCache(sc, paste0(sequentialCacheText, "NextModule"))
+      cur <- current(sim)
+      keep <- which(nextEventName %in% cur[["eventType"]] & nextModuleName %in% cur[["moduleName"]])
+      if (length(keep))
+        nextEvent <- nextEvent[keep]
+      if (length(keep) == 0)
+        nextEvent <- NULL
+    }
+    if (length(nextEvent != sim[["._prevCache"]]) > 1) browser()
     if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
       simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
       if (!is(simSkip, "try-error")) {
-        attr(sim, "runFnCallAsExpr") <- FALSE
-        sim <- .prepareOutput(simSkip, cachePath(sim), sim)
-        Require::messageVerbose(blue("     Skipped digest of simList because sequential Cache calls of events"),
-                                verbose = verbose)
-        .cacheMessage(sim, functionName = moduleCall, verbose = verbose)
-        attr(sim, "tags") <- paste0("cacheId:", nextEvent)
+        if (all(current(simSkip) == current(sim))) {
+          attr(sim, "runFnCallAsExpr") <- FALSE
+          sim <- .prepareOutput(simSkip, cachePath(sim), sim)
+          .cacheMessageObjectToRetrieve(functionName = moduleCall, fullCacheTableForObj = sc,
+                                        cachePath = cachePath(sim),
+                                        cacheId = sim[["._prevCache"]], verbose = verbose)
+          Require::messageVerbose(blue("     Skipped digest of simList because sequential Cache calls of events"),
+                                  verbose = verbose)
+          .cacheMessage(sim, functionName = moduleCall, verbose = verbose)
+          attr(sim, "tags") <- paste0("cacheId:", nextEvent)
+        }
       }
     }
 
@@ -2322,11 +2339,59 @@ allowSequentialCachingFinal <- function(sim) {
   wasFromCache <- !is.null(attr(sim, "tags"))
   if (wasFromCache) {
     thisCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
-    if (!is.null(sim[["._prevCache"]]))
-      reproducible:::.updateTagsRepo(cacheId = sim[["._prevCache"]],
-                                     tagKey = "NextEvent", tagValue = thisCacheId,
-                                     cachePath = cachePath(sim), add = TRUE)
+    if (!is.null(sim[["._prevCache"]])) {
+      sc <- showCacheFast(sim[["._prevCache"]])
+      cp <- cachePath(sim)
+      cur <- current(sim)
+      seqCache <- sc[startsWith(sc$tagKey, sequentialCacheText)]
+      # This is multiple tags for the NextEvent stuff
+      if (length(thisCacheId) > 1) browser()
+      args <- data.frame(cacheId = sim[["._prevCache"]],
+                   tagKey = paste0(sequentialCacheText, "Next", c("EventCacheId", "Module", "Event")),
+                   tagValue = c(thisCacheId, cur[["moduleName"]], cur[["eventType"]]),
+                   cachePath = cp)
+      if (all(c(cur$moduleName, cur$eventType) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
+        fn <- reproducible:::.updateTagsRepo
+        args$add = TRUE
+      } else {
+        browser()
+        fn <- reproducible:::.addTagsRepo
+      }
+
+      # put all tags in
+      by(args, INDICES = seq(NROW(args)), FUN = function(a) do.call(fn, a))
+    }
     sim[["._prevCache"]] <- thisCacheId
   }
   sim
 }
+
+
+clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"),
+                                  key = paste0(sequentialCacheText, "Next")) {
+  onesWithNextEvent <- character()
+  a <- lapply(dir(CacheStorageDir(cachePath), pattern = "dbFile", full.names = TRUE), function(x) {
+    y <- readRDS(x)
+    if (any(grep(key, y$tagKey))) {
+      y <- y[grep(paste0("^", key), tagKey, invert = TRUE)]
+      message("resaving ", x)
+      onesWithNextEvent <<- c(onesWithNextEvent, x)
+      saveRDS(y, file = x)
+    }
+  })
+  return(onesWithNextEvent)
+
+}
+
+showCacheFast <- function(cacheId, cachePath = getOption("reproducible.cachePath")) {
+  fileexists <- dir(CacheStorageDir(cachePath), full.names = TRUE,
+                    pattern = paste0(cacheId, "\\.dbFile"))
+  if (length(fileexists)) {
+    sc <- readRDS(fileexists)
+  } else {
+    sc <- showCache(userTags = cacheId, verbose = FALSE)[cacheId %in% cacheId]
+  }
+  sc[]
+}
+
+sequentialCacheText <- "SequentialCache_"
