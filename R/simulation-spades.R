@@ -2291,10 +2291,10 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
     sc <- showCacheFast(sim[["._prevCache"]])
     # sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
     nextEvent <- extractFromCache(sc, paste0(sequentialCacheText, "NextEventCacheId"))
+    cur <- current(sim)
     if (length(nextEvent) > 1) {
       nextEventName <- extractFromCache(sc, paste0(sequentialCacheText, "NextEvent"))
       nextModuleName <- extractFromCache(sc, paste0(sequentialCacheText, "NextModule"))
-      cur <- current(sim)
       keep <- which(nextEventName %in% cur[["eventType"]] & nextModuleName %in% cur[["moduleName"]])
       if (length(keep))
         nextEvent <- nextEvent[keep]
@@ -2305,8 +2305,21 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
     if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
       simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
       if (!is(simSkip, "try-error")) {
-        if (all(current(simSkip) == current(sim))) {
-          attr(sim, "runFnCallAsExpr") <- FALSE
+
+        # The user can't have modified the function being run
+        scNe <- showCacheFast(nextEvent)
+        preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
+        grepVal <- paste0("sim\\.\\.list\\.", cur[["moduleName"]], preModCall, moduleCall)
+
+        scFn <- scNe[grepl(grepVal, tagValue) & grepl("preDigest", tagKey)]
+        a <- .robustDigest(sim[[".mods"]][[cur[["moduleName"]]]][[moduleCall]])
+        b <- gsub(".+:(.+)", "\\1", scFn$tagValue)
+        noChange <- (a == b)
+        if (isTRUE(noChange %in% FALSE)) browser()
+
+
+        if (isTRUE(noChange) && all(current(simSkip) == current(sim))) {
+          attr(sim, "runFnCallAsExpr") <- FALSE # the trigger to NOT pull the next event
           sim <- .prepareOutput(simSkip, cachePath(sim), sim)
           .cacheMessageObjectToRetrieve(functionName = moduleCall, fullCacheTableForObj = sc,
                                         cachePath = cachePath(sim),
@@ -2354,7 +2367,6 @@ allowSequentialCachingFinal <- function(sim) {
         fn <- reproducible:::.updateTagsRepo
         args$add = TRUE
       } else {
-        browser()
         fn <- reproducible:::.addTagsRepo
       }
 
