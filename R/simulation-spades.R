@@ -2303,35 +2303,51 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
     }
     if (length(nextEvent != sim[["._prevCache"]]) > 1) browser()
     if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
-      isMemoised <- isMemoised(cacheId = nextEvent, cachePath = cachePath(sim))
-      simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
-      if (!is(simSkip, "try-error")) {
+      # The user can't have modified the function being run
+      scNe <- showCacheFast(nextEvent)
+      d <- .robustDigest(Copy(sim, objects = FALSE))
 
-        # The user can't have modified the function being run
-        scNe <- showCacheFast(nextEvent)
-        preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
-        grepVal <- paste0("sim\\.\\.list\\.", cur[["moduleName"]], preModCall, moduleCall)
+      # need to check for non-object (e.g., function, params, depends) that could have changed
+      # checkParams
+      sPoss <- .robustDigest(Copy(sim, objects = FALSE))
+      scNePreDigests <- scNe$tagValue["preDigest" == scNe$tagKey]
 
-        # need to check for non-object (e.g., function) that could have changed
-        scFn <- scNe[grepl(grepVal, tagValue) & grepl("preDigest", tagKey)]
-        # Check that function itself (.inputObject or doEvent.XXX) has not changed
-        a <- .robustDigest(sim[[".mods"]][[cur[["moduleName"]]]][[moduleCall]])
-        b <- gsub(".+:(.+)", "\\1", scFn$tagValue)
-        noChange <- (a == b)
-        if (isTRUE(noChange %in% FALSE)) browser()
+      wh <- c("params", "depends")
+      wh2 <- paste0("sim.", wh)
+      noChanges <- logical(length(wh) + 1)
+      for (iii in seq(wh)) {
+        paramCIs <- gsub(".+:(.+)", "\\1", scNePreDigests[startsWith(scNePreDigests, wh2[iii])])
+        noChanges[iii] <- all(unlist(d[[wh[iii]]][[cur[["moduleName"]]]]) %in% paramCIs)
+      }
 
+      # preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
+      # grepVal <- paste0("sim\\.\\.list\\.", cur[["moduleName"]], preModCall, moduleCall)
+      # Check that function itself (.inputObject or doEvent.XXX) has not changed
+      grepVal <- paste0("sim..list.", cur[["moduleName"]], ".", moduleCall)
+      scFn <- startsWith(scNePreDigests, grepVal) # grepl(scNePreDigests, pattern = grepVal)
+      a <- .robustDigest(sim[[".mods"]][[cur[["moduleName"]]]][[moduleCall]])
+      b <- gsub(".+:(.+)", "\\1", scNePreDigests[scFn])
+      noChanges[length(noChanges)] <- (a %in% b)
+      noChange <- all(noChanges)
 
-        if (isTRUE(noChange) && all(current(simSkip) == current(sim))) {
-          attr(sim, "runFnCallAsExpr") <- FALSE # the trigger to NOT pull the next event
-          sim <- .prepareOutput(simSkip, cachePath(sim), sim)
-          .cacheMessageObjectToRetrieve(functionName = moduleCall, fullCacheTableForObj = sc,
-                                        cachePath = cachePath(sim),
-                                        cacheId = sim[["._prevCache"]], verbose = verbose)
-          Require::messageVerbose(blue("     Skipped digest of simList because sequential Cache calls of events"),
-                                  verbose = verbose)
-          .cacheMessage(sim, functionName = moduleCall, fromMemoise = isMemoised, verbose = verbose)
-          attr(sim, "tags") <- paste0("cacheId:", nextEvent)
+      if (isTRUE(noChange)) {
+        isMemoised <- isMemoised(cacheId = nextEvent, cachePath = cachePath(sim))
+        simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
+        if (!is(simSkip, "try-error")) {
+          if (all(current(simSkip) == current(sim))) {
+            attr(sim, "runFnCallAsExpr") <- FALSE # the trigger to NOT pull the next event
+            sim <- .prepareOutput(simSkip, cachePath(sim), sim)
+            .cacheMessageObjectToRetrieve(functionName = moduleCall, fullCacheTableForObj = sc,
+                                          cachePath = cachePath(sim),
+                                          cacheId = sim[["._prevCache"]], verbose = verbose)
+            Require::messageVerbose(blue("     Skipped digest of simList because sequential Cache calls of events"),
+                                    verbose = verbose)
+            .cacheMessage(sim, functionName = moduleCall, fromMemoise = isMemoised, verbose = verbose)
+            attr(sim, "tags") <- paste0("cacheId:", nextEvent)
+
+          }
         }
+
       }
     }
 
