@@ -687,6 +687,9 @@ setMethod(
               .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
             } else {
               sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+              cur <- list(eventTime = sim@simtimes$current, moduleName = m, eventType = ".inputObjects", eventPriority = 0)
+              cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+              sim <- appendCompleted(sim, cur)
             }
           }
 
@@ -1553,6 +1556,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
                           objects = objects, inputs = inputs, outputs = outputs,
                           times = list(start = as.numeric(start(sim)),
                                        end = as.numeric(start(sim)), timeunit = timeunit(sim)))
+        simAlt@.xData$._ranInitDuringSimInit <- completed(simAlt)$moduleName
         messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
         simAltOut <- spades(simAlt, events = "init",
                             debug = debug)
