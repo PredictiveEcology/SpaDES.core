@@ -2207,7 +2207,8 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 }
 
-paramsDontCacheOn <- c(".useCache", ".useParallel") # don't change Caching based on .useCache
+paramsDontCacheOn <- c(".useCache", ".useParallel",
+                       paste0(".", c("plots", "plotInterval", "plotInitialTime", "saveInitialTime", "saveInterval"))) # don't change Caching based on .useCache
                                                     # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
 
 

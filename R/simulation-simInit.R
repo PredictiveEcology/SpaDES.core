@@ -1283,8 +1283,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             debugonce(.inputObjects)
 
           modParams <- sim@params[[mBase]]
-          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in% paramsDontCacheOn
-          simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
+          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
+            paramsDontCacheOn
+          # simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           # nextEvent <- NULL
