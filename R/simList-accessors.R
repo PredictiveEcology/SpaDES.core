@@ -61,9 +61,14 @@ setMethod(
 
     p <- mapply(
       function(x, y) {
+        vals <- I(as.list(y))
+        isFun <- vapply(vals, is.function, FUN.VALUE = logical(1))
+        vals[isFun] <- lapply(vals[isFun], format)
+
+
         if (length(names(y)) > 0)
-        data.frame(Module = x, Parameter = names(y), Value = I(as.list(y)),
-                   stringsAsFactors = FALSE, row.names = NULL)
+          data.frame(Module = x, Parameter = names(y), Value = vals,
+                     stringsAsFactors = FALSE, row.names = NULL)
       },
       x = names(params(object))[-omit],
       y = params(object)[-omit],
