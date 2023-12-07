@@ -45,9 +45,10 @@ if (!isGeneric("Copy")) {
 setMethod("Copy",
           signature(object = "simList"),
           definition = function(object,
-                                objects, queues, ...) {
+                                objects, queues, modules, ...) {
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
+            if (missing(modules)) modules <-  TRUE
             sim_ <- object
             sim_@completed <- new.env(parent = emptyenv())
             if (queues) {
@@ -77,6 +78,9 @@ setMethod("Copy",
 
               # browser(expr = exists("._Copy_6"))
               objNames <- ls(object@.xData$.mods, all.names = TRUE)
+              if (isTRUE(is.character(modules))) {
+                objNames <- objNames[match(modules, objNames)]
+              }
               names(objNames) <- objNames
               isEnv <- unlist(lapply(objNames,
                                      function(obj)
@@ -103,7 +107,11 @@ setMethod("Copy",
               })
 
               # Copy .objects
-              lapply(modules(sim_), function(mod) {
+              modsToCopy <- modules(sim_)
+              if (is.character(modules)) {
+                modsToCopy <- intersect(modules, modsToCopy)
+              }
+              lapply(modsToCopy, function(mod) {
                 if (exists(mod, envir = sim_@.xData$.mods, inherits = FALSE)) {
                   rm(list = ".objects", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
                   sim_@.xData$.mods[[mod]]$.objects <- new.env(parent = emptyenv())
