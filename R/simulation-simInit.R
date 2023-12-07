@@ -1570,6 +1570,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
         list2env(objs, sim$.mods[[mod]]$.objects)
       })
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
+      sim <- updateParamsFromGlobals(sim)
       list2env(objs(simAltOut), envir(sim))
 
       dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
