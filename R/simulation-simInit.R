@@ -1591,8 +1591,14 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
         }
       }
 
-      if (length(simAltOut@events))
+      if (length(simAltOut@events)) {
+        # have to remove the .coreModules if they have already run
+        modulesRun <- vapply(sim@events, function(x) x$moduleName, FUN.VALUE = character(1))
+        coreModules <- modulesRun %in% .coreModules()
+        if (any(coreModules))
+          sim@events <- sim@events[-which(coreModules)]
         sim@events <- append(sim@events, simAltOut@events)
+      }
 
     }
   }
