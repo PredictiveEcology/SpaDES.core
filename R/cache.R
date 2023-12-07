@@ -932,13 +932,21 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
                           conn = getOption("reproducible.conn", NULL),
                           verbose = getOption("reproducible.verbose"),
+                          outputObjects = NULL,
                           ...) {
+
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
-  objTmp <- Copy(obj, objects = 2, drv = drv, conn = conn, verbose = verbose)
+  modules <- TRUE
+  if (!is.null(outputObjects)) {
+    grepForMods <- "^.mods"
+    isAModule <- grep(grepForMods, outputObjects)
+    modules <- gsub(paste0("^.mods", "\\$"), "", outputObjects[isAModule])
+  }
+  objTmp <- Copy(obj, objects = 2, modules = modules, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose,
+  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects, drv = drv, conn = conn, verbose = verbose,
                ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
