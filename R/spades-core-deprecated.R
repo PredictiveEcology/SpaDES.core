@@ -1,4 +1,4 @@
-deprecatedMsg <- function(fnName = as.character(match.call()[[1]]),
+.messageDeprecatedFn <- function(fnName = as.character(match.call()[[1]]),
                           newPackage = NULL) {
 
   gitSite <- c(paste0("PredictiveEcology/", newPackage, "@development"),
@@ -17,26 +17,26 @@ deprecatedMsg <- function(fnName = as.character(match.call()[[1]]),
 #' @param ... Unused.
 #' @rdname deprecated
 experiment <- function(...) {
-  .Deprecated(msg = deprecatedMsg(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
 }
 
 
 #' @export
 #' @rdname deprecated
 experiment2 <- function(...) {
-  .Deprecated(msg = deprecatedMsg(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
 }
 
 #' @export
 #' @rdname deprecated
 POM <- function(...) {
-  .Deprecated(msg = deprecatedMsg(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
 }
 
 #' @export
 #' @rdname deprecated
 simInitAndExperiment <- function(...) {
-  .Deprecated(msg = deprecatedMsg(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
 }
 
 #' @rdname deprecated
