@@ -1407,10 +1407,10 @@ setMethod(
       sim <- allowSequentialCaching1(sim, cacheIt, moduleCall, verbose)
       runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
     }
-    #if (cur[["eventType"]] %in% "prepIgnitionFitData") { browser()
-      # bbbb <<- 1
-      # on.exit(rm(bbbb, envir = .GlobalEnv))
-    #}
+    # if (isTRUE(grepl("fireSense_data", cur[["moduleName"]]))) { browser()
+    #   bbbb <<- 1
+    #   on.exit(rm(bbbb, envir = .GlobalEnv))
+    # }
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
 
