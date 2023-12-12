@@ -943,6 +943,15 @@ objSize.simList <- function(x, quick = TRUE, ...) {
     modules <- gsub(paste0("^.mods", "\\$"), "", outputObjects[isAModule])
   }
   objTmp <- Copy(obj, objects = 2, modules = modules, drv = drv, conn = conn, verbose = verbose)
+
+  # Remove Par and mod active bindings --> these shouldn't be .wrap'd
+  modulesInSim <- ls(objTmp$.mods)
+  for (mo in modulesInSim) {
+    try(rm(list = c("Par", "mod"), envir = objTmp$.mods[[mo]]))
+  }
+
+  # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
+  objTmp$.mods <- .wrap(objTmp$.mods, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects

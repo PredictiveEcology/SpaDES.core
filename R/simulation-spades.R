@@ -1407,9 +1407,13 @@ setMethod(
       sim <- allowSequentialCaching1(sim, cacheIt, moduleCall, verbose)
       runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
     }
-    # if (isTRUE(grepl("fireSense_data", cur[["moduleName"]]))) { browser()
+    # if (isTRUE(grepl("fireSense_data", cur[["moduleName"]]))) {
     #   bbbb <<- 1
     #   on.exit(rm(bbbb, envir = .GlobalEnv))
+    #   # debug(.unwrap.simList)
+    #   opts <- options(reproducible.useMemoise = FALSE)
+    #   on.exit(options(opts), add = TRUE)
+    #   browser()
     # }
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
