@@ -22,7 +22,7 @@ if (!isGeneric(".robustDigest")) {
 #' @aliases Cache
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
-#' @importFrom Require modifyList2
+#' @importFrom Require modifyList2 invertList
 #' @importFrom reproducible asPath .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
@@ -199,9 +199,29 @@ setMethod(
     #   not files
     nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
     dependsSeparate <- setdiff(nonDotListNoOutputs, "depends")
-    obj[dependsSeparate] <- lapply(dependsSeparate, function(x)
-      .robustDigest(slot(object, x), algo = algo))
-    obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
+    obj[dependsSeparate] <- lapply(dependsSeparate, function(x) {
+      .robustDigest(slot(object, x), algo = algo)})
+    dependsFirst <- obj[["depends"]] <- list()
+    for (ii in c("inputObjects", "outputObjects", "parameters")) {
+      dependsFirst[[ii]] <-
+        .robustDigest(lapply(object@depends@dependencies,
+                             function(mo) {
+                               mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
+                             } ))
+    }
+
+    obj[["depends"]] <- invertList(dependsFirst)
+
+    otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
+                           "spatialExtent", "timeframe", "timeunit", "version")
+    dependsSecond <-
+      .robustDigest(lapply(object@depends@dependencies,
+                           function(mo) {
+                             mo[otherDependsToDig]
+                           } ))
+
+    obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
+    # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
     obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
     if (!is.null(classOptions$events))
