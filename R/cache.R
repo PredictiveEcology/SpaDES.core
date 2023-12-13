@@ -974,6 +974,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
                             conn = getOption("reproducible.conn", NULL), ...) {
 
   # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
+  obj$.mods <- .unwrap(obj$.mods, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
   outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
