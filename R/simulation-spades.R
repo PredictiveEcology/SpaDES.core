@@ -2345,17 +2345,6 @@ clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"
 
 }
 
-showCacheFast <- function(cacheId, cachePath = getOption("reproducible.cachePath")) {
-  fileexists <- dir(CacheStorageDir(cachePath), full.names = TRUE,
-                    pattern = paste0(cacheId, "\\.dbFile"))
-  if (length(fileexists)) {
-    sc <- readRDS(fileexists)
-  } else {
-    sc <- showCache(userTags = cacheId, verbose = FALSE)[cacheId %in% cacheId]
-  }
-  sc[]
-}
-
 sequentialCacheText <- "SequentialCache_"
 
 appendCompleted <- function(sim, cur) {
