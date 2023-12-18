@@ -23,5 +23,7 @@ compareVersion2 <- getFromNamespace("compareVersion2", "Require")
 
 remapFilenames <- getFromNamespace("remapFilenames", "reproducible")
 extractFromCache <- getFromNamespace("extractFromCache", "reproducible")
+loadFile <- getFromNamespace("loadFile", "reproducible")
 
 .messageAddingToMemoised <- getFromNamespace(".messageAddingToMemoised", "reproducible")
+
