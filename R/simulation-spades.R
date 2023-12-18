@@ -1683,9 +1683,10 @@ spadesDefaultFormatter <- function(record) {
 #' @importFrom reproducible Filenames
 clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
   if (isTRUE(recoverMode > 0)) {
-    toClear <- recoverableObjs[[as.numeric(recoverMode)]]
-    if (length(toClear)) {
-      out <- lapply(toClear, function(x) {
+    if (length(recoverableObjs) >= as.numeric(recoverMode)) {
+      toClear <- recoverableObjs[[as.numeric(recoverMode)]]
+      if (length(toClear)) {
+        out <- lapply(toClear, function(x) {
         if (is(x, "Raster")) {
           Filenames(x)
         }
@@ -1698,6 +1699,7 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
         filesLeft <- dir(dirs, full.names = TRUE)
         if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
           unlink(dirs, recursive = TRUE)
+        }
         }
       }
     }
