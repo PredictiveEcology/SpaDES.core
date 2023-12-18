@@ -244,7 +244,8 @@ Plots <- function(data, fn, filename,
       if (!is(gg, ".quickPlot")) {
         ggListToScreen <- setNames(list(gg), "gg")
         if (!is.null(gg$labels$title) && needScreen) {
-          ggListToScreen <- setNames(ggListToScreen, gg$labels$title)
+          ggListToScreen <- setNames(ggListToScreen,
+                                     format(paste(gg$labels$title, collapse = " ")))
           ggListToScreen[[1]]$labels$title <- NULL
         }
       }
