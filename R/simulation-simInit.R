@@ -688,7 +688,6 @@ setMethod(
             } else {
               sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
               cur <- list(eventTime = sim@simtimes$current, moduleName = m, eventType = ".inputObjects", eventPriority = 0)
-              cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
               sim <- appendCompleted(sim, cur)
             }
           }

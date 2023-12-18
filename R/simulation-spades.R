@@ -313,7 +313,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
         # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
-        cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+        # cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         sim <- appendCompleted(sim, cur)
       }
 
@@ -2359,6 +2359,7 @@ showCacheFast <- function(cacheId, cachePath = getOption("reproducible.cachePath
 sequentialCacheText <- "SequentialCache_"
 
 appendCompleted <- function(sim, cur) {
+  cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
   if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
     #instead of sim@.xData because collisions with parallel sims from same sim object
 
