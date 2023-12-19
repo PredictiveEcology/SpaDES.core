@@ -1062,6 +1062,12 @@ setMethod(
             restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
           )
         }
+
+        # seconds <- "secs"
+        # sim$._totalElapsedTime <- difftime(Sys.time(), sim$._startClockTime, units = seconds)
+        # subtractOff <- difftime(Sys.time(), tail(completed(sim)[["clockTime"]], 1), units = seconds)
+        # sim$._elapsedTimeIncompleteFinaleEvent <- subtractOff
+
       }, add = TRUE)
 
       if (!is.null(.plots)) {
@@ -1534,9 +1540,9 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
     rmo$recoverableModObjs <- rmo$recoverableModObjs[seq_len(recoverMode - 1)]
   }
-  curMod <- sim@events[[1]][["moduleName"]]
 
   if (length(sim@events) > 0) {
+    curMod <- sim@events[[1]][["moduleName"]]
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod  ]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
     mess <- capture.output(type = "message", {
@@ -1572,6 +1578,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     if (length(mess) > 0)
       lapply(mess, message)
   }
+
   endTime <- Sys.time()
   rmo$preEvents <- sim@events
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
@@ -1705,19 +1712,19 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
       toClear <- recoverableObjs[[as.numeric(recoverMode)]]
       if (length(toClear)) {
         out <- lapply(toClear, function(x) {
-        if (is(x, "Raster")) {
-          Filenames(x)
-        }
-      })
-      files <- unname(unlist(out))
-      files <- files[nzchar(files)]
-      if (length(files) != 0 ) {
-        unlink(files)
-        dirs <- unique(dirname(files))
-        filesLeft <- dir(dirs, full.names = TRUE)
-        if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
-          unlink(dirs, recursive = TRUE)
-        }
+          if (is(x, "Raster")) {
+            Filenames(x)
+          }
+        })
+        files <- unname(unlist(out))
+        files <- files[nzchar(files)]
+        if (length(files) != 0 ) {
+          unlink(files)
+          dirs <- unique(dirname(files))
+          filesLeft <- dir(dirs, full.names = TRUE)
+          if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
+            unlink(dirs, recursive = TRUE)
+          }
         }
       }
     }
@@ -2372,7 +2379,23 @@ clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"
 sequentialCacheText <- "SequentialCache_"
 
 appendCompleted <- function(sim, cur) {
+  # if (cur$moduleName == "checkpoint") browser()
+
   cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+
+  last <- attr(sim, "completedCounter")
+  isLastWrong <- length(sim@completed) != last
+  if (isTRUE(isLastWrong)) {
+    last <- attr(sim, "completedCounter") <- NULL
+  }
+  # if ("Biomass_borealDataPrep" %in% cur$moduleName && "init" %in% cur$eventType) browser()
+  if (is.null(last)) {
+    prevTime <- cur$._clockTime
+  } else {
+    prevTime <- sim@completed[[as.character(last)]]$._clockTime
+  }
+  cur$._prevEventTimeFinish <- prevTime
+
   if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
     #instead of sim@.xData because collisions with parallel sims from same sim object
 

@@ -101,12 +101,24 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   if (numMods > 0) {
+
+    com <- completed(sim)
+    etSecs <- sum(com[, et := difftime(clockTime, ._prevEventTimeFinish, units = "secs"), by = seq(NROW(com))]$et)
+
+    # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
+    # et <- difftime(tail(com$clockTime, numMods - 1)[1], com$clockTime[1])
+    st <- Sys.time()
+    sim$._startClockTime <- st - etSecs
+
     simCompletedList <- as.list(sim@completed)
     simCompletedList <- simCompletedList[order(as.integer(names(simCompletedList)))]
     eventsToReverse <- tail(simCompletedList, numMods - 1)
 
     sim@events <- append(unname(lapply(eventsToReverse, function(x) x[1:4])), sim@events)
     rm(list = names(eventsToReverse), envir = sim@completed)
+
+    last <- as.character(length(sim@completed))
+    sim@completed[[last]]$._clockTime <- st
 
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
     if (numMods > length(sim$.recoverableObjs))
