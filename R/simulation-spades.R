@@ -1353,14 +1353,16 @@ setMethod(
 #' @keywords internal
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
+    expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     if (cacheIt) { # means that a module or event is to be cached
 
-      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par")) # .inputObjects is not run in `spades`; mod is same as .objects
+      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
-          na.omit(createsOutputs)) # objects outputted by module
+          na.omit(expectsInputs)) # objects that should exist at the time of calling the module
+
       #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
       moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
