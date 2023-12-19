@@ -128,17 +128,17 @@ test_that("local mod object", {
                       params = list(test2 = list(testRestartSpades = 1)))
     ss <- try(spades(mySim8, debug = FALSE), silent = TRUE)
 
-    sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
+    sim <- asNamespace("SpaDES.core")$savedSimEnv()$.sim
     err <- capture_error({
       sim2 <- restartSpades(sim, debug = FALSE)
     }) # is missing completed events
 
-    sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
+    sim <- asNamespace("SpaDES.core")$savedSimEnv()$.sim
     err <- capture_error({
       sim3 <- restartSpades(sim, debug = FALSE)
     }) # is missing completed events
 
-    sim <- asNamespace("SpaDES.core")$.pkgEnv$.sim
+    sim <- asNamespace("SpaDES.core")$savedSimEnv()$.sim
     sim@params$test2$testRestartSpades <- NULL
     sim3 <- restartSpades(sim, debug = FALSE)
     expect_true(NROW(completed(sim3)) == 7)
