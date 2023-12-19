@@ -145,21 +145,32 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       # need to overwrite with NULL if the object was not yet created
       sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
       # sim$.recoverableObjs[[event]]
-      objNames <- names(sim$.recoverableObjs[[event]])
+      objsToCopy <- sim$.recoverableObjs[[event]]
+
+      objNames <- names(objsToCopy)
       # objNames <- setdiff(objNames, notYetCreated)
       if (!is.null(objNames)) {
         # only take objects that changed -- determine which ones are changed
-        fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) .robustDigest(obj)))
+        whNULLs <- sapply(objsToCopy, is.null)
+        objsWONULLSs <- objsToCopy[!whNULLs]
+        if (any(whNULLs)) {
+          NULLed <- names(whNULLs)[whNULLs]
+          keeps <- names(whNULLs)[!whNULLs]
+          a <- try(rm(list = NULLed, envir = sim@.xData), silent = TRUE)
+          if (is(a, "try-error")) browser()
+          objsToCopy <- objsToCopy[keeps]
+        }
+
+        fd1 <- lapply(objsToCopy, function(obj) .robustDigest(obj))
         objNames <- objNames[objNames %in% ls(sim@.xData)]
-        fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj)))
+        fd2 <- lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj))
         if (!is.null(fd2)) {
           fd1 <- fd1[match(names(fd2), names(fd1))]
           stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
-          fd1 <- fd1[fd1 != fd2]
-
+          fd1 <- fd1[!unlist(unname(fd1)) %in% unlist(unname(fd2))]
         }
         # move the changed ones to the simList
-        list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
+        list2env(objsToCopy[names(fd1)], envir = sim@.xData)
       }
 
       modObjNames <- names(sim$.recoverableModObjs[[event]])
