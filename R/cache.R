@@ -491,7 +491,7 @@ if (!isGeneric(".prepareOutput")) {
 setdiffNamedRecursive <- function(l1, l2, missingFill) {
   l1Different <- Require::setdiffNamed(l1, l2)
   if (length(l1Different)) {
-    areList <- unlist(lapply(l1Different, is.list))
+    areList <- unlist(lapply(l1Different, is, "list"))
     if (any(areList)) {
       l1Different[areList] <- Map(nl1 = names(l1Different)[areList], function(nl1) {
         if (nl1 %in% names(l2)) {
