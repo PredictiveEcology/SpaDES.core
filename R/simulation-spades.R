@@ -1410,17 +1410,18 @@ setMethod(
       runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
     }
 
-    if (isTRUE(grepl("Biomass_speciesFactorial", cur[["moduleName"]]))) {
-    #   bbbb <<- 1
-    #   on.exit(rm(bbbb, envir = .GlobalEnv))
-    #   # debug(.unwrap.simList)
-    #   opts <- options(reproducible.useMemoise = FALSE)
-    #   on.exit(options(opts), add = TRUE)
-        browser()
-    }
-
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
+#
+# if (isTRUE(grepl("borealData", cur[["moduleName"]]))) {
+#   #   bbbb <<- 1
+#   #   on.exit(rm(bbbb, envir = .GlobalEnv))
+#   #   # debug(.unwrap.simList)
+#   #   opts <- options(reproducible.useMemoise = FALSE)
+#   #   on.exit(options(opts), add = TRUE)
+#   stop()
+#   browser()
+# }
 
     if (allowSequentialCaching) {
         sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
@@ -1523,6 +1524,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo <- list(
       recoverModeTiming = 0,
       recoverableObjs = list(),
+      recoverableModObjs = list(),
       addedEvents = list(list()),
       randomSeed = list(list())
     )
@@ -1538,19 +1540,41 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     #   should be temporary versions and so can be safely deleted
     clearFileBackedObjs(rmo$recoverableObjs, recoverMode)
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
+    rmo$recoverableModObjs <- rmo$recoverableModObjs[seq_len(recoverMode - 1)]
   }
+  curMod <- sim@events[[1]][["moduleName"]]
 
   if (length(sim@events) > 0) {
-    objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
+    objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod  ]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
-    mess <- capture.output(type = "message",
-                           rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
-                             Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-                                  filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
-                           } else {
-                             list()
-                           }), rmo$recoverableObjs)
+    mess <- capture.output(type = "message", {
+      newList <- list(if (any(objsInSimListAndModule)) {
+        Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
+             filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+      } else {
+        list()
+      })
+      names(newList) <- curMod
+      rmo$recoverableObjs <- append(newList, rmo$recoverableObjs)
+    }
     )
+
+    if (exists(curMod, envir = sim$.mods)) {
+      if (!is.null(sim$.mods[[curMod]])) {
+        if (exists(".objects", sim$.mods[[curMod]])) {
+          objsInModObjects <- ls(sim$.mods[[curMod]]$.objects)
+          mess2 <- capture.output(type = "message",
+                                  rmo$recoverableModObjs <- append(list(if (any(objsInModObjects)) {
+                                    Copy(mget(objsInModObjects, envir = sim@.xData),
+                                         filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                                  } else {
+                                    list()
+                                  }), rmo$recoverableModObjs)
+          )
+        }
+      }
+    }
+
     mess <- grep("Hardlinked version", mess, invert = TRUE)
     if (length(mess) > 0)
       lapply(mess, message)
@@ -1581,6 +1605,7 @@ recoverModePost <- function(sim, rmo, recoverMode) {
 #' @keywords internal
 recoverModeOnExit <- function(sim, rmo, recoverMode) {
   sim@.xData$.recoverableObjs <- rmo$recoverableObjs
+  sim@.xData$.recoverableModObjs <- rmo$recoverableModObjs
   recoverableObjsSize <- sum(unlist(objSize(rmo$recoverableObjs)))
   class(recoverableObjsSize) <- "object_size"
   rmo$postEvents <- sim@events

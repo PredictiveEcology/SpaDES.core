@@ -114,24 +114,27 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
               "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
     if (numMods < length(sim$.recoverableObjs))
       sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
-    names(sim$.recoverableObjs) <- eventsToReplayDT$moduleName
+    eventIndices <- seq_len(NROW(eventsToReplayDT))
+    eventIndicesRev <- rev(eventIndices)
+    # names(sim$.recoverableObjs) <- eventsToReplayDT$moduleName[eventIndicesRev]
 
-    modules <- eventsToReplayDT$moduleName
+    modules <- eventsToReplayDT$moduleName[eventIndicesRev]
     modules <- unique(modules)
     names(modules) <- modules
     modules <- modules[!modules %in% unlist(.coreModules())]
     # move objects back in place
-    eventIndices <- seq_len(NROW(eventsToReplayDT))
-    eventIndicesRev <- rev(eventIndices)
     # browser(expr = exists("._restartSpades_2"))
     out <- lapply(eventIndices, function(event) {
       objNames <- names(sim$.recoverableObjs[[event]])
-      notYetCreated <- setdiff(outputObjects(sim)[[module]]$objectName, objNames)
+      notYetCreated <- setdiff(outputObjects(sim)[[modules[event]]]$objectName, objNames)
       names(notYetCreated) <- notYetCreated
       notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
+
+      # need to overwrite with NULL if the object was not yet created
       sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
-      sim$.recoverableObjs[[event]]
+      # sim$.recoverableObjs[[event]]
       objNames <- names(sim$.recoverableObjs[[event]])
+      # objNames <- setdiff(objNames, notYetCreated)
       if (!is.null(objNames)) {
         # only take objects that changed -- determine which ones are changed
         fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) .robustDigest(obj)))
@@ -141,9 +144,22 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
           fd1 <- fd1[match(names(fd2), names(fd1))]
           stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
           fd1 <- fd1[fd1 != fd2]
+
         }
+        # move the changed ones to the simList
         list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
       }
+
+      modObjNames <- names(sim$.recoverableModObjs[[event]])
+      modObjEnv <- sim$.mods[[modules[event]]]$.objects
+      modObjLs <- ls(modObjEnv)
+      if (length(modObjLs)) { # there are some --> maybe need to delete them
+        toDelete <- setdiff(modObjLs, modObjNames)
+        if (length(toDelete)) {
+          rm(list = toDelete, envir = modObjEnv)
+        }
+      }
+
       message(crayon::blue("Reversing event: ",
                            paste(collapse = " ",
                                  paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
