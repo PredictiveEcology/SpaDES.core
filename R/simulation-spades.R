@@ -1414,16 +1414,6 @@ setMethod(
 
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
-#
-# if (isTRUE(grepl("borealData", cur[["moduleName"]]))) {
-#   #   bbbb <<- 1
-#   #   on.exit(rm(bbbb, envir = .GlobalEnv))
-#   #   # debug(.unwrap.simList)
-#   #   opts <- options(reproducible.useMemoise = FALSE)
-#   #   on.exit(options(opts), add = TRUE)
-#   stop()
-#   browser()
-# }
 
     if (allowSequentialCaching) {
         sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
@@ -1564,10 +1554,11 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     if (exists(curMod, envir = sim$.mods)) {
       if (!is.null(sim$.mods[[curMod]])) {
         if (exists(".objects", sim$.mods[[curMod]])) {
-          objsInModObjects <- ls(sim$.mods[[curMod]]$.objects)
+          modEnv <- sim$.mods[[curMod]]$.objects
+          objsInModObjects <- ls(modEnv)
           mess2 <- capture.output(type = "message",
-                                  rmo$recoverableModObjs <- append(list(if (any(objsInModObjects)) {
-                                    Copy(mget(objsInModObjects, envir = sim@.xData),
+                                  rmo$recoverableModObjs <- append(list(if (length(objsInModObjects)) {
+                                    Copy(mget(objsInModObjects, envir = modEnv),
                                          filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
                                   } else {
                                     list()
