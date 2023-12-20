@@ -27,3 +27,4 @@ loadFile <- getFromNamespace("loadFile", "reproducible")
 
 .messageAddingToMemoised <- getFromNamespace(".messageAddingToMemoised", "reproducible")
 .messageCacheIndent <- getFromNamespace(".messageCacheIndent", "reproducible")
+messageCache <- getFromNamespace("messageCache", "reproducible")
