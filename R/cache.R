@@ -334,7 +334,7 @@ setMethod(
       #     message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
       #   }
       # } else {
-      reproducible:::messageCache(crayon::blue(reproducible:::.messageCacheIndent, "for", cur$eventType, "event in",
+      messageCache(crayon::blue(.messageCacheIndent, "for", cur$eventType, "event in",
                            cur$moduleName, "module"), verbose = verbose)
 
       # }

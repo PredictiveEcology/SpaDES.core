@@ -47,15 +47,22 @@ option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 \item{outputObjects}{Optional character vector indicating which objects to
 return. This is only relevant for list, environment (or similar) objects}
 
-\item{...}{Other arguments. Currently, \code{regexp}, a logical, can be provided.
-This must be \code{TRUE} if the use is passing a regular expression.
+\item{...}{Other arguments. Can be in the form of \code{tagKey = tagValue}, such as,
+\code{class = "numeric"} to find all entries that are numerics in the cache.
+Note: the special cases of \code{cacheId} and \code{fun} have their own
+named arguments in these functions.
+Also can be \code{regexp = xx}, where xx is \code{TRUE} if the user
+is passing a regular expression.
 Otherwise, \code{userTags} will need to be exact matches. Default is
 missing, which is the same as \code{TRUE}. If there are errors due
 to regular expression problem, try \code{FALSE}. For \code{cc}, it is
 passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
 it can also be \code{sorted = FALSE} to return the object unsorted.}
 
-\item{cacheId}{Used strictly for messaging. This should be the cacheId of the object being recovered.}
+\item{cacheId}{An optional character vector describing the \code{cacheId}s to extract.
+Only entries with this/these \code{cacheId}s will be returned. If \code{useDBI(FALSE)},
+this will also be dramatically faster than using \code{userTags}, for a large
+cache.}
 }
 \value{
 The same object as passed into the function, but dealt with so that it can be
