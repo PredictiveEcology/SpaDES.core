@@ -586,7 +586,7 @@ setMethod(
 
       # push globals onto parameters within each module
       if (length(sim@params$.globals)) {
-        sim <- updateParamsFromGlobals(sim)
+        sim <- updateParamsFromGlobals(sim, dontUseGlobals = params)
       }
 
       ## add name to depends
@@ -1570,7 +1570,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       })
       # update parameters -- from simAltOut; then from user passed params
       globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
-      sim <- updateParamsFromGlobals(sim)
+      sim <- updateParamsFromGlobals(sim, dontUseGlobals = params)
+      # This keeps the user passed params
       sim@params <- modifyList2(sim@params, params)
 
       list2env(objs(simAltOut), envir(sim))
@@ -1608,12 +1609,12 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   sim
 }
 
-updateParamsFromGlobals <- function(sim) {
-  sim@params <- updateParamsSlotFromGlobals(sim@params)
+updateParamsFromGlobals <- function(sim, dontUseGlobals = list()) {
+  sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals)
   sim
 }
 
-updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
+updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates, dontUseGlobals = list()) {
   if (missing(paramsWithUpdates)) {
     paramsWithUpdates <- paramsOrig
   }
@@ -1623,7 +1624,9 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
   for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
     modParams <- names(paramsOrig[[mod]])
     modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
+    userOverrides <- if (is.null(dontUseGlobals[[mod]])) NULL else dontUseGlobals[[mod]]
     common <- intersect(modParams, names(paramsWithUpdates$.globals))
+    common <- setdiff(common, names(userOverrides))
     if (length(common)) {
       globalsUsed <- paste(common, sep = ", ")
       globalsUsedInModules <- rep(mod, length(common))
