@@ -329,7 +329,7 @@ setMethod(
       #   } else if (!is.na(fromMemoise)) {
       #     message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
       #             "\n        ",
-      #             crayon::blue(.addingToMemoisedMsg))
+      #             crayon::blue(.messageAddingToMemoised))
       #   } else {
       #     message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
       #   }

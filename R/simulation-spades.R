@@ -2015,31 +2015,10 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     }
   }
 
+  # Prepend the middle
   messPoss <- paste0(middleFix, " ", mess)
-
-  # Split long lines -- this is complicated because of prependTime, spacing, colours etc.
-  # nCharPrependTime <- nchar(prependTime)
-  # numChars <- nchar(messPoss) + nCharPrependTime
-  # wdth <- getOption("width")
-  # if (any(numChars > wdth)) {
-  #   whereSpaces <- gregexpr(" ", mess)
-  #   breakAt <- lapply(whereSpaces, function(ws) {
-  #     ba <- which(diff(ws %% wdth) < 0)
-  #     if (length(ba) == 0)
-  #       ba <- length(ws)
-  #     ws[ba]})
-  #   # breakAt <- whereSpaces[which(diff(whereSpaces %% wdth) < 0)]
-  #   mess <- Map(m = mess, ba = breakAt, function(m, ba) {
-  #     m <- substring(rep(m, length(ba) + 1), c(1, ba + 1), c(ba - 1, 1e3))
-  #     len <- length(m)
-  #     if (len > 1)
-  #       m[-len] <- paste0(m[-len], "\n")
-  #     m
-  #     })
-  #   mess <- unlist(unname(mess))
-  # }
-
   if (!isTRUE(noNew)) {
+    # Prepend the time
     mess <- paste0(prependTime, " ", messPoss)
   }
 
