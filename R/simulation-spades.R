@@ -1418,6 +1418,7 @@ setMethod(
       runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
     }
 
+    # if (cur$eventType %in% "prepSpreadFitData") browser()
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
 

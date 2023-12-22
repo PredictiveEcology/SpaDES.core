@@ -580,13 +580,15 @@ setMethod(
         #   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
         #   cached copy of other modules
         simPost@params[currModules] <- simFromCache@params[currModules]
-        anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
-
-        if (length(anyNewGlobals)) {
-          suppressMessages(
-            simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
+        if (FALSE) { # Eliot Dec 2023 -- removed this because it is already occuring during simInit;
+          #  also, user may have passed individual values for individual modules that should not
+          #  be overridden by globals
+          anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
+          if (length(anyNewGlobals)) {
+            suppressMessages(
+              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
+          }
         }
-        # simPost@params <- simFromCache@params
 
         # Step 2 -- copy the objects that are in simPre to simPost
         # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
