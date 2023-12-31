@@ -156,8 +156,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
         if (any(whNULLs)) {
           NULLed <- names(whNULLs)[whNULLs]
           keeps <- names(whNULLs)[!whNULLs]
-          a <- try(rm(list = NULLed, envir = sim@.xData), silent = TRUE)
-          if (is(a, "try-error")) browser()
+          a <- suppressWarnings(rm(list = NULLed, envir = sim@.xData))
           objsToCopy <- objsToCopy[keeps]
         }
 
