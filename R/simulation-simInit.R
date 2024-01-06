@@ -1333,7 +1333,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       }
 
       if (!(FALSE %in% debug || any(is.na(debug))) )
-        objectsCreatedPost(sim, objsIsNullBefore)
+        sim <- objectsCreatedPost(sim, objsIsNullBefore)
 
     }
   } else {
@@ -1650,10 +1650,37 @@ objectsCreatedPost <- function(sim, objsIsNullBefore) {
   objsIsNullAfter <- objsAreNull(sim)
   newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
   if (length(newObjs)) {
-    df <- data.frame(`New objects created:` = names(newObjs))
+    df <- data.frame(newObjects = names(newObjs))
     messageColoured("New objects created:", colour = "yellow")
     messageDF(df, colour = "yellow", colnames = FALSE)
+    setDT(df)
+    sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit = sim@simtimes$timeunit, sim@.xData)
+    set(df, NULL, names(sim@current), sim@current)
+    if (is.null(sim$._objectsCreated))
+      sim$._objectsCreated <- list()
+    sim$._objectsCreated <- append(sim$._objectsCreated, list(df))
   }
+  sim
+}
+
+#' Show which objects were first created in a simInit or spades call
+#'
+#' This does an `rbindlist(sim$._objectsCreated)`. This object in the `sim` records the
+#' yellow message that reports on when objects are created.
+#' @param sim A `simList` object that data.table` objects
+#' @export
+#' @return The `data.table` of the objects created, alongside the `current(sim)`
+#' at each moment of creation.
+newObjectsCreated <- function(sim) {
+  if (!is.null(sim$._objectsCreated)) {
+    dt <- data.table::rbindlist(sim$._objectsCreated)
+    setorderv(dt, "newObjects")
+    print(format(as.data.frame(dt), justify = "left"))
+  } else {
+    dt <- data.table(newObjects = character(), .emptyEventListDT)
+  }
+  invisible(dt)
+
 }
 
 objsAreNull <- function(sim) {

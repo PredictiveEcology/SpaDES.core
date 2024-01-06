@@ -3277,6 +3277,31 @@ setMethod("sessInfo",
             return(sim@.xData[["._sessionInfo"]])
 })
 
+
+
+#' Show which objects were first created in a simInit or spades call
+#'
+#' This does an `rbindlist(sim$._objectsCreated)`. This object in the `sim` records the
+#' yellow message that reports on when objects are created.
+#' @param sim A `simList` object that data.table` objects
+#' @export
+#' @aliases newObjectsCreated
+#' @aliases objectsCreated
+#' @rdname simList-accessors-objects
+#' @return The `data.table` of the objects created, alongside the `current(sim)`
+#' at each moment of creation.
+newObjectsCreated <- function(sim) {
+  if (!is.null(sim$._objectsCreated)) {
+    dt <- data.table::rbindlist(sim$._objectsCreated)
+    setorderv(dt, "newObjects")
+    print(format(as.data.frame(dt), justify = "left"))
+  } else {
+    dt <- data.table(newObjects = character(), .emptyEventListDT)
+  }
+  invisible(dt)
+
+}
+
 ################################################################################
 #' @export
 #' @include simList-class.R

@@ -1440,7 +1440,7 @@ setMethod(
 
 
   if (!(FALSE %in% debug || any(is.na(debug))) )
-    objectsCreatedPost(sim, objsIsNullBefore)
+    sim <- objectsCreatedPost(sim, objsIsNullBefore)
 
   # Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
