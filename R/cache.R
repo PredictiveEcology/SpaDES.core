@@ -334,12 +334,11 @@ setMethod(
       #     message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
       #   }
       # } else {
-      messageCache(crayon::blue(.messageCacheIndent, "for", cur$eventType, "event in",
-                           cur$moduleName, "module"), verbose = verbose)
+      messageCache(.messageHangingIndent, "for ", cur$eventType, " event in ", cur$moduleName, " module", verbose = verbose)
 
       # }
     } else {
-      messageCache("... from ", cur$moduleName, " module", verbose = verbose)
+      messageCache(.messageHangingIndent, "from ", cur$moduleName, " module", verbose = verbose)
     }
 })
 

@@ -1268,8 +1268,9 @@ setMethod(
         logging::loginfo(m$message)
       }
       if (useNormalMessaging) {
-        if (startsWith(m$message, "\b")) {
-          message(gsub("\n$", "", m$message))
+        # if (grepl("done! took", m$message)) browser()
+        if (isTRUE(any(grepl("\b", m$message)))) {
+          message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
         } else {
           message(loggingMessage(m$message))
         }
@@ -2228,6 +2229,8 @@ paramsDontCacheOn <- c(".useCache", ".useParallel",
 
 
 allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
+  # getFromNamespace(".messageIndentUpdate", ns = "reproducible")()
+  .messageIndentUpdate()
   attr(sim, "runFnCallAsExpr") <- NULL
   if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
     sc <- showCacheFast(sim[["._prevCache"]])
@@ -2282,7 +2285,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
             .cacheMessageObjectToRetrieve(functionName = moduleCall, fullCacheTableForObj = sc,
                                           cachePath = cachePath(sim),
                                           cacheId = sim[["._prevCache"]], verbose = verbose)
-            Require::messageVerbose(blue("     Skipped digest of simList because sequential Cache calls of events"),
+            messageCache("Skipped digest of simList because sequential Cache calls of events",
                                     verbose = verbose)
             .cacheMessage(sim, functionName = moduleCall, fromMemoise = isMemoised, verbose = verbose)
             attr(sim, "tags") <- paste0("cacheId:", nextEvent)
