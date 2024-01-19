@@ -90,7 +90,7 @@ moduleDefaults <- list(
 #'                              it is for human readers only.\cr
 #'    `loadOrder` \tab Named list of length 0, 1, or 2, with names being `after` and `before`.
 #'                     Each element should be a character string/vector naming 1 or more
-#'                     modules that will be loaded `after` or `before` this module.
+#'                     modules that this module must be `after` or `before`.
 #'                     `after` and `before` are used from the current module's
 #'                     perspective. So, `list(after = c("Biomass_core"))` means that
 #'                     this module must come *after* `"Biomass_core"`. This should only
