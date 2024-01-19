@@ -1559,8 +1559,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
                                        end = as.numeric(start(sim)), timeunit = timeunit(sim)))
         simAlt@.xData$._ranInitDuringSimInit <- completed(simAlt)$moduleName
         messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
-        simAltOut <- spades(simAlt, events = "init",
-                            debug = debug)
+        simAltOut <- spades(simAlt, events = "init", debug = debug)
       })
 
       Map(mod = canSafelyRunInit, function(mod) {
