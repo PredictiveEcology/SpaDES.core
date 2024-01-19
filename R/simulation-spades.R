@@ -2233,7 +2233,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
   .messageIndentUpdate()
   attr(sim, "runFnCallAsExpr") <- NULL
   if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
-    sc <- showCacheFast(sim[["._prevCache"]])
+    sc <- showCache(cacheId = sim[["._prevCache"]])
     # sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
     nextEvent <- extractFromCache(sc, paste0(sequentialCacheText, "NextEventCacheId"))
     cur <- current(sim)
@@ -2249,7 +2249,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
     if (length(nextEvent != sim[["._prevCache"]]) > 1) browser()
     if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
       # The user can't have modified the function being run
-      scNe <- showCacheFast(nextEvent)
+      scNe <- showCache(cacheId = nextEvent)
       d <- .robustDigest(Copy(sim, objects = FALSE))
 
       # need to check for non-object (e.g., function, params, depends) that could have changed
@@ -2317,7 +2317,7 @@ allowSequentialCachingFinal <- function(sim) {
   if (wasFromCache) {
     thisCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
     if (!is.null(sim[["._prevCache"]])) {
-      sc <- showCacheFast(sim[["._prevCache"]])
+      sc <- showCache(cacheId = sim[["._prevCache"]])
       cp <- cachePath(sim)
       cur <- current(sim)
       seqCache <- sc[startsWith(sc$tagKey, sequentialCacheText)]
