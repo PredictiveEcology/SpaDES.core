@@ -1267,13 +1267,15 @@ setMethod(
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
+
       if (useNormalMessaging) {
-        # if (grepl("done! took", m$message)) browser()
+        # if (grepl("projecting", m$message)) browser()
         if (isTRUE(any(grepl("\b", m$message)))) {
-          message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
-        } else {
-          message(loggingMessage(m$message))
-        }
+          m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
+          # message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
+        } # else {
+        message(loggingMessage(m$message))
+        # }
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -1420,8 +1422,10 @@ setMethod(
     }
 
     # if (cur$eventType %in% "prepSpreadFitData") browser()
+    rr <- .Random.seed
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
+    if (identical(rr, .Random.seed)) message(crayon::bgYellow(cur$moduleName)) # browser()
 
     if (allowSequentialCaching) {
         sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
@@ -2018,10 +2022,16 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   }
 
   # Prepend the middle
-  messPoss <- paste0(middleFix, " ", mess)
-  if (!isTRUE(noNew)) {
-    # Prepend the time
-    mess <- paste0(prependTime, " ", messPoss)
+  if (isTRUE(any(grepl("\b", mess)))) {
+    # noNew <- TRUE
+    mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
+  } else {
+    messPoss <- paste0(middleFix, " ", mess)
+    if (!isTRUE(noNew)) {
+      # Prepend the time
+      mess <- paste0(prependTime, " ", messPoss)
+
+    }
   }
 
   mess
@@ -2233,13 +2243,13 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
   .messageIndentUpdate()
   attr(sim, "runFnCallAsExpr") <- NULL
   if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
-    sc <- showCache(cacheId = sim[["._prevCache"]])
+    sc <- showCache(cacheId = sim[["._prevCache"]], x = cachePath(sim), verbose = -1)
     # sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
-    nextEvent <- extractFromCache(sc, paste0(sequentialCacheText, "NextEventCacheId"))
+    nextEvent <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextEventCacheId")))
     cur <- current(sim)
     if (length(nextEvent) > 1) {
-      nextEventName <- extractFromCache(sc, paste0(sequentialCacheText, "NextEvent"))
-      nextModuleName <- extractFromCache(sc, paste0(sequentialCacheText, "NextModule"))
+      nextEventName <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextEvent")))
+      nextModuleName <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextModule")))
       keep <- which(nextEventName %in% cur[["eventType"]] & nextModuleName %in% cur[["moduleName"]])
       if (length(keep))
         nextEvent <- nextEvent[keep]
@@ -2249,7 +2259,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
     if (length(nextEvent != sim[["._prevCache"]]) > 1) browser()
     if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
       # The user can't have modified the function being run
-      scNe <- showCache(cacheId = nextEvent)
+      scNe <- showCache(cacheId = nextEvent, x = cachePath(sim), verbose = -1)
       d <- .robustDigest(Copy(sim, objects = FALSE))
 
       # need to check for non-object (e.g., function, params, depends) that could have changed
@@ -2317,7 +2327,7 @@ allowSequentialCachingFinal <- function(sim) {
   if (wasFromCache) {
     thisCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
     if (!is.null(sim[["._prevCache"]])) {
-      sc <- showCache(cacheId = sim[["._prevCache"]])
+      sc <- showCache(cacheId = sim[["._prevCache"]], x = cachePath(sim), verbose = -1)
       cp <- cachePath(sim)
       cur <- current(sim)
       seqCache <- sc[startsWith(sc$tagKey, sequentialCacheText)]
