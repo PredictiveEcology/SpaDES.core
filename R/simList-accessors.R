@@ -2954,13 +2954,15 @@ setMethod(
       pkgs <- lapply(paths, function(paths) {
         pkgs <- .parseModulePartial(filename = paths, defineModuleElement = "reqdPkgs",
                                     envir = envir) %>%
-          unlist() %>% unique()
+          unlist() # %>% unique()
+        pkgs <- pkgs[!duplicated(pkgs)]
         if (!is.null(pkgs)) {
           pkgs <- sort(pkgs)
         } else {
           pkgs <- character(0)
         }
-        pkgs <- unique(pkgs[nzchar(pkgs)])
+        pkgs <- pkgs[nzchar(pkgs)]
+        pkgs <- pkgs[!duplicated(pkgs)]
         if (!any(grepl("SpaDES.core", pkgs)))
           pkgs <- c("SpaDES.core", pkgs)
         return(pkgs)

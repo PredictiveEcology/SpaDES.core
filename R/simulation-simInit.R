@@ -1497,12 +1497,14 @@ buildParentChildGraph <- function(sim, mods, childModules) {
 
 #' @importFrom Require getCRANrepos
 loadPkgs <- function(reqdPkgs) {
-  uniqueReqdPkgs <- unique(unlist(reqdPkgs))
+  uniqueReqdPkgs <- unlist(reqdPkgs)
+  uniqueReqdPkgs <- uniqueReqdPkgs[!duplicated(uniqueReqdPkgs)]
 
   if (length(uniqueReqdPkgs)) {
     allPkgs <- uniqueReqdPkgs
-    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) # append SpaDES.core if it isn't already there
-      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) {# append SpaDES.core if it isn't already there
+      allPkgs <- c(uniqueReqdPkgs, "SpaDES.core")
+    }
 
     # Check for SpaDES.core minimum version
     checkSpaDES.coreMinVersion(allPkgs)
