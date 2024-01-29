@@ -2260,7 +2260,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
     if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
       # The user can't have modified the function being run
       scNe <- showCache(cacheId = nextEvent, x = cachePath(sim), verbose = -1)
-      d <- .robustDigest(Copy(sim, objects = FALSE))
+      # d <- .robustDigest(Copy(sim, objects = FALSE))
 
       # need to check for non-object (e.g., function, params, depends) that could have changed
       # checkParams
@@ -2272,7 +2272,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
       noChanges <- logical(length(wh) + 1)
       for (iii in seq(wh)) {
         paramCIs <- gsub(".+:(.+)", "\\1", scNePreDigests[startsWith(scNePreDigests, wh2[iii])])
-        noChanges[iii] <- all(unlist(d[[wh[iii]]][[cur[["moduleName"]]]]) %in% paramCIs)
+        noChanges[iii] <- all(unlist(sPoss[[wh[iii]]][[cur[["moduleName"]]]]) %in% paramCIs)
       }
 
       # preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
