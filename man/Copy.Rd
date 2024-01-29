@@ -4,7 +4,7 @@
 \alias{Copy,simList-method}
 \title{Copy for \code{simList} class objects}
 \usage{
-\S4method{Copy}{simList}(object, objects, queues, ...)
+\S4method{Copy}{simList}(object, objects, queues, modules, ...)
 }
 \arguments{
 \item{object}{An R object (likely containing environments) or an environment.}

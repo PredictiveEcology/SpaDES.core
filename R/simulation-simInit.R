@@ -586,7 +586,7 @@ setMethod(
 
       # push globals onto parameters within each module
       if (length(sim@params$.globals)) {
-        sim <- updateParamsFromGlobals(sim)
+        sim <- updateParamsFromGlobals(sim, dontUseGlobals = params)
       }
 
       ## add name to depends
@@ -625,6 +625,7 @@ setMethod(
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
+        # This is the call to Init with allowInitDuringSimInit
         sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs)
         if (length(sim@completed))
           sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$module, .coreModules())
@@ -687,6 +688,8 @@ setMethod(
               .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
             } else {
               sim <- .runModuleInputObjects(sim, m, objects, notOlderThan)
+              cur <- list(eventTime = sim@simtimes$current, moduleName = m, eventType = ".inputObjects", eventPriority = 0)
+              sim <- appendCompleted(sim, cur)
             }
           }
 
@@ -1231,6 +1234,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       if (!(FALSE %in% debug || any(is.na(debug))) )
         objsIsNullBefore <- objsAreNull(sim)
 
+      allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1279,23 +1283,36 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             debugonce(.inputObjects)
 
           modParams <- sim@params[[mBase]]
-          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in% paramsDontCacheOn
-          simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
+          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
+            paramsDontCacheOn
+          # simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
-          sim <- Cache(.inputObjects, sim,
-                       .objects = objectsToEvaluateForCaching,
-                       notOlderThan = notOlderThan,
-                       outputObjects = moduleSpecificInputObjects,
-                       quick = getOption("reproducible.quick", FALSE),
-                       cachePath = sim@paths$cachePath,
-                       classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                                           params = paramsWoKnowns,
-                                           # .globals = globsWoKnowns,
-                                           modules = mBase),
-                       showSimilar = showSimilar,
-                       userTags = c(paste0("module:", mBase),
-                                    "eventType:.inputObjects"))
+          # nextEvent <- NULL
+          runFnCallAsExpr <- TRUE
+          if (allowSequentialCaching) {
+            sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debug)
+            runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
+          }
+          if (runFnCallAsExpr) {
+            sim <- Cache(.inputObjects, sim,
+                         .objects = objectsToEvaluateForCaching,
+                         notOlderThan = notOlderThan,
+                         outputObjects = moduleSpecificInputObjects,
+                         quick = getOption("reproducible.quick", FALSE),
+                         cachePath = sim@paths$cachePath,
+                         classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                                             params = paramsWoKnowns,
+                                             # .globals = globsWoKnowns,
+                                             modules = mBase),
+                         showSimilar = showSimilar,
+                         userTags = c(paste0("module:", mBase),
+                                      "eventType:.inputObjects"), verbose = debug)
+          }
+          if (allowSequentialCaching) {
+            sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
+          }
+
 
           # put back the current values of params that were not cached on
           if (sum(paramsDontCacheOnActual))
@@ -1311,8 +1328,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           sim <- .inputObjects(sim)
         }
       }
+      if (allowSequentialCaching) {
+        sim <- allowSequentialCachingFinal(sim)
+      }
+
       if (!(FALSE %in% debug || any(is.na(debug))) )
-        objectsCreatedPost(sim, objsIsNullBefore)
+        sim <- objectsCreatedPost(sim, objsIsNullBefore)
 
     }
   } else {
@@ -1476,12 +1497,14 @@ buildParentChildGraph <- function(sim, mods, childModules) {
 
 #' @importFrom Require getCRANrepos
 loadPkgs <- function(reqdPkgs) {
-  uniqueReqdPkgs <- unique(unlist(reqdPkgs))
+  uniqueReqdPkgs <- unlist(reqdPkgs)
+  uniqueReqdPkgs <- uniqueReqdPkgs[!duplicated(uniqueReqdPkgs)]
 
   if (length(uniqueReqdPkgs)) {
     allPkgs <- uniqueReqdPkgs
-    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) # append SpaDES.core if it isn't already there
-      allPkgs <- unique(c(uniqueReqdPkgs, "SpaDES.core"))
+    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) {# append SpaDES.core if it isn't already there
+      allPkgs <- c(uniqueReqdPkgs, "SpaDES.core")
+    }
 
     # Check for SpaDES.core minimum version
     checkSpaDES.coreMinVersion(allPkgs)
@@ -1536,9 +1559,9 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
                           objects = objects, inputs = inputs, outputs = outputs,
                           times = list(start = as.numeric(start(sim)),
                                        end = as.numeric(start(sim)), timeunit = timeunit(sim)))
+        simAlt@.xData$._ranInitDuringSimInit <- completed(simAlt)$moduleName
         messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
-        simAltOut <- spades(simAlt, events = "init",
-                            debug = debug)
+        simAltOut <- spades(simAlt, events = "init", debug = debug)
       })
 
       Map(mod = canSafelyRunInit, function(mod) {
@@ -1547,8 +1570,17 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
         objs <- mget(objsNames, objEnv)
         list2env(objs, sim$.mods[[mod]]$.objects)
       })
-      globals(sim) <- modifyList2(globals(sim), globals(simAltOut))
+      # update parameters -- from simAltOut; then from user passed params
+      # Don't use `globals(sim)<-` because it updates the parameters, which we don't want here
+      sim@params$.globals <- modifyList2(globals(sim), globals(simAltOut))
+      sim <- updateParamsFromGlobals(sim, dontUseGlobals = params)
+      # This keeps the user passed params
+      sim@params <- modifyList2(sim@params, params)
+
       list2env(objs(simAltOut), envir(sim))
+
+      dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
+      list2env(mget(dotUnderscoreObjs, envir = envir(simAltOut)), envir(sim))
 
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
       list2env(as.list(simAltOut@completed), sim@completed)
@@ -1565,20 +1597,27 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
         }
       }
 
-      if (length(simAltOut@events))
+      if (length(simAltOut@events)) {
+        # have to remove the .coreModules if they have already run
+        modulesRun <- vapply(sim@events, function(x) x$moduleName, FUN.VALUE = character(1))
+        coreModules <- modulesRun %in% .coreModules()
+        if (any(coreModules))
+          sim@events <- sim@events[-which(coreModules)]
         sim@events <- append(sim@events, simAltOut@events)
+      }
+
     }
   }
   # sim@modules <- sim@modules[match(loadOrder, sim@modules)]
   sim
 }
 
-updateParamsFromGlobals <- function(sim) {
-  sim@params <- updateParamsSlotFromGlobals(sim@params)
+updateParamsFromGlobals <- function(sim, dontUseGlobals = list()) {
+  sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals)
   sim
 }
 
-updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
+updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates, dontUseGlobals = list()) {
   if (missing(paramsWithUpdates)) {
     paramsWithUpdates <- paramsOrig
   }
@@ -1588,7 +1627,9 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates) {
   for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
     modParams <- names(paramsOrig[[mod]])
     modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
+    userOverrides <- if (is.null(dontUseGlobals[[mod]])) NULL else dontUseGlobals[[mod]]
     common <- intersect(modParams, names(paramsWithUpdates$.globals))
+    common <- setdiff(common, names(userOverrides))
     if (length(common)) {
       globalsUsed <- paste(common, sep = ", ")
       globalsUsedInModules <- rep(mod, length(common))
@@ -1610,10 +1651,37 @@ objectsCreatedPost <- function(sim, objsIsNullBefore) {
   objsIsNullAfter <- objsAreNull(sim)
   newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
   if (length(newObjs)) {
-    df <- data.frame(`New objects created:` = names(newObjs))
+    df <- data.frame(newObjects = names(newObjs))
     messageColoured("New objects created:", colour = "yellow")
     messageDF(df, colour = "yellow", colnames = FALSE)
+    setDT(df)
+    sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit = sim@simtimes$timeunit, sim@.xData)
+    set(df, NULL, names(sim@current), sim@current)
+    if (is.null(sim$._objectsCreated))
+      sim$._objectsCreated <- list()
+    sim$._objectsCreated <- append(sim$._objectsCreated, list(df))
   }
+  sim
+}
+
+#' Show which objects were first created in a simInit or spades call
+#'
+#' This does an `rbindlist(sim$._objectsCreated)`. This object in the `sim` records the
+#' yellow message that reports on when objects are created.
+#' @param sim A `simList` object that data.table` objects
+#' @export
+#' @return The `data.table` of the objects created, alongside the `current(sim)`
+#' at each moment of creation.
+newObjectsCreated <- function(sim) {
+  if (!is.null(sim$._objectsCreated)) {
+    dt <- data.table::rbindlist(sim$._objectsCreated)
+    setorderv(dt, "newObjects")
+    print(format(as.data.frame(dt), justify = "left"))
+  } else {
+    dt <- data.table(newObjects = character(), .emptyEventListDT)
+  }
+  invisible(dt)
+
 }
 
 objsAreNull <- function(sim) {

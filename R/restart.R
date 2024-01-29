@@ -52,7 +52,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' The `simList` will be in the state it was at the time of the error.
 #'
 #' @param sim A `simList.` If not supplied (the default), this will take the `sim` from
-#'    `SpaDES.core:::.pkgEnv$.sim`, i.e., the one that was interrupted
+#'    `SpaDES.core:::savedSimEnv()$.sim`, i.e., the one that was interrupted
 #'
 #' @param module A character string length one naming the module that caused the error and
 #'   whose source code was fixed. This module will be re-parsed and placed into the `simList`
@@ -81,7 +81,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- spades(s) # if this is interrupted or fails
 #' # the following line will not work if the previous line didn't fail
 #' s <- restartSpades(s) # don't need to specify `sim` if previous line fails
-#'                      # will take from SpaDES.core:::.pkgEnv$.sim automatically
+#'                      # will take from SpaDES.core:::savedSimEnv()$.sim automatically
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...) {
   message("This is very experimental and will only work if the event that caused ",
@@ -90,7 +90,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 
   # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
-    sim <- .pkgEnv$.sim
+    sim <- savedSimEnv()$.sim
   }
 
   if (is.null(module)) {
@@ -101,6 +101,15 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   if (numMods > 0) {
+
+    com <- completed(sim)
+    etSecs <- sum(com[, et := difftime(clockTime, ._prevEventTimeFinish, units = "secs"), by = seq(NROW(com))]$et)
+
+    # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
+    # et <- difftime(tail(com$clockTime, numMods - 1)[1], com$clockTime[1])
+    st <- Sys.time()
+    sim$._startClockTime <- st - etSecs
+
     simCompletedList <- as.list(sim@completed)
     simCompletedList <- simCompletedList[order(as.integer(names(simCompletedList)))]
     eventsToReverse <- tail(simCompletedList, numMods - 1)
@@ -108,42 +117,71 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     sim@events <- append(unname(lapply(eventsToReverse, function(x) x[1:4])), sim@events)
     rm(list = names(eventsToReverse), envir = sim@completed)
 
+    last <- as.character(length(sim@completed))
+    sim@completed[[last]]$._clockTime <- st
+
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
     if (numMods > length(sim$.recoverableObjs))
       message("Cannot replay ", numMods, " events as requested by numMods; ",
               "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
     if (numMods < length(sim$.recoverableObjs))
       sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
-    names(sim$.recoverableObjs) <- eventsToReplayDT$moduleName
+    eventIndices <- seq_len(NROW(eventsToReplayDT))
+    eventIndicesRev <- rev(eventIndices)
+    # names(sim$.recoverableObjs) <- eventsToReplayDT$moduleName[eventIndicesRev]
 
-    modules <- eventsToReplayDT$moduleName
+    modules <- eventsToReplayDT$moduleName[eventIndicesRev]
     modules <- unique(modules)
     names(modules) <- modules
     modules <- modules[!modules %in% unlist(.coreModules())]
     # move objects back in place
-    eventIndices <- seq_len(NROW(eventsToReplayDT))
-    eventIndicesRev <- rev(eventIndices)
     # browser(expr = exists("._restartSpades_2"))
     out <- lapply(eventIndices, function(event) {
       objNames <- names(sim$.recoverableObjs[[event]])
-      notYetCreated <- setdiff(outputObjects(sim)[[module]]$objectName, objNames)
+      notYetCreated <- setdiff(outputObjects(sim)[[modules[event]]]$objectName, objNames)
       names(notYetCreated) <- notYetCreated
       notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
+
+      # need to overwrite with NULL if the object was not yet created
       sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
-      sim$.recoverableObjs[[event]]
-      objNames <- names(sim$.recoverableObjs[[event]])
+      # sim$.recoverableObjs[[event]]
+      objsToCopy <- sim$.recoverableObjs[[event]]
+
+      objNames <- names(objsToCopy)
+      # objNames <- setdiff(objNames, notYetCreated)
       if (!is.null(objNames)) {
         # only take objects that changed -- determine which ones are changed
-        fd1 <- unlist(lapply(sim$.recoverableObjs[[event]], function(obj) .robustDigest(obj)))
+        whNULLs <- sapply(objsToCopy, is.null)
+        objsWONULLSs <- objsToCopy[!whNULLs]
+        if (any(whNULLs)) {
+          NULLed <- names(whNULLs)[whNULLs]
+          keeps <- names(whNULLs)[!whNULLs]
+          a <- suppressWarnings(rm(list = NULLed, envir = sim@.xData))
+          objsToCopy <- objsToCopy[keeps]
+        }
+
+        fd1 <- lapply(objsToCopy, function(obj) .robustDigest(obj))
         objNames <- objNames[objNames %in% ls(sim@.xData)]
-        fd2 <- unlist(lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj)))
+        fd2 <- lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj))
         if (!is.null(fd2)) {
           fd1 <- fd1[match(names(fd2), names(fd1))]
           stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
-          fd1 <- fd1[fd1 != fd2]
+          fd1 <- fd1[!unlist(unname(fd1)) %in% unlist(unname(fd2))]
         }
-        list2env(sim$.recoverableObjs[[event]][names(fd1)], envir = sim@.xData)
+        # move the changed ones to the simList
+        list2env(objsToCopy[names(fd1)], envir = sim@.xData)
       }
+
+      modObjNames <- names(sim$.recoverableModObjs[[event]])
+      modObjEnv <- sim$.mods[[modules[event]]]$.objects
+      modObjLs <- ls(modObjEnv)
+      if (length(modObjLs)) { # there are some --> maybe need to delete them
+        toDelete <- setdiff(modObjLs, modObjNames)
+        if (length(toDelete)) {
+          rm(list = toDelete, envir = modObjEnv)
+        }
+      }
+
       message(crayon::blue("Reversing event: ",
                            paste(collapse = " ",
                                  paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
@@ -228,7 +266,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' This is only intended to restart a simulation in exactly the same place as it was
 #' (i.e., cannot change machines), and because of the restart, the assignment of the `spades`
 #' call will be either to `sim` or the user must make such an assignment manually,
-#' e.g., `sim <- SpaDES.core:::.pkgEnv$.sim`.
+#' e.g., `sim <- SpaDES.core:::savedSimEnv()$.sim`.
 #' This is stated in a message.
 #'
 #' @details
@@ -477,7 +515,7 @@ First <- function(...) {
     sim <- eval(.spadesCall)
     message(crayon::green("Because restartR was used, the simList is located in the location above.",
                           " It should be assigned to an object immediately: e.g.,\n",
-                          "sim <- SpaDES.core:::.pkgEnv$.sim"))
+                          "sim <- SpaDES.core:::savedSimEnv()$.sim"))
   } else {
     message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
                           " named 'sim' (which may not be the same as the original assignment)"))

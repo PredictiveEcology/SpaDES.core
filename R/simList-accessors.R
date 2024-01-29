@@ -61,9 +61,14 @@ setMethod(
 
     p <- mapply(
       function(x, y) {
+        vals <- I(as.list(y))
+        isFun <- vapply(vals, is.function, FUN.VALUE = logical(1))
+        vals[isFun] <- lapply(vals[isFun], format)
+
+
         if (length(names(y)) > 0)
-        data.frame(Module = x, Parameter = names(y), Value = I(as.list(y)),
-                   stringsAsFactors = FALSE, row.names = NULL)
+          data.frame(Module = x, Parameter = names(y), Value = vals,
+                     stringsAsFactors = FALSE, row.names = NULL)
       },
       x = names(params(object))[-omit],
       y = params(object)[-omit],
@@ -2949,13 +2954,15 @@ setMethod(
       pkgs <- lapply(paths, function(paths) {
         pkgs <- .parseModulePartial(filename = paths, defineModuleElement = "reqdPkgs",
                                     envir = envir) %>%
-          unlist() %>% unique()
+          unlist() # %>% unique()
+        pkgs <- pkgs[!duplicated(pkgs)]
         if (!is.null(pkgs)) {
           pkgs <- sort(pkgs)
         } else {
           pkgs <- character(0)
         }
-        pkgs <- unique(pkgs[nzchar(pkgs)])
+        pkgs <- pkgs[nzchar(pkgs)]
+        pkgs <- pkgs[!duplicated(pkgs)]
         if (!any(grepl("SpaDES.core", pkgs)))
           pkgs <- c("SpaDES.core", pkgs)
         return(pkgs)
@@ -3272,6 +3279,31 @@ setMethod("sessInfo",
             return(sim@.xData[["._sessionInfo"]])
 })
 
+
+
+#' Show which objects were first created in a simInit or spades call
+#'
+#' This does an `rbindlist(sim$._objectsCreated)`. This object in the `sim` records the
+#' yellow message that reports on when objects are created.
+#' @param sim A `simList` object that data.table` objects
+#' @export
+#' @aliases newObjectsCreated
+#' @aliases objectsCreated
+#' @rdname simList-accessors-objects
+#' @return The `data.table` of the objects created, alongside the `current(sim)`
+#' at each moment of creation.
+newObjectsCreated <- function(sim) {
+  if (!is.null(sim$._objectsCreated)) {
+    dt <- data.table::rbindlist(sim$._objectsCreated)
+    setorderv(dt, "newObjects")
+    print(format(as.data.frame(dt), justify = "left"))
+  } else {
+    dt <- data.table(newObjects = character(), .emptyEventListDT)
+  }
+  invisible(dt)
+
+}
+
 ################################################################################
 #' @export
 #' @include simList-class.R
@@ -3306,7 +3338,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
     ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy] #nolint
     a <- ret$elapsedTime
     if (identical(units, "auto")) {
-      unts <- "secs"
+      unt <- "secs"
       if (any(a > minutesInSeconds)) {
         if (any(a > hoursInSeconds)) {
           if (any(a > daysInSeconds)) {

@@ -313,47 +313,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
         # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
-        cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
-        if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
-          #instead of sim@.xData because collisions with parallel sims from same sim object
-
-          # next section replaces sim@completed <- append(sim@completed, list(cur)),
-          # which gets slower with size of sim@completed
-          # sim@completed <- append(sim@completed, list(cur))
-          #   following does not: it is more or less O(1). Algorithm from: https://stackoverflow.com/questions/17046336/here-we-go-again-append-an-element-to-a-list-in-r?lq=1
-          #   it basically increases size of list by *2 every time it fills up
-          attr(sim, "completedCounter") <- attr(sim, "completedCounter") + 1
-
-          # increase length of list by doubling as it grows
-          # if(attr(sim, "completedCounter")==attr(sim, "completedSize")) {
-          #   lenCompl <- length(sim@completed)
-          #   if (lenCompl > .pkgEnv[["spades.nCompleted"]]) { # we are above desired
-          #     if (attr(sim, "completedCounter") >= lenCompl ) { # We can now cull earlier ones
-          #       keepFrom <- lenCompl - .pkgEnv[["spades.nCompleted"]]
-          #       sim@completed <- sim@completed[keepFrom:lenCompl] # keep 10000 of them, from lenCompl - nCompleted to current
-          #       attr(sim, "completedSize") <- length(sim@completed)
-          #       attr(sim, "completedCounter") <- attr(sim, "completedSize")
-          #     }
-          #   }
-          #   attr(sim, "completedSize") <- attr(sim, "completedSize") * 2
-          #   #length(sim@completed) <- attr(sim, "completedSize")
-          # }
-
-          # faster to use assign
-          assign(as.character(attr(sim, "completedCounter")), value = cur, envir = sim@completed)
-          #sim@completed[[as.character(attr(sim, "completedCounter"))]] <- cur
-        } else {
-          if (!isFALSE(sim@.xData$._ranInitDuringSimInit)) {
-            cc <- NROW(sim@completed) + 1
-            cs <- cc * 2
-          } else {
-            cc <- 1
-            cs <- 2
-          }
-          attr(sim, "completedCounter") <- cc
-          attr(sim, "completedSize") <- cs
-          sim@completed[[as.character(cc)]] <- cur
-        }
+        # cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+        sim <- appendCompleted(sim, cur)
       }
 
       # current event completed, replace current with empty
@@ -463,45 +424,7 @@ scheduleEvent <- function(sim,
 
   }
   if (length(eventTime)) {
-    if (!is.na(eventTime)) {
-      if (eventTime < 0) {
-          stop("You have tried to schedule an event with negative time. You cannot do this. ",
-               " Reschedule event (", eventType," event in ", moduleName, " module) with positive time.")
-      }
-      eventTimeInSeconds <- calculateEventTimeInSeconds(sim, eventTime, moduleName)
-      attr(eventTimeInSeconds, "unit") <- "second"
-
-      if (eventTimeInSeconds < sim@simtimes$start)
-        stop("You have tried to schedule an event before start(sim). You cannot do this.",
-             " Reschedule event (", eventType," event in ", moduleName, " module) at or after start(sim).")
-
-      newEventList <- list(list(
-        eventTime = eventTimeInSeconds,
-        moduleName = moduleName,
-        eventType = eventType,
-        eventPriority = eventPriority
-      ))
-      numEvents <- length(sim@events)
-
-      # put new event into event queue
-      if (numEvents == 0L) {
-        slot(sim, "events", check = FALSE) <- newEventList
-      } else {
-        slot(sim, "events", check = FALSE) <- append(sim@events, newEventList)
-        needSort <- TRUE
-        if (eventTimeInSeconds > sim@events[[numEvents]][[1]]) {
-          needSort <- FALSE
-        } else if (eventTimeInSeconds == sim@events[[numEvents]][[1]] &&
-                   eventPriority >= sim@events[[numEvents]][[4]]) {
-          needSort <- FALSE
-        }
-        if (needSort) {
-          ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
-                       unlist(lapply(sim@events, function(x) x$eventPriority)))
-          slot(sim, "events") <- sim@events[ord]
-        }
-      }
-    }
+    sim <- appendEvents(sim, eventTime, eventType, moduleName, eventPriority)
   } else {
     warning(
       paste(
@@ -997,7 +920,7 @@ setMethod(
       options("spades.covr2" = TRUE)
       if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
       .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-      return(.pkgEnv$.sim)
+      return(savedSimEnv()$.sim)
     }
     oldWd <- getwd()
     on.exit({
@@ -1029,9 +952,10 @@ setMethod(
       # If there already is a sim object saved in the .pkgEnv, it may have objects,
       #   and those objects may have temporary files from file-backed objects stored.
       #   This will remove those file-backed temp files
-      clearFileBackedObjs(.pkgEnv$.sim$.recoverableObjs, recoverMode)
-      .pkgEnv$.sim <- NULL # Clear anything that was here.
-      .pkgEnv$.sim <- sim # set up pointer
+      clearFileBackedObjs(savedSimEnv()$.sim$.recoverableObjs, recoverMode)
+      .savedSimEnv <- savedSimEnv() # can't assign to a function
+      .savedSimEnv$.sim <- NULL
+      .savedSimEnv$.sim <- sim # set up pointer
 
       # set the options("spades.xxxPath") to the values in the sim@paths
       oldGetPaths <- getPaths()
@@ -1115,10 +1039,11 @@ setMethod(
             messageInterrupt1(recoverMode)
           } else {
             message(crayon::magenta("simList saved in"), "\n",
-                    crayon::blue("SpaDES.core:::.pkgEnv$.sim"), "\n",
+                    crayon::blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
                     crayon::magenta("It will be deleted at next spades() call."))
           }
-          .pkgEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
+          .savedSimEnv <- savedSimEnv() # can't assign to a function
+          .savedSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
           .pkgEnv$.cleanEnd <- NULL
         }
         # For restarting R -- a few extra pieces, including saving the simList as the last thing
@@ -1137,6 +1062,12 @@ setMethod(
             restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
           )
         }
+
+        # seconds <- "secs"
+        # sim$._totalElapsedTime <- difftime(Sys.time(), sim$._startClockTime, units = seconds)
+        # subtractOff <- difftime(Sys.time(), tail(completed(sim)[["clockTime"]], 1), units = seconds)
+        # sim$._elapsedTimeIncompleteFinaleEvent <- subtractOff
+
       }, add = TRUE)
 
       if (!is.null(.plots)) {
@@ -1336,12 +1267,15 @@ setMethod(
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
       }
+
       if (useNormalMessaging) {
-        if (startsWith(m$message, "\b")) {
-          message(gsub("\n$", "", m$message))
-        } else {
-          message(loggingMessage(m$message))
-        }
+        # if (grepl("projecting", m$message)) browser()
+        if (isTRUE(any(grepl("\b", m$message)))) {
+          m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
+          # message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
+        } # else {
+        message(loggingMessage(m$message))
+        # }
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -1428,14 +1362,16 @@ setMethod(
 #' @keywords internal
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
+    expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
     if (cacheIt) { # means that a module or event is to be cached
 
-      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par")) # .inputObjects is not run in `spades`; mod is same as .objects
+      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
-          na.omit(createsOutputs)) # objects outputted by module
+          na.omit(expectsInputs)) # objects that should exist at the time of calling the module
+
       #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
       moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
@@ -1452,6 +1388,8 @@ setMethod(
                            modules = cur[["moduleName"]])
     }
   }
+  verbose <- if (is.numeric(debug)) debug else !debug %in% FALSE
+
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
     expression(Cache(FUN = modCall,
@@ -1463,7 +1401,7 @@ setMethod(
                      classOptions = classOptions,
                      showSimilar = showSimilar,
                      cachePath = sim@paths[["cachePath"]],
-                     .functionName = moduleCall))
+                     .functionName = moduleCall, verbose = verbose))
   } else {
     # Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall,
@@ -1476,7 +1414,26 @@ setMethod(
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
-    sim <- eval(fnCallAsExpr) # slower than more direct version just above
+    runFnCallAsExpr <- TRUE
+    allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
+    if (allowSequentialCaching) {
+      sim <- allowSequentialCaching1(sim, cacheIt, moduleCall, verbose)
+      runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
+    }
+
+    # if (cur$eventType %in% "prepSpreadFitData") browser()
+    rr <- .Random.seed
+    if (runFnCallAsExpr)
+      sim <- eval(fnCallAsExpr) # slower than more direct version just above
+    if (identical(rr, .Random.seed)) message(crayon::bgYellow(cur$moduleName)) # browser()
+
+    if (allowSequentialCaching) {
+        sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
+    }
+  }
+
+  if (allowSequentialCaching) {
+    sim <- allowSequentialCachingFinal(sim)
   }
 
   # put back the current values of params that were not cached on
@@ -1487,7 +1444,7 @@ setMethod(
 
 
   if (!(FALSE %in% debug || any(is.na(debug))) )
-    objectsCreatedPost(sim, objsIsNullBefore)
+    sim <- objectsCreatedPost(sim, objsIsNullBefore)
 
   # Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
@@ -1571,6 +1528,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     rmo <- list(
       recoverModeTiming = 0,
       recoverableObjs = list(),
+      recoverableModObjs = list(),
       addedEvents = list(list()),
       randomSeed = list(list())
     )
@@ -1586,23 +1544,47 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     #   should be temporary versions and so can be safely deleted
     clearFileBackedObjs(rmo$recoverableObjs, recoverMode)
     rmo$recoverableObjs <- rmo$recoverableObjs[seq_len(recoverMode - 1)]
+    rmo$recoverableModObjs <- rmo$recoverableModObjs[seq_len(recoverMode - 1)]
   }
 
   if (length(sim@events) > 0) {
-    objsInSimListAndModule <- ls(sim) %in% allObjNames[[sim@events[[1]][["moduleName"]]  ]]
+    curMod <- sim@events[[1]][["moduleName"]]
+    objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod  ]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
-    mess <- capture.output(type = "message",
-                           rmo$recoverableObjs <- append(list(if (any(objsInSimListAndModule)) {
-                             Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-                                  filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
-                           } else {
-                             list()
-                           }), rmo$recoverableObjs)
+    mess <- capture.output(type = "message", {
+      newList <- list(if (any(objsInSimListAndModule)) {
+        Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
+             filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+      } else {
+        list()
+      })
+      names(newList) <- curMod
+      rmo$recoverableObjs <- append(newList, rmo$recoverableObjs)
+    }
     )
+
+    if (exists(curMod, envir = sim$.mods)) {
+      if (!is.null(sim$.mods[[curMod]])) {
+        if (exists(".objects", sim$.mods[[curMod]])) {
+          modEnv <- sim$.mods[[curMod]]$.objects
+          objsInModObjects <- ls(modEnv)
+          mess2 <- capture.output(type = "message",
+                                  rmo$recoverableModObjs <- append(list(if (length(objsInModObjects)) {
+                                    Copy(mget(objsInModObjects, envir = modEnv),
+                                         filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                                  } else {
+                                    list()
+                                  }), rmo$recoverableModObjs)
+          )
+        }
+      }
+    }
+
     mess <- grep("Hardlinked version", mess, invert = TRUE)
     if (length(mess) > 0)
       lapply(mess, message)
   }
+
   endTime <- Sys.time()
   rmo$preEvents <- sim@events
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
@@ -1629,6 +1611,7 @@ recoverModePost <- function(sim, rmo, recoverMode) {
 #' @keywords internal
 recoverModeOnExit <- function(sim, rmo, recoverMode) {
   sim@.xData$.recoverableObjs <- rmo$recoverableObjs
+  sim@.xData$.recoverableModObjs <- rmo$recoverableModObjs
   recoverableObjsSize <- sum(unlist(objSize(rmo$recoverableObjs)))
   class(recoverableObjsSize) <- "object_size"
   rmo$postEvents <- sim@events
@@ -1639,7 +1622,7 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
                                  format(rmo$recoverModeTiming, units = "auto", digits = 3),
                                  " and ", format(recoverableObjsSize, units = "auto"))))
   message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
-                          "in the simList located at SpaDES.core:::.pkgEnv$.sim,",
+                          "in the simList located at SpaDES.core:::savedSimEnv()$.sim,",
                           "as sim$.recoverableObjs, with the most recent event",
                           "the first element in the list, 2nd most recent event = the second most recent event, etc.",
                           " The objects contained in each of those are only the objects that may have",
@@ -1654,7 +1637,7 @@ messageInterrupt1 <- function(recoverMode) {
     crayon::magenta("Because of an interrupted spades call, the sim object ",
                     c("at the time of interruption ",
                       "at the start of the interrupted event ")[(recoverMode > 0) + 1],
-                    "was saved in"), "\n", crayon::blue("SpaDES.core:::.pkgEnv$.sim"),
+                    "was saved in"), "\n", crayon::blue("SpaDES.core:::savedSimEnv()$.sim"),
                     "\n", magenta("It will be deleted on next call to spades"))
 }
 
@@ -1731,21 +1714,23 @@ spadesDefaultFormatter <- function(record) {
 #' @importFrom reproducible Filenames
 clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
   if (isTRUE(recoverMode > 0)) {
-    toClear <- recoverableObjs[[as.numeric(recoverMode)]]
-    if (length(toClear)) {
-      out <- lapply(toClear, function(x) {
-        if (is(x, "Raster")) {
-          Filenames(x)
-        }
-      })
-      files <- unname(unlist(out))
-      files <- files[nzchar(files)]
-      if (length(files) != 0 ) {
-        unlink(files)
-        dirs <- unique(dirname(files))
-        filesLeft <- dir(dirs, full.names = TRUE)
-        if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
-          unlink(dirs, recursive = TRUE)
+    if (length(recoverableObjs) >= as.numeric(recoverMode)) {
+      toClear <- recoverableObjs[[as.numeric(recoverMode)]]
+      if (length(toClear)) {
+        out <- lapply(toClear, function(x) {
+          if (is(x, "Raster")) {
+            Filenames(x)
+          }
+        })
+        files <- unname(unlist(out))
+        files <- files[nzchar(files)]
+        if (length(files) != 0 ) {
+          unlink(files)
+          dirs <- unique(dirname(files))
+          filesLeft <- dir(dirs, full.names = TRUE)
+          if (length(filesLeft) == 0 || all(grepl("cache", filesLeft))) {
+            unlink(dirs, recursive = TRUE)
+          }
         }
       }
     }
@@ -2036,32 +2021,17 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     }
   }
 
-  messPoss <- paste0(middleFix, " ", mess)
+  # Prepend the middle
+  if (isTRUE(any(grepl("\b", mess)))) {
+    # noNew <- TRUE
+    mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
+  } else {
+    messPoss <- paste0(middleFix, " ", mess)
+    if (!isTRUE(noNew)) {
+      # Prepend the time
+      mess <- paste0(prependTime, " ", messPoss)
 
-  # Split long lines -- this is complicated because of prependTime, spacing, colours etc.
-  # nCharPrependTime <- nchar(prependTime)
-  # numChars <- nchar(messPoss) + nCharPrependTime
-  # wdth <- getOption("width")
-  # if (any(numChars > wdth)) {
-  #   whereSpaces <- gregexpr(" ", mess)
-  #   breakAt <- lapply(whereSpaces, function(ws) {
-  #     ba <- which(diff(ws %% wdth) < 0)
-  #     if (length(ba) == 0)
-  #       ba <- length(ws)
-  #     ws[ba]})
-  #   # breakAt <- whereSpaces[which(diff(whereSpaces %% wdth) < 0)]
-  #   mess <- Map(m = mess, ba = breakAt, function(m, ba) {
-  #     m <- substring(rep(m, length(ba) + 1), c(1, ba + 1), c(ba - 1, 1e3))
-  #     len <- length(m)
-  #     if (len > 1)
-  #       m[-len] <- paste0(m[-len], "\n")
-  #     m
-  #     })
-  #   mess <- unlist(unname(mess))
-  # }
-
-  if (!isTRUE(noNew)) {
-    mess <- paste0(prependTime, " ", messPoss)
+    }
   }
 
   mess
@@ -2263,6 +2233,253 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 }
 
-paramsDontCacheOn <- c(".useCache", ".useParallel") # don't change Caching based on .useCache
+paramsDontCacheOn <- c(".useCache", ".useParallel",
+                       paste0(".", c("plots", "plotInterval", "plotInitialTime", "saveInitialTime", "saveInterval"))) # don't change Caching based on .useCache
                                                     # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
 
+
+allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
+  # getFromNamespace(".messageIndentUpdate", ns = "reproducible")()
+  .messageIndentUpdate()
+  attr(sim, "runFnCallAsExpr") <- NULL
+  if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
+    sc <- showCache(cacheId = sim[["._prevCache"]], x = cachePath(sim), verbose = -1)
+    # sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
+    nextEvent <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextEventCacheId")))
+    cur <- current(sim)
+    if (length(nextEvent) > 1) {
+      nextEventName <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextEvent")))
+      nextModuleName <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextModule")))
+      keep <- which(nextEventName %in% cur[["eventType"]] & nextModuleName %in% cur[["moduleName"]])
+      if (length(keep))
+        nextEvent <- nextEvent[keep]
+      if (length(keep) == 0)
+        nextEvent <- NULL
+    }
+    if (length(nextEvent != sim[["._prevCache"]]) > 1) browser()
+    if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
+      # The user can't have modified the function being run
+      scNe <- showCache(cacheId = nextEvent, x = cachePath(sim), verbose = -1)
+      # d <- .robustDigest(Copy(sim, objects = FALSE))
+
+      # need to check for non-object (e.g., function, params, depends) that could have changed
+      # checkParams
+      sPoss <- .robustDigest(Copy(sim, objects = FALSE))
+      scNePreDigests <- scNe$tagValue["preDigest" == scNe$tagKey]
+
+      wh <- c("params", "depends")
+      wh2 <- paste0("sim.", wh)
+      noChanges <- logical(length(wh) + 1)
+      for (iii in seq(wh)) {
+        paramCIs <- gsub(".+:(.+)", "\\1", scNePreDigests[startsWith(scNePreDigests, wh2[iii])])
+        noChanges[iii] <- all(unlist(sPoss[[wh[iii]]][[cur[["moduleName"]]]]) %in% paramCIs)
+      }
+
+      # preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
+      # grepVal <- paste0("sim\\.\\.list\\.", cur[["moduleName"]], preModCall, moduleCall)
+      # Check that function itself (.inputObject or doEvent.XXX) has not changed
+      grepVal <- paste0("sim..list.", cur[["moduleName"]], ".", moduleCall)
+      scFn <- startsWith(scNePreDigests, grepVal) # grepl(scNePreDigests, pattern = grepVal)
+      a <- .robustDigest(sim[[".mods"]][[cur[["moduleName"]]]][[moduleCall]])
+      b <- gsub(".+:(.+)", "\\1", scNePreDigests[scFn])
+      noChanges[length(noChanges)] <- (a %in% b)
+      noChange <- all(noChanges)
+
+      if (isTRUE(noChange)) {
+        isMemoised <- isMemoised(cacheId = nextEvent, cachePath = cachePath(sim))
+        simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
+        if (!is(simSkip, "try-error")) {
+          if (all(current(simSkip) == current(sim))) {
+            attr(sim, "runFnCallAsExpr") <- FALSE # the trigger to NOT pull the next event
+            sim <- .prepareOutput(simSkip, cachePath(sim), sim)
+            .cacheMessageObjectToRetrieve(functionName = moduleCall, fullCacheTableForObj = sc,
+                                          cachePath = cachePath(sim),
+                                          cacheId = sim[["._prevCache"]], verbose = verbose)
+            messageCache("Skipped digest of simList because sequential Cache calls of events",
+                                    verbose = verbose)
+            .cacheMessage(sim, functionName = moduleCall, fromMemoise = isMemoised, verbose = verbose)
+            attr(sim, "tags") <- paste0("cacheId:", nextEvent)
+
+          }
+        }
+
+      }
+    }
+
+  }
+  sim
+}
+
+allowSequentialCachingUpdateTags <- function(sim, cacheIt) {
+  if (!isTRUE(cacheIt)) {
+    attr(sim, "tags") <- NULL
+    attr(sim, ".Cache") <- NULL
+    sim[["._prevCache"]] <- NULL
+    attr(sim, "runFnCallAsExpr") <- NULL
+
+  }
+
+  sim
+}
+
+allowSequentialCachingFinal <- function(sim) {
+  wasFromCache <- !is.null(attr(sim, "tags"))
+  if (wasFromCache) {
+    thisCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
+    if (!is.null(sim[["._prevCache"]])) {
+      sc <- showCache(cacheId = sim[["._prevCache"]], x = cachePath(sim), verbose = -1)
+      cp <- cachePath(sim)
+      cur <- current(sim)
+      seqCache <- sc[startsWith(sc$tagKey, sequentialCacheText)]
+      # This is multiple tags for the NextEvent stuff
+      if (length(thisCacheId) > 1) browser()
+      args <- data.frame(cacheId = sim[["._prevCache"]],
+                   tagKey = paste0(sequentialCacheText, "Next", c("EventCacheId", "Module", "Event")),
+                   tagValue = c(thisCacheId, cur[["moduleName"]], cur[["eventType"]]),
+                   cachePath = cp)
+      if (all(c(cur$moduleName, cur$eventType) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
+        fn <- reproducible:::.updateTagsRepo
+        args$add = TRUE
+      } else {
+        fn <- reproducible:::.addTagsRepo
+      }
+
+      # put all tags in
+      by(args, INDICES = seq(NROW(args)), FUN = function(a) do.call(fn, a))
+    }
+    sim[["._prevCache"]] <- thisCacheId
+  }
+  sim
+}
+
+
+clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"),
+                                  key = paste0(sequentialCacheText, "Next")) {
+  onesWithNextEvent <- character()
+  a <- lapply(dir(CacheStorageDir(cachePath), pattern = "dbFile", full.names = TRUE), function(x) {
+    y <- readRDS(x)
+    if (any(grep(key, y$tagKey))) {
+      y <- y[grep(paste0("^", key), tagKey, invert = TRUE)]
+      message("resaving ", x)
+      onesWithNextEvent <<- c(onesWithNextEvent, x)
+      saveRDS(y, file = x)
+    }
+  })
+  return(onesWithNextEvent)
+
+}
+
+sequentialCacheText <- "SequentialCache_"
+
+appendCompleted <- function(sim, cur) {
+  # if (cur$moduleName == "checkpoint") browser()
+
+  cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+
+  last <- attr(sim, "completedCounter")
+  isLastWrong <- length(sim@completed) != last
+  if (isTRUE(isLastWrong)) {
+    last <- attr(sim, "completedCounter") <- NULL
+  }
+  # if ("Biomass_borealDataPrep" %in% cur$moduleName && "init" %in% cur$eventType) browser()
+  if (is.null(last)) {
+    prevTime <- cur$._clockTime
+  } else {
+    prevTime <- sim@completed[[as.character(last)]]$._clockTime
+  }
+  cur$._prevEventTimeFinish <- prevTime
+
+  if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
+    #instead of sim@.xData because collisions with parallel sims from same sim object
+
+    # next section replaces sim@completed <- append(sim@completed, list(cur)),
+    # which gets slower with size of sim@completed
+    # sim@completed <- append(sim@completed, list(cur))
+    #   following does not: it is more or less O(1). Algorithm from: https://stackoverflow.com/questions/17046336/here-we-go-again-append-an-element-to-a-list-in-r?lq=1
+    #   it basically increases size of list by *2 every time it fills up
+
+    # increase length of list by doubling as it grows
+    # if(attr(sim, "completedCounter")==attr(sim, "completedSize")) {
+    #   lenCompl <- length(sim@completed)
+    #   if (lenCompl > .pkgEnv[["spades.nCompleted"]]) { # we are above desired
+    #     if (attr(sim, "completedCounter") >= lenCompl ) { # We can now cull earlier ones
+    #       keepFrom <- lenCompl - .pkgEnv[["spades.nCompleted"]]
+    #       sim@completed <- sim@completed[keepFrom:lenCompl] # keep 10000 of them, from lenCompl - nCompleted to current
+    #       attr(sim, "completedSize") <- length(sim@completed)
+    #       attr(sim, "completedCounter") <- attr(sim, "completedSize")
+    #     }
+    #   }
+    #   attr(sim, "completedSize") <- attr(sim, "completedSize") * 2
+    #   #length(sim@completed) <- attr(sim, "completedSize")
+    # }
+
+    # faster to use assign
+    attr(sim, "completedCounter") <- attr(sim, "completedCounter") + 1
+    assign(as.character(attr(sim, "completedCounter")), value = cur, envir = sim@completed)
+    #sim@completed[[as.character(attr(sim, "completedCounter"))]] <- cur
+  } else {
+    # This chunk only occurs during the first event of a `spades` call
+    if (!isFALSE(sim@.xData$._ranInitDuringSimInit)) {
+      cc <- NROW(sim@completed) + 1
+      cs <- cc * 2
+    } else {
+      cc <- 1
+      cs <- 2
+    }
+    attr(sim, "completedCounter") <- cc
+    attr(sim, "completedSize") <- cs
+    sim@completed[[as.character(cc)]] <- cur
+  }
+  sim
+}
+
+
+appendEvents <- function(sim, eventTime, eventType, moduleName, eventPriority) {
+  if (!is.na(eventTime)) {
+    if (eventTime < 0) {
+      stop("You have tried to schedule an event with negative time. You cannot do this. ",
+           " Reschedule event (", eventType," event in ", moduleName, " module) with positive time.")
+    }
+    eventTimeInSeconds <- calculateEventTimeInSeconds(sim, eventTime, moduleName)
+    attr(eventTimeInSeconds, "unit") <- "second"
+
+    if (eventTimeInSeconds < sim@simtimes$start)
+      stop("You have tried to schedule an event before start(sim). You cannot do this.",
+           " Reschedule event (", eventType," event in ", moduleName, " module) at or after start(sim).")
+
+    newEventList <- list(list(
+      eventTime = eventTimeInSeconds,
+      moduleName = moduleName,
+      eventType = eventType,
+      eventPriority = eventPriority
+    ))
+    numEvents <- length(sim@events)
+
+    # put new event into event queue
+    if (numEvents == 0L) {
+      slot(sim, "events", check = FALSE) <- newEventList
+    } else {
+      slot(sim, "events", check = FALSE) <- append(sim@events, newEventList)
+      needSort <- TRUE
+      if (eventTimeInSeconds > sim@events[[numEvents]][[1]]) {
+        needSort <- FALSE
+      } else if (eventTimeInSeconds == sim@events[[numEvents]][[1]] &&
+                 eventPriority >= sim@events[[numEvents]][[4]]) {
+        needSort <- FALSE
+      }
+      if (needSort) {
+        ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
+                     unlist(lapply(sim@events, function(x) x$eventPriority)))
+        slot(sim, "events") <- sim@events[ord]
+      }
+    }
+  }
+  sim
+}
+
+savedSimEnv <- function(envir = .GlobalEnv) {
+  if (!isTRUE(getOption("reproducible.memoisePersist"))) {
+    envir <- new.env(parent = emptyenv())
+  }
+  envir
+}

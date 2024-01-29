@@ -421,19 +421,25 @@ setMethod(
         # do inputObjects and outputObjects
         pf <- tmp$pf # tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
         if (any(inObjs)) {
+          evald <- try(eval(pf[[1]][[3]][inObjs][[1]]), silent = TRUE)
+          if (is(evald, "try-error")) stop("In ", mBase, " in the `inputObjects`:",
+                                           "\n", evald)
           sim@depends@dependencies[[i]]@inputObjects <- data.frame(
             rbindlist(fill = TRUE,
                       list(sim@depends@dependencies[[i]]@inputObjects,
-                           eval(pf[[1]][[3]][inObjs][[1]]))
+                           evald)
             )
           )
         }
 
         if (any(outObjs)) {
+          evald <- try(eval(pf[[1]][[3]][outObjs][[1]]), silent = TRUE)
+          if (is(evald, "try-error")) stop("In ", mBase, " in the `outputObjects`:",
+                                           "\n", evald)
           sim@depends@dependencies[[i]]@outputObjects <- data.frame(
             rbindlist(fill = TRUE,
                       list(sim@depends@dependencies[[i]]@outputObjects,
-                           eval(pf[[1]][[3]][outObjs][[1]]))
+                           evald)
             )
           )
         }

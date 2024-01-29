@@ -214,7 +214,7 @@ Plots <- function(data, fn, filename,
         fn <- plot
     }
   }
-  fnIsPlot <- identical(fn, Plot)
+  fnIsPlot <- identical(fn, Plot) || identical(fn, plot) || identical(fn, terra::plot)
   if (fnIsPlot) {
     # make dummies
     gg <- 1
@@ -244,7 +244,8 @@ Plots <- function(data, fn, filename,
       if (!is(gg, ".quickPlot")) {
         ggListToScreen <- setNames(list(gg), "gg")
         if (!is.null(gg$labels$title) && needScreen) {
-          ggListToScreen <- setNames(ggListToScreen, gg$labels$title)
+          ggListToScreen <- setNames(ggListToScreen,
+                                     format(paste(gg$labels$title, collapse = " ")))
           ggListToScreen[[1]]$labels$title <- NULL
         }
       }
@@ -355,14 +356,14 @@ Plots <- function(data, fn, filename,
       if (is.call(path))
         path <- "."
     }
-    if (fnIsPlot) {
+    if (fnIsPlot || is.null(gg)) {
       baseSaveFormats <- intersect(baseClassesCanHandle, types)
       for (bsf in baseSaveFormats) {
         type <- get(bsf)
         theFilename <- file.path(path, paste0(filename, ".", bsf))
         do.call(type, modifyList2(list(theFilename), deviceArgs))
         # curDev <- dev.cur()
-        clearPlot()
+        if (isTRUE(fnIsPlot)) clearPlot()
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
         if (!is(plotted, "try-error")) {

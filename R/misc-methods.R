@@ -669,7 +669,10 @@ paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
   paramToUpdateValInOtherMods <- lapply(params, function(p) p[[paramToCheck]])
   ## remove NULLs
   paramToUpdateValInOtherMods <- paramToUpdateValInOtherMods[!sapply(paramToUpdateValInOtherMods, is.null)]
-  paramInOtherMods <- unique(paramToUpdateValInOtherMods)  ## again, preserve list -- if there is only one entry, all definitions are identical
+  # paramToUpdateValInOtherMods <- lapply(paramToUpdateValInOtherMods, sort)
+  dups <- duplicated(paramToUpdateValInOtherMods)
+  paramInOtherMods <- paramToUpdateValInOtherMods[!dups]
+  # paramInOtherMods <- unique(paramToUpdateValInOtherMods)  ## again, preserve list -- if there is only one entry, all definitions are identical
 
   messSuff <- paste0("); they should not. Perhaps pass params = list(.globals = list(",
                      paramToCheck, " = '", paramInOtherMods[1], "')) in the simInit call?")
