@@ -1091,6 +1091,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                  paths = objsSimInit$paths, inputs = objsSimInit$inputs,
                  outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
                  notOlderThan = objsSimInit$notOlderThan, ...)
+  opts <- options(spades.loadReqdPkgs = FALSE)
+  on.exit(options(opts), add = TRUE)
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
