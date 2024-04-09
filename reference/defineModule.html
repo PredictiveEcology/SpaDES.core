@@ -132,7 +132,7 @@ if a character or numeric are supplied).
 The module developer should update manually this with each change
 that is made to the module. See <a href="https://semver.org/" class="external-link">https://semver.org/</a>
 for a widely accepted standard for version numbering.</td></tr><tr><td><code>spatialExtent</code></td><td>The spatial extent of the module supplied via
-<code><a href="https://rdrr.io/pkg/terra/man/ext.html" class="external-link">terra::ext</a></code>. This is currently unimplemented.
+<code><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">terra::ext</a></code>. This is currently unimplemented.
 Once implemented, this should define what spatial region this
 module is scientifically reasonable to be used in.</td></tr><tr><td><code>timeframe</code></td><td>Vector (length 2) of <code>POSIXt</code> dates specifying the temporal extent
 of the module. Currently unimplemented.
@@ -214,7 +214,7 @@ that will cause these objects to be put into the
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span>  <span class="co">## a default version of the defineModule is created with a call to newModule</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="newModule.html">newModule</a></span><span class="op">(</span><span class="st">"test"</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpzNRBK9</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp1xa6p9</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in </span><span style="color: #BBBB00;">test.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in </span><span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in </span><span style="color: #BBBB00;">test.Rmd</span></span>

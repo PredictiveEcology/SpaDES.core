@@ -624,7 +624,7 @@
 <li><p><code>simInit</code> and <code>spades</code> now call <code>setPaths(paths)</code> or <code>setPaths(sim$paths)</code>, unsetting them <code>on.exit</code> internally to make the paths used for functions e.g., <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> to use the correct path</p></li>
 <li><p>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</p></li>
 <li><p>improved default path settings in <code>.inputObjects</code> (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/83" class="external-link">#83</a>)</p></li>
-<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://Rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on <code>simList</code> objects)</p></li>
+<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on <code>simList</code> objects)</p></li>
 <li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul></div>
 <div class="section level3">
