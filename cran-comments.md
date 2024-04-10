@@ -1,6 +1,6 @@
 ## Release information
 
-This is an update to deal with several minor bugfixes, plus to accommodate changes in upstream package dependencies with reproducible.
+This release drops support for R version 4.1 due to changes in dependencies.
 
 ## Test environments
 

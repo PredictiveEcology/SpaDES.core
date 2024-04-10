@@ -365,12 +365,11 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
         pths <- paths(tmpsim)
       else
         pths <- list(projectPath = projectPath)
-      newFiles <- reproducible:::remapFilenames(tags, cachePath = NULL, paths = pths)
+      newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
       tmpsim[[nam]][] <- newFiles$newName[]
     }
   }
-
 
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 

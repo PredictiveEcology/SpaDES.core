@@ -1,7 +1,6 @@
 # SpaDES.core 2.0.4
-## Enhancements
-## Dependency changes
-## Bug fixes
+
+* drop support for R 4.1 due to changes in dependency packages
 
 # SpaDES.core 2.0.3
 
