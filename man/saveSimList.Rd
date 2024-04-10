@@ -46,8 +46,8 @@ It is the environment where the object named \code{sim} can be found.}
 \item{...}{Additional arguments. See Details.}
 }
 \value{
-Invoked for side effects of saving a \code{.qs} or \code{.rds} file,
-or a \code{.tar.gz} (non-Windows) or \code{.zip} (Windows).
+Invoked for side effects of saving both a \code{.qs} (or \code{.rds}) file,
+and a compressed archive (one of \code{.tar.gz} if using non-Windows OS or \code{.zip} on Windows).
 }
 \description{
 Saving a \code{simList} may not work using the standard approaches

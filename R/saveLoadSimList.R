@@ -58,8 +58,8 @@
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
-#' Invoked for side effects of saving a `.qs` or `.rds` file,
-#' or a `.tar.gz` (non-Windows) or `.zip` (Windows).
+#' Invoked for side effects of saving both a `.qs` (or `.rds`) file,
+#' and a compressed archive (one of `.tar.gz` if using non-Windows OS or `.zip` on Windows).
 #'
 #' @aliases saveSim
 #' @export
