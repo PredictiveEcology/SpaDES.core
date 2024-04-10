@@ -41,7 +41,9 @@ There are some NOTEs:
         Availability using Additional_repositories specification:
           NLMR         yes   https://predictiveecology.r-universe.dev/
 
-2. We have made an effort to reduce the package as much as possible, but the installed package size is larger than the 5MB limit.
+2. Found (possibly) invalid URLs for multiple DOIs, which appear to be inaccessible from the CRAN check machines but are available in a web browser.
+
+3. We have made an effort to reduce the package as much as possible, but the installed package size is larger than the 5MB limit.
 
         checking installed package size ... NOTE
             installed size is  6.4Mb
