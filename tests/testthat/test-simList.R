@@ -35,7 +35,7 @@ test_that("simList object initializes correctly (1)", {
   options(width = 100L)
   out <- utils::capture.output(show(mySim))
 
-  expect_equal(length(out), 76)
+  expect_equal(length(out), 77)
   options(width = w)
   rm(w)
 

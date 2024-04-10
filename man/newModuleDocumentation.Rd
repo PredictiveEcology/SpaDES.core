@@ -41,9 +41,9 @@ Create new module documentation
 }
 \seealso{
 Other module creation helpers: 
+\code{\link{newModule}()},
 \code{\link{newModuleCode}()},
-\code{\link{newModuleTests}()},
-\code{\link{newModule}()}
+\code{\link{newModuleTests}()}
 }
 \author{
 Eliot McIntire and Alex Chubaty
