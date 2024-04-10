@@ -12,8 +12,8 @@ Core functionality for Spatial Discrete Event System (SpaDES).
 
 This package provides the core framework for a discrete event system to 
     implement a complete data-to-decisions, reproducible workflow
-    (e.g., McIntire et al. (2022) <doi:10.1111/ele.13994>,
-    Barros et al. (2022) <doi:10.1111/2041-210X.14034>).
+    (e.g., McIntire et al. (2022) <https://doi.org/10.1111/ele.13994>,
+    Barros et al. (2022) <https://doi.org/10.1111/2041-210X.14034>).
     The core components facilitate the development of modular pieces, 
     and enable the user to include additional functionality by running user-built modules.
     Includes conditional scheduling, restart after interruption, packaging of

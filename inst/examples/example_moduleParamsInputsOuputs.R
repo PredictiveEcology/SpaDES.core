@@ -11,4 +11,3 @@ knitr::kable(p)
 knitr::kable(i)
 knitr::kable(o)
 }
-

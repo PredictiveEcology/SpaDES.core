@@ -83,8 +83,9 @@ setMethod("Copy",
               }
               names(objNames) <- objNames
               isEnv <- unlist(lapply(objNames,
-                                     function(obj)
-                                       is.environment(get(obj, envir = object@.xData$.mods))))
+                                     function(obj) {
+                                       is.environment(get(obj, envir = object@.xData$.mods))
+                                     }))
               # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
 
               if (objects == 1) {
@@ -126,4 +127,3 @@ setMethod("Copy",
             sim_@.envir <- sim_@.xData
             return(sim_)
           })
-

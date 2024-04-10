@@ -671,7 +671,8 @@ setMethod(
           # These are the unchanged objects
           for (modNam in currModules) {
             objs <-
-              setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = T), changedModEnvObjs[[modNam]]$.objects)
+              setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = TRUE),
+                                    changedModEnvObjs[[modNam]]$.objects)
             if (length(objs))
               list2env(objs, simPost$.mods[[modNam]]$.objects)
           }
@@ -715,7 +716,10 @@ setMethod(
               #              args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
               a1 <- rbindlist(a)
               f1 <- a[order(a1$eventTime, a1$eventPriority, a1$order)]
-              simPost@events <- lapply(f1, function(f) {f$order <- NULL; f})
+              simPost@events <- lapply(f1, function(f) {
+                f$order <- NULL
+                f
+              })
               # simPost@events <- do.call(unique,
               #                           args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
             }
@@ -723,8 +727,6 @@ setMethod(
           #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
         simPost@current <- simFromCache@current
-
-
 
         # This is for objects that are not in the return environment yet because they are unrelated to the
         #   current module -- these need to be copied over

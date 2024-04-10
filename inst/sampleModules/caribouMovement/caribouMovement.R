@@ -31,7 +31,7 @@ defineModule(sim, list(
     defineParameter("torus", "logical", FALSE, FALSE, TRUE,
                     "should the map wrap around like a torus?"),
     defineParameter(".plots", "character", "screen", NA, NA,
-                    "A modular mechanism to create plots, using png, screen device or other. See ?Plots."),
+                    "A modular mechanism to create plots, using png, screen device or other. See `?Plots`."),
     defineParameter(".plotInitialTime", "numeric", start(sim), -Inf, Inf,
                     "time to schedule first plot event"),
     defineParameter(".plotInterval", "numeric", 1, -Inf, Inf,

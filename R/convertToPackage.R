@@ -130,7 +130,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   fileNames <- Map(element = whNotDefModule, nextElement = nextElement,
                    function(element, nextElement) {
                      i <- 0
-                     fn <- filePath <- fnCh <- parseWithFn<- lineWithFn <- list()
+                     fn <- filePath <- fnCh <- parseWithFn <- lineWithFn <- list()
                      for (elem in c(element, nextElement)) {
                        i <- i + 1
                        if (is.infinite(elem)) {
@@ -150,7 +150,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
                              break
                            }
                          }
-                       parseWithFn[[i]] <- gpd[gpdLines,]
+                       parseWithFn[[i]] <- gpd[gpdLines, ]
                        lineWithFn[[i]] <- parseWithFn[[i]][, "line1"]
                        if (length(lineWithFn[[i]]) > 1) {
                          if (i == 1) {
@@ -167,7 +167,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
                      whPrev <- which((lineWithFn[[2]] - linesWithRoxygen) == 1) # is the roxygen next to function
 
                      if (length(wh) || length(whPrev)) {
-                       iAll <- if(length(wh) > 0) c(1, if (length(whPrev) > 0)  2 else NULL) else 2
+                       iAll <- if (length(wh) > 0) c(1, if (length(whPrev) > 0)  2 else NULL) else 2
                        for (i in rev(iAll)) {
                          # This means there is a roxygen block for this function -- must keep it with the function code
                          lastRoxygenLine <- lineWithFn[[i]] - 1 == linesWithRoxygen
@@ -204,10 +204,10 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   otherStuffFn <- filenameFromFunction(packageFolderName, "other", "R")
   cat("
 makeActiveBinding('mod', SpaDES.core:::activeModBindingFunction, ",
-      paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
+      paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'', module, '\'))'), ")
 
 makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
-      paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'',module,'\'))'),")
+      paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'', module, '\'))'), ")
 
 ", file = otherStuffFn)
 
@@ -276,7 +276,7 @@ makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
   if (length(d$Imports))
     cat(c("Imports:", paste("   ", d$Imports, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
 
-  Suggests = c('knitr', 'rmarkdown')
+  Suggests <- c('knitr', 'rmarkdown')
   cat(c("Suggests:", paste("   ", Suggests, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
 
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
