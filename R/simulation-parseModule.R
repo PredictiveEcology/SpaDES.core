@@ -406,7 +406,7 @@ setMethod(
         deps <- sim@depends@dependencies[[i]]@parameters
         sim@params[[mBase]] <- list()
         if (NROW(deps) > 0) {
-          for (x in 1:NROW(deps)) {
+          for (x in seq_len(NROW(deps))) {
             sim@params[[mBase]][[deps$paramName[x]]] <- deps$default[[x]]
           }
         }

@@ -1667,7 +1667,7 @@ setReplaceMethod(
     #  cache, input, module, output
     if (length(na.omit(wh)) < length(value)) {
       whichNamed <- which(!is.na(wh))
-      whichUnnamed <- (1:length(sim@paths))
+      whichUnnamed <- (seq_along(sim@paths))
       if (length(whichNamed) > 0) whichUnnamed <- whichUnnamed[-whichNamed]
       sim@paths[whichUnnamed][seq_len(sum(whValueUnnamed))] <- value[whValueUnnamed]
     }
@@ -2583,7 +2583,7 @@ setReplaceMethod(
      }
 
      if (NROW(value)) {
-       sim@events <- lapply(seq_along(1:NROW(value)), function(x) as.list(value[x,]))
+       sim@events <- lapply(seq_len(NROW(value)), function(x) as.list(value[x,]))
      } else {
        sim@events <- list()
      }
@@ -2799,7 +2799,7 @@ setReplaceMethod(
     }
     sim@completed <- new.env(parent = emptyenv())
     if (NROW(value)) {
-      integerVals <- seq(NROW(value))
+      integerVals <- seq_len(NROW(value))
       outList <- lapply(integerVals,
                       function(x) as.list(value[x, ]))
       names(outList) <- as.character(integerVals)

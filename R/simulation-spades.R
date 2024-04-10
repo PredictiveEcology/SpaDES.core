@@ -1789,7 +1789,7 @@ resolveFutureNow <- function(sim, cause = "") {
     warning("Seeing this message means that the runScheduleEventsOnly did not find all events; ",
             "please use `switch` and `scheduleEvent` inside the doEvent.", currentModule(tmpSim),
             " function")
-    newEvents <- lapply(seq(NROW(newEvents)), function(x) as.list(newEvents[x]))
+    newEvents <- lapply(seq_len(NROW(newEvents)), function(x) as.list(newEvents[x]))
     slot(sim, "events", check = FALSE) <- append(sim@events, newEvents)
     ord <- order(unlist(lapply(sim@events, function(x) x$eventTime)),
                  unlist(lapply(sim@events, function(x) x$eventPriority)))
@@ -1918,7 +1918,7 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else isTRUE(x), FUN.VALUE = logical(1))))
     debug <- append(list(1L), debug)
   for (i in seq_along(debug)) {
-    if (isTRUE(debug[[i]]) | identical(debug[[i]], "current") | identical(debug[[i]], "step")) {
+    if (isTRUE(debug[[i]]) || identical(debug[[i]], "current") || identical(debug[[i]], "step")) {
       if (length(cur) > 0) {
         if (debug[[i]] == "step") {
           if (interactive())

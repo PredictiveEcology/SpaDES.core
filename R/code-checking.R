@@ -162,7 +162,7 @@ cantCodeCheckMessage <- ": line could not be checked "
         } else {
           out <- character()
         }
-      } else if (is.name(x[[1]]) &
+      } else if (is.name(x[[1]]) &&
                  (any(grepl(x[[1]], pattern = paste(mustAssignToSim, collapse = "|"))))) {
         out <- as.character(x[[1]])
         x <- "" # clear x so it doesn't go any further in these cases
@@ -184,7 +184,7 @@ cantCodeCheckMessage <- ": line could not be checked "
             assigner <- TRUE # accessor on LHS like P(sim$a) <- "hi"
             }
           } else {
-            if (identical(as.character(x[[2]])[1], "[") |
+            if (identical(as.character(x[[2]])[1], "[") ||
                 identical(as.character(x[[2]])[1], "[[")) {
               assigner <- TRUE
             } else {
@@ -609,7 +609,7 @@ cantCodeCheckMessage <- ": line could not be checked "
     if (type == "assign") {
       if (is.name(x)) {
         out <- character()
-      } else if (identical(as.character(x)[1], "[") |
+      } else if (identical(as.character(x)[1], "[") ||
                  identical(as.character(x)[1], "[[")) {
         out <- character()
       } else {
@@ -658,7 +658,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 
     # Make sure they are inside the correct function
     linesWithFail <- lapply(linesWithFail, function(lwf) {
-      whInner <- any((pd[outerWh,"line1"] < lwf) & (pd[outerWh,"line2"] > lwf) )
+      whInner <- any((pd[outerWh, "line1"] < lwf) & (pd[outerWh, "line2"] > lwf) )
       if (isTRUE(whInner)) lwf else numeric()
     })
     if (length(linesWithFail) == length(patt))

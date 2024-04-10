@@ -158,7 +158,7 @@ sim <- simInit(
 )
 
 ##############################
-#A fully described inputs object, including arguments:
+# A fully described inputs object, including arguments:
 files <- dir(getMapPath(tempdir()), full.names = TRUE)
 
 # arguments must be a list of lists. This may require I() to keep it as a list

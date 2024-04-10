@@ -169,14 +169,14 @@ setMethod(
         if (any(anyKnown %in% TRUE)) {
           userParams <- userParams[!anyKnown]
         }
-        collapsedSrc <- paste(readFile[[uM]], collapse = "");
+        collapsedSrc <- paste(readFile[[uM]], collapse = "")
         isInCode <- sapply(names(userParams), function(pp) grepl(pp, collapsedSrc, fixed = TRUE))
         if (any(!isInCode)) {
           allFound <- FALSE
-          lapply(names(userParams)[!isInCode], function(uP)
-            message(paste("Parameter", uP, "is not used in module", uM)))
+          lapply(names(userParams)[!isInCode], function(uP) {
+            message(paste("Parameter", uP, "is not used in module", uM))
+          })
         }
-
       }
 
       globalsFound <- unique(globalsFound)
@@ -206,7 +206,7 @@ setMethod(
 
         if (length(moduleParams) > 0) {
           if (length(globalParams) > 0) {
-            for (i in 1:length(moduleParams)) {
+            for (i in seq_along(moduleParams)) {
               mP <- moduleParams[i]
               if (mP %in% names(globalParams)) {
                 globalsFound <- append(globalsFound, mP)
@@ -229,7 +229,7 @@ setMethod(
           # which params does the user supply to simInit?
           userParams <- sort(unlist(names(params[[uM]])))
           if (length(userParams) > 0) {
-            for (i in 1:length(moduleParams)) {
+            for (i in seq_along(moduleParams)) {
               mP <- moduleParams[i]
               if (!(mP %in% userParams)) {
                 allFound <- FALSE
