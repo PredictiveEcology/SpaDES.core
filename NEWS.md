@@ -1,6 +1,7 @@
 # SpaDES.core 2.0.4
 
 * drop support for R 4.1 due to changes in dependency packages;
+* improve `saveSimList` documentation (#260);
 * `newModule` now correctly defaults to current working directory (#273);
 
 # SpaDES.core 2.0.3
