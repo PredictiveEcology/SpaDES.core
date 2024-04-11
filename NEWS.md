@@ -1,6 +1,7 @@
 # SpaDES.core 2.0.4
 
-* drop support for R 4.1 due to changes in dependency packages
+* drop support for R 4.1 due to changes in dependency packages;
+* `newModule` now correctly defaults to current working directory (#273);
 
 # SpaDES.core 2.0.3
 
