@@ -85,7 +85,7 @@ setMethod(
       data.frame(
         task = DT[moduleName == x]$eventType,
         status = ganttStatus(DT[moduleName == x]$eventType),
-        pos = paste0(x, 1:nrow(DT[moduleName == x])),
+        pos = paste0(x, seq_len(nrow(DT[moduleName == x]))),
         start = as.Date(
           DT[moduleName == x]$eventTime * ts, origin = startDate
         ),

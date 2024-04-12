@@ -951,7 +951,7 @@ setMethod(
     ma <- match(expectedOrder, listNames)
     li <- li[ma]
 
-    correctArgs <- (sapply(1:length(li), function(x) {
+    correctArgs <- (sapply(seq_along(li), function(x) {
       is(li[[x]], expectedClasses[x])
     }))
     if (!all(correctArgs)) {
@@ -977,7 +977,7 @@ setMethod(
     names(neic) <- neic
     namesInner <- lapply(neic, function(x) NULL)
     # browser(expr = exists("._simInit_2"))
-    correctArgsInner <- unlist(lapply(1:length(li), function(x) {
+    correctArgsInner <- unlist(lapply(seq_along(li), function(x) {
       # browser(expr = exists("._simInit_3"))
       if (isTRUE(is(li[[x]], "list")) &&
           isTRUE(all(expectedInnerClasses[[x]] != "ANY"))) {
@@ -986,7 +986,7 @@ setMethod(
             names(expectedInnerClasses[[x]])[match(names(li[[x]]),
                                         names(expectedInnerClasses[[x]]))]
           } else {
-            seq(length(li[[x]]))
+            seq_along(li[[x]])
           }
           NAItems <- is.na(items)
           if (any(NAItems)) { # delete unnamed list elements; they must be named
@@ -1012,7 +1012,7 @@ setMethod(
           }))
         } else {
           if (length(li[[x]]) > 0)
-            all(sapply(seq(length(li[[x]])), function(y) {
+            all(sapply(seq_along(li[[x]]), function(y) {
               is(li[[x]][[y]], expectedInnerClasses[[x]])
             }))
         }
@@ -1862,7 +1862,7 @@ warningSplitOnColon <- function(w) {
   mess <- strsplit(w$message, "\\): ")[[1]]
   len <- length(mess)
   mess[-len] <- paste0(mess[-len], "):")
-  mess <- Map(mes = mess, vec = rep("  ", length(mess)), tim = seq(length(mess)) - 1,
+  mess <- Map(mes = mess, vec = rep("  ", length(mess)), tim = seq_along(mess) - 1,
               function(mes, vec, tim) paste(paste(rep(vec, tim), collapse = ""), mes))
   lapply(mess, warning, call. = FALSE)
 }
