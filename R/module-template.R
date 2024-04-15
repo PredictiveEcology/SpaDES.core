@@ -169,7 +169,7 @@ setMethod(
   "newModule",
   signature = c(name = "character", path = "missing"),
   definition = function(name, ...) {
-    newModule(name = name, path = getOption("spades.modulePath"), ...)
+    newModule(name = name, path = , ...)
 })
 
 ################################################################################
@@ -670,7 +670,7 @@ setMethod(
 setMethod("copyModule",
           signature = c(from = "character", to = "character", path = "missing"),
           definition = function(from, to, ...) {
-            copyModule(from, to, path = getOption('spades.modulePath'), ...)
+            copyModule(from, to, path = getOption("spades.modulePath"), ...)
 })
 
 #' Create a zip archive of a module subdirectory

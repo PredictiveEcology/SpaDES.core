@@ -746,7 +746,7 @@ setMethod(
     if (any(is.na(outputDF[, "fun"]))) {
       fl <- outputDF$file
       exts <- fileExt(fl)
-      if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+      if (any(is.na(fl)) || any(!nzchar(exts, keepNA = TRUE))) {
         outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <-
           .fileExts$fun[rowInDotFileExts]
       }
@@ -759,7 +759,7 @@ setMethod(
     if (any(is.na(outputDF[, "package"]))) {
       fl <- outputDF$file
       exts <- fileExt(fl)
-      if (any(is.na(fl)) | any(!nzchar(exts, keepNA = TRUE))) {
+      if (any(is.na(fl)) || any(!nzchar(exts, keepNA = TRUE))) {
         outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[rowInDotFileExts]
       }
       if (any(is.na(outputDF[, "package"]))) {
@@ -782,10 +782,9 @@ checkKnownExts <- function(exts, knownFileExts) {
   extsAvail
 }
 
-
 addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
   if (length(templist) > 0) {
-    for (i in 1:length(templist)) {
+    for (i in seq_along(templist)) {
       returnDataframe <- data.frame(cbind(returnDataframe, I(list(templist[[i]])),
                                           stringsAsFactors = FALSE))
       nam <- names(templist)[i]
@@ -796,4 +795,3 @@ addNamedEntry <- function(returnDataframe, templist, objectName, fn) {
   }
   returnDataframe
 }
-

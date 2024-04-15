@@ -58,12 +58,12 @@
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
-#' Invoked for side effects of saving a `.qs` or `.rds` file,
-#' or a `.tar.gz` (non-Windows) or `.zip` (Windows).
+#' Invoked for side effects of saving both a `.qs` (or `.rds`) file,
+#' and a compressed archive (one of `.tar.gz` if using non-Windows OS or `.zip` on Windows).
 #'
 #' @aliases saveSim
 #' @export
-#' @importFrom fs is_absolute_path path_common
+#' @importFrom fs path_common
 #' @importFrom qs qsave
 #' @importFrom stats runif
 #' @importFrom reproducible makeRelative
@@ -245,49 +245,6 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE) {
   .Deprecated("saveSimList")
   saveSimList(sim, filename = zipfile)
-  # dots <- list(...)
-  # # if (is.null(dots$filename)) dots$filename <- paste0(rndstr(1, 6), ".qs")
-  # # tmpDir <- file.path(tempdir(), rndstr(1, 6))
-  # # tmpf <- file.path(tmpDir, basename(dots$filename))
-  # if (is.null(dots$filebackedDir)) dots$filebackedDir <- paste0("TransferFolder")
-  # if (is.null(dots$fileBackend)) dots$fileBackend <- 1
-  # # tmpRasters <- file.path(tmpDir, basename(dots$filebackedDir))
-  # fnOrig <- Filenames(sim)
-  # fnOrigSingle <- Filenames(sim, allowMultiple = FALSE)
-  #
-  # rasters <- getFromNamespace("isOrHasRaster", ns = "reproducible")(sim)
-  # rasterObjNames <- names(rasters)[unlist(lapply(rasters, function(r) any(unlist(r))))]
-  #
-  # sim@.xData$._rasterFilenames <- list(filenames = fnOrig, filenamesSingle = fnOrigSingle,
-  #                                      topLevelObjs = rasterObjNames)
-  # do.call(saveSimList, append(list(sim), dots))
-  #
-  # tmpf <- dots[["filename"]]
-  # fbd <- dots[["filebackedDir"]]
-  #
-  # outputFNs <- NULL
-  # if (isTRUE(outputs)) {
-  #   outputFNs <- outputs(sim)$file
-  # }
-  # inputFNs <- NULL
-  # if (isTRUE(inputs)) {
-  #   inputFNs <- inputs(sim)$file
-  # }
-  # # rasterFns <- Filenames(sim, allowMultiple = TRUE)
-  # # if (all(nchar(rasterFns) == 0))
-  # #   rasterFns <- NULL
-  #
-  # fbdFns <- if (!is.null(fbd)) {
-  #   dir(fbd, full.names = TRUE, recursive = TRUE)
-  # } else {
-  #   NULL
-  # }
-  # if (file.exists(zipfile)) unlink(zipfile)
-  # fns <- c(tmpf, # rasterFns,
-  #          fbdFns, outputFNs, inputFNs)
-  # checkPath(dirname(zipfile), create = TRUE)
-  #
-  # zip(zipfile = zipfile, files = unname(unlist(fns)))
 }
 
 #' Load a saved `simList` and ancillary files
@@ -365,12 +322,11 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
         pths <- paths(tmpsim)
       else
         pths <- list(projectPath = projectPath)
-      newFiles <- reproducible:::remapFilenames(tags, cachePath = NULL, paths = pths)
+      newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
       tmpsim[[nam]][] <- newFiles$newName[]
     }
   }
-
 
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 

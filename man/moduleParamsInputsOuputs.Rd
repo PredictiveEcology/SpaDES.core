@@ -50,7 +50,6 @@ knitr::kable(p)
 knitr::kable(i)
 knitr::kable(o)
 }
-
 }
 \seealso{
 \code{\link[=moduleMetadata]{moduleMetadata()}}

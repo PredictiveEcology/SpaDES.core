@@ -30,9 +30,9 @@ Create template testing structures for new modules
 }
 \seealso{
 Other module creation helpers: 
+\code{\link{newModule}()},
 \code{\link{newModuleCode}()},
-\code{\link{newModuleDocumentation}()},
-\code{\link{newModule}()}
+\code{\link{newModuleDocumentation}()}
 }
 \author{
 Eliot McIntire and Alex Chubaty

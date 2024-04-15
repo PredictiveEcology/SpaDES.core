@@ -14,8 +14,8 @@ Description: Provides the core framework for a discrete event system to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2023-11-09
-Version: 2.0.3
+Date: 2024-04-10
+Version: 2.0.4
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -28,7 +28,7 @@ Authors@R: c(
     person("His Majesty the King in Right of Canada, as represented by the Minister of Natural Resources Canada", role = "cph")
   )
 Depends:
-    R (>= 4.1),
+    R (>= 4.2),
     quickPlot (>= 1.0.2),
     reproducible (>= 2.0.9)
 Imports:
@@ -128,4 +128,4 @@ Collate:
     'suppliedElsewhere.R'
     'zzz.R'
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1

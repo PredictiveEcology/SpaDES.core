@@ -32,9 +32,9 @@ Create new module code file
 }
 \seealso{
 Other module creation helpers: 
+\code{\link{newModule}()},
 \code{\link{newModuleDocumentation}()},
-\code{\link{newModuleTests}()},
-\code{\link{newModule}()}
+\code{\link{newModuleTests}()}
 }
 \author{
 Eliot McIntire and Alex Chubaty
