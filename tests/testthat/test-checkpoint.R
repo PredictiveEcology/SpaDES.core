@@ -44,6 +44,7 @@ test_that("test checkpointing", {
 
 test_that("test checkpointing with disk-backed raster", {
   skip_on_cran()
+  skip_if_not_installed("archive")
   skip_if_not_installed("magrittr") ## using tee pipe (`%T>%`)
 
   testInit(c(sampleModReqdPkgs, "magrittr"), opts = list(spades.recoveryMode = FALSE))
