@@ -1,4 +1,4 @@
-# SpaDES.core (development version)
+# SpaDES.core 2.0.5
 
 * fix a failing test on R-devel and latest R-release (#275)
 
