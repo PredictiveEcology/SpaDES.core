@@ -20,8 +20,8 @@ This release fixes a problem with an occasionally failing test.
 * Windows                 (win-builder), R 4.4.0
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2024-04-24 r86483)
-* Ubuntu 20.04                  (local), R-devel (2024-04-24 r86483)
+* Ubuntu 20.04                 (GitHub), R-devel (2024-04-24 r86473)
+* Ubuntu 20.04                  (local), R-devel (2024-04-24 r86473)
 * Windows                      (GitHub), R-devel (2024-04-24 r86483 ucrt)
 * Windows                 (win-builder), R-devel (2024-04-24 r86483 ucrt)
 
