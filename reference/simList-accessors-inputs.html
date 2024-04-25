@@ -211,14 +211,14 @@ the module will get it here:</p>
 <span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpdVQ7Ty/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpdVQ7Ty/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpdVQ7Ty'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpdVQ7Ty/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpdVQ7Ty/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpQY1NJV/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpQY1NJV/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpQY1NJV'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpQY1NJV/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpQY1NJV/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02615476 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02568173 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">test</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="va">tmpdir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"inputs"</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/checkPath.html" class="external-link">checkPath</a></span><span class="op">(</span>create <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
@@ -227,23 +227,23 @@ the module will get it here:</p>
 <span class="r-in"><span><span class="fu">inputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">tmpFile</span><span class="op">)</span> <span class="co"># using only required column, "file"</span></span></span>
 <span class="r-in"><span><span class="fu">inputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># see that it is not yet loaded, but when it is scheduled to be loaded</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              file     fun package objectName loadTime loaded</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/RtmpdVQ7Ty/inputs/test.rds readRDS    base       test        0     NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/RtmpQY1NJV/inputs/test.rds readRDS    base       test        0     NA</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   arguments intervals</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        NA        NA</span>
 <span class="r-in"><span><span class="va">simOut</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.027 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.029 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.035 secs | 0 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:16 load  :<span style="color: #00BB00;">inputs</span> test read from /tmp/RtmpdVQ7Ty/inputs/test.rds using readRDS</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.027 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.029 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.03 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.032 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.034 secs | 0 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> test read from /tmp/RtmpQY1NJV/inputs/test.rds using readRDS</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 <span class="r-in"><span><span class="fu">inputs</span><span class="op">(</span><span class="va">simOut</span><span class="op">)</span> <span class="co"># confirm it was loaded</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>                              file     fun package objectName loadTime loaded</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/RtmpdVQ7Ty/inputs/test.rds readRDS    base       test        0   TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 /tmp/RtmpQY1NJV/inputs/test.rds readRDS    base       test        0   TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   arguments intervals</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1        NA        NA</span>
 <span class="r-in"><span><span class="va">simOut</span><span class="op">$</span><span class="va">test</span></span></span>
@@ -265,19 +265,19 @@ the module will get it here:</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpdVQ7Ty/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpdVQ7Ty/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpdVQ7Ty'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpdVQ7Ty/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpdVQ7Ty/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpQY1NJV/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpQY1NJV/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpQY1NJV'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpQY1NJV/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpQY1NJV/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit DEM read from /tmp/RtmpdVQ7Ty/maps/DEM.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit forestAge read from /tmp/RtmpdVQ7Ty/maps/forestAge.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit forestCover read from /tmp/RtmpdVQ7Ty/maps/forestCover.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit habitatQuality read from /tmp/RtmpdVQ7Ty/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit percentPine read from /tmp/RtmpdVQ7Ty/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.04957485 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit DEM read from /tmp/RtmpQY1NJV/maps/DEM.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit forestAge read from /tmp/RtmpQY1NJV/maps/forestAge.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit forestCover read from /tmp/RtmpQY1NJV/maps/forestCover.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit habitatQuality read from /tmp/RtmpQY1NJV/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit percentPine read from /tmp/RtmpQY1NJV/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.04806399 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">##############################</span></span></span>
 <span class="r-in"><span><span class="co"># A fully described inputs object, including arguments:</span></span></span>
@@ -296,20 +296,20 @@ the module will get it here:</p>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">inputs</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">filelist</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.051 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.053 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.055 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.056 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.058 secs | 0 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> Maps1 read from /tmp/RtmpdVQ7Ty/maps/DEM.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> Maps2 read from /tmp/RtmpdVQ7Ty/maps/forestAge.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> Maps3 read from /tmp/RtmpdVQ7Ty/maps/forestCover.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> Maps4 read from /tmp/RtmpdVQ7Ty/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> Maps5 read from /tmp/RtmpdVQ7Ty/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.076 secs | 10 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> Maps5 read from /tmp/RtmpdVQ7Ty/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span>    at time 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.049 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.051 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.053 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.055 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.057 secs | 0 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> Maps1 read from /tmp/RtmpQY1NJV/maps/DEM.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> Maps2 read from /tmp/RtmpQY1NJV/maps/forestAge.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> Maps3 read from /tmp/RtmpQY1NJV/maps/forestCover.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> Maps4 read from /tmp/RtmpQY1NJV/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> Maps5 read from /tmp/RtmpQY1NJV/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.075 secs | 10 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> Maps5 read from /tmp/RtmpQY1NJV/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span>    at time 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -329,22 +329,22 @@ the module will get it here:</p>
 <span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>inputs <span class="op">=</span> <span class="va">inputs</span>, times <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpdVQ7Ty/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpdVQ7Ty/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpdVQ7Ty'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpdVQ7Ty/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpdVQ7Ty/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpQY1NJV/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpQY1NJV/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpQY1NJV'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpQY1NJV/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpQY1NJV/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02971268 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.03023195 secs</span>
 <span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.035 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.036 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.038 secs | 1 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> a loaded into simList</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.035 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.037 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.039 secs | 1 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> a loaded into simList</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -353,9 +353,9 @@ the module will get it here:</p>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">3</span></span></span>
 <span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span> <span class="co"># different object (a2) loaded onto a$a</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.053 secs | 2 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 15:49:17 load  :<span style="color: #00BB00;">inputs</span> a loaded into simList</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.054 secs | 2 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 17:33:21 load  :<span style="color: #00BB00;">inputs</span> a loaded into simList</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
