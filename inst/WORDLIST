@@ -11,7 +11,6 @@ Etienne
 GDAL
 GLPK
 Gantt
-GitHub
 GoogleDrive
 IBMs
 Init
@@ -34,8 +33,6 @@ S3
 S4
 SELES
 SpaDES
-Versioned
-Workflow
 al
 amongst
 aren
@@ -47,7 +44,6 @@ bugfix
 bugfixes
 cacheId
 checkpointing
-checksum
 checksums
 choosealicense
 codecov
@@ -73,7 +69,6 @@ ing
 init
 julia
 lingua
-login
 macOS
 memoisable
 memoise
@@ -89,7 +84,6 @@ natively
 novo
 objSize
 oldrel
-optimizations
 overplot
 params
 pixelated
@@ -116,12 +110,7 @@ timezones
 unevaluated
 unparsed
 unsetting
-userTag
 v1
 v2
 vectorized
-versa
-versioning
-workflow
-workflows
 www

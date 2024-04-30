@@ -1,29 +1,29 @@
 ## Release information
 
-This release drops support for R version 4.1 due to changes in dependencies.
+This release fixes a problem with an occasionally failing test.
 
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 20.04                 (GitHub), R 4.2.3
-* Windows                      (GitHub), R 4.2.3
-* Windows                 (win-builder), R 4.2.3
-
-### Current R versions
-* macOS 12.6.3                 (GitHub), R 4.3.3
-* macOS 13.3.1            (mac-builder), R 4.3.3
-* macOS 14.4.1                  (local), R 4.3.3
-* Ubuntu 20.04                 (GitHub), R 4.3.3
-* Ubuntu 20.04                  (local), R 4.3.3
-* Windows                      (GitHub), R 4.3.3
-* Windows                       (local), R 4.3.3
+* Ubuntu 20.04                 (GitHub), R 4.2.3, 4.3.3
+* Windows                      (GitHub), R 4.2.3, 4.3.3
 * Windows                 (win-builder), R 4.3.3
 
+### Current R versions
+* macOS 12.6.3                 (GitHub), R 4.4.0
+* macOS 13.3.1            (mac-builder), R 4.4.0
+* macOS 14.4.1                  (local), R 4.4.0
+* Ubuntu 20.04                 (GitHub), R 4.4.0
+* Ubuntu 20.04                  (local), R 4.4.0
+* Windows                      (GitHub), R 4.4.0
+* Windows                       (local), R 4.4.0
+* Windows                 (win-builder), R 4.4.0
+
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2024-04-09 r86391)
-* Ubuntu 20.04                  (local), R-devel (2024-04-10 r86396)
-* Windows                      (GitHub), R-devel (2024-04-09 r86391 ucrt)
-* Windows                 (win-builder), R-devel (2024-04-09 r86391 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2024-04-23 r86473)
+* Ubuntu 20.04                  (local), R-devel (2024-04-24 r86484)
+* Windows                      (GitHub), R-devel (2024-04-24 r86483 ucrt)
+* Windows                 (win-builder), R-devel (2024-04-23 r86473 ucrt)
 
 ## R CMD check results
 

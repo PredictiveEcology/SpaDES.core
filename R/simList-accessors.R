@@ -2743,7 +2743,6 @@ setMethod(
   "completed",
   signature = c("simList", "character"),
   definition = function(sim, unit, times = TRUE) {
-
     obj <- as.list(sim@completed)
     obj <- rbindlist(obj, idcol = if (length(sim@completed)) "eventNumber" else NULL)
 

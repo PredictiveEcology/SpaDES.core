@@ -155,6 +155,8 @@ test_that("saving csv files does not work correctly", {
 })
 
 test_that("saveSimList does not work correctly", {
+  skip_if_not_installed("archive")
+
   testInit(sampleModReqdPkgs,
            tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
            opts = list(reproducible.verbose = 0))
@@ -269,6 +271,8 @@ test_that("saveSimList does not work correctly", {
 })
 
 test_that("saveSimList with file backed objs", {
+  skip_if_not_installed("archive")
+
   testInit(sampleModReqdPkgs,
            tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
   mapPath <- getMapPath(tmpdir)

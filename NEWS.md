@@ -1,17 +1,23 @@
+# SpaDES.core 2.0.5
+
+* fix a failing test on R-devel and latest R-release (#275)
+
 # SpaDES.core 2.0.4
 
-* drop support for R 4.1 due to changes in dependency packages
+* drop support for R 4.1 due to changes in dependency packages;
+* improve `saveSimList` documentation (#260);
+* `newModule` now correctly defaults to current working directory (#273);
 
 # SpaDES.core 2.0.3
 
 ## Enhancements
 * new accessor function `figurePath()` to get the directory of a module's output figures, which is now uses a separate subdirectory per module (i.e., `file.path(outputPath(sim), "figures", <moduleName>)`); `Plots()` defaults to using this path, and module developers are encouraged to update their module code to use `figurePath(sim)` where `Plots()` is not being used.
-* re-Caching of a simList no longer triggers on changes to `.useCache` parameter, when it doesn't pertain to the event or module in question.
+* re-Caching of a `simList` no longer triggers on changes to `.useCache` parameter, when it doesn't pertain to the event or module in question.
 * many historical modules used `bind_rows` from `dplyr` within `expectsInput` or `createsOutput`. Now, if a module uses `bind_rows` and doesn't have `dplyr` installed, `SpaDES.core` will intercept and use `SpaDES.core::bindrows`.
 * `saveSimList()` better handles relative paths and symbolic links (#263)
 * `saveSimList()` does an improved job at handling file-backed objects (previously, tests were passing because object was still there; now object is deleted, simList reloaded, and file-backed objects put back into place)
 * deal with upstream `reproducible` changes to `.wrap` 
-* deal with upstream `reproducible` changes to `Cache` messaging, specifically, remove cases where `function` was a userTag for an outer function call. Now these will display as `otherFunction`, so that individual functions can be more easily isolated.
+* deal with upstream `reproducible` changes to `Cache` messaging, specifically, remove cases where `function` was a `userTag` for an outer function call. Now these will display as `otherFunction`, so that individual functions can be more easily isolated.
 * overhaul of messaging during `simInit` and `spades` that allows for nested calls to `simInit` and/or `spades`
 * elapsed time during `simInit` is now reported
 * `elapsedTime` now displays the largest time unit, which may not be `secs`

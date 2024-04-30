@@ -63,7 +63,7 @@
 #'
 #' @aliases saveSim
 #' @export
-#' @importFrom fs is_absolute_path path_common
+#' @importFrom fs path_common
 #' @importFrom qs qsave
 #' @importFrom stats runif
 #' @importFrom reproducible makeRelative

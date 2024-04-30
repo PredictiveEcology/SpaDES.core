@@ -126,7 +126,7 @@ setMethod(
       authors = moduleDefaults[["authors"]],
       version = moduleDefaults[["version"]],
       spatialExtent = terra::ext(rep(0, 4)), ## match up with moduleDefaults
-      timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
+      timeframe = as.POSIXlt(c(NA, NA)),     ## match up with moduleDefaults
       timeunit = moduleDefaults[["timeunit"]],
       citation = moduleDefaults[["citation"]],
       documentation = moduleDefaults[["documentation"]],
