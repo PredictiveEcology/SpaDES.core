@@ -24,6 +24,8 @@ if (!isGeneric("Copy")) {
 #' @param queues Logical. Should the events queues (`events`, `current`, `completed`)
 #'               be deep copied via `data.table::copy()`
 #'
+#' @param modules Logical. Should list of modules be copied.
+#'
 #' @return a copy of `object`
 #'
 #' @details

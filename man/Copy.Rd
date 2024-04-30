@@ -15,6 +15,8 @@ should be copied. Default \code{TRUE}, which may be slow.}
 \item{queues}{Logical. Should the events queues (\code{events}, \code{current}, \code{completed})
 be deep copied via \code{data.table::copy()}}
 
+\item{modules}{Logical. Should list of modules be copied.}
+
 \item{...}{Only used for custom Methods}
 }
 \value{

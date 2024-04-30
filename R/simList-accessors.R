@@ -2798,14 +2798,13 @@ setReplaceMethod(
   function(sim, value) {
     if (!is(value, "data.table")) stop("Completed queue must be a data.table")
     if (!identical(names(value), .emptyEventListCols)) {
-      stop("Event queue must be a data.table with columns, ",
-        paste(.emptyEventListCols, collapse = ", "), ".")
+      stop("Event queue must be a data.table with columns: ",
+           paste(.emptyEventListCols, collapse = ", "), ".")
     }
     sim@completed <- new.env(parent = emptyenv())
     if (NROW(value)) {
       integerVals <- seq_len(NROW(value))
-      outList <- lapply(integerVals,
-                      function(x) as.list(value[x, ]))
+      outList <- lapply(integerVals, function(x) as.list(value[x, ]))
       names(outList) <- as.character(integerVals)
       list2env(outList, envir = sim@completed)
     }
@@ -3278,13 +3277,12 @@ setMethod("sessInfo",
             return(sim@.xData[["._sessionInfo"]])
 })
 
-
-
-#' Show which objects were first created in a simInit or spades call
+#' Show which objects were first created in a `simInit` or `spades` call
 #'
 #' This does an `rbindlist(sim$._objectsCreated)`. This object in the `sim` records the
 #' yellow message that reports on when objects are created.
-#' @param sim A `simList` object that data.table` objects
+#'
+#' @param sim A `simList` object that contains data.table `objects`
 #' @export
 #' @aliases newObjectsCreated
 #' @aliases objectsCreated
@@ -3293,14 +3291,13 @@ setMethod("sessInfo",
 #' at each moment of creation.
 newObjectsCreated <- function(sim) {
   if (!is.null(sim$._objectsCreated)) {
-    dt <- data.table::rbindlist(sim$._objectsCreated)
+    dt <- rbindlist(sim$._objectsCreated)
     setorderv(dt, "newObjects")
     print(format(as.data.frame(dt), justify = "left"))
   } else {
     dt <- data.table(newObjects = character(), .emptyEventListDT)
   }
   invisible(dt)
-
 }
 
 ################################################################################
@@ -3362,17 +3359,19 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   return(ret[])
 }
 
-.knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval", ".saveInitialTime", ".saveInterval", ".useCache")
+.knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval",
+                     ".saveInitialTime", ".saveInterval", ".useCache")
 
-
-#' @export
-#' @rdname objects
 #' @inheritParams inputObjects
+#'
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
 #' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
 #' will be determined either from a `simList` or from the module source code.
+#'
+#' @export
 #' @importFrom data.table set rbindlist setcolorder
+#' @rdname objects
 moduleObjects <- function(sim, module, path) {
   simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check
   if (missing(sim)) {
@@ -3386,7 +3385,6 @@ moduleObjects <- function(sim, module, path) {
     }
     sim <- simTry
   }
-
 
   if (!is.null(sim)) {
     path <- modulePath(sim)
@@ -3445,7 +3443,6 @@ findObjects <- function(objects, sim, module, path) {
   mo <- moduleObjects(sim, module, path)
   mo[grep(paste(objects, collapse = "|"), objectName), ]
 }
-
 
 #' Extract an intact `simList` but with subset of objects
 #'

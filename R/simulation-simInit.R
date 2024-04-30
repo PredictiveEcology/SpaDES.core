@@ -1666,37 +1666,16 @@ objectsCreatedPost <- function(sim, objsIsNullBefore) {
   sim
 }
 
-#' Show which objects were first created in a simInit or spades call
-#'
-#' This does an `rbindlist(sim$._objectsCreated)`. This object in the `sim` records the
-#' yellow message that reports on when objects are created.
-#' @param sim A `simList` object that data.table` objects
-#' @export
-#' @return The `data.table` of the objects created, alongside the `current(sim)`
-#' at each moment of creation.
-newObjectsCreated <- function(sim) {
-  if (!is.null(sim$._objectsCreated)) {
-    dt <- data.table::rbindlist(sim$._objectsCreated)
-    setorderv(dt, "newObjects")
-    print(format(as.data.frame(dt), justify = "left"))
-  } else {
-    dt <- data.table(newObjects = character(), .emptyEventListDT)
-  }
-  invisible(dt)
-
-}
-
 objsAreNull <- function(sim) {
   mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
                          ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
                     envir = envir(sim)), function(obj) is.null(obj))
 }
 
-
 adjustModuleNameSpacing <- function(modNames) {
   nchar <- getOption("spades.messagingNumCharsModule") - loggingMessagePrefixLength
   if (length(modNames)) {
-    for(i in seq(nchar, max(nchar(modNames)))) {
+    for (i in seq(nchar, max(nchar(modNames)))) {
       modName8Chars <- mapply(modName = unname(modNames),
                               MoreArgs = list(ncm = i),
                               function(modName, ncm)

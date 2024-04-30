@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  ".", ".attachedPkgsFilename",  ".First", ".oldWd",
+  ".", "._prevEventTimeFinish", ".attachedPkgsFilename", "et", ".First", ".oldWd",
   ".spadesCall", ".spades.restartRInterval", ".spades.simFilename"
 ))
 
@@ -101,7 +101,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   if (numMods > 0) {
-
     com <- completed(sim)
     etSecs <- sum(com[, et := difftime(clockTime, ._prevEventTimeFinish, units = "secs"), by = seq(NROW(com))]$et)
 

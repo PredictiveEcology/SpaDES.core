@@ -1,4 +1,4 @@
-utils::globalVariables(c(".", ".I", "whi"))
+utils::globalVariables(c(".", ".I", "tagKey", "whi"))
 
 ################################################################################
 #' Process a simulation event
@@ -1562,8 +1562,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
       })
       names(newList) <- curMod
       rmo$recoverableObjs <- append(newList, rmo$recoverableObjs)
-    }
-    )
+    })
 
     if (exists(curMod, envir = sim$.mods)) {
       if (!is.null(sim$.mods[[curMod]])) {
@@ -1683,7 +1682,7 @@ setupDebugger <- function(debug = getOption("spades.debug")) {
           if (!"writeToFile" %in% names(logging::getLogger()[["handlers"]])) {
             if (is.null(debug$file$file))
               debug$file$file <- "log.txt"
-            logging::addHandler(logging::writeToFile, file=debug$file$file, level = fileLevel)
+            logging::addHandler(logging::writeToFile, file = debug$file$file, level = fileLevel)
           }
           logging::setLevel(fileLevel, logging::getHandler(logging::writeToFile))
           cat(file = debug$file$file, "##################################\n",
@@ -1845,17 +1844,25 @@ getFutureNeeds <- function(deps, curModName) {
   futureListLabel <- paste(unlist(cur), collapse = "_")
   sim$.simFuture[[futureListLabel]] <-
     list(sim = future::future(
-      getFromNamespace(".runForFutureWrapper", "SpaDES.core")(sim, cacheIt = cacheIt,
-                                                              debug = debug, moduleCall = moduleCall,
-                                                              fnEnv = fnEnv, cur = cur, notOlderThan = notOlderThan,
-                                                              showSimilar = showSimilar, .pkgEnv = .pkgEnv),
+      getFromNamespace(".runForFutureWrapper", "SpaDES.core")(sim,
+                                                              cacheIt = cacheIt,
+                                                              debug = debug,
+                                                              moduleCall = moduleCall,
+                                                              fnEnv = fnEnv,
+                                                              cur = cur,
+                                                              notOlderThan = notOlderThan,
+                                                              showSimilar = showSimilar,
+                                                              .pkgEnv = .pkgEnv),
       globals = globs,
       packages = c("SpaDES.core", pkgs),
       # envir = envir,
       seed = TRUE),
-      thisModOutputs = list(moduleName = cur[["moduleName"]],
-                            objects = futureNeeds$thisModOutputs,
-                            dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]))
+      thisModOutputs = list(
+        moduleName = cur[["moduleName"]],
+        objects = futureNeeds$thisModOutputs,
+        dontAllowModules = names(futureNeeds$dontAllowModules)[futureNeeds$dontAllowModules]
+      )
+    )
   sim
 }
 
@@ -1864,7 +1871,6 @@ getFutureNeeds <- function(deps, curModName) {
   sim <- .runEvent(sim, ...)
   .wrap(sim)
 }
-
 
 modNameInFuture <- function(simFuture) {
   gsub("^.+\\_(.+)\\_.+\\_.+", "\\1", names(simFuture))
@@ -2164,7 +2170,7 @@ moduleNameStripped <- function(modName, numCharsMax) {
     modName8Chars <-
       paste0(substr(gsub(paste0("(?<=\\S)[AEIOUaeiou]{",
                                 tooFewVowels,",",tooManyVowels,"}"), "",
-                         modName, perl=TRUE), 1, numCharsMax))
+                         modName, perl = TRUE), 1, numCharsMax))
     nchr <- nchar(modName8Chars)
     if (nchr < numCharsMax) {
       modName8Chars <- paste0(modName8Chars,
@@ -2185,11 +2191,11 @@ debugMessTRUE <- function(sim, events) {
   sim[[".spadesDebugWidth"]] <- pmax(widths, sim[[".spadesDebugWidth"]])
   evnts1[1L, ] <- sprintf(paste0("%-", sim[[".spadesDebugWidth"]],"s"), evnts1)
   evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
-  evnts1[1L, 1L] <- sprintf(paste0("%-", sim[[".spadesDebugWidth"]][1L],"s"), evnts1[1L, 1L])
+  evnts1[1L, 1L] <- sprintf(paste0("%-", sim[[".spadesDebugWidth"]][1L], "s"), evnts1[1L, 1L])
   if (.pkgEnv[[".spadesDebugFirst"]]) {
     evnts2 <- evnts1
-    evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",sim[[".spadesDebugWidth"]],"s"), names(evnts2)),
-                             sprintf(paste0("%-",sim[[".spadesDebugWidth"]],"s"), evnts2))
+    evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",sim[[".spadesDebugWidth"]], "s"), names(evnts2)),
+                             sprintf(paste0("%-",sim[[".spadesDebugWidth"]], "s"), evnts2))
 
     outMess <- paste(unname(evnts2[1, ]), collapse = ' ')
     outMess <- c(outMess, paste(unname(evnts2[2, ]), collapse = ' '))
@@ -2239,7 +2245,7 @@ paramsDontCacheOn <- c(".useCache", ".useParallel",
                        paste0(".", c("plots", "plotInterval", "plotInitialTime", "saveInitialTime", "saveInterval"))) # don't change Caching based on .useCache
                                                     # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
 
-
+#' @importFrom reproducible .cacheMessageObjectToRetrieve loadFromCache showCache
 allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
   # getFromNamespace(".messageIndentUpdate", ns = "reproducible")()
   .messageIndentUpdate()
@@ -2298,16 +2304,13 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
                                           cachePath = cachePath(sim),
                                           cacheId = sim[["._prevCache"]], verbose = verbose)
             messageCache("Skipped digest of simList because sequential Cache calls of events",
-                                    verbose = verbose)
+                         verbose = verbose)
             .cacheMessage(sim, functionName = moduleCall, fromMemoise = isMemoised, verbose = verbose)
             attr(sim, "tags") <- paste0("cacheId:", nextEvent)
-
           }
         }
-
       }
     }
-
   }
   sim
 }
@@ -2318,7 +2321,6 @@ allowSequentialCachingUpdateTags <- function(sim, cacheIt) {
     attr(sim, ".Cache") <- NULL
     sim[["._prevCache"]] <- NULL
     attr(sim, "runFnCallAsExpr") <- NULL
-
   }
 
   sim
@@ -2354,7 +2356,7 @@ allowSequentialCachingFinal <- function(sim) {
   sim
 }
 
-
+#' @importFrom reproducible CacheStorageDir
 clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"),
                                   key = paste0(sequentialCacheText, "Next")) {
   onesWithNextEvent <- character()
@@ -2368,7 +2370,6 @@ clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"
     }
   })
   return(onesWithNextEvent)
-
 }
 
 sequentialCacheText <- "SequentialCache_"

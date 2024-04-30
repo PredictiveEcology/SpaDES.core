@@ -3,12 +3,12 @@
 \name{newObjectsCreated}
 \alias{newObjectsCreated}
 \alias{objectsCreated}
-\title{Show which objects were first created in a simInit or spades call}
+\title{Show which objects were first created in a \code{simInit} or \code{spades} call}
 \usage{
 newObjectsCreated(sim)
 }
 \arguments{
-\item{sim}{A \code{simList} object that data.table` objects}
+\item{sim}{A \code{simList} object that contains data.table \code{objects}}
 }
 \value{
 The \code{data.table} of the objects created, alongside the \code{current(sim)}
