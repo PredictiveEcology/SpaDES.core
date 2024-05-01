@@ -15,6 +15,6 @@ The \code{data.table} of the objects created, alongside the \code{current(sim)}
 at each moment of creation.
 }
 \description{
-This does an \code{rbindlist(sim$._objectsCreated)}. This object in the \code{sim} records the
-yellow message that reports on when objects are created.
+This does an \code{rbindlist(sim$._objectsCreated)}.
+This object in the \code{sim} records the yellow message that reports on when objects are created.
 }

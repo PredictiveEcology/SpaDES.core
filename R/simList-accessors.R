@@ -2750,7 +2750,7 @@ setMethod(
       obj[, eventNumber := as.numeric(eventNumber)]
       setkeyv(obj, "eventNumber")
       if (!isTRUE(times)) {
-        set(obj, NULL, "._clockTime", NULL)
+        set(obj, NULL, grep("^[.]_", names(obj)), NULL)
       }
       if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
         # note the above line captures empty eventTime, whereas `is.na` does not
@@ -3279,11 +3279,13 @@ setMethod("sessInfo",
 
 #' Show which objects were first created in a `simInit` or `spades` call
 #'
-#' This does an `rbindlist(sim$._objectsCreated)`. This object in the `sim` records the
-#' yellow message that reports on when objects are created.
+#' This does an `rbindlist(sim$._objectsCreated)`.
+#' This object in the `sim` records the yellow message that reports on when objects are created.
 #'
 #' @param sim A `simList` object that contains data.table `objects`
+#'
 #' @export
+#' @importFrom data.table data.table rbindlist setorderv
 #' @aliases newObjectsCreated
 #' @aliases objectsCreated
 #' @rdname simList-accessors-objects

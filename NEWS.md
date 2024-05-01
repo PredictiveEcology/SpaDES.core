@@ -1,3 +1,7 @@
+# SpaDES.core (development version)
+
+* fix issue with event queue colnames in `completed<-` and `all.equal.simList` (#272)
+
 # SpaDES.core 2.0.5
 
 * fix a failing test on R-devel and latest R-release (#275)

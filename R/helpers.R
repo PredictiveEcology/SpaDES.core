@@ -51,14 +51,22 @@
 #' @keywords internal
 #' @name emptyEventList
 #' @rdname emptyEventList
-.emptyEventListDT <- data.table(eventTime = integer(0L), moduleName = character(0L),
-                                eventType = character(0L), eventPriority = numeric(0L))
+.emptyEventListDT <- data.table(
+  eventTime = integer(0L),
+  moduleName = character(0L),
+  eventType = character(0L),
+  eventPriority = numeric(0L)
+)
 
 #' @importFrom data.table data.table
 #' @keywords internal
 #' @rdname emptyEventList
-.singleEventListDT <- data.table(eventTime = integer(1L), moduleName = character(1L),
-                                 eventType = character(1L), eventPriority = numeric(1L))
+.singleEventListDT <- data.table(
+  eventTime = integer(1L),
+  moduleName = character(1L),
+  eventType = character(1L),
+  eventPriority = numeric(1L)
+)
 
 #' @keywords internal
 #' @rdname emptyEventList
