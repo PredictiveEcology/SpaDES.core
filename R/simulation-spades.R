@@ -2110,7 +2110,8 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'   out <- spades(sim)
 #' }
 #'
-defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir) {
+defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
+                        envir = parent.frame()) {
   code <- substitute(code)
   curMod <- currentModule(sim)
   if (is.null(moduleName))
@@ -2126,7 +2127,7 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir)
       if (exists(moduleName, sim$.mods, inherits = FALSE))
         useSimModsEnv <- TRUE
     }
-    envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
+    # envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
   }
   fn <- paste0("
     fn <- function(sim, eventTime, eventType, priority) {
@@ -2147,8 +2148,10 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL, envir)
                                                           digest = .robustDigest(parsedFn))
   }
 
-  assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
+  assign(eventFnName, eval(parsedFn, envir = new.env(parent = envir)),
          envir = envir)
+  # assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
+  #        envir = envir)
   theEvalEnvir <- environment(get(eventFnName, envir = envir))
   rm(list = ls(theEvalEnvir), envir = theEvalEnvir)
   return(invisible(sim))
