@@ -626,7 +626,8 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     #                                  silent = TRUE, error = function(x) FALSE))
     # if (isFALSE(isPack)) {
       if (!isAbsolutePath(fullModulePath)) {
-        fullModulePath <- file.path(modulePath(sim), fullModulePath)
+        fullModulePath <- file.path(modulePath(sim), fullModulePath) ## may be length > 1
+        fullModulePath <- fullModulePath[dir.exists(fullModulePath)]
       }
       isPack <- file.exists(file.path(fullModulePath, "DESCRIPTION"))
     #}
