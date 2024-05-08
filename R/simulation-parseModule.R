@@ -15,7 +15,7 @@ utils::globalVariables(".")
 setGeneric(".unparsed",
            function(modules) {
              standardGeneric(".unparsed")
-           })
+})
 
 #' @rdname unparsed
 setMethod(
@@ -26,7 +26,7 @@ setMethod(
       (attr(x, "parsed") == FALSE)
     }) %>% `==`(., TRUE) %>% which()
     return(ids)
-  })
+})
 
 #' @param filename The filename of the module to be parsed.
 #'

@@ -36,7 +36,7 @@ system.time({
 system.time({
   outSimCached <- spades(Copy(mySim), cache = TRUE)
 })
-all.equal(outSim, outSimCached) ## TODO: all.equal fails; see #272
+all.equal(outSim, outSimCached)
 
 ## ----module-level, echo=TRUE--------------------------------------------------
 # Module-level
