@@ -294,7 +294,8 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     newFns <- file.path(projectPath, filenameRel)
     linkOrCopy(filename[-1], newFns, verbose = verbose - 1)
   } else {
-    filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
+    # filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
+    filenameRel <- getRelative(filename, projectPath)
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
@@ -550,8 +551,8 @@ relativizePaths <- function(paths, projectPath = NULL) {
 
 #' @importFrom fs path_abs
 absolutizePaths <- function(paths, projectPath, tempdir = tempdir()) {
-  p <- unlist(paths)
-  p[corePaths] <- fs::path_abs(p[corePaths], projectPath)
-  p[tmpPaths] <- fs::path_abs(p[tmpPaths], tempdir)
-  normPath(p)
+  p <- paths
+  p[corePaths] <- sapply(paths[corePaths], fs::path_abs, start = projectPath)
+  p[tmpPaths] <- sapply(paths[tmpPaths], fs::path_abs, start = tempdir)
+  lapply(p, normPath)
 }

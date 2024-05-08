@@ -107,3 +107,20 @@ test_that("paths file does not work correctly", {
   terraPath(mySim) <- tmpdir
   expect_equal(terraPath(mySim), tmpdir)
 })
+
+test_that("absolutizePaths can handle multiple paths" {
+  test_paths <- list(
+    cachePath = "/mnt/scratch/achubaty/BC_HRV/cache",
+    inputPath = "mnt/projects/HRV/BC_HRV/inputs",
+    modulePath = c("/home/achubaty/GitHub/BC_HRV/modules",
+                   "/home/achubaty/GitHub/BC_HRV/modules/scfm/modules"),
+    outputPath = "/mnt/projects/HRV/BC_HRV/outputs/NRD_Quesnel_scfm_hrv_FRT_res125/rep01",
+    rasterPath = "/mnt/scratch/achubaty/BC_HRV/raster",
+    scratchPath = "/mnt/scratch/achubaty/BC_HRV",
+    terraPath = "/mnt/scratch/achubaty/BC_HRV/terra"
+  )
+
+  absolutizePaths(paths = test_paths,
+                  projectPath = "/home/achubaty/GitHub/BC_HRV",
+                  tempdir = "/mnt/scratch/achubaty/tmp/RtmpJ0cOm1")
+})
