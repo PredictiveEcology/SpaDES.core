@@ -30,4 +30,4 @@ remapFilenames <- getFromNamespace("remapFilenames", "reproducible")
 
 #' @importFrom reproducible paddedFloatToChar
 #' @export
-paddedFloatToChar <- reproducible::paddedFloatToChar
+reproducible::paddedFloatToChar
