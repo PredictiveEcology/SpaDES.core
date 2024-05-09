@@ -367,7 +367,6 @@ test_that("test .robustDigest for simLists", {
   expect_true(aa == 0) # seems to vary stochastically; either is OK
   options(opts)
   expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
-
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
@@ -404,7 +403,6 @@ test_that("test .checkCacheRepo with function as reproducible.cachePath", {
   mySim <- simInit()
   aa <- .checkCacheRepo(list(mySim))
   expect_equal(normPath(aa), normPath(tmpCache))
-
 })
 
 test_that("test objSize", {
@@ -561,7 +559,6 @@ test_that("Cache sim objs via .Cache attr", {
 })
 
 test_that("test showSimilar", {
-
   testInit(sampleModReqdPkgs, verbose = TRUE)
   opts <- options("reproducible.cachePath" = tmpdir)
 
@@ -606,9 +603,7 @@ test_that("test showSimilar", {
   expect_false(any(grepl("Cache of.*differs", mess)))
 })
 
-
 test_that("test multipart cache file", {
-
   testInit(sampleModReqdPkgs, verbose = TRUE)
   opts <- options("reproducible.cachePath" = tmpdir)
 
@@ -635,7 +630,6 @@ test_that("test multipart cache file", {
   out1 <- Cache(spades(Copy(mySim)))
   end(out1) <- 2
   out2 <- Cache(spades(Copy(out1)))
-
 })
 
 test_that("multifile cache saving", {
