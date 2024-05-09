@@ -329,16 +329,16 @@ setMethod(
       #   } else if (!is.na(fromMemoise)) {
       #     message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
       #             "\n        ",
-      #             crayon::blue(.messageAddingToMemoised))
+      #             crayon::blue(.message$AddingToMemoised))
       #   } else {
       #     message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
       #   }
       # } else {
-      messageCache(.messageHangingIndent, "for ", cur$eventType, " event in ", cur$moduleName, " module", verbose = verbose)
+      messageCache(.message$HangingIndent, "for ", cur$eventType, " event in ", cur$moduleName, " module", verbose = verbose)
 
       # }
     } else {
-      messageCache(.messageHangingIndent, "from ", cur$moduleName, " module", verbose = verbose)
+      messageCache(.message$HangingIndent, "from ", cur$moduleName, " module", verbose = verbose)
     }
 })
 

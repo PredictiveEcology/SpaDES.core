@@ -1,32 +1,33 @@
-#' @importFrom reproducible paddedFloatToChar
-#' @export
-reproducible::paddedFloatToChar
+## non-exported imports from other packages -------------------------------------
 
-filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
-messageColoured <- utils::getFromNamespace("messageColoured", "reproducible")
-messageVerbose <- utils::getFromNamespace("messageVerbose", "Require")
+.message <- getFromNamespace(".message", "reproducible") ## envir for messages + message-funs
+.quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
 
+#' @importFrom reproducible messageColoured
+messageColoured <- reproducible::messageColoured
+
+#' @importFrom reproducible messageCache
+messageCache <- reproducible::messageCache
+
+## TODO: why aren't these properly exported from reproducible if intended for use?
+compareVersion2 <- getFromNamespace("compareVersion2", "Require")
+extractFromCache <- getFromNamespace("extractFromCache", "reproducible")
+extractInequality <- getFromNamespace("extractInequality", "Require")
+fileExt <- getFromNamespace("fileExt", "reproducible")
+filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
 getDrv <- getFromNamespace("getDrv", "reproducible")
 isWindows <- getFromNamespace("isWindows", "reproducible")
-makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 isRaster <- getFromNamespace("isRaster", "reproducible")
 isSpat <- getFromNamespace("isSpat", "reproducible")
 layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
-
-.quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
-
-fileExt <- getFromNamespace("fileExt", "reproducible")
-filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
-extractInequality <- getFromNamespace("extractInequality", "Require")
-compareVersion2 <- getFromNamespace("compareVersion2", "Require")
-
-remapFilenames <- getFromNamespace("remapFilenames", "reproducible")
-extractFromCache <- getFromNamespace("extractFromCache", "reproducible")
 loadFile <- getFromNamespace("loadFile", "reproducible")
+makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
+messageVerbose <- utils::getFromNamespace("messageVerbose", "Require")
+remapFilenames <- getFromNamespace("remapFilenames", "reproducible")
 
-.messageAddingToMemoised <- getFromNamespace(".messageAddingToMemoised", "reproducible")
-.messageCacheIndent <- getFromNamespace(".messageCacheIndent", "reproducible")
-.messageHangingIndent <- getFromNamespace(".messageHangingIndent", "reproducible")
-messageCache <- getFromNamespace("messageCache", "reproducible")
-.messageIndentUpdate <- getFromNamespace(".messageIndentUpdate", "reproducible")
+## re-exported functions --------------------------------------------------------
+
+#' @importFrom reproducible paddedFloatToChar
+#' @export
+paddedFloatToChar <- reproducible::paddedFloatToChar

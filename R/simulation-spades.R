@@ -2250,8 +2250,7 @@ paramsDontCacheOn <- c(".useCache", ".useParallel",
 
 #' @importFrom reproducible .cacheMessageObjectToRetrieve loadFromCache showCache
 allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
-  # getFromNamespace(".messageIndentUpdate", ns = "reproducible")()
-  .messageIndentUpdate()
+  .message$IndentUpdate()
   attr(sim, "runFnCallAsExpr") <- NULL
   if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
     sc <- showCache(cacheId = sim[["._prevCache"]], x = cachePath(sim), verbose = -1)
