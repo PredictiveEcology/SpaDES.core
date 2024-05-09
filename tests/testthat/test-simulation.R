@@ -87,7 +87,6 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(!all("fireSpread" %in% completed(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
-
   mySimEvent9 <- simInitAndSpades(times, params, modules, objects = list(), paths,
                         debug = FALSE, .plotInitialTime = NA, events = "init")
   expect_true(all("init" == completed(mySimEvent9)$eventType))
@@ -104,7 +103,6 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(time(simOut) == end(simOut)) # it is at 10, the end
   expect_true(!all("init" == completed(simOut)$eventType))
   expect_true(max(completed(simOut)$eventTime) == end(simOut)) # got to end time
-
 
   mySimEvent11 <- simInit(times = list(start = 2000, end = 2010), params, modules,
                           objects = list(), paths,
@@ -129,12 +127,9 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(any(grepl("not specified", mess)))
 
   expect_true(all(file.exists(outputs(mySimEvent12Out)$file[outputs(mySimEvent12Out)$saved])))
-
-
 })
 
 test_that("spades calls - diff't signatures", {
-
   testInit(sampleModReqdPkgs, verbose = TRUE)
 
   a <- simInit()

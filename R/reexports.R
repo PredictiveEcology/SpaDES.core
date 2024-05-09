@@ -9,7 +9,9 @@ messageColoured <- reproducible::messageColoured
 #' @importFrom reproducible messageCache
 messageCache <- reproducible::messageCache
 
-## TODO: why aren't these properly exported from reproducible if intended for use?
+## TODO: why aren't these properly exported if intended for use?
+## see <https://github.com/PredictiveEcology/Require/issues/105>
+## and <https://github.com/PredictiveEcology/reproducible/issues/389>
 compareVersion2 <- getFromNamespace("compareVersion2", "Require")
 extractFromCache <- getFromNamespace("extractFromCache", "reproducible")
 extractInequality <- getFromNamespace("extractInequality", "Require")
