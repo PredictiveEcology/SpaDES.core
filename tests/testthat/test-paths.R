@@ -108,7 +108,7 @@ test_that("paths file does not work correctly", {
   expect_equal(terraPath(mySim), tmpdir)
 })
 
-test_that("absolutizePaths can handle multiple paths" {
+test_that("absolutizePaths can handle multiple paths", {
   test_paths <- list(
     cachePath = "/mnt/scratch/achubaty/BC_HRV/cache",
     inputPath = "mnt/projects/HRV/BC_HRV/inputs",
@@ -120,7 +120,11 @@ test_that("absolutizePaths can handle multiple paths" {
     terraPath = "/mnt/scratch/achubaty/BC_HRV/terra"
   )
 
-  absolutizePaths(paths = test_paths,
-                  projectPath = "/home/achubaty/GitHub/BC_HRV",
-                  tempdir = "/mnt/scratch/achubaty/tmp/RtmpJ0cOm1")
+  expect_no_error({
+    out <- absolutizePaths(paths = test_paths,
+                           projectPath = "/home/achubaty/GitHub/BC_HRV",
+                           tempdir = "/mnt/scratch/achubaty/tmp/RtmpJ0cOm1")
+  })
+
+  expect_equivalent(sapply(out, length), c(1, 1, 2, 1, 1, 1, 1))
 })
