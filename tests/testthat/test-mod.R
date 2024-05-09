@@ -1,6 +1,6 @@
 test_that("local mod object", {
   testInit(smcc = FALSE, debug = FALSE, verbose = TRUE,
-                          opts = list("reproducible.useMemoise" = FALSE))
+           opts = list("reproducible.useMemoise" = FALSE))
   opts <- options(reproducible.cachePath = tmpCache)
   on.exit(options(opts), add = TRUE)
 
@@ -62,7 +62,7 @@ test_that("local mod object", {
   expect_true(out3$.mods$test2$.objects$y == "This module is test2")
 
   # Cached copy
-  expect_true(any(grepl("loaded cached", mess)))
+  expect_true(any(grepl("Loaded! Cached", mess)))
   expect_true(out4$.mods$test$.objects$a == 2) ## TODO: fails (gets NULL)
   expect_true(out4$.mods$test2$.objects$a == 1) ## TODO: fails (gets NULL)
   expect_true(out4$.mods$test2$.objects$b == 2) ## TODO: fails (gets NULL)
@@ -94,9 +94,11 @@ test_that("local mod object", {
   mySim7 <- Cache(spades, Copy(mySim6)) # should get cached
   expect_true(P(mySim7)$test2$testParB == 1953 + 800 * 2)
 
-  warns <- capture_warnings(mySim3 <- simInit(times = list(start = 0, end = 0),
-                    paths = list(modulePath = tmpdir), modules = c("test", "test2"),
-                    params = list(.globals = list(testParB = 321321))))
+  warns <- capture_warnings({
+    mySim3 <- simInit(times = list(start = 0, end = 0),
+                      paths = list(modulePath = tmpdir), modules = c("test", "test2"),
+                      params = list(.globals = list(testParB = 321321)))
+  })
   expect_true(grepl("P has changed", warns))
   # test different ways of setting parameters
   expect_true(identical(P(mySim7, module = "test2", "testParA"), 42))
