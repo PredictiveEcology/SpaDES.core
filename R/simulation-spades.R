@@ -2152,7 +2152,7 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
                                                                digest = .robustDigest(parsedFn))
   }
 
-  assign(eventFnName, eval(parsedFn, envir = new.env(parent = envir)),
+  assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
          envir = envir)
   # assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
   #        envir = envir)
