@@ -2129,7 +2129,7 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
     }
     # envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
   }
-    }
+
 
 
   eventFnName <-  makeEventFn(moduleName, eventName)
@@ -2149,7 +2149,7 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
       sim@.xData[[eventFnElementEnvir()]] <- new.env(parent = asNamespace("SpaDES.core"))
     }
     sim@.xData[[eventFnElementEnvir()]][[eventFnName]] <- list(envir = envir,
-                                                          digest = .robustDigest(parsedFn))
+                                                               digest = .robustDigest(parsedFn))
   }
 
   assign(eventFnName, eval(parsedFn, envir = new.env(parent = envir)),
