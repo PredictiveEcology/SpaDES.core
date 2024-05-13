@@ -57,7 +57,9 @@
 #' @param path  Character string. Subdirectory in which to place the new module code file.
 #'              The default is the current working directory.
 #'
-#' @param ...   Additional arguments. Currently, only the following are supported:\cr\cr
+#' @param ...   Additional arguments. Currently, these can be either named
+#'    function definitions (which will be added to the `simList` or one or
+#'    more of the following::\cr\cr
 #' \describe{
 #'   \item{`children`}{Required when `type = "parent"`. A character vector
 #'   specifying the names of child modules.}
@@ -70,6 +72,9 @@
 #'   \item{`useGitHub`}{Logical. Is module development happening on GitHub?
 #'   Default `TRUE`.}
 #' }
+#' @param events A list of named expressions, each of which is surrounded by `{ }`.
+#'   A user can specify events here, instead of accepting the default `doEvent` function
+#'   that comes with the module template. See example.
 #'
 #' @return Nothing is returned. The new module file is created at
 #' \file{path/name.R}, as well as ancillary files for documentation, citation,

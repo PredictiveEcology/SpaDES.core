@@ -6,11 +6,11 @@
 \alias{newModule,character,missing-method}
 \title{Create new module from template}
 \usage{
-newModule(name, path, ...)
+newModule(name, path, ..., events)
 
-\S4method{newModule}{character,character}(name, path, ...)
+\S4method{newModule}{character,character}(name, path, ..., events)
 
-\S4method{newModule}{character,missing}(name, path, ...)
+\S4method{newModule}{character,missing}(name, path, ..., events)
 }
 \arguments{
 \item{name}{Character string specifying the name of the new module.}

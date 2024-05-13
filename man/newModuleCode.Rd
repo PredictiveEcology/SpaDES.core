@@ -5,9 +5,9 @@
 \alias{newModuleCode,character,character,logical,character,character-method}
 \title{Create new module code file}
 \usage{
-newModuleCode(name, path, open, type, children)
+newModuleCode(name, path, open, type, children, events, ...)
 
-\S4method{newModuleCode}{character,character,logical,character,character}(name, path, open, type, children)
+\S4method{newModuleCode}{character,character,logical,character,character}(name, path, open, type, children, events, ...)
 }
 \arguments{
 \item{name}{Character string specifying the name of the new module.}

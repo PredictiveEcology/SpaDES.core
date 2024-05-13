@@ -202,15 +202,17 @@ setMethod(
     obj[dependsSeparate] <- lapply(dependsSeparate, function(x) {
       .robustDigest(slot(object, x), algo = algo)})
     dependsFirst <- obj[["depends"]] <- list()
-    for (ii in c("inputObjects", "outputObjects", "parameters")) {
-      dependsFirst[[ii]] <-
-        .robustDigest(lapply(object@depends@dependencies,
-                             function(mo) {
-                               mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
-                             } ))
-    }
+    if (!isTRUE(all(sapply(object@depends@dependencies, is.null)))) {
+      for (ii in c("inputObjects", "outputObjects", "parameters")) {
+        dependsFirst[[ii]] <-
+          .robustDigest(lapply(object@depends@dependencies,
+                               function(mo) {
+                                 mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
+                               } ))
+      }
 
-    obj[["depends"]] <- invertList(dependsFirst)
+      obj[["depends"]] <- invertList(dependsFirst)
+    }
 
     otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
                            "spatialExtent", "timeframe", "timeunit", "version")
