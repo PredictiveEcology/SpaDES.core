@@ -2129,16 +2129,20 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
     }
     # envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
   }
-  fn <- paste0("
-    fn <- function(sim, eventTime, eventType, priority) {
-    ",
-         paste(format(substitute(code)), collapse = "\n")
-    ,"
-    return(sim)
     }
-  ")
+
 
   eventFnName <-  makeEventFn(moduleName, eventName)
+  fn <- defineEventFnMaker(substitute(code), eventFnName)
+  # fn <- paste0("
+  #   fn <- function(sim, eventTime, eventType, priority) {
+  #   ",
+  #        paste(format(substitute(code)), collapse = "\n")
+  #   ,"
+  #   return(sim)
+  #   }
+  # ")
+
   parsedFn <- parse(text = fn)
   if (!useSimModsEnv) {
     if (is.null(sim@.xData[[eventFnElementEnvir()]])) {
@@ -2487,4 +2491,21 @@ savedSimEnv <- function(envir = .GlobalEnv) {
     envir <- new.env(parent = emptyenv())
   }
   envir
+}
+
+
+defineEventFnMaker <- function(code, eventFnName) {
+  codeAsTxt <- format(code)
+  if (identical(codeAsTxt[1], "{"))
+    codeAsTxt <- codeAsTxt[-1]
+  if (identical(codeAsTxt[length(codeAsTxt)], "}"))
+    codeAsTxt <- codeAsTxt[-length(codeAsTxt)]
+  fn <- paste0("
+",eventFnName," <- function(sim, eventTime, eventType, priority) {
+",
+paste(codeAsTxt, collapse = "\n")
+,"
+  return(sim)
+}
+")
 }

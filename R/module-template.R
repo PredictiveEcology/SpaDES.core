@@ -98,7 +98,7 @@
 #'   unlink(tmpdir, recursive = TRUE)
 #' }
 #'
-setGeneric("newModule", function(name, path, ...) {
+setGeneric("newModule", function(name, path, ..., events) {
   standardGeneric("newModule")
 })
 
@@ -108,10 +108,25 @@ setGeneric("newModule", function(name, path, ...) {
 setMethod(
   "newModule",
   signature = c(name = "character", path = "character"),
-  definition = function(name, path, ...) {
-    args <- list(...)
+  definition = function(name, path, ..., events) {
+    events <- substitute(events)
+    argsFull <- substitute(list(...))
+    argsNames <- ...names()
 
-    stopifnot((names(args) %in% c("children", "open", "type", "unitTests", "useGitHub")))
+    simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
+    simpleArgsHere <- intersect(argsNames, simpleArgs)
+    args <- eval(as.list(argsFull[simpleArgsHere]))
+    args <- lapply(args, eval) # Things like T --> TRUE
+
+    argsOther <- as.list(argsFull[setdiff(argsNames, simpleArgsHere)])
+    if (any(sapply(argsOther, is.null))) {
+      a <- argsFull[-1][!nzchar(names(argsFull[-1]))]
+      if (any(grepl("<-", a[[1]][[1]])))
+        stop("Did you use `<-` operator instead of `=` for arguments?")
+    }
+    # args <- list(...)
+
+    stopifnot((names(args) %in% simpleArgs))
 
     children <- args$children
     open <- args$open
@@ -125,6 +140,8 @@ setMethod(
     if (is.null(type)) type <- "child"
     if (is.null(unitTests)) unitTests <- TRUE
     if (is.null(useGitHub)) useGitHub <- TRUE
+
+    args$open <- NULL # will be passed as do.call
 
     stopifnot(
       is(children, "character"),
@@ -150,8 +167,17 @@ setMethod(
     }
 
     ## module code file
-    newModuleCode(name = name, path = path, open = isTRUE(open) || endsWith(tolower(open), "r"),
-                  type = type, children = children)
+    do.call(newModuleCode, append(alist(
+      name = name, path = path, open = openIsRequested(open, suff = "r"),
+      type = type, children = children, events = events
+    ), append(args, argsOther)))
+
+    if (!openIsRequested(open, "r"))
+      message("Main module file is: ", normalizePath(file.path(path, name, paste0(name, ".R"))))
+
+    if (open %in% TRUE)
+    # newModuleCode(name = name, path = path, open = isTRUE(open) || endsWith(tolower(open), "r"),
+    #               type = type, children = children, events = events, ...)
 
     if (type == "child" && unitTests) {
       newModuleTests(name = name, path = path, open = !isFALSE(open), useGitHub = useGitHub)
@@ -159,9 +185,15 @@ setMethod(
 
     ### Make R Markdown file for module documentation
     newModuleDocumentation(name = name, path = path,
-                           open = isTRUE(open) || endsWith(tolower(open), "rmd"),
+                           open = openIsRequested(open, suff = "rmd"),
                            type = type, children = children)
-})
+    if (!openIsRequested(open, "rmd"))
+      message("Main documentation file is: ", normalizePath(file.path(path, name, paste0(name, ".Rmd"))))
+  })
+
+openIsRequested <- function(open, suff) {
+  isTRUE(open) || endsWith(tolower(open), suff)
+}
 
 #' @export
 #' @rdname newModule
@@ -194,7 +226,7 @@ setMethod(
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @rdname newModuleCode
-setGeneric("newModuleCode", function(name, path, open, type, children) {
+setGeneric("newModuleCode", function(name, path, open, type, children, events, ...) {
   standardGeneric("newModuleCode")
 })
 
@@ -209,8 +241,15 @@ setMethod(
   "newModuleCode",
   signature = c(name = "character", path = "character", open = "logical",
                 type = "character", children = "character"),
-  definition = function(name, path, open, type, children) {
+  definition = function(name, path, open, type, children, events, ...) {
     stopifnot(type %in% c("child", "parent"))
+
+    argsFull <- substitute(list(...))
+    argsNames <- ...names()
+    simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
+    simpleArgsHere <- intersect(argsNames, simpleArgs)
+    args <- eval(as.list(argsFull[simpleArgsHere]))
+
 
     path <- checkPath(path, create = TRUE)
     nestedPath <- file.path(path, name) %>% checkPath(create = TRUE)
@@ -256,13 +295,80 @@ setMethod(
       name = name,
       name_char = deparse(name)
     )
-    moduleEventsTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
-                                                "modulePartialEvents.R.template"))
+
+    templDE <- "doEvent"
+    templs <- c("Init", "Save", "plotFn", "Event1", "Event2", ".inputObjects", "ggplotFn")
+    moduleTmplTxt <- list()
+    for (templ in c(templDE, templs)) {
+      moduleTmplTxt[[templ]] <- readLines(file.path(.pkgEnv[["templatePath"]],
+                                                    paste0("module", templ, ".R.template")))
+    }
+
+    if (!missing(events)) {
+      evs <- names(events)[nzchar(names(events))]
+      ord <- c(evs, templs)
+      if (length(evs)) {
+        moduleTmplTxt[["doEvent"]] <- NULL
+        for (n in evs) {
+          #   defineEvent(code = events[[n]], eventName = n, moduleName = name)
+
+          eventFnName <-  makeEventFn(name, n)
+          moduleTmplTxt[[n]] <- defineEventFnMaker(events[[n]], eventFnName)
+        }
+      } else {
+        stop("events must be a list of named elements, where each name is the event name")
+      }
+
+      ord <- intersect(ord, names(moduleTmplTxt))
+      moduleTmplTxt <- moduleTmplTxt[ord]
+    }
+    # b <- lapply(events, substitute)
+
+    if (!is.null(...names())) {
+      other <- ...names()[nzchar(...names())]
+      ord <- c(templDE, evs, other, templs)
+      if (length(other)) {
+        for (n in other) {
+          moduleTmplTxt[[n]] <- paste0(n, " <- ", paste(format(argsFull[[n]]), collapse = "\n")) # defineEventFnMaker(events[[n]], eventFnName)
+        }
+      }
+
+      ord <- intersect(ord, names(moduleTmplTxt))
+      moduleTmplTxt <- moduleTmplTxt[ord]
+
+    }
+
+    #if (exists("moduleTmplTxt", inherits = FALSE)) {
+    moduleEventsTemplate <- unlist(moduleTmplTxt, use.names = FALSE)
+    #}
+    # else {
+    #   # This is "single template file approach"
+    #   moduleEventsTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
+    #                                               "modulePartialEvents.R.template"))
+    # }
+
+
     moduleEvents <- if (type == "child") {
       whisker.render(moduleEventsTemplate, modulePartialEvents)
     } else {
       "## this is a parent module and as such does not have any events."
     }
+
+    # if (length(argsNames)) {
+    #
+    #   pp <- parse(text = moduleEvents)
+    #   doEvent <- grep("doEvent\\.", pp)
+    #   df <- deparse(as.list(argsFull)[[argsNames]])
+    #   # fn <- defineEventFnMaker(df)
+    #   eventFnName <-  makeEventFn(name, argsNames)
+    #   fn <- defineEventFnMaker(df, eventFnName)
+    #
+    #   pp[[doEvent]] <- fn
+    #   eventFnName <-  makeEventFn(name, argsNames)
+    #
+    #
+    # }
+
 
     moduleData <- list(
       authors = deparse(moduleDefaults[["authors"]], width.cutoff = 500),
@@ -760,3 +866,5 @@ setMethod("zipModule",
             vers <- moduleVersion(name, path) %>% as.character()
             zipModule(name = name, path = path, version = vers, data = data, ...)
 })
+
+

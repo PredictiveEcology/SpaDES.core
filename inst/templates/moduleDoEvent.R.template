@@ -1,0 +1,74 @@
+doEvent.{{{name}}} = function(sim, eventTime, eventType) {
+  switch(
+    eventType,
+    init = {
+      ### check for more detailed object dependencies:
+      ### (use `checkObject` or similar)
+
+      # do stuff for this event
+      sim <- Init(sim)
+
+      # schedule future event(s)
+      sim <- scheduleEvent(sim, P(sim)$.plotInitialTime, {{{name_char}}}, "plot")
+      sim <- scheduleEvent(sim, P(sim)$.saveInitialTime, {{{name_char}}}, "save")
+    },
+    plot = {
+      # ! ----- EDIT BELOW ----- ! #
+      # do stuff for this event
+
+      plotFun(sim) # example of a plotting function
+      # schedule future event(s)
+
+      # e.g.,
+      #sim <- scheduleEvent(sim, time(sim) + P(sim)$.plotInterval, "{{{name}}}", "plot")
+
+      # ! ----- STOP EDITING ----- ! #
+    },
+    save = {
+      # ! ----- EDIT BELOW ----- ! #
+      # do stuff for this event
+
+      # e.g., call your custom functions/methods here
+      # you can define your own methods below this `doEvent` function
+
+      # schedule future event(s)
+
+      # e.g.,
+      # sim <- scheduleEvent(sim, time(sim) + P(sim)$.saveInterval, "{{{name}}}", "save")
+
+      # ! ----- STOP EDITING ----- ! #
+    },
+    event1 = {
+      # ! ----- EDIT BELOW ----- ! #
+      # do stuff for this event
+
+      # e.g., call your custom functions/methods here
+      # you can define your own methods below this `doEvent` function
+
+      # schedule future event(s)
+
+      # e.g.,
+      # sim <- scheduleEvent(sim, time(sim) + increment, "{{{name}}}", "templateEvent")
+
+      # ! ----- STOP EDITING ----- ! #
+    },
+    event2 = {
+      # ! ----- EDIT BELOW ----- ! #
+      # do stuff for this event
+
+      # e.g., call your custom functions/methods here
+      # you can define your own methods below this `doEvent` function
+
+      # schedule future event(s)
+
+      # e.g.,
+      # sim <- scheduleEvent(sim, time(sim) + increment, "{{{name}}}", "templateEvent")
+
+      # ! ----- STOP EDITING ----- ! #
+    },
+    warning(paste("Undefined event type: \'", current(sim)[1, "eventType", with = FALSE],
+                  "\' in module \'", current(sim)[1, "moduleName", with = FALSE], "\'", sep = ""))
+  )
+  return(invisible(sim))
+}
+

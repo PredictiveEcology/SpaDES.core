@@ -1,0 +1,11 @@
+### template for your event1
+Event1 <- function(sim) {
+  # ! ----- EDIT BELOW ----- ! #
+  # THE NEXT TWO LINES ARE FOR DUMMY UNIT TESTS; CHANGE OR DELETE THEM.
+  # sim$event1Test1 <- " this is test for event 1. " # for dummy unit test
+  # sim$event1Test2 <- 999 # for dummy unit test
+
+  # ! ----- STOP EDITING ----- ! #
+  return(invisible(sim))
+}
+
