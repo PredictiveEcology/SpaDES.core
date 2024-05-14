@@ -76,11 +76,11 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' \itemize{
 #'   \item `cachePath`: `getOption("reproducible.cachePath")`;
 #'
-#'   \item `inputPath`: `getOption("spades.modulePath")`;
+#'   \item `inputPath`: `getOption("spades.inputPath")`;
 #'
-#'   \item `modulePath`: `getOption("spades.inputPath")`;
+#'   \item `modulePath`: `getOption("spades.modulePath")`;
 #'
-#'   \item `inputPath`: `getOption("spades.outputPath")`.
+#'   \item `outputPath`: `getOption("spades.outputPath")`.
 #' }
 #'
 #' @section Parsing and Checking Code:
