@@ -37,19 +37,23 @@ test_that("test event-level cache & memory leaks", {
   set.seed(1123)
   # ._robustDigest_2 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<- ._Cache_11 <<- ._Cache_13 <<- 1
   #._addTagsToOutput_2 <<- 1
-  expect_true(!"loaded cached copy of init event in randomLandscapes module" %in%
-                capture_messages({
+
+  # expect_false("Loaded!" %in%
+  mess1 <- capture_messages({
                   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
-                }))
+                })
+  expect_false(LoadedMgsCheck(mess1, "init"))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
   fireMap1 <- sims$landscape$Fires
   #._doEvent_3 <<- ._prepareOutput_5 <<- 1
-  bbbb <<- 1
+  # bbbb <<- 1
   mess1 <- capture_messages({
-    sims <- spades(Copy(mySim), debug = FALSE)
+    sims <- spades(Copy(mySim), debug = TRUE)
   })
-  expect_true(any(grepl(pattern = "loaded cached copy of init event in randomLandscapes module", mess1)))
+  expect_true(LoadedMgsCheck(mess1, "init"))
+
+  # expect_true(sum(grepl(pattern = "Loaded!|event in.+module", mess1)) == 2)
   landscapeMaps2 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
   fireMap2 <- sims$landscape$Fires
 
@@ -185,11 +189,12 @@ test_that("test module-level cache", {
 
   set.seed(1123)
   pdf(tmpfile)
-  expect_true(!("loaded cached copy of init event in randomLandscapes module" %in%
-                  capture_messages({
-                    sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
-                  })))
+  mess11 <- capture_messages({
+    sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
+  })
   dev.off()
+  expect_false(all(grepl("Loaded.+randomLandscapes", mess11)))
+
 
   ## TODO: original test fails on R-devel (4.5; 2024-04-10 r86396) but not 4.4 alpha or earlier;
   ##       also failing for R 4.4.0 release in #275, but not for CRAN checks.
@@ -208,8 +213,8 @@ test_that("test module-level cache", {
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
   pdf(tmpfile1)
-  mess1 <- capture_messages({
-    sims <- spades(Copy(mySim), debug = FALSE)
+  mess12 <- capture_messages({
+    sims <- spades(Copy(mySim), debug = TRUE)
   })
   dev.off()
 
@@ -218,7 +223,8 @@ test_that("test module-level cache", {
 
   unlink(tmpfile1)
 
-  expect_true(any(grepl(pattern = "loaded cached copy of randomLandscapes module", mess1)))
+  expect_false(all(grepl("Loaded.+randomLandscapes", mess12)))
+  # expect_true(any(grepl(pattern = "loaded cached copy of randomLandscapes module", mess1)))
   landscapeMaps2 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
   fireMap2 <- sims$landscape$Fires
 
@@ -347,7 +353,9 @@ test_that("test .robustDigest for simLists", {
     aaMess <- capture_messages(spades(bbb, debug = FALSE))
   })
   options(opts)
-  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
+  mess31 <- capture_messages(spades(bbb, debug = TRUE))
+  expect_true(LoadedMgsCheck(mess31, "init"))
+  # expect_true(sum(grepl("Loaded!|for init event", mess31)) == 2)
 
   # make a change in Init function
   xxx <- readLines(fileName)
@@ -362,11 +370,14 @@ test_that("test .robustDigest for simLists", {
 
   # should NOT use Cached copy, so no message
   opts <- options(spades.saveSimOnExit = FALSE)
-  aaa <- capture_messages(spades(bbb, debug = FALSE))
-  aa <- sum(grepl("loaded cached", aaa))
-  expect_true(aa == 0) # seems to vary stochastically; either is OK
+  aaa <- capture_messages(spades(bbb, debug = TRUE))
+  expect_false(LoadedMgsCheck(aaa, "init"))
+  # aa <- sum(grepl("Loaded! Cached", aaa))
+  # expect_true(aa == 0) # seems to vary stochastically; either is OK
   options(opts)
-  expect_message(spades(bbb), regexp = "loaded cached copy of init", all = FALSE)
+  mess111 <- capture_messages(spades(bbb, debug = TRUE))
+  expect_true(LoadedMgsCheck(mess111, "init"))
+  # expect_true(sum(grepl("Loaded! Cached|for init event", mess111)) == 2)
 })
 
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
@@ -496,20 +507,24 @@ test_that("Cache sim objs via .Cache attr", {
   # expect_true(is.null(mySim$.mods$test$hi)) # is not in the
   # ._prepareOutput_5 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<-  1
   mess1 <- capture_messages({
-    mySim2 <- spades(Copy(mySim))
+    mySim2 <- spades(Copy(mySim), debug = TRUE)
   })
   # expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
   # Test mod
   expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
-  expect_true(any(grepl("loaded cached copy", mess1)))
+
+  expect_true(LoadedMgsCheck(mess1, "init"))
 
 
   # Capture failed Cache, when a function is changed, that is not the .inputObjects,
   #   Cache should return the .inputObjects cached copy, but not the cached copy of the
   #   functions
-  mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
+  withr::local_options("spades.debug" = TRUE)
+  mess120 <- capture_messages({
+    mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
                      list(test = list(.useCache = c(".inputObjects", "init"))))
+  })
 
   cat(append = TRUE, sep = "\n", fill = FALSE, file = fileNames[1],
   "newFun <- function(sim) return(invisible(sim))")
@@ -518,7 +533,9 @@ test_that("Cache sim objs via .Cache attr", {
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
                      list(test = list(.useCache = c(".inputObjects", "init"))))
   })
-  expect_true(sum(grepl("loaded cached copy of .inputObjects", mess10)) == 1)
+  expect_true(LoadedMgsCheck(mess10, ".inputObjects"))
+
+  # expect_true(sum(grepl("Loaded! Cached|for .inputObjects event", mess10)) == 2)
   expect_true(exists("newFun", envir = mySim$.mods$test))
 
   # Test 2 in the "capture failed Cache"...

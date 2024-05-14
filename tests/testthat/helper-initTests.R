@@ -252,3 +252,7 @@ runTestsWithTimings <- function(pkgPath = ".",
   data.table::setorderv(gg, c("skipOnCRAN", "elapsed"), order = c(1L, -1L))
   gg[]
 }
+
+LoadedMgsCheck <- function(msg, event) {
+  sum(grepl(paste0("Loaded! Cached|for ", event," event"), msg)) == 2
+}
