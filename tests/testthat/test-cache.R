@@ -4,7 +4,7 @@ test_that("test event-level cache & memory leaks", {
   testInit(sampleModReqdPkgs,
            opts = list(reproducible.useMemoise = FALSE,
                        spades.memoryUseInterval = NULL))
-  opts <- options("reproducible.cachePath" = tmpdir)
+  opts <- options(reproducible.cachePath = tmpdir)
 
   modPath <- getSampleModules(tmpdir)
 
@@ -93,8 +93,9 @@ test_that("test event-level cache & memory leaks", {
   # On covr::package_coverage -- this shows a HUGE difference ... about 130x. I don't know exactly why,
   #   but I feel like it is due to capturing of each call, which is unique to covr
   #   So this should be skipped on covr
-  if (!identical(Sys.getenv("USING_COVR"), "true"))
+  if (!identical(Sys.getenv("USING_COVR"), "true")) {
     expect_identical(length(grep("causing a memory leak", warnsFunction)), 0L)
+  }
 
   # Take a leaky function -- should trigger memory leak stuff
   fn <- function() { rnorm(1)}
@@ -160,9 +161,9 @@ test_that("test event-level cache & memory leaks", {
 })
 
 test_that("test module-level cache", {
-  testInit(sampleModReqdPkgs, opts = list("reproducible.useMemoise" = FALSE))
+  testInit(sampleModReqdPkgs, opts = list(reproducible.useMemoise = FALSE))
 
-  opts <- options("reproducible.cachePath" = tmpdir)
+  opts <- options(reproducible.cachePath = tmpdir)
   tmpfile <- tempfile(fileext = ".pdf")
   tmpfile1 <- tempfile(fileext = ".pdf")
   expect_true(file.create(tmpfile))
@@ -293,10 +294,10 @@ test_that("test .prepareOutput", {
 
 test_that("test .robustDigest for simLists", {
   testInit(c("terra", "ggplot2"), smcc = TRUE,
-                          opts = list(spades.recoveryMode = FALSE,
-                                      reproducible.verbose = 1,
-                                      "reproducible.useMemoise" = FALSE,
-                                      reproducible.showSimilar = TRUE))
+           opts = list(spades.recoveryMode = FALSE,
+                       reproducible.verbose = 1,
+                       reproducible.useMemoise = FALSE,
+                       reproducible.showSimilar = TRUE))
   # opts <- options("reproducible.cachePath" = tmpdir)
 
   modName <- "test"
@@ -644,16 +645,21 @@ test_that("test multipart cache file", {
     outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
   )
 
-  out1 <- Cache(spades(Copy(mySim)))
+  expect_no_error({
+    out1 <- Cache(spades(Copy(mySim)))
+  })
   end(out1) <- 2
-  out2 <- Cache(spades(Copy(out1)))
+  expect_no_error({
+    out2 <- Cache(spades(Copy(out1)))
+  })
 })
 
 test_that("multifile cache saving", {
   skip_on_cran()
-  testInit("terra",
-           tmpFileExt = c(".tif", ".tif"),
-           opts = list(reproducible.useMemoise = FALSE)
+  testInit(
+    "terra",
+    tmpFileExt = c(".tif", ".tif"),
+    opts = list(reproducible.useMemoise = FALSE)
   )
 
   nOT <- Sys.time()
