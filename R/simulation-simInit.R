@@ -786,6 +786,12 @@ setMethod(
 
       if (length(outputs)) {
         outputs(sim) <- outputs
+
+        ## ensure save events put back in the queue - they were removed in resolveDepsRunInitIfPoss
+        if (getOption("spades.allowInitDuringSimInit", TRUE)) {
+          sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
+                               "save", "init", .first() - 1)
+        }
       }
 
       ## check the parameters supplied by the user
@@ -1603,7 +1609,6 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
           sim@events <- sim@events[-which(coreModules)]
         sim@events <- append(sim@events, simAltOut@events)
       }
-
     }
   }
   # sim@modules <- sim@modules[match(loadOrder, sim@modules)]
