@@ -235,11 +235,11 @@ the defaults are as follows:
 \itemize{
 \item \code{cachePath}: \code{getOption("reproducible.cachePath")};
 
-\item \code{inputPath}: \code{getOption("spades.modulePath")};
+\item \code{inputPath}: \code{getOption("spades.inputPath")};
 
-\item \code{modulePath}: \code{getOption("spades.inputPath")};
+\item \code{modulePath}: \code{getOption("spades.modulePath")};
 
-\item \code{inputPath}: \code{getOption("spades.outputPath")}.
+\item \code{outputPath}: \code{getOption("spades.outputPath")}.
 }
 }
 \note{

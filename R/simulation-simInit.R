@@ -76,11 +76,11 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' \itemize{
 #'   \item `cachePath`: `getOption("reproducible.cachePath")`;
 #'
-#'   \item `inputPath`: `getOption("spades.modulePath")`;
+#'   \item `inputPath`: `getOption("spades.inputPath")`;
 #'
-#'   \item `modulePath`: `getOption("spades.inputPath")`;
+#'   \item `modulePath`: `getOption("spades.modulePath")`;
 #'
-#'   \item `inputPath`: `getOption("spades.outputPath")`.
+#'   \item `outputPath`: `getOption("spades.outputPath")`.
 #' }
 #'
 #' @section Parsing and Checking Code:
@@ -377,7 +377,8 @@ setMethod(
     sim[["._simNesting"]] <- ._simNesting
 
     opt <- options("encoding" = "UTF-8")
-    on.exit({ options(opt)
+    on.exit({
+      options(opt)
       sim <- elapsedTimeInSimInit(._startClockTime, sim)
       ._startClockTime <- Sys.time()
       dt <- difftime(._startClockTime, ._startClockTime - sim$._simInitElapsedTime)
@@ -498,7 +499,6 @@ setMethod(
     }
     # From here, capture messaging and prepend it
     withCallingHandlers({
-
       simDTthreads <- getOption("spades.DTthreads", 1L)
       message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
       origDTthreads <- setDTthreads(simDTthreads)
@@ -792,7 +792,6 @@ setMethod(
       checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
       sim <- elapsedTimeInSimInit(._startClockTime, sim)
       ._startClockTime <- Sys.time()
-
     },
     message = function(m) {
       message(loggingMessage(m$message, prefix = prefixSimInit))
@@ -1369,7 +1368,6 @@ simInitDefaults <- function() {
 }
 
 .fillInSimInit <- function(li, namesMatchCall) {
-
   fa <- formalArgs(simInit)
   fa <- fa[!fa %in% "..."]
   isMissing <- !fa %in% namesMatchCall[-1]
@@ -1516,12 +1514,10 @@ loadPkgs <- function(reqdPkgs) {
       Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
     }
   }
-
 }
 
 #' @importFrom quickPlot whereInStack
@@ -1587,17 +1583,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
       list2env(as.list(simAltOut@completed), sim@completed)
 
-      # don't double up on outputs
-      outpts <- outputs(simAltOut)
-      evnts <- events(simAltOut)
-      if (NROW(outpts)) {
-        ouptEvents <- which(evnts$moduleName %in% "save" & evnts$eventType != "init")
-        whTRUE <- evnts[ouptEvents, ]$eventTime %in% outpts$saveTime
-        if (any(whTRUE)) {
-          for(oo in rev(ouptEvents[whTRUE]))
-            simAltOut@events[[oo]] <- NULL
-        }
-      }
+      ## 2024-05-14: scheduled saves, via outputs, modules, etc. need to be kept in the queue
+      ## don't remove them, as the save init event was already run and won't be run again.
 
       if (length(simAltOut@events)) {
         # have to remove the .coreModules if they have already run
@@ -1607,7 +1594,6 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
           sim@events <- sim@events[-which(coreModules)]
         sim@events <- append(sim@events, simAltOut@events)
       }
-
     }
   }
   # sim@modules <- sim@modules[match(loadOrder, sim@modules)]

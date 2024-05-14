@@ -92,7 +92,7 @@
 ## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`
 * many examples that were protected behind `\dontrun` or `\donttest` were stale; these have been updated
-* `saveFiles` bugfix: multiple objects names can now be passed to `.saveOuputs` module parameters.
+* `saveFiles` bugfix: multiple objects names can now be passed to `.saveOutputs` module parameters.
 
 ## Deprecated, Defunct, and Removed Features
 * several previously-deprecated functions have been made defunct: `remoteFileSize()`, `updateList()`. These will be removed by mid-2023.
