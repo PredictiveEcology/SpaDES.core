@@ -73,7 +73,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           TRUE
         }
 
-
         if (!canProceed || future::resolved(sim$.simFuture[[1]][[1]])) {
           cause <- if (!canProceed) paste0(curForFuture$moduleName, " requires outputs from ", modInFuture[1])
           else if (curForFuture$moduleName == "save") paste0("Current event is 'save'; so resolving all")
@@ -82,17 +81,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           sim <- resolveFutureNow(sim, cause = cause)
           return(invisible(sim))
         }
-
       }
-
     }
-
   }
 
   if (length(sim@current) == 0) {
     # get next event from the queue and remove it from the queue
     if (length(sim@events)) {
-
       # Section for allowing events to be specified in `spades` call
       dots <- list(...)
       eventIndex <- if (!is.null(events))
@@ -107,7 +102,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         if (is.list(sim@events[-eventIndex]))
           slot(sim, "events", check = FALSE) <- sim@events[-eventIndex]
       }
-
     } else {
       # no more events, return empty event list
       slot(sim, "current", check = FALSE) <- list() # this is guaranteed to be a list
@@ -155,7 +149,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", curModuleName, sep = ".")
       # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
-      if (!is.null(fnEnv))
+      if (!is.null(fnEnv)) {
         if (!exists(moduleCall, envir = fnEnv)) {
           moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur$eventType)
           if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
@@ -165,9 +159,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
             if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
               moduleCall <- moduleCallSeparateEventFns
             }
-
           }
         }
+      }
 
       # if debug is TRUE
       if (is.null(attr(sim, "needDebug"))) {
@@ -1069,7 +1063,6 @@ setMethod(
         # sim$._totalElapsedTime <- difftime(Sys.time(), sim$._startClockTime, units = seconds)
         # subtractOff <- difftime(Sys.time(), tail(completed(sim)[["clockTime"]], 1), units = seconds)
         # sim$._elapsedTimeIncompleteFinaleEvent <- subtractOff
-
       }, add = TRUE)
 
       if (!is.null(.plots)) {
