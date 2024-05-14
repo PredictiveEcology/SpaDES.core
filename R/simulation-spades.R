@@ -1376,7 +1376,7 @@ setMethod(
       simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
       modParams <- modParamsFull[!paramsDontCacheOnActual]
 
-      classOptions <- list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+      classOptions <- list(events = cur[["eventType"]], current = FALSE, completed = FALSE, simtimes = FALSE,
                            paths = FALSE, outputs = FALSE,
                            params = modParams,
                            # .globals = globalParams,
