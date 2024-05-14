@@ -1733,7 +1733,6 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
 }
 
 resolveFutureNow <- function(sim, cause = "") {
-
   futureRunning <- sim@events[[1]]
   futureRunning[1:4] <- as.list(strsplit(names(sim$.simFuture)[1], split = "_")[[1]])
   futureRunning[["eventTime"]] <- as.numeric(futureRunning[["eventTime"]])
