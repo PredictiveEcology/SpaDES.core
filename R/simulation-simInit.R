@@ -786,12 +786,6 @@ setMethod(
 
       if (length(outputs)) {
         outputs(sim) <- outputs
-
-        ## ensure save events put back in the queue - they were removed in resolveDepsRunInitIfPoss
-        if (getOption("spades.allowInitDuringSimInit", TRUE)) {
-          sim <- scheduleEvent(sim, start(sim, unit = sim@simtimes[["timeunit"]]),
-                               "save", "init", .first() - 1)
-        }
       }
 
       ## check the parameters supplied by the user
@@ -1589,17 +1583,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
       list2env(as.list(simAltOut@completed), sim@completed)
 
-      # don't double up on outputs
-      outpts <- outputs(simAltOut)
-      evnts <- events(simAltOut)
-      if (NROW(outpts)) {
-        ouptEvents <- which(evnts$moduleName %in% "save" & evnts$eventType != "init")
-        whTRUE <- evnts[ouptEvents, ]$eventTime %in% outpts$saveTime
-        if (any(whTRUE)) {
-          for (oo in rev(ouptEvents[whTRUE]))
-            simAltOut@events[[oo]] <- NULL
-        }
-      }
+      ## 2024-05-14: scheduled saves, via outputs, modules, etc. need to be kept in the queue
+      ## don't remove them, as the save init event was already run and won't be run again.
 
       if (length(simAltOut@events)) {
         # have to remove the .coreModules if they have already run
