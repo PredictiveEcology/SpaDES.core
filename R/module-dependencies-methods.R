@@ -39,6 +39,10 @@ setMethod(
   definition = function(sim, plot) {
     deps <- sim@depends
     DT <- .depsEdgeList(deps, plot)
+    correctOrd <- unlist(sim@modules, use.names = FALSE)
+    DT[, fromOrd := factor(from, levels = correctOrd)]
+    DT[, toOrd := factor(to, levels = correctOrd)]
+    DT <- setorderv(DT, c("fromOrd", "toOrd"))
     return(DT)
 })
 
@@ -209,7 +213,7 @@ setMethod(
     } else {
       newEdgeList <- simEdgeList
     }
-    return(newEdgeList %>% data.table() %>% setorder("from", "to", "objName"))
+    return(newEdgeList %>% data.table() %>% setorder("fromOrd", "toOrd", "objName"))
 })
 
 ################################################################################
