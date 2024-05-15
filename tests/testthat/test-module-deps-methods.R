@@ -221,6 +221,7 @@ test_that("3 levels of parent and child modules load and show correctly", {
       skip("GLPK not available on Linux")
     }
   } else {
+    skip_if_not_installed("ggplot2")
     mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
     mg <- moduleGraph(mySim, FALSE) ## will be list if successful; NULL if not (no igraph GLPK support)
     if (is(mg, "list")) {
