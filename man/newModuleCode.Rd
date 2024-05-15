@@ -2,12 +2,12 @@
 % Please edit documentation in R/module-template.R
 \name{newModuleCode}
 \alias{newModuleCode}
-\alias{newModuleCode,character,character,logical,character,character-method}
+\alias{newModuleCode,character,character-method}
 \title{Create new module code file}
 \usage{
-newModuleCode(name, path, open, type, children, events, ...)
+newModuleCode(name, path, ..., events)
 
-\S4method{newModuleCode}{character,character,logical,character,character}(name, path, open, type, children, events, ...)
+\S4method{newModuleCode}{character,character}(name, path, ..., events)
 }
 \arguments{
 \item{name}{Character string specifying the name of the new module.}
@@ -15,17 +15,24 @@ newModuleCode(name, path, open, type, children, events, ...)
 \item{path}{Character string. Subdirectory in which to place the new module code file.
 The default is the current working directory.}
 
-\item{open}{Logical. Should the new module file be opened after creation?
-Default \code{TRUE} in an interactive session.}
-
-\item{type}{Character string specifying one of \code{"child"} (default),
-or \code{"parent"}.}
-
-\item{children}{Required when \code{type = "parent"}. A character vector
+\item{...}{Additional arguments. Currently, these can be either named
+function definitions (which will be added to the \code{simList}) or one or
+more of the following:\cr\cr
+\describe{
+\item{\code{children}}{Required when \code{type = "parent"}. A character vector
 specifying the names of child modules.}
+\item{\code{open}}{Logical. Should the new module file be opened after creation?
+Default \code{TRUE}.}
+\item{\code{type}}{Character string specifying one of \code{"child"} (default),
+or \code{"parent"}.}
+}}
+
+\item{events}{A list of named expressions, each of which is surrounded by \code{{ }}.
+A user can specify events here, instead of accepting the default \code{doEvent} function
+that comes with the module template. See example for \code{\link[=newModule]{newModule()}}.}
 }
 \value{
-Nothing is returned. Invoked for its side effect of creating new module code files.
+NULL (invisibly). Invoked for its side effect of creating new module code files.
 }
 \description{
 Create new module code file

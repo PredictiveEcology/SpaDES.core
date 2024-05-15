@@ -33,7 +33,7 @@ e.g., add \code{"-q"} using \code{flags="-q -r9X"}
 (the default flags are \code{"-r9X"}).}
 }
 \value{
-Nothing is returned. Invoked for its side effect of zipping module files.
+NULL (invisibly). Invoked for its side effect of zipping module files.
 }
 \description{
 The most common use of this would be from a "modules" directory, rather than

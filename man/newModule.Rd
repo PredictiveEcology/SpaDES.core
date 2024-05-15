@@ -18,7 +18,9 @@ newModule(name, path, ..., events)
 \item{path}{Character string. Subdirectory in which to place the new module code file.
 The default is the current working directory.}
 
-\item{...}{Additional arguments. Currently, only the following are supported:\cr\cr
+\item{...}{Additional arguments. Currently, these can be either named
+function definitions (which will be added to the \code{simList}) or one or
+more of the following:\cr\cr
 \describe{
 \item{\code{children}}{Required when \code{type = "parent"}. A character vector
 specifying the names of child modules.}
@@ -31,9 +33,13 @@ Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.}
 \item{\code{useGitHub}}{Logical. Is module development happening on GitHub?
 Default \code{TRUE}.}
 }}
+
+\item{events}{A list of named expressions, each of which is surrounded by \code{{ }}.
+A user can specify events here, instead of accepting the default \code{doEvent} function
+that comes with the module template. See example.}
 }
 \value{
-Nothing is returned. The new module file is created at
+NULL (invisibly). The new module file is created at
 \file{path/name.R}, as well as ancillary files for documentation, citation,
 \file{LICENSE}, \file{README}, and \file{tests} directory.
 }
@@ -45,11 +51,9 @@ The \code{newModuleDocumentation} will not generate the module file, but will
 create the other files.
 }
 \details{
-All files will be created within a subdirectory named \code{name} within the
-\code{path}:
+All files will be created within a subdirectory named \code{name} within the \code{path}:
 
-\preformatted{
-  <path>/
+\if{html}{\out{<div class="sourceCode">}}\preformatted{  <path>/
     |_ <name>/
     |_ R/               # contains additional module R scripts
     |_ data/            # directory for all included data
@@ -60,7 +64,7 @@ All files will be created within a subdirectory named \code{name} within the
     |_ README.md        # provide overview of key aspects
     |_ <name>.R         # module code file (incl. metadata)
     |_ <name>.Rmd       # documentation, usage info, etc.
-}
+}\if{html}{\out{</div>}}
 }
 \note{
 On Windows there is currently a bug in RStudio that prevents the editor

@@ -29,7 +29,7 @@ all modules will be opened within the base directory.}
 there are only module subdirectories.}
 }
 \value{
-Nothing is returned. All file are open via \code{file.edit}.
+NULL (invisibly). All file are open via \code{file.edit}.
 }
 \description{
 This is just a convenience wrapper for opening several modules at once, recursively.

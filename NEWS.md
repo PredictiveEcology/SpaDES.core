@@ -1,7 +1,7 @@
 # SpaDES.core (development version)
 
-* fix issue with event queue colnames in `completed<-` and `all.equal.simList` (#272)
-* fixed issue saving simLists when multiple paths were used (e.g., `length(modulePath) > 1`)
+* fix issue with event queue colnames in `completed<-` and `all.equal.simList` (#272);
+* fixed issue saving simLists when multiple paths were used (e.g., `length(modulePath) > 1`);
 
 ## Breaking changes
 

@@ -1,4 +1,8 @@
-################################################################################
+#' @keywords internal
+openIsRequested <- function(open, suff) {
+  isTRUE(open) || endsWith(tolower(open), suff)
+}
+
 #' Open a file for editing
 #'
 #' RStudio's `file.edit` behaves differently than `utils::file.edit`.
@@ -12,21 +16,17 @@
 #' @importFrom utils file.edit
 #' @keywords internal
 #' @rdname fileEdit
-#'
 .fileEdit <- function(file) {
   if (Sys.getenv("RSTUDIO") == "1") {
     file <- gsub(file, pattern = "\\./", replacement = "")
     file.show(file)
-    message("Using RStudio; may need to open manually e.g., with file.edit or file.show")#,
-#            paste0("file.edit('", file, "')")
-#    )
+    message("Using RStudio; may need to open manually e.g., with file.edit or file.show")
   } else {
     file.edit(file)
   }
   message(paste0("file.edit('", file, "')"))
 }
 
-################################################################################
 #' Create new module from template
 #'
 #' Generate a skeleton for a new SpaDES module, a template for a
@@ -35,10 +35,9 @@
 #' The `newModuleDocumentation` will not generate the module file, but will
 #' create the other files.
 #'
-#' All files will be created within a subdirectory named `name` within the
-#' `path`:
+#' All files will be created within a subdirectory named `name` within the `path`:
 #'
-#' \preformatted{
+#' ```
 #'   <path>/
 #'     |_ <name>/
 #'     |_ R/               # contains additional module R scripts
@@ -50,7 +49,7 @@
 #'     |_ README.md        # provide overview of key aspects
 #'     |_ <name>.R         # module code file (incl. metadata)
 #'     |_ <name>.Rmd       # documentation, usage info, etc.
-#' }
+#' ```
 #'
 #' @param name  Character string specifying the name of the new module.
 #'
@@ -58,8 +57,8 @@
 #'              The default is the current working directory.
 #'
 #' @param ...   Additional arguments. Currently, these can be either named
-#'    function definitions (which will be added to the `simList` or one or
-#'    more of the following::\cr\cr
+#'    function definitions (which will be added to the `simList`) or one or
+#'    more of the following:\cr\cr
 #' \describe{
 #'   \item{`children`}{Required when `type = "parent"`. A character vector
 #'   specifying the names of child modules.}
@@ -72,11 +71,12 @@
 #'   \item{`useGitHub`}{Logical. Is module development happening on GitHub?
 #'   Default `TRUE`.}
 #' }
+#'
 #' @param events A list of named expressions, each of which is surrounded by `{ }`.
 #'   A user can specify events here, instead of accepting the default `doEvent` function
 #'   that comes with the module template. See example.
 #'
-#' @return Nothing is returned. The new module file is created at
+#' @return NULL (invisibly). The new module file is created at
 #' \file{path/name.R}, as well as ancillary files for documentation, citation,
 #' \file{LICENSE}, \file{README}, and \file{tests} directory.
 #'
@@ -131,85 +131,75 @@ setMethod(
     }
     # args <- list(...)
 
-    stopifnot((names(args) %in% simpleArgs))
+    stopifnot(all(names(args) %in% simpleArgs))
 
-    children <- args$children
-    open <- args$open
-    type <- args$type
-    unitTests <- args$unitTests
-    useGitHub <- args$useGitHub
-
-    # define defaults for ... args
-    if (is.null(children)) children <- NA_character_
-    if (is.null(open)) open <- interactive()
-    if (is.null(type)) type <- "child"
-    if (is.null(unitTests)) unitTests <- TRUE
-    if (is.null(useGitHub)) useGitHub <- TRUE
-
-    args$open <- NULL # will be passed as do.call
+    ## define defaults for ... args
+    if (is.null(args$children)) args$children <- NA_character_
+    if (is.null(args$open)) {
+      args$open <- open.user <- interactive()
+    } else {
+      open.user <- args$open
+    }
+    if (is.null(args$type)) args$type <- "child"
+    if (is.null(args$unitTests)) args$unitTests <- TRUE
+    if (is.null(args$useGitHub)) args$useGitHub <- TRUE
 
     stopifnot(
-      is(children, "character"),
-      is(open, "logical") || any(endsWith(tolower(open), c("r", "rmd"))),
-      is(type, "character"),
-      type %in% c("child", "parent"),
-      is(unitTests, "logical"),
-      is(useGitHub, "logical")
+      is(args$children, "character"),
+      is(args$open, "logical") || any(endsWith(tolower(args$open), c("r", "rmd"))),
+      is(args$type, "character"),
+      args$type %in% c("child", "parent"),
+      is(args$unitTests, "logical"),
+      is(args$useGitHub, "logical")
     )
 
     path <- checkPath(path, create = TRUE)
-    nestedPath <- file.path(path, name) %>% checkPath(create = TRUE)
-    dataPath <- file.path(nestedPath, "data") %>% checkPath(create = TRUE)
-    RPath <- file.path(nestedPath, "R") %>% checkPath(create = TRUE)
+    nestedPath <- file.path(path, name) |> checkPath(create = TRUE)
+    dataPath <- file.path(nestedPath, "data") |> checkPath(create = TRUE)
+    RPath <- file.path(nestedPath, "R") |> checkPath(create = TRUE)
 
     ## empty data checksum file
     cat("", file = file.path(dataPath, "CHECKSUMS.txt"))
 
-    if (isTRUE(useGitHub)) {
+    if (isTRUE(args$useGitHub)) {
       ## basic .gitignore file for module data
       gitignoreTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "data-gitignore.template"))
       writeLines(whisker.render(gitignoreTemplate), file.path(dataPath, ".gitignore"))
     }
 
     ## module code file
-    do.call(newModuleCode, append(alist(
-      name = name, path = path, open = openIsRequested(open, suff = "r"),
-      type = type, children = children, events = events
-    ), append(args, argsOther)))
+    args$open <- openIsRequested(open.user, suff = "r")
+    do.call(newModuleCode, append(alist(name = name, path = path, events = events),
+                                  append(args, argsOther)))
 
-    if (!openIsRequested(open, "r"))
+    if (!args$open) {
       message("Main module file is: ", normalizePath(file.path(path, name, paste0(name, ".R"))))
+    }
 
-    if (open %in% TRUE)
-    # newModuleCode(name = name, path = path, open = isTRUE(open) || endsWith(tolower(open), "r"),
-    #               type = type, children = children, events = events, ...)
-
-    if (type == "child" && unitTests) {
-      newModuleTests(name = name, path = path, open = !isFALSE(open), useGitHub = useGitHub)
+    if (args$type == "child" && args$unitTests) {
+      newModuleTests(name = name, path = path, open = !isFALSE(args$open), useGitHub = args$useGitHub)
     }
 
     ### Make R Markdown file for module documentation
+    args$open <- openIsRequested(open.user, suff = "rmd")
     newModuleDocumentation(name = name, path = path,
-                           open = openIsRequested(open, suff = "rmd"),
-                           type = type, children = children)
-    if (!openIsRequested(open, "rmd"))
+                           open = args$open, type = args$type, children = args$children)
+    if (!args$open) {
       message("Main documentation file is: ", normalizePath(file.path(path, name, paste0(name, ".Rmd"))))
-  })
+    }
 
-openIsRequested <- function(open, suff) {
-  isTRUE(open) || endsWith(tolower(open), suff)
-}
+    return(invisible(NULL))
+})
 
 #' @export
 #' @rdname newModule
 setMethod(
   "newModule",
   signature = c(name = "character", path = "missing"),
-  definition = function(name, ...) {
-    newModule(name = name, path = , ...)
+  definition = function(name, ..., events = list()) {
+    newModule(name = name, path = ".", ..., events = events)
 })
 
-################################################################################
 #' Create new module code file
 #'
 #' @param name  Character string specifying the name of the new module.
@@ -217,21 +207,28 @@ setMethod(
 #' @param path  Character string. Subdirectory in which to place the new module code file.
 #'              The default is the current working directory.
 #'
-#' @param open  Logical. Should the new module file be opened after creation?
-#'              Default `TRUE` in an interactive session.
+#' @param ...   Additional arguments. Currently, these can be either named
+#'    function definitions (which will be added to the `simList`) or one or
+#'    more of the following:\cr\cr
+#' \describe{
+#'   \item{`children`}{Required when `type = "parent"`. A character vector
+#'   specifying the names of child modules.}
+#'   \item{`open`}{Logical. Should the new module file be opened after creation?
+#'   Default `TRUE`.}
+#'   \item{`type`}{Character string specifying one of `"child"` (default),
+#'   or `"parent"`.}
+#' }
 #'
-#' @param type  Character string specifying one of `"child"` (default),
-#'              or `"parent"`.
+#' @param events A list of named expressions, each of which is surrounded by `{ }`.
+#'   A user can specify events here, instead of accepting the default `doEvent` function
+#'   that comes with the module template. See example for [newModule()].
 #'
-#' @param children   Required when `type = "parent"`. A character vector
-#'                   specifying the names of child modules.
-#'
-#' @return Nothing is returned. Invoked for its side effect of creating new module code files.
+#' @return NULL (invisibly). Invoked for its side effect of creating new module code files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
 #' @rdname newModuleCode
-setGeneric("newModuleCode", function(name, path, open, type, children, events, ...) {
+setGeneric("newModuleCode", function(name, path, ..., events) {
   standardGeneric("newModuleCode")
 })
 
@@ -244,32 +241,41 @@ setGeneric("newModuleCode", function(name, path, open, type, children, events, .
 # igraph exports %>% from magrittr
 setMethod(
   "newModuleCode",
-  signature = c(name = "character", path = "character", open = "logical",
-                type = "character", children = "character"),
-  definition = function(name, path, open, type, children, events, ...) {
-    stopifnot(type %in% c("child", "parent"))
-
+  signature = c(name = "character", path = "character"),
+  definition = function(name, path, ..., events) {
     argsFull <- substitute(list(...))
     argsNames <- ...names()
-    simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
+    simpleArgs <- c("children", "open", "type")
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
 
+    stopifnot(all(names(args) %in% simpleArgs))
+
+    ## define defaults for ... args
+    if (is.null(args$children)) args$children <- NA_character_
+    if (is.null(args$open)) {
+      args$open <- open.user <- interactive()
+    } else {
+      open.user <- args$open
+    }
+    if (is.null(args$type)) args$type <- "child"
+
+    stopifnot(args$type %in% c("child", "parent"))
 
     path <- checkPath(path, create = TRUE)
-    nestedPath <- file.path(path, name) %>% checkPath(create = TRUE)
+    nestedPath <- file.path(path, name) |> checkPath(create = TRUE)
     filenameR <- file.path(nestedPath, paste0(name, ".R"))
 
-    children_char <- if (any(is.na(children)) || length(children) == 0L) {
+    children_char <- if (any(is.na(args$children)) || length(args$children) == 0L) {
       "character(0)"
     } else {
-      capture.output(dput(children))
+      capture.output(dput(args$children))
     }
 
     version <- list()
     version[[name]] <- moduleDefaults[["version"]]
-    if (type == "parent")
-      lapply(children, function(x) version[[x]] <<- "0.0.1")
+    if (args$type == "parent")
+      lapply(args$children, function(x) version[[x]] <<- "0.0.1")
 
     SpaDES.core.version <- as.character(utils::packageVersion("SpaDES.core"))
     DESCtxt <- readLines(system.file("DESCRIPTION", package = "SpaDES.core"))
@@ -289,7 +295,7 @@ setMethod(
     )
     modulePartialMetaTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
                                                      "modulePartialMeta.R.template"))
-    otherMetadata <- if (type == "child") {
+    otherMetadata <- if (args$type == "child") {
       whisker.render(modulePartialMetaTemplate, modulePartialMeta)
     } else {
       paste("## this is a parent module and as such does not have any",
@@ -326,34 +332,27 @@ setMethod(
 
       ord <- intersect(ord, names(moduleTmplTxt))
       moduleTmplTxt <- moduleTmplTxt[ord]
-    }
-    # b <- lapply(events, substitute)
 
-    if (!is.null(...names())) {
-      other <- ...names()[nzchar(...names())]
-      ord <- c(templDE, evs, other, templs)
-      if (length(other)) {
-        for (n in other) {
-          moduleTmplTxt[[n]] <- paste0(n, " <- ", paste(format(argsFull[[n]]), collapse = "\n")) # defineEventFnMaker(events[[n]], eventFnName)
+      # b <- lapply(events, substitute)
+
+      if (!is.null(...names())) {
+        other <- ...names()[nzchar(...names())]
+        ord <- c(templDE, evs, other, templs)
+        if (length(other)) {
+          for (n in other) {
+            ## defineEventFnMaker(events[[n]], eventFnName)
+            moduleTmplTxt[[n]] <- paste0(n, " <- ", paste(format(argsFull[[n]]), collapse = "\n"))
+          }
         }
+
+        ord <- intersect(ord, names(moduleTmplTxt))
+        moduleTmplTxt <- moduleTmplTxt[ord]
       }
-
-      ord <- intersect(ord, names(moduleTmplTxt))
-      moduleTmplTxt <- moduleTmplTxt[ord]
-
     }
 
-    #if (exists("moduleTmplTxt", inherits = FALSE)) {
     moduleEventsTemplate <- unlist(moduleTmplTxt, use.names = FALSE)
-    #}
-    # else {
-    #   # This is "single template file approach"
-    #   moduleEventsTemplate <- readLines(file.path(.pkgEnv[["templatePath"]],
-    #                                               "modulePartialEvents.R.template"))
-    # }
 
-
-    moduleEvents <- if (type == "child") {
+    moduleEvents <- if (args$type == "child") {
       whisker.render(moduleEventsTemplate, modulePartialEvents)
     } else {
       "## this is a parent module and as such does not have any events."
@@ -374,7 +373,6 @@ setMethod(
     #
     # }
 
-
     moduleData <- list(
       authors = deparse(moduleDefaults[["authors"]], width.cutoff = 500),
       children = children_char,
@@ -387,7 +385,7 @@ setMethod(
       RmdName = deparse(paste0(name, ".Rmd")),
       timeframe = deparse(moduleDefaults[["timeframe"]]),
       timeunit = deparse(moduleDefaults[["timeunit"]]),
-      type = type,
+      type = args$type,
       versions = deparse(version)
     )
     moduleTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.R.template"))
@@ -406,16 +404,18 @@ setMethod(
     message(crayon::green("* tell others how to cite your module by editing", crayon::yellow("citation.bib")))
     message(crayon::green("* choose a license for your module; see", crayon::yellow("LICENSE.md")))
 
-    if (isTRUE(open)) {
+    if (isTRUE(args$open)) {
       openModules(name, nestedPath)
     }
+
+    return(invisible(NULL))
 })
 
 #' Create new module documentation
 #'
 #' @inheritParams newModuleCode
 #'
-#' @return Nothing is returned. Invoked for its side effect of creating new module code files.
+#' @return NULL (invisibly). Invoked for its side effect of creating new module code files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @importFrom reproducible checkPath
@@ -423,7 +423,7 @@ setMethod(
 #' @family module creation helpers
 #' @rdname newModuleDocumentation
 #'
-setGeneric("newModuleDocumentation", function(name, path, open, type, children) {
+setGeneric("newModuleDocumentation", function(name, path, ...) {
   standardGeneric("newModuleDocumentation")
 })
 
@@ -431,9 +431,23 @@ setGeneric("newModuleDocumentation", function(name, path, open, type, children) 
 #' @rdname newModuleDocumentation
 setMethod(
   "newModuleDocumentation",
-  signature = c(name = "character", path = "character", open = "logical",
-                type = "character", children = "character"),
-  definition = function(name, path, open, type, children) {
+  signature = c(name = "character", path = "character"),
+  definition = function(name, path, ...) {
+    argsFull <- list(...)
+    argsNames <- ...names()
+    simpleArgs <- c("children", "open", "type")
+    simpleArgsHere <- intersect(argsNames, simpleArgs)
+    args <- eval(as.list(argsFull[simpleArgsHere]))
+
+    stopifnot(all(names(args) %in% simpleArgs))
+
+    ## define defaults for ... args
+    if (is.null(args$children)) args$children <- NA_character_
+    if (is.null(args$open)) args$open <- interactive()
+    if (is.null(args$type)) args$type <- "child"
+
+    stopifnot(args$type %in% c("child", "parent"))
+
     path <- checkPath(path, create = TRUE)
     nestedPath <- file.path(path, name) %>% checkPath(create = TRUE)
     filenameRmd <- file.path(nestedPath, paste0(name, ".Rmd"))
@@ -480,7 +494,7 @@ setMethod(
       writeLines(whisker.render(ReadmeTemplate, moduleRmd), filenameREADME)
     }
 
-    if (open) {
+    if (args$open) {
       openModules(basename(filenameRmd), nestedPath)
     }
 
@@ -490,25 +504,9 @@ setMethod(
 #' @export
 #' @rdname newModuleDocumentation
 setMethod("newModuleDocumentation",
-          signature = c(name = "character", path = "missing", open = "logical"),
-          definition = function(name, open) {
-            newModuleDocumentation(name = name, path = ".", open = open)
-})
-
-#' @export
-#' @rdname newModuleDocumentation
-setMethod("newModuleDocumentation",
-          signature = c(name = "character", path = "character", open = "missing"),
-          definition = function(name, path) {
-            newModuleDocumentation(name = name, path = path, open = interactive())
-})
-
-#' @export
-#' @rdname newModuleDocumentation
-setMethod("newModuleDocumentation",
-          signature = c(name = "character", path = "missing", open = "missing"),
-          definition = function(name) {
-            newModuleDocumentation(name = name, path = ".", open = interactive())
+          signature = c(name = "character", path = "missing"),
+          definition = function(name, ...) {
+            newModuleDocumentation(name = name, path = ".", ...)
 })
 
 #' Use GitHub actions for automated module checking
@@ -548,7 +546,7 @@ use_gha <- function(name, path) {
 #'                  If `TRUE` (default), creates suitable configuration files (e.g.,
 #'                  \file{.gitignore}) and configures basic GitHub actions for module code checking.
 #'
-#' @return Nothing is returned. Invoked for its side effect of creating new module test files.
+#' @return NULL (invisibly). Invoked for its side effect of creating new module test files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @importFrom reproducible checkPath
@@ -590,6 +588,8 @@ setMethod(
     if (isTRUE(useGitHub)) {
       use_gha(name, path)
     }
+
+    return(invisible(NULL))
 })
 
 #' Open all modules nested within a base directory
@@ -604,7 +604,7 @@ setMethod(
 #' @param path  Character string of length 1. The base directory within which
 #'              there are only module subdirectories.
 #'
-#' @return Nothing is returned. All file are open via `file.edit`.
+#' @return NULL (invisibly). All file are open via `file.edit`.
 #'
 #' @note On Windows there is currently a bug in RStudio that prevents the editor
 #' from opening when `file.edit` is called. `file.edit` does work if the
@@ -667,6 +667,8 @@ setMethod(
 
     lapply(file.path(basedir, Rfiles), .fileEdit)
     setwd(origDir)
+
+    return(invisible(NULL))
 })
 
 #' @export
@@ -798,7 +800,7 @@ setMethod("copyModule",
 #'                e.g., add `"-q"` using `flags="-q -r9X"`
 #'                (the default flags are `"-r9X"`).
 #'
-#' @return Nothing is returned. Invoked for its side effect of zipping module files.
+#' @return NULL (invisibly). Invoked for its side effect of zipping module files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
@@ -845,6 +847,8 @@ setMethod(
     }
     file.copy(zipFileName, to = paste0(name, "/", zipFileName), overwrite = TRUE)
     file.remove(zipFileName)
+
+    return(invisible(NULL))
 })
 
 #' @rdname zipModule
@@ -871,5 +875,3 @@ setMethod("zipModule",
             vers <- moduleVersion(name, path) %>% as.character()
             zipModule(name = name, path = path, version = vers, data = data, ...)
 })
-
-
