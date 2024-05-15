@@ -22,12 +22,12 @@ jobs:
       matrix:
         config:
           - {os: macOS-latest,   nosuggests: false, r: 'release'}
-          - {os: windows-latest, nosuggests: false, r: 'devel', http-user-agent: 'release'}}
+          - {os: windows-latest, nosuggests: false, r: 'devel', http-user-agent: 'release'}
           - {os: windows-latest, nosuggests: false, r: 'release'}
           - {os: windows-latest, nosuggests: true,  r: 'release'}
           - {os: windows-latest, nosuggests: false, r: 'oldrel-1'}
           - {os: windows-latest, nosuggests: false, r: 'oldrel-2'}
-          - {os: ubuntu-20.04,   nosuggests: false, r: 'devel', http-user-agent: 'release'}}
+          - {os: ubuntu-20.04,   nosuggests: false, r: 'devel', http-user-agent: 'release'}
           - {os: ubuntu-20.04,   nosuggests: false, r: 'release'}
           - {os: ubuntu-20.04,   nosuggests: true,  r: 'release'}
           - {os: ubuntu-20.04,   nosuggests: false, r: 'oldrel-1'}
