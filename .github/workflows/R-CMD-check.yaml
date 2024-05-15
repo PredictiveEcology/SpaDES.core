@@ -59,6 +59,7 @@ jobs:
             any::rcmdcheck
             fastshp=?ignore
             NLMR=?ignore
+            traversc/qs
           needs: check
 
       - name: Install additional package dependencies
