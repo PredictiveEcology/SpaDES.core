@@ -2,6 +2,7 @@
 
 * fix issue with event queue colnames in `completed<-` and `all.equal.simList` (#272);
 * fixed issue saving simLists when multiple paths were used (e.g., `length(modulePath) > 1`);
+* events can be defined directly in calls to `newModule()`;
 
 ## Breaking changes
 

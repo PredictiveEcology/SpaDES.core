@@ -148,12 +148,12 @@ test_that("local mod object", {
 })
 
 test_that("convertToPackage testing", {
-  skip_if_not_installed('pkgload')
+  skip_if_not_installed("pkgload")
   skip_on_cran()
 
   testInit(c("roxygen2", "ggplot2"), smcc = FALSE, debug = FALSE,
-                          opts = list("reproducible.useMemoise" = FALSE,
-                                      "spades.moduleDocument" = TRUE))
+           opts = list(reproducible.useMemoise = FALSE,
+                       spades.moduleDocument = TRUE))
 
   testName1 <- paste0("test.", .rndstr(len = 2))
   testName2 <- paste0("test2.", .rndstr(len = 1))
@@ -206,7 +206,7 @@ test_that("convertToPackage testing", {
         return(sim)
       }
 
-      Run2 <- function(a) {
+      Run <- function(a) {
         return(a + 2)
       }
       ', fill = TRUE, append = TRUE)
@@ -221,12 +221,10 @@ test_that("convertToPackage testing", {
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
     expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
+    ## list.files(file.path(tmpdir, tt, "R"))
+    expect_true(file.exists(file.path(tmpdir, tt, "R", "Init.R"))) ## TODO: file does't exist
+    expect_true(file.exists(file.path(tmpdir, tt, "R", "Run.R"))) ## TODO: file does't exist
   }
-
-  expect_true(file.exists(file.path(tmpdir, testName1, "R", "Init.R")))
-  expect_true(file.exists(file.path(tmpdir, testName2, "R", "Init.R")))
-  expect_true(file.exists(file.path(tmpdir, testName1, "R", "Run.R")))
-  expect_true(file.exists(file.path(tmpdir, testName2, "R", "Run2.R")))
 
   mySim9 <- simInit(times = list(start = 0, end = 1),
                     paths = list(modulePath = tmpdir), modules = c(testName1, testName2))
@@ -256,7 +254,7 @@ test_that("convertToPackage testing", {
     expect_true(is(working, "simList"))
     expect_true(working$aaaa == 2)
     expect_true(is(working$cccc, "try-error"))
-    bbb <- get("Run2", asNamespace(testName2))(2)
+    bbb <- get("Run", asNamespace(testName2))(2)
     fnTxt <- readLines(file.path(dirname(test2FilePath), "R", "Init.R"))
     expect_true(sum(grepl("Need to keep comments", fnTxt)) == 1)
     expect_true(bbb == 4)

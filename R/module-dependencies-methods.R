@@ -1,6 +1,6 @@
 utils::globalVariables(c(
-  ".", "from", "i.module", "i.objectClass", "module", "module.x", "module.y",
-  "name", "objectClass", "objectName", "other", "sourceURL", "to"
+  ".", "from", "fromOrd", "i.module", "i.objectClass", "module", "module.x", "module.y",
+  "name", "objectClass", "objectName", "other", "sourceURL", "to", "toOrd"
 ))
 
 # register the S3 `igraph` class for use with S4 methods.

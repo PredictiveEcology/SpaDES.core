@@ -197,13 +197,12 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
                              lineWithFn[[2]] <- lineWithFn[[2]][whAfterLine1[1]]
                          }
                        }
-
                      }
                      fn <- file.path(path, unlist(module), "R", paste0(unlist(module), "Fns.R"))
                      cat("#' @export", file = fn, sep = "\n", append = FALSE)
                      cat(rlaa[lineWithFn[[2]]:length(rlaa)],
                          file = fn, sep = "\n", append = TRUE)
-                     cat(rlaa[1:(lineWithFn[[2]]-1)], file = mainModuleFile,
+                     cat(rlaa[1:(lineWithFn[[2]] - 1)], file = mainModuleFile,
                          sep = "\n", append = FALSE)
                    })
 

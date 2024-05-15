@@ -97,8 +97,7 @@ test_that("simList object initializes correctly (1)", {
   # checkpoint
   expect_true(is.null(checkpointFile(mySim)))
   checkpointFile(mySim) <- file.path(outputPath(mySim), "checkpoint.RData")
-  expect_identical(checkpointFile(mySim),
-                   file.path(outputPath(mySim), "checkpoint.RData"))
+  expect_identical(checkpointFile(mySim), file.path(outputPath(mySim), "checkpoint.RData"))
 
   expect_true(is.na(checkpointInterval(mySim)))
   checkpointInterval(mySim) <- 10
