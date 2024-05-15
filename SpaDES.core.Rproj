@@ -22,5 +22,7 @@ PackageBuildArgs: --compact-vignettes=both
 PackageCheckArgs: --as-cran --run-dontrun --run-donttest
 PackageRoxygenize: rd,collate,namespace,vignette
 
+UseNativePipeOperator: Yes
+
 QuitChildProcessesOnExit: Yes
 DisableExecuteRprofile: Yes

@@ -119,9 +119,9 @@ setMethod("depsGraph",
             if (plot) {
               el <- depsEdgeList(sim, plot)
             } else {
-              el <- depsEdgeList(sim, plot) %>% .depsPruneEdges()
+              el <- depsEdgeList(sim, plot) |> .depsPruneEdges()
             }
-            m <- modules(sim) %>% unlist() # modules(sim) doesn't return hidden modules
+            m <- modules(sim) |> unlist() # modules(sim) doesn't return hidden modules
             v <- unique(c(el$to, el$from, m)) # so no need to remove them
             return(graph_from_data_frame(el, vertices = v, directed = TRUE))
 })
@@ -177,16 +177,16 @@ setMethod(
                                    to = colnames(M)[col])$vpath[[1]]
             pth1 <- data.frame(from = rownames(M)[pth1],
                                to = rownames(M)[shift(match(names(pth1), rownames(M)), -1)],
-                               stringsAsFactors = FALSE) %>%
-                    na.omit() %>% as.data.table()
+                               stringsAsFactors = FALSE) |>
+                    na.omit() |> as.data.table()
 
             pth2 <- shortest_paths(simGraph,
                                    from = colnames(M)[col],
                                    to = rownames(M)[row])$vpath[[1]]
             pth2 <- data.frame(from = rownames(M)[pth2],
                                to = rownames(M)[shift(match(names(pth2), rownames(M)), -1)],
-                               stringsAsFactors = FALSE) %>%
-                    na.omit() %>% as.data.table()
+                               stringsAsFactors = FALSE) |>
+                    na.omit() |> as.data.table()
 
             pth <- rbindlist(list(pth, rbindlist(list(pth1, pth2))))
           }
@@ -195,25 +195,24 @@ setMethod(
       pth <- unique(pth)
       pth <- simEdgeList[pth, on = c("from", "to")]
 
-      # what is not provided in modules, but needed
-      # missingObjects <- simEdgeList %>% filter(from != to) %>%
-      #   anti_join(pth, ., by = c("from", "to"))
+      ## what is not provided in modules, but needed
       missingObjects <- pth[!simEdgeList[from != to], on = c("from", "to")]
       if (nrow(missingObjects)) {
         warning("Problem resolving the module dependencies:\n",
                 paste(missingObjects), collapse = "\n")
       }
 
-      # what is provided in modules, and can be omitted from simEdgeList object
-      # newEdgeList <- simEdgeList %>%
-      #   filter(from != to) %>%
-      #   anti_join(pth, by = c("from", "to"))
+      ## what is provided in modules, and can be omitted from simEdgeList object
       newEdgeList <- simEdgeList[from != to][!pth, on = c("from", "to")]
 
     } else {
       newEdgeList <- simEdgeList
     }
-    return(newEdgeList %>% data.table() %>% setorder("fromOrd", "toOrd", "objName"))
+
+    newEdgeList <- newEdgeList |> setorder("fromOrd", "toOrd", "objName")
+    newEdgeList <- newEdgeList[, `:=`(fromOrd = as.character(fromOrd), toOrd = as.character(toOrd))]
+
+    return(newEdgeList)
 })
 
 ################################################################################

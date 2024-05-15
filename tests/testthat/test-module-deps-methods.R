@@ -142,20 +142,21 @@ test_that("depsEdgeList and depsGraph work", {
 
   # depsEdgeList
   el <- depsEdgeList(mySim)
-  el_from <- c("caribouMovement", "fireSpread", "fireSpread",
-               "fireSpread", "randomLandscapes", "randomLandscapes")
-  el_to <- c("caribouMovement", "caribouMovement", "fireSpread", "fireSpread",
-             "caribouMovement", "fireSpread")
-  el_objName <- c("caribou", "landscape", "landscape",
-                  "npixelsburned", "landscape", "landscape")
-  el_objClass <- c("SpatialPointsDataFrame", "RasterStack", "RasterStack",
-                   "numeric", "RasterStack", "RasterStack")
-
-  el_objClass <- c("SpatVector", "SpatRaster", "SpatRaster",
-                   "numeric", "SpatRaster", "SpatRaster")
+  el_from <- c("randomLandscapes", "randomLandscapes",
+               "fireSpread", "fireSpread", "fireSpread",
+               "caribouMovement")
+  el_to <- c("fireSpread", "caribouMovement",
+             "fireSpread", "fireSpread", "caribouMovement",
+             "caribouMovement")
+  el_objName <- c("landscape", "landscape", "landscape",
+                  "npixelsburned", "landscape",
+                  "caribou")
+  el_objClass <- c("SpatRaster", "SpatRaster",
+                   "SpatRaster", "numeric", "SpatRaster",
+                   "SpatVector")
 
   expect_is(el, "data.table")
-  expect_equal(names(el), c("from", "to", "objName", "objClass"))
+  expect_equal(names(el), c("from", "to", "objName", "objClass", "fromOrd", "toOrd"))
   expect_equal(el$from, el_from)
   expect_equal(el$to, el_to)
   expect_equal(el$objName, el_objName)
@@ -163,12 +164,16 @@ test_that("depsEdgeList and depsGraph work", {
 
   # .depsPruneEdges
   p <- .depsPruneEdges(el)
-  p_from <- c("fireSpread", "randomLandscapes", "randomLandscapes")
-  p_to <- c("caribouMovement", "caribouMovement", "fireSpread")
+  p_from <- c("randomLandscapes", "randomLandscapes", "fireSpread")
+  p_to <- c("fireSpread", "caribouMovement", "caribouMovement")
   p_objName <- c("landscape", "landscape", "landscape")
   p_objClass <- c("SpatRaster", "SpatRaster", "SpatRaster")
+  fromOrd <- p_from
+  toOrd <- p_to
   p_ <- data.table::data.table(
-    from = p_from, to = p_to, objName = p_objName, objClass = p_objClass
+    from = p_from, to = p_to,
+    objName = p_objName, objClass = p_objClass,
+    fromOrd = p_from, toOrd = p_to
   )
 
   expect_is(p, "data.table")
