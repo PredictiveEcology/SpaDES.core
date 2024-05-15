@@ -243,7 +243,6 @@ test_that("3 levels of parent and child modules load and show correctly", {
   }
 })
 
-
 test_that("Test cleaning up of desc in createsOutputs, expectsInputs, defineParameters", {
   testInit("terra", smcc = FALSE)
 
@@ -252,11 +251,12 @@ test_that("Test cleaning up of desc in createsOutputs, expectsInputs, definePara
                "Hi ", "Ho ", "its off
               to work we go", otherCol = "lala")
   aList[[2]] <- createsOutput("ROCList", "list", # sourceURL = NA,
-                    "Hi ", "Ho ", "its off
-              to work we go", otherCol = "lala")
-  aList[[3]] <- defineParameter("ROCList", "list", NA, NA, NA, # sourceURL = NA,
                               "Hi ", "Ho ", "its off
               to work we go", otherCol = "lala")
+  aList[[3]] <- defineParameter("ROCList", "list", NA, NA, NA, # sourceURL = NA,
+                                "Hi ", "Ho ", "its off
+              to work we go", otherCol = "lala")
+
   tests <- Map(a = aList,
                nam = c("expectsInput", "createsOutput", "defineParameter"),
                function(a, nam) {
@@ -272,6 +272,4 @@ test_that("Test cleaning up of desc in createsOutputs, expectsInputs, definePara
                  expect_false(grepl("  ", desc))
                  expect_false(grepl("\n", desc))
                })
-
-
 })
