@@ -115,7 +115,7 @@ setMethod(
   signature = c(name = "character", path = "character"),
   definition = function(name, path, ..., events) {
     events <- substitute(events)
-    argsFull <- substitute(list(...))
+    argsFull <- list(...)
     argsNames <- ...names()
 
     simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
@@ -243,7 +243,7 @@ setMethod(
   "newModuleCode",
   signature = c(name = "character", path = "character"),
   definition = function(name, path, ..., events) {
-    argsFull <- substitute(list(...))
+    argsFull <- list(...)
     argsNames <- ...names()
     simpleArgs <- c("children", "open", "type")
     simpleArgsHere <- intersect(argsNames, simpleArgs)
