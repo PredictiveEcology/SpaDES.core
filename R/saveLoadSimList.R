@@ -394,6 +394,7 @@ checkArchiveAlternative <- function(filename) {
 
 archiveExts <- "(tar$|tar\\.gz$|zip$|gz$)"
 
+#' @importFrom data.table as.data.table data.table rbindlist
 recoverDataTableFromQs <- function(sim) {
   objectName <- ls(sim)
   names(objectName) <- objectName
@@ -408,15 +409,16 @@ recoverDataTableFromQs <- function(sim) {
   objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
 
   objs <- objs[dt, on = "objectName"]
-  objs <- objs[objectClass == "data.table"]
+  objs <- objs[objectClass == "data.table" & objectClassInSim != "disk.frame"]
   objs <- objs[objectClass != objectClassInSim]
   if (NROW(objs)) {
     message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
     message("Converting all known data.table objects (according to metadata) from list to data.table")
     simEnv <- envir(sim)
     out <- lapply(objs$objectName, function(on) {
-      tryCatch(assign(on, copy(as.data.table(sim[[on]])), envir = simEnv),
-               error = function(e) warning(e))
+      tryCatch({
+        assign(on, copy(as.data.table(sim[[on]])), envir = simEnv)
+      }, error = function(e) warning(e))
     })
   }
   sim
