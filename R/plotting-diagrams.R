@@ -76,9 +76,9 @@ setMethod(
     width <- 4500 / as.numeric(width) # fixed at 3 days
 
     # simulation timestep in 'days'
-    ts <- sim@simtimes[["timeunit"]] %>%
-      inSeconds(envir = sim@.xData) %>%
-      convertTimeunit("day", envir = sim@.xData) %>%
+    ts <- sim@simtimes[["timeunit"]] |>
+      inSeconds(envir = sim@.xData) |>
+      convertTimeunit("day", envir = sim@.xData) |>
       as.numeric()
 
     out <- lapply(modules, function(x) {
@@ -147,7 +147,7 @@ setMethod(
   "eventDiagram",
   signature(sim = "simList", n = "numeric", startDate = "character"),
   definition = function(sim, n, startDate, ...) {
-    # get automatic scaling of vertical bars in Gantt chart
+    ## get automatic scaling of vertical bars in Gantt chart
     needInstall("DiagrammeR", minVersion = "0.8.2",
                 messageStart = "Please install DiagrammeR: ")
     dots <- list(...)
@@ -158,11 +158,11 @@ setMethod(
     }
     ll <- .sim2gantt(sim, n, startDate, dots$width)
 
-    # remove progress bar events
+    ## remove progress bar events
     ll <- ll[names(ll) != "progress"]
 
     if (length(ll)) {
-      # estimate the height of the diagram
+      ## estimate the height of the diagram
       dots$height <- if (any(grepl(pattern = "height", names(dots)))) {
         as.numeric(dots$height)
       } else {
@@ -170,12 +170,12 @@ setMethod(
       }
 
       diagram <- paste0(
-        # mermaid "header"
+        ## mermaid "header"
         "gantt", "\n",
         "dateFormat  YYYY-MM-DD", "\n",
         "title SpaDES event diagram", "\n",
 
-        # mermaid "body"
+        ## mermaid "body"
         paste("section ", names(ll), "\n", lapply(ll, function(df) {
           paste0(df$task, ":", df$status, ",", df$pos, ",",
                  df$start, ",", df$end, collapse = "\n")
@@ -203,11 +203,10 @@ setMethod(
   "eventDiagram",
   signature(sim = "simList", n = "missing", startDate = "missing"),
   definition = function(sim, startDate, ...) {
-    d <- as.Date(start(sim), format(Sys.time(), "%Y-%m-%d")) %>% as.character()
+    d <- as.Date(start(sim), format(Sys.time(), "%Y-%m-%d")) |> as.character()
     eventDiagram(sim = sim, n = NROW(completed(sim)), startDate = d, ...)
 })
 
-################################################################################
 #' Simulation object dependency diagram
 #'
 #' Create a sequence diagram illustrating the data object dependencies of a
@@ -254,17 +253,16 @@ setMethod(
                 messageStart = "Please install DiagrammeR: ")
     DiagrammeR::mermaid(...,
       paste0(
-        # mermaid "header"
+        ## mermaid "header"
         "sequenceDiagram", "\n",
 
-        # mermaid "body"
+        ## mermaid "body"
         paste(dt$from, "->>", dt$to, ":", dt$objName, collapse = "\n"),
         "\n"
       )
     )
 })
 
-################################################################################
 #' Simulation module dependency diagram
 #'
 #' Create a network diagram illustrating the simplified module dependencies of a
@@ -336,7 +334,6 @@ setMethod(
 #' }
 #' }
 #'
-# NOTE: `igraph` is being imported in spades-package.R
 setGeneric("moduleDiagram", function(sim, type, showParents = TRUE, ...) {
   standardGeneric("moduleDiagram")
 })
@@ -372,7 +369,7 @@ setMethod(
     if (showParents) {
       moduleGraph(sim = sim, ...)
     } else {
-      # need to remove dots ... not as easy as hoped -- define new function which removes
+      ## need to remove dots ... not as easy as hoped -- define new function which removes
       PlotRemovingDots <- function(modDia, plotFn, axes, ...,
                                    vertex.color,
                                    vertex.size,
@@ -393,7 +390,7 @@ setMethod(
         }
 
         vertexSize <- if (!("vertex.size" %in% nDots)) {
-          c(nchar(namesModDia)^0.8 * 10) # use exponential to stretch out, and multiplication to make all bigger
+          c(nchar(namesModDia)^0.8 * 10) # use exponent to stretch out, and multiply to make bigger
         } else {
           dots$vertex.size
         }
@@ -476,7 +473,6 @@ setMethod(
     }
 })
 
-################################################################################
 #' Build a module dependency graph
 #'
 #' This is still experimental, but this will show the hierarchical structure of
@@ -497,7 +493,6 @@ setMethod(
 #' @rdname moduleGraph
 #' @seealso [moduleDiagram()]
 #'
-# `igraph` is being imported in spades-package.R
 setGeneric("moduleGraph", function(sim, plot, ...) {
   standardGeneric("moduleGraph")
 })
@@ -527,12 +522,12 @@ setMethod(
       mg <- attr(sim@modules, "modulesGraph")
       mg[["from"]] <- basename(mg[["from"]])
       mg[["to"]] <- basename(mg[["to"]])
-      parents <- unique(mg[, "from"]) %>% basename()
+      parents <- unique(mg[, "from"]) |> basename()
 
       deps <- depsEdgeList(sim)[, list(from, to)]
       el <- rbind(mg, deps)
 
-      # This is just for the dummy case of having no object dependencies
+      ## This is just for the dummy case of having no object dependencies
       if (NROW(deps) == 0) deps <- mg
 
       grph <- graph_from_data_frame(el, directed = TRUE)
