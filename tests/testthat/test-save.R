@@ -189,9 +189,14 @@ test_that("saveSimList works correctly", {
     outputPath = outputPath
   )
 
-  mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-                   outputs = data.frame(objectName = "landscape", saveTime = times$end))
-  mySim <- spades(mySim)
+  mySim <- simInit(
+    times = times,
+    params = parameters,
+    modules = modules,
+    paths = paths,
+    outputs = data.frame(objectName = "landscape", saveTime = times$end)
+  ) |>
+    spades()
   mySim$landscape[] <- round(mySim$landscape[], 3) # after saving, these come back different, unless rounded
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
   mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
@@ -217,16 +222,16 @@ test_that("saveSimList works correctly", {
   sim$landscape[] <- sim$landscape[]
   sim$habitatQuality[] <- sim$habitatQuality[]
 
-  # Now put it back to disk for subsequent test
-  #sim$landscape[] <- sim$landscape[]
-  #sim$habitatQuality[] <- sim$habitatQuality[]
+  ## Now put it back to disk for subsequent test
+  # sim$landscape[] <- sim$landscape[]
+  # sim$habitatQuality[] <- sim$habitatQuality[]
   unlink(c(tmpfile[1], paste0(tools::file_path_sans_ext(tmpfile[1]), ".gri"))) ## needed because of hardlink shenanigans
   unlink(c(tmpfile[7], paste0(tools::file_path_sans_ext(tmpfile[7]), ".gri"))) ## needed because of hardlink shenanigans
   sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1])
   sim$habitatQuality <- writeRaster(sim$habitatQuality, filename = tmpfile[7])
-  # grd format doesn't get minmax right especially with terra -- can't fix it with terra
+  ## grd format doesn't get minmax right especially with terra -- can't fix it with terra
 
-  # The terra pointers with grd files make comparisons wrong
+  ## The terra pointers with grd files make comparisons wrong
   # mySim$habitatQuality <- rasterToMemory(mySim$habitatQuality)
   # mySim$landscape <- rasterToMemory(mySim$landscape)
   # sim$habitatQuality <- rasterToMemory(sim$habitatQuality)
@@ -234,11 +239,11 @@ test_that("saveSimList works correctly", {
   #
   # expect_true(all.equal(mySim, sim, check.environment = FALSE))
 
-  # Now try to keep filename intact
+  ## Now try to keep filename intact
   # mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
-  # loses the raster landscape
+  ## loses the raster landscape
   saveSimList(sim, filename = tmpfile[3])
   sim <- loadSimList(file = tmpfile[3])
   expect_equivalent(

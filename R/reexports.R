@@ -8,6 +8,7 @@
 ## and <https://github.com/PredictiveEcology/reproducible/issues/389>
 compareVersion2 <- getFromNamespace("compareVersion2", "Require")
 extractInequality <- getFromNamespace("extractInequality", "Require")
+
 getDrv <- getFromNamespace("getDrv", "reproducible")
 isWindows <- getFromNamespace("isWindows", "reproducible")
 isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")

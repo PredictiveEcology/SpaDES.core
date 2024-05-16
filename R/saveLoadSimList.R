@@ -354,7 +354,6 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   return(tmpsim)
 }
 
-
 #' `unzipSimList` will unzip a zipped `simList`
 #'
 #' `unzipSimList` is a convenience wrapper around `unzip` and `loadSimList` where
