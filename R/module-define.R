@@ -183,8 +183,8 @@ setMethod(
     metadataProvided <- metadataRequired %in% names(x)
     metadataMissing <- metadataRequired[!metadataProvided]
 
-    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation",
-                     "loadOrder")
+    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe",
+                     "citation", "documentation", "loadOrder")
     if (!all(metadataProvided)) {
       # inputObjects and outputObjects are dealt with differently in parseModule
       #   don't trigger a warning here.
@@ -214,7 +214,7 @@ setMethod(
       if (any(is.na(x$childModules))) {
         moduleDefaults$childModules
       } else {
-        x$childModules %>% as.character() %>% na.omit() %>% as.character() # nolint
+        x$childModules |> as.character() |> na.omit() |> as.character() # nolint
       }
     }
 
@@ -329,7 +329,7 @@ setMethod(
     if (length(x$childModules)) {
       lapply(x$childModules, function(y) {
         if (file.exists(file.path(modulePath(sim), y))) {
-          z <- y %>% lapply(., `attributes<-`, list(type = "child"))
+          z <- y |> lapply(`attributes<-`, list(type = "child"))
           modules(sim) <- append_attr(sim@modules, z)
         } else {
           stop("Module ", y, "(a child module of ", x$name, ") not found in modulePath.")
