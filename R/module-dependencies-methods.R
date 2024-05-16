@@ -279,8 +279,9 @@ setMethod(".depsLoadOrder",
                   }
               }
             }
-            if (doTopoSort)
+            if (doTopoSort) {
               tsort <- topo_sort(simGraph, "out")
+            }
 
             # depsGrDF <- as.data.table(as_data_frame(simGraph))
             if (length(tsort)) {
@@ -335,10 +336,3 @@ setMethod(".depsLoadOrder",
             }
             return(loadOrder)
 })
-
-.rndstr <- function(n = 1, len = 8) {
-  unlist(lapply(character(n), function(x) {
-    x <- paste0(sample(c(0:9, letters, LETTERS), size = len,
-                       replace = TRUE), collapse = "")
-  }))
-}
