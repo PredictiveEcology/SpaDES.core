@@ -22,7 +22,6 @@ isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 isRaster <- getFromNamespace("isRaster", "reproducible")
 isSpat <- getFromNamespace("isSpat", "reproducible")
 layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
-loadFile <- getFromNamespace("loadFile", "reproducible")
 makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 messageVerbose <- utils::getFromNamespace("messageVerbose", "Require")
 
