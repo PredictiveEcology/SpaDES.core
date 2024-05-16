@@ -407,8 +407,8 @@ test_that("inputObjects on module arg not sim", {
 })
 
 test_that("test sped-up Caching of sequentially cached events", {
-  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE,
-                                          reproducible.cachePath = tmpdir))
+  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE))
+  withr::local_options(list(reproducible.cachePath = tmpdir))
 
   defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
@@ -475,8 +475,8 @@ test_that("test sped-up Caching of sequentially cached events", {
 })
 
 test_that("test sped-up Caching of sequentially cached events", {
-  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE,
-                                          reproducible.cachePath = tmpdir))
+  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE))
+  withr::local_options(list(reproducible.cachePath = tmpdir))
 
   defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
