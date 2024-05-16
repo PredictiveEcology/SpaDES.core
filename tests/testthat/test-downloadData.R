@@ -11,7 +11,7 @@ test_that("downloadData downloads and unzips module data", {
   testInit(c("googledrive", "terra"), opts = opts)
 
   m <- "test"
-  datadir <- file.path(tmpdir, m, "data") %>% checkPath(create = TRUE)
+  datadir <- file.path(tmpdir, m, "data") |> checkPath(create = TRUE)
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
   Rversion <- getRversion()

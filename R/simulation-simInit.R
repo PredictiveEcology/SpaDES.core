@@ -474,8 +474,8 @@ setMethod(
            "- the module was not created using 'newModule(...)' so is missing key files")
     }
 
-    modules <- modules[!sapply(modules, is.null)] %>%
-      lapply(., `attributes<-`, list(parsed = FALSE))
+    modules <- modules[!sapply(modules, is.null)] |>
+      lapply(`attributes<-`, list(parsed = FALSE))
 
     # parameters for core modules
     dotParamsReal <- list(".saveInterval",
@@ -591,9 +591,8 @@ setMethod(
 
       ## add name to depends
       if (!is.null(names(sim@depends@dependencies))) {
-        names(sim@depends@dependencies) <- sim@depends@dependencies %>%
-          lapply(., function(x)
-            x@name) %>%
+        names(sim@depends@dependencies) <- sim@depends@dependencies |>
+          lapply(function(x) x@name) |>
           unlist()
       }
 
@@ -753,7 +752,7 @@ setMethod(
             objectName = objNames,
             loadTime = as.numeric(sim@simtimes[["current"]]),
             stringsAsFactors = FALSE
-          ) %>%
+          ) |>
             .fillInputRows(startTime = start(sim))
           inputs(sim) <- newInputs
         }
@@ -1524,7 +1523,7 @@ loadPkgs <- function(reqdPkgs) {
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
   depsGr <- depsGraph(sim, plot = FALSE)
-  depsGrDF <- (depsEdgeList(sim, FALSE) %>% .depsPruneEdges())
+  depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
     cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
     hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)

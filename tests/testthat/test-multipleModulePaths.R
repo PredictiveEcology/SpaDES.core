@@ -8,10 +8,8 @@ test_that("simulation runs with simInit and spades", {
   sysFiles <- getSampleModules(tmpdir)
   modules <- list("randomLandscapes", "caribouMovement")
   files <- dir(sysFiles, recursive = TRUE, full.names = TRUE)
-  rootPth1 <- file.path(tmpdir, modules[[1]]) %>%
-    checkPath(., create = TRUE)
-  rootPth2 <- file.path(tmpCache, modules[[2]]) %>%
-    checkPath(., create = TRUE)
+  rootPth1 <- file.path(tmpdir, modules[[1]]) |> checkPath(create = TRUE)
+  rootPth2 <- file.path(tmpCache, modules[[2]]) |> checkPath(create = TRUE)
 
   file.copy(grep(modules[[1]], files, value = TRUE), file.path(rootPth1, paste0(modules[[1]], ".R")))
   file.copy(grep(modules[[2]], files, value = TRUE), rootPth2)
@@ -71,7 +69,7 @@ test_that("simulation runs with simInit and spades", {
   expect_false(identical(normPath(paths$cachePath), normPath(.paths()$cachePath)))
 
   # Do a single run of simInit for this whole test
-  mySim <- simInit(times, params, modules = modules, objects = list(), paths) %>%
+  mySim <- simInit(times, params, modules = modules, objects = list(), paths) |>
     spades(debug = FALSE)
 
   expect_true(all(modules(mySim) %in% unlist(modules)))

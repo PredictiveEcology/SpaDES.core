@@ -24,7 +24,9 @@ setMethod(
   definition = function(modules) {
     ids <- lapply(modules, function(x) {
       (attr(x, "parsed") == FALSE)
-    }) %>% `==`(., TRUE) %>% which()
+    }) |>
+      (function(x) x == TRUE)() |>
+      which()
     return(ids)
 })
 
@@ -445,8 +447,8 @@ setMethod(
         }
 
         # add child modules to list of all child modules, to be parsed later
-        children <- as.list(sim@depends@dependencies[[i]]@childModules) %>%
-          lapply(., `attributes<-`, list(parsed = FALSE))
+        children <- as.list(sim@depends@dependencies[[i]]@childModules) |>
+          lapply(`attributes<-`, list(parsed = FALSE))
         names(children) <- file.path(dirname(m), children)
         all_children <- append_attr(all_children, children)
 
@@ -475,8 +477,8 @@ setMethod(
       } else {
         alreadyIn <- names(sim@depends@dependencies) %in% mBase
         if (any(alreadyIn)) {
-          children <- as.list(sim@depends@dependencies[[which(alreadyIn)]]@childModules) %>%
-            lapply(., `attributes<-`, list(parsed = FALSE))
+          children <- as.list(sim@depends@dependencies[[which(alreadyIn)]]@childModules) |>
+            lapply(`attributes<-`, list(parsed = FALSE))
           names(children) <- file.path(dirname(m), children)
           all_children <- append_attr(all_children, children)
         }

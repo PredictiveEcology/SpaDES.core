@@ -379,9 +379,10 @@ setMethod(
     #rep(FALSE, length = length(sc))
     #st <- grepl(sc, pattern = "moduleCall")
     if (length(st)) {
-      mod <- parse(text = "moduleCall") %>%
-        eval(envir = sys.frame(st[1] - 1)) %>%
-        strsplit(split = "\\.")[[1]][2]
+      mod <- parse(text = "moduleCall") |>
+        eval(envir = sys.frame(st[1] - 1)) |>
+        strsplit(split = "\\.") |>
+        (function(x) x[[1]][2])()
     } else {
       mod <- NULL
     }

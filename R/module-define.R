@@ -249,7 +249,7 @@ setMethod(
       eval(moduleDefaults$timeframe)
     } else if (!is.numeric.POSIXt(x$timeframe)) {
       as.POSIXlt(x$timeframe)
-    } %>% `[`(1:2) # nolint
+    } |> (function(x) x[1:2])() # nolint
 
     if (is.null(x$timeunit) || any(is.na(x$timeunit))) {
       x$timeunit <- moduleDefaults$timeunit
@@ -315,8 +315,8 @@ setMethod(
     }
 
     ## check that documentation actually exists locally
-    docs <- sapply(x$documentation, na.omit) %>%
-      (function(x) if (length(x)) character(0) else as.character(x))
+    docs <- sapply(x$documentation, na.omit) |>
+      (function(x) if (length(x)) character(0) else as.character(x))()
     if (length(docs)) {
       lapply(docs, function(y) {
         if (!file.exists(file.path(modulePath(sim), y))) {

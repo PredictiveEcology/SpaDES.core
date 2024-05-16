@@ -285,7 +285,7 @@ setMethod(".depsLoadOrder",
 
             # depsGrDF <- as.data.table(as_data_frame(simGraph))
             if (length(tsort)) {
-              loadOrder <- names(simGraph[[tsort, ]]) %>% .[!(. %in% "_INPUT_" )]
+              loadOrder <- names(simGraph[[tsort, ]]) |> (function(x) x[!(x %in% "_INPUT_")])()
             } else {
               modules <- unlist(sim@modules)
               if (length(sim@modules)) {

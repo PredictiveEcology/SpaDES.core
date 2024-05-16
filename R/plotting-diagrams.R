@@ -166,7 +166,7 @@ setMethod(
       dots$height <- if (any(grepl(pattern = "height", names(dots)))) {
         as.numeric(dots$height)
       } else {
-        sapply(ll, NROW) %>% sum() %>% `*`(., 26L)
+        sapply(ll, NROW) |> sum() |> (\(x) x * 26L)()
       }
 
       diagram <- paste0(

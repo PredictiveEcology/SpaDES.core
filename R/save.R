@@ -151,9 +151,9 @@ saveFiles <- function(sim) {
 
   if (moduleName != "save") {
     # i.e., a module driven save event
-    toSave <- lapply(params(sim), function(y) return(y$.saveObjects))[[moduleName]] %>%
-      unlist() %>%
-      data.table(objectName = ., saveTime = curTime, file = ., stringsAsFactors = FALSE) %>%
+    toSave <- lapply(params(sim), function(y) return(y$.saveObjects))[[moduleName]] |>
+      unlist() |>
+      (function(x) data.table(objectName = x, saveTime = curTime, file = x, stringsAsFactors = FALSE))() |>
       as.data.frame()
     toSave <- .fillOutputRows(toSave)
     outputs(sim) <- rbind(outputs(sim), toSave)
