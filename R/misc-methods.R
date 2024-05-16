@@ -315,7 +315,6 @@ setMethod(
     return(classFilter(x, include, exclude = NA_character_, envir = sys.frame(-1)))
 })
 
-
 # fileTable -----------------------------------------------------------------------------------
 
 #' Create empty `fileTable` for inputs and outputs
