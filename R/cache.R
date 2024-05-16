@@ -980,8 +980,8 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects, drv = drv, conn = conn, verbose = verbose,
-               ...)
+  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects,
+               drv = drv, conn = conn, verbose = verbose, ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))

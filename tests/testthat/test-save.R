@@ -114,7 +114,7 @@ test_that("saving files (and memoryUse)", {
   rm(mySim)
 })
 
-test_that("saving csv files does not work correctly", {
+test_that("saving csv files works correctly", {
   testInit(smcc = FALSE)
 
    tempObj <- 1:10
@@ -154,7 +154,7 @@ test_that("saving csv files does not work correctly", {
    expect_false(identical(df1, newObj))
 })
 
-test_that("saveSimList does not work correctly", {
+test_that("saveSimList works correctly", {
   skip_if_not_installed("archive")
 
   testInit(sampleModReqdPkgs,
@@ -296,9 +296,13 @@ test_that("saveSimList with file backed objs", {
     expect_identical(Sys.readlink(outputPath), linkedDir)
   }
 
-  linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
-  linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
-             file.path(modulePath, dir(modules, recursive = TRUE)))
+  expect_true(
+    all(linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath))))
+  )
+  expect_true(
+    all(linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
+                   file.path(modulePath, dir(modules, recursive = TRUE))))
+  )
 
   times <- list(start = 0, end = 5)
   parameters <- list(
