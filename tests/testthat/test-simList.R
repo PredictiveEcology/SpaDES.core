@@ -1,7 +1,7 @@
 test_that("simList object initializes correctly (1)", {
   testInit(sampleModReqdPkgs)
 
-  defaults <- .coreModules() %>% unname()
+  defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape")
@@ -35,7 +35,7 @@ test_that("simList object initializes correctly (1)", {
   options(width = 100L)
   out <- utils::capture.output(show(mySim))
 
-  expect_equal(length(out), 77)
+  expect_equal(length(out), 81)
   options(width = w)
   rm(w)
 
@@ -128,7 +128,7 @@ test_that("simList object initializes correctly (1)", {
 
   ### SLOT completed
   expect_is(completed(mySim), "data.table")
-  expect_equal(nrow(completed(mySim)), 0)
+  expect_equal(nrow(completed(mySim)), 3) ## .inputObjects for each module have run
 
   ### SLOT depends
   expect_is(depends(mySim), ".simDeps")
@@ -161,7 +161,7 @@ test_that("simList object initializes correctly (1)", {
 
   expect_equivalent(end(mySim)   <- 20, 20.0)
   expect_equivalent(start(mySim) <- 10, 10.0)
-  expect_equivalent(time(mySim)  <- 10, 10.0)
+  expect_equivalent(time(mySim), 1.0)
 
   expect_equal(timeunit(mySim), attr(end(mySim), "unit"))
   expect_equal(timeunit(mySim), attr(start(mySim), "unit"))
@@ -179,20 +179,20 @@ test_that("simList object initializes correctly (1)", {
   reqdPkgs <- lapply(modules, function(m) {
     mfile <- file.path(getSampleModules(tmpdir), m, paste0(m, ".R"))
     packages(filename = mfile)
-  }) %>%
-    unlist() %>%
-    sort() %>%
-    SpaDES.core:::.cleanPkgs() %>%
+  }) |>
+    unlist() |>
+    sort() |>
+    SpaDES.core:::.cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
   mdir <- getOption("spades.modulePath")
   options(spades.modulePath = getSampleModules(tmpdir))
   on.exit(options(spades.modulePath = mdir), add = TRUE)
-  reqdPkgs <- lapply(modules, function(m) packages(module = m)) %>%
-    unlist() %>%
-    sort() %>%
-    SpaDES.core:::.cleanPkgs() %>%
+  reqdPkgs <- lapply(modules, function(m) packages(module = m)) |>
+    unlist() |>
+    sort() |>
+    SpaDES.core:::.cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
@@ -229,10 +229,11 @@ test_that("simList test all signatures", {
       setPaths(modulePath = origDir)
     }
   }, add = TRUE)
-  # times
+
+  ## times
   times <- list(start = 0.0, end = 10)
 
-  # modules
+  ## modules
   modules <- list("randomLandscapes")#, "caribouMovement", "fireSpread")
   curPathIsPkgPath <- (identical(
     normPath(getSampleModules(tmpdir)),
@@ -246,7 +247,7 @@ test_that("simList test all signatures", {
     setPaths(modulePath = getwd())
   }
 
-  # paths
+  ## paths
   mapPath <- getMapPath(tmpdir)
   paths <- list(
     modulePath = getSampleModules(tmpdir),
@@ -254,7 +255,7 @@ test_that("simList test all signatures", {
     outputPath = tempdir()
   )
 
-  # inputs
+  ## inputs
   filelist <- data.frame(
     files = dir(file.path(mapPath), full.names = TRUE, pattern = "tif")[1:2],
     functions = "rast",
@@ -263,21 +264,21 @@ test_that("simList test all signatures", {
     stringsAsFactors = FALSE
   )
 
-  # objects
+  ## objects
   layers <- lapply(filelist$files, rasterToMemory)
   DEM <- layers[[1]]
   forestAge <- layers[[2]]
   objects <- list(DEM = "DEM", forestAge = "forestAge")
   objectsChar <- c("DEM", "forestAge")
 
-  # outputs
+  ## outputs
   outputs <- data.frame(
     expand.grid(objectName = c("caribou", "landscape"),
                 saveTime = 1:2,
                 stringsAsFactors = FALSE)
   )
 
-  # parameters
+  ## parameters
   parameters <- list(
     caribouMovement = list(.plotInitialTime = NA),
     randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
@@ -286,11 +287,11 @@ test_that("simList test all signatures", {
   # loadOrder
   loadOrder <- c("randomLandscapes")#, "caribouMovement", "fireSpread")
 
-  # test all argument combinations to simInit
+  ## test all argument combinations to simInit
   N <- 256L
   successes <- logical(N)
   argsTested <- vector("list", length = N)
-  # setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
+  ## setPaths(inputPath = NULL, outputPath = NULL, modulePath = NULL, cachePath = NULL)
   for (i in 1L:N) {
     li <- list(
       {if (i %% 2 ^ 1 == 0) times = times},                   # nolint
@@ -306,15 +307,16 @@ test_that("simList test all signatures", {
                   "outputs", "loadOrder")
     names(li) <- argNames
     li <- li[!sapply(li, is.null)]
-    messes <- capture_messages(successes[i] <- tryCatch(
-      is(suppressMessages(do.call(simInit, args = li)), "simList"),
-      error = function(e) { FALSE },
-      warning = function(w) { TRUE }
-    ))
+    messes <- capture_messages({
+      successes[i] <- tryCatch({
+          is(suppressMessages(do.call(simInit, args = li)), "simList")
+        }, error = function(e) { FALSE }, warning = function(w) { TRUE }
+      )
+    })
     argsTested[[i]] <- names(li)
   }
 
-  # needs paths and params; many defaults are fine
+  ## needs paths and params; many defaults are fine
   expect_equal(sum(successes, na.rm = TRUE), 256)
   if (FALSE) {
     dt <- data.table(lapply(argsTested, paste, collapse = "_"), successes)
@@ -382,7 +384,7 @@ test_that("test that module directory exists, but not files", {
 test_that("inputObjects on module arg not sim", {
   testInit(sampleModReqdPkgs)
 
-  defaults <- .coreModules() %>% unname()
+  defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape")
@@ -404,13 +406,11 @@ test_that("inputObjects on module arg not sim", {
   })
 })
 
-
 test_that("test sped-up Caching of sequentially cached events", {
-  testInit(sampleModReqdPkgs, opts = list("spades.allowSequentialCaching" = TRUE))
-  opts <- options(reproducible.cachePath = tmpdir)
-  on.exit(opts)
+  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE,
+                                          reproducible.cachePath = tmpdir))
 
-  defaults <- .coreModules() %>% unname()
+  defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
@@ -424,56 +424,61 @@ test_that("test sped-up Caching of sequentially cached events", {
   paths <- list(modulePath = getSampleModules(tmpdir))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  mess <- capture_messages({
+    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+  })
   expect_false(any(grepl("Skipped digest", mess)))
 
-  # Rerun with Cached copies being recovered
+  ## Rerun with Cached copies being recovered
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  mess <- capture_messages({
+    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+  })
   expect_true(sum(grepl("Skipped digest", mess)) == 2)
 
-  # If they are not sequential, shouldn't do it
+  ## If they are not sequential, shouldn't do it
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = list(.useCache = c("init", ".inputObjects")),
     caribouMovement = list(.useCache = c("init", ".inputObjects"))
-
   )
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  mess <- capture_messages({
+    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+  })
   expect_false(any(grepl("Skipped digest", mess)))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  mess <- capture_messages({
+    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+  })
   expect_false(any(grepl("Skipped digest", mess)))
 
-
-  # If they are different sequential, should do it
+  ## If they are different sequential, should do it
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
     randomLandscapes = list(.useCache = c("init", ".inputObjects")),
     fireSpread = list(.useCache = c("init", ".inputObjects"))
     # caribouMovement = list(.useCache = c("init", ".inputObjects"))
-
   )
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  mess <- capture_messages({
+    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+  })
   expect_false(sum(grepl("Skipped digest", mess)) == 1)
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
-  mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+  mess <- capture_messages({
+    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+  })
   expect_true(sum(grepl("Skipped digest", mess)) == 1)
-
-
 })
 
-
 test_that("test sped-up Caching of sequentially cached events", {
-  testInit(sampleModReqdPkgs, opts = list("spades.allowSequentialCaching" = TRUE))
-  opts <- options(reproducible.cachePath = tmpdir)
-  on.exit(opts)
+  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE,
+                                          reproducible.cachePath = tmpdir))
 
-  defaults <- .coreModules() %>% unname()
+  defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
@@ -499,19 +504,20 @@ test_that("test sped-up Caching of sequentially cached events", {
     cat(xxx1, file = fn, sep = "\n")
   }
 
-  # Run first time to create the caches
+  ## Run first time to create the caches
   for (i in 1:2) {
-    mess1 <- capture_messages(mySim <- simInit(times, params, modules, objects = list(), paths, debug = 1))
-    mess <- capture_messages(mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA))
+    mess1 <- capture_messages({
+      mySim <- simInit(times, params, modules, objects = list(), paths, debug = 1)
+    })
+    mess <- capture_messages({
+      mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    })
     if (i == 1) {
       expect_equal(sum(grepl("Skipped digest", mess)), 0)
       expect_equal(sum(grepl("Skipped digest", mess1)), 0)
     } else {
       expect_equal(sum(grepl("Skipped digest", mess)), 3)
-      expect_equal(sum(grepl("Skipped digest", mess1)), 1)   # there is no .inputObjects for randomLandscapes
+      expect_equal(sum(grepl("Skipped digest", mess1)), 1) # there is no .inputObjects for randomLandscapes
     }
-
-
   }
-
 })
