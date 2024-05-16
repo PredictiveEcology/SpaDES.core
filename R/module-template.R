@@ -238,7 +238,6 @@ setGeneric("newModuleCode", function(name, path, ..., events) {
 #' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
 #' @rdname newModuleCode
-# igraph exports %>% from magrittr
 setMethod(
   "newModuleCode",
   signature = c(name = "character", path = "character"),
@@ -449,7 +448,7 @@ setMethod(
     stopifnot(args$type %in% c("child", "parent"))
 
     path <- checkPath(path, create = TRUE)
-    nestedPath <- file.path(path, name) %>% checkPath(create = TRUE)
+    nestedPath <- file.path(path, name) |> checkPath(create = TRUE)
     filenameRmd <- file.path(nestedPath, paste0(name, ".Rmd"))
     filenameCitation <- file.path(nestedPath, "citation.bib")
     filenameLICENSE <- file.path(nestedPath, "LICENSE.md")
@@ -568,7 +567,7 @@ setMethod(
       warning('The `testthat` package is required to run unit tests on modules.')
     }
     path <- checkPath(path, create = TRUE)
-    testthatDir <- file.path(path, name, "tests", "testthat") %>% checkPath(create = TRUE)
+    testthatDir <- file.path(path, name, "tests", "testthat") |> checkPath(create = TRUE)
     testDir <- dirname(testthatDir)
 
     ## create basic local testing structure based on testthat
@@ -872,6 +871,6 @@ setMethod("zipModule",
 setMethod("zipModule",
           signature = c(name = "character", path = "character", version = "missing"),
           definition = function(name, path, data, ...) {
-            vers <- moduleVersion(name, path) %>% as.character()
+            vers <- moduleVersion(name, path) |> as.character()
             zipModule(name = name, path = path, version = vers, data = data, ...)
 })
