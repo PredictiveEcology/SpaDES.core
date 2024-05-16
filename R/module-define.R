@@ -647,6 +647,7 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
+#' @importFrom tools file_ext
 #' @rdname fillInputRows
 .fillInputRows <- function(inputDF, startTime) {
   factorCols <- sapply(inputDF, is.factor)
@@ -688,14 +689,14 @@ setMethod(
     if (any(is.na(inputDF2[, "fun"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]))
+      exts <- na.omit(match(tools::file_ext(fl), .fileExts[, "exts"]))
       inputDF2$fun[is.na(inputDF2$fun)] <- .fileExts[exts, "fun"]
     }
 
     if (any(is.na(inputDF2[, "package"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- match(fileExt(fl), .fileExts[, "exts"])
+      exts <- match(tools::file_ext(fl), .fileExts[, "exts"])
       inputDF2$package[is.na(inputDF2$package)]  <- .fileExts[exts, "package"]
     }
     inputDF[!objectsOnly, ] <- inputDF2
@@ -710,6 +711,7 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
+#' @importFrom tools file_ext
 #' @rdname fillOutputRows
 .fillOutputRows <- function(outputDF, endTime) {
   needRenameArgs <- grepl(names(outputDF), pattern = "arg[s]?$")
@@ -745,7 +747,7 @@ setMethod(
 
     if (any(is.na(outputDF[, "fun"]))) {
       fl <- outputDF$file
-      exts <- fileExt(fl)
+      exts <- tools::file_ext(fl)
       if (any(is.na(fl)) || any(!nzchar(exts, keepNA = TRUE))) {
         outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <-
           .fileExts$fun[rowInDotFileExts]
@@ -758,12 +760,12 @@ setMethod(
 
     if (any(is.na(outputDF[, "package"]))) {
       fl <- outputDF$file
-      exts <- fileExt(fl)
+      exts <- tools::file_ext(fl)
       if (any(is.na(fl)) || any(!nzchar(exts, keepNA = TRUE))) {
         outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[rowInDotFileExts]
       }
       if (any(is.na(outputDF[, "package"]))) {
-        exts <- fileExt(fl)
+        exts <- tools::file_ext(fl)
         extsAvail <- checkKnownExts(exts, .fileExts)
         outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
       }

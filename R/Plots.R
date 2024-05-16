@@ -93,8 +93,9 @@
 #' @include simList-accessors.R
 #' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs qsave
-#' @importFrom terra writeRaster
 #' @importFrom quickPlot clearPlot Plot whereInStack
+#' @importFrom terra writeRaster
+#' @importFrom tools file_path_sans_ext
 #'
 #' @examples
 #' \donttest{
@@ -337,14 +338,14 @@ Plots <- function(data, fn, filename,
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = filePathSansExt(basename(rasterFilename)),
+                                     objectName = tools::file_path_sans_ext(basename(rasterFilename)),
                                      file = rasterFilename, fun = "terra::writeRaster", ...)
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = filePathSansExt(basename(rawFilename)),
+                                     objectName = tools::file_path_sans_ext(basename(rawFilename)),
                                      file = rawFilename, fun = "qs::qsave", ...)
     }
   }
@@ -370,7 +371,7 @@ Plots <- function(data, fn, filename,
           if (exists("sim", inherits = FALSE)) {
             pkgAndFn <- .guessPkgFun(bsf)
             sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                         objectName = filePathSansExt(basename(theFilename)),
+                                         objectName = tools::file_path_sans_ext(basename(theFilename)),
                                          file = theFilename, fun = pkgAndFn, ...)
           }
           message("Saved figure to: ", theFilename)
@@ -391,7 +392,7 @@ Plots <- function(data, fn, filename,
 
         if (exists("sim", inherits = FALSE))
           sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                       objectName = filePathSansExt(basename(theFilename)),
+                                       objectName = tools::file_path_sans_ext(basename(theFilename)),
                                        file = theFilename, fun = "ggplot2::ggsave", ...)
         message("Saved figure to: ", theFilename)
       }
@@ -403,7 +404,7 @@ Plots <- function(data, fn, filename,
 
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = filePathSansExt(basename(filename11)),
+                                     objectName = tools::file_path_sans_ext(basename(filename11)),
                                      file = filename11, fun = "qs::qsave", ...)
     }
   }
@@ -439,8 +440,6 @@ anyPlotting <- function(.plots) {
 
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
-
-# filePathSansExt <- getFromNamespace("filePathSansExt", ns = "reproducible")
 
 #' Guess package of a function
 #'

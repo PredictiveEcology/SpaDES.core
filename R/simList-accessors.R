@@ -1316,6 +1316,7 @@ setGeneric("outputs<-",
 #' @aliases outputs<-,simList-method
 #' @export
 #' @importFrom data.table setDT
+#' @importFrom tools file_ext
 #' @name outputs<-
 #' @rdname simList-accessors-outputs
 setReplaceMethod(
@@ -1391,12 +1392,10 @@ setReplaceMethod(
        wh <- !grepl(txtTimeA, sim@outputs$file)
        fns <- sim@outputs[["file"]][wh]
        sim@outputs[["file"]][wh] <- paste0(
-         filePathSansExt(fns),
+         tools::file_path_sans_ext(fns),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(fileExt(fns), keepNA = TRUE) , ".", ""),
-         ifelse(nzchar(fileExt(fns), keepNA = TRUE) ,
-                fileExt(fns),
-                "")
+         ifelse(nzchar(tools::file_ext(fns), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(tools::file_ext(fns), keepNA = TRUE) , tools::file_ext(fns), "")
        )
      } else {
        sim@outputs <- value
