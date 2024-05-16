@@ -87,7 +87,17 @@ setMethod("append_attr",
             return(out[!dups])
 })
 
-###############################################################################
+
+# random strings ------------------------------------------------------------------------------
+
+#' @rdname rndstr
+.rndstr <- function(n = 1, len = 8) {
+  unlist(lapply(character(n), function(x) {
+    x <- paste0(sample(c(0:9, letters, LETTERS), size = len,
+                       replace = TRUE), collapse = "")
+  }))
+}
+
 #' Generate random strings
 #'
 #' Generate a vector of random alphanumeric strings each of an arbitrary length.
