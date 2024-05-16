@@ -997,8 +997,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .unwrap.simList <- function(obj, cachePath, cacheId,
                             drv = getOption("reproducible.drv", NULL),
                             conn = getOption("reproducible.conn", NULL), ...) {
-
-  # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
+  ## the as.list doesn't get everything. But with a simList, this is OK; rest will stay
   obj$.mods <- .unwrap(obj$.mods, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
@@ -1006,9 +1005,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
                      drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
   obj
-
 }
-
 
 #' Make `simList` correctly work with `memoise`
 #'

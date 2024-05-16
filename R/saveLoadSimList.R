@@ -308,7 +308,17 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   } else {
     paths <- list()
   }
-  paths(tmpsim) <- modifyList2(paths(tmpsim), paths)
+
+  ## TODO: figure out what is inserting 'NA' into some paths during saveSimList
+  paths(tmpsim) <- paths(tmpsim) |>
+    # sapply(function(pth) {
+    #   if (fs::path_has_parent(pth, "NA")) {
+    #     gsub("NA/", "./", pth) |> fs::path_norm() |> as.character()
+    #   } else {
+    #     pth
+    #   }
+    # }, simplify = FALSE) |>
+    modifyList2(paths)
 
   paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
 
@@ -319,10 +329,11 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   for (nam in names(oldFns)) {
     tags <- attr(tmpsim[[nam]], "tags")
     if (!is.null(tags)) {
-      if (identical(projectPath, getwd()))
+      if (identical(projectPath, getwd())) {
         pths <- paths(tmpsim)
-      else
+      } else {
         pths <- list(projectPath = projectPath)
+      }
       newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
       tmpsim[[nam]][] <- newFiles$newName[]

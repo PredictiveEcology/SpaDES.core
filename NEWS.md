@@ -3,6 +3,7 @@
 * fix issue with event queue colnames in `completed<-` and `all.equal.simList` (#272);
 * fixed issue saving simLists when multiple paths were used (e.g., `length(modulePath) > 1`);
 * events can be defined directly in calls to `newModule()`;
+* checkpoints are assumed to be used locally, and no longer invoke simulation file archiving and re-extraction of files (i.e., uses `saveSimList(..., inputs = FALSE, outputs = FALSE, cache = FALSE, files = FALSE)`);
 
 ## Breaking changes
 

@@ -1653,23 +1653,21 @@ setReplaceMethod(
   "paths",
   signature = "simList",
   function(sim, value) {
-    N <- 5 # total number of named paths (cache, module, input, output)
-
-    # get named elements and their position in value list
-    wh <- pmatch(names(sim@paths), names(value)) # always length 5, NA if no name match, number if yes
+    ## get named elements and their position in value list
+    wh <- pmatch(names(sim@paths), names(value)) # always length 7, NA if no name match, number if yes
     whValueNamed <- which(!is.na(pmatch(names(value), names(sim@paths)))) # length of names of value
     whValueUnnamed <- rep(TRUE, length(value))
     if (length(whValueNamed)) whValueUnnamed[whValueNamed] <- FALSE
 
-    # start with .paths()
+    ## start with .paths()
     emptyOnes <- unlist(lapply(sim@paths, is.null))
     if (sum(emptyOnes) > 0) sim@paths[emptyOnes] <- .paths()[emptyOnes]
 
-    # override with named ones
+    ## override with named ones
     sim@paths[!is.na(wh)] <- value[na.omit(wh)]
 
-    # keep named elements, use unnamed in remaining order:
-    #  cache, input, module, output
+    ## keep named elements, use unnamed in remaining order:
+    ##  cache, input, module, output
     if (length(na.omit(wh)) < length(value)) {
       whichNamed <- which(!is.na(wh))
       whichUnnamed <- (seq_along(sim@paths))
