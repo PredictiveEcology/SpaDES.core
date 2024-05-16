@@ -2244,7 +2244,7 @@ paramsDontCacheOn <- c(".useCache", ".useParallel",
                        paste0(".", c("plots", "plotInterval", "plotInitialTime", "saveInitialTime", "saveInterval"))) # don't change Caching based on .useCache
                                                     # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
 
-#' @importFrom reproducible .cacheMessageObjectToRetrieve loadFromCache showCache
+#' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache showCache
 allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
   .message$IndentUpdate()
   attr(sim, "runFnCallAsExpr") <- NULL

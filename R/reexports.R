@@ -13,7 +13,6 @@ messageCache <- reproducible::messageCache
 ## see <https://github.com/PredictiveEcology/Require/issues/105>
 ## and <https://github.com/PredictiveEcology/reproducible/issues/389>
 compareVersion2 <- getFromNamespace("compareVersion2", "Require")
-extractFromCache <- getFromNamespace("extractFromCache", "reproducible")
 extractInequality <- getFromNamespace("extractInequality", "Require")
 fileExt <- getFromNamespace("fileExt", "reproducible")
 filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
