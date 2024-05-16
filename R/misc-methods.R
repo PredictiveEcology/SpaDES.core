@@ -1,4 +1,6 @@
-utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
+utils::globalVariables(c(
+  "newQuantity", "quantityAdj", "quantityAdj2"
+))
 
 #' A slightly modified version of `getOption()`
 #'
@@ -17,14 +19,12 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
   }
 }
 
-################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
 #' Defunct. Use [utils::modifyList()] (which can not handle NULL) or
 #' [Require::modifyList2()] for case with >2 lists and can handle NULL lists.
 #'
-#' @param x   a named list
-#' @param y   a named list
+#' @param x,y   a named list
 #'
 #' @return A named list, with elements sorted by name.
 #'          The values of matching elements in list `y`
@@ -36,18 +36,15 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #' @rdname updateList
 updateList <- function(x, y) {
   .Defunct("Require::modifyList2", "Require")
-  # if (missing(x)) x <- list()
-  # if (missing(y)) y <- list()
-  # if (is.null(y)) y <- list()
-  # if (is.null(x)) x <- list()
-  # modifyList2(x = x, val = y)
 }
 
-################################################################################
-#' Add a module to a `moduleList`
+# append_attr ---------------------------------------------------------------------------------
+
+#' Append attributes
 #'
-#' Ordinary base lists and vectors do not retain their attributes when subsetted
-#' or appended. This function appends items to a list while preserving the
+#' Ordinary base lists and vectors do not retain their attributes
+#' when subsetted or appended.
+#' This function appends items to a list while preserving the
 #' attributes of items in the list (but not of the list itself).
 #'
 #' Similar to `updateList` but does not require named lists.
@@ -86,7 +83,6 @@ setMethod("append_attr",
             dups <- duplicated(out) # unique strips names ... out[!dups] does not
             return(out[!dups])
 })
-
 
 # random strings ------------------------------------------------------------------------------
 
@@ -199,7 +195,9 @@ setMethod("rndstr",
             rndstr(n = 1, len = 8, characterFirst = TRUE)
 })
 
-################################################################################
+
+# classFilter ---------------------------------------------------------------------------------
+
 #' Filter objects by class
 #'
 #' Based on <https://stackoverflow.com/a/5158978/1380598>.
@@ -317,7 +315,9 @@ setMethod(
     return(classFilter(x, include, exclude = NA_character_, envir = sys.frame(-1)))
 })
 
-################################################################################
+
+# fileTable -----------------------------------------------------------------------------------
+
 #' Create empty `fileTable` for inputs and outputs
 #'
 #' Internal functions.
