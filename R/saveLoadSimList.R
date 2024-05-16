@@ -287,6 +287,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   if (grepl(archiveExts, tolower(tools::file_ext(filename)))) {
     td <- tempdir2(sub = .rndstr())
     filename <- archiveExtract(filename, exdir = td)
+    on.exit(unlink(td, recursive = TRUE), add = TRUE)
     filenameRel <- gsub(paste0(td, "/"), "", filename[-1])  ## TODO: WRONG!
 
     ## This will put the files to relative path of projectPath
@@ -323,7 +324,9 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
   ## remap all the file-backed objects. their paths in the objects will point
   ## to their old locations, but they are now at newFns, which is remapped to projectPath
-  oldFns <- Filenames(tmpsim, returnList = FALSE) ## will remove length 0 filenames
+  oldFns <- Filenames(tmpsim, returnList = TRUE)
+  oldFns <- oldFns[lengths(oldFns) > 0] ## TODO: need to deal with nested lists e.g. scfm objs
+
   for (nam in names(oldFns)) {
     tags <- attr(tmpsim[[nam]], "tags")
     if (!is.null(tags)) {

@@ -986,9 +986,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
   objTmp
-
 }
-
 
 #' @export
 #' @inheritParams reproducible::.unwrap
