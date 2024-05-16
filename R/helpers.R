@@ -1,4 +1,3 @@
-################################################################################
 #' Named list of core `SpaDES` modules
 #'
 #' Internal function.
@@ -10,17 +9,22 @@
 #' @name .coreModules
 #' @rdname coreModules
 .coreModules <- function() {
-  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load",
-       restartR = "restartR")
+  list(
+    checkpoint = "checkpoint",
+    save = "save",
+    progress = "progress",
+    load = "load",
+    restartR = "restartR"
+  )
 }
 
 #' @keywords internal
 #' @include environment.R
-.pkgEnv$.coreModules <- .coreModules() %>% unname()
+.pkgEnv$.coreModules <- .coreModules() |> unname()
 
 #' @keywords internal
 #' @include environment.R
-.pkgEnv$.coreModulesMinusSave <- setdiff(.coreModules(), "save") %>% unname()
+.pkgEnv$.coreModulesMinusSave <- .coreModules() |> setdiff("save") |> unname()
 
 #' @keywords internal
 .pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
@@ -330,7 +334,6 @@ needInstall <- function(
          "install.packages('", pkg, "')")
   }
 }
-
 
 .moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))
 
