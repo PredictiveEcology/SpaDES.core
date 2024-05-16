@@ -730,7 +730,7 @@ setMethod(
     outputDF[is.na(outputDF$saveTime), "saveTime"] <- endTime
   }
 
-  # correct those for which a specific function is supplied in filelistDT$fun
+  ## correct those for which a specific function is supplied in filelistDT$fun
   usesSemiColon <- grep(outputDF[, "fun"], pattern = "::")
 
   if (length(usesSemiColon) > 0) {

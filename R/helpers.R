@@ -29,7 +29,6 @@
 #' @keywords internal
 .pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
 
-
 # empty event lists ---------------------------------------------------------------------------
 
 #' Blank (template) event list

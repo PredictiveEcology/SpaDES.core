@@ -1333,25 +1333,25 @@ setReplaceMethod(
 
        sim@outputs <- .fillOutputRows(value, end(sim))
 
-       # coerce any factors to the correct class
+       ## coerce any factors to the correct class
        for (col in which(sapply(sim@outputs, is.factor))) {
          sim@outputs[[col]] <- as(sim@outputs[[col]], class(.fileTableOut()[[col]]))
        }
 
-       # if saveTime not provided, give it end(sim)
+       ## if saveTime not provided, give it end(sim)
        sim@outputs[["saveTime"]][is.na(sim@outputs$saveTime)] <-
          end(sim, sim@simtimes[["timeunit"]])
        attributes(sim@outputs$saveTime)$unit <- sim@simtimes[["timeunit"]]
 
-       # Deal with file names
-       # 3 things: 1. if relative, concatenate outputPath
-       #           2. if absolute, don't use outputPath
-       #           3. concatenate time to file name in all cases
-       # If no filename provided, use the object name
+       ## Deal with file names
+       ## 3 things: 1. if relative, concatenate outputPath
+       ##           2. if absolute, don't use outputPath
+       ##           3. concatenate time to file name in all cases
+       ## If no filename provided, use the object name
        sim@outputs[["file"]][is.na(sim@outputs$file)] <-
          paste0(sim@outputs$objectName[is.na(sim@outputs$file)])
-       # If a filename is provided, determine if it is absolute path, if so,
-       # use that, if not, then append it to outputPath(sim)
+       ## If a filename is provided, determine if it is absolute path, if so,
+       ## use that, if not, then append it to outputPath(sim)
        alreadyWithOutputPath <- grepl(pattern = paste0("^", outputPath(sim)), sim@outputs$file)
        if (any(!alreadyWithOutputPath)) {
          isAP <- isAbsolutePath(as.character(sim@outputs$file))
@@ -1360,17 +1360,17 @@ setReplaceMethod(
            file.path(outputPath(sim), sim@outputs[["file"]][!isAP])
        }
 
-       # If there is no function provided, then use saveRDS, from package base
+       ## If there is no function provided, then use saveRDS, from package base
        sim@outputs[["fun"]][is.na(sim@outputs$fun)] <- "saveRDS"
        sim@outputs[["package"]][is.na(sim@outputs$package)] <- "base"
 
-       # file extension stuff
+       ## file extension stuff
        fileExts <- .saveFileExtensions()
        fileExtsHere <- setDT(fileExts)[setDT(sim@outputs[, c("fun", "package")]),
                                        on = c("fun", "package")]
        fe <- fileExtsHere$exts
 
-       # grep allows for file extensions from 1 to 5 characters
+       ## grep allows for file extensions from 1 to 5 characters
        wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) & nzchar(fe, keepNA = TRUE)
        if (anyNA(fe[wh])) {
          messageDF(unique(fileExtsHere), verbose = TRUE)
@@ -1381,8 +1381,8 @@ setReplaceMethod(
        }
        sim@outputs[["file"]][wh] <- paste0(sim@outputs[["file"]][wh], ".", fe[wh])
 
-       # If the file name already has a time unit on it,
-       # i.e., passed explicitly by user, then don't postpend again
+       ## If the file name already has a time unit on it,
+       ## i.e., passed explicitly by user, then don't postpend again
        txtTimeA <- paste0(attr(sim@outputs[["saveTime"]], "unit"))
        txtTimeB <- paddedFloatToChar(
          sim@outputs[["saveTime"]],

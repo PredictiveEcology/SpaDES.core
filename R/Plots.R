@@ -1,11 +1,13 @@
+baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
+ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
+
 #' `Plot` wrapper intended for use in a SpaDES module
 #'
 #' This is a single function call that allows a user to change which format in which
 #' the plots will occur.
 #' Specifically, the two common formats would be to `"screen"` or to disk as an image file,
 #' such as `"png"`.
-#' *THIS CURRENTLY HAS BEEN TESTED WITH `ggplot2`, `RasterLayer`, and
-#' `tmap` objects.*
+#' *This has currently been tested with `ggplot2`, `RasterLayer`, and `tmap` objects.*
 #' The default (or change with e.g., `fn = "print", usePlot = FALSE`) uses
 #' `Plot` internally, so individual plots may be rearranged. When saved to
 #' disk (e.g., via `type = 'png'`), then `Plot` will not be used and the single object
@@ -15,11 +17,10 @@
 #' arguments required by `fn`).
 #' See below and examples.
 #'
-#' @note THIS IS STILL EXPERIMENTAL and could change in the next release.
+#' @note **This is still experimental and could change in the next release.**
 #'
-#' `Plots` now has experimental support for "just a `Plot` call",
-#' but with `types` specified.
-#' See example.
+#' `Plots` now has experimental support for "just a `Plot` call", but with `types` specified.
+#' See examples.
 #' The devices to save on disk will have some different behaviours to the screen representation,
 #' since "wiping" an individual plot on a device doesn't exist for a file device.
 #'
@@ -152,7 +153,6 @@ Plots <- function(data, fn, filename,
                   ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
                   deviceArgs = list(),
                   ...) {
-
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
@@ -163,7 +163,7 @@ Plots <- function(data, fn, filename,
     }
   }
 
-  # Deal with non sim cases
+  ## Deal with non-sim cases
   if (is.null(simIsIn)) {
     if (is.call(types) && any(grepl("sim", types)))
       types <- "screen"
@@ -185,7 +185,7 @@ Plots <- function(data, fn, filename,
       .plotInitialTime <- 0L
     } else {
       sim <- get("sim", envir = simIsIn)
-      # only look in the metadata -- not the simList (which will have a default of NA)
+      ## only look in the metadata -- not the simList (which will have a default of NA)
       isPlotITinSim <- ".plotInitialTime" %in% moduleMetadata(sim, currentModule(sim))$parameters$paramName
       if (isFALSE(isPlotITinSim))
         .plotInitialTime <- NULL
@@ -203,7 +203,7 @@ Plots <- function(data, fn, filename,
   ggplotClassesCanHandleBar <- paste(ggplotClassesCanHandle, collapse = "|")
   needSave <- any(grepl(paste(ggplotClassesCanHandleBar, "|object"), types))
 
-  # has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
+  ## has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
   if (missing(fn)) {
     if (isTRUE(usePlot)) {
@@ -217,15 +217,16 @@ Plots <- function(data, fn, filename,
   }
   fnIsPlot <- identical(fn, Plot) || identical(fn, plot) || identical(fn, terra::plot)
   if (fnIsPlot) {
-    # make dummies
+    ## make dummies
     gg <- 1
     objNamePassedToData1 <- substitute(data)
     origEnv <- parent.frame()
     objNamePassedToData <- evalAttempt(objNamePassedToData1, origEnv)
-    if (!is.character(objNamePassedToData))
+    if (!is.character(objNamePassedToData)) {
       objNamePassedToData <- deparse1(objNamePassedToData)
+    }
 
-    # Try to see if the object is in the parent.frame(). If it isn't, default back to here.
+    ## Try to see if the object is in the parent.frame(). If it isn't, default back to here.
     if (!objNamePassedToData %in% ls(origEnv))
       origEnv <- environment()
     if (!(is(data, "list") && length(names(data)) == length(data))) {
@@ -254,9 +255,8 @@ Plots <- function(data, fn, filename,
   }
 
   if (needScreen) {
-
     if (fnIsPlot) {
-      if (is.list(data)){# || is(data, "RasterStack") || is(data, "RasterBrick") ||
+      if (is.list(data)) {# || is(data, "RasterStack") || is(data, "RasterBrick") ||
       #    (is(data, "SpatRaster") || is(data, "SpatVector")) && nlayers2(data) > 1)
       #  {
         dataListToScreen <- data
@@ -281,7 +281,7 @@ Plots <- function(data, fn, filename,
         }
       }
 
-      # Necessary for inheritance -- pass the environment with correct inheritance
+      ## Necessary for inheritance -- pass the environment with correct inheritance
       if (!is.null(simIsIn)) {
         newEnv <- new.env(parent = simIsIn)
       } else {
@@ -310,7 +310,6 @@ Plots <- function(data, fn, filename,
         print(gg)
       }
     }
-
   }
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
@@ -328,8 +327,9 @@ Plots <- function(data, fn, filename,
       filename <- basename(filename)
     }
 
-    if (is(path, "character"))
+    if (is(path, "character")) {
       checkPath(path, create = TRUE)
+    }
   }
 
   if (needSaveRaw) {
@@ -376,7 +376,6 @@ Plots <- function(data, fn, filename,
           }
           message("Saved figure to: ", theFilename)
         }
-
       }
     } else {
       ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
@@ -415,7 +414,6 @@ Plots <- function(data, fn, filename,
   return(invisible(NULL))
 }
 
-
 #' Test whether there should be any plotting from `.plots` module parameter
 #'
 #' This will do all the various tests needed to determine whether
@@ -437,9 +435,6 @@ anyPlotting <- function(.plots) {
 
   needSaveRaw || needSave || needScreen
 }
-
-ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
-baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 
 #' Guess package of a function
 #'
