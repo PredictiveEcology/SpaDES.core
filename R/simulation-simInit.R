@@ -1520,6 +1520,7 @@ loadPkgs <- function(reqdPkgs) {
 }
 
 #' @importFrom quickPlot whereInStack
+#' @importFrom Require messageVerbose
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
   depsGr <- depsGraph(sim, plot = FALSE)
@@ -1725,6 +1726,8 @@ getDebug <- function() {
   debug
 }
 
+#' @keywords internal
+#' @importFrom Require messageVerbose
 dealWithOptions <- function(objects, ..., sim,
                             thePkgs = c("SpaDES.core", "reproducible", "Require")) {
   finished <- FALSE

@@ -33,6 +33,7 @@
 #' It will return the current value if there are no other modules with the same parameter.
 #'
 #' @export
+#' @importFrom Require messageVerbose
 #' @rdname paramCheckOtherMods
 paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
                                 ifSetButDifferent = c("error", "warning", "message", "silent"),

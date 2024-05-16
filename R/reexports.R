@@ -21,8 +21,6 @@ isRaster <- getFromNamespace("isRaster", "reproducible")
 isSpat <- getFromNamespace("isSpat", "reproducible")
 layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
 
-messageVerbose <- utils::getFromNamespace("messageVerbose", "Require")
-
 makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 
 ## re-exported functions --------------------------------------------------------

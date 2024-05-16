@@ -24,11 +24,11 @@ utils::globalVariables(c(".", ".I", "tagKey", "whi"))
 #' @export
 #' @importFrom data.table data.table rbindlist fread
 #' @importFrom reproducible Cache messageDF
+#' @importFrom Require messageVerbose
 #' @importFrom utils write.table
 #' @include helpers.R memory-leaks.R
 #' @keywords internal
 #' @rdname doEvent
-#'
 doEvent <- function(sim, debug = FALSE, notOlderThan,
                     useFuture = getOption("spades.futureEvents", FALSE),
                     events = NULL,
