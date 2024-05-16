@@ -49,11 +49,11 @@ setMethod(
     zipFiles <- grep(paste0(name, "_+.+.zip"), moduleFiles, value = TRUE) # moduleName_....zip only
     zipFiles <- grep(file.path(name, "data"), zipFiles, invert = TRUE, value = TRUE) # remove any zip in data folder
     # all zip files is not correct behaviour, only
-    versions <- strsplit(zipFiles, "_") %>%
-      unlist() %>%
-      grep("[.]zip$", ., value = TRUE) %>%
-      strsplit(., "[.]zip$") %>%
-      unlist() %>%
+    versions <- strsplit(zipFiles, "_") |>
+      unlist() |>
+      grep("[.]zip$", x = _, value = TRUE) |>
+      strsplit("[.]zip$") |>
+      unlist() |>
       as.numeric_version()
     currentVersion <- sort(versions, decreasing = TRUE)[1]
 
@@ -69,7 +69,6 @@ setMethod("getModuleVersion",
             return(v)
 })
 
-################################################################################
 #' Check for the existence of a remote module
 #'
 #' Looks in the remote `repo` for a module named `name`.
@@ -123,12 +122,12 @@ setMethod(
         moduleFiles <- grep(paste0("^", name), allFiles, value = TRUE)
         if (length(moduleFiles) == 0) {
           agrep(name, allFiles, max.distance = 0.25, value = TRUE,
-                ignore.case = FALSE) %>%
-            strsplit(., split = "/") %>%
-            lapply(., function(x) x[2]) %>%
-            unique() %>%
-            unlist() %>%
-            paste(., collapse = ", ") %>%
+                ignore.case = FALSE) |>
+            strsplit(split = "/") |>
+            lapply(function(x) x[2]) |>
+            unique() |>
+            unlist() |>
+            paste(collapse = ", ") |>
             stop("Module ", name, " does not exist in the repository. ",
                  "Did you mean: ", ., "?")
         }
@@ -169,12 +168,10 @@ setMethod("checkModule",
 #'
 #' @return Logical indicating presence of the module (invisibly).
 #'
+#' @author Alex Chubaty
 #' @export
 #' @rdname checkModuleLocal
 #'
-#' @author Alex Chubaty
-#'
-# igraph exports %>% from magrittr
 setGeneric("checkModuleLocal", function(name, path, version) {
   standardGeneric("checkModuleLocal")
 })
@@ -189,13 +186,10 @@ setMethod(
       name <- name[1]
     }
 
-    essentialFiles <- c(
-      paste0(name, ".R")
-    ) %>%
-      file.path(path, name, .)
+    essentialFiles <- file.path(path, name, c(paste0(name, ".R")))
 
-    moduleFiles <- file.path(path, name) %>%
-      list.files(full.names = TRUE, recursive = TRUE) %>%
+    moduleFiles <- file.path(path, name) |>
+      list.files(full.names = TRUE, recursive = TRUE) |>
       unlist(use.names = FALSE)
 
     result <- FALSE
