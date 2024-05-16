@@ -1959,7 +1959,6 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
         message(crayon::green(substring(x, first = 1, last = w - 30))))
     }
   }
-
 }
 
 updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
@@ -2036,7 +2035,6 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 
   mess
 }
-
 
 #' Alternative way to define events in SpaDES.core
 #'
@@ -2122,8 +2120,6 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
     # envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
   }
 
-
-
   eventFnName <-  makeEventFn(moduleName, eventName)
   fn <- defineEventFnMaker(substitute(code), eventFnName)
   # fn <- paste0("
@@ -2208,9 +2204,7 @@ debugMessTRUE <- function(sim, events) {
   outMess
 }
 
-
 runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"), currnt) {
-
   if (missing(currnt)) {
     currnt <- unlist(current(sim))
     currnt[["eventTime"]] <- as.numeric(currnt[["eventTime"]])
@@ -2235,14 +2229,13 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
     }
   }
   sim
-
-
-
 }
 
-paramsDontCacheOn <- c(".useCache", ".useParallel",
-                       paste0(".", c("plots", "plotInterval", "plotInitialTime", "saveInitialTime", "saveInterval"))) # don't change Caching based on .useCache
-                                                    # e.g., add "init" to ".inputObjects" vector shouldn't recalculate
+## don't change Caching based on .useCache etc. -
+## e.g., add "init" to .inputObjects vector shouldn't recalculate
+paramsDontCacheOn <- paste0(".", c("plotInitialTime", "plotInterval", "plots",
+                                   "saveInitialTime", "saveInterval",
+                                   "useCache", "useParallel"))
 
 #' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache showCache
 allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
