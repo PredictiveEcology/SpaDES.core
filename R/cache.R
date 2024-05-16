@@ -301,7 +301,7 @@ if (!isGeneric(".cacheMessage")) {
 #'
 #' @exportMethod .cacheMessage
 #' @importFrom crayon blue
-#' @importFrom reproducible .cacheMessage
+#' @importFrom reproducible .cacheMessage messageCache
 #' @importMethodsFrom reproducible .cacheMessage
 #' @inheritParams reproducible::.cacheMessage
 #' @include simList-class.R

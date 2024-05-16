@@ -3,12 +3,6 @@
 .message <- getFromNamespace(".message", "reproducible") ## envir for messages + message-funs
 .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
 
-#' @importFrom reproducible messageColoured
-messageColoured <- reproducible::messageColoured
-
-#' @importFrom reproducible messageCache
-messageCache <- reproducible::messageCache
-
 ## TODO: why aren't these properly exported if intended for use?
 ## see <https://github.com/PredictiveEcology/Require/issues/105>
 ## and <https://github.com/PredictiveEcology/reproducible/issues/389>

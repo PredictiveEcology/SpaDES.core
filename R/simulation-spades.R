@@ -2237,7 +2237,8 @@ paramsDontCacheOn <- paste0(".", c("plotInitialTime", "plotInterval", "plots",
                                    "saveInitialTime", "saveInterval",
                                    "useCache", "useParallel"))
 
-#' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache showCache
+#' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache
+#' @importFrom reproducible messageCache showCache
 allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
   .message$IndentUpdate()
   attr(sim, "runFnCallAsExpr") <- NULL

@@ -1635,6 +1635,8 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates, dontUseGl
 }
 
 
+#' @keywords internal
+#' @importFrom reproducible messageColoured
 objectsCreatedPost <- function(sim, objsIsNullBefore) {
   objsIsNullAfter <- objsAreNull(sim)
   newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
