@@ -66,7 +66,7 @@
 #' @importFrom fs path_common
 #' @importFrom qs qsave
 #' @importFrom stats runif
-#' @importFrom reproducible makeRelative
+#' @importFrom reproducible makeRelative .wrap
 #' @importFrom Require messageVerbose
 #' @importFrom tools file_ext
 #' @importFrom utils modifyList
@@ -80,8 +80,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
   ## user can explicitly override archiving files if FALSE
   if (isFALSE(dots$files)) {
-    cache <- inputs <- outputs <- FALSE
-    files <- FALSE
+    files <- cache <- inputs <- outputs <- FALSE
   } else {
     files <- TRUE
   }
@@ -105,6 +104,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       dots$fileBackedDir <- NULL
     }
   }
+
   if (!is.null(dots$filebackend))
     if (is.null(dots$fileBackend)) {
       dots$fileBackend <- dots$filebackend
@@ -146,7 +146,6 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     empties <- nchar(fns) == 0
     if (any(empties)) {
       fns <- fns[!empties]
-      fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns) ## TODO: not used?
     }
   }
 
@@ -276,7 +275,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @rdname loadSimList
 #' @seealso [saveSimList()], [zipSimList()]
 #' @importFrom qs qread
-#' @importFrom reproducible updateFilenameSlots linkOrCopy
+#' @importFrom reproducible linkOrCopy remapFilenames updateFilenameSlots .unwrap
 #' @importFrom tools file_ext
 loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
                         paths = NULL, otherFiles = "",
@@ -290,7 +289,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     filename <- archiveExtract(filename, exdir = td)
     filenameRel <- gsub(paste0(td, "/"), "", filename[-1])  ## TODO: WRONG!
 
-    # This will put the files to relative path of projectPath
+    ## This will put the files to relative path of projectPath
     newFns <- file.path(projectPath, filenameRel)
     linkOrCopy(filename[-1], newFns, verbose = verbose - 1)
   } else {
@@ -322,10 +321,9 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
   paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
 
-  # need to remap all the file-backed objects --> their paths in the objects will point
-  #   to their old locations, but they are now at newFns, which is remapped to projectPath
-  oldFns <- Filenames(tmpsim, returnList = TRUE)
-  oldFns <- oldFns[lengths(oldFns) > 0]
+  ## remap all the file-backed objects. their paths in the objects will point
+  ## to their old locations, but they are now at newFns, which is remapped to projectPath
+  oldFns <- Filenames(tmpsim, returnList = FALSE) ## will remove length 0 filenames
   for (nam in names(oldFns)) {
     tags <- attr(tmpsim[[nam]], "tags")
     if (!is.null(tags)) {
@@ -342,12 +340,10 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 
-  # Work around for bug in qs that recovers data.tables as lists
+  ## Work around for bug in qs that recovers data.tables as lists
   tmpsim <- recoverDataTableFromQs(tmpsim)
 
-  mods <- setdiff(tmpsim@modules, .coreModules())
-
-  # Deal with all the RasterBacked Files that will be wrong
+  ## Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {
     .dealWithRasterBackends(tmpsim) # no need to assign to sim b/c uses list2env
   }

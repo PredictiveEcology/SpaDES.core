@@ -26,7 +26,6 @@ layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
 loadFile <- getFromNamespace("loadFile", "reproducible")
 makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 messageVerbose <- utils::getFromNamespace("messageVerbose", "Require")
-remapFilenames <- getFromNamespace("remapFilenames", "reproducible")
 
 ## re-exported functions --------------------------------------------------------
 
