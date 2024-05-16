@@ -3,7 +3,7 @@
 \name{append_attr}
 \alias{append_attr}
 \alias{append_attr,list,list-method}
-\title{Add a module to a \code{moduleList}}
+\title{Append attributes}
 \usage{
 append_attr(x, y)
 
@@ -16,8 +16,9 @@ append_attr(x, y)
 An updated \code{list} with attributes.
 }
 \description{
-Ordinary base lists and vectors do not retain their attributes when subsetted
-or appended. This function appends items to a list while preserving the
+Ordinary base lists and vectors do not retain their attributes
+when subsetted or appended.
+This function appends items to a list while preserving the
 attributes of items in the list (but not of the list itself).
 }
 \details{

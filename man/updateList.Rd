@@ -7,9 +7,7 @@
 updateList(x, y)
 }
 \arguments{
-\item{x}{a named list}
-
-\item{y}{a named list}
+\item{x, y}{a named list}
 }
 \value{
 A named list, with elements sorted by name.

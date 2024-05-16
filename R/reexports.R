@@ -14,16 +14,16 @@ messageCache <- reproducible::messageCache
 ## and <https://github.com/PredictiveEcology/reproducible/issues/389>
 compareVersion2 <- getFromNamespace("compareVersion2", "Require")
 extractInequality <- getFromNamespace("extractInequality", "Require")
-fileExt <- getFromNamespace("fileExt", "reproducible")
-filePathSansExt <- getFromNamespace("filePathSansExt", "reproducible")
 getDrv <- getFromNamespace("getDrv", "reproducible")
 isWindows <- getFromNamespace("isWindows", "reproducible")
 isAbsolutePath <- getFromNamespace("isAbsolutePath", "reproducible")
 isRaster <- getFromNamespace("isRaster", "reproducible")
 isSpat <- getFromNamespace("isSpat", "reproducible")
 layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
-makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
+
 messageVerbose <- utils::getFromNamespace("messageVerbose", "Require")
+
+makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 
 ## re-exported functions --------------------------------------------------------
 

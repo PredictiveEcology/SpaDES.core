@@ -110,6 +110,7 @@ Collate:
     'modActiveBinding.R'
     'module-define.R'
     'module-dependencies-methods.R'
+    'module-param-check.R'
     'module-repository.R'
     'module-template.R'
     'moduleCoverage.R'
