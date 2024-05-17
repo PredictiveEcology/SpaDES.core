@@ -52,7 +52,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' The `simList` will be in the state it was at the time of the error.
 #'
 #' @param sim A `simList.` If not supplied (the default), this will take the `sim` from
-#'    `SpaDES.core:::savedSimEnv()$.sim`, i.e., the one that was interrupted
+#'    `savedSimEnv()$.sim`, i.e., the one that was interrupted
 #'
 #' @param module A character string length one naming the module that caused the error and
 #'   whose source code was fixed. This module will be re-parsed and placed into the `simList`
@@ -81,7 +81,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- spades(s) # if this is interrupted or fails
 #' # the following line will not work if the previous line didn't fail
 #' s <- restartSpades(s) # don't need to specify `sim` if previous line fails
-#'                      # will take from SpaDES.core:::savedSimEnv()$.sim automatically
+#'                      # will take from savedSimEnv()$.sim automatically
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...) {
   message("This is very experimental and will only work if the event that caused ",
@@ -265,7 +265,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' This is only intended to restart a simulation in exactly the same place as it was
 #' (i.e., cannot change machines), and because of the restart, the assignment of the `spades`
 #' call will be either to `sim` or the user must make such an assignment manually,
-#' e.g., `sim <- SpaDES.core:::savedSimEnv()$.sim`.
+#' e.g., `sim <- savedSimEnv()$.sim`, or perhaps, the safer `sim <- Copy(savedSimEnv()$.sim)`.
 #' This is stated in a message.
 #'
 #' @details
@@ -514,7 +514,7 @@ First <- function(...) {
     sim <- eval(.spadesCall)
     message(crayon::green("Because restartR was used, the simList is located in the location above.",
                           " It should be assigned to an object immediately: e.g.,\n",
-                          "sim <- SpaDES.core:::savedSimEnv()$.sim"))
+                          "sim <- Copy(savedSimEnv()$.sim)"))
   } else {
     message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
                           " named 'sim' (which may not be the same as the original assignment)"))

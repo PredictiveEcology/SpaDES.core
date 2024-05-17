@@ -63,7 +63,7 @@ e.g., \code{options("spades.restartRInterval" = 100)}.
 This is only intended to restart a simulation in exactly the same place as it was
 (i.e., cannot change machines), and because of the restart, the assignment of the \code{spades}
 call will be either to \code{sim} or the user must make such an assignment manually,
-e.g., \code{sim <- SpaDES.core:::savedSimEnv()$.sim}.
+e.g., \code{sim <- savedSimEnv()$.sim}, or perhaps, the safer \code{sim <- Copy(savedSimEnv()$.sim)}.
 This is stated in a message.
 }
 \details{

@@ -1,17 +1,15 @@
 test_that("local mod object", {
   testInit(smcc = FALSE, debug = FALSE, verbose = TRUE,
-           opts = list("reproducible.useMemoise" = FALSE))
-  opts <- options(reproducible.cachePath = tmpCache)
-  on.exit(options(opts), add = TRUE)
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache)
 
   newModule("test", tmpdir, open = FALSE)
   newModule("test2", tmpdir, open = FALSE)
   testFilePath <- file.path(tmpdir, "test", "test.R")
   test2FilePath <- file.path(tmpdir, "test2", "test2.R")
 
-  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+  ## 2018-09-18: Changed to use "seconds" -- better comparison with simple loop
   cat(file = testFilePath, testCode, fill = TRUE)
-
   cat(file = test2FilePath, test2Code, fill = TRUE)
 
   mySim <- simInit(times = list(start = 0, end = 0),
@@ -121,26 +119,28 @@ test_that("local mod object", {
     expect_true(sum(grepl("There was an error", mess)) == len)
   })
 
-  # Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
+  ## Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
   if (interactive()) {
-    opt <- options("spades.recoveryMode" = TRUE)
-    on.exit(options(opt), add = TRUE)
+    withr::local_options(spades.recoveryMode = TRUE)
+
     mySim8 <- simInit(times = list(start = 0, end = 0),
                       paths = list(modulePath = tmpdir), modules = c("test", "test2"),
                       params = list(test2 = list(testRestartSpades = 1)))
     ss <- try(spades(mySim8, debug = FALSE), silent = TRUE)
 
-    sim <- asNamespace("SpaDES.core")$savedSimEnv()$.sim
+    sim <- savedSimEnv()$.sim ## TODO: retrieves NULL
+    expect_true(is(sim, "simList"))
+
     err <- capture_error({
       sim2 <- restartSpades(sim, debug = FALSE)
     }) # is missing completed events
 
-    sim <- asNamespace("SpaDES.core")$savedSimEnv()$.sim
+    sim <- savedSimEnv()$.sim
     err <- capture_error({
       sim3 <- restartSpades(sim, debug = FALSE)
     }) # is missing completed events
 
-    sim <- asNamespace("SpaDES.core")$savedSimEnv()$.sim
+    sim <- savedSimEnv()$.sim
     sim@params$test2$testRestartSpades <- NULL
     sim3 <- restartSpades(sim, debug = FALSE)
     expect_true(NROW(completed(sim3)) == 7)

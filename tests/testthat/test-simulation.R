@@ -826,8 +826,7 @@ test_that("messaging with multiple modules", {
   for (y in 3:4) {
     cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
   }
-  opts <- options("spades.allowInitDuringSimInit" = FALSE)
-  on.exit(options(opts), add = TRUE)
+  withr::local_options(spades.allowInitDuringSimInit = FALSE)
   mm1 <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
   mm1 <- cleanMessage(mm1)
   expect_true(all(unlist(lapply(fullMessage,

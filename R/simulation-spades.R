@@ -1,6 +1,27 @@
 utils::globalVariables(c(".", ".I", "tagKey", "whi"))
 
-################################################################################
+#' @keywords internal
+.savedSimEnv <- new.env()
+.savedSimEnv$.sim <- list() ## placeholder for future simList
+
+#' Retrieve environment for saving interrupted simulations
+#'
+#' If the user sets `options(reproducible.memoisePersist = TRUE)`,
+#' the global environment will be used, otherwise, a package environment.
+#'
+#' @param envir an environment to use to store the `.sim` (`simList`) object.
+#'              default is to use the user's global environment (`.GlobalEnv`).
+#'
+#' @export
+#' @rdname savedSimEnv
+savedSimEnv <- function(envir = .GlobalEnv) {
+  if (isTRUE(getOption("reproducible.memoisePersist"))) {
+    envir
+  } else {
+    .savedSimEnv
+  }
+}
+
 #' Process a simulation event
 #'
 #' Internal function called from `spades`.
@@ -941,19 +962,20 @@ setMethod(
 
     sim <- withCallingHandlers({
       recoverModeWrong <- getOption("spades.recoverMode")
-      if (!is.null(recoverModeWrong))
+      if (!is.null(recoverModeWrong)) {
         warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+      }
       recoverMode <- getOption("spades.recoveryMode", FALSE)
 
-      # If there already is a sim object saved in the .pkgEnv, it may have objects,
-      #   and those objects may have temporary files from file-backed objects stored.
-      #   This will remove those file-backed temp files
+      ## If there already is a sim object saved in the package .savdeSimEnv, it may have objects,
+      ##   and those objects may have temporary files from file-backed objects stored.
+      ##   This will remove those file-backed temp files.
       clearFileBackedObjs(savedSimEnv()$.sim$.recoverableObjs, recoverMode)
-      .savedSimEnv <- savedSimEnv() # can't assign to a function
-      .savedSimEnv$.sim <- NULL
-      .savedSimEnv$.sim <- sim # set up pointer
+      svdSimEnv <- savedSimEnv() # can't assign to a function
+      svdSimEnv$.sim <- NULL
+      svdSimEnv$.sim <- sim # set up pointer
 
-      # set the options("spades.xxxPath") to the values in the sim@paths
+      ## set the options("spades.xxxPath") to the values in the sim@paths
       oldGetPaths <- getPaths()
       do.call(setPaths, append(sim@paths, list(silent = TRUE)))
       on.exit({
@@ -1038,8 +1060,8 @@ setMethod(
                     crayon::blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
                     crayon::magenta("It will be deleted at next spades() call."))
           }
-          .savedSimEnv <- savedSimEnv() # can't assign to a function
-          .savedSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
+          svdSimEnv <- savedSimEnv() # can't assign to a function
+          svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
           .pkgEnv$.cleanEnd <- NULL
         }
         # For restarting R -- a few extra pieces, including saving the simList as the last thing
@@ -2471,14 +2493,6 @@ appendEvents <- function(sim, eventTime, eventType, moduleName, eventPriority) {
   }
   sim
 }
-
-savedSimEnv <- function(envir = .GlobalEnv) {
-  if (!isTRUE(getOption("reproducible.memoisePersist"))) {
-    envir <- new.env(parent = emptyenv())
-  }
-  envir
-}
-
 
 defineEventFnMaker <- function(code, eventFnName) {
   codeAsTxt <- format(code)

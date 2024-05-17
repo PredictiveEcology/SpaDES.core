@@ -4,6 +4,7 @@
 * fixed issue saving simLists when multiple paths were used (e.g., `length(modulePath) > 1`);
 * events can be defined directly in calls to `newModule()`;
 * checkpoints are assumed to be used locally, and no longer invoke simulation file archiving and re-extraction of files (i.e., uses `saveSimList(..., inputs = FALSE, outputs = FALSE, cache = FALSE, files = FALSE)`);
+* improved recovery of interrupted simulations via `savedSimEnv()$.sim` -- `savedSimEnv()` is now exported for easier discovery -- an internal package environment is used, unless the user specifies `options(reproducible.memoisePersist = TRUE)`, which will use the global environment to store the `.sim` object;
 
 ## Breaking changes
 
