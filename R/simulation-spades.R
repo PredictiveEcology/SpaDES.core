@@ -2501,10 +2501,8 @@ defineEventFnMaker <- function(code, eventFnName) {
   if (identical(codeAsTxt[length(codeAsTxt)], "}"))
     codeAsTxt <- codeAsTxt[-length(codeAsTxt)]
   fn <- paste0("
-",eventFnName," <- function(sim, eventTime, eventType, priority) {
-",
-paste(codeAsTxt, collapse = "\n")
-,"
+", eventFnName, " <- function(sim, eventTime, eventType, priority) {
+", paste(codeAsTxt, collapse = "\n") ,"
   return(sim)
 }
 ")

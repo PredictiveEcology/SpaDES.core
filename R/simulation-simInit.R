@@ -1826,7 +1826,6 @@ elapsedTimeInSimInit <- function(._startClockTime, sim) {
   sim
 }
 
-
 warningSplitOnColon <- function(w) {
   mess <- strsplit(w$message, "\\): ")[[1]]
   len <- length(mess)
@@ -1839,7 +1838,6 @@ warningSplitOnColon <- function(w) {
 prefixSimInit <- " simInit:"
 
 spaceDashDashSpace <- " -- "
-
 
 simNestingSetup <- function(...) {
   prevSimEnv <- tryCatch(whereInStack("._simNesting"), error = function(x) character())
