@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  ".", "._prevEventTimeFinish", ".attachedPkgsFilename", "et", ".First", ".oldWd",
+  ".", "._clockTime", "._prevEventTimeFinish", ".attachedPkgsFilename", "et", ".First", ".oldWd",
   ".spadesCall", ".spades.restartRInterval", ".spades.simFilename"
 ))
 
@@ -102,10 +102,11 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   if (numMods > 0) {
     com <- completed(sim)
-    etSecs <- sum(com[, et := difftime(clockTime, ._prevEventTimeFinish, units = "secs"), by = seq(NROW(com))]$et)
+    etSecs <- sum(com[, et := difftime(._clockTime, ._prevEventTimeFinish, units = "secs"),
+                      by = seq(NROW(com))]$et)
 
     # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
-    # et <- difftime(tail(com$clockTime, numMods - 1)[1], com$clockTime[1])
+    # et <- difftime(tail(com$._clockTime, numMods - 1)[1], com$._clockTime[1])
     st <- Sys.time()
     sim$._startClockTime <- st - etSecs
 
