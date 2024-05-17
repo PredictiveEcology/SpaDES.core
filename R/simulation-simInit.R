@@ -1178,7 +1178,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' and remove it from the `simList` so next module won't rerun it.
 #'
 #' @keywords internal
-#' @importFrom crayon green
+#' @importFrom cli col_green
 #' @importFrom reproducible basename2
 #' @rdname runModuleInputsObjects
 .runModuleInputObjects <- function(sim, m, objects, notOlderThan) {
@@ -1227,7 +1227,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         }
       }
 
-      message(crayon::green("Running .inputObjects for ", mBase, sep = ""))
+      message(cli::col_green("Running .inputObjects for ", mBase, sep = ""))
 
       debug <- getDebug() # from options first, then override if in a simInitAndSpades
 
@@ -1337,7 +1337,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
     }
   } else {
-    message(crayon::green("All required inputObjects for ",mBase, " provided; skipping .inputObjects"))
+    message(cli::col_green("All required inputObjects for ",mBase, " provided; skipping .inputObjects"))
   }
 
   sim@current <- list()
@@ -1538,11 +1538,11 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
     if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
       verbose <- getOption("reproducible.verbose")
-      messageVerbose(crayon::yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
-      messageVerbose(crayon::yellow("as their outputs are needed by the other modules and ",
+      messageVerbose(cli::col_yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
+      messageVerbose(cli::col_yellow("as their outputs are needed by the other modules and ",
                                     "can be safely run"), verbose = verbose)
       safeToRunModules <- paste(canSafelyRunInit, collapse = ", ")
-      messageVerbose(crayon::yellow(safeToRunModules), verbose = verbose)
+      messageVerbose(cli::col_yellow(safeToRunModules), verbose = verbose)
       stripNchars <- getOption("spades.messagingNumCharsModule") - 5
       stripNcharsSpades <- 2 #stripNchars + 2
       stripNcharsSimInit <- stripNchars + 5
@@ -1558,7 +1558,7 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
                           times = list(start = as.numeric(start(sim)),
                                        end = as.numeric(end(sim)), timeunit = timeunit(sim)))
         simAlt@.xData$._ranInitDuringSimInit <- completed(simAlt)$moduleName
-        messageVerbose(crayon::yellow("**** Running spades call for:", safeToRunModules, "****"))
+        messageVerbose(cli::col_yellow("**** Running spades call for:", safeToRunModules, "****"))
         simAltOut <- spades(simAlt, events = "init", debug = debug)
       })
 
@@ -1704,15 +1704,15 @@ stopMessForRequireFail <- function(pkg) {
   "\nIf this/these occur(s) again, your session likely ",
   "pre-loads old packages from e.g., your personal library. ",
   "The best thing to do is try to\n",
-  crayon::yellow("restart R without loading any packages."),
+  cli::col_yellow("restart R without loading any packages."),
   "\n\nIf that is not easy to do, you can try to update it in that location with (for a CRAN package) e.g., :\n",
-  crayon::yellow("restart R "),
-  crayon::blue(paste0("\ninstall.packages(c('", pkg, "'))")),
-  crayon::yellow("\nrestart R"),
+  cli::col_yellow("restart R "),
+  cli::col_blue(paste0("\ninstall.packages(c('", pkg, "'))")),
+  cli::col_yellow("\nrestart R"),
   "\n\nIf that does not work (including non-CRAN packages), perhaps removing the old one...",
-  crayon::yellow("\nrestart R "),
-  crayon::blue(paste0("\nremove.packages(c('", pkg, "'))")),
-  crayon::yellow("\nrestart R"),
+  cli::col_yellow("\nrestart R "),
+  cli::col_blue(paste0("\nremove.packages(c('", pkg, "'))")),
+  cli::col_yellow("\nrestart R"),
   "\nThis should trigger a re-installation, or allow ",
   "for a manual install.packages ...")
 }
@@ -1849,12 +1849,12 @@ simNestingSetup <- function(...) {
   c(prevSimEnv, messageTxt)
 }
 
-
+#' @importFrom cli col_green
 simNestingOverride <- function(sim, mBase) {
   len <- length(sim[["._simNesting"]])
   ._simNestingTail <- sim[["._simNesting"]][len]
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
   modName8Chars <- moduleNameStripped(mBase, numCharsMax)
-  sim[["._simNesting"]][len] <- paste0(modName8Chars, ":", green(sim@current$eventType))
+  sim[["._simNesting"]][len] <- paste0(modName8Chars, ":", cli::col_green(sim@current$eventType))
   sim[["._simNesting"]]
 }

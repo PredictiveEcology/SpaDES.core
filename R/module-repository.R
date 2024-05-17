@@ -83,7 +83,7 @@ setMethod("getModuleVersion",
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
-#' @importFrom crayon magenta
+#' @importFrom cli col_magenta
 #' @importFrom utils packageVersion
 #' @rdname checkModule
 setGeneric("checkModule", function(name, repo) {
@@ -112,7 +112,7 @@ setMethod(
       request <- if (identical(pat, "")) {
         httr::GET(apiurl, ua)
       } else {
-        message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
+        message(cli::col_magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
         httr::GET(apiurl, ua, config = list(httr::config(token = pat)))
       }
       httr::stop_for_status(request)
@@ -314,7 +314,7 @@ setMethod(
         request <- if (identical(pat, "")) {
           httr::GET(zip, ua, httr::write_disk(localzip, overwrite = overwrite))
         } else {
-          message(crayon::magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
+          message(cli::col_magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
           httr::GET(zip, ua, config = list(httr::config(token = pat)),
                     httr::write_disk(localzip, overwrite = overwrite))
         }
@@ -377,7 +377,7 @@ setMethod(
     } else {
       dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
     }
-    message(crayon::magenta("Download complete for module ", name,
+    message(cli::col_magenta("Download complete for module ", name,
                             " (v", version, " at '", path,"').", sep = ""))
     } else{
       stop("downloadModule does not work without httr package: ",

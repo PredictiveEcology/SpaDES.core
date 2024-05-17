@@ -383,7 +383,7 @@ setMethod(
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
-#' @importFrom crayon magenta
+#' @importFrom cli col_magenta
 #'
 #' @examples
 #' parameters = rbind(
@@ -468,7 +468,7 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
     if (isTRUE(classWrong)) {
       # any messages here are captured if this is run from .parseModule
       #   It will append module name
-      message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
+      message(cli::col_magenta("defineParameter: '", name, "' is not of specified type '",
                               class, "'.", sep = ""))
     }
   }

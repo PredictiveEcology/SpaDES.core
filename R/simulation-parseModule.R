@@ -182,7 +182,7 @@ setMethod(
 #' @return A `simList` simulation object.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @importFrom crayon blue green
+#' @importFrom cli col_blue col_green
 #' @importFrom reproducible Cache
 #' @include environment.R
 #' @include module-dependencies-class.R
@@ -254,7 +254,7 @@ setMethod(
           if (!requireNamespace("roxygen2")) stop("Please install.packages(c('roxygen2'))")
           namespaceFile <- dir(m, pattern = "NAMESPACE")
           if (isTRUE(getOption("spades.moduleDocument", NULL)) || length(namespaceFile) == 0) {
-            message(crayon::blue("    To skip rebuilding documentation, set options('spades.moduleDocument' = FALSE)"))
+            message(cli::col_blue("    To skip rebuilding documentation, set options('spades.moduleDocument' = FALSE)"))
             roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
             pkgload::dev_topic_index_reset(m)
             pkgload::unload(.moduleNameNoUnderscore(mBase)) # so, unload here before reloading without exporting
@@ -289,7 +289,7 @@ setMethod(
 
           # evaluate the rest of the parsed file
           if (doesntUseNamespacing) {
-            stop("Module ", crayon::green(mBase), " still uses the old way of function naming.\n  ",
+            stop("Module ", cli::col_green(mBase), " still uses the old way of function naming.\n  ",
                  "It is now recommended to define functions that are not prefixed with the module name\n  ",
                  "and to no longer call the functions with sim$functionName.\n  ",
                  "Simply call functions in your module with their name: e.g.,\n  ",

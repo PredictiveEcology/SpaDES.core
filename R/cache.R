@@ -300,7 +300,7 @@ if (!isGeneric(".cacheMessage")) {
 #' See [reproducible::.cacheMessage()].
 #'
 #' @exportMethod .cacheMessage
-#' @importFrom crayon blue
+#' @importFrom cli col_blue
 #' @importFrom reproducible .cacheMessage messageCache
 #' @importMethodsFrom reproducible .cacheMessage
 #' @inheritParams reproducible::.cacheMessage
@@ -327,13 +327,13 @@ setMethod(
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       # if (isTRUE(useCacheVals[[whCurrent]])) {
       #   if (isTRUE(fromMemoise)) {
-      #     message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module"))
+      #     message(cli::col_blue("  Loading memoised copy of", cur$moduleName, "module"))
       #   } else if (!is.na(fromMemoise)) {
-      #     message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
+      #     message(cli::col_blue("     loaded cached copy of", cur$moduleName, "module"),
       #             "\n        ",
-      #             crayon::blue(.message$AddingToMemoised))
+      #             cli::col_blue(.message$AddingToMemoised))
       #   } else {
-      #     message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
+      #     message(cli::col_blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
       #   }
       # } else {
       messageCache(.message$HangingIndent, "for ", cur$eventType, " event in ", cur$moduleName, " module", verbose = verbose)

@@ -72,7 +72,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
-#' @importFrom crayon blue
+#' @importFrom cli col_blue
 #'
 #' @examples
 #' \donttest{
@@ -181,7 +181,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
         }
       }
 
-      message(crayon::blue("Reversing event: ",
+      message(cli::col_blue("Reversing event: ",
                            paste(collapse = " ",
                                  paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
       invisible()
@@ -217,7 +217,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
         lapply(pp, function(pp1) evalWithActiveCode(pp1,
                                                     sim@.xData$.mods[[module]],
                                                     sim = sim))
-        message(crayon::blue("Reparsing", module, "source code"))
+        message(cli::col_blue("Reparsing", module, "source code"))
       }
       #rm(list = "sim", envir = ee)
       #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
@@ -328,7 +328,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' @return invoked for side effect of restarting the R session
 #'
 #' @export
-#' @importFrom crayon bgBlue white
+#' @importFrom cli bg_blue col_white
 #' @importFrom reproducible checkPath
 restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
                      .RDataFile = getOption("spades.restartR.RDataFilename"),
@@ -401,7 +401,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   mu <- sum(gc()[, 1] * c(as.integer(8 * .Machine$sizeof.pointer - .Machine$sizeof.pointer),
                           as.integer(8)))
   class(mu) <- "object_size"
-  message(crayon::bgBlue(crayon::white(format(mu, units = "auto"))))
+  message(cli::bg_blue(cli::col_white(format(mu, units = "auto"))))
   #}
 
   .spadesCall <- sim$._restartRList$.spadesCall
@@ -453,7 +453,7 @@ FirstFromR <- function(...) {
   First(.rndString = .rndString)
 }
 
-#' @importFrom crayon green
+#' @importFrom cli col_green
 #' @keywords internal
 First <- function(...) {
   # From Rstudio, it gets all the correct, session-specific files.
@@ -512,11 +512,11 @@ First <- function(...) {
   })
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
-    message(crayon::green("Because restartR was used, the simList is located in the location above.",
+    message(cli::col_green("Because restartR was used, the simList is located in the location above.",
                           " It should be assigned to an object immediately: e.g.,\n",
                           "sim <- Copy(savedSimEnv()$.sim)"))
   } else {
-    message(crayon::green("Because restartR was used, the simList is now saved in the .GlobalEnv",
+    message(cli::col_green("Because restartR was used, the simList is now saved in the .GlobalEnv",
                           " named 'sim' (which may not be the same as the original assignment)"))
   }
   return(sim)

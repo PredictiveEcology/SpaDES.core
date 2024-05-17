@@ -234,7 +234,7 @@ setGeneric("newModuleCode", function(name, path, ..., events) {
 
 #' @export
 #' @family module creation helpers
-#' @importFrom crayon bold green yellow
+#' @importFrom cli col_green col_yellow style_bold
 #' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
 #' @rdname newModuleCode
@@ -391,17 +391,27 @@ setMethod(
     writeLines(whisker.render(moduleTemplate, moduleData), filenameR)
 
     ## help the user with next steps
-    message(crayon::bold(paste(
-      crayon::green("New module"),
-      crayon::yellow(name),
-      crayon::green("created at"),
-      crayon::yellow(dirname(nestedPath))
+    message(cli::style_bold(paste(
+      cli::col_green("New module"),
+      cli::col_yellow(name),
+      cli::col_green("created at"),
+      cli::col_yellow(dirname(nestedPath))
     )))
-    message(crayon::green("* edit module code in", crayon::yellow(paste0(name, ".R"))))
-    message(crayon::green("* write tests for your module code in", crayon::yellow("tests/")))
-    message(crayon::green("* describe and document your module in", crayon::yellow(paste0(name, ".Rmd"))))
-    message(crayon::green("* tell others how to cite your module by editing", crayon::yellow("citation.bib")))
-    message(crayon::green("* choose a license for your module; see", crayon::yellow("LICENSE.md")))
+    message(paste(
+      cli::col_green("* edit module code in"), cli::col_yellow(paste0(name, ".R"))
+    ))
+    message(paste(
+      cli::col_green("* write tests for your module code in"), cli::col_yellow("tests/")
+    ))
+    message(paste(
+      cli::col_green("* describe and document your module in"), cli::col_yellow(paste0(name, ".Rmd"))
+    ))
+    message(paste(
+      cli::col_green("* tell others how to cite your module by editing"), cli::col_yellow("citation.bib")
+    ))
+    message(paste(
+      cli::col_green("* choose a license for your module; see"), cli::col_yellow("LICENSE.md")
+    ))
 
     if (isTRUE(args$open)) {
       openModules(name, nestedPath)
@@ -824,7 +834,7 @@ setMethod(
     on.exit(setwd(callingWd), add = TRUE)
     setwd(path)
     zipFileName <- paste0(name, "_", version, ".zip")
-    message(crayon::green(paste("Zipping module into zip file:", zipFileName)), sep = "")
+    message(cli::col_green(paste("Zipping module into zip file:", zipFileName)), sep = "")
 
     allFiles <- dir(path = file.path(name), recursive = TRUE, full.names = TRUE)
 

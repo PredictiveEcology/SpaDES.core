@@ -273,7 +273,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
             spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
             messageVerbose(
-              crayon::magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
+              cli::col_magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
                             "next module (", nextScheduledEvent, ")")),
               verbose = 1 - (debug %in% FALSE))
             simFuture <- sim$.simFuture
@@ -795,7 +795,7 @@ scheduleConditionalEvent <- function(sim,
 #' See <https://github.com/PredictiveEcology/SpaDES/wiki/Debugging> for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @importFrom crayon blue magenta
+#' @importFrom cli col_blue col_magenta
 #' @importFrom data.table setDTthreads
 #' @export
 #' @rdname spades
@@ -1056,9 +1056,9 @@ setMethod(
             }
             messageInterrupt1(recoverMode)
           } else {
-            message(crayon::magenta("simList saved in"), "\n",
-                    crayon::blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
-                    crayon::magenta("It will be deleted at next spades() call."))
+            message(cli::col_magenta("simList saved in"), "\n",
+                    cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
+                    cli::col_magenta("It will be deleted at next spades() call."))
           }
           svdSimEnv <- savedSimEnv() # can't assign to a function
           svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
@@ -1176,10 +1176,10 @@ setMethod(
         if (!requireNamespace("future", quietly = TRUE))
           stop("To use 'spades.futureEvents', please run \ninstall.packages('future') ")
 
-        message(crayon::magenta("useFuture is set to TRUE; this will attempt to spawn events"))
-        message(crayon::magenta("  in a separate process, if their outputs are not needed immediately"))
-        message(crayon::magenta("  STILL EXPERIMENTAL. Use cautiously."))
-        message(crayon::magenta("  User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))"))
+        message(cli::col_magenta("useFuture is set to TRUE; this will attempt to spawn events"))
+        message(cli::col_magenta("  in a separate process, if their outputs are not needed immediately"))
+        message(cli::col_magenta("  STILL EXPERIMENTAL. Use cautiously."))
+        message(cli::col_magenta("  User must manage future::plan, e.g., \nfuture::plan(multisession(workers = 2))"))
         sim$.futureEventsSkipped <- 0
         sim$.simFuture <- list()
       }
@@ -1246,7 +1246,7 @@ setMethod(
             sim <- resolveFutureNow(sim, cause = "End of simulation")
           }
         }
-        message(crayon::magenta(sim$.futureEventsSkipped, " events ran in futures"))
+        message(cli::col_magenta(sim$.futureEventsSkipped, " events ran in futures"))
       }
       sim@simtimes[["current"]] <- sim@simtimes[["end"]]
 
@@ -1377,6 +1377,7 @@ setMethod(
 })
 
 #' @keywords internal
+#' @importFrom cli bg_yellow
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
     expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
@@ -1442,7 +1443,7 @@ setMethod(
     rr <- .Random.seed
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
-    if (identical(rr, .Random.seed)) message(crayon::bgYellow(cur$moduleName)) # browser()
+    if (identical(rr, .Random.seed)) message(cli::bg_yellow(cur$moduleName)) # browser()
 
     if (allowSequentialCaching) {
         sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
@@ -1609,7 +1610,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
 
   timeElapsedHere <- difftime(endTime, startTime, units = "secs")
   if (timeElapsedHere > 1)
-    message(crayon::magenta(paste0("... spades.recoveryMode used ",
+    message(cli::col_magenta(paste0("... spades.recoveryMode used ",
                                    format(timeElapsedHere, units = "auto", digits = 3))))
 
   rmo$recoverModeTiming <- rmo$recoverModeTiming + timeElapsedHere
@@ -1625,6 +1626,7 @@ recoverModePost <- function(sim, rmo, recoverMode) {
 }
 
 #' @keywords internal
+#' @importFrom cli cli_code
 recoverModeOnExit <- function(sim, rmo, recoverMode) {
   sim@.xData$.recoverableObjs <- rmo$recoverableObjs
   sim@.xData$.recoverableModObjs <- rmo$recoverableModObjs
@@ -1634,27 +1636,33 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
   rmo$addedEvents <- append(list(setdiff(rmo$postEvents, rmo$preEvents)), rmo$addedEvents)
   sim@.xData$.addedEvents <- rmo$addedEvents
   sim@.xData$._randomSeed <- rmo$randomSeed
-  message(crayon::magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
+  message(cli::col_magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
                                  format(rmo$recoverModeTiming, units = "auto", digits = 3),
                                  " and ", format(recoverableObjsSize, units = "auto"))))
-  message(crayon::magenta("The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
-                          "in the simList located at SpaDES.core:::savedSimEnv()$.sim,",
-                          "as sim$.recoverableObjs, with the most recent event",
-                          "the first element in the list, 2nd most recent event = the second most recent event, etc.",
-                          " The objects contained in each of those are only the objects that may have",
-                          "changed, according to the metadata for each module. To recover, use:\n",
-                          "restartSpades()"))
+  message(cli::col_magenta(
+    "The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
+    "in the simList located at savedSimEnv()$.sim,",
+    "as sim$.recoverableObjs, with the most recent event",
+    "the first element in the list, 2nd most recent event = the second most recent event, etc.",
+    " The objects contained in each of those are only the objects that may have",
+    "changed, according to the metadata for each module. To recover, use:",
+    cli::cli_code("restartSpades()")
+  ))
   return(sim)
 }
 
 #' @keywords internal
 messageInterrupt1 <- function(recoverMode) {
   message(
-    crayon::magenta("Because of an interrupted spades call, the sim object ",
-                    c("at the time of interruption ",
-                      "at the start of the interrupted event ")[(recoverMode > 0) + 1],
-                    "was saved in"), "\n", crayon::blue("SpaDES.core:::savedSimEnv()$.sim"),
-                    "\n", magenta("It will be deleted on next call to spades"))
+    cli::col_magenta(
+      "Because of an interrupted spades call, the sim object ",
+      c("at the time of interruption ",
+        "at the start of the interrupted event ")[(recoverMode > 0) + 1],
+      "was saved in"
+    ), "\n",
+    cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
+    cli::col_magenta("It will be deleted on next call to spades().")
+  )
 }
 
 setupDebugger <- function(debug = getOption("spades.debug")) {
@@ -1776,8 +1784,8 @@ resolveFutureNow <- function(sim, cause = "") {
   # objects
   list2env(mget(simMetadata$objects, envir = envir(tmpSim)), envir = envir(sim))
   # }
-  message(crayon::magenta(paste0(" Resolved: ", outMess)))
-  message(crayon::magenta("   ", spacing, "because", cause))
+  message(cli::col_magenta(paste0(" Resolved: ", outMess)))
+  message(cli::col_magenta("   ", spacing, "because", cause))
   allCols <- c("eventTime", "moduleName", "eventTime", "eventPriority")
   # events
   evntsFut <- events(tmpSim, unit = "seconds")
@@ -1841,7 +1849,7 @@ getFutureNeeds <- function(deps, curModName) {
 .runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
   spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1]), collapse = "")
-  message(crayon::magenta(spacing, "-- Spawning in a future"))
+  message(cli::col_magenta(spacing, "-- Spawning in a future"))
   sim$.futureEventsSkipped <- sim$.futureEventsSkipped + 1
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
   objsToGet <- grep("^\\._", ls(envir = modEnv, all.names = TRUE), value = TRUE, invert = TRUE)
@@ -1919,7 +1927,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
   i
 }
 
-#' @importFrom crayon green
+#' @importFrom cli col_green
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
   if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else isTRUE(x), FUN.VALUE = logical(1))))
@@ -1978,7 +1986,7 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
     } else {
       w <- getOption("width")
       suppress <- lapply(outMess, function(x)
-        message(crayon::green(substring(x, first = 1, last = w - 30))))
+        message(cli::col_green(substring(x, first = 1, last = w - 30))))
     }
   }
 }
