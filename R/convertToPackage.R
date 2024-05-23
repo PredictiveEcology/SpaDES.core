@@ -137,6 +137,11 @@
 #'
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
                              buildDocuments = TRUE) {
+  stopifnot(
+    requireNamespace("pkgload", quietly = TRUE),
+    requireNamespace("roxygen2", quietly = TRUE)
+  )
+
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
   packageFolderName <- dirname(mainModuleFile)
   aa <- parse(mainModuleFile, keep.source = TRUE)
@@ -205,7 +210,6 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
                      cat(rlaa[1:(lineWithFn[[2]] - 1)], file = mainModuleFile,
                          sep = "\n", append = FALSE)
                    })
-
 
   otherStuffFn <- filenameFromFunction(packageFolderName, "other", "R")
   cat("
@@ -329,7 +333,6 @@ vignettes/.*\\.log$
       file = RBuildIgnoreFile, fill = TRUE)
 
   return(invisible())
-
 }
 
 filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fileExt = ".R") {
