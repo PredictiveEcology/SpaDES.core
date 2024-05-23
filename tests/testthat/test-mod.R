@@ -188,14 +188,14 @@ test_that("convertToPackage testing", {
       #\' @name Init
       #\' @param sim A simList
       Init <- function(sim) {
-        sim$aaaa <- Run(1)
+        sim$aaaa <- Run1(1)
         return(sim)
       }
 
       #\' @title Run
       #\' @name Run
       #\' @param a An object
-      Run <- function(a) {
+      Run1 <- function(a) {
         return(a + 1)
       }
       ', fill = TRUE, append = TRUE)
@@ -203,11 +203,11 @@ test_that("convertToPackage testing", {
   cat(file = test2FilePath,'
       Init <- function(sim) {
         # Need to keep comments
-        sim$cccc <- try(Run(1), silent = TRUE)
+        sim$cccc <- try(Run1(1), silent = TRUE)
         return(sim)
       }
 
-      Run <- function(a) {
+      Run2 <- function(a) {
         return(a + 2)
       }
       ', fill = TRUE, append = TRUE)
@@ -226,8 +226,7 @@ test_that("convertToPackage testing", {
     expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
     ## list.files(file.path(tmpdir, tt, "R"))
-    expect_true(file.exists(file.path(tmpdir, tt, "R", "Init.R"))) ## TODO: file does't exist
-    expect_true(file.exists(file.path(tmpdir, tt, "R", "Run.R"))) ## TODO: file does't exist
+    expect_true(file.exists(filenameForMainFunctions(tt, tmpdir)))
   }
 
   mySim9 <- simInit(times = list(start = 0, end = 1),
@@ -242,27 +241,27 @@ test_that("convertToPackage testing", {
   working <- spades(mySim9, debug = FALSE)
 
   # if (requireNamespace("roxygen2")) {
-    # document -- this exports all functions!! Danger for testing later
-    # out <- lapply(c(testName1, testName2), function(tt) {
-    #   roxygen2::roxygenise(file.path(tmpdir, tt))
-    # })
+  # document -- this exports all functions!! Danger for testing later
+  # out <- lapply(c(testName1, testName2), function(tt) {
+  #   roxygen2::roxygenise(file.path(tmpdir, tt))
+  # })
 
-    # Will run document() so will have the NAMESPACE and
-    for (tt in c(testName1, testName2)) {
-      expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-      expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-      expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
-    }
+  # Will run document() so will have the NAMESPACE and
+  for (tt in c(testName1, testName2)) {
+    expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
+    expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
+  }
 
-    # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
-    expect_true(is(working, "simList"))
-    expect_true(working$aaaa == 2)
-    expect_true(is(working$cccc, "try-error"))
-    bbb <- get("Run", asNamespace(testName2))(2)
-    fnTxt <- readLines(file.path(dirname(test2FilePath), "R", "Init.R"))
-    expect_true(sum(grepl("Need to keep comments", fnTxt)) == 1)
-    expect_true(bbb == 4)
-    pkgload::unload(testName1)
-    pkgload::unload(testName2)
+  # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
+  expect_true(is(working, "simList"))
+  expect_true(working$aaaa == 2)
+  expect_true(is(working$cccc, "try-error"))
+  bbb <- get("Run2", asNamespace(testName2))(2)
+  fnTxt <- readLines(filenameForMainFunctions(tt, tmpdir))
+  expect_true(sum(grepl("Need to keep comments", fnTxt)) == 1)
+  expect_true(bbb == 4)
+  pkgload::unload(testName1)
+  pkgload::unload(testName2)
   #}
 })

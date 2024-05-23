@@ -60,7 +60,7 @@ setMethod(
     } else {
       TRUE
     }
-    # browser(expr = exists("._robustDigest_2"))
+
     if (!isObjectEmpty) {
       # objects may be provided in a namespaced format: modName:objName --
       # e.g., coming from .parseModule

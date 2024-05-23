@@ -203,7 +203,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
                          }
                        }
                      }
-                     fn <- file.path(path, unlist(module), "R", paste0(unlist(module), "Fns.R"))
+                     fn <- filenameForMainFunctions(module, path)
                      cat("#' @export", file = fn, sep = "\n", append = FALSE)
                      cat(rlaa[lineWithFn[[2]]:length(rlaa)],
                          file = fn, sep = "\n", append = TRUE)
@@ -338,3 +338,6 @@ vignettes/.*\\.log$
 filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fileExt = ".R") {
   normPath(file.path(packageFolderName, subFolder, paste0(gsub("\\.", "", fn), fileExt)))
 }
+
+filenameForMainFunctions <- function(module, modulePath = ".")
+  normPath(file.path(modulePath, unlist(module), "R", paste0(unlist(basename(module)), "Fns.R")))
