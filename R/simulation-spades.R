@@ -920,6 +920,9 @@ setMethod(
     sim[["._simNesting"]] <- ._simNesting
 
     opt <- options("encoding" = "UTF-8")
+    if (isTRUE(getOption("spades.allowSequentialCaching"))) {
+      opt <- append(opt, options(reproducible.showSimilarDepth = 6))
+    }
     on.exit(options(opt), add = TRUE)
 
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
