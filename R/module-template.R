@@ -75,6 +75,8 @@ openIsRequested <- function(open, suff) {
 #' @param events A list of named expressions, each of which is surrounded by `{ }`.
 #'   A user can specify events here, instead of accepting the default `doEvent` function
 #'   that comes with the module template. See example.
+#' @param envir An environment where objects being passed to `newModule` can be found.
+#'   Default `parent.frame()`, which should be fine for most cases.
 #'
 #' @return NULL (invisibly). The new module file is created at
 #' \file{path/name.R}, as well as ancillary files for documentation, citation,
@@ -103,7 +105,7 @@ openIsRequested <- function(open, suff) {
 #'   unlink(tmpdir, recursive = TRUE)
 #' }
 #'
-setGeneric("newModule", function(name, path, ..., events) {
+setGeneric("newModule", function(name, path, ..., events, envir = parent.frame()) {
   standardGeneric("newModule")
 })
 
@@ -113,15 +115,15 @@ setGeneric("newModule", function(name, path, ..., events) {
 setMethod(
   "newModule",
   signature = c(name = "character", path = "character"),
-  definition = function(name, path, ..., events) {
+  definition = function(name, path, ..., events, envir) {
     events <- substitute(events)
-    argsFull <- list(...)
+    argsFull <- substitute(list(...))
     argsNames <- ...names()
 
     simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
-    args <- lapply(args, eval) # Things like T --> TRUE
+    args <- lapply(args, eval, envir = envir) # Things like T --> TRUE
 
     argsOther <- as.list(argsFull[setdiff(argsNames, simpleArgsHere)])
     if (any(sapply(argsOther, is.null))) {
@@ -196,8 +198,9 @@ setMethod(
 setMethod(
   "newModule",
   signature = c(name = "character", path = "missing"),
-  definition = function(name, ..., events = list()) {
-    newModule(name = name, path = ".", ..., events = events)
+  definition = function(name, ..., events = list(), envir) {
+    browser()
+    newModule(name = name, path = ".", ..., events = events, envir = envir)
 })
 
 #' Create new module code file

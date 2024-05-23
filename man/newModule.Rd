@@ -6,11 +6,11 @@
 \alias{newModule,character,missing-method}
 \title{Create new module from template}
 \usage{
-newModule(name, path, ..., events)
+newModule(name, path, ..., events, envir = parent.frame())
 
-\S4method{newModule}{character,character}(name, path, ..., events)
+\S4method{newModule}{character,character}(name, path, ..., events, envir = parent.frame())
 
-\S4method{newModule}{character,missing}(name, path, ..., events)
+\S4method{newModule}{character,missing}(name, path, ..., events, envir = parent.frame())
 }
 \arguments{
 \item{name}{Character string specifying the name of the new module.}
@@ -37,6 +37,9 @@ Default \code{TRUE}.}
 \item{events}{A list of named expressions, each of which is surrounded by \code{{ }}.
 A user can specify events here, instead of accepting the default \code{doEvent} function
 that comes with the module template. See example.}
+
+\item{envir}{An environment where objects being passed to \code{newModule} can be found.
+Default \code{parent.frame()}, which should be fine for most cases.}
 }
 \value{
 NULL (invisibly). The new module file is created at

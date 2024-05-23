@@ -217,7 +217,7 @@ mySim2 <- spades(mySim)
 # More sophisticated, passing arguments to outputs()
 outputs(mySim) <- data.frame(
   objectName = "landscape", fun = "writeRaster", package = "terra",
-  saveTime = c(3,6), arguments = I(lapply(c(3,6), function(x) {
+  saveTime = c(3, 6), arguments = I(lapply(c(3, 6), function(x) {
     list(datatype = "FLT4S", filetype = "GTiff", overwrite = TRUE)
 })))
 mySim2 <- spades(mySim)
