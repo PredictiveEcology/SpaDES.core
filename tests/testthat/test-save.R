@@ -245,13 +245,13 @@ test_that("saveSimList works correctly", {
 
   ## loses the raster landscape
   saveSimList(sim, filename = tmpfile[3])
-  sim <- loadSimList(file = tmpfile[3])
+  simLoaded <- loadSimList(file = tmpfile[3])
   expect_equivalent(
-    gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(sim$landscape, allowMultiple = FALSE))),
+    gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(simLoaded$landscape, allowMultiple = FALSE))),
     tmpfile[1])
-  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement)) ## TODO: fails?
+  expect_true(bindingIsActive("mod", simLoaded@.xData$.mods$caribouMovement)) ## TODO: fails?
 
-  mySim <- sim
+  mySim <- simLoaded
   # Now keep as file-backed, but change name
   # aaaa <<- 1
   saveSimList(mySim, filename = tmpfile[3])

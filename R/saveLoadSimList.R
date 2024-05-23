@@ -350,6 +350,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   if (any(nchar(otherFiles) > 0)) {
     .dealWithRasterBackends(tmpsim) # no need to assign to sim b/c uses list2env
   }
+  makeSimListActiveBindings(tmpsim)
 
   return(tmpsim)
 }
