@@ -215,7 +215,7 @@ Plots <- function(data, fn, filename,
         fn <- plot
     }
   }
-  fnIsPlot <- identical(fn, Plot) || identical(fn, plot) || identical(fn, terra::plot)
+  fnIsPlot <- identical(fn, Plot) # || identical(fn, plot) || identical(fn, terra::plot)
   if (fnIsPlot) {
     ## make dummies
     gg <- 1

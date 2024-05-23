@@ -199,7 +199,8 @@ test_that("Plots function 2", {
 })
 
 test_that("Plots function 3 - use as Plot", {
-  if (interactive()) {
+  skip_if_not(interactive())
+  # if (interactive()) {
     testInit("terra", opts = list(spades.PlotsUsePlot = TRUE))
     packages <- c("raster", "terra")
     functions <- cbind(c("raster", "extent", "stack", "nlayers"),
@@ -244,7 +245,7 @@ test_that("Plots function 3 - use as Plot", {
       # should show plots as a using terra::plot
       expect_no_error(Plots(data = stk1, types = "screen", usePlot = FALSE, fn = terra::plot))
     }
-  }
+  # }
 })
 
 test_that("Plots test .guessPkgFun", {
