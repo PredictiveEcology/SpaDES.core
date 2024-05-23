@@ -20,10 +20,9 @@ cleanMessage <- function(mm) {
 #   optsAsk in this environment,
 testInit <- function(libraries = character(), ask = FALSE, verbose,
                      debug = FALSE, tmpFileExt = "",
-                     opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE) {
+                     opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE,
+                     pf = parent.frame()) {
   set.randomseed()
-
-  pf <- parent.frame()
 
   if (isTRUE(needGoogleDriveAuth))
     libraries <- c(libraries, "googledrive")

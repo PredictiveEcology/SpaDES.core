@@ -12,7 +12,7 @@ test_that("test spades.futureEvents", {
   origFiles <- dir(modPath, full.names = TRUE, recursive = TRUE)
   tmpFiles <- file.path(tmpdir, dir(modPath, recursive = TRUE))
   checkPath(unique(dirname(tmpFiles)), create = TRUE)
-  expect_true(file.copy(origFiles, tmpFiles))
+  expect_true(all(file.copy(origFiles, tmpFiles)))
   modPath <- tmpdir
 
   newModule("test", path = modPath, open = FALSE)

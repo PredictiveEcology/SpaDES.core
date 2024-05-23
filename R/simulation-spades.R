@@ -172,7 +172,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
       if (!is.null(fnEnv)) {
         if (!exists(moduleCall, envir = fnEnv)) {
-          moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur$eventType)
+          moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur[["eventType"]])
           if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
             fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
             moduleCall <- moduleCallSeparateEventFns
@@ -1443,7 +1443,7 @@ setMethod(
     rr <- .Random.seed
     if (runFnCallAsExpr)
       sim <- eval(fnCallAsExpr) # slower than more direct version just above
-    if (identical(rr, .Random.seed)) message(cli::bg_yellow(cur$moduleName)) # browser()
+    if (identical(rr, .Random.seed)) message(cli::bg_yellow(cur[["moduleName"]])) # browser()
 
     if (allowSequentialCaching) {
         sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
@@ -1485,7 +1485,7 @@ setMethod(
     if (isTRUE(is(out, "try-error"))) {
       numTries <- numTries + 1
       if (numTries > 1) {
-        tmp <- .parseConditional(filename = sim@.xData$.mods[[cur$moduleName]]$._sourceFilename)
+        tmp <- .parseConditional(filename = sim@.xData$.mods[[cur[["moduleName"]]]]$._sourceFilename)
         eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
              envir = sim@.xData$.mods[[cur[["moduleName"]]]])
         numTries <- 0
@@ -1876,7 +1876,7 @@ getFutureNeeds <- function(deps, curModName) {
                                                               showSimilar = showSimilar,
                                                               .pkgEnv = .pkgEnv),
       globals = globs,
-      packages = c("SpaDES.core", pkgs),
+      packages = unique(c("SpaDES.core", pkgs)),
       # envir = envir,
       seed = TRUE),
       thisModOutputs = list(
@@ -2363,7 +2363,7 @@ allowSequentialCachingFinal <- function(sim) {
                    tagKey = paste0(sequentialCacheText, "Next", c("EventCacheId", "Module", "Event")),
                    tagValue = c(thisCacheId, cur[["moduleName"]], cur[["eventType"]]),
                    cachePath = cp)
-      if (all(c(cur$moduleName, cur$eventType) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
+      if (all(c(cur[["moduleName"]], cur[["eventType"]]) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
         fn <- reproducible:::.updateTagsRepo
         args$add = TRUE
       } else {
@@ -2399,7 +2399,7 @@ sequentialCacheText <- "SequentialCache_"
 appendCompleted <- function(sim, cur) {
   # if (cur$moduleName == "checkpoint") browser()
 
-  cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+  cur[["._clockTime"]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
 
   last <- attr(sim, "completedCounter")
   isLastWrong <- length(sim@completed) != last
@@ -2408,11 +2408,11 @@ appendCompleted <- function(sim, cur) {
   }
   # if ("Biomass_borealDataPrep" %in% cur$moduleName && "init" %in% cur$eventType) browser()
   if (is.null(last)) {
-    prevTime <- cur$._clockTime
+    prevTime <- cur[["._clockTime"]]
   } else {
     prevTime <- sim@completed[[as.character(last)]]$._clockTime
   }
-  cur$._prevEventTimeFinish <- prevTime
+  cur[["._prevEventTimeFinish"]] <- prevTime
 
   if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
     #instead of sim@.xData because collisions with parallel sims from same sim object
