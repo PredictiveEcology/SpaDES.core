@@ -2319,7 +2319,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
       noChange <- all(noChanges)
 
       if (isTRUE(noChange)) {
-        isMemoised <- isMemoised(cacheId = nextEvent, cachePath = cachePath(sim))
+        isMemoised <- reproducible::.isMemoised(cacheId = nextEvent, cachePath = cachePath(sim))
         simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
         if (!is(simSkip, "try-error")) {
           if (all(current(simSkip) == current(sim))) {
