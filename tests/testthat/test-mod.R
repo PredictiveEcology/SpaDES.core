@@ -149,8 +149,8 @@ test_that("local mod object", {
 })
 
 test_that("convertToPackage testing", {
-  skip_if_not_installed("pkgload")
   skip_on_cran()
+  skip_if_not_installed(c("ggplot2", "pkgload", "roxygen2"))
 
   testInit(c("roxygen2", "ggplot2"), smcc = FALSE, debug = FALSE,
            opts = list(reproducible.useMemoise = FALSE,
@@ -173,16 +173,16 @@ test_that("convertToPackage testing", {
   testFilePath <- file.path(tmpdir, testName1, mainModFile1)
   test2FilePath <- file.path(tmpdir, testName2, mainModFile2)
 
-  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+  ## Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
 
   testCodeMod <- gsub("test", testName1, testCode)
   test2CodeMod <- gsub("test2", testName2, test2Code)
 
   cat(file = testFilePath, testCodeMod, fill = TRUE)
-
   cat(file = test2FilePath, test2CodeMod, fill = TRUE)
-  # Test converting these to packages
-  cat(file = testFilePath,'
+
+  ## Test converting these to packages
+  cat(file = testFilePath, '
       #\' @title Init
       #\' @rdname Init
       #\' @name Init
@@ -217,10 +217,11 @@ test_that("convertToPackage testing", {
     expect_false(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
   }
 
-  convertToPackage(module = testName1, path = tmpdir, buildDocuments = FALSE)
+  convertToPackage(module = testName1, path = tmpdir, buildDocuments = FALSE) ## TODO: roxygen2 not above function
   convertToPackage(module = testName2, path = tmpdir, buildDocuments = FALSE)
 
   for (tt in c(testName1, testName2)) {
+    expect_true(file.exists(file.path(tmpdir, tt, ".Rbuildignore")))
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
     expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))

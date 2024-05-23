@@ -306,7 +306,7 @@ makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
     pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
   }
 
-  RBuildIgnoreFile <- filenameFromFunction(packageFolderName, ".Rbuildignore", fileExt = "")
+  RBuildIgnoreFile <- filenameFromFunction(packageFolderName, "", fileExt = ".Rbuildignore")
   cat("^.*\\.Rproj$
 ^\\.Rproj\\.user$
 ^_pkgdown\\.yml$
