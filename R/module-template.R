@@ -199,7 +199,6 @@ setMethod(
   "newModule",
   signature = c(name = "character", path = "missing"),
   definition = function(name, ..., events = list(), envir) {
-    browser()
     newModule(name = name, path = ".", ..., events = events, envir = envir)
 })
 
