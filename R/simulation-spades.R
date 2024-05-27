@@ -797,6 +797,7 @@ scheduleConditionalEvent <- function(sim,
 #' @author Alex Chubaty and Eliot McIntire
 #' @importFrom cli col_blue col_magenta
 #' @importFrom data.table setDTthreads
+#' @seealso vignettes
 #' @export
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
@@ -809,8 +810,7 @@ scheduleConditionalEvent <- function(sim,
 #'     requireNamespace("NLMR", quietly = TRUE)) {
 #'   # some options are not necessary when not interactive
 #'   opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
-#'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA,
-#'                                                    "spades.debug" = FALSE))
+#'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA))
 #'   mySim <- simInit(
 #'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
 #'    params = list(
@@ -822,57 +822,6 @@ scheduleConditionalEvent <- function(sim,
 #'    paths = list(modulePath = getSampleModules(tempdir()))
 #'   )
 #'   spades(mySim)
-#'
-#'   # Different debug options (overrides the package option 'spades.debug')
-#'   spades(mySim, debug = TRUE) # Fastest
-#'   spades(mySim, debug = "print(table(sim$landscape$Fires[]))")
-#'   # To get a combination -- use list(debug = list(..., ...))
-#'   spades(mySim, debug = list(debug = list(1, quote(as.data.frame(table(sim$landscape$Fires[]))))))
-#'
-#'   # Can turn off plotting at spades call, and inspect the output simList instead
-#'   out <- spades(mySim, .plots = NA)
-#'   completed(out) # shows completed events
-#'
-#'   # use cache -- simInit should generally be rerun each time a spades call is made
-#'   #   to guarantee that it is identical. Here, run spades call twice, first
-#'   #   time to establish cache, second time to return cached result
-#'   for (i in 1:2) {
-#'    mySim <- simInit(
-#'      times = list(start = 0.0, end = 1.0, timeunit = "year"),
-#'      params = list(
-#'        randomLandscapes = list(nx = 10, ny = 10),
-#'        .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-#'      ),
-#'      modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'      paths = list(modulePath = getSampleModules(tempdir()))
-#'    )
-#'    print(system.time(out <- spades(mySim, cache = TRUE, .plots = NA)))
-#'   }
-#'
-#'   # E.g., with only the init events
-#'   outInitsOnly <- spades(mySim, events = "init")
-#'
-#'   # or more fine grained control
-#'   outSomeEvents <- spades(mySim, .plots = NA,
-#'           events = list(randomLandscapes = c("init"),
-#'                         fireSpread = c("init", "burn")))
-#'
-#'   # with outputs, the save module gets invoked and must be explicitly limited to "init"
-#'   mySim <- simInit(
-#'    times = list(start = 0.0, end = 1.0, timeunit = "year"),
-#'    params = list(
-#'      randomLandscapes = list(nx = 10, ny = 10),
-#'      .globals = list(stackName = "landscape", burnStats = "nPixelsBurned")
-#'    ),
-#'    modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
-#'    outputs = data.frame(objectName = "landscape", saveTime = 0:2),
-#'    paths = list(modulePath = getSampleModules(tempdir()))
-#'   )
-#'   # This will print a message saying that caribouMovement will run its events
-#'   outSomeEvents <- spades(mySim, .plots = NA,
-#'           events = list(randomLandscapes = c("init"),
-#'                         fireSpread = c("init", "burn"),
-#'                         save = "init"))
 #'
 #'   options(opts) # reset options
 #' }

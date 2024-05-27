@@ -86,50 +86,33 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @examples
 #' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
-#' requireNamespace("NLMR", quietly = TRUE)) {
+#'     requireNamespace("NLMR", quietly = TRUE)) {
 #' ## This will save the "caribou" object at the save interval of 1 unit of time
 #' ## in the outputPath location
 #'   outputPath <- file.path(tempdir(), "test_save")
 #'   times <- list(start = 0, end = 1, "month")
-#'   parameters <- list(
-#'     .globals = list(stackName = "landscape"),
-#'     caribouMovement = list(
-#'       .saveObjects = "caribou",
-#'       .saveInitialTime = 1, .saveInterval = 1,
-#'       .plots = NA
-#'     ),
-#'     randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
 #'
 #'   modules <- list("randomLandscapes", "caribouMovement")
 #'   paths <- list(
 #'     modulePath = getSampleModules(tempdir()),
 #'     outputPath = outputPath
 #'   )
-#'   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
-#'   mySim <- simInit(times = times, params = parameters, modules = modules,
-#'                    paths = paths)
-#'
-#'   # The caribou module has a saveFiles(sim) call, so it will save caribou
-#'   spades(mySim)
-#'   dir(outputPath)
-#'
-#'   # remove the files
-#'   file.remove(dir(outputPath, full.names = TRUE))
+#'  opts <- options("spades.moduleCodeChecks" = FALSE,
+#'                  "spades.useRequire" = FALSE) # not necessary for example
 #'
 #'   ## save multiple outputs
 #'   parameters <- list(
 #'     .globals = list(stackName = "landscape"),
 #'     caribouMovement = list(
 #'       .saveObjects = c("caribou", "habitatQuality"),
-#'       .saveInitialTime = 1, .saveInterval = 1,
-#'       .plots = NA
+#'       .saveInitialTime = 1, .saveInterval = 1
 #'     ),
 #'     randomLandscapes = list(.plots = NA, nx = 20, ny = 20))
 #'
 #'   mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #'
-#'   spades(mySim)
+#'   spades(mySim, .plotInitialTime = NA) # plotting not relevant for this example
 #'   dir(outputPath)
 #'   # remove the files
 #'   file.remove(dir(outputPath, full.names = TRUE))
