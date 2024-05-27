@@ -110,7 +110,6 @@ setMethod(
 #' @rdname emptyEventList
 .emptyEventListCols <- colnames(.emptyEventList())
 
-
 # empty metadata ------------------------------------------------------------------------------
 
 #' Default (empty) metadata
@@ -287,6 +286,7 @@ setMethod(
 #' @return See [base::all.equal()]
 #'
 #' @export
+#' @importFrom reproducible .wrap
 all.equal.simList <- function(target, current, ...) {
   attr(target, ".Cache")$newCache <- NULL
   attr(current, ".Cache")$newCache <- NULL
@@ -322,6 +322,7 @@ all.equal.simList <- function(target, current, ...) {
   all.equal.default(target1, current1, ...)
 }
 
+#' @importFrom utils packageVersion
 needInstall <- function(
     pkg = "methods",
     minVersion = NULL,
@@ -336,8 +337,7 @@ needInstall <- function(
         need <- TRUE
   }
   if (need) {
-    stop(messageStart,
-         "install.packages('", pkg, "')")
+    stop(messageStart, "install.packages('", pkg, "')")
   }
 }
 
@@ -350,6 +350,7 @@ needInstall <- function(
 #' @return character vector of filepaths to the copied files
 #'
 #' @export
+#' @importFrom reproducible checkPath
 #' @rdname getSampleFiles
 getMapPath <- function(tmpdir) {
   mapPath <- system.file("maps", package = "quickPlot")
