@@ -279,6 +279,8 @@ setMethod(
 #' This function removes a few attributes that are added internally
 #' by \pkg{SpaDES.core} and are not relevant to the `all.equal`.
 #' One key element removed is any time stamps, as these are guaranteed to be different.
+#' A possibly very important argument to pass to the `...` is `check.attributes = FALSE`
+#' which will allow successful comparisons of many objects that might have pointers.
 #'
 #' @inheritParams base::all.equal
 #'
@@ -317,7 +319,7 @@ all.equal.simList <- function(target, current, ...) {
 
   target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
   current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
-  all.equal.default(target1, current1, check.environment = FALSE)
+  all.equal.default(target1, current1, ...)
 }
 
 needInstall <- function(

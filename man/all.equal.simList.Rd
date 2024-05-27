@@ -21,4 +21,6 @@ See \code{\link[base:all.equal]{base::all.equal()}}
 This function removes a few attributes that are added internally
 by \pkg{SpaDES.core} and are not relevant to the \code{all.equal}.
 One key element removed is any time stamps, as these are guaranteed to be different.
+A possibly very important argument to pass to the \code{...} is \code{check.attributes = FALSE}
+which will allow successful comparisons of many objects that might have pointers.
 }

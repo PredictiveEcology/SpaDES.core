@@ -121,5 +121,5 @@ test_that("test checkpointing with disk-backed raster", {
   ## both versions above should yield identical results
   expect_true(compareGeom(simA$ras, simB$ras, stopOnError = FALSE))
   expect_equal(simA$ras, simB$ras, ignore_attr = "cpp")
-  expect_true(all.equal(simA, simB, check.environment = FALSE))
+  expect_equivalent(simA, simB)
 })
