@@ -121,9 +121,9 @@ test_that("testing .plotInitialTime & .plots", {
     times <- list(start = 0.0, end = 1, timeunit = "year")
     params <- list(
       .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-      randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-      # caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-      fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+      randomLandscapes = list(.plots = ""),
+      # caribouMovement = list(.plots = "", torus = TRUE),
+      fireSpread = list(.plots = "")
     )
     modules <- list("randomLandscapes", #"caribouMovement",
                     "fireSpread")
@@ -142,7 +142,7 @@ test_that("testing .plotInitialTime & .plots", {
     clearPlot()
     spades(mySim, .plots = NA)
     expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
-    spades(mySim, .plotInitialTime = NA)
+    spades(mySim, .plots = "")
     expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
   }
 })

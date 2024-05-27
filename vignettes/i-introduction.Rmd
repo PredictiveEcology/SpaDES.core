@@ -152,16 +152,16 @@ demoSim <- suppressMessages(simInit(
     .globals = list(burnStats = "nPixelsBurned"),
     randomLandscapes = list(
       nx = 1e2, ny = 1e2, .saveObjects = "landscape",
-      .plotInitialTime = NA, .plotInterval = NA, inRAM = TRUE
+      .plots = "", inRAM = TRUE
     ),
     caribouMovement = list(
       N = 1e2, .saveObjects = "caribou",
-      .plotInitialTime = 1, .plotInterval = 1, moveInterval = 1
+      .plots = "screen", .plotInterval = 1, moveInterval = 1
     ),
     fireSpread = list(
       nFires = 1e1, spreadprob = 0.235, persistprob = 0, its = 1e6,
       returnInterval = 10, startTime = 0,
-      .plotInitialTime = 0, .plotInterval = 10
+      .plots = "screen", .plotInterval = 10
     )
   ),
   path = list(modulePath = getSampleModules(tempdir()))

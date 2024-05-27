@@ -3,8 +3,6 @@
     #defineParameter("paramName", "paramClass", value, min, max, "parameter description"),
     defineParameter(".plots", "character", "screen", NA, NA,
                     "Used by Plots function, which can be optionally used here"),
-    defineParameter(".plotInitialTime", "numeric", start(sim), NA, NA,
-                    "Describes the simulation time at which the first plot event should occur."),
     defineParameter(".plotInterval", "numeric", NA, NA, NA,
                     "Describes the simulation time interval between plot events."),
     defineParameter(".saveInitialTime", "numeric", NA, NA, NA,

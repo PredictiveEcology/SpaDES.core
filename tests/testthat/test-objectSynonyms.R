@@ -26,7 +26,7 @@ test_that("test objectSynonyms", {
   sim <- simInit(times, params, modules, objects = list(), paths)
   sim <- objectSynonyms(sim, list(c("caribou", "caribouObj")))
 
-  simOut <- spades(sim, .plotInitialTime = NA, debug = FALSE)
+  simOut <- spades(sim, .plots = "", debug = FALSE)
   expect_true(identical(simOut$caribou, simOut$caribouObj))
   simOut$caribou$x1[2] <- 20
   expect_true(identical(simOut$caribou, simOut$caribouObj))

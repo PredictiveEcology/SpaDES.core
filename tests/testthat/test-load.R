@@ -16,8 +16,8 @@ test_that("loading inputs does not work correctly", {
     times <- list(start = 0, end = 1)
     parameters <- list(
       .globals = list(stackName = "landscape"),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "", nx = 20, ny = 20)
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
@@ -124,8 +124,8 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
   files <- dir(file.path(mapPath), full.names = TRUE, pattern =  "tif")[1:4]
   parameters <- list(
     .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", nx = 20, ny = 20)
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
@@ -228,8 +228,8 @@ test_that("passing objects to simInit does not work correctly", {
     times <- list(start = 0, end = 1)
     parameters <- list(
       .globals = list(stackName = "landscape"),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "", nx = 20, ny = 20)
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(

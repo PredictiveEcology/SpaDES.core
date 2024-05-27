@@ -131,9 +131,9 @@ test_that("depsEdgeList and depsGraph work", {
   times <- list(start = 0.0, end = 10)
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA),
-    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    randomLandscapes = list(.plots = ""),
+    caribouMovement = list(.plots = ""),
+    fireSpread = list(.plots = "")
   )
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
   paths <- list(modulePath = getSampleModules(tmpdir))

@@ -19,9 +19,9 @@ test_that("simulation runs with simInit and spades", {
   times <- list(start = 0.0, end = 0.0, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    randomLandscapes = list(.plots = ""),
+    caribouMovement = list(.plots = "", torus = TRUE),
+    fireSpread = list(.plots = "")
   )
   paths <- list(modulePath = c(tmpdir, tmpCache))
 

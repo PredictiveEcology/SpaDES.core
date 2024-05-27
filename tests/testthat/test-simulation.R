@@ -7,9 +7,9 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .seed = list("init" = 321)),
-    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    randomLandscapes = list(.plots = "", .seed = list("init" = 321)),
+    caribouMovement = list(.plots = "", torus = TRUE),
+    fireSpread = list(.plots = "")
   )
   modules <- list("randomLandscapes", #"caribouMovement",
                   "fireSpread")
@@ -17,10 +17,10 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
 
   set.seed(123)
   mySim <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA)
+    spades(debug = FALSE, .plots = "")
   set.seed(123)
   mySim2 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA)
+    spades(debug = FALSE, .plots = "")
 
   ## simtime
   expect_equivalent(time(mySim), 1.0)
@@ -35,25 +35,25 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
 
   set.seed(123)
   mySimEvent <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = "init")
+    spades(debug = FALSE, .plots = "", events = "init")
   expect_true(all("init" == completed(mySimEvent)$eventType))
   expect_true(max(events(mySimEvent)$eventTime) <= end(mySimEvent)) # didn't schedule next event
 
 
   eventTypes <- c("init", "burn")
   mySimEvent2 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+    spades(debug = FALSE, .plots = "", events = eventTypes)
   expect_true(all(eventTypes %in% completed(mySimEvent2)$eventType))
 
   eventTypes <- c()
   mySimEvent3 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+    spades(debug = FALSE, .plots = "", events = eventTypes)
   expect_true(all(eventTypes %in% completed(mySimEvent3)$eventType))
   expect_true(identical(completed(mySimEvent3)[,1:4], completed(mySim)[,1:4]))
 
   eventTypes <- c("nothing")
   mySimEvent4 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+    spades(debug = FALSE, .plots = "", events = eventTypes)
   expect_true(NROW(completed(mySimEvent4)) == 0) # nothing completed
   expect_true(all("init" == events(mySimEvent4)$eventType)) # nothing happened; only inits in queue
 
@@ -61,7 +61,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
                      fireSpread = c("init", "burn")
   )
   mySimEvent5 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+    spades(debug = FALSE, .plots = "", events = eventTypes)
   expect_true(all(unique(unlist(eventTypes)) %in% completed(mySimEvent5)$eventType))
   expect_true(!all("stats" %in% completed(mySimEvent5)$eventType))
 
@@ -70,32 +70,32 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
                      fireSpread = c("initial", "burn")
   )
   mySimEvent6 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
+    spades(debug = FALSE, .plots = "", events = eventTypes)
   expect_true(all("randomLandscapes" %in% completed(mySimEvent6)$moduleName))
   expect_true(!all("fireSpread" %in% completed(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent7 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
+    spades(debug = FALSE, .plots = "", events = eventTypes, cache = TRUE)
   expect_true(all("randomLandscapes" %in% completed(mySimEvent7)$moduleName))
   expect_true(!all("fireSpread" %in% completed(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent8 <- simInit(times, params, modules, objects = list(), paths) |>
-    spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
+    spades(debug = FALSE, .plots = "", events = eventTypes, cache = TRUE)
   expect_true(all("randomLandscapes" %in% completed(mySimEvent8)$moduleName))
   expect_true(!all("fireSpread" %in% completed(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent9 <- simInitAndSpades(times, params, modules, objects = list(), paths,
-                        debug = FALSE, .plotInitialTime = NA, events = "init")
+                        debug = FALSE, .plots = "", events = "init")
   expect_true(all("init" == completed(mySimEvent9)$eventType))
   expect_true(max(events(mySimEvent9)$eventTime) <= end(mySimEvent9)) # didn't schedule next event
 
   # Test times
   #  Set end time to WAY after the init events
   mySimEvent10 <- simInitAndSpades(times = list(start = 0, end = 10), params, modules, objects = list(), paths,
-                                  debug = FALSE, .plotInitialTime = NA, events = "init")
+                                  debug = FALSE, .plots = "", events = "init")
   expect_true(time(mySimEvent10) == end(mySimEvent10)) # it is at 10, the end
   expect_true(all("init" == completed(mySimEvent10)$eventType))
   expect_true(max(completed(mySimEvent10)$eventTime) == start(mySimEvent10)) # didn't go past start time because init are all at start
@@ -137,23 +137,23 @@ test_that("spades calls - diff't signatures", {
   opts <- options(spades.saveSimOnExit = FALSE)
   expect_message(spades(a, debug = TRUE), "eventTime")
   expect_silent(expect_message(spades(a, debug = FALSE), "DTthreads"))
-  expect_silent(expect_message(spades(a, debug = FALSE, .plotInitialTime = NA), "DTthreads"))
+  expect_silent(expect_message(spades(a, debug = FALSE, .plots = ""), "DTthreads"))
   expect_silent(expect_message(spades(a, debug = FALSE, .saveInitialTime = NA), "DTthreads"))
   opts <- options(opts)
-  expect_message(spades(a, debug = TRUE, .plotInitialTime = NA), "eventTime")
+  expect_message(spades(a, debug = TRUE, .plots = ""), "eventTime")
   expect_message(spades(a, debug = TRUE, .saveInitialTime = NA), "eventTime")
-  expect_equivalent(capture_output(spades(a, debug = "current", .plotInitialTime = NA)),
-                    capture_output(spades(a, debug = TRUE, .plotInitialTime = NA)))
+  expect_equivalent(capture_output(spades(a, debug = "current", .plots = "")),
+                    capture_output(spades(a, debug = TRUE, .plots = "")))
 
   if (requireNamespace("logging", quietly = TRUE)) {
-    expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+    expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plots = ""),
         "eventTime *moduleName *eventType *eventPriority")
   } else {
-    expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
+    expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plots = ""),
                    "eventTime *moduleName *eventType *eventPriority")
   }
-  expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA), "moduleName")
-  expect_message(spades(a, debug = "simList", .plotInitialTime = NA), "Completed Events")
+  expect_message(spades(a, debug = c("current", "events"), .plots = ""), "moduleName")
+  expect_message(spades(a, debug = "simList", .plots = ""), "Completed Events")
 
   if (interactive()) {
     # warnings occur on Rstudio-server related to can't use display 0:, when using devtools::test() interactively
@@ -190,7 +190,7 @@ test_that("spades calls - diff't signatures", {
   for (i in 1:2) {
     a <- simInit(times, params, modules, paths = paths)
     paths(a)$cachePath <- file.path(tempdir(), "cache") |> checkPath(create = TRUE)
-    assign(paste0("st", i), system.time(spades(a, cache = TRUE, .plotInitialTime = NA)))
+    assign(paste0("st", i), system.time(spades(a, cache = TRUE, .plots = "")))
   }
   params1 <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
@@ -231,8 +231,8 @@ test_that("simulation runs with simInit with duplicate modules named", {
 
   times <- list(start = 0.0, end = 10, timeunit = "year")
   params <- list(
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE)
+    randomLandscapes = list(.plots = ""),
+    caribouMovement = list(.plots = "", torus = TRUE)
   )
   modules <- list("randomLandscapes", "randomLandscapes", "caribouMovement")
   paths <- list(modulePath = getSampleModules(tmpdir))
@@ -920,9 +920,9 @@ test_that("simInitAndSpades", {
   times <- list(start = 0.0, end = 0, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    randomLandscapes = list(.plots = ""),
+    caribouMovement = list(.plots = "", torus = TRUE),
+    fireSpread = list(.plots = "")
   )
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
   paths <- list(modulePath = getSampleModules(tmpdir))
@@ -961,9 +961,9 @@ test_that("debug using logging", {
   times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .useCache = "init"),
-    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    randomLandscapes = list(.plots = "", .useCache = "init"),
+    caribouMovement = list(.plots = "", torus = TRUE),
+    fireSpread = list(.plots = "")
   )
   modules <- list("randomLandscapes")
   paths <- list(modulePath = getSampleModules(tmpdir))
@@ -977,7 +977,7 @@ test_that("debug using logging", {
     mess2 <- capture.output(type = "output", {
       mySim2 <- spades(Copy(mySim),
                        debug = list("console" = list(level = 10), debug = 1),
-                       .plotInitialTime = NA)
+                       .plots = "")
     })
   })
   expect_false(any(grepl("total elpsd", mess1))) # using new mechanism console
@@ -992,7 +992,7 @@ test_that("debug using logging", {
                        debug = list("console" = list(level = 5),
                                     "file" = list(file = tmpfile),
                                     debug = 1),
-                       .plotInitialTime = NA)
+                       .plots = "")
     })
   })
 
@@ -1006,7 +1006,7 @@ test_that("debug using logging", {
   logging::logReset()
   mess1 <- capture_messages({
     mess2 <- capture.output(type = "output", {
-      mySim2 <- spades(Copy(mySim), debug = 1, .plotInitialTime = NA)
+      mySim2 <- spades(Copy(mySim), debug = 1, .plots = "")
     })
   })
   expect_false(file.exists(tmpfile))
@@ -1020,7 +1020,7 @@ test_that("debug using logging", {
       suppressMessages({
         mySim2 <- spades(Copy(mySim),
                          debug = list("console" = list(level = "INFO"), debug = 1),
-                         .plotInitialTime = NA)
+                         .plots = "")
         })
     })
   })
@@ -1030,7 +1030,7 @@ test_that("debug using logging", {
   mess1 <- capture_messages({
     mess2 <- capture.output(type = "output", {
       suppressMessages({
-        mySim2 <- spades(Copy(mySim), debug = 1, .plotInitialTime = NA)
+        mySim2 <- spades(Copy(mySim), debug = 1, .plots = "")
       })
     })
   })

@@ -10,8 +10,8 @@ test_that("test checkpointing", {
   parameters <- list(
     .globals = list(stackName = "landscape"),
     checkpoint = list(interval = 1, file = file),
-    randomLandscapes = list(.plotInitialTime = NA),
-    caribouMovement = list(.plotInitialTime = NA, torus = TRUE)
+    randomLandscapes = list(.plots = ""),
+    caribouMovement = list(.plots = "", torus = TRUE)
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(
@@ -57,8 +57,8 @@ test_that("test checkpointing with disk-backed raster", {
   parameters <- list(
     .globals = list(stackName = "landscape"),
     checkpoint = list(interval = 1, file = file),
-    randomLandscapes = list(.plotInitialTime = NA_integer_),
-    caribouMovement = list(.plotInitialTime = NA_integer_, torus = TRUE)
+    randomLandscapes = list(.plots = ""),
+    caribouMovement = list(.plots = "", torus = TRUE)
   )
   modules <- list("randomLandscapes", "caribouMovement")
   paths <- list(

@@ -55,9 +55,9 @@ test_that("test spades.futureEvents", {
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
       # Turn off interactive plotting
-      fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+      fireSpread = list(.plots = ""),
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "", .useCache = "init", .showSimilar = TRUE)
     ),
     modules = mods,
     paths = list(modulePath = modPath,
@@ -71,7 +71,7 @@ test_that("test spades.futureEvents", {
                          stringsAsFactors = FALSE)
   )
 
-  mySim@params$test$.plotInitialTime <- 0
+  mySim@params$test$.plots <- "png"
   mySim@params$test$.plotInterval <- 1
 
   withr::local_options(list(spades.futureEvents = TRUE))

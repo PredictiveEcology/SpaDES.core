@@ -1,6 +1,7 @@
 test_that("test event-level cache & memory leaks", {
   skip_on_cran()
 
+  withr::local_options(reproducible.showSimilarDepth = 6)
   testInit(sampleModReqdPkgs,
            opts = list(reproducible.useMemoise = FALSE,
                        spades.memoryUseInterval = NULL))
@@ -21,9 +22,9 @@ test_that("test event-level cache & memory leaks", {
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
       # Turn off interactive plotting
-      fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+      fireSpread = list(.plots = ""),
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "", .useCache = "init", .showSimilar = TRUE)
     ),
     modules = mods,
     paths = list(modulePath = modPath,
@@ -40,18 +41,18 @@ test_that("test event-level cache & memory leaks", {
 
   # expect_false("Loaded!" %in%
   mess1 <- capture_messages({
-                  sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
-                })
+                  sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE)
+               })
   expect_false(LoadedMgsCheck(mess1, "init"))
   #sims <- spades(Copy(mySim), notOlderThan = Sys.time()) ## TODO: fix this test
   landscapeMaps1 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
   fireMap1 <- sims$landscape$Fires
   #._doEvent_3 <<- ._prepareOutput_5 <<- 1
   # bbbb <<- 1
-  mess1 <- capture_messages({
+  mess2 <- capture_messages({
     sims <- spades(Copy(mySim), debug = TRUE)
   })
-  expect_true(LoadedMgsCheck(mess1, "init"))
+  expect_true(LoadedMgsCheck(mess2, "init"))
 
   # expect_true(sum(grepl(pattern = "Loaded!|event in.+module", mess1)) == 2)
   landscapeMaps2 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
@@ -176,9 +177,9 @@ test_that("test module-level cache", {
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
       # Turn off interactive plotting
-      fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = times$start, .useCache = TRUE)
+      fireSpread = list(.plots = ""),
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "png", .useCache = TRUE)
     ),
     modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
     paths = list(modulePath = getSampleModules(tmpdir),
@@ -211,28 +212,31 @@ test_that("test module-level cache", {
   landscapeMaps1 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
   fireMap1 <- sims$landscape$Fires
 
+  # This is no longer relevant with May 27, 2024 changes to not use .plotInitialTime
+  #   nor use separate events for the sampleModules
+  #
   # The cached version will be identical for both events (init and plot),
   # but will not actually complete the plot, because plotting isn't cacheable
-  pdf(tmpfile1)
-  mess12 <- capture_messages({
-    sims <- spades(Copy(mySim), debug = TRUE)
-  })
-  dev.off()
-
-  if (!identical(Sys.info()[["sysname"]], "Windows") || interactive()) ## TODO: TEMPORARY to avoid random CRAN fail
-    expect_true(file.info(tmpfile1)$size < 10000)
-
-  unlink(tmpfile1)
-
-  expect_false(all(grepl("Loaded.+randomLandscapes", mess12)))
+  # pdf(tmpfile1)
+  # mess12 <- capture_messages({
+  #   sims <- spades(Copy(mySim), debug = TRUE)
+  # })
+  # dev.off()
+  #
+  # browser()
+  # if (!identical(Sys.info()[["sysname"]], "Windows") || interactive()) ## TODO: TEMPORARY to avoid random CRAN fail
+  #   expect_true(file.info(tmpfile1)$size < 10000)
+  #
+  # unlink(tmpfile1)
+  # expect_false(all(grepl("Loaded.+randomLandscapes", mess12)))
   # expect_true(any(grepl(pattern = "loaded cached copy of randomLandscapes module", mess1)))
-  landscapeMaps2 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
-  fireMap2 <- sims$landscape$Fires
-
-  # Test that cached part comes up identical in both (all maps but Fires),
-  #   but non-cached part are different (Fires should be different because stochastic)
-  expect_equal(landscapeMaps1[], landscapeMaps2[]) ## TODO: #236
-  expect_false(isTRUE(suppressWarnings(all.equal(fireMap1[], fireMap2[]))))
+  # landscapeMaps2 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
+  # fireMap2 <- sims$landscape$Fires
+  #
+  # # Test that cached part comes up identical in both (all maps but Fires),
+  # #   but non-cached part are different (Fires should be different because stochastic)
+  # expect_equal(landscapeMaps1[], landscapeMaps2[]) ## TODO: #236
+  # expect_false(isTRUE(suppressWarnings(all.equal(fireMap1[], fireMap2[]))))
 })
 
 test_that("test .prepareOutput", {
@@ -257,8 +261,8 @@ test_that("test .prepareOutput", {
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
     params = list(
       .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-      fireSpread = list(.plotInitialTime = NA),
-      caribouMovement = list(.plotInitialTime = NA)
+      fireSpread = list(.plots = ""),
+      caribouMovement = list(.plots = "")
     ),
     modules = list("fireSpread", "caribouMovement"),
     paths = list(modulePath = getSampleModules(tmpdir),
@@ -584,9 +588,9 @@ test_that("test showSimilar", {
   params <- list(
     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
     # Turn off interactive plotting
-    fireSpread = list(.plotInitialTime = NA),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+    fireSpread = list(.plots = ""),
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", .useCache = "init", .showSimilar = TRUE)
   )
 
   mySim <- simInit(
@@ -629,9 +633,9 @@ test_that("test multipart cache file", {
   params <- list(
     .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
     # Turn off interactive plotting
-    fireSpread = list(.plotInitialTime = NA),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, .useCache = "init", .showSimilar = TRUE)
+    fireSpread = list(.plots = ""),
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", .useCache = "init", .showSimilar = TRUE)
   )
 
   mySim <- simInit(

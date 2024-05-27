@@ -21,9 +21,9 @@ test_that("testing memoryUse", {
   times <- list(start = 0.0, end = if (isWindows()) 60 else 30, timeunit = "year")
   params <- list(
     .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+    randomLandscapes = list(.plots = ""),
+    caribouMovement = list(.plots = "", torus = TRUE),
+    fireSpread = list(.plots = "")
   )
   modules <- list("randomLandscapes", "caribouMovement", "fireSpread")
   paths <- list(modulePath = getSampleModules(tmpdir))

@@ -67,8 +67,8 @@ mySim <- simInit(
   times = list(start = 0.0, end = 3.0),
   params = list(
     .globals = list(stackName = "landscape", burnStats = "testStats"),
-    randomLandscapes = list(.plotInitialTime = NA),
-    fireSpread = list(.plotInitialTime = NA)
+    randomLandscapes = list(.plots = ""),
+    fireSpread = list(.plots = "")
   ),
   modules = list("randomLandscapes", "fireSpread"),
   paths = list(modulePath = getSampleModules(tempdir()))
@@ -84,7 +84,7 @@ system.time({
 })
 ```
 
-Note that if there were any visualizations (here we turned them off with `.plotInitialTime = NA` above) they will happen the first time through, but not the cached times.
+Note that if there were any visualizations (here we turned them off with `.plots = ""` above) they will happen the first time through, but not the cached times.
 
 ```{r spades-cached}
 # faster 2nd time
@@ -109,13 +109,13 @@ This would be useful when only one random landscape is needed simply for trying 
 # Module-level
 params(mySim)$randomLandscapes$.useCache <- TRUE
 system.time({
-  randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
+  randomSim <- spades(Copy(mySim), .plots = "",
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
 # faster the second time
 system.time({
-  randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
+  randomSimCached <- spades(Copy(mySim), .plots = "", debug = TRUE)
 })
 ```
 
@@ -142,13 +142,13 @@ Here, we don't change the module-level caching for `randomLandscapes`, but we ad
 ```{r event-level, echo=TRUE}
 params(mySim)$fireSpread$.useCache <- "init"
 system.time({
-  randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
+  randomSim <- spades(Copy(mySim), .plots = "",
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
 # faster the second time
 system.time({
-  randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
+  randomSimCached <- spades(Copy(mySim), .plots = "", debug = TRUE)
 })
 ```
 

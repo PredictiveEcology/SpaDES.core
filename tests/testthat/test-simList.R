@@ -280,8 +280,8 @@ test_that("simList test all signatures", {
 
   ## parameters
   parameters <- list(
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", nx = 20, ny = 20)
   )
 
   # loadOrder
@@ -425,14 +425,14 @@ test_that("test sped-up Caching of sequentially cached events", {
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = "")
   })
   expect_false(any(grepl("Skipped digest", mess)))
 
   ## Rerun with Cached copies being recovered
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = "")
   })
   expect_true(sum(grepl("Skipped digest", mess)) == 2)
 
@@ -444,13 +444,13 @@ test_that("test sped-up Caching of sequentially cached events", {
   )
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = "")
   })
   expect_false(any(grepl("Skipped digest", mess)))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = "")
   })
   expect_false(any(grepl("Skipped digest", mess)))
 
@@ -463,13 +463,13 @@ test_that("test sped-up Caching of sequentially cached events", {
   )
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = "")
   })
   expect_false(sum(grepl("Skipped digest", mess)) == 1)
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = "")
   })
   expect_true(sum(grepl("Skipped digest", mess)) == 1)
 })
@@ -510,7 +510,7 @@ test_that("test sped-up Caching of sequentially cached events", {
       mySim <- simInit(times, params, modules, objects = list(), paths, debug = 1)
     })
     mess <- capture_messages({
-      mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+      mySimOut <- spades(mySim, debug = 1, .plots = "")
     })
     if (i == 1) {
       expect_equal(sum(grepl("Skipped digest", mess)), 0)

@@ -19,10 +19,10 @@ test_that("saving files (and memoryUse)", {
   parameters <- list(
     .globals = list(stackName = "landscape"),
     caribouMovement = list(
-      .plotInitialTime = NA, torus = TRUE, .saveObjects = "caribou",
+      .plots = "", torus = TRUE, .saveObjects = "caribou",
       .saveInitialTime = 1, .saveInterval = 1
     ),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 5, ny = 5)
+    randomLandscapes = list(.plots = "", nx = 5, ny = 5)
   )
 
   outputs <- data.frame(
@@ -75,8 +75,8 @@ test_that("saving files (and memoryUse)", {
   times <- list(start = 0, end = 1, "month")
   parameters <- list(
     .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 5, ny = 5)
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", nx = 5, ny = 5)
   )
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
@@ -100,8 +100,8 @@ test_that("saving files (and memoryUse)", {
   times <- list(start = 0, end = 1, "month")
   parameters <- list(
     .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA),
-    randomLandscapes = list(.plotInitialTime = NA, nx = 5, ny = 5)
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", nx = 5, ny = 5)
   )
   mySim <- simInit(times = times, params = parameters, modules = modules,
                    paths = paths, outputs = outputs)
@@ -177,8 +177,8 @@ test_that("saveSimList works correctly", {
   times <- list(start = 0, end = 1)
   parameters <- list(
     .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA_integer_),
-    randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", nx = 20, ny = 20)
   )
 
   modules <- list("randomLandscapes", "caribouMovement")
@@ -312,8 +312,8 @@ test_that("saveSimList with file backed objs", {
   times <- list(start = 0, end = 5)
   parameters <- list(
     .globals = list(stackName = "landscape"),
-    caribouMovement = list(.plotInitialTime = NA_integer_),
-    randomLandscapes = list(.plotInitialTime = NA_integer_, nx = 20, ny = 20)
+    caribouMovement = list(.plots = ""),
+    randomLandscapes = list(.plots = "", nx = 20, ny = 20)
   )
 
   modules <- list("randomLandscapes", "caribouMovement")
@@ -379,8 +379,8 @@ test_that("restart does not work correctly", {
     times <- list(start = 0, end = 1)
     parameters <- list(
       .globals = list(stackName = "landscape"),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "", nx = 20, ny = 20)
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
@@ -401,9 +401,9 @@ test_that("restart does not work correctly", {
       params = list(
         .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
         # Turn off interactive plotting
-        fireSpread = list(.plotInitialTime = NA),
-        caribouMovement = list(.plotInitialTime = NA),
-        randomLandscapes = list(.plotInitialTime = NA)
+        fireSpread = list(.plots = ""),
+        caribouMovement = list(.plots = ""),
+        randomLandscapes = list(.plots = "")
       ),
       modules = list("randomLandscapes", "fireSpread", "caribouMovement"),
       paths = list(modulePath = getSampleModules(tmpdir),
@@ -422,8 +422,8 @@ test_that("restart does not work correctly", {
     times <- list(start = 0, end = 1)
     parameters <- list(
       .globals = list(stackName = "landscape"),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "", nx = 20, ny = 20)
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(
@@ -466,8 +466,8 @@ test_that("restart with logging", {
     times <- list(start = 0, end = 1)
     parameters <- list(
       .globals = list(stackName = "landscape"),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+      caribouMovement = list(.plots = ""),
+      randomLandscapes = list(.plots = "", nx = 20, ny = 20)
     )
     modules <- list("randomLandscapes", "caribouMovement")
     paths <- list(

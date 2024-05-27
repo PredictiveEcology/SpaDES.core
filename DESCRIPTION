@@ -15,7 +15,7 @@ URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
 Date: 2024-05-27
-Version: 2.0.5.9029
+Version: 2.0.5.9030
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 4.2),
     quickPlot (>= 1.0.2),
-    reproducible (>= 2.0.12.9019)
+    reproducible (>= 2.0.12.9020)
 Imports:
     cli,
     data.table (>= 1.11.0),

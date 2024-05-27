@@ -28,7 +28,7 @@ defineModule(sim, list(
     defineParameter("moveInterval", "numeric", 1.0, 1, 1,
                     "time interval between movoment events"),
     defineParameter("N", "numeric", 100L, 10L, 1000L, "initial number of caribou"),
-    defineParameter("torus", "logical", FALSE, FALSE, TRUE,
+    defineParameter("torus", "logical", TRUE, FALSE, TRUE,
                     "should the map wrap around like a torus?"),
     defineParameter(".plots", "character", "screen", NA, NA,
                     "A modular mechanism to create plots, using png, screen device or other. See `?Plots`."),

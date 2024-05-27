@@ -183,7 +183,7 @@ parameters <- list(
   fireSpread = list(
     nFires = 10L, spreadprob = 0.225, its = 1e6, persistprob = 0,
     returnInterval = 10, startTime = 0,
-    .plotInitialTime = 0, .plotInterval = 10
+    .plots = "screen", .plotInterval = 10
   ),
   caribouMovement = list(
     N = 100L, moveInterval = 1, torus = TRUE,
@@ -266,7 +266,7 @@ parameters <- list(
   randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
   fireSpread = list(nFires = 10L, spreadprob = 0.225, its = 1e6,
                     persistprob = 0, returnInterval = 1, startTime = 0,
-                    .plotInitialTime = 0, .plotInterval = 10),
+                    .plots = "screen", .plotInterval = 10),
   caribouMovement = list(N = 100L, moveInterval = 1, torus = TRUE,
                          .plotInitialTime = 1, .plotInterval = 1)
 )
@@ -610,7 +610,7 @@ Plotting events can be scheduled similarly to save events, by passing module-spe
 mySim <- simInit(times = list(start = 0, end = 5),
                  params = list(
                    .globals = list(stackName = "landscape"),
-                   randomLandscapes = list(.plotInitialTime = 0, .plotInterval = 1)
+                   randomLandscapes = list(.plots = "screen", .plotInterval = 1)
                  ),
                  modules = list("randomLandscapes"),
                  paths = list(modulePath = getSampleModules(tempdir()))
@@ -729,7 +729,7 @@ parameters <- list(
   fireSpread = list(
     nFires = 10L, spreadprob = 0.225, its = 1e6, persistprob = 0,
     returnInterval = 10, startTime = 0,
-    .plotInitialTime = 0, .plotInterval = 10
+    .plots = "screen", .plotInterval = 10
   ),
   caribouMovement = list(
     N = 100L, moveInterval = 1, torus = TRUE,
