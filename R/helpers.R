@@ -372,12 +372,15 @@ getSampleModules <- function(tmpdir) {
   sampModPathTmp
 }
 
-
 #' Text for no event with that name
 #'
 #' Provides the text to be sent to `warning` in each module as the default `switch` case.
+#'
 #' @inheritParams spades
+#'
 #' @return A text string specifying the event name and module for which there is no event
+#'
+#' @export
 noEventWarning <- function(sim) {
   paste(
     "Undefined event type: \'", current(sim)[1, "eventType", with = FALSE],
