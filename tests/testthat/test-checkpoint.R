@@ -101,7 +101,6 @@ test_that("test checkpointing with disk-backed raster", {
   simB <- spades(simB)
   fns <- Filenames(simB)
   rm(simB)
-  unlink(fns) # make sure the file-backed files are removed
 
   simB <- checkpointLoad(file = file.path(paths$outputPath, file))
   end(simB) <- 2
@@ -112,9 +111,15 @@ test_that("test checkpointing with disk-backed raster", {
   #  names are the same -- next line will move from disk to memory
   simA$ras[] <- simA$ras[]
   simB$ras[] <- simB$ras[]
-  # Because they did have different file-backed file names, their "names" attribute is different
-  names(simA$ras) <- names(simB$ras) <- "tmp"
+  # Because they did have different file-backed file names, their "varnames" attribute is different
+  varnames(simA$ras) <- varnames(simB$ras) <- "tmp"
+
+  # ignore unimportant attributes for tests
+  attr(simA$ras, "nParentDirs") <- attr(simB$ras, "nParentDirs") <- NULL
+  attr(simA$ras, "tags") <- attr(simB$ras, "tags") <- NULL
 
   ## both versions above should yield identical results
-  expect_true(all.equal(simA, simB, check.environment = FALSE))
+  expect_true(compareGeom(simA$ras, simB$ras, stopOnError = FALSE))
+  expect_equal(simA$ras, simB$ras, ignore_attr = "cpp")
+  expect_equivalent(simA, simB)
 })

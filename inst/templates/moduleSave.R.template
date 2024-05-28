@@ -1,0 +1,10 @@
+### template for save events
+Save <- function(sim) {
+  # ! ----- EDIT BELOW ----- ! #
+  # do stuff for this event
+  sim <- saveFiles(sim)
+
+  # ! ----- STOP EDITING ----- ! #
+  return(invisible(sim))
+}
+

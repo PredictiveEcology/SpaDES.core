@@ -203,8 +203,8 @@ setMethod(
   signature = c(module = "character", path = "missing", sim = "simList", envir = "ANY"),
   definition = function(module, sim, envir) {
     v <- .parseModulePartial(sim = sim, modules = list(module),
-                             defineModuleElement = "version", envir = envir) %>%
-      `[[`(module)
+                             defineModuleElement = "version", envir = envir) |>
+      (function(x) x[[module]])()
 
     if (is.null(names(v))) {
       as.numeric_version(v) ## SpaDES < 1.3.1.9044

@@ -3,7 +3,8 @@ utils::globalVariables(c(
   "minEventTime", "maxEventTime", "savetime", "unit"
 ))
 
-### `show` generic is already defined in the methods package
+## NOTE: `show` generic is already defined in the methods package
+
 #' Show an Object
 #'
 #' @param object `simList`
@@ -35,7 +36,7 @@ setMethod(
 
     ### modules loaded
     out[[8]] <- capture.output(cat(">> Modules:\n"))
-    ord <- match(unlist(modules(object)), names(timeunits(object))) %>% na.omit
+    ord <- match(unlist(modules(object)), names(timeunits(object))) |> na.omit()
     out[[9]] <- capture.output(print(
       cbind(Name = unname(modules(object)),
             #Timeunit = c(rep(NA_character_, 4), unname(timeunits(object))[ord])),
@@ -61,9 +62,14 @@ setMethod(
 
     p <- mapply(
       function(x, y) {
+        vals <- I(as.list(y))
+        isFun <- vapply(vals, is.function, FUN.VALUE = logical(1))
+        vals[isFun] <- lapply(vals[isFun], format)
+
+
         if (length(names(y)) > 0)
-        data.frame(Module = x, Parameter = names(y), Value = I(as.list(y)),
-                   stringsAsFactors = FALSE, row.names = NULL)
+          data.frame(Module = x, Parameter = names(y), Value = vals,
+                     stringsAsFactors = FALSE, row.names = NULL)
       },
       x = names(params(object))[-omit],
       y = params(object)[-omit],
@@ -98,8 +104,8 @@ setMethod(
     cat(unlist(out), fill = FALSE, sep = "\n")
 })
 
+# environment ---------------------------------------------------------------------------------
 
-################################################################################
 #' Simulation environment
 #'
 #' Accessor functions for the `.xData` slot, which is the default virtual
@@ -153,7 +159,8 @@ setReplaceMethod("envir",
                    return(sim)
 })
 
-################################################################################
+# objects -------------------------------------------------------------------------------------
+
 #' Extract or replace an object from the simulation environment
 #'
 #' The `[[` and `$` operators provide "shortcuts" for accessing
@@ -217,7 +224,7 @@ setReplaceMethod(
        objectName = names(value),
        loadTime = as.numeric(sim@simtimes[["current"]]),
        loaded = TRUE,
-       stringsAsFactors = FALSE) %>% .fillInputRows(startTime = start(sim))
+       stringsAsFactors = FALSE) |> .fillInputRows(startTime = start(sim))
      inputs(sim) <- rbind(inputs(sim), newInputs)
 
     # lapply(names(value), function(z) {
@@ -230,7 +237,8 @@ setReplaceMethod(
     return(sim)
 })
 
-################################################################################
+# modules -------------------------------------------------------------------------------------
+
 #' Simulation modules and dependencies
 #'
 #' Accessor functions for the `depends` and `modules` slots in a `simList` object.
@@ -271,7 +279,7 @@ setMethod(
     if (hidden) {
       mods <- sim@modules
     } else {
-      hiddenMods <- unlist(sim@modules) %in% (.pkgEnv$.coreModules %>% unlist())
+      hiddenMods <- unlist(sim@modules) %in% (.pkgEnv$.coreModules |> unlist())
       mods <- sim@modules[!hiddenMods]
     }
     return(mods)
@@ -295,7 +303,8 @@ setReplaceMethod("modules",
                    return(sim)
 })
 
-################################################################################
+# dependencies -------------------------------------------------------------------------------
+
 #' @inheritParams modules
 #' @export
 #' @include simList-class.R
@@ -332,7 +341,8 @@ setReplaceMethod("depends",
                    return(sim)
 })
 
-################################################################################
+# namespacing ---------------------------------------------------------------------------------
+
 #' Namespacing within `SpaDES`
 #'
 #' This will only return the module name if it is inside a `spades` call,
@@ -369,9 +379,10 @@ setMethod(
     #rep(FALSE, length = length(sc))
     #st <- grepl(sc, pattern = "moduleCall")
     if (length(st)) {
-      mod <- parse(text = "moduleCall") %>%
-        eval(., envir = sys.frame(st[1] - 1)) %>%
-        strsplit(., split = "\\.")[[1]][2]
+      mod <- parse(text = "moduleCall") |>
+        eval(envir = sys.frame(st[1] - 1)) |>
+        strsplit(split = "\\.") |>
+        (function(x) x[[1]][2])()
     } else {
       mod <- NULL
     }
@@ -397,7 +408,8 @@ setMethod(
       return(character(0))
 })
 
-################################################################################
+# params --------------------------------------------------------------------------------------
+
 #' Get and set simulation parameters
 #'
 #' `params`, `P` and `Par` (an active binding, like "mod") access the parameter
@@ -616,7 +628,8 @@ P.simList <- function(sim, param, module) {
   return(sim)
 }
 
-################################################################################
+# globals -------------------------------------------------------------------------------------
+
 #' Get and set global simulation parameters
 #'
 #' `globals`, and the alias `G`, accesses or sets the "globals"
@@ -696,7 +709,8 @@ setReplaceMethod("G",
                    return(sim)
 })
 
-################################################################################
+# parameters ----------------------------------------------------------------------------------
+
 #' @details
 #' `parameters` will extract only the metadata with the metadata defaults,
 #' NOT the current values that may be overwritten by a user. See examples.
@@ -769,7 +783,8 @@ setMethod("parameters",
             return(tmp)
 })
 
-################################################################################
+# checkpoint ----------------------------------------------------------------------------------
+
 #' @inheritParams params
 #' @export
 #' @include simList-class.R
@@ -807,7 +822,6 @@ setReplaceMethod("checkpointFile",
                    return(sim)
 })
 
-################################################################################
 #' @inheritParams params
 #' @export
 #' @include simList-class.R
@@ -844,7 +858,8 @@ setReplaceMethod("checkpointInterval",
                    return(sim)
 })
 
-################################################################################
+# progress ------------------------------------------------------------------------------------
+
 #' Get and set simulation progress bar details
 #'
 #' The progress bar can be set in two ways in SpaDES. First, by setting values
@@ -929,7 +944,6 @@ setReplaceMethod("progressInterval",
                    return(sim)
 })
 
-################################################################################
 #' @inheritParams params
 #' @include simList-class.R
 #' @export
@@ -966,7 +980,8 @@ setReplaceMethod("progressType",
                    return(sim)
 })
 
-################################################################################
+# inputs --------------------------------------------------------------------------------------
+
 #' Simulation inputs
 #'
 #' Accessor functions for the `inputs` slots in a `simList` object.
@@ -1169,24 +1184,26 @@ setReplaceMethod(
           }
 
         } else {
-          sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <-
-            sim@simtimes[["current"]]
-          newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] %>%
-            min(., na.rm = TRUE)
+          sim@inputs[["loadTime"]][is.na(sim@inputs$loadTime)] <- sim@simtimes[["current"]]
+          newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)] |>
+            min(na.rm = TRUE)
           attributes(newTime)$unit <- "seconds"
           sim <- scheduleEvent(sim, newTime, "load", "inputs", .first() - 1)
         }
       }
     }
     possNewUSON <- inputs(sim)$objectName
-    sim$.userSuppliedObjNames <- if (is.null(sim$.userSuppliedObjNames))
-      possNewUSON else unique(c(sim$.userSuppliedObjNames, possNewUSON))
-
+    sim$.userSuppliedObjNames <- if (is.null(sim$.userSuppliedObjNames)) {
+      possNewUSON
+    } else {
+      unique(c(sim$.userSuppliedObjNames, possNewUSON))
+    }
 
     return(sim)
-  })
+})
 
-################################################################################
+# outputs -------------------------------------------------------------------------------------
+
 #' Simulation outputs
 #'
 #' Accessor functions for the `outputs` slots in a `simList` object.
@@ -1299,6 +1316,7 @@ setGeneric("outputs<-",
 #' @aliases outputs<-,simList-method
 #' @export
 #' @importFrom data.table setDT
+#' @importFrom tools file_ext
 #' @name outputs<-
 #' @rdname simList-accessors-outputs
 setReplaceMethod(
@@ -1315,25 +1333,25 @@ setReplaceMethod(
 
        sim@outputs <- .fillOutputRows(value, end(sim))
 
-       # coerce any factors to the correct class
+       ## coerce any factors to the correct class
        for (col in which(sapply(sim@outputs, is.factor))) {
          sim@outputs[[col]] <- as(sim@outputs[[col]], class(.fileTableOut()[[col]]))
        }
 
-       # if saveTime not provided, give it end(sim)
+       ## if saveTime not provided, give it end(sim)
        sim@outputs[["saveTime"]][is.na(sim@outputs$saveTime)] <-
          end(sim, sim@simtimes[["timeunit"]])
        attributes(sim@outputs$saveTime)$unit <- sim@simtimes[["timeunit"]]
 
-       # Deal with file names
-       # 3 things: 1. if relative, concatenate outputPath
-       #           2. if absolute, don't use outputPath
-       #           3. concatenate time to file name in all cases
-       # If no filename provided, use the object name
+       ## Deal with file names
+       ## 3 things: 1. if relative, concatenate outputPath
+       ##           2. if absolute, don't use outputPath
+       ##           3. concatenate time to file name in all cases
+       ## If no filename provided, use the object name
        sim@outputs[["file"]][is.na(sim@outputs$file)] <-
          paste0(sim@outputs$objectName[is.na(sim@outputs$file)])
-       # If a filename is provided, determine if it is absolute path, if so,
-       # use that, if not, then append it to outputPath(sim)
+       ## If a filename is provided, determine if it is absolute path, if so,
+       ## use that, if not, then append it to outputPath(sim)
        alreadyWithOutputPath <- grepl(pattern = paste0("^", outputPath(sim)), sim@outputs$file)
        if (any(!alreadyWithOutputPath)) {
          isAP <- isAbsolutePath(as.character(sim@outputs$file))
@@ -1342,17 +1360,17 @@ setReplaceMethod(
            file.path(outputPath(sim), sim@outputs[["file"]][!isAP])
        }
 
-       # If there is no function provided, then use saveRDS, from package base
+       ## If there is no function provided, then use saveRDS, from package base
        sim@outputs[["fun"]][is.na(sim@outputs$fun)] <- "saveRDS"
        sim@outputs[["package"]][is.na(sim@outputs$package)] <- "base"
 
-       # file extension stuff
+       ## file extension stuff
        fileExts <- .saveFileExtensions()
        fileExtsHere <- setDT(fileExts)[setDT(sim@outputs[, c("fun", "package")]),
                                        on = c("fun", "package")]
        fe <- fileExtsHere$exts
 
-       # grep allows for file extensions from 1 to 5 characters
+       ## grep allows for file extensions from 1 to 5 characters
        wh <- !grepl(pattern = "\\..{1,5}$", sim@outputs$file) & nzchar(fe, keepNA = TRUE)
        if (anyNA(fe[wh])) {
          messageDF(unique(fileExtsHere), verbose = TRUE)
@@ -1363,8 +1381,8 @@ setReplaceMethod(
        }
        sim@outputs[["file"]][wh] <- paste0(sim@outputs[["file"]][wh], ".", fe[wh])
 
-       # If the file name already has a time unit on it,
-       # i.e., passed explicitly by user, then don't postpend again
+       ## If the file name already has a time unit on it,
+       ## i.e., passed explicitly by user, then don't postpend again
        txtTimeA <- paste0(attr(sim@outputs[["saveTime"]], "unit"))
        txtTimeB <- paddedFloatToChar(
          sim@outputs[["saveTime"]],
@@ -1374,12 +1392,10 @@ setReplaceMethod(
        wh <- !grepl(txtTimeA, sim@outputs$file)
        fns <- sim@outputs[["file"]][wh]
        sim@outputs[["file"]][wh] <- paste0(
-         filePathSansExt(fns),
+         tools::file_path_sans_ext(fns),
          "_", txtTimeA, txtTimeB[wh],
-         ifelse(nzchar(fileExt(fns), keepNA = TRUE) , ".", ""),
-         ifelse(nzchar(fileExt(fns), keepNA = TRUE) ,
-                fileExt(fns),
-                "")
+         ifelse(nzchar(tools::file_ext(fns), keepNA = TRUE) , ".", ""),
+         ifelse(nzchar(tools::file_ext(fns), keepNA = TRUE) , tools::file_ext(fns), "")
        )
      } else {
        sim@outputs <- value
@@ -1392,7 +1408,6 @@ setReplaceMethod(
 
     return(sim)
 })
-
 
 outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = NA,
                           args = I(list(NA)), ...) {
@@ -1494,7 +1509,8 @@ registerOutputs <- function(filename, sim, ...) {
   sim
 }
 
-################################################################################
+# inputArgs + outputArgs ----------------------------------------------------------------------
+
 #' `inputArgs` and `outputArgs` are ways to specify any arguments that are needed for
 #' file loading and file saving. This is still somewhat experimental.
 #'
@@ -1585,7 +1601,8 @@ setReplaceMethod(
    return(sim)
 })
 
-################################################################################
+# paths ---------------------------------------------------------------------------------------
+
 #' Specify paths for modules, inputs, outputs, and temporary rasters
 #'
 #' Accessor functions for the `paths` slot in a `simList` object.
@@ -1648,23 +1665,21 @@ setReplaceMethod(
   "paths",
   signature = "simList",
   function(sim, value) {
-    N <- 5 # total number of named paths (cache, module, input, output)
-
-    # get named elements and their position in value list
-    wh <- pmatch(names(sim@paths), names(value)) # always length 5, NA if no name match, number if yes
+    ## get named elements and their position in value list
+    wh <- pmatch(names(sim@paths), names(value)) # always length 7, NA if no name match, number if yes
     whValueNamed <- which(!is.na(pmatch(names(value), names(sim@paths)))) # length of names of value
     whValueUnnamed <- rep(TRUE, length(value))
     if (length(whValueNamed)) whValueUnnamed[whValueNamed] <- FALSE
 
-    # start with .paths()
+    ## start with .paths()
     emptyOnes <- unlist(lapply(sim@paths, is.null))
     if (sum(emptyOnes) > 0) sim@paths[emptyOnes] <- .paths()[emptyOnes]
 
-    # override with named ones
+    ## override with named ones
     sim@paths[!is.na(wh)] <- value[na.omit(wh)]
 
-    # keep named elements, use unnamed in remaining order:
-    #  cache, input, module, output
+    ## keep named elements, use unnamed in remaining order:
+    ##  cache, input, module, output
     if (length(na.omit(wh)) < length(value)) {
       whichNamed <- which(!is.na(wh))
       whichUnnamed <- (seq_along(sim@paths))
@@ -1679,7 +1694,7 @@ setReplaceMethod(
     return(sim)
 })
 
-# cachePath ----------------------------------------------------------------------------------
+## cachePath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
 #' @include simList-class.R
@@ -1722,7 +1737,7 @@ setReplaceMethod(
     return(sim)
 })
 
-# inputPath ----------------------------------------------------------------------------------
+## inputPath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
 #' @include simList-class.R
@@ -1765,8 +1780,7 @@ setReplaceMethod(
     return(sim)
 })
 
-
-# outputPath ----------------------------------------------------------------------------------
+## outputPath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
 #' @include simList-class.R
@@ -1866,7 +1880,7 @@ setMethod("logPath",
             return(lp)
 })
 
-# modulePath ----------------------------------------------------------------------------------
+## modulePath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
 #' @param module The optional character string of the module(s) whose
@@ -1915,8 +1929,7 @@ setReplaceMethod(
     return(sim)
 })
 
-
-# scratchPath ---------------------------------------------------------------------------------
+## scratchPath ---------------------------------------------------------------------------------
 
 #' @inheritParams paths
 #'
@@ -1959,7 +1972,7 @@ setReplaceMethod(
     return(sim)
 })
 
-# rasterPath ----------------------------------------------------------------------------------
+## rasterPath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
 #'
@@ -2002,7 +2015,7 @@ setReplaceMethod(
     return(sim)
 })
 
-# terraPath ----------------------------------------------------------------------------------
+## terraPath ----------------------------------------------------------------------------------
 
 #' @inheritParams paths
 #'
@@ -2072,7 +2085,8 @@ setMethod("dataPath",
             return(file.path(modulePath(sim, currentModule(sim)), currentModule(sim), "data"))
 })
 
-################################################################################
+# time ----------------------------------------------------------------------------------------
+
 #' Time usage in `SpaDES`
 #'
 #' Functions for the `simtimes` slot of a `simList` object
@@ -2185,7 +2199,6 @@ setReplaceMethod(
      return(x)
 })
 
-################################################################################
 #' @export
 #' @importFrom stats time
 #' @include simList-class.R
@@ -2236,7 +2249,6 @@ setReplaceMethod(
      return(x)
 })
 
-################################################################################
 #' @export
 #' @importFrom stats end
 #' @include times.R
@@ -2288,7 +2300,6 @@ setReplaceMethod(
     return(x)
 })
 
-################################################################################
 #' @export
 #' @importFrom stats start
 #' @include simList-class.R
@@ -2341,7 +2352,6 @@ setReplaceMethod(
      return(x)
 })
 
-################################################################################
 #' @inheritParams times
 #' @include simList-class.R
 #' @include times.R
@@ -2365,7 +2375,6 @@ setReplaceMethod(
   return(out)
 }
 
-################################################################################
 #' @details `timeunit` will extract the current units of the time used in a
 #' simulation (i.e., within a `spades` call).
 #' If it is set within a `simInit`, e.g.,
@@ -2433,7 +2442,6 @@ setReplaceMethod(
     return(x)
 })
 
-################################################################################
 #' @details `timeunits` will extract the current units of the time of all
 #' modules used in a simulation.
 #' This is different from `timeunit` because it is not necessarily
@@ -2479,7 +2487,9 @@ setMethod(
     return(timestepUnits)
 })
 
-################################################################################
+
+# events --------------------------------------------------------------------------------------
+
 #' Simulation event lists
 #'
 #' Accessor functions for the `events` and `completed` slots of a
@@ -2590,7 +2600,9 @@ setReplaceMethod(
      return(sim)
 })
 
-#############################
+
+## conditional events --------------------------------------------------------------------------
+
 #' @aliases simList-accessors-events
 #' @export
 #' @rdname simList-accessors-events
@@ -2644,7 +2656,6 @@ setMethod("conditionalEvents",
             return(res)
 })
 
-################################################################################
 #' @inheritParams events
 #'
 #' @aliases simList-accessors-events
@@ -2716,7 +2727,6 @@ setReplaceMethod("current",
                    return(sim)
 })
 
-################################################################################
 #' @inheritParams events
 #' @param times Logical. Should this function report the `clockTime`.
 #'
@@ -2738,7 +2748,6 @@ setMethod(
   "completed",
   signature = c("simList", "character"),
   definition = function(sim, unit, times = TRUE) {
-
     obj <- as.list(sim@completed)
     obj <- rbindlist(obj, idcol = if (length(sim@completed)) "eventNumber" else NULL)
 
@@ -2746,7 +2755,7 @@ setMethod(
       obj[, eventNumber := as.numeric(eventNumber)]
       setkeyv(obj, "eventNumber")
       if (!isTRUE(times)) {
-        set(obj, NULL, "._clockTime", NULL)
+        set(obj, NULL, grep("^[.]_", names(obj)), NULL)
       }
       if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
         # note the above line captures empty eventTime, whereas `is.na` does not
@@ -2794,21 +2803,19 @@ setReplaceMethod(
   function(sim, value) {
     if (!is(value, "data.table")) stop("Completed queue must be a data.table")
     if (!identical(names(value), .emptyEventListCols)) {
-      stop("Event queue must be a data.table with columns, ",
-        paste(.emptyEventListCols, collapse = ", "), ".")
+      stop("Event queue must be a data.table with columns: ",
+           paste(.emptyEventListCols, collapse = ", "), ".")
     }
     sim@completed <- new.env(parent = emptyenv())
     if (NROW(value)) {
       integerVals <- seq_len(NROW(value))
-      outList <- lapply(integerVals,
-                      function(x) as.list(value[x, ]))
+      outList <- lapply(integerVals, function(x) as.list(value[x, ]))
       names(outList) <- as.character(integerVals)
       list2env(outList, envir = sim@completed)
     }
     return(sim)
 })
 
-################################################################################
 #' Add simulation dependencies
 #'
 #' Internal function.
@@ -2849,6 +2856,9 @@ setMethod(
     return(sim)
 })
 
+
+# packages ------------------------------------------------------------------------------------
+
 #' strip GitHub repo info from vector of packages
 #'
 #' @keywords internal
@@ -2861,7 +2871,6 @@ setMethod(
   # return(pkgs)
 }
 
-################################################################################
 #' Get module or simulation package dependencies
 #'
 #' @param sim  A `simList` object.
@@ -2887,8 +2896,6 @@ setMethod(
 #' @include simList-class.R
 #' @family functions to access elements of a 'simList' object
 #' @rdname packages
-#'
-# igraph exports %>% from magrittr
 setGeneric("packages", function(sim, modules, paths, filenames, envir,
                                 clean = FALSE, ...) {
   standardGeneric("packages")
@@ -2902,19 +2909,20 @@ setMethod(
   signature(sim = "ANY"),
   definition = function(sim, modules, paths, filenames, envir,
                         clean = FALSE, ...) {
-    if (missing(sim)) { # can either have no sim, or can have a sim that is incomplete,
-                        #   i.e., with no reqdPkgs slot filled
+    if (missing(sim)) {
+      ## can either have no sim, or can have a sim that is incomplete,
+      ## i.e., with no reqdPkgs slot filled
       depsInSim <- list(NULL)
     } else {
       depsInSim <- sim@depends@dependencies
       if (is.null(depsInSim[[1]])) return(character()) # basically for empty simList objects
     }
 
-    if (!is.null(depsInSim[[1]])) { # check within dependencies slot for any elements,
-                                    #  if not NULL, one will be reqdPkgs
+    if (!is.null(depsInSim[[1]])) {
+      ## check within dependencies slot for any elements, if not NULL, one will be reqdPkgs
       pkgs <- lapply(depsInSim, function(x) {
         x@reqdPkgs
-      }) %>% unlist()
+      }) |> unlist()
       pkgs <- unique(pkgs)
       if (!any(grepl("SpaDES.core", pkgs)))
         pkgs <- c("SpaDES.core", pkgs)
@@ -2948,14 +2956,16 @@ setMethod(
 
       pkgs <- lapply(paths, function(paths) {
         pkgs <- .parseModulePartial(filename = paths, defineModuleElement = "reqdPkgs",
-                                    envir = envir) %>%
-          unlist() %>% unique()
+                                    envir = envir) |>
+          unlist() # |> unique()
+        pkgs <- pkgs[!duplicated(pkgs)]
         if (!is.null(pkgs)) {
           pkgs <- sort(pkgs)
         } else {
           pkgs <- character(0)
         }
-        pkgs <- unique(pkgs[nzchar(pkgs)])
+        pkgs <- pkgs[nzchar(pkgs)]
+        pkgs <- pkgs[!duplicated(pkgs)]
         if (!any(grepl("SpaDES.core", pkgs)))
           pkgs <- c("SpaDES.core", pkgs)
         return(pkgs)
@@ -2968,7 +2978,9 @@ setMethod(
     return(unique(pkgs))
 })
 
-################################################################################
+
+# inputObjects --------------------------------------------------------------------------------
+
 #' Metadata accessors
 #'
 #' These accessors extract the metadata for a module (if specified) or all modules
@@ -3031,7 +3043,9 @@ inputOrOutputObjects <- function(type, module, path) {
   mm
 }
 
-################################################################################
+
+# outputObjects -------------------------------------------------------------------------------
+
 #' @inheritParams P
 #' @include simList-class.R
 #' @export
@@ -3076,7 +3090,8 @@ setMethod("outputObjects",
             inputOrOutputObjects(type = "outputObjects", module = module, path = path)
 })
 
-################################################################################
+# outputObjectNames ---------------------------------------------------------------------------
+
 #' @inheritParams P
 #' @include simList-class.R
 #' @export
@@ -3110,7 +3125,8 @@ setMethod("outputObjectNames",
             return(out)
 })
 
-################################################################################
+# reqdPkgs -----------------------------------------------------------------------------------
+
 #' @inheritParams P
 #' @param module Character vector of module name(s)
 #' @param modulePath That path where `module` can be found. If set already
@@ -3168,7 +3184,8 @@ setMethod("reqdPkgs",
             return(out)
 })
 
-################################################################################
+# documentation -------------------------------------------------------------------------------
+
 #' @inheritParams P
 #' @include simList-class.R
 #' @export
@@ -3206,6 +3223,7 @@ setGeneric("citation", function(package, lib.loc = NULL, auto = NULL, module = c
   standardGeneric("citation")
 })
 
+# citation ------------------------------------------------------------------------------------
 
 #' A citation method for `SpaDES` modules
 #'
@@ -3240,7 +3258,6 @@ setMethod("citation",
             return(out)
 })
 
-
 #' @export
 #' @rdname citation
 #' @name citation
@@ -3251,7 +3268,8 @@ setMethod("citation",
             utils::citation(package = package, lib.loc = lib.loc, auto = auto)
 })
 
-################################################################################
+# session info --------------------------------------------------------------------------------
+
 #' @inheritParams P
 #' @inheritParams utils::citation
 #' @include simList-class.R
@@ -3272,7 +3290,33 @@ setMethod("sessInfo",
             return(sim@.xData[["._sessionInfo"]])
 })
 
-################################################################################
+#' Show which objects were first created in a `simInit` or `spades` call
+#'
+#' This does an `rbindlist(sim$._objectsCreated)`.
+#' This object in the `sim` records the yellow message that reports on when objects are created.
+#'
+#' @param sim A `simList` object that contains data.table `objects`
+#'
+#' @export
+#' @importFrom data.table data.table rbindlist setorderv
+#' @aliases newObjectsCreated
+#' @aliases objectsCreated
+#' @rdname simList-accessors-objects
+#' @return The `data.table` of the objects created, alongside the `current(sim)`
+#' at each moment of creation.
+newObjectsCreated <- function(sim) {
+  if (!is.null(sim$._objectsCreated)) {
+    dt <- rbindlist(sim$._objectsCreated)
+    setorderv(dt, "newObjects")
+    print(format(as.data.frame(dt), justify = "left"))
+  } else {
+    dt <- data.table(newObjects = character(), .emptyEventListDT)
+  }
+  invisible(dt)
+}
+
+# elapsedTime ---------------------------------------------------------------------------------
+
 #' @export
 #' @include simList-class.R
 #' @include times.R
@@ -3306,7 +3350,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
     ret <- comp[, list(elapsedTime = sum(diffTime)), by = theBy] #nolint
     a <- ret$elapsedTime
     if (identical(units, "auto")) {
-      unts <- "secs"
+      unt <- "secs"
       if (any(a > minutesInSeconds)) {
         if (any(a > hoursInSeconds)) {
           if (any(a > daysInSeconds)) {
@@ -3331,17 +3375,19 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   return(ret[])
 }
 
-.knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval", ".saveInitialTime", ".saveInterval", ".useCache")
+.knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval",
+                     ".saveInitialTime", ".saveInterval", ".useCache")
 
-
-#' @export
-#' @rdname objects
 #' @inheritParams inputObjects
+#'
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
 #' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
 #' will be determined either from a `simList` or from the module source code.
+#'
+#' @export
 #' @importFrom data.table set rbindlist setcolorder
+#' @rdname objects
 moduleObjects <- function(sim, module, path) {
   simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check
   if (missing(sim)) {
@@ -3355,7 +3401,6 @@ moduleObjects <- function(sim, module, path) {
     }
     sim <- simTry
   }
-
 
   if (!is.null(sim)) {
     path <- modulePath(sim)
@@ -3414,7 +3459,6 @@ findObjects <- function(objects, sim, module, path) {
   mo <- moduleObjects(sim, module, path)
   mo[grep(paste(objects, collapse = "|"), objectName), ]
 }
-
 
 #' Extract an intact `simList` but with subset of objects
 #'

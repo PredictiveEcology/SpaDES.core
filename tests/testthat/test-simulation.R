@@ -16,10 +16,10 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   paths <- list(modulePath = getSampleModules(tmpdir))
 
   set.seed(123)
-  mySim <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySim <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA)
   set.seed(123)
-  mySim2 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySim2 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA)
 
   ## simtime
@@ -34,25 +34,25 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(all("stats" %in% completed(mySim)$eventType))
 
   set.seed(123)
-  mySimEvent <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = "init")
   expect_true(all("init" == completed(mySimEvent)$eventType))
   expect_true(max(events(mySimEvent)$eventTime) <= end(mySimEvent)) # didn't schedule next event
 
 
   eventTypes <- c("init", "burn")
-  mySimEvent2 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent2 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
   expect_true(all(eventTypes %in% completed(mySimEvent2)$eventType))
 
   eventTypes <- c()
-  mySimEvent3 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent3 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
   expect_true(all(eventTypes %in% completed(mySimEvent3)$eventType))
   expect_true(identical(completed(mySimEvent3)[,1:4], completed(mySim)[,1:4]))
 
   eventTypes <- c("nothing")
-  mySimEvent4 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent4 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
   expect_true(NROW(completed(mySimEvent4)) == 0) # nothing completed
   expect_true(all("init" == events(mySimEvent4)$eventType)) # nothing happened; only inits in queue
@@ -60,7 +60,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   eventTypes <- list(randomLandscapes = c("init"),
                      fireSpread = c("init", "burn")
   )
-  mySimEvent5 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent5 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
   expect_true(all(unique(unlist(eventTypes)) %in% completed(mySimEvent5)$eventType))
   expect_true(!all("stats" %in% completed(mySimEvent5)$eventType))
@@ -69,24 +69,23 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   eventTypes <- list(randomLandscapes = c("init"),
                      fireSpread = c("initial", "burn")
   )
-  mySimEvent6 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent6 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
   expect_true(all("randomLandscapes" %in% completed(mySimEvent6)$moduleName))
   expect_true(!all("fireSpread" %in% completed(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
-  mySimEvent7 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent7 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
   expect_true(all("randomLandscapes" %in% completed(mySimEvent7)$moduleName))
   expect_true(!all("fireSpread" %in% completed(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
-  mySimEvent8 <- simInit(times, params, modules, objects = list(), paths) %>%
+  mySimEvent8 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
   expect_true(all("randomLandscapes" %in% completed(mySimEvent8)$moduleName))
   expect_true(!all("fireSpread" %in% completed(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
-
 
   mySimEvent9 <- simInitAndSpades(times, params, modules, objects = list(), paths,
                         debug = FALSE, .plotInitialTime = NA, events = "init")
@@ -104,7 +103,6 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(time(simOut) == end(simOut)) # it is at 10, the end
   expect_true(!all("init" == completed(simOut)$eventType))
   expect_true(max(completed(simOut)$eventTime) == end(simOut)) # got to end time
-
 
   mySimEvent11 <- simInit(times = list(start = 2000, end = 2010), params, modules,
                           objects = list(), paths,
@@ -129,12 +127,9 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(any(grepl("not specified", mess)))
 
   expect_true(all(file.exists(outputs(mySimEvent12Out)$file[outputs(mySimEvent12Out)$saved])))
-
-
 })
 
 test_that("spades calls - diff't signatures", {
-
   testInit(sampleModReqdPkgs, verbose = TRUE)
 
   a <- simInit()
@@ -171,7 +166,7 @@ test_that("spades calls - diff't signatures", {
   expect_silent(expect_message(spades(a, debug = FALSE, progress = "rr"), "DTthreads"))
   opts <- options(opts)
 
-  paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
+  paths(a)$cachePath <- file.path(tempdir(), "cache") |> checkPath(create = TRUE)
   a <- Copy(a1)
   expect_message(spades(a, cache = TRUE, debug = TRUE, notOlderThan = Sys.time()), "eventTime")
   expect_true(all(basename2(c(CacheDBFile(paths(a)$cachePath), CacheStorageDir(paths(a)$cachePath))) %in%
@@ -194,7 +189,7 @@ test_that("spades calls - diff't signatures", {
 
   for (i in 1:2) {
     a <- simInit(times, params, modules, paths = paths)
-    paths(a)$cachePath <- file.path(tempdir(), "cache") %>% checkPath(create = TRUE)
+    paths(a)$cachePath <- file.path(tempdir(), "cache") |> checkPath(create = TRUE)
     assign(paste0("st", i), system.time(spades(a, cache = TRUE, .plotInitialTime = NA)))
   }
   params1 <- list(
@@ -333,7 +328,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   N <- 5000
 
   moduleDir <- file.path(tmpdir)
-  inputDir <- file.path(moduleDir, "inputs") %>% checkPath(create = TRUE)
+  inputDir <- file.path(moduleDir, "inputs") |> checkPath(create = TRUE)
   outputDir <- file.path(moduleDir, "outputs")
   cacheDir <- file.path(outputDir, "cache")
   times <- list(start = 0, end = N)
@@ -831,8 +826,7 @@ test_that("messaging with multiple modules", {
   for (y in 3:4) {
     cat(xxx1[[y]], sep = "\n", fill = FALSE, file = fileNames[y])
   }
-  opts <- options("spades.allowInitDuringSimInit" = FALSE)
-  on.exit(options(opts), add = TRUE)
+  withr::local_options(spades.allowInitDuringSimInit = FALSE)
   mm1 <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
   mm1 <- cleanMessage(mm1)
   expect_true(all(unlist(lapply(fullMessage,
@@ -938,7 +932,7 @@ test_that("simInitAndSpades", {
 
   set.seed(123)
   mySim2 <- simInit(times = times, params = params,
-                    modules = modules, objects = list(), paths = paths) %>%
+                    modules = modules, objects = list(), paths = paths) |>
     spades(debug = FALSE)
 
   expect_true(all.equal(mySim, mySim2))
@@ -975,7 +969,7 @@ test_that("debug using logging", {
   paths <- list(modulePath = getSampleModules(tmpdir))
 
   set.seed(123)
-  mySim <- simInit(times, params, modules, objects = list(), paths) #%>%
+  mySim <- simInit(times, params, modules, objects = list(), paths) #|>
   logging::logReset()
   unlink(tmpfile)
   expect_false(file.exists(tmpfile))

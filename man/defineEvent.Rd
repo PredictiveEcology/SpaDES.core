@@ -4,7 +4,13 @@
 \alias{defineEvent}
 \title{Alternative way to define events in SpaDES.core}
 \usage{
-defineEvent(sim, eventName = "init", code, moduleName = NULL, envir)
+defineEvent(
+  sim,
+  eventName = "init",
+  code,
+  moduleName = NULL,
+  envir = parent.frame()
+)
 }
 \arguments{
 \item{sim}{A \code{simList}}

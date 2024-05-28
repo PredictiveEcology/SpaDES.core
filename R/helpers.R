@@ -1,4 +1,3 @@
-################################################################################
 #' Named list of core `SpaDES` modules
 #'
 #' Internal function.
@@ -10,22 +9,28 @@
 #' @name .coreModules
 #' @rdname coreModules
 .coreModules <- function() {
-  list(checkpoint = "checkpoint", save = "save", progress = "progress", load = "load",
-       restartR = "restartR")
+  list(
+    checkpoint = "checkpoint",
+    save = "save",
+    progress = "progress",
+    load = "load",
+    restartR = "restartR"
+  )
 }
 
 #' @keywords internal
 #' @include environment.R
-.pkgEnv$.coreModules <- .coreModules() %>% unname()
+.pkgEnv$.coreModules <- .coreModules() |> unname()
 
 #' @keywords internal
 #' @include environment.R
-.pkgEnv$.coreModulesMinusSave <- setdiff(.coreModules(), "save") %>% unname()
+.pkgEnv$.coreModulesMinusSave <- .coreModules() |> setdiff("save") |> unname()
 
 #' @keywords internal
 .pkgEnv$.progressEmpty <- list(type = NA_character_, interval = NA_real_)
 
-################################################################################
+# empty event lists ---------------------------------------------------------------------------
+
 #' Blank (template) event list
 #'
 #' Internal function called from `spades`, returning an empty event list.
@@ -51,14 +56,22 @@
 #' @keywords internal
 #' @name emptyEventList
 #' @rdname emptyEventList
-.emptyEventListDT <- data.table(eventTime = integer(0L), moduleName = character(0L),
-                                eventType = character(0L), eventPriority = numeric(0L))
+.emptyEventListDT <- data.table(
+  eventTime = integer(0L),
+  moduleName = character(0L),
+  eventType = character(0L),
+  eventPriority = numeric(0L)
+)
 
 #' @importFrom data.table data.table
 #' @keywords internal
 #' @rdname emptyEventList
-.singleEventListDT <- data.table(eventTime = integer(1L), moduleName = character(1L),
-                                 eventType = character(1L), eventPriority = numeric(1L))
+.singleEventListDT <- data.table(
+  eventTime = integer(1L),
+  moduleName = character(1L),
+  eventType = character(1L),
+  eventPriority = numeric(1L)
+)
 
 #' @keywords internal
 #' @rdname emptyEventList
@@ -97,6 +110,8 @@ setMethod(
 #' @rdname emptyEventList
 .emptyEventListCols <- colnames(.emptyEventList())
 
+# empty metadata ------------------------------------------------------------------------------
+
 #' Default (empty) metadata
 #'
 #' Internal use only.
@@ -126,7 +141,7 @@ setMethod(
       authors = moduleDefaults[["authors"]],
       version = moduleDefaults[["version"]],
       spatialExtent = terra::ext(rep(0, 4)), ## match up with moduleDefaults
-      timeframe = as.POSIXlt(c(NA, NA)),                ## match up with moduleDefaults
+      timeframe = as.POSIXlt(c(NA, NA)),     ## match up with moduleDefaults
       timeunit = moduleDefaults[["timeunit"]],
       citation = moduleDefaults[["citation"]],
       documentation = moduleDefaults[["documentation"]],
@@ -263,12 +278,15 @@ setMethod(
 #' This function removes a few attributes that are added internally
 #' by \pkg{SpaDES.core} and are not relevant to the `all.equal`.
 #' One key element removed is any time stamps, as these are guaranteed to be different.
+#' A possibly very important argument to pass to the `...` is `check.attributes = FALSE`
+#' which will allow successful comparisons of many objects that might have pointers.
 #'
 #' @inheritParams base::all.equal
 #'
 #' @return See [base::all.equal()]
 #'
 #' @export
+#' @importFrom reproducible .wrap
 all.equal.simList <- function(target, current, ...) {
   attr(target, ".Cache")$newCache <- NULL
   attr(current, ".Cache")$newCache <- NULL
@@ -281,8 +299,8 @@ all.equal.simList <- function(target, current, ...) {
     completed(current) <- completed(current, times = FALSE)
 
   # remove all objects starting with ._ in the simList@.xData
-  objNamesTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^._")
-  objNamesCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^._")
+  objNamesTarget <- ls(envir = envir(target), all.names = TRUE, pattern = "^[.]_")
+  objNamesCurrent <- ls(envir = envir(current), all.names = TRUE, pattern = "^[.]_")
   objsTarget <- mget(objNamesTarget, envir = envir(target))
   objsCurrent <- mget(objNamesCurrent, envir = envir(current))
   on.exit({
@@ -301,9 +319,10 @@ all.equal.simList <- function(target, current, ...) {
 
   target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
   current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
-  all.equal.default(target1, current1, check.environment = FALSE)
+  all.equal.default(target1, current1, ...)
 }
 
+#' @importFrom utils packageVersion
 needInstall <- function(
     pkg = "methods",
     minVersion = NULL,
@@ -318,11 +337,9 @@ needInstall <- function(
         need <- TRUE
   }
   if (need) {
-    stop(messageStart,
-         "install.packages('", pkg, "')")
+    stop(messageStart, "install.packages('", pkg, "')")
   }
 }
-
 
 .moduleNameNoUnderscore <- function(mod) gsub("_", ".", basename(mod))
 
@@ -333,6 +350,7 @@ needInstall <- function(
 #' @return character vector of filepaths to the copied files
 #'
 #' @export
+#' @importFrom reproducible checkPath
 #' @rdname getSampleFiles
 getMapPath <- function(tmpdir) {
   mapPath <- system.file("maps", package = "quickPlot")
@@ -352,4 +370,18 @@ getSampleModules <- function(tmpdir) {
   checkPath(unique(dirname(allNewFiles)), create = TRUE)
   out <- file.copy(allFiles, file.path(sampModPathTmp, allFilesRel))
   sampModPathTmp
+}
+
+
+#' Text for no event with that name
+#'
+#' Provides the text to be sent to `warning` in each module as the default `switch` case.
+#' @inheritParams spades
+#' @return A text string specifying the event name and module for which there is no event
+noEventWarning <- function(sim) {
+  paste(
+    "Undefined event type: \'", current(sim)[1, "eventType", with = FALSE],
+    "\' in module \'", current(sim)[1, "moduleName", with = FALSE], "\'",
+    sep = ""
+  )
 }

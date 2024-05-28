@@ -12,7 +12,7 @@
 \alias{doEvent.checkpoint}
 \alias{checkpointLoad}
 \alias{.checkpointSave}
-\title{Simulation checkpoints.}
+\title{Simulation checkpoints}
 \usage{
 checkpointFile(sim)
 
@@ -59,7 +59,11 @@ Save and reload the current state of the simulation,
 including the state of the random number generator,
 by scheduling checkpoint events.
 }
-\details{
+\note{
+Checkpoint files are intended to be used locally, and do not invoke
+the simulation archiving tools to bundle and subsequently extract simulation
+files (e.g., file-backed rasters).
+
 RNG save code adapted from:
 \url{http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/}
 and \url{https://stackoverflow.com/q/13997444/1380598}

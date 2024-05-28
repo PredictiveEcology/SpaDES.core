@@ -22,7 +22,7 @@ if (!isGeneric(".robustDigest")) {
 #' @aliases Cache
 #' @author Eliot McIntire
 #' @exportMethod .robustDigest
-#' @importFrom Require modifyList2
+#' @importFrom Require modifyList2 invertList
 #' @importFrom reproducible asPath .orderDotsUnderscoreFirst .robustDigest .sortDotsUnderscoreFirst
 #' @importMethodsFrom reproducible .robustDigest
 #' @include simList-class.R
@@ -60,7 +60,7 @@ setMethod(
     } else {
       TRUE
     }
-    # browser(expr = exists("._robustDigest_2"))
+
     if (!isObjectEmpty) {
       # objects may be provided in a namespaced format: modName:objName --
       # e.g., coming from .parseModule
@@ -199,9 +199,31 @@ setMethod(
     #   not files
     nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
     dependsSeparate <- setdiff(nonDotListNoOutputs, "depends")
-    obj[dependsSeparate] <- lapply(dependsSeparate, function(x)
-      .robustDigest(slot(object, x), algo = algo))
-    obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
+    obj[dependsSeparate] <- lapply(dependsSeparate, function(x) {
+      .robustDigest(slot(object, x), algo = algo)})
+    dependsFirst <- obj[["depends"]] <- list()
+    if (!isTRUE(all(sapply(object@depends@dependencies, is.null)))) {
+      for (ii in c("inputObjects", "outputObjects", "parameters")) {
+        dependsFirst[[ii]] <-
+          .robustDigest(lapply(object@depends@dependencies,
+                               function(mo) {
+                                 mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
+                               } ))
+      }
+
+      obj[["depends"]] <- invertList(dependsFirst)
+    }
+
+    otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
+                           "spatialExtent", "timeframe", "timeunit", "version")
+    dependsSecond <-
+      .robustDigest(lapply(object@depends@dependencies,
+                           function(mo) {
+                             mo[otherDependsToDig]
+                           } ))
+
+    obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
+    # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
     obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
     if (!is.null(classOptions$events))
@@ -268,7 +290,7 @@ setMethod(
 })
 
 if (!isGeneric(".cacheMessage")) {
-  setGeneric(".cacheMessage", function(object, functionName, fromMemoise) {
+  setGeneric(".cacheMessage", function(object, functionName, fromMemoise, verbose) {
     standardGeneric(".cacheMessage")
   })
 }
@@ -278,8 +300,8 @@ if (!isGeneric(".cacheMessage")) {
 #' See [reproducible::.cacheMessage()].
 #'
 #' @exportMethod .cacheMessage
-#' @importFrom crayon blue
-#' @importFrom reproducible .cacheMessage
+#' @importFrom cli col_blue
+#' @importFrom reproducible .cacheMessage messageCache
 #' @importMethodsFrom reproducible .cacheMessage
 #' @inheritParams reproducible::.cacheMessage
 #' @include simList-class.R
@@ -289,8 +311,11 @@ setMethod(
   ".cacheMessage",
   signature = "simList",
   definition = function(object, functionName,
-                        fromMemoise = getOption("reproducible.useMemoise", TRUE)) {
+                        fromMemoise = getOption("reproducible.useMemoise", TRUE),
+                        verbose = getOption("reproducible.verbose")) {
     cur <- current(object)
+    .cacheMessage(NULL, functionName, fromMemoise = fromMemoise, verbose = verbose)
+
     if (NROW(cur)) {
       whichCached <- grep(".useCache", object@params)
       useCacheVals <- lapply(whichCached, function(x) {
@@ -300,34 +325,22 @@ setMethod(
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
       if (is.na(fromMemoise)) fromMemoise <- FALSE
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
-      if (isTRUE(useCacheVals[[whCurrent]])) {
-        if (isTRUE(fromMemoise)) {
-          message(crayon::blue("  Loading memoised copy of", cur$moduleName, "module"))
-        } else if (!is.na(fromMemoise)) {
-          message(crayon::blue("     loaded cached copy of", cur$moduleName, "module"),
-                  "\n        ",
-                  crayon::blue(.addingToMemoisedMsg))
-        } else {
-          message(crayon::blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
-        }
-      } else {
-        if (isTRUE(fromMemoise)) {
-          message(crayon::blue("     loaded memoised copy of", cur$eventType, "event in",
-                           cur$moduleName, "module"))
+      # if (isTRUE(useCacheVals[[whCurrent]])) {
+      #   if (isTRUE(fromMemoise)) {
+      #     message(cli::col_blue("  Loading memoised copy of", cur$moduleName, "module"))
+      #   } else if (!is.na(fromMemoise)) {
+      #     message(cli::col_blue("     loaded cached copy of", cur$moduleName, "module"),
+      #             "\n        ",
+      #             cli::col_blue(.message$AddingToMemoised))
+      #   } else {
+      #     message(cli::col_blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
+      #   }
+      # } else {
+      messageCache(.message$HangingIndent, "for ", cur$eventType, " event in ", cur$moduleName, " module", verbose = verbose)
 
-        } else if (!is.na(fromMemoise)) {
-          message(crayon::blue("     loaded cached copy of", cur$eventType, "event in",
-                           cur$moduleName, "module. ",
-                           if (fromMemoise) .addingToMemoisedMsg
-                           ))
-        } else {
-          message(crayon::blue("     loaded ", fromWhere," copy of", cur$eventType, "event in",
-                           cur$moduleName, "module"))
-        }
-
-      }
+      # }
     } else {
-      .cacheMessage(NULL, functionName, fromMemoise = fromMemoise)
+      messageCache(.message$HangingIndent, "from ", cur$moduleName, " module", verbose = verbose)
     }
 })
 
@@ -479,7 +492,7 @@ if (!isGeneric(".prepareOutput")) {
 setdiffNamedRecursive <- function(l1, l2, missingFill) {
   l1Different <- Require::setdiffNamed(l1, l2)
   if (length(l1Different)) {
-    areList <- unlist(lapply(l1Different, is.list))
+    areList <- unlist(lapply(l1Different, is, "list"))
     if (any(areList)) {
       l1Different[areList] <- Map(nl1 = names(l1Different)[areList], function(nl1) {
         if (nl1 %in% names(l2)) {
@@ -568,13 +581,15 @@ setMethod(
         #   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
         #   cached copy of other modules
         simPost@params[currModules] <- simFromCache@params[currModules]
-        anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
-
-        if (length(anyNewGlobals)) {
-          suppressMessages(
-            simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
+        if (FALSE) { # Eliot Dec 2023 -- removed this because it is already occuring during simInit;
+          #  also, user may have passed individual values for individual modules that should not
+          #  be overridden by globals
+          anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
+          if (length(anyNewGlobals)) {
+            suppressMessages(
+              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
+          }
         }
-        # simPost@params <- simFromCache@params
 
         # Step 2 -- copy the objects that are in simPre to simPost
         # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
@@ -942,21 +957,36 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
                           conn = getOption("reproducible.conn", NULL),
                           verbose = getOption("reproducible.verbose"),
+                          outputObjects = NULL,
                           ...) {
+
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
-  objTmp <- Copy(obj, objects = 2, drv = drv, conn = conn, verbose = verbose)
+  modules <- TRUE
+  if (!is.null(outputObjects)) {
+    grepForMods <- "^.mods"
+    isAModule <- grep(grepForMods, outputObjects)
+    modules <- gsub(paste0("^.mods", "\\$"), "", outputObjects[isAModule])
+  }
+  objTmp <- Copy(obj, objects = 2, modules = modules, drv = drv, conn = conn, verbose = verbose)
+
+  # Remove Par and mod active bindings --> these shouldn't be .wrap'd
+  modulesInSim <- ls(objTmp$.mods)
+  for (mo in modulesInSim) {
+    try(rm(list = c("Par", "mod"), envir = objTmp$.mods[[mo]]))
+  }
+
+  # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
+  objTmp$.mods <- .wrap(objTmp$.mods, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose,
-               ...)
+  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects,
+               drv = drv, conn = conn, verbose = verbose, ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
   objTmp
-
 }
-
 
 #' @export
 #' @inheritParams reproducible::.unwrap
@@ -965,17 +995,15 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .unwrap.simList <- function(obj, cachePath, cacheId,
                             drv = getOption("reproducible.drv", NULL),
                             conn = getOption("reproducible.conn", NULL), ...) {
-
-  # the as.list doesn't get everything. But with a simList, this is OK; rest will stay
+  ## the as.list doesn't get everything. But with a simList, this is OK; rest will stay
+  obj$.mods <- .unwrap(obj$.mods, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
   outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
                      drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
   obj
-
 }
-
 
 #' Make `simList` correctly work with `memoise`
 #'

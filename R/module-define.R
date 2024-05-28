@@ -90,7 +90,7 @@ moduleDefaults <- list(
 #'                              it is for human readers only.\cr
 #'    `loadOrder` \tab Named list of length 0, 1, or 2, with names being `after` and `before`.
 #'                     Each element should be a character string/vector naming 1 or more
-#'                     modules that will be loaded `after` or `before` this module.
+#'                     modules that this module must be `after` or `before`.
 #'                     `after` and `before` are used from the current module's
 #'                     perspective. So, `list(after = c("Biomass_core"))` means that
 #'                     this module must come *after* `"Biomass_core"`. This should only
@@ -183,8 +183,8 @@ setMethod(
     metadataProvided <- metadataRequired %in% names(x)
     metadataMissing <- metadataRequired[!metadataProvided]
 
-    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe", "citation", "documentation",
-                     "loadOrder")
+    notEnforced <- c("spatialExtent", "keywords", "childModules", "timeframe",
+                     "citation", "documentation", "loadOrder")
     if (!all(metadataProvided)) {
       # inputObjects and outputObjects are dealt with differently in parseModule
       #   don't trigger a warning here.
@@ -214,7 +214,7 @@ setMethod(
       if (any(is.na(x$childModules))) {
         moduleDefaults$childModules
       } else {
-        x$childModules %>% as.character() %>% na.omit() %>% as.character() # nolint
+        x$childModules |> as.character() |> na.omit() |> as.character() # nolint
       }
     }
 
@@ -249,7 +249,7 @@ setMethod(
       eval(moduleDefaults$timeframe)
     } else if (!is.numeric.POSIXt(x$timeframe)) {
       as.POSIXlt(x$timeframe)
-    } %>% `[`(1:2) # nolint
+    } |> (function(x) x[1:2])() # nolint
 
     if (is.null(x$timeunit) || any(is.na(x$timeunit))) {
       x$timeunit <- moduleDefaults$timeunit
@@ -315,8 +315,8 @@ setMethod(
     }
 
     ## check that documentation actually exists locally
-    docs <- sapply(x$documentation, na.omit) %>%
-      (function(x) if (length(x)) character(0) else as.character(x))
+    docs <- sapply(x$documentation, na.omit) |>
+      (function(x) if (length(x)) character(0) else as.character(x))()
     if (length(docs)) {
       lapply(docs, function(y) {
         if (!file.exists(file.path(modulePath(sim), y))) {
@@ -329,7 +329,7 @@ setMethod(
     if (length(x$childModules)) {
       lapply(x$childModules, function(y) {
         if (file.exists(file.path(modulePath(sim), y))) {
-          z <- y %>% lapply(., `attributes<-`, list(type = "child"))
+          z <- y |> lapply(`attributes<-`, list(type = "child"))
           modules(sim) <- append_attr(sim@modules, z)
         } else {
           stop("Module ", y, "(a child module of ", x$name, ") not found in modulePath.")
@@ -383,7 +383,7 @@ setMethod(
 #'
 #' @author Alex Chubaty and Eliot McIntire
 #' @export
-#' @importFrom crayon magenta
+#' @importFrom cli col_magenta
 #'
 #' @examples
 #' parameters = rbind(
@@ -468,7 +468,7 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
     if (isTRUE(classWrong)) {
       # any messages here are captured if this is run from .parseModule
       #   It will append module name
-      message(crayon::magenta("defineParameter: '", name, "' is not of specified type '",
+      message(cli::col_magenta("defineParameter: '", name, "' is not of specified type '",
                               class, "'.", sep = ""))
     }
   }
@@ -647,6 +647,7 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
+#' @importFrom tools file_ext
 #' @rdname fillInputRows
 .fillInputRows <- function(inputDF, startTime) {
   factorCols <- sapply(inputDF, is.factor)
@@ -688,14 +689,14 @@ setMethod(
     if (any(is.na(inputDF2[, "fun"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- na.omit(match(fileExt(fl), .fileExts[, "exts"]))
+      exts <- na.omit(match(tools::file_ext(fl), .fileExts[, "exts"]))
       inputDF2$fun[is.na(inputDF2$fun)] <- .fileExts[exts, "fun"]
     }
 
     if (any(is.na(inputDF2[, "package"]))) {
       .fileExts <- .fileExtensions()
       fl <- inputDF2$file
-      exts <- match(fileExt(fl), .fileExts[, "exts"])
+      exts <- match(tools::file_ext(fl), .fileExts[, "exts"])
       inputDF2$package[is.na(inputDF2$package)]  <- .fileExts[exts, "package"]
     }
     inputDF[!objectsOnly, ] <- inputDF2
@@ -710,6 +711,7 @@ setMethod(
 #'
 #' @keywords internal
 #' @importFrom data.table setnames
+#' @importFrom tools file_ext
 #' @rdname fillOutputRows
 .fillOutputRows <- function(outputDF, endTime) {
   needRenameArgs <- grepl(names(outputDF), pattern = "arg[s]?$")
@@ -728,7 +730,7 @@ setMethod(
     outputDF[is.na(outputDF$saveTime), "saveTime"] <- endTime
   }
 
-  # correct those for which a specific function is supplied in filelistDT$fun
+  ## correct those for which a specific function is supplied in filelistDT$fun
   usesSemiColon <- grep(outputDF[, "fun"], pattern = "::")
 
   if (length(usesSemiColon) > 0) {
@@ -745,7 +747,7 @@ setMethod(
 
     if (any(is.na(outputDF[, "fun"]))) {
       fl <- outputDF$file
-      exts <- fileExt(fl)
+      exts <- tools::file_ext(fl)
       if (any(is.na(fl)) || any(!nzchar(exts, keepNA = TRUE))) {
         outputDF$fun[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <-
           .fileExts$fun[rowInDotFileExts]
@@ -758,12 +760,12 @@ setMethod(
 
     if (any(is.na(outputDF[, "package"]))) {
       fl <- outputDF$file
-      exts <- fileExt(fl)
+      exts <- tools::file_ext(fl)
       if (any(is.na(fl)) || any(!nzchar(exts, keepNA = TRUE))) {
         outputDF$package[is.na(fl) | (!nzchar(exts, keepNA = TRUE))] <- .fileExts$package[rowInDotFileExts]
       }
       if (any(is.na(outputDF[, "package"]))) {
-        exts <- fileExt(fl)
+        exts <- tools::file_ext(fl)
         extsAvail <- checkKnownExts(exts, .fileExts)
         outputDF$package[is.na(outputDF$package)] <- .fileExts[extsAvail, "package"]
       }

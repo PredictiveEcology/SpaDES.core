@@ -142,20 +142,21 @@ test_that("depsEdgeList and depsGraph work", {
 
   # depsEdgeList
   el <- depsEdgeList(mySim)
-  el_from <- c("caribouMovement", "fireSpread", "fireSpread",
-               "fireSpread", "randomLandscapes", "randomLandscapes")
-  el_to <- c("caribouMovement", "caribouMovement", "fireSpread", "fireSpread",
-             "caribouMovement", "fireSpread")
-  el_objName <- c("caribou", "landscape", "landscape",
-                  "npixelsburned", "landscape", "landscape")
-  el_objClass <- c("SpatialPointsDataFrame", "RasterStack", "RasterStack",
-                   "numeric", "RasterStack", "RasterStack")
-
-  el_objClass <- c("SpatVector", "SpatRaster", "SpatRaster",
-                   "numeric", "SpatRaster", "SpatRaster")
+  el_from <- c("randomLandscapes", "randomLandscapes",
+               "fireSpread", "fireSpread", "fireSpread",
+               "caribouMovement")
+  el_to <- c("fireSpread", "caribouMovement",
+             "fireSpread", "fireSpread", "caribouMovement",
+             "caribouMovement")
+  el_objName <- c("landscape", "landscape", "landscape",
+                  "npixelsburned", "landscape",
+                  "caribou")
+  el_objClass <- c("SpatRaster", "SpatRaster",
+                   "SpatRaster", "numeric", "SpatRaster",
+                   "SpatVector")
 
   expect_is(el, "data.table")
-  expect_equal(names(el), c("from", "to", "objName", "objClass"))
+  expect_equal(names(el), c("from", "to", "objName", "objClass", "fromOrd", "toOrd"))
   expect_equal(el$from, el_from)
   expect_equal(el$to, el_to)
   expect_equal(el$objName, el_objName)
@@ -163,12 +164,16 @@ test_that("depsEdgeList and depsGraph work", {
 
   # .depsPruneEdges
   p <- .depsPruneEdges(el)
-  p_from <- c("fireSpread", "randomLandscapes", "randomLandscapes")
-  p_to <- c("caribouMovement", "caribouMovement", "fireSpread")
+  p_from <- c("randomLandscapes", "randomLandscapes", "fireSpread")
+  p_to <- c("fireSpread", "caribouMovement", "caribouMovement")
   p_objName <- c("landscape", "landscape", "landscape")
   p_objClass <- c("SpatRaster", "SpatRaster", "SpatRaster")
+  fromOrd <- p_from
+  toOrd <- p_to
   p_ <- data.table::data.table(
-    from = p_from, to = p_to, objName = p_objName, objClass = p_objClass
+    from = p_from, to = p_to,
+    objName = p_objName, objClass = p_objClass,
+    fromOrd = p_from, toOrd = p_to
   )
 
   expect_is(p, "data.table")
@@ -179,6 +184,8 @@ test_that("depsEdgeList and depsGraph work", {
 })
 
 test_that("3 levels of parent and child modules load and show correctly", {
+  skip_if_not_installed("ggplot2")
+
   testInit("terra", smcc = FALSE)
 
   suppressMessages({
@@ -236,7 +243,6 @@ test_that("3 levels of parent and child modules load and show correctly", {
   }
 })
 
-
 test_that("Test cleaning up of desc in createsOutputs, expectsInputs, defineParameters", {
   testInit("terra", smcc = FALSE)
 
@@ -245,11 +251,12 @@ test_that("Test cleaning up of desc in createsOutputs, expectsInputs, definePara
                "Hi ", "Ho ", "its off
               to work we go", otherCol = "lala")
   aList[[2]] <- createsOutput("ROCList", "list", # sourceURL = NA,
-                    "Hi ", "Ho ", "its off
-              to work we go", otherCol = "lala")
-  aList[[3]] <- defineParameter("ROCList", "list", NA, NA, NA, # sourceURL = NA,
                               "Hi ", "Ho ", "its off
               to work we go", otherCol = "lala")
+  aList[[3]] <- defineParameter("ROCList", "list", NA, NA, NA, # sourceURL = NA,
+                                "Hi ", "Ho ", "its off
+              to work we go", otherCol = "lala")
+
   tests <- Map(a = aList,
                nam = c("expectsInput", "createsOutput", "defineParameter"),
                function(a, nam) {
@@ -265,6 +272,4 @@ test_that("Test cleaning up of desc in createsOutputs, expectsInputs, definePara
                  expect_false(grepl("  ", desc))
                  expect_false(grepl("\n", desc))
                })
-
-
 })

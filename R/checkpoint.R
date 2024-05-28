@@ -1,9 +1,12 @@
-################################################################################
-#' Simulation checkpoints.
+#' Simulation checkpoints
 #'
 #' Save and reload the current state of the simulation,
 #' including the state of the random number generator,
 #' by scheduling checkpoint events.
+#'
+#' @note Checkpoint files are intended to be used locally, and do not invoke
+#' the simulation archiving tools to bundle and subsequently extract simulation
+#' files (e.g., file-backed rasters).
 #'
 #' RNG save code adapted from:
 #' <http://www.cookbook-r.com/Numbers/Saving_the_state_of_the_random_number_generator/>
@@ -85,9 +88,8 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @rdname checkpoint
 checkpointLoad <- function(file) {
   stopifnot(tools::file_ext(file) == "qs")
-  # stopifnot(raster::extension(file) == ".qs")
 
-  # check for previous checkpoint files
+  ## check for previous checkpoint files
   file <- checkArchiveAlternative(file)
   if (file.exists(file[1])) {
     sim <- loadSimList(file[1])
@@ -115,8 +117,13 @@ checkpointLoad <- function(file) {
   if (file.exists(file[1])) {
     unlink(file)
   }
-  saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs,
-              filename = file, envir = tmpEnv, paths = paths(sim))
+  saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs, filename = file,
+              ## checkpoints are **local** only, so do not require archiving
+              ## e.g., raster files along with the simList
+              ## setting these to TRUE will actually break things because the files
+              ## get deleted before they are "put back" and are incorrectly linked.
+              inputs = FALSE, outputs = FALSE, cache = FALSE, files = FALSE,
+              envir = tmpEnv, paths = paths(sim))
 
   invisible(TRUE) # return "success" invisibly
 }

@@ -59,7 +59,7 @@ Table \@ref(tab:moduleInputs-{{{name2}}}) shows the full list of module inputs.
 ```{r moduleInputs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
 knitr::kable(df_inputs,
-             caption = "List of (ref:{{{name2}}}) input objects and their description.") %>%
+             caption = "List of (ref:{{{name2}}}) input objects and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
@@ -68,7 +68,7 @@ Provide a summary of user-visible parameters (Table \@ref(tab:moduleParams-{{{na
 
 ```{r moduleParams-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
-knitr::kable(df_params, caption = "List of (ref:{{{name2}}}) parameters and their description.") %>%
+knitr::kable(df_params, caption = "List of (ref:{{{name2}}}) parameters and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
@@ -90,7 +90,7 @@ Description of the module outputs (Table \@ref(tab:moduleOutputs-{{{name2}}})).
 
 ```{r moduleOutputs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
 df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
-knitr::kable(df_outputs, caption = "List of (ref:{{{name2}}}) outputs and their description.") %>%
+knitr::kable(df_outputs, caption = "List of (ref:{{{name2}}}) outputs and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 

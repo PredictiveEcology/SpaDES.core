@@ -23,7 +23,7 @@ If \code{TRUE} (default), creates suitable configuration files (e.g.,
 \file{.gitignore}) and configures basic GitHub actions for module code checking.}
 }
 \value{
-Nothing is returned. Invoked for its side effect of creating new module test files.
+NULL (invisibly). Invoked for its side effect of creating new module test files.
 }
 \description{
 Create template testing structures for new modules

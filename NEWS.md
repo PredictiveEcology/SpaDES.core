@@ -1,3 +1,16 @@
+# SpaDES.core (development version)
+
+* fix issue with event queue colnames in `completed<-` and `all.equal.simList` (#272);
+* fixed issue saving simLists when multiple paths were used (e.g., `length(modulePath) > 1`);
+* events can be defined directly in calls to `newModule()`;
+* checkpoints are assumed to be used locally, and no longer invoke simulation file archiving and re-extraction of files (i.e., uses `saveSimList(..., inputs = FALSE, outputs = FALSE, cache = FALSE, files = FALSE)`);
+* improved recovery of interrupted simulations via `savedSimEnv()$.sim` -- `savedSimEnv()` is now exported for easier discovery -- an internal package environment is used, unless the user specifies `options(reproducible.memoisePersist = TRUE)`, which will use the global environment to store the `.sim` object;
+* switch from `crayon` (superseded) to `cli` for message colours;
+
+## Breaking changes
+
+* due to upstream changes in `reproducible`, `loadSimList()` is incompatible with simLists saved with earlier versions of `SpaDES.core`.
+
 # SpaDES.core 2.0.5
 
 * fix a failing test on R-devel and latest R-release (#275)
@@ -83,7 +96,7 @@
 ## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`
 * many examples that were protected behind `\dontrun` or `\donttest` were stale; these have been updated
-* `saveFiles` bugfix: multiple objects names can now be passed to `.saveOuputs` module parameters.
+* `saveFiles` bugfix: multiple objects names can now be passed to `.saveOutputs` module parameters.
 
 ## Deprecated, Defunct, and Removed Features
 * several previously-deprecated functions have been made defunct: `remoteFileSize()`, `updateList()`. These will be removed by mid-2023.
@@ -586,8 +599,8 @@ objects (this may have very little/no effect on `simList` objects)
 * `@importFrom` only used functions from `utils` due to name conflicts with `raster::stack` and `utils::stack`
 * new function `remoteFileSize` to check the size of remote files
 * new namespaced function `dataPath` will return `file.path(modulePath(sim), currentModule(sim), "data")`, which will return a different path, depending on which module it is placed inside.
-* add crayon to imports -- now messages are more colour coded
-* bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same `simList` object
+* add `crayon` to Imports -- now messages are more colour-coded;
+* bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same `simList` object;
 
 
 # SpaDES.core 0.1.0

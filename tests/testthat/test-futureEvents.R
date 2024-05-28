@@ -1,17 +1,19 @@
 test_that("test spades.futureEvents", {
   skip_on_cran() ## these are longer tests (~2m)
+
+  needPkgs <- c(sampleModReqdPkgs, "future", "ggplot2")
+  skip_if_not_installed(needPkgs)
+
   # skip_on_os("windows")
-  testInit(c(sampleModReqdPkgs, "future", "ggplot2"),
-           opts = list("reproducible.useMemoise" = FALSE,
-                       "spades.futureEvents" = TRUE))
+  testInit(needPkgs, opts = list(reproducible.useMemoise = FALSE,
+                                 spades.futureEvents = TRUE))
   # tmpdir <- tempdir2(.rndstr())
   modPath <- getSampleModules(tmpdir)
   origFiles <- dir(modPath, full.names = TRUE, recursive = TRUE)
   tmpFiles <- file.path(tmpdir, dir(modPath, recursive = TRUE))
   checkPath(unique(dirname(tmpFiles)), create = TRUE)
-  file.copy(origFiles, tmpFiles)
+  expect_true(all(file.copy(origFiles, tmpFiles)))
   modPath <- tmpdir
-
 
   newModule("test", path = modPath, open = FALSE)
   mods1 <- c("caribouMovement", "fireSpread", "test")
@@ -36,15 +38,18 @@ test_that("test spades.futureEvents", {
   }
 
   if (isWindows()) {
-    future::plan(future.callr::callr, workers = 3)
+    oldPlan <- future::plan(future.callr::callr, workers = 3)
   } else {
-    future::plan(future::multisession, workers = 3)
+    oldPlan <- future::plan(future::multisession, workers = 3)
   }
-  #future::plan("sequential", workers = 3)
+  # oldPlan <- future::plan("sequential", workers = 3)
+  on.exit(future::plan(oldPlan), add = TRUE)
 
   mods <- c("caribouMovement", "randomLandscapes", "fireSpread", "test")
-  # Example of changing parameter values
-  options(spades.saveFileExtensions = data.frame(exts = ".grd", fun = "writeRaster", package = "terra"))
+  ## Example of changing parameter values
+  withr::local_options(
+    list(spades.saveFileExtensions = data.frame(exts = ".grd", fun = "writeRaster", package = "terra"))
+  )
   mySim <- simInit(
     times = list(start = 0.0, end = 2.0, timeunit = "year"),
     params = list(
@@ -69,12 +74,12 @@ test_that("test spades.futureEvents", {
   mySim@params$test$.plotInitialTime <- 0
   mySim@params$test$.plotInterval <- 1
 
-  options("spades.futureEvents" = TRUE)
+  withr::local_options(list(spades.futureEvents = TRUE))
   set.seed(1)
   simsTRUE <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = TRUE) |>
-    suppressWarnings()
+    suppressWarnings() ## TODO: Error in cur$moduleName : $ operator is invalid for atomic vectors
 
-  options("spades.futureEvents" = FALSE)
+  withr::local_options(list(spades.futureEvents = FALSE))
   fls <- outputs(simsTRUE)$file
   expect_true(all(file.exists(fls)))
   unlink(fls)
@@ -102,6 +107,4 @@ test_that("test spades.futureEvents", {
   expect_true(all(file.exists(fls)))
   unlink(fls)
   expect_true(isTRUE(all.equal(completed(simsFALSE)[, 1:4], completed(simsTRUE)[, 1:4])))
-
-
 })

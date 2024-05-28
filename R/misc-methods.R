@@ -1,4 +1,6 @@
-utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
+utils::globalVariables(c(
+  "newQuantity", "quantityAdj", "quantityAdj2"
+))
 
 #' A slightly modified version of `getOption()`
 #'
@@ -17,14 +19,12 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
   }
 }
 
-################################################################################
 #' Update elements of a named list with elements of a second named list
 #'
 #' Defunct. Use [utils::modifyList()] (which can not handle NULL) or
 #' [Require::modifyList2()] for case with >2 lists and can handle NULL lists.
 #'
-#' @param x   a named list
-#' @param y   a named list
+#' @param x,y   a named list
 #'
 #' @return A named list, with elements sorted by name.
 #'          The values of matching elements in list `y`
@@ -36,18 +36,15 @@ utils::globalVariables(c("newQuantity", "quantityAdj", "quantityAdj2"))
 #' @rdname updateList
 updateList <- function(x, y) {
   .Defunct("Require::modifyList2", "Require")
-  # if (missing(x)) x <- list()
-  # if (missing(y)) y <- list()
-  # if (is.null(y)) y <- list()
-  # if (is.null(x)) x <- list()
-  # modifyList2(x = x, val = y)
 }
 
-################################################################################
-#' Add a module to a `moduleList`
+# append_attr ---------------------------------------------------------------------------------
+
+#' Append attributes
 #'
-#' Ordinary base lists and vectors do not retain their attributes when subsetted
-#' or appended. This function appends items to a list while preserving the
+#' Ordinary base lists and vectors do not retain their attributes
+#' when subsetted or appended.
+#' This function appends items to a list while preserving the
 #' attributes of items in the list (but not of the list itself).
 #'
 #' Similar to `updateList` but does not require named lists.
@@ -87,7 +84,16 @@ setMethod("append_attr",
             return(out[!dups])
 })
 
-###############################################################################
+# random strings ------------------------------------------------------------------------------
+
+#' @rdname rndstr
+.rndstr <- function(n = 1, len = 8) {
+  unlist(lapply(character(n), function(x) {
+    x <- paste0(sample(c(0:9, letters, LETTERS), size = len,
+                       replace = TRUE), collapse = "")
+  }))
+}
+
 #' Generate random strings
 #'
 #' Generate a vector of random alphanumeric strings each of an arbitrary length.
@@ -189,7 +195,9 @@ setMethod("rndstr",
             rndstr(n = 1, len = 8, characterFirst = TRUE)
 })
 
-################################################################################
+
+# classFilter ---------------------------------------------------------------------------------
+
 #' Filter objects by class
 #'
 #' Based on <https://stackoverflow.com/a/5158978/1380598>.
@@ -307,7 +315,8 @@ setMethod(
     return(classFilter(x, include, exclude = NA_character_, envir = sys.frame(-1)))
 })
 
-################################################################################
+# fileTable -----------------------------------------------------------------------------------
+
 #' Create empty `fileTable` for inputs and outputs
 #'
 #' Internal functions.
@@ -367,223 +376,11 @@ setMethod(
 #' @rdname fileTable
 .fileTableOutDF <- .fileTableOut()
 
-################################################################################
-#' Get and set default working directories
-#'
-#' Wrapper functions to access the packages options for default working directories.
-#' Note: there is an active binding made to `Paths`, so a user can use
-#' `Paths$cachePath` for example instead of `getPaths()$cachePath`
-#'
-#' @param cachePath   The default local directory in which to cache simulation outputs.
-#'                    If not specified, defaults to `getOption("reproducible.cachePath")`.
-#'
-#' @param inputPath   The default local directory in which to look for simulation inputs
-#'                    If not specified, defaults to `getOption("spades.inputPath")`.
-#'
-#' @param modulePath  The default local directory where modules and data will be
-#'                    downloaded and stored.
-#'                    If not specified, defaults to `getOption("spades.modulePath")`.
-#'
-#' @param outputPath  The default local directory in which to save simulation outputs.
-#'                    If not specified, defaults to `getOption("spades.outputPath")`.
-#'
-#' @param rasterPath  The default local directory in which to save transient raster files.
-#'                    If not specified, defaults to
-#'                    `file.path(getOption("spades.scratchPath"), "raster")`.
-#'                    *Important note:* this location may not be cleaned up automatically,
-#'                    so be sure to monitor this directory and remove unnecessary temp files
-#'                    that may contribute to excessive disk usage.
-#'                     *This option will be deprecated in a future release.*
-#'
-#' @param scratchPath The default local directory in which to save transient files.
-#'                    If not specified, defaults to `getOption("spades.scratchPath")`.
-#'                    *Important note:* this location may not be cleaned up automatically,
-#'                    so be sure to monitor this directory and remove unnecessary temp files
-#'                    that may contribute to excessive disk usage.
-#'
-#' @param terraPath  The default local directory in which to save transient `terra` files.
-#'                   If not specified, defaults to
-#'                   `file.path(getOption("spades.scratchPath"), "terra")`.
-#'                   *Important note:* this location may not be cleaned up automatically,
-#'                   so be sure to monitor this directory and remove unnecessary temp files
-#'                   that may contribute to excessive disk usage.
-#'
-#' @return `getPaths` returns a named list of the user's default working directories.
-#' `setPaths` is invoked for the side effect of setting these directories.
-#'
-#' @author Alex Chubaty
-#' @keywords internal
-#' @name setPaths
-#' @rdname setPaths
-#' @export
-#'
-#' @examples
-#' \donttest{
-#' getPaths()                       ## returns the current default working paths
-#'
-#' ## set individual custom paths
-#' setPaths(cachePath = file.path(tempdir(), "cache"))
-#' setPaths(inputPath = file.path(tempdir(), "inputs"))
-#' setPaths(modulePath = file.path(tempdir(), "modules"))
-#' setPaths(outputPath = file.path(tempdir(), "outputs"))
-#' setPaths(scratchPath = file.path(tempdir(), "scratch"))
-#'
-#' # NOTE: on loading and attaching SpaDES.core,
-#' # an active binding is made to "Paths"
-#'
-#' getPaths()
-#' Paths ## same as getPaths() above
-#' setPaths(outputPath = tempdir())
-#' Paths # shows change
-#' }
-#'
-.paths <- function() {
-  if (!is.null(.getOption("spades.cachePath"))) {
-    message("option('spades.cachePath') is being deprecated. Please use ",
-            "option('reproducible.cachePath').\n",
-            "Setting option('reproducible.cachePath' = getOption('spades.cachePath'))")
-  }
-
-  list(
-    cachePath = .getOption("reproducible.cachePath"), # nolint
-    inputPath = getOption("spades.inputPath"), # nolint
-    modulePath = getOption("spades.modulePath"), # nolint
-    outputPath = getOption("spades.outputPath"), # nolint
-    rasterPath = file.path(getOption("spades.scratchPath"), "raster"), # nolint
-    scratchPath = getOption("spades.scratchPath"), # nolint
-    terraPath = file.path(getOption("spades.scratchPath"), "terra") # nolint
-  )
-}
-
-#' @export
-#' @rdname setPaths
-getPaths <- function() {
-  return(.paths())
-}
-
-#' @export
-#' @rdname setPaths
-Paths <- .paths()
-
-#' @param silent Logical. Should the messaging occur.
-#'
-#' @export
-#' @importFrom reproducible checkPath
-#' @rdname setPaths
-setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, scratchPath,
-                     terraPath, silent = FALSE) {
-  defaults <- list(
-    CP = FALSE,
-    IP = FALSE,
-    MP = FALSE,
-    OP = FALSE,
-    RP = FALSE,
-    SP = FALSE,
-    TP = FALSE
-  )
-  if (missing(cachePath)) {
-    cachePath <- .getOption("reproducible.cachePath") # nolint
-    defaults$CP <- TRUE
-  }
-  if (missing(inputPath)) {
-    inputPath <- getOption("spades.inputPath") # nolint
-    defaults$IP <- TRUE
-  }
-  if (missing(modulePath)) {
-    modulePath <- getOption("spades.modulePath") # nolint
-    defaults$MP <- TRUE
-  }
-  if (missing(outputPath)) {
-    outputPath <- getOption("spades.outputPath") # nolint
-    defaults$OP <- TRUE
-  }
-  if (missing(rasterPath)) { ## TODO: deprecate
-    rasterPath <- file.path(getOption("spades.scratchPath"), "raster") # nolint
-    defaults$RP <- TRUE
-  }
-  if (missing(scratchPath)) {
-    scratchPath <- getOption("spades.scratchPath") # nolint
-    defaults$SP <- TRUE
-  }
-  if (missing(terraPath)) {
-    terraPath <- file.path(getOption("spades.scratchPath"), "terra") # nolint
-    defaults$TP <- TRUE
-  }
-
-  allDefault <- all(unlist(defaults))
-
-  originalPaths <- .paths()
-  newPaths <- lapply(list(
-    cachePath = cachePath,
-    inputPath = inputPath,
-    modulePath = modulePath,
-    outputPath = outputPath,
-    rasterPath = rasterPath,
-    scratchPath = scratchPath,
-    terraPath = terraPath
-  ), checkPath, create = TRUE)
-  newPaths <- as.list(normPath(newPaths))
-
-  ## set the new paths via options
-  options(
-    rasterTmpDir = newPaths$rasterPath,
-    reproducible.cachePath = cachePath,
-    spades.inputPath = inputPath,
-    spades.modulePath = unlist(modulePath),
-    spades.outputPath = outputPath,
-    spades.scratchPath = scratchPath
-  )
-
-  if (requireNamespace("terra", quietly = TRUE)) {
-    terra::terraOptions(tempdir = terraPath)
-  }
-
-  ## message the user
-  modPaths <- if (length(modulePath) > 1) {
-    paste0("c('", paste(normPath(modulePath), collapse = "', '"), "')")
-  } else {
-    normPath(modulePath)
-  }
-
-  if (!silent) {
-    if (!allDefault) {
-      message(
-        "Setting:\n",
-        "  options(\n",
-        if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"),
-        if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
-        if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
-        if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
-        if (!defaults$SP) paste0("    spades.scratchPath = '", normPath(scratchPath), "'\n"),
-        "  )"
-      )
-    }
-
-    if (any(unlist(defaults))) {
-      message(
-        "Paths set to:\n",
-        "  options(\n",
-        "    rasterTmpDir = '", normPath(rasterPath), "'\n",
-        "    reproducible.cachePath = '", normPath(cachePath), "'\n",
-        "    spades.inputPath = '", normPath(inputPath), "'\n",
-        "    spades.outputPath = '", normPath(outputPath), "'\n",
-        "    spades.modulePath = '", modPaths, "'\n", # normPath'ed above
-        "    spades.scratchPath = '", normPath(scratchPath), "'\n",
-        "  )\n",
-        "  terra::terraOptions(tempdir = '", normPath(terraPath), "'"
-      )
-    }
-  }
-
-  return(invisible(originalPaths))
-}
-
 #' Simple wrapper around `data.table::rbindlist`
 #'
-#' This simply sets defaults to `fill = TRUE`, and
-#' `use.names = TRUE`
+#' This simply sets defaults to `fill = TRUE`, and `use.names = TRUE`.
 #'
-#' @param ... 1 or more `data.frame`, `data.table`, or `list` objects
+#' @param ... one or more `data.frame`, `data.table`, or `list` objects
 #'
 #' @return a `data.table` object
 #'
@@ -614,119 +411,4 @@ bindrows <- function(...) {
 moduleCodeFiles <- function(paths, modules) {
   path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
-}
-
-#' Test and update a parameter against same parameter in other modules
-#'
-#' This function is intended to be part of module code and will test whether
-#' the value of a parameter within the current module matches the value of the
-#' same parameter in other modules. This is a test for parameters that might expect
-#' to be part of a `params = list(.globals = list(someParam = "test"))` passed to `simInit`.
-#'
-#' It is considered a "fail" under several conditions:
-#' 1. current module has a value that is not `NULL` or `"default"` and another module
-#'    has a different value;
-#' 2. there is more than one value for the `paramToCheck` in the other modules,
-#'    so it is ambiguous which one to return.
-#'
-#' Either the current module is different than other modules, unless it is "default" or NULL.
-#'
-#' @param sim A `simList` object
-#'
-#' @param paramToCheck A character string, length one, of a parameter name to
-#'   check and compare between the current module and one or more or all others
-#'
-#' @param moduleToUse A character vector of module names to check against. This can be
-#'   `"all"` which will compare against all other modules.
-#'
-#' @param ifSetButDifferent A character string indicating whether to `"error"` the default,
-#'   or send a `"warning"`, `message` or just silently continue (any other value).
-#'
-#' @param verbose Logical or Numeric, follows `reproducible.verbose` value by default.
-#'
-#' @return If the value of the `paramToCheck` in the current module is either `NULL` or
-#' `"default"`, and there is only one other value across all modules named in `moduleToUse`,
-#' then this will return a character string with the value of the single parameter value
-#' in the other module(s).
-#' It will return the current value if there are no other modules with the same parameter.
-#'
-#' @export
-#' @rdname paramCheckOtherMods
-paramCheckOtherMods <- function(sim, paramToCheck, moduleToUse = "all",
-                                ifSetButDifferent = c("error", "warning", "message", "silent"),
-                                verbose = getOption("reproducible.verbose")) {
-  currentModule <- currentModule(sim)
-  paramsInSim <- params(sim)
-  paramInCurrentMod <- P(sim)[[paramToCheck]]
-  if (identical(moduleToUse, "all")) {
-    moduleToUse <- names(paramsInSim)
-  }
-  paramInThisMod <- paramsInSim[[currentModule]][[paramToCheck]]
-  params <- paramsInSim[setdiff(moduleToUse, currentModule)]
-
-  ## preserve list for parameters composed of several values - will this work with lists of lists?
-  ## may need a Reduce(..., identical)?
-  paramToUpdateValInOtherMods <- lapply(params, function(p) p[[paramToCheck]])
-  ## remove NULLs
-  paramToUpdateValInOtherMods <- paramToUpdateValInOtherMods[!sapply(paramToUpdateValInOtherMods, is.null)]
-  paramInOtherMods <- unique(paramToUpdateValInOtherMods)  ## again, preserve list -- if there is only one entry, all definitions are identical
-
-  messSuff <- paste0("); they should not. Perhaps pass params = list(.globals = list(",
-                     paramToCheck, " = '", paramInOtherMods[1], "')) in the simInit call?")
-
-  newVal <- paramInThisMod
-  fail <- FALSE
-
-  test <- if (is.list(paramInOtherMods)) {
-    all(sapply(paramInOtherMods, function(x, paramInThisMod) identical(paramInThisMod, x),
-           paramInThisMod = paramInThisMod))
-  } else {
-    identical(paramInThisMod, paramInOtherMods)
-  }
-
-  if (!test) {
-    if (is.null(paramInThisMod) || identical("default", paramInThisMod)) {
-      if (length(paramInOtherMods) == 1) {
-        newVal <- unlist(paramInOtherMods) ## can unlist here
-        message(paramToCheck, " in ", currentModule," is set to 'default' or NULL;")
-        message("... setting to '", newVal,
-                "' to match value in ",paste(names(paramToUpdateValInOtherMods), collapse = ", ")," in the simList")
-      } else if (length(paramInOtherMods) > 1) {
-        mess <- paste0("Modules in this simList have multiple values for ", paramToCheck," (",
-                       paste(paramInOtherMods, collapse = ", "),
-                       messSuff)
-        fail <- TRUE
-      }
-    } else {
-      if (length(paramInOtherMods) > 0) {
-        mess <- paste0("Including this module, there are multiple values for ",paramToCheck," (",
-                       paste(c(paramInThisMod, paramInOtherMods), collapse = ", "),
-                       messSuff)
-        fail <- TRUE
-      }
-    }
-    if (isTRUE(fail)) {
-      if (is.null(paramInThisMod)) {
-        paramInThisMod <- "NULL"  ## avoid failure below due to 0 length
-      }
-
-      # dfThis <- data.frame(module = currentModule, value = paramInThisMod, row.names = NULL)
-      # dfOther <- data.frame(module = names(paramToUpdateValInOtherMods),
-      #                       value = paramToUpdateValInOtherMods, row.names = NULL)
-      ## this works better when the parameter has length()>1 :
-      dfThis <- data.frame(modName = paramInThisMod, row.names = NULL)
-      names(dfThis) <- currentModule
-      dfOther <- as.data.frame(paramToUpdateValInOtherMods, row.names = NULL)
-      messageVerbose("This module", verbose = verbose)
-      messageDF(dfThis, colour = "green", verbose = verbose)
-      messageVerbose("Other modules", verbose = verbose)
-      messageDF(dfOther, verbose = verbose)
-
-      if (identical(ifSetButDifferent[1], "error")) stop(mess)
-      if (identical(ifSetButDifferent[1], "warning")) warning(mess)
-      if (identical(ifSetButDifferent[1], "message")) message(mess)
-    }
-  }
-
-  newVal
 }

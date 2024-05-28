@@ -114,7 +114,7 @@ test_that("saving files (and memoryUse)", {
   rm(mySim)
 })
 
-test_that("saving csv files does not work correctly", {
+test_that("saving csv files works correctly", {
   testInit(smcc = FALSE)
 
    tempObj <- 1:10
@@ -154,7 +154,7 @@ test_that("saving csv files does not work correctly", {
    expect_false(identical(df1, newObj))
 })
 
-test_that("saveSimList does not work correctly", {
+test_that("saveSimList works correctly", {
   skip_if_not_installed("archive")
 
   testInit(sampleModReqdPkgs,
@@ -189,9 +189,14 @@ test_that("saveSimList does not work correctly", {
     outputPath = outputPath
   )
 
-  mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-                   outputs = data.frame(objectName = "landscape", saveTime = times$end))
-  mySim <- spades(mySim)
+  mySim <- simInit(
+    times = times,
+    params = parameters,
+    modules = modules,
+    paths = paths,
+    outputs = data.frame(objectName = "landscape", saveTime = times$end)
+  ) |>
+    spades()
   mySim$landscape[] <- round(mySim$landscape[], 3) # after saving, these come back different, unless rounded
   mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
   mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
@@ -217,16 +222,16 @@ test_that("saveSimList does not work correctly", {
   sim$landscape[] <- sim$landscape[]
   sim$habitatQuality[] <- sim$habitatQuality[]
 
-  # Now put it back to disk for subsequent test
-  #sim$landscape[] <- sim$landscape[]
-  #sim$habitatQuality[] <- sim$habitatQuality[]
+  ## Now put it back to disk for subsequent test
+  # sim$landscape[] <- sim$landscape[]
+  # sim$habitatQuality[] <- sim$habitatQuality[]
   unlink(c(tmpfile[1], paste0(tools::file_path_sans_ext(tmpfile[1]), ".gri"))) ## needed because of hardlink shenanigans
   unlink(c(tmpfile[7], paste0(tools::file_path_sans_ext(tmpfile[7]), ".gri"))) ## needed because of hardlink shenanigans
   sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1])
   sim$habitatQuality <- writeRaster(sim$habitatQuality, filename = tmpfile[7])
-  # grd format doesn't get minmax right especially with terra -- can't fix it with terra
+  ## grd format doesn't get minmax right especially with terra -- can't fix it with terra
 
-  # The terra pointers with grd files make comparisons wrong
+  ## The terra pointers with grd files make comparisons wrong
   # mySim$habitatQuality <- rasterToMemory(mySim$habitatQuality)
   # mySim$landscape <- rasterToMemory(mySim$landscape)
   # sim$habitatQuality <- rasterToMemory(sim$habitatQuality)
@@ -234,19 +239,19 @@ test_that("saveSimList does not work correctly", {
   #
   # expect_true(all.equal(mySim, sim, check.environment = FALSE))
 
-  # Now try to keep filename intact
+  ## Now try to keep filename intact
   # mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE)
   # mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
-  # loses the raster landscape
+  ## loses the raster landscape
   saveSimList(sim, filename = tmpfile[3])
-  sim <- loadSimList(file = tmpfile[3])
+  simLoaded <- loadSimList(file = tmpfile[3])
   expect_equivalent(
-    gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(sim$landscape, allowMultiple = FALSE))),
+    gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(simLoaded$landscape, allowMultiple = FALSE))),
     tmpfile[1])
-  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
+  expect_true(bindingIsActive("mod", simLoaded@.xData$.mods$caribouMovement)) ## TODO: fails?
 
-  mySim <- sim
+  mySim <- simLoaded
   # Now keep as file-backed, but change name
   # aaaa <<- 1
   saveSimList(mySim, filename = tmpfile[3])
@@ -265,7 +270,7 @@ test_that("saveSimList does not work correctly", {
   assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$.objects)
   assign("a", 2, envir = sim@.xData$.mods$caribouMovement$.objects)
 
-  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement))
+  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement)) ## TODO: fails?
   # test file-backed raster is gone
   expect_error(mySim$landscape$DEM[])
 })
@@ -296,9 +301,13 @@ test_that("saveSimList with file backed objs", {
     expect_identical(Sys.readlink(outputPath), linkedDir)
   }
 
-  linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
-  linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
-             file.path(modulePath, dir(modules, recursive = TRUE)))
+  expect_true(
+    all(linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath))))
+  )
+  expect_true(
+    all(linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
+                   file.path(modulePath, dir(modules, recursive = TRUE))))
+  )
 
   times <- list(start = 0, end = 5)
   parameters <- list(
