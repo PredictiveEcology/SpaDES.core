@@ -22,7 +22,7 @@ test_that("Plots function 1", {
     fn <- "testing"
     wdth <- 4.77
     fnForCat <- capture.output(dput(fn))
-    cat(file = file.path(tmpdir, "test", "test.R"),'
+    cat(file = file.path(tmpdir, "test", "test.R"), '
     defineModule(sim, list(
     name = "test",
     description = "insert module description here",
@@ -52,8 +52,8 @@ test_that("Plots function 1", {
     init = {
       sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1", .skipChecks = TRUE)
       sim$something <- data.frame(a = sample(1:10, replace = TRUE))
-      Plots(data = sim$something, fn = fn1, filename = ',fnForCat,', bins = 10, fill = "red",
-            ggsaveArgs = list(width = ',wdth,'))
+      Plots(data = sim$something, fn = fn1, filename = ', fnForCat, ', bins = 10, fill = "red",
+            ggsaveArgs = list(width = ', wdth, '))
     },
     event1 = {
     sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1", .skipChecks = TRUE)
@@ -155,7 +155,7 @@ test_that("Plots function 2", {
   newModule("test", tmpdir, open = FALSE)
 
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
-  cat(file = file.path(tmpdir, "test", "test.R"),'
+  cat(file = file.path(tmpdir, "test", "test.R"), '
     defineModule(sim, list(
     name = "test",
     description = "insert module description here",
@@ -206,7 +206,7 @@ test_that("Plots function 3 - use as Plot", {
     functions <- cbind(c("raster", "extent", "stack", "nlayers"),
                        c("rast", "ext", "rast", "nlyr"))
     if (!requireNamespace("raster", quietly = TRUE)) {
-      functions <- functions[, 2,drop = FALSE]
+      functions <- functions[, 2, drop = FALSE]
       packages <- packages[2]
     }
     for (i in seq(packages)) {
@@ -220,7 +220,7 @@ test_that("Plots function 3 - use as Plot", {
       nlyr <- getFromNamespace(functions[4, i], ns = packages[i])
 
 
-      ras <- read(ext(0,10, 0, 10), vals = runif(100, 0, 1), res = 1)
+      ras <- read(ext(0, 10, 0, 10), vals = runif(100, 0, 1), res = 1)
       stk1 <- stk(ras, lyr2 = ras)
       stk2 <- stk(ras, lyr2 = ras)
 

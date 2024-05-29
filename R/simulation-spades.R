@@ -588,7 +588,7 @@ scheduleConditionalEvent <- function(sim,
       needSort <- TRUE
       if (minEventTimeInSeconds > sim$._conditionalEvents[[numEvents]]$minEventTime) {
         needSort <- FALSE
-      } else if (minEventTimeInSeconds == sim$._conditionalEvents[[numEvents]]$minEventTime &
+      } else if (minEventTimeInSeconds == sim$._conditionalEvents[[numEvents]]$minEventTime &&
                  eventPriority >= sim$._conditionalEvents[[numEvents]]$eventPriority) {
         needSort <- FALSE
       }
@@ -1272,7 +1272,7 @@ setMethod(
 
     oldGetPaths <- getPaths()
     do.call(setPaths, append(list(silent = TRUE), sim@paths))
-    on.exit({do.call(setPaths, append(list(silent = TRUE), oldGetPaths))}, add = TRUE)
+    on.exit(do.call(setPaths, append(list(silent = TRUE), oldGetPaths)), add = TRUE)
 
     dots <- list(...)
     omitArgs <- c("cl", "notOlderThan")
@@ -1373,13 +1373,13 @@ setMethod(
                      cachePath = sim@paths[["cachePath"]],
                      .functionName = moduleCall, verbose = verbose))
   } else {
-    # Faster just to pass the NULL and just call it directly inside .runEvent
-    expression(get(moduleCall,
-                   envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
+    ## Faster just to pass the NULL and just call it directly inside .runEvent
+    expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
-  if (!(FALSE %in% debug || any(is.na(debug))) )
+  if (!(FALSE %in% debug || any(is.na(debug)))) {
     objsIsNullBefore <- objsAreNull(sim)
+  }
 
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
@@ -1393,10 +1393,12 @@ setMethod(
 
     # if (cur$eventType %in% "prepSpreadFitData") browser()
     rr <- .Random.seed
-    if (runFnCallAsExpr)
-      sim <- eval(fnCallAsExpr) # slower than more direct version just above
-    if (identical(rr, .Random.seed)) message(cli::bg_yellow(cur[["moduleName"]])) # browser()
-
+    if (runFnCallAsExpr) {
+      sim <- eval(fnCallAsExpr) ## slower than more direct version just above
+    }
+    if (identical(rr, .Random.seed)) {
+      message(cli::bg_yellow(cur[["moduleName"]])) # browser()
+    }
     if (allowSequentialCaching) {
         sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
     }
@@ -1406,23 +1408,27 @@ setMethod(
     sim <- allowSequentialCachingFinal(sim)
   }
 
-  # put back the current values of params that were not cached on
-  if (exists("modParams", inherits = FALSE))
+  ## put back the current values of params that were not cached on
+  if (exists("modParams", inherits = FALSE)) {
     if (sum(paramsDontCacheOnActual)) {
       sim@params[[cur[["moduleName"]]]][paramsDontCacheOnActual] <- modParamsFull[paramsDontCacheOnActual]
     }
+  }
 
-
-  if (!(FALSE %in% debug || any(is.na(debug))) )
+  if (!(FALSE %in% debug || any(is.na(debug)))) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore)
+  }
 
-  # Test for memory leaks
+  ## Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
-    if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects))
-      sim$._knownObjects <- testMemoryLeaks(simEnv = sim@.xData,
-                                            modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
-                                            modName = cur[["moduleName"]],
-                                            knownObjects = sim@.xData$._knownObjects)
+    if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects)) {
+      sim$._knownObjects <- testMemoryLeaks(
+        simEnv = sim@.xData,
+        modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
+        modName = cur[["moduleName"]],
+        knownObjects = sim@.xData$._knownObjects
+      )
+    }
   }
 
   return(sim) # TEMPORARY THIS IS FOR TESTING DEBUGGING IN FUTURE
@@ -2215,9 +2221,7 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 ## don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
-paramsDontCacheOn <- paste0(".", c("plotInitialTime", "plotInterval", "plots",
-                                   "saveInitialTime", "saveInterval",
-                                   "useCache", "useParallel"))
+paramsDontCacheOn <- .knownDotParams
 
 #' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache
 #' @importFrom reproducible messageCache showCache
@@ -2323,7 +2327,7 @@ allowSequentialCachingFinal <- function(sim) {
       }
 
       # put all tags in
-      by(args, INDICES = seq(NROW(args)), FUN = function(a) do.call(fn, a))
+      by(args, INDICES = seq_len(NROW(args)), FUN = function(a) do.call(fn, a))
     }
     sim[["._prevCache"]] <- thisCacheId
   }

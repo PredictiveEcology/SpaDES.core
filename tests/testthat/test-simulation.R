@@ -49,7 +49,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   mySimEvent3 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
   expect_true(all(eventTypes %in% completed(mySimEvent3)$eventType))
-  expect_true(identical(completed(mySimEvent3)[,1:4], completed(mySim)[,1:4]))
+  expect_true(identical(completed(mySimEvent3)[, 1:4], completed(mySim)[, 1:4]))
 
   eventTypes <- c("nothing")
   mySimEvent4 <- simInit(times, params, modules, objects = list(), paths) |>
@@ -255,7 +255,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   sim <- simInit()
 
   # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
-  cat(file = file.path(tmpdir, "test", "test.R"),'
+  cat(file = file.path(tmpdir, "test", "test.R"), '
       defineModule(sim, list(
       name = "test",
       description = "insert module description here",
@@ -290,7 +290,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
       }
       ', fill = TRUE)
 
-  cat(file = file.path(tmpdir, "test2", "test2.R"),'
+  cat(file = file.path(tmpdir, "test2", "test2.R"), '
       defineModule(sim, list(
       name = "test2",
       description = "insert module description here",
@@ -565,7 +565,7 @@ test_that("conflicting function types", {
   cat(xxx1, sep = "\n", fill = FALSE, file = fileName)
 
   expect_message(simInit(paths = list(modulePath = tmpdir), modules = m),
-                 c(paste0(m, ": module code: doEvent.",m," must return")))
+                 c(paste0(m, ": module code: doEvent.", m, " must return")))
 
   lineWithInputObjects <- grep(xxx, pattern = " expectsInput")
   lineWithOutputObjects <- grep(xxx, pattern = " createsOutput")
@@ -603,7 +603,7 @@ test_that("conflicting function types", {
       url1 <- extractURL('ei4', sim = sim)
       if (!identical(url1, 'test.com'))
         stop('extractURL without module fails')",
-paste0("      url1 <- extractURL('ei4', sim = sim, module = \"",m,"\")"),"
+paste0("      url1 <- extractURL('ei4', sim = sim, module = \"", m, "\")") ,"
       if (!identical(url1, 'test.com'))
         stop('extractURL fails')
       sim$g <- 1
@@ -702,7 +702,7 @@ test_that("messaging with multiple modules", {
   newModule(m3, tmpdir, open = FALSE)
   newModule(m4, tmpdir, open = FALSE)
   #lapply(m, newModule, tmpdir, open = FALSE)
-  fileNames <- file.path(tmpdir, m, paste0(m,".R"))
+  fileNames <- file.path(tmpdir, m, paste0(m, ".R"))
   xxx <- lapply(fileNames, readLines)
   set.seed(113)
 
@@ -887,8 +887,8 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
     "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in metadata outputObjects")
   fullMessageNonInteractive <- c(
     "Running .inputObjects for child4",
-    "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx <- matrix.*",#possibly at .*147",
-    "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx2 <- matrix.*",#possibly at .*148",
+    "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx <- matrix.*", #possibly at .*147",
+    "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx2 <- matrix.*", #possibly at .*148",
     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
     "child4: outputObjects: b, a are assigned to sim inside Init, but are not declared in metadata outputObjects"
   )

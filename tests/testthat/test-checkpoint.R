@@ -82,7 +82,7 @@ test_that("test checkpointing with disk-backed raster", {
   ## save checkpoints; with load/restore
   set.seed(1234)
   simB <- simInit(times = times, params = parameters, modules = modules, paths = paths)
-  simB$ras <- terra::rast(terra::ext(0,10,0,10), vals = 1)
+  simB$ras <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1)
   expect_error(simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename))
 
   # Eliot uncommented this next line Sept 17, 2019 b/c writeRaster next line newly failed

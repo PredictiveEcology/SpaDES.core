@@ -43,11 +43,9 @@ test_that("defineModule correctly handles different inputs", {
   )
 
   # This is now corrected automatically
-  expect_false(any(unlist(lapply(x1, function(v)
-    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
   x1 <- rmExtraSpacesEOLList(x1)
-  expect_false(any(unlist(lapply(x1, function(v)
-    grepl("  |\n", v)))))
+  expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
 
   ## check name
   x2 <- x1
@@ -224,7 +222,7 @@ test_that("3 levels of parent and child modules load and show correctly", {
   if (Sys.which("glpsol") == "") {
     if (Sys.info()[['sysname']] == "Darwin") {
       skip("GLPK not available on macOS")
-    } else if (Sys.info()[['sysname']] == "Linux") {
+    } else if (Sys.info()[["sysname"]] == "Linux") {
       skip("GLPK not available on Linux")
     }
   } else {

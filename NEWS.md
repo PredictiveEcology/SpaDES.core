@@ -1,15 +1,19 @@
-# SpaDES.core (development version)
+# SpaDES.core 2.1.0
 
-* fix issue with event queue colnames in `completed<-` and `all.equal.simList` (#272);
-* fixed issue saving simLists when multiple paths were used (e.g., `length(modulePath) > 1`);
+* fix issue with event queue `colnames` in `completed<-` and `all.equal.simList` (#272);
+* fixed issue saving `simList` objects when multiple paths were used (e.g., `length(modulePath) > 1`);
 * events can be defined directly in calls to `newModule()`;
 * checkpoints are assumed to be used locally, and no longer invoke simulation file archiving and re-extraction of files (i.e., uses `saveSimList(..., inputs = FALSE, outputs = FALSE, cache = FALSE, files = FALSE)`);
 * improved recovery of interrupted simulations via `savedSimEnv()$.sim` -- `savedSimEnv()` is now exported for easier discovery -- an internal package environment is used, unless the user specifies `options(reproducible.memoisePersist = TRUE)`, which will use the global environment to store the `.sim` object;
 * switch from `crayon` (superseded) to `cli` for message colours;
 
+## Dependency changes
+
+* require `reproducible` v2.1.0 or higher;
+
 ## Breaking changes
 
-* due to upstream changes in `reproducible`, `loadSimList()` is incompatible with simLists saved with earlier versions of `SpaDES.core`.
+* due to upstream changes in `reproducible`, `loadSimList()` is incompatible with `simList` objects saved with earlier versions of `SpaDES.core`.
 
 # SpaDES.core 2.0.5
 
@@ -28,7 +32,7 @@
 * re-Caching of a `simList` no longer triggers on changes to `.useCache` parameter, when it doesn't pertain to the event or module in question.
 * many historical modules used `bind_rows` from `dplyr` within `expectsInput` or `createsOutput`. Now, if a module uses `bind_rows` and doesn't have `dplyr` installed, `SpaDES.core` will intercept and use `SpaDES.core::bindrows`.
 * `saveSimList()` better handles relative paths and symbolic links (#263)
-* `saveSimList()` does an improved job at handling file-backed objects (previously, tests were passing because object was still there; now object is deleted, simList reloaded, and file-backed objects put back into place)
+* `saveSimList()` does an improved job at handling file-backed objects (previously, tests were passing because object was still there; now object is deleted, `simList` reloaded, and file-backed objects put back into place)
 * deal with upstream `reproducible` changes to `.wrap` 
 * deal with upstream `reproducible` changes to `Cache` messaging, specifically, remove cases where `function` was a `userTag` for an outer function call. Now these will display as `otherFunction`, so that individual functions can be more easily isolated.
 * overhaul of messaging during `simInit` and `spades` that allows for nested calls to `simInit` and/or `spades`

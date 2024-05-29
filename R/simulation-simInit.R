@@ -389,9 +389,9 @@ setMethod(
       message("Elpsed time for simInit: ", format(dt, format = "auto"))
     }, add = TRUE)
 
-    paths <- lapply(paths, function(p)
+    paths <- lapply(paths, function(p) {
       checkPath(p, create = TRUE)
-    )
+    })
 
     if (length(...names())) {
       objects <- append(objects, list(...))
@@ -441,7 +441,7 @@ setMethod(
 
     # Make a temporary place to store parsed module files
     sim@.xData[[".parsedFiles"]] <- new.env(parent = emptyenv())
-    on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE )
+    on.exit(rm(".parsedFiles", envir = sim@.xData), add = TRUE)
 
     # paths
     oldGetPaths <- .paths()
@@ -472,10 +472,11 @@ setMethod(
     names(childModMainFiles) <- basename2(moduleNames)
     childModFilesExist <- file.exists(childModMainFiles)
     if (any(!childModFilesExist)) {
-      stop(childModMainFiles[!childModFilesExist], " does not exist; please create one or diagnose. ",
+      stop(childModMainFiles[!childModFilesExist],
+           " does not exist; please create one or diagnose. ",
            "  Some possible causes:\n  ",
            "- git submodule not initiated?\n  ",
-           "- the module was not created using 'newModule(...)' so is missing key files")
+           "- the module was not created using 'newModule(...)' so is missing key files.")
     }
 
     modules <- modules[!sapply(modules, is.null)] |>
@@ -673,12 +674,12 @@ setMethod(
         ## run .inputObjects() for each module
         if (needInitAndInputObjects)
           if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
-            if (is.character(getOption("spades.covr", FALSE))  ) {
+            if (is.character(getOption("spades.covr", FALSE))) {
               mod <- getOption("spades.covr")
-              tf <- tempfile();
+              tf <- tempfile()
               if (is.null(notOlderThan)) notOlderThan <- "NULL"
-              cat(file = tf, paste0('simOut <- .runModuleInputObjects(sim, "', m,
-                                    '", notOlderThan = ', notOlderThan,')'))
+              cat(file = tf, paste0("simOut <- .runModuleInputObjects(sim, '", m,
+                                    "', notOlderThan = ", notOlderThan, ")"))
               # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
               # unlockBinding(mod, sim$.mods)
               if (length(objects))
@@ -1130,13 +1131,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     if (length(modulesToSearch3) > 0) {
       isParent <- unlist(lapply(modulesToSearch3, function(x) length(x) > 0))
 
-      modulesToSearch3[isParent] <- Map(x = modulesToSearch3[isParent],
-                                       nam = dirname(names(modulesToSearch3[isParent])),
-                                       function(x, nam){
-                                         mods <- lapply(x, function(y) file.path(nam, y))
-                                         names(mods) <- unlist(lapply(mods, basename2))
-
-                                         .identifyChildModules(sim = sim, modules = mods)}
+      modulesToSearch3[isParent] <- Map(
+        x = modulesToSearch3[isParent],
+        nam = dirname(names(modulesToSearch3[isParent])),
+        function(x, nam) {
+          mods <- lapply(x, function(y) file.path(nam, y))
+          names(mods) <- unlist(lapply(mods, basename2))
+          .identifyChildModules(sim = sim, modules = mods)
+        }
       )
       modulesToSearch2 <- as.list(names(modulesToSearch3[!isParent]))
       names(modulesToSearch2) <- names(modulesToSearch3[!isParent])
@@ -1235,7 +1237,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
       debug <- getDebug() # from options first, then override if in a simInitAndSpades
 
-      if (!(FALSE %in% debug || any(is.na(debug))) )
+      if (!(FALSE %in% debug || any(is.na(debug))))
         objsIsNullBefore <- objsAreNull(sim)
 
       allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
@@ -1336,12 +1338,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         sim <- allowSequentialCachingFinal(sim)
       }
 
-      if (!(FALSE %in% debug || any(is.na(debug))) )
+      if (!(FALSE %in% debug || any(is.na(debug)))) {
         sim <- objectsCreatedPost(sim, objsIsNullBefore)
-
+      }
     }
   } else {
-    message(cli::col_green("All required inputObjects for ",mBase, " provided; skipping .inputObjects"))
+    message(
+      cli::col_green("All required inputObjects for ", mBase, " provided; skipping .inputObjects")
+    )
   }
 
   sim@current <- list()
@@ -1363,7 +1367,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' @export
 #' @rdname simInit
 simInitDefaults <- function() {
-
   times <- append(.timesDefault(), list(timeunit = .timeunitDefault()))
   simInitCall <- call("simInit", times = times)
 
@@ -1398,8 +1401,9 @@ simInitDefaults <- function() {
 .checkModuleDirsAndFiles <- function(modules, modulePath) {
   moduleDirsPoss <- lapply(modules, function(m) file.path(modulePath, m))
   moduleDirsExist <- lapply(moduleDirsPoss, function(poss) dir.exists(poss))
-  moduleFilesPoss <- lapply(moduleDirsPoss, function(poss) file.path(file.path(poss,
-                                                                               paste0(basename(poss), ".R"))))
+  moduleFilesPoss <- lapply(moduleDirsPoss, function(poss) {
+    file.path(file.path(poss, paste0(basename(poss), ".R")))
+  })
   moduleFilesExist <- lapply(moduleFilesPoss, function(poss) file.exists(poss))
   # dir.exists(file.path(paths$modulePath, unlist(modules)))
   if (!isTRUE(all(unlist(lapply(moduleDirsExist, any))))) {
@@ -1414,14 +1418,14 @@ simInitDefaults <- function() {
          moduleTxt2," exist in:\n    ", modulePath)
   }
   if (!isTRUE(all(unlist(lapply(moduleFilesExist, any))))) {
-    notExist <- !unlist(lapply(moduleFilesExist, any));
+    notExist <- !unlist(lapply(moduleFilesExist, any))
     notExist <- Map(poss = moduleDirsPoss[notExist], exist = moduleFilesExist[notExist],
-        function(poss, exist) poss[!exist])
+                    f = function(poss, exist) poss[!exist])
     stop(paste0(names(notExist), " doesn't exist in modulePath(sim): (",
-                   lapply(notExist, paste, collapse = ", "), ")", collapse = "\n"))
+                lapply(notExist, paste, collapse = ", "), ")", collapse = "\n"))
   }
-  modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist, function(poss, exist)
-    poss[exist][1])
+  modulePaths <- Map(poss = moduleDirsPoss, exist = moduleDirsExist,
+                     f = function(poss, exist) poss[exist][1])
 }
 
 #' @importFrom Require extractVersionNumber
@@ -1442,7 +1446,7 @@ checkSpaDES.coreMinVersion <- function(allPkgs) {
         stop("One of the modules needs a newer version of SpaDES.core. Please ",
              "restart R and install with: \n",
              "Require::Install(c('",
-             paste(scPackageFullnames[ok %in% FALSE], collapse = ", "),"'))")
+             paste(scPackageFullnames[ok %in% FALSE], collapse = ", "), "'))")
     }
   }
 }
@@ -1668,10 +1672,10 @@ adjustModuleNameSpacing <- function(modNames) {
   nchar <- getOption("spades.messagingNumCharsModule") - loggingMessagePrefixLength
   if (length(modNames)) {
     for (i in seq(nchar, max(nchar(modNames)))) {
-      modName8Chars <- mapply(modName = unname(modNames),
-                              MoreArgs = list(ncm = i),
-                              function(modName, ncm)
-                                moduleNameStripped(modName, numCharsMax = ncm)
+      modName8Chars <- mapply(
+        modName = unname(modNames),
+        MoreArgs = list(ncm = i),
+        FUN = function(modName, ncm) moduleNameStripped(modName, numCharsMax = ncm)
       )
       if (all(!duplicated(modName8Chars))) {
         options("spades.messagingNumCharsModule" = i + loggingMessagePrefixLength)
@@ -1703,22 +1707,30 @@ RequireWithHandling <- function(allPkgs, standAlone = FALSE, upgrade = FALSE) {
   )
 }
 
+#' @importFrom cli cli cli_code col_blue col_yellow cli_text
 stopMessForRequireFail <- function(pkg) {
-  paste0("\nThe above error(s) likely mean(s) you must restart R and run again.",
-  "\nIf this/these occur(s) again, your session likely ",
-  "pre-loads old packages from e.g., your personal library. ",
-  "The best thing to do is try to\n",
-  cli::col_yellow("restart R without loading any packages."),
-  "\n\nIf that is not easy to do, you can try to update it in that location with (for a CRAN package) e.g., :\n",
-  cli::col_yellow("restart R "),
-  cli::col_blue(paste0("\ninstall.packages(c('", pkg, "'))")),
-  cli::col_yellow("\nrestart R"),
-  "\n\nIf that does not work (including non-CRAN packages), perhaps removing the old one...",
-  cli::col_yellow("\nrestart R "),
-  cli::col_blue(paste0("\nremove.packages(c('", pkg, "'))")),
-  cli::col_yellow("\nrestart R"),
-  "\nThis should trigger a re-installation, or allow ",
-  "for a manual install.packages ...")
+  cli::cli({
+    cli::cli_text("The above error(s) likely mean(s) you must restart R and run again.")
+    cli::cli_text(
+      "If this/these occur(s) again, your session likely pre-loads old packages",
+      "from e.g., your personal library."
+    )
+    cli::cli_text(
+      cli::col_yellow("The best thing to do is try to restart R without loading any packages.")
+    )
+
+    cli::cli_text("\nIf that is not easy to do, try to update e.g., a CRAN package, with:")
+    cli::cli_text(cli::col_yellow("Restart your R session"))
+    cli::col_blue(cli::cli_code(paste0("\ninstall.packages(c('", pkg, "'))")))
+    cli::cli_text(cli::col_yellow("Restart your R session"))
+
+    cli::cli_text("\nIf that fails (including non-CRAN packages), try removing the old one:")
+    cli::cli_text(cli::col_yellow("Restart your R session"))
+    cli::col_blue(cli::cli_code(paste0("\nremove.packages(c('", pkg, "'))")))
+    cli::cli_text(cli::col_yellow("Restart your R session"))
+
+    cli::cli_text("\nThis should trigger a re-installation, or allow for a manual install.")
+  })
 }
 
 getDebug <- function() {

@@ -106,8 +106,8 @@ setClass(
   "simList",
   contains = "environment",
   slots = list(
-    modules = "list", params = "list", events = "list",#data.table",
-    current = "list", #"data.table",
+    modules = "list", params = "list",
+    events = "list", current = "list", ## formerly data.tables
     completed = "environment", depends = ".simDeps",
     simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
     .envir = "environment"
@@ -147,30 +147,36 @@ setMethod("initialize",
             expected <- c("modules", "params", "depends", "simtimes",
                           "inputs", "outputs", "paths")
             haves <- na.omit(match(sn[!slotsProvided], expected))
-            if (any(1 == haves))
-              .Object@modules = as.list(NULL)
-
-            if (any(2 == haves))
-              .Object@params = list(
+            if (any(1 == haves)) {
+              .Object@modules <- as.list(NULL)
+            }
+            if (any(2 == haves)) {
+              .Object@params <- list(
                 checkpoint = list(interval = NA_real_, file = NULL),
                 .progress = list(type = NULL, interval = NULL)
               )
-            if (any(3 == haves))
-              .Object@depends = .emptySimDeps #new(".simDeps", dependencies = list(NULL))
-            if (any(4 == haves))
-              .Object@simtimes = list(
+            }
+            if (any(3 == haves)) {
+              .Object@depends <- .emptySimDeps
+            }
+            if (any(4 == haves)) {
+              .Object@simtimes <- list(
                 current = 0.00, start = 0.00, end = 1.00, timeunit = NA_character_
               )
-            if (any(5 == haves))
-              .Object@inputs = .fileTableInDF
-            if (any(6 == haves))
-              .Object@outputs = .fileTableOutDF
-            if (any(7 == haves))
-              .Object@paths = .paths()
+            }
+            if (any(5 == haves)) {
+              .Object@inputs <- .fileTableInDF
+            }
+            if (any(6 == haves)) {
+              .Object@outputs <- .fileTableOutDF
+            }
+            if (any(7 == haves)) {
+              .Object@paths <- .paths()
+            }
 
             .Object@completed <- new.env(parent = emptyenv())
 
-            #.Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            # .Object@.xData <- new.env(parent = asNamespace("SpaDES.core"))
             # browser(expr = exists("._initialize_2"))
             .Object@.xData <- new.env(parent = emptyenv())
             # .Object@.xData$.objects <- new.env(parent = emptyenv())
@@ -188,8 +194,8 @@ setMethod("initialize",
 setClass("simList_",
          contains = "list",
          slots = list(
-           modules = "list", params = "list", events = "list",#data.table",
-           current = "list", #"data.table",
+           modules = "list", params = "list",
+           events = "list", current = "list", ## formerly data.tables
            completed = "list", depends = ".simDeps",
            simtimes = "list", inputs = "data.frame", outputs = "data.frame", paths = "list",
            .list = "list"

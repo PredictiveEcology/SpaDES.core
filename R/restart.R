@@ -103,7 +103,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   if (numMods > 0) {
     com <- completed(sim)
     etSecs <- sum(com[, et := difftime(._clockTime, ._prevEventTimeFinish, units = "secs"),
-                      by = seq(NROW(com))]$et)
+                      by = seq_len(NROW(com))]$et)
 
     # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
     # et <- difftime(tail(com$._clockTime, numMods - 1)[1], com$._clockTime[1])
@@ -469,7 +469,7 @@ First <- function(...) {
 
   setwd(.oldWd)
 
-  #attachedPkgsFilename <- file.path("~", paste0(".", .rndString), '.attachedPkgs.RData')
+  # attachedPkgsFilename <- file.path("~", paste0(".", .rndString), ".attachedPkgs.RData")
   load(.attachedPkgsFilename) # for "attached" object
   lapply(rev(attached), function(x) require(x, character.only = TRUE))
   sim <- loadSimList(.spades.simFilename)

@@ -50,13 +50,13 @@ These
 \item keep the \code{defineModule(...)} function call with all the metadata in
 the same file, \code{moduleName.R}, but with all other content removed,
 i.e., only the \code{defineModule(...)} will be here.
-\item build documentation from all the roxygen tags
-\item places one roxygen tag, \verb{@export} in front of the \code{doEvent.moduleName}
+\item build documentation from all the \pkg{roxygen2} tags
+\item places one \pkg{roxygen2} tag, \verb{@export} in front of the \code{doEvent.moduleName}
 function, so that the function can be found by \code{SpaDES.core}
 \item All other functions will be kept "private", i.e., not exported, unless
-the user manually addes \verb{@export}, as per a normal package
+the user manually adds \verb{@export}, as per a normal package
 \item will make a \code{DESCRIPTION} file from the SpaDES module metadata
-\item will make a \code{NAMESPACE} file from the roxygen tags (e.g., \verb{@export})
+\item will make a \code{NAMESPACE} file from the \pkg{roxygen2} tags (e.g., \verb{@export})
 }
 
 A user can continue to use the module code as before, i.e., by editing it and

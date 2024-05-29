@@ -98,7 +98,7 @@ test_that("test event-level cache & memory leaks", {
   }
 
   # Take a leaky function -- should trigger memory leak stuff
-  fn <- function() { rnorm(1)}
+  fn <- function() rnorm(1)
   sims$crazyFunction <- fn
   end(sims) <- end(sims) + 0.1
 
@@ -131,7 +131,7 @@ test_that("test event-level cache & memory leaks", {
   expect_true(!grepl("crazyFunction", warnsFormula))
   expect_true(!grepl("function", warnsFormula))
 
-  sims$.mods$caribouMovement$.objects$crazyFunction <- function() { rnorm(1)}
+  sims$.mods$caribouMovement$.objects$crazyFunction <- function() rnorm(1)
   end(sims) <- end(sims) + 0.1
   mess <- capture.output({
     warnsFunction <- capture_warnings({
@@ -145,7 +145,7 @@ test_that("test event-level cache & memory leaks", {
   expect_true(grepl("mod", warnsFunction))
   expect_true(!grepl("formula", warnsFunction))
 
-  sims$.mods$caribouMovement$.objects$crazyFormula <-  formula(hi ~ test)
+  sims$.mods$caribouMovement$.objects$crazyFormula <- formula(hi ~ test)
   end(sims) <- end(sims) + 0.1
   mess <- capture.output({
     warnsFormula <- capture_warnings({
@@ -302,7 +302,7 @@ test_that("test .robustDigest for simLists", {
 
   modName <- "test"
   newModule(modName, path = tmpdir, open = FALSE)
-  fileName <- file.path(modName, paste0(modName,".R"))
+  fileName <- file.path(modName, paste0(modName, ".R"))
   newCode <- "\"hi\"" # this will be added below in 2 different spots
 
   args <- list(modules = list("test"),
@@ -312,9 +312,9 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   mess1 <- capture_messages(do.call(simInit, args))
   msgGrep11 <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
-                   "Setting", "Paths", "using dataPath", "Using setDTthreads",
-                   "with user supplied tags",
-                   "There is no similar item in the cachePath", "Saving", "Done", "Elpsed time for", sep = "|")
+                     "Setting", "Paths", "using dataPath",
+                     "Using setDTthreads with user supplied tags.",
+                     "There is no similar item in the cachePath", "Saving", "Done", "Elpsed time for", sep = "|")
   expect_true(all(grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -384,8 +384,8 @@ test_that("test .robustDigest for simLists", {
 test_that("test .checkCacheRepo with function as reproducible.cachePath", {
   testInit(smcc = TRUE)
 
-  awesomeCacheFun <- function() tmpCache ;
-  options("reproducible.cachePath" = awesomeCacheFun)
+  awesomeCacheFun <- function() tmpCache
+  options(reproducible.cachePath = awesomeCacheFun)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
@@ -400,8 +400,8 @@ test_that("test .checkCacheRepo with function as reproducible.cachePath", {
   aa <- .checkCacheRepo(list(mySim))
   expect_equal(normPath(aa), normPath(tmpCache))
 
-  justAPath <- tmpCache ;
-  options("reproducible.cachePath" = justAPath)
+  justAPath <- tmpCache
+  options(reproducible.cachePath = justAPath)
 
   # uses .getOptions
   aa <- .checkCacheRepo(list(1), create = TRUE)
@@ -426,10 +426,9 @@ test_that("test objSize", {
 })
 
 test_that("Cache sim objs via .Cache attr", {
-  testInit("ggplot2",
-                          smcc = FALSE, debug = FALSE,
-                          opts = list(spades.recoveryMode = FALSE,
-                                      "reproducible.useMemoise" = FALSE))
+  testInit("ggplot2", smcc = FALSE, debug = FALSE,
+           opts = list(spades.recoveryMode = FALSE,
+                       reproducible.useMemoise = FALSE))
   withr::local_options(list(reproducible.cachePath = tmpdir))
 
   m1 <- "test"

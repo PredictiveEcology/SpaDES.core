@@ -354,8 +354,8 @@ test_that("test that module directory exists, but not files", {
   paths <- getPaths()
   modules <- list(parentModName)
   times <- list(start = 1, end = 10)
-  mainChildModuleFile <- file.path(paths$modulePath, childModName, paste0(childModName, ".R") )
-  mainParentModuleFile <- file.path(paths$modulePath, parentModName, paste0(parentModName, ".R") )
+  mainChildModuleFile <- file.path(paths$modulePath, childModName, paste0(childModName, ".R"))
+  mainParentModuleFile <- file.path(paths$modulePath, parentModName, paste0(parentModName, ".R"))
   expect_true(file.exists(mainChildModuleFile))
 
   file.remove(mainChildModuleFile)

@@ -2,7 +2,7 @@ test_that("test objectSynonyms", {
   testInit(sampleModReqdPkgs, opts = list(spades.useRequire = FALSE))
   sim <- simInit()
 
-  sim$age <- 1:10;
+  sim$age <- 1:10
   sim <- objectSynonyms(sim, list(c("age", "ageMap", "age2")))
 
   expect_true(identical(sim$ageMap, sim$age))
@@ -55,7 +55,7 @@ test_that("test objectSynonyms", {
 
   # Test simInit for .inputObjects
   newModule("test", tmpdir, open = FALSE)
-  cat(file = file.path(tmpdir, "test", "test.R"),'
+  cat(file = file.path(tmpdir, "test", "test.R"), '
       defineModule(sim, list(
       name = "test",
       description = "insert module description here",

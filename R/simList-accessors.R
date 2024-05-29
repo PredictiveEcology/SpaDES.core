@@ -524,7 +524,7 @@ P.simList <- function(sim, param, module) {
       } else {
         modFilePaths <- checkPath(names(mods))
 
-        scalls <- sys.calls();
+        scalls <- sys.calls()
         whereInSC <- .grepSysCalls(scalls, "^P\\(")
         while (whereInSC > 1) {
           poss <- scalls[whereInSC - 1]
@@ -2593,13 +2593,12 @@ setReplaceMethod(
      }
 
      if (NROW(value)) {
-       sim@events <- lapply(seq_len(NROW(value)), function(x) as.list(value[x,]))
+       sim@events <- lapply(seq_len(NROW(value)), function(x) as.list(value[x, ]))
      } else {
        sim@events <- list()
      }
      return(sim)
 })
-
 
 ## conditional events --------------------------------------------------------------------------
 
@@ -2622,9 +2621,9 @@ setMethod(
       conds <- sim$._conditionalEvents
       conds <- lapply(conds, function(x) {
         if (is.call(x$condition)) {
-          x$condition <- deparse(x$condition);
+          x$condition <- deparse(x$condition)
         } else {
-          x$condition <- as.character(x$condition);
+          x$condition <- as.character(x$condition)
         }
         x
       })
@@ -3354,13 +3353,13 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
       if (any(a > minutesInSeconds)) {
         if (any(a > hoursInSeconds)) {
           if (any(a > daysInSeconds)) {
-            unt = "days"
+            unt <- "days"
           }
         } else {
-          unt = "hours"
+          unt <- "hours"
         }
       } else {
-        unt = "mins"
+        unt <- "mins"
       }
       st <- Sys.time()
       a <- round(difftime(a + st, st, units = unt), 3) # work around for forcing a non seconds unit, allowing "auto"
@@ -3374,9 +3373,6 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   }
   return(ret[])
 }
-
-.knownDotParams <- c(".plots", ".plotInitialTime", ".plotInterval",
-                     ".saveInitialTime", ".saveInterval", ".useCache")
 
 #' @inheritParams inputObjects
 #'
@@ -3392,7 +3388,7 @@ moduleObjects <- function(sim, module, path) {
   simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      for (i in seq(length(sys.frames()))[-1]) { # don't start in this environment; not here
+      for (i in seq_along(sys.frames())[-1]) { # don't start in this environment; not here
         simTry <- suppressWarnings(try(get("sim", whereInStack("sim", whFrame = -i)), silent = TRUE))
         if (!is(simTry, "try-error")) {
           break

@@ -76,11 +76,13 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
     objDeparsedIfHasSim <- .parsingSim(theCall[[1]], "assign")
-    if (length(objDeparsedIfHasSim))
+    if (length(objDeparsedIfHasSim)) {
       objDeparsed <- objDeparsedIfHasSim
+    }
     env <- parent.frame()
-    isSimList <- unlist(lapply(theCall[[1]], function(x)
-      isTRUE(try(is(eval(x, envir = env), "simList"), silent = TRUE))))
+    isSimList <- unlist(lapply(theCall[[1]], function(x) {
+      isTRUE(try(is(eval(x, envir = env), "simList"), silent = TRUE))
+    }))
     if (!all(isSimList)) {
       sim <- get("sim", envir = env)
     } else {

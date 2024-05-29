@@ -200,9 +200,9 @@ inSeconds <- function(unit, envir, skipChecks = FALSE) {
                 #attributes(out)$unit = "second"
                 if (checkTimeunit(unit, envir)) {
                   as.numeric(get(paste0("d", unit), envir = envir)(1))
-                  } else {
-                    NULL
-                  })
+                } else {
+                  NULL
+                })
 
   return(out)
 }
@@ -318,8 +318,7 @@ setMethod(
         })
         if (!all(sapply(timesteps, is.na))) {
           return(timesteps[!is.na(timesteps)][[which.max(sapply(
-            timesteps[!sapply(timesteps, is.na)], function(x)
-              .getTU(x, envir(sim))))]])
+            timesteps[!sapply(timesteps, is.na)], function(x) .getTU(x, envir(sim))))]])
         }
       }
     }
@@ -360,8 +359,7 @@ setMethod(
         })
         if (!all(sapply(timesteps, is.na))) {
           return(timesteps[!is.na(timesteps)][[which.min(sapply(
-            timesteps[!sapply(timesteps, is.na)], function(x)
-              .getTU(x, envir(sim))))]])
+            timesteps[!sapply(timesteps, is.na)], function(x) .getTU(x, envir(sim))))]])
         }
       }
     }
@@ -387,8 +385,9 @@ setMethod(
     if (all(!keep)) {
       keep <- rep(TRUE, length(keep))
     }
-    tu <- unlist(lapply(sim[keep], function(xtime)
-      as.numeric(eval(parse(text = paste0("d", xtime, "(1)"))))))
+    tu <- unlist(lapply(sim[keep], function(xtime) {
+      as.numeric(eval(parse(text = paste0("d", xtime, "(1)"))))
+    }))
 
     return(sim[keep][which.min(tu)])
 })
@@ -432,17 +431,18 @@ setMethod("checkTimeunit",
               out <- TRUE
             } else {
               out <- sapply(unit, function(unit) {
-                if (exists(paste0("d", unit), envir = envir )) {
+                if (exists(paste0("d", unit), envir = envir)) {
                   if (is.function(get(paste0("d", unit), envir = envir)))
                     out <- TRUE
-                } else if (exists(paste0("d", unit, "s"), envir = envir) ) {
+                } else if (exists(paste0("d", unit, "s"), envir = envir)) {
                   if (is.function(get(paste0("d", unit, "s"), envir = envir)))
                     out <- TRUE
                 } else if (exists(gsub(x = paste0("d", unit),
-                                       pattern = "s$", replacement = ""), envir = envir) ) {
+                                       pattern = "s$", replacement = ""), envir = envir)) {
                   if (is.function(get(gsub(x = paste0("d", unit),
-                                          pattern = "s$", replacement = ""), envir = envir)))
+                                           pattern = "s$", replacement = ""), envir = envir))) {
                     out <- TRUE
+                  }
                 } else {
                   out <- FALSE
                 }

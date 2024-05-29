@@ -138,7 +138,9 @@ test_that("saving csv files works correctly", {
    outputs(sim2)
    completes <- completed(sim2)
    expect_true("eventPriority" %in% colnames(completes))
-   expect_true(all(completes[eventType != "init"]$eventPriority == outs[order(outs$saveTime),]$eventPriority))
+   expect_true(all(
+     completes[eventType != "init"]$eventPriority == outs[order(outs$saveTime), ]$eventPriority
+   ))
 
    # read one back in just to test it all worked as planned
    newObj <- read.csv(dir(tmpdir, pattern = "year10.csv", full.name = TRUE))
@@ -436,7 +438,7 @@ test_that("restart does not work correctly", {
     times <- list(start = 0, end = 3)
     mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                      outputs = data.frame(objectName = "landscape", saveTime = times$end))
-    mySim$tesRas <- raster(extent(0,10,0,10), vals = 1, res = 1)
+    mySim$tesRas <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
     tmpFilename <- "~/tmpRas.tif"
     mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
     mySim <- spades(mySim, debug = 1)
@@ -459,33 +461,33 @@ test_that("restart with logging", {
                                           "spades.restartR.clearFiles" = FALSE))
 
   tmpdir <- "~"
-  testNum = 3
-    interval = 1
-    mapPath <- getMapPath(tmpdir)
+  testNum <- 3
+  interval <- 1
+  mapPath <- getMapPath(tmpdir)
 
-    times <- list(start = 0, end = 1)
-    parameters <- list(
-      .globals = list(stackName = "landscape"),
-      caribouMovement = list(.plotInitialTime = NA),
-      randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
-    )
-    modules <- list("randomLandscapes", "caribouMovement")
-    paths <- list(
-      modulePath = getSampleModules(tmpdir),
-      inputPath = mapPath,
-      outputPath = tmpdir
-    )
+  times <- list(start = 0, end = 1)
+  parameters <- list(
+    .globals = list(stackName = "landscape"),
+    caribouMovement = list(.plotInitialTime = NA),
+    randomLandscapes = list(.plotInitialTime = NA, nx = 20, ny = 20)
+  )
+  modules <- list("randomLandscapes", "caribouMovement")
+  paths <- list(
+    modulePath = getSampleModules(tmpdir),
+    inputPath = mapPath,
+    outputPath = tmpdir
+  )
 
-    options("spades.restartRInterval" = interval)
-    times <- list(start = 0, end = 3)
-    mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
-                     outputs = data.frame(objectName = "landscape", saveTime = times$end))
-    mySim$tesRas <- raster(extent(0,10,0,10), vals = 1, res = 1)
-    tmpFilename <- "~/tmpRas.tif"
-    mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
-    mySim <- spades(mySim, debug = list("file" = list("file" = "log.txt")))
-    sim$tesRas + 1
-    file.exists(tmpFilename)
+  options("spades.restartRInterval" = interval)
+  times <- list(start = 0, end = 3)
+  mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
+                   outputs = data.frame(objectName = "landscape", saveTime = times$end))
+  mySim$tesRas <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+  tmpFilename <- "~/tmpRas.tif"
+  mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
+  mySim <- spades(mySim, debug = list("file" = list("file" = "log.txt")))
+  sim$tesRas + 1
+  file.exists(tmpFilename)
 
   unlink(unique(dirname(outputs(sim)$file)), recursive = TRUE, force = TRUE)
   options("spades.restartRInterval" = 0)

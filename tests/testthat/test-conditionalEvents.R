@@ -26,7 +26,7 @@ test_that("simulation runs with simInit and spades", {
   paths <- list(modulePath = c(tmpdir, tmpCache))
 
   newModule("test", tmpdir, open = FALSE)
-  cat(file = file.path(tmpdir, "test", "test.R"),'
+  cat(file = file.path(tmpdir, "test", "test.R"), '
       defineModule(sim, list(
       name = "test",
       description = "insert module description here",

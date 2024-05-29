@@ -42,14 +42,11 @@
   # Create active binding for "Paths"
   pkgEnv <- parent.env(environment())
   rm("Paths", envir = pkgEnv)
-  makeActiveBinding(sym = "Paths",
-                    fun = function() .paths(),
-                    env = pkgEnv
-  )
+  makeActiveBinding(sym = "Paths", fun = function() .paths(), env = pkgEnv)
 
   # parent <- parent.env(environment())
   # print(str(parent))
-  #reg.finalizer(parent, finalize, onexit= TRUE)
+  # reg.finalizer(parent, finalize, onexit= TRUE)
 
   invisible()
 }
@@ -69,7 +66,7 @@
     )
   }
 
-  #unlockBinding("Paths", as.environment("package:SpaDES.core"))
+  # unlockBinding("Paths", as.environment("package:SpaDES.core"))
   # rm("Paths", envir = as.environment("package:SpaDES.core"))
   # makeActiveBinding(sym = "Paths",
   #                   fun = function() {
