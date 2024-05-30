@@ -154,6 +154,9 @@
     <loc>https://spades-core.predictiveecology.org/reference/dot-guessPkgFun.html</loc>
   </url>
   <url>
+    <loc>https://spades-core.predictiveecology.org/reference/dot-params.html</loc>
+  </url>
+  <url>
     <loc>https://spades-core.predictiveecology.org/reference/downloadData.html</loc>
   </url>
   <url>
@@ -304,6 +307,9 @@
     <loc>https://spades-core.predictiveecology.org/reference/newProjectCode.html</loc>
   </url>
   <url>
+    <loc>https://spades-core.predictiveecology.org/reference/noEventWarning.html</loc>
+  </url>
+  <url>
     <loc>https://spades-core.predictiveecology.org/reference/objSize.simList.html</loc>
   </url>
   <url>
@@ -394,6 +400,9 @@
     <loc>https://spades-core.predictiveecology.org/reference/saveSimList.html</loc>
   </url>
   <url>
+    <loc>https://spades-core.predictiveecology.org/reference/savedSimEnv.html</loc>
+  </url>
+  <url>
     <loc>https://spades-core.predictiveecology.org/reference/scheduleConditionalEvent.html</loc>
   </url>
   <url>
@@ -434,6 +443,9 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/simList-accessors-modules.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org/reference/simList-accessors-objects.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/simList-accessors-outputs.html</loc>

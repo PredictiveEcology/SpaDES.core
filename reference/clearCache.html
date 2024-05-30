@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -87,6 +87,8 @@
 <span>  userTags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  after <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  before <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fun <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cacheId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  ask <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.ask"</span><span class="op">)</span>,</span>
 <span>  useCloud <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  cloudFolderID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.cloudFolderID"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
@@ -102,6 +104,8 @@
 <span>  userTags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  after <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  before <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  fun <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cacheId <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drv <span class="op">=</span> <span class="fu">getDrv</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.drv"</span>, <span class="cn">NULL</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  conn <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.conn"</span>, <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.verbose"</span><span class="op">)</span>,</span>
@@ -155,6 +159,18 @@ Objects cached after this time will be shown or deleted.</p></dd>
 Objects cached before this time will be shown or deleted.</p></dd>
 
 
+<dt>fun</dt>
+<dd><p>An optional character vector describing the function name to extract.
+Only functions with this/these functions will be returned.</p></dd>
+
+
+<dt>cacheId</dt>
+<dd><p>An optional character vector describing the <code>cacheId</code>s to extract.
+Only entries with this/these <code>cacheId</code>s will be returned. If <code>useDBI(FALSE)</code>,
+this will also be dramatically faster than using <code>userTags</code>, for a large
+cache.</p></dd>
+
+
 <dt>ask</dt>
 <dd><p>Logical. If <code>FALSE</code>, then it will not ask to confirm deletions using
 <code>clearCache</code> or <code>keepCache</code>. Default is <code>TRUE</code></p></dd>
@@ -193,8 +209,12 @@ option, e.g., <code>options('reproducible.verbose' = 0) to reduce to minimal</co
 
 
 <dt>...</dt>
-<dd><p>Other arguments. Currently, <code>regexp</code>, a logical, can be provided.
-This must be <code>TRUE</code> if the use is passing a regular expression.
+<dd><p>Other arguments. Can be in the form of <code>tagKey = tagValue</code>, such as,
+<code>class = "numeric"</code> to find all entries that are numerics in the cache.
+Note: the special cases of <code>cacheId</code> and <code>fun</code> have their own
+named arguments in these functions.
+Also can be <code>regexp = xx</code>, where <code>xx</code> is <code>TRUE</code> if the user
+is passing a regular expression.
 Otherwise, <code>userTags</code> will need to be exact matches. Default is
 missing, which is the same as <code>TRUE</code>. If there are errors due
 to regular expression problem, try <code>FALSE</code>. For <code>cc</code>, it is

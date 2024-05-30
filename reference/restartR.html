@@ -16,7 +16,7 @@ e.g., options("spades.restartRInterval" = 100).
 This is only intended to restart a simulation in exactly the same place as it was
 (i.e., cannot change machines), and because of the restart, the assignment of the spades
 call will be either to sim or the user must make such an assignment manually,
-e.g., sim &amp;lt;- SpaDES.core:::.pkgEnv$.sim.
+e.g., sim &amp;lt;- savedSimEnv()$.sim, or perhaps, the safer sim &amp;lt;- Copy(savedSimEnv()$.sim).
 This is stated in a message.'><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -41,7 +41,7 @@ This is stated in a message.'><!-- mathjax --><script src="https://cdnjs.cloudfl
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -112,7 +112,7 @@ e.g., <code>options("spades.restartRInterval" = 100)</code>.
 This is only intended to restart a simulation in exactly the same place as it was
 (i.e., cannot change machines), and because of the restart, the assignment of the <code>spades</code>
 call will be either to <code>sim</code> or the user must make such an assignment manually,
-e.g., <code>sim &lt;- SpaDES.core:::.pkgEnv$.sim</code>.
+e.g., <code>sim &lt;- savedSimEnv()$.sim</code>, or perhaps, the safer <code>sim &lt;- Copy(savedSimEnv()$.sim)</code>.
 This is stated in a message.</p>
     </div>
 

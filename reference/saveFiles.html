@@ -26,7 +26,7 @@ then be saved whenever a call to saveFiles is made."><!-- mathjax --><script src
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -159,50 +159,33 @@ wants it or not.</p>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"SpaDES.tools"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"NLMR"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"NLMR"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span><span class="co">## This will save the "caribou" object at the save interval of 1 unit of time</span></span></span>
 <span class="r-in"><span><span class="co">## in the outputPath location</span></span></span>
 <span class="r-in"><span>  <span class="va">outputPath</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"test_save"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">times</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>start <span class="op">=</span> <span class="fl">0</span>, end <span class="op">=</span> <span class="fl">1</span>, <span class="st">"month"</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>    caribouMovement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>      .saveObjects <span class="op">=</span> <span class="st">"caribou"</span>,</span></span>
-<span class="r-in"><span>      .saveInitialTime <span class="op">=</span> <span class="fl">1</span>, .saveInterval <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>      .plots <span class="op">=</span> <span class="cn">NA</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    randomLandscapes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>.plots <span class="op">=</span> <span class="cn">NA</span>, nx <span class="op">=</span> <span class="fl">20</span>, ny <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">modules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"randomLandscapes"</span>, <span class="st">"caribouMovement"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="va">paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    modulePath <span class="op">=</span> <span class="fu"><a href="getSampleFiles.html">getSampleModules</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    outputPath <span class="op">=</span> <span class="va">outputPath</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.moduleCodeChecks"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># not necessary for example</span></span></span>
-<span class="r-in"><span>  <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>times <span class="op">=</span> <span class="va">times</span>, params <span class="op">=</span> <span class="va">parameters</span>, modules <span class="op">=</span> <span class="va">modules</span>,</span></span>
-<span class="r-in"><span>                   paths <span class="op">=</span> <span class="va">paths</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="co"># The caribou module has a saveFiles(sim) call, so it will save caribou</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">outputPath</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="co"># remove the files</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">outputPath</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="va">opts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.moduleCodeChecks"</span> <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
+<span class="r-in"><span>                 <span class="st">"spades.useRequire"</span> <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># not necessary for example</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">## save multiple outputs</span></span></span>
 <span class="r-in"><span>  <span class="va">parameters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>    .globals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>stackName <span class="op">=</span> <span class="st">"landscape"</span><span class="op">)</span>,</span></span>
 <span class="r-in"><span>    caribouMovement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>      .saveObjects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"caribou"</span>, <span class="st">"habitatQuality"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>      .saveInitialTime <span class="op">=</span> <span class="fl">1</span>, .saveInterval <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>      .plots <span class="op">=</span> <span class="cn">NA</span></span></span>
+<span class="r-in"><span>      .saveInitialTime <span class="op">=</span> <span class="fl">1</span>, .saveInterval <span class="op">=</span> <span class="fl">1</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
 <span class="r-in"><span>    randomLandscapes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>.plots <span class="op">=</span> <span class="cn">NA</span>, nx <span class="op">=</span> <span class="fl">20</span>, ny <span class="op">=</span> <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>times <span class="op">=</span> <span class="va">times</span>, params <span class="op">=</span> <span class="va">parameters</span>, modules <span class="op">=</span> <span class="va">modules</span>,</span></span>
 <span class="r-in"><span>                 paths <span class="op">=</span> <span class="va">paths</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">mySim</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="co"># plotting not relevant for this example</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">outputPath</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="co"># remove the files</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.remove</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">outputPath</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -212,97 +195,48 @@ wants it or not.</p>
 <span class="r-in"><span><span class="op">}</span><span class="co"># }</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpoLaiAE/test_save'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpoLaiAE/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpc4Z3Nd/test_save'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpc4Z3Nd/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpoLaiAE/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpoLaiAE/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpoLaiAE/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpoLaiAE/test_save'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpoLaiAE/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpoLaiAE/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpc4Z3Nd/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpc4Z3Nd/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpc4Z3Nd/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpc4Z3Nd/test_save'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpc4Z3Nd/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpc4Z3Nd/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpoLaiAE/SpaDES/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit Key: &lt;global, module&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit              module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit              &lt;char&gt;    &lt;char&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit 1:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit 2: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.09969759 secs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:17 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 randomLandscapes init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            landscape</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.56 secs | 0 caribouMovement init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:              caribou</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 rndmLn:<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.57 secs | 0 randomLandscapes plot 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">plot.init</span> <span style="color: #00BB00;">total elpsd: 0.58 secs | 0 caribouMovement plot.in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">total elpsd: 0.62 secs | 1 caribouMovement move 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">1:       habitatQuality</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.66 secs | 1 caribouMovement plot 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:18 crbMvm:<span style="color: #00BB00;">save</span> <span style="color: #00BB00;">total elpsd: 0.66 secs | 1 caribouMovement save 11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpc4Z3Nd/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit Key: &lt;global, module&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit &lt;char&gt;    &lt;char&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit 1:  caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit 2: randomLandscapes stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.1022518 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 randomLandscapes init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  landscape</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.56 secs | 0 caribouMovement init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:    caribou</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">total elpsd: 0.57 secs | 1 caribouMovement move 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">           &lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">1: habitatQuality</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:11 crbMvm:<span style="color: #00BB00;">save</span> <span style="color: #00BB00;">total elpsd: 0.62 secs | 1 caribouMovement save 11</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:03:14 crbMvm:<span style="color: #00BB00;">save</span> <span style="background-color: #BBBB00;">caribouMovement</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpoLaiAE/test_save'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpoLaiAE/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpoLaiAE/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpoLaiAE/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpoLaiAE/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpoLaiAE/test_save'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpoLaiAE/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpoLaiAE/SpaDES/scratch'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpoLaiAE/SpaDES/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit Key: &lt;global, module&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit              module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit              &lt;char&gt;    &lt;char&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit 1:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit 2: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.07608056 secs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.078 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.08 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.082 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.084 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:19 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.086 secs | 0 randomLandscapes init </span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            landscape</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.2 secs | 0 caribouMovement init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:              caribou</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 rndmLn:<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.21 secs | 0 randomLandscapes plot 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">plot.init</span> <span style="color: #00BB00;">total elpsd: 0.22 secs | 0 caribouMovement plot.in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">total elpsd: 0.22 secs | 1 caribouMovement move 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">1:       habitatQuality</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.24 secs | 1 caribouMovement plot 10</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:01:20 crbMvm:<span style="color: #00BB00;">save</span> <span style="color: #00BB00;">total elpsd: 0.25 secs | 1 caribouMovement save 11</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
 </code></pre></div>
     </div>

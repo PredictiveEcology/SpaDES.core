@@ -28,7 +28,7 @@ When this is not the desired behaviour, use this function."><!-- mathjax --><scr
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -92,7 +92,7 @@ When this is not the desired behaviour, use this function.</p>
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for simList</span></span>
-<span><span class="fu">Copy</span><span class="op">(</span><span class="va">object</span>, <span class="va">objects</span>, <span class="va">queues</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">Copy</span><span class="op">(</span><span class="va">object</span>, <span class="va">objects</span>, <span class="va">queues</span>, <span class="va">modules</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -109,6 +109,10 @@ should be copied. Default <code>TRUE</code>, which may be slow.</p></dd>
 <dt>queues</dt>
 <dd><p>Logical. Should the events queues (<code>events</code>, <code>current</code>, <code>completed</code>)
 be deep copied via <code><a href="https://rdatatable.gitlab.io/data.table/reference/copy.html" class="external-link">data.table::copy()</a></code></p></dd>
+
+
+<dt>modules</dt>
+<dd><p>Logical. Should list of modules be copied.</p></dd>
 
 
 <dt>...</dt>

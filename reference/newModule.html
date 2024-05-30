@@ -27,7 +27,7 @@ create the other files."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -89,13 +89,13 @@ create the other files.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">newModule</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">newModule</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span>, <span class="va">events</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for character,character</span></span>
-<span><span class="fu">newModule</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="fu">newModule</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span>, <span class="va">events</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for character,missing</span></span>
-<span><span class="fu">newModule</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">newModule</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span>, <span class="va">events</span>, envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -110,7 +110,9 @@ The default is the current working directory.</p></dd>
 
 
 <dt>...</dt>
-<dd><p>Additional arguments. Currently, only the following are supported:<br><br></p><dl><dt><code>children</code></dt>
+<dd><p>Additional arguments. Currently, these can be either named
+function definitions (which will be added to the <code>simList</code>) or one or
+more of the following:<br><br></p><dl><dt><code>children</code></dt>
 <dd><p>Required when <code>type = "parent"</code>. A character vector
 specifying the names of child modules.</p></dd>
 
@@ -133,33 +135,40 @@ Default <code>TRUE</code>.</p></dd>
 
 </dl></dd>
 
+
+<dt>events</dt>
+<dd><p>A list of named expressions, each of which is surrounded by <code><a href="https://rdrr.io/r/base/Paren.html" class="external-link">{ }</a></code>.
+A user can specify events here, instead of accepting the default <code>doEvent</code> function
+that comes with the module template. See example.</p></dd>
+
+
+<dt>envir</dt>
+<dd><p>An environment where objects being passed to <code>newModule</code> can be found.
+Default <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame()</a></code>, which should be fine for most cases.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>Nothing is returned. The new module file is created at
+<p>NULL (invisibly). The new module file is created at
 <code class="file">path/name.R</code>, as well as ancillary files for documentation, citation,
 <code class="file">LICENSE</code>, <code class="file">README</code>, and <code class="file">tests</code> directory.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>All files will be created within a subdirectory named <code>name</code> within the
-<code>path</code>:</p>
-<div class="sourceCode"><pre><code>
-  &lt;path&gt;/
-    |_ &lt;name&gt;/
-    |_ R/               # contains additional module R scripts
-    |_ data/            # directory for all included data
-      |_ CHECKSUMS.txt  # contains checksums for data files
-    |_ tests/           # contains unit tests for module code
-    |_ citation.bib     # bibtex citation for the module
-    |_ LICENSE          # describes module's legal usage
-    |_ README.md        # provide overview of key aspects
-    |_ &lt;name&gt;.R         # module code file (incl. metadata)
-    |_ &lt;name&gt;.Rmd       # documentation, usage info, etc.
-</code></pre></div>
-
+    <p>All files will be created within a subdirectory named <code>name</code> within the <code>path</code>:</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>  <span class="sc">&lt;</span>path<span class="sc">&gt;</span><span class="er">/</span></span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>    <span class="er">|</span>_ <span class="sc">&lt;</span>name<span class="sc">&gt;</span><span class="er">/</span></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>    <span class="er">|</span>_ R<span class="sc">/</span>               <span class="co"># contains additional module R scripts</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    <span class="er">|</span>_ data<span class="sc">/</span>            <span class="co"># directory for all included data</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>      <span class="er">|</span>_ CHECKSUMS.txt  <span class="co"># contains checksums for data files</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    <span class="sc">|</span>_ tests<span class="sc">/</span>           <span class="co"># contains unit tests for module code</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    <span class="er">|</span>_ citation.bib     <span class="co"># bibtex citation for the module</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>    <span class="sc">|</span>_ LICENSE          <span class="co"># describes module's legal usage</span></span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>    <span class="sc">|</span>_ README.md        <span class="co"># provide overview of key aspects</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>    <span class="sc">|</span>_ <span class="sc">&lt;</span>name<span class="sc">&gt;</span>.R         <span class="co"># module code file (incl. metadata)</span></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>    <span class="sc">|</span>_ <span class="sc">&lt;</span>name<span class="sc">&gt;</span>.Rmd       <span class="co"># documentation, usage info, etc.</span></span></code></pre><p></p></div>
     </div>
     <div id="note">
     <h2>Note</h2>
@@ -188,21 +197,25 @@ A message with the correct lines to copy and paste is provided.</p>
 <span class="r-in"><span>  <span class="va">tmpdir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/tempdir2.html" class="external-link">tempdir2</a></span><span class="op">(</span><span class="st">"exampleNewModule"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="co">## create a "myModule" module in the "modules" subdirectory.</span></span></span>
 <span class="r-in"><span>  <span class="fu">newModule</span><span class="op">(</span><span class="st">"myModule"</span>, <span class="va">tmpdir</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpoLaiAE/reproducible/exampleNewModule</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in </span><span style="color: #BBBB00;">myModule.R</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in </span><span style="color: #BBBB00;">tests/</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in </span><span style="color: #BBBB00;">myModule.Rmd</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing </span><span style="color: #BBBB00;">citation.bib</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see </span><span style="color: #BBBB00;">LICENSE.md</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmpc4Z3Nd/reproducible/exampleNewModule</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in</span> <span style="color: #BBBB00;">myModule.R</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in</span> <span style="color: #BBBB00;">tests/</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in</span> <span style="color: #BBBB00;">myModule.Rmd</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing</span> <span style="color: #BBBB00;">citation.bib</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see</span> <span style="color: #BBBB00;">LICENSE.md</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmpc4Z3Nd/reproducible/exampleNewModule/myModule/myModule.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmpc4Z3Nd/reproducible/exampleNewModule/myModule/myModule.Rmd</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">## create a new parent module in the "modules" subdirectory.</span></span></span>
 <span class="r-in"><span>  <span class="fu">newModule</span><span class="op">(</span><span class="st">"myParentModule"</span>, <span class="va">tmpdir</span>, type <span class="op">=</span> <span class="st">"parent"</span>, children <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"child1"</span>, <span class="st">"child2"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myParentModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpoLaiAE/reproducible/exampleNewModule</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in </span><span style="color: #BBBB00;">myParentModule.R</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in </span><span style="color: #BBBB00;">tests/</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in </span><span style="color: #BBBB00;">myParentModule.Rmd</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing </span><span style="color: #BBBB00;">citation.bib</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see </span><span style="color: #BBBB00;">LICENSE.md</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myParentModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmpc4Z3Nd/reproducible/exampleNewModule</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in</span> <span style="color: #BBBB00;">myParentModule.R</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in</span> <span style="color: #BBBB00;">tests/</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in</span> <span style="color: #BBBB00;">myParentModule.Rmd</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing</span> <span style="color: #BBBB00;">citation.bib</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see</span> <span style="color: #BBBB00;">LICENSE.md</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmpc4Z3Nd/reproducible/exampleNewModule/myParentModule/myParentModule.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmpc4Z3Nd/reproducible/exampleNewModule/myParentModule/myParentModule.Rmd</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">tmpdir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>

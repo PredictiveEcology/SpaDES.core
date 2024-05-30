@@ -3,8 +3,7 @@
 the plots will occur.
 Specifically, the two common formats would be to &quot;screen&quot; or to disk as an image file,
 such as &quot;png&quot;.
-THIS CURRENTLY HAS BEEN TESTED WITH ggplot2, RasterLayer, and
-tmap objects.
+This has currently been tested with ggplot2, RasterLayer, and tmap objects.
 The default (or change with e.g., fn = &quot;print&quot;, usePlot = FALSE) uses
 Plot internally, so individual plots may be rearranged. When saved to
 disk (e.g., via type = 'png'), then Plot will not be used and the single object
@@ -36,7 +35,7 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -94,8 +93,7 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
 the plots will occur.
 Specifically, the two common formats would be to <code>"screen"</code> or to disk as an image file,
 such as <code>"png"</code>.
-<em>THIS CURRENTLY HAS BEEN TESTED WITH <code>ggplot2</code>, <code>RasterLayer</code>, and
-<code>tmap</code> objects.</em>
+<em>This has currently been tested with <code>ggplot2</code>, <code>RasterLayer</code>, and <code>tmap</code> objects.</em>
 The default (or change with e.g., <code>fn = "print", usePlot = FALSE</code>) uses
 <code>Plot</code> internally, so individual plots may be rearranged. When saved to
 disk (e.g., via <code>type = 'png'</code>), then <code>Plot</code> will not be used and the single object
@@ -200,10 +198,9 @@ the data argument</p></li>
 </ul></div>
     <div id="note">
     <h2>Note</h2>
-    <p>THIS IS STILL EXPERIMENTAL and could change in the next release.</p>
-<p><code>Plots</code> now has experimental support for "just a <code>Plot</code> call",
-but with <code>types</code> specified.
-See example.
+    <p><strong>This is still experimental and could change in the next release.</strong></p>
+<p><code>Plots</code> now has experimental support for "just a <code>Plot</code> call", but with <code>types</code> specified.
+See examples.
 The devices to save on disk will have some different behaviours to the screen representation,
 since "wiping" an individual plot on a device doesn't exist for a file device.</p>
 <p>This offers up to 4 different actions for a given plot:</p><ul><li><p>To screen device</p></li>
@@ -276,30 +273,30 @@ the file(s) that is/are saved will be appended to the <code>outputs</code> slot 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: ggplot2</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpoLaiAE/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpoLaiAE/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpoLaiAE/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpoLaiAE/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpoLaiAE/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpc4Z3Nd/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpc4Z3Nd/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpc4Z3Nd/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpc4Z3Nd/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpc4Z3Nd/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Apr25 18:00:45 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.03089046 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May30 20:02:38 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.04681087 secs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpoLaiAE/file269f3bcfa318.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpc4Z3Nd/file919b7581b1be.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpoLaiAE/file269f75e47eb6.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpc4Z3Nd/file919b1d847a90.png</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Error in pgmatrix(grobToPlot, col, real, size, minv, maxv, legend, legendText,  : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   object 'nrowLegText' not found</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Error in pgmatrix(grobToPlot, col, real, size, minv, maxv, legend, legendText,  : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   object 'nrowLegText' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpoLaiAE/file269f7d0c2599.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpc4Z3Nd/file919b5951fc21.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: ggplotify</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: lattice</span>
 <span class="r-plt img"><img src="Plots-1.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/RtmpoLaiAE/file269f43ea8bac.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpc4Z3Nd/file919b778710e3.png</span>
 <span class="r-plt img"><img src="Plots-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="co"># } # end of dontrun</span></span></span>
 </code></pre></div>

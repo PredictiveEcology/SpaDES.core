@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -81,19 +81,13 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">open</span>, <span class="va">type</span>, <span class="va">children</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,character,logical,character,character</span></span>
-<span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">open</span>, <span class="va">type</span>, <span class="va">children</span><span class="op">)</span></span>
+<span><span class="co"># S4 method for character,character</span></span>
+<span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,missing,logical,ANY,ANY</span></span>
-<span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span>, <span class="va">open</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for character,character,missing,ANY,ANY</span></span>
-<span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># S4 method for character,missing,missing,ANY,ANY</span></span>
-<span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># S4 method for character,missing</span></span>
+<span><span class="fu">newModuleDocumentation</span><span class="op">(</span><span class="va">name</span>, <span class="va">path</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -107,26 +101,30 @@
 The default is the current working directory.</p></dd>
 
 
-<dt>open</dt>
+<dt>...</dt>
+<dd><p>Additional arguments. Currently, these can be either named
+function definitions (which will be added to the <code>simList</code>) or one or
+more of the following:<br><br></p><dl><dt><code>children</code></dt>
+<dd><p>Required when <code>type = "parent"</code>. A character vector
+specifying the names of child modules.</p></dd>
+
+<dt><code>open</code></dt>
 <dd><p>Logical. Should the new module file be opened after creation?
-Default <code>TRUE</code> in an interactive session.</p></dd>
+Default <code>TRUE</code>.</p></dd>
 
-
-<dt>type</dt>
+<dt><code>type</code></dt>
 <dd><p>Character string specifying one of <code>"child"</code> (default),
 or <code>"parent"</code>.</p></dd>
 
 
-<dt>children</dt>
-<dd><p>Required when <code>type = "parent"</code>. A character vector
-specifying the names of child modules.</p></dd>
+</dl></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     
 
-<p>Nothing is returned. Invoked for its side effect of creating new module code files.</p>
+<p>NULL (invisibly). Invoked for its side effect of creating new module code files.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>

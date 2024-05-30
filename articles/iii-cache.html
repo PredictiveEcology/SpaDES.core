@@ -39,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.0.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
       </span>
     </div>
 
@@ -100,7 +100,7 @@
                         <h4 data-toc-skip class="author">Eliot J. B.
 McIntire</h4>
             
-            <h4 data-toc-skip class="date">April 25 2024</h4>
+            <h4 data-toc-skip class="date">May 30 2024</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/vignettes/iii-cache.Rmd" class="external-link"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -180,47 +180,53 @@ call.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">outSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span>, notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Loading required package: RColorBrewer</span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:10 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:10 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.21 secs | 0 checkpoint init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:10 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.21 secs | 0 save init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:10 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.21 secs | 0 progress init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:10 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.22 secs | 0 load init 0</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:10 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.22 secs | 0 randomLandscapes init 1</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            landscape</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.8 secs | 0 fireSpread init 1</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            testStats</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 1.8 secs | 1 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 1.9 secs | 1 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 1.9 secs | 2 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 2 secs | 2 fireSpread stats 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 2 secs | 3 fireSpread burn 5</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 2 secs | 3 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:57 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:57 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.23 secs | 0 checkpoint init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:57 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.23 secs | 0 save init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:57 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.23 secs | 0 progress init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:57 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.23 secs | 0 load init 0</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:57 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.24 secs | 0 randomLandscapes init 1</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:03:59 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  landscape</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 1.9 secs | 0 fireSpread init 1</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  testStats</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 1.9 secs | 1 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 2 secs | 1 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 2 secs | 2 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 2.1 secs | 2 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 2.1 secs | 3 fireSpread burn 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 2.1 secs | 3 fireSpread stats 5</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:03:59 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
-<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span></span>
 <span><span class="co">## <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">Saving large object (fn: spades, cacheId: 16831f12a867a5ab) to Cache: 92.6 Mb</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Saving large object (fn: </span><span style="color: #BB0000;">spades</span><span style="color: #0000BB;">, cacheId:</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">  ac0a5289e5ad6e29) to Cache: 101.8 Mb</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #0000BB;"> Done!</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Saved! Cache file: ac0a5289e5ad6e29.rds; fn: </span><span style="color: #BB0000;">spades</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   4.501   0.152   4.664</span></span></code></pre>
+<span><span class="co">##   6.382   0.292   6.709</span></span></code></pre>
 <p>Note that if there were any visualizations (here we turned them off
 with <code>.plotInitialTime = NA</code> above) they will happen the
 first time through, but not the cached times.</p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster 2nd time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">outSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">  ...(Object to retrieve (fn: spades, 16831f12a867a5ab.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">     loaded cached result from previous spades call</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Object to retrieve (fn: </span><span style="color: #BB0000;">spades</span><span style="color: #0000BB;">, ac0a5289e5ad6e29.rds) ... </span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Loaded! Cached result from previous spades call</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">from  module</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.437   0.000   0.439</span></span></code></pre>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">outSim</span>, <span class="va">outSimCached</span><span class="op">)</span> </span></code></pre></div>
+<span><span class="co">##   1.245   0.008   1.256</span></span></code></pre>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">outSim</span>, <span class="va">outSimCached</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##  [1] "Names: 3 string mismatches"                                       </span></span>
 <span><span class="co">##  [2] "Length mismatch: comparison on first 4 components"                </span></span>
 <span><span class="co">##  [3] "Component 2: Modes: numeric, NULL"                                </span></span>
@@ -230,7 +236,7 @@ first time through, but not the cached times.</p>
 <span><span class="co">##  [7] "Component 4: Modes: S4, numeric"                                  </span></span>
 <span><span class="co">##  [8] "Component 4: Lengths: 1, 3"                                       </span></span>
 <span><span class="co">##  [9] "Component 4: Attributes: &lt; Modes: list, NULL &gt;"                   </span></span>
-<span><span class="co">## [10] "Component 4: Attributes: &lt; Lengths: 4, 0 &gt;"                       </span></span>
+<span><span class="co">## [10] "Component 4: Attributes: &lt; Lengths: 5, 0 &gt;"                       </span></span>
 <span><span class="co">## [11] "Component 4: Attributes: &lt; names for target but not for current &gt;"</span></span>
 <span><span class="co">## [12] "Component 4: Attributes: &lt; current is not list-like &gt;"</span></span></code></pre>
 </div>
@@ -253,79 +259,94 @@ call to spades will result in identical outputs from the
 only one random landscape is needed simply for trying something out, or
 putting into production code (<em>e.g.</em>, publication, decision
 support, etc.).</p>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Module-level</span></span>
 <span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.useCache</span> <span class="op">&lt;-</span> <span class="cn">TRUE</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Apr25 18:02:16 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:16 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:16 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:16 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:16 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:16 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:16 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:17 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saving large object (fn: doEvent.randomLandscapes, cacheId: 0bd85a65c211b611) to Cache: 92.5 Mb</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;"> Done!</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            landscape</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            testStats</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:18 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:06 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:06 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:06 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:06 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:06 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:06 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:06 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:08 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saving large object (fn: </span><span style="color: #BB0000;">doEvent.randomLandscapes</span><span style="color: #0000BB;">,</span></span></span>
+<span><span class="co">## May30 20:04:08 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  cacheId: 7a1e1fac75a91549) to Cache: 101.7 Mb</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;"> Done!</span></span></span>
+<span><span class="co">## </span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saved! Cache file: 7a1e1fac75a91549.rds; fn:</span></span></span>
+<span><span class="co">## May30 20:04:10 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  </span><span style="color: #BB0000;">doEvent.randomLandscapes</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:10 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  landscape</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  testStats</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:10 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
-<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span></span>
 <span><span class="co">## <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   2.503   0.044   2.556</span></span></code></pre>
-<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
+<span><span class="co">##   3.968   0.152   4.140</span></span></code></pre>
+<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Apr25 18:02:19 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  ...(Object to retrieve (fn: doEvent.randomLandscapes, 0bd85a65c211b611.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module</span></span></span>
-<span><span class="co">## Apr25 18:02:19 rndmLn:<span style="color: #00BB00;">init</span>         <span style="color: #0000BB;">(and added a memoised copy)</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            landscape</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            testStats</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:19 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:11 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Object to retrieve (fn: </span><span style="color: #BB0000;">doEvent.randomLandscapes</span><span style="color: #0000BB;">,</span></span></span>
+<span><span class="co">## May30 20:04:11 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  7a1e1fac75a91549.rds) ...</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Loaded! Cached result from previous doEvent.randomLandscapes call</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">for init event in randomLandscapes module</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">randomLandscapes</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  landscape</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  testStats</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
-<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span></span>
 <span><span class="co">## <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.606   0.000   0.607</span></span></code></pre>
+<span><span class="co">##   1.079   0.024   1.108</span></span></code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are
 identical, not <code>fireSpread</code>.</p>
-<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb93"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">layers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"DEM"</span>, <span class="st">"forestAge"</span>, <span class="st">"habitatQuality"</span>, <span class="st">"percentPine"</span>, <span class="st">"Fires"</span><span class="op">)</span></span>
-<span><span class="va">same</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">layers</span>, <span class="kw">function</span><span class="op">(</span><span class="va">l</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">randomSim</span><span class="op">$</span><span class="va">landscape</span><span class="op">[[</span><span class="va">l</span><span class="op">]</span><span class="op">]</span>, <span class="va">randomSimCached</span><span class="op">$</span><span class="va">landscape</span><span class="op">[[</span><span class="va">l</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">same</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">layers</span>, <span class="kw">function</span><span class="op">(</span><span class="va">l</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">randomSim</span><span class="op">$</span><span class="va">landscape</span><span class="op">[[</span><span class="va">l</span><span class="op">]</span><span class="op">]</span>, <span class="va">randomSimCached</span><span class="op">$</span><span class="va">landscape</span><span class="op">[[</span><span class="va">l</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="op">}</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">same</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">layers</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">same</span><span class="op">)</span> <span class="co"># Fires is not same because all non-init events in fireSpread are not cached</span></span></code></pre></div>
 <pre><code><span><span class="co">## $DEM</span></span>
@@ -363,76 +384,95 @@ useful for events that have no stochasticity, such as data-preparation
 events, GIS events etc. Here, we don’t change the module-level caching
 for <code>randomLandscapes</code>, but we add to it a cache for only the
 “init” event for <code>fireSpread</code>.</p>
-<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb95"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">fireSpread</span><span class="op">$</span><span class="va">.useCache</span> <span class="op">&lt;-</span> <span class="st">"init"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>,</span>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Apr25 18:02:20 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:20 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:20 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:20 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:20 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:20 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:20 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:21 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saving large object (fn: doEvent.randomLandscapes, cacheId: 0bd85a65c211b611) to Cache: 92.5 Mb</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;"> Done!</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            landscape</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:24 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saving large object (fn: doEvent.fireSpread, cacheId: cf191a0937e4496e) to Cache: 92.6 Mb</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;"> Done!</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            testStats</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:12 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:14 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saving large object (fn: </span><span style="color: #BB0000;">doEvent.randomLandscapes</span><span style="color: #0000BB;">,</span></span></span>
+<span><span class="co">## May30 20:04:14 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  cacheId: 7a1e1fac75a91549) to Cache: 101.7 Mb</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;"> Done!</span></span></span>
+<span><span class="co">## </span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:16 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saved! Cache file: 7a1e1fac75a91549.rds; fn:</span></span></span>
+<span><span class="co">## May30 20:04:16 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  </span><span style="color: #BB0000;">doEvent.randomLandscapes</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:16 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:16 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:16 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  landscape</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:16 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:18 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saving large object (fn: </span><span style="color: #BB0000;">doEvent.fireSpread</span><span style="color: #0000BB;">, cacheId:</span></span></span>
+<span><span class="co">## May30 20:04:18 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  5e21ed868d5c7d6b) to Cache: 101.8 Mb</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;"> Done!</span></span></span>
+<span><span class="co">## </span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Saved! Cache file: 5e21ed868d5c7d6b.rds; fn:</span></span></span>
+<span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  </span><span style="color: #BB0000;">doEvent.fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  testStats</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:20 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
-<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span></span>
 <span><span class="co">## <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   4.640   0.096   4.756</span></span></code></pre>
-<div class="sourceCode" id="cb112"><pre class="downlit sourceCode r">
+<span><span class="co">##   7.875   0.100   7.982</span></span></code></pre>
+<div class="sourceCode" id="cb125"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## Apr25 18:02:25 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:25 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  ...(Object to retrieve (fn: doEvent.randomLandscapes, 0bd85a65c211b611.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">     loaded cached copy of randomLandscapes module</span></span></span>
-<span><span class="co">## Apr25 18:02:26 rndmLn:<span style="color: #00BB00;">init</span>         <span style="color: #0000BB;">(and added a memoised copy)</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            landscape</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  ...(Object to retrieve (fn: doEvent.fireSpread, cf191a0937e4496e.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">     loaded cached copy of init event in fireSpread module.  </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">                 &lt;char&gt;</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:            testStats</span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
-<pre><code><span><span class="co">## Apr25 18:02:26 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">eventTime moduleName eventType eventPriority</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         checkpoint init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         save       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         progress   init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         load       init      0            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         randomLandscapes init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:21 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Object to retrieve (fn: </span><span style="color: #BB0000;">doEvent.randomLandscapes</span><span style="color: #0000BB;">,</span></span></span>
+<span><span class="co">## May30 20:04:21 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  7a1e1fac75a91549.rds) ...</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Loaded! Cached result from previous doEvent.randomLandscapes call</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">for init event in randomLandscapes module</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">randomLandscapes</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:22 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  landscape</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">0         fireSpread       init      1            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Object to retrieve (fn: </span><span style="color: #BB0000;">doEvent.fireSpread</span><span style="color: #0000BB;">,</span></span></span>
+<span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">  5e21ed868d5c7d6b.rds) ...</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">Loaded! Cached result from previous doEvent.fireSpread call</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #0000BB;">for init event in fireSpread module</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span></span>
+<span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:  testStats</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:22 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">1         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">1         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">2         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">2         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">3         fireSpread       burn      5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">3         fireSpread       stats     5            </span></span></span></code></pre>
+<pre><code><span><span class="co">## May30 20:04:23 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span></span></code></pre>
 <pre><code><span><span class="co">## <span style="color: #BB00BB;">simList saved in</span></span></span>
-<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::.pkgEnv$.sim</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span></span>
 <span><span class="co">## <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   1.000   0.004   1.009</span></span></code></pre>
+<span><span class="co">##   1.947   0.016   1.969</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="function-level-caching">Function-level caching<a class="anchor" aria-label="anchor" href="#function-level-caching"></a>
@@ -442,7 +482,7 @@ for <code>randomLandscapes</code>, but we add to it a cache for only the
 <p>This will be a slight change to a function call, such as:
 <code>projectRaster(raster, crs = crs(newRaster))</code> to
 <code>Cache(projectRaster, raster, crs = crs(newRaster))</code>.</p>
-<div class="sourceCode" id="cb139"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb157"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ras</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1e3</span>, <span class="fl">0</span>, <span class="fl">1e3</span><span class="op">)</span>, res <span class="op">=</span> <span class="fl">1</span>, vals <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="fu">SpaDES.tools</span><span class="fu">::</span><span class="fu"><a href="https://spades-tools.predictiveecology.org/reference/neutralLandscapeMap.html" class="external-link">neutralLandscapeMap</a></span><span class="op">(</span><span class="va">ras</span><span class="op">)</span>,</span>
@@ -452,21 +492,30 @@ for <code>randomLandscapes</code>, but we add to it a cache for only the
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## Warning: In (SpaDES.tools::neutralLandscapeMap(ras))(): nlm_mpd changes the</span></span>
 <span><span class="co">## dimensions of the RasterLayer if even ncols/nrows are choosen.</span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Saving large object (fn:</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">  </span><span style="color: #BB0000;">SpaDES.tools::neutralLandscapeMap</span><span style="color: #0000BB;">, cacheId:</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">  94d035af43fc613d) to Cache: 17.1 Mb</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;"> Done!</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Saved! Cache file: 94d035af43fc613d.rds; fn:</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">  </span><span style="color: #BB0000;">SpaDES.tools::neutralLandscapeMap</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.576   0.027   0.610</span></span></code></pre>
-<div class="sourceCode" id="cb142"><pre class="downlit sourceCode r">
+<span><span class="co">##   1.995   0.031   2.032</span></span></code></pre>
+<div class="sourceCode" id="cb163"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">mapCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="fu">SpaDES.tools</span><span class="fu">::</span><span class="fu"><a href="https://spades-tools.predictiveecology.org/reference/neutralLandscapeMap.html" class="external-link">neutralLandscapeMap</a></span><span class="op">(</span><span class="va">ras</span><span class="op">)</span>,</span>
 <span>                     cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>,</span>
 <span>                     userTags <span class="op">=</span> <span class="st">"neutralLandscapeMap"</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">  ...(Object to retrieve (fn: SpaDES.tools::neutralLandscapeMap, 94d035af43fc613d.rds))</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">     loaded cached result from previous SpaDES.tools::neutralLandscapeMap call</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Object to retrieve (fn: </span><span style="color: #BB0000;">SpaDES.tools::neutralLandscapeMap</span><span style="color: #0000BB;">,</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">  94d035af43fc613d.rds) ...</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Loaded! Cached result from previous</span></span></span>
+<span><span class="co">## <span style="color: #0000BB;">  SpaDES.tools::neutralLandscapeMap call</span></span></span></code></pre>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.081   0.004   0.087</span></span></code></pre>
-<div class="sourceCode" id="cb146"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">map</span><span class="op">[</span><span class="op">]</span>, <span class="va">mapCached</span><span class="op">[</span><span class="op">]</span><span class="op">)</span> <span class="co"># note --&gt; can't use all.equal on SpatRaster -- they are pointers </span></span></code></pre></div>
+<span><span class="co">##   0.544   0.000   0.546</span></span></code></pre>
+<div class="sourceCode" id="cb167"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()</span></span>
+<span><span class="fu"><a href="https://rspatial.github.io/terra/reference/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">map</span><span class="op">[</span><span class="op">]</span>, <span class="va">mapCached</span><span class="op">[</span><span class="op">]</span><span class="op">)</span> </span></code></pre></div>
 <pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
@@ -481,16 +530,16 @@ several helpers in the <code>reproducible</code> package, including
 <code>saveToCache</code> that may be useful. Also, one can access cached
 items manually (rather than simply rerunning the same <code>Cache</code>
 function again).</p>
-<div class="sourceCode" id="cb148"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb169"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cacheDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/viewCache.html" class="external-link">showCache</a></span><span class="op">(</span><span class="va">mySim</span>, userTags <span class="op">=</span> <span class="st">"neutralLandscapeMap"</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #0000BB;">Cache size: </span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">  Total (including Rasters): 1.9 Mb</span></span></span></code></pre>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">  Selected objects (not including Rasters): 1.9 Mb</span></span></span></code></pre>
-<div class="sourceCode" id="cb152"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## <span style="color: #0000BB;">  Total (including Rasters): 4.3 Mb</span></span></span></code></pre>
+<pre><code><span><span class="co">## <span style="color: #0000BB;">  Selected objects (not including Rasters): 4.3 Mb</span></span></span></code></pre>
+<div class="sourceCode" id="cb173"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## get the RasterLayer that was produced with neutralLandscapeMap()</span></span>
 <span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/CacheHelpers.html" class="external-link">loadFromCache</a></span><span class="op">(</span>cacheId <span class="op">=</span> <span class="va">cacheDB</span><span class="op">$</span><span class="va">cacheId</span>, cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## <span style="color: #0000BB;">     loaded cached result from previous  call</span></span></span></code></pre>
-<div class="sourceCode" id="cb154"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">## <span style="color: #0000BB;">Loaded! Cached result from previous  call</span></span></span></code></pre>
+<div class="sourceCode" id="cb175"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/clearPlot.html" class="external-link">clearPlot</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">Plot</a></span><span class="op">(</span><span class="va">map</span><span class="op">)</span></span></code></pre></div>
 <p><img src="iii-cache_files/figure-html/manual-cache-1.png" width="700"></p>
@@ -514,9 +563,9 @@ accommodated by caching.</p>
 <li>To run this would have a nested structure with the following
 functions:</li>
 </ul>
-<div class="sourceCode" id="cb156"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb156-1"><a href="#cb156-1" tabindex="-1"></a><span class="fu">simInit</span>() <span class="sc">-</span><span class="ot">-&gt;</span> many .inputObjects calls</span>
-<span id="cb156-2"><a href="#cb156-2" tabindex="-1"></a></span>
-<span id="cb156-3"><a href="#cb156-3" tabindex="-1"></a><span class="fu">spades</span>() call <span class="sc">-</span><span class="ot">-&gt;</span> many module calls <span class="sc">-</span><span class="ot">-&gt;</span> many event calls <span class="sc">-</span><span class="ot">-&gt;</span> many <span class="cf">function</span> calls</span></code></pre></div>
+<div class="sourceCode" id="cb177"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb177-1"><a href="#cb177-1" tabindex="-1"></a><span class="fu">simInit</span>() <span class="sc">-</span><span class="ot">-&gt;</span> many .inputObjects calls</span>
+<span id="cb177-2"><a href="#cb177-2" tabindex="-1"></a></span>
+<span id="cb177-3"><a href="#cb177-3" tabindex="-1"></a><span class="fu">spades</span>() call <span class="sc">-</span><span class="ot">-&gt;</span> many module calls <span class="sc">-</span><span class="ot">-&gt;</span> many event calls <span class="sc">-</span><span class="ot">-&gt;</span> many <span class="cf">function</span> calls</span></code></pre></div>
 <p>Lets say we start to introduce caching to this structure. We start
 from the “inner” most functions that we could imaging Caching would be
 useful. Lets say there are some GIS operations, like
@@ -552,7 +601,7 @@ during the <code>simInit</code></p>
 <p>Some modules are inherently non-random, such as GIS modules, or
 parameter fitting statistical modules. We expect these to be identical
 results each time, so we can safely cache the entire module.</p>
-<div class="sourceCode" id="cb157"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb178"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  FireModule <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>.useCache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
