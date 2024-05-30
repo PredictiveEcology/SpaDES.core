@@ -325,7 +325,7 @@ test_that("test .robustDigest for simLists", {
 
   # make change to .inputObjects code -- should rerun .inputObjects
   xxx <- readLines(fileName)
-  startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
+  startOfFunctionLine <- grep(xxx, pattern = "^[.]inputObjects")
   editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
   editBelowLine <- editBelowLines[editBelowLines > startOfFunctionLine]
   xxx[editBelowLine + 1] <- newCode
@@ -336,7 +336,7 @@ test_that("test .robustDigest for simLists", {
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
   xxx <- readLines(fileName)
-  startOfFunctionLine <- grep(xxx, pattern = "^.inputObjects")
+  startOfFunctionLine <- grep(xxx, pattern = "^[.]inputObjects")
   editBelowLines <- grep(xxx, pattern = "EDIT BELOW")
   editBelowLine <- editBelowLines[editBelowLines < startOfFunctionLine][1]
   xxx[editBelowLine + 1] <- newCode
