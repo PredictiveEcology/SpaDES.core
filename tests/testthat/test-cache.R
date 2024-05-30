@@ -312,9 +312,10 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   mess1 <- capture_messages(do.call(simInit, args))
   msgGrep11 <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
-                     "Setting", "Paths", "using dataPath",
-                     "Using setDTthreads with user supplied tags.",
-                     "There is no similar item in the cachePath", "Saving", "Done", "Elpsed time for", sep = "|")
+                     "Setting", "Paths", "using dataPath", "Using setDTthreads",
+                     "with user supplied tags",
+                     "There is no similar item in the cachePath",
+                     "Saving", "Done", "Elpsed time for", sep = "|")
   expect_true(all(grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
