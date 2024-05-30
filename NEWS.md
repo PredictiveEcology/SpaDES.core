@@ -1,3 +1,20 @@
+# SpaDES.core 2.1.0
+
+* fix issue with event queue `colnames` in `completed<-` and `all.equal.simList` (#272);
+* fixed issue saving `simList` objects when multiple paths were used (e.g., `length(modulePath) > 1`);
+* events can be defined directly in calls to `newModule()`;
+* checkpoints are assumed to be used locally, and no longer invoke simulation file archiving and re-extraction of files (i.e., uses `saveSimList(..., inputs = FALSE, outputs = FALSE, cache = FALSE, files = FALSE)`);
+* improved recovery of interrupted simulations via `savedSimEnv()$.sim` -- `savedSimEnv()` is now exported for easier discovery -- an internal package environment is used, unless the user specifies `options(reproducible.memoisePersist = TRUE)`, which will use the global environment to store the `.sim` object;
+* switch from `crayon` (superseded) to `cli` for message colours;
+
+## Dependency changes
+
+* require `reproducible` v2.1.0 or higher;
+
+## Breaking changes
+
+* due to upstream changes in `reproducible`, `loadSimList()` is incompatible with `simList` objects saved with earlier versions of `SpaDES.core`.
+
 # SpaDES.core 2.0.5
 
 * fix a failing test on R-devel and latest R-release (#275)
@@ -15,7 +32,7 @@
 * re-Caching of a `simList` no longer triggers on changes to `.useCache` parameter, when it doesn't pertain to the event or module in question.
 * many historical modules used `bind_rows` from `dplyr` within `expectsInput` or `createsOutput`. Now, if a module uses `bind_rows` and doesn't have `dplyr` installed, `SpaDES.core` will intercept and use `SpaDES.core::bindrows`.
 * `saveSimList()` better handles relative paths and symbolic links (#263)
-* `saveSimList()` does an improved job at handling file-backed objects (previously, tests were passing because object was still there; now object is deleted, simList reloaded, and file-backed objects put back into place)
+* `saveSimList()` does an improved job at handling file-backed objects (previously, tests were passing because object was still there; now object is deleted, `simList` reloaded, and file-backed objects put back into place)
 * deal with upstream `reproducible` changes to `.wrap` 
 * deal with upstream `reproducible` changes to `Cache` messaging, specifically, remove cases where `function` was a `userTag` for an outer function call. Now these will display as `otherFunction`, so that individual functions can be more easily isolated.
 * overhaul of messaging during `simInit` and `spades` that allows for nested calls to `simInit` and/or `spades`
@@ -83,7 +100,7 @@
 ## Bug Fixes
 * several minor, e.g., `Plots` when not specifying `fn`, but `usePlot = FALSE`
 * many examples that were protected behind `\dontrun` or `\donttest` were stale; these have been updated
-* `saveFiles` bugfix: multiple objects names can now be passed to `.saveOuputs` module parameters.
+* `saveFiles` bugfix: multiple objects names can now be passed to `.saveOutputs` module parameters.
 
 ## Deprecated, Defunct, and Removed Features
 * several previously-deprecated functions have been made defunct: `remoteFileSize()`, `updateList()`. These will be removed by mid-2023.
@@ -586,8 +603,8 @@ objects (this may have very little/no effect on `simList` objects)
 * `@importFrom` only used functions from `utils` due to name conflicts with `raster::stack` and `utils::stack`
 * new function `remoteFileSize` to check the size of remote files
 * new namespaced function `dataPath` will return `file.path(modulePath(sim), currentModule(sim), "data")`, which will return a different path, depending on which module it is placed inside.
-* add crayon to imports -- now messages are more colour coded
-* bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same `simList` object
+* add `crayon` to Imports -- now messages are more colour-coded;
+* bug fix in 'inputs' for the case of loading objects from the global environment, either from the same object to the same object, or from different global objects overwriting on the same `simList` object;
 
 
 # SpaDES.core 0.1.0

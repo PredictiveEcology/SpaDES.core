@@ -2,21 +2,15 @@
 % Please edit documentation in R/module-template.R
 \name{newModuleDocumentation}
 \alias{newModuleDocumentation}
-\alias{newModuleDocumentation,character,character,logical,character,character-method}
-\alias{newModuleDocumentation,character,missing,logical,ANY,ANY-method}
-\alias{newModuleDocumentation,character,character,missing,ANY,ANY-method}
-\alias{newModuleDocumentation,character,missing,missing,ANY,ANY-method}
+\alias{newModuleDocumentation,character,character-method}
+\alias{newModuleDocumentation,character,missing-method}
 \title{Create new module documentation}
 \usage{
-newModuleDocumentation(name, path, open, type, children)
+newModuleDocumentation(name, path, ...)
 
-\S4method{newModuleDocumentation}{character,character,logical,character,character}(name, path, open, type, children)
+\S4method{newModuleDocumentation}{character,character}(name, path, ...)
 
-\S4method{newModuleDocumentation}{character,missing,logical,ANY,ANY}(name, open)
-
-\S4method{newModuleDocumentation}{character,character,missing,ANY,ANY}(name, path)
-
-\S4method{newModuleDocumentation}{character,missing,missing,ANY,ANY}(name)
+\S4method{newModuleDocumentation}{character,missing}(name, path, ...)
 }
 \arguments{
 \item{name}{Character string specifying the name of the new module.}
@@ -24,17 +18,20 @@ newModuleDocumentation(name, path, open, type, children)
 \item{path}{Character string. Subdirectory in which to place the new module code file.
 The default is the current working directory.}
 
-\item{open}{Logical. Should the new module file be opened after creation?
-Default \code{TRUE} in an interactive session.}
-
-\item{type}{Character string specifying one of \code{"child"} (default),
-or \code{"parent"}.}
-
-\item{children}{Required when \code{type = "parent"}. A character vector
+\item{...}{Additional arguments. Currently, these can be either named
+function definitions (which will be added to the \code{simList}) or one or
+more of the following:\cr\cr
+\describe{
+\item{\code{children}}{Required when \code{type = "parent"}. A character vector
 specifying the names of child modules.}
+\item{\code{open}}{Logical. Should the new module file be opened after creation?
+Default \code{TRUE}.}
+\item{\code{type}}{Character string specifying one of \code{"child"} (default),
+or \code{"parent"}.}
+}}
 }
 \value{
-Nothing is returned. Invoked for its side effect of creating new module code files.
+NULL (invisibly). Invoked for its side effect of creating new module code files.
 }
 \description{
 Create new module documentation

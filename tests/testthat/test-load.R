@@ -145,11 +145,11 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
       intervals = c(NA, 1, 2, NA),
       stringsAsFactors = FALSE
     )
-    if (length(args[[i]]))
-      inputs$args = args[[i]]
+    if (length(args[[i]])) {
+      inputs$args <- args[[i]]
+    }
 
     times <- list(start = 0, end = 1, timeunit = "seconds")
-
     sim2 <- simInit(times = times, params = parameters, modules = modules,
                     paths = paths, inputs = inputs)
     expect_true(c("DEM") %in% ls(sim2))
@@ -423,7 +423,7 @@ test_that("Filenames for simList", {
   functions <- cbind(c("raster", "extent", "stack", "nlayers"),
                      c("rast", "ext", "rast", "nlyr"))
   if (!requireNamespace("raster", quietly = TRUE)) {
-    functions <- functions[, 2,drop = FALSE]
+    functions <- functions[, 2, drop = FALSE]
     packages <- packages[2]
   }
   for (i in seq(packages)) {
@@ -452,7 +452,8 @@ test_that("Filenames for simList", {
     expect_true(identical(Fns[["r"]], normPath(Filenames(s$r))))
     expect_true(identical(Fns[["r2"]], normPath(Filenames(s$r2))))
     expect_true(identical(c(Fns[["s1"]], Fns[["s2"]]),
-                          sapply(seq_len(nlyr(s$s)), function(rInd)
-                            normPath(Filenames(s$s[[rInd]])))))
+                          sapply(seq_len(nlyr(s$s)), function(rInd) {
+                            normPath(Filenames(s$s[[rInd]]))
+                          })))
   }
 })

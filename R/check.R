@@ -126,8 +126,6 @@ setMethod(
   definition = function(sim, coreParams, ...) {
     params <- sim@params
     userModules <- modules(sim) # already removes core modules
-    # modules <- sim@modules
-    # userModules <- modules[-which(coreModules %in% modules)]
     globalParams <- sim@params$.globals
     allFound <- TRUE
 
@@ -191,18 +189,19 @@ setMethod(
       globalsFound <- list()
       for (uM in userModules) {
         # read in and cleanup/isolate the global params in the module's .R file
-        moduleParams <- grep("globals\\(sim\\)\\$", readFile[[uM]], value = TRUE) %>%
-          strsplit(., " ") %>%
-          unlist(lapply(., function(x) x[nzchar(x, keepNA = TRUE)])) %>%
-          grep("globals\\(sim\\)\\$", ., value = TRUE) %>%
-          gsub(",", "", .) %>%
-          gsub("\\)\\)", "", .) %>%
-          gsub("^.*\\(globals\\(sim\\)", "\\globals\\(sim\\)", .) %>%
-          gsub("^globals\\(sim\\)", "", .) %>%
-          gsub("\\)\\$.*", "", .) %>%
-          unique(.) %>%
-          sort(.) %>%
-          gsub("\\$", "", .)
+        moduleParams <- grep("globals\\(sim\\)\\$", readFile[[uM]], value = TRUE) |>
+          strsplit(" ") |>
+          lapply(function(x) x[nzchar(x, keepNA = TRUE)]) |>
+          unlist() |>
+          grep("globals\\(sim\\)\\$", x = _, value = TRUE) |>
+          gsub(",", "", x = _) |>
+          gsub("\\)\\)", "", x = _) |>
+          gsub("^.*\\(globals\\(sim\\)", "\\globals\\(sim\\)", x = _) |>
+          gsub("^globals\\(sim\\)", "", x = _) |>
+          gsub("\\)\\$.*", "", x = _) |>
+          unique() |>
+          sort() |>
+          gsub("\\$", "", x = _)
 
         if (length(moduleParams) > 0) {
           if (length(globalParams) > 0) {
@@ -217,13 +216,13 @@ setMethod(
 
         # read in and cleanup/isolate the user params in the module's .R file
         moduleParams <- grep(paste0("params\\(sim\\)\\$", uM, "\\$"), readFile[[uM]],
-                             value = TRUE) %>%
-          gsub(paste0("^.*params\\(sim\\)\\$", uM, "\\$"), "", .) %>%
-          gsub("[!\"#$%&\'()*+,/:;<=>?@[\\^`{|}~-].*$", "", .) %>%
-          gsub("]*", "", .) %>%
-          gsub(" *", "", .) %>%
-          unique(.) %>%
-          sort(.)
+                             value = TRUE) |>
+          gsub(paste0("^.*params\\(sim\\)\\$", uM, "\\$"), "", x = _) |>
+          gsub("[!\"#$%&\'()*+,/:;<=>?@[\\^`{|}~-].*$", "", x = _) |>
+          gsub("]*", "", x = _) |>
+          gsub(" *", "", x = _) |>
+          unique() |>
+          sort()
 
         if (length(moduleParams) > 0) {
           # which params does the user supply to simInit?
@@ -254,4 +253,4 @@ setMethod(
       allFound <- FALSE
     }
     return(invisible(allFound))
-  })
+})

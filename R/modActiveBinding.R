@@ -7,7 +7,6 @@ makeSimListActiveBindings <- function(sim) {
   })
 }
 
-
 makeModActiveBinding <- function(sim, mod) {
   if (.isPackage(fullModulePath = mod, sim = sim)) {
     env <- asNamespace(.moduleNameNoUnderscore(mod))
@@ -19,7 +18,6 @@ makeModActiveBinding <- function(sim, mod) {
                       fun = activeModBindingFunction,
                       env = env)
     }
-
 }
 
 #' @include helpers.R
@@ -34,7 +32,6 @@ makeParActiveBinding <- function(sim, mod) {
                       fun = activeParBindingFunction,
                       env = env)
     }
-
 }
 
 activeModBindingFunction <- function(value) {

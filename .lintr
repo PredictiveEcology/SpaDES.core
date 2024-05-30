@@ -1,3 +1,11 @@
-linters: linters_with_defaults(line_length_linter(100), object_name_linter("camelCase"), defaults = default_linters[-which(names(default_linters) == "object_usage_linter")])
-exclusions: list("R/module-template.R")
-
+linters: linters_with_defaults(
+    line_length_linter(100),
+    object_name_linter("camelCase"),
+    object_usage_linter = NULL,
+    return_linter = NULL
+  )
+exclusions: list(
+  "inst/examples",
+  "R/module-template.R",
+  "vignettes/iii-cache.Rmd" = 213:215
+  )

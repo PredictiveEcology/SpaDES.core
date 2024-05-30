@@ -76,7 +76,7 @@ This is currently not parsed by SpaDES;
 it is for human readers only.\cr
 \code{loadOrder} \tab Named list of length 0, 1, or 2, with names being \code{after} and \code{before}.
 Each element should be a character string/vector naming 1 or more
-modules that will be loaded \code{after} or \code{before} this module.
+modules that this module must be \code{after} or \code{before}.
 \code{after} and \code{before} are used from the current module's
 perspective. So, \code{list(after = c("Biomass_core"))} means that
 this module must come \emph{after} \code{"Biomass_core"}. This should only

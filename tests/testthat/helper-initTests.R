@@ -20,10 +20,9 @@ cleanMessage <- function(mm) {
 #   optsAsk in this environment,
 testInit <- function(libraries = character(), ask = FALSE, verbose,
                      debug = FALSE, tmpFileExt = "",
-                     opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE) {
+                     opts = NULL, needGoogleDriveAuth = FALSE, smcc = FALSE,
+                     pf = parent.frame()) {
   set.randomseed()
-
-  pf <- parent.frame()
 
   if (isTRUE(needGoogleDriveAuth))
     libraries <- c(libraries, "googledrive")
@@ -251,4 +250,8 @@ runTestsWithTimings <- function(pkgPath = ".",
   gg[, elapsed := round(elapsed, 2)]
   data.table::setorderv(gg, c("skipOnCRAN", "elapsed"), order = c(1L, -1L))
   gg[]
+}
+
+LoadedMgsCheck <- function(msg, event) {
+  sum(grepl(paste0("Loaded! Cached|for ", event," event"), msg)) == 2
 }

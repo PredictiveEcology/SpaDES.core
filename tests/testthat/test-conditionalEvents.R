@@ -9,10 +9,8 @@ test_that("simulation runs with simInit and spades", {
   sysFiles <- getSampleModules(tmpdir)
   modules <- list("randomLandscapes", "caribouMovement")
   files <- dir(sysFiles, recursive = TRUE, full.names = TRUE)
-  rootPth1 <- file.path(tmpdir, modules[[1]]) %>%
-    checkPath(., create = TRUE)
-  rootPth2 <- file.path(tmpCache, modules[[2]]) %>%
-    checkPath(., create = TRUE)
+  rootPth1 <- file.path(tmpdir, modules[[1]]) |> checkPath(create = TRUE)
+  rootPth2 <- file.path(tmpCache, modules[[2]]) |> checkPath(create = TRUE)
 
   file.copy(grep(modules[[1]], files, value = TRUE),
             file.path(rootPth1, paste0(modules[[1]], ".R")))
@@ -28,7 +26,7 @@ test_that("simulation runs with simInit and spades", {
   paths <- list(modulePath = c(tmpdir, tmpCache))
 
   newModule("test", tmpdir, open = FALSE)
-  cat(file = file.path(tmpdir, "test", "test.R"),'
+  cat(file = file.path(tmpdir, "test", "test.R"), '
       defineModule(sim, list(
       name = "test",
       description = "insert module description here",

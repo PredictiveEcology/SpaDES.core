@@ -429,7 +429,7 @@ cantCodeCheckMessage <- ": line could not be checked "
     hadPrevMessage <- .parseMessage(
       m, "module code",
       paste0("the following function(s) ", verb, " used that conflict(s)",
-             "\n  with base functions: ", crayon::bold(paste(hasConflicts, collapse = ", ")),
+             "\n  with base functions: ", cli::style_bold(paste(hasConflicts, collapse = ", ")),
              "\n  It is a good idea to be explicit about the package sources",
              ", e.g., ", paste(whichFnsWithPackage, collapse = ", "),
              " but only for the 'get' functions, not the 'set' function ","
@@ -544,7 +544,7 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @return returns `TRUE`; invoked for side effect of generating message with that starts with
 #' `paste0(m, ":", message)`.
 #'
-#' @importFrom crayon magenta
+#' @importFrom cli col_magenta
 #' @keywords internal
 #' @rdname parseMessage
 .parseMessage <- function(m, problem, message) {
@@ -560,7 +560,7 @@ cantCodeCheckMessage <- ": line could not be checked "
     ""
   }
 
-  message(crayon::magenta(
+  message(cli::col_magenta(
     paste0(m, sub, message)
   ))
   return(TRUE)

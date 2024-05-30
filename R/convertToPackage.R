@@ -1,7 +1,33 @@
 #' Convert standard module code into an R package
 #'
-#' *EXPERIMENTAL -- USE WITH CAUTION*. This function will only create the
-#' necessary source files so that all the code can be used (and installed) like an R package.
+#' *EXPERIMENTAL -- USE WITH CAUTION*. This function attempts to convert a
+#' SpaDES module to the closest rendition of the same functionality, but in an
+#' R package. The main change is that instead of `SpaDES.core` parsing the functions
+#' using custom parsing tools, it will use `pkgload::load_all` on the package functions.
+#' These
+#'
+#' `convertToPackage` will:
+#' \enumerate{
+#'   \item move any functions that were defined within the main module file
+#'   (`moduleName.R`) into the R folder, with the same name, but ending with `Fns.R`;
+#'   \item keep the `defineModule(...)` function call with all the metadata in
+#'         the same file, `moduleName.R`, but with all other content removed,
+#'         i.e., only the `defineModule(...)` will be here.
+#'   \item build documentation from all the \pkg{roxygen2} tags
+#'   \item places one \pkg{roxygen2} tag, `@export` in front of the `doEvent.moduleName`
+#'         function, so that the function can be found by `SpaDES.core`
+#'   \item All other functions will be kept "private", i.e., not exported, unless
+#'         the user manually adds `@export`, as per a normal package
+#'   \item will make a `DESCRIPTION` file from the SpaDES module metadata
+#'   \item will make a `NAMESPACE` file from the \pkg{roxygen2} tags (e.g., `@export`)
+#' }
+#'
+#' A user can continue to use the module code as before, i.e., by editing it and
+#' putting `browser()` etc. It will be parsed during `simInit`. Because the functions
+#' are "in a package", they are automatically namespaced with each other, so that
+#' when you want to use a function from that package, there is no need to put a
+#' prefix with the package name.
+#'
 #' This function does not install anything (e.g., `devtools::install`). After
 #' running this function, `simInit` will automatically detect that this is now
 #' a package and will load the functions (via `pkgload::load_all`) from the source files.
@@ -12,10 +38,7 @@
 #' In other words, this should cause no changes to running the module code via
 #' `simInit` and `spades`.
 #'
-#' This will move all functions that are not already in an `.R` file
-#' in the `R` folder into that folder, one function per file, including the
-#' `doEvent.xxx` function. It will not
-#' touch any other functions already in the `"R"` folder. It will also create
+#' This function will create
 #' and fill a minimal `DESCRIPTION` file. This will leave the `defineModule`
 #' function call as the only code in the main module file. This `defineModule`
 #' and a `doEvent.xxx` are the only 2 elements that are required for an R
@@ -34,6 +57,13 @@
 #' package from `.libPaths` and delete the `DESCRIPTION` file and
 #' `SpaDES.core` will treat it as a normal module.
 #'
+#' @section Reverting:
+#' Currently, this is not a reversible process. We recommend trying one module at
+#' a time, running your code. If all seems to work, then great. Commit the changes.
+#' If things don't seem to work, then revert the changes and continue on as before.
+#' Ideally, file a bug report on the `SpaDES.core` GitHub.com pages.
+#'
+#' Currently
 #' @return Invoked for its side effects. There will be a new or modified
 #' `DESCRIPTION` file in the root directory of the module. Any functions that
 #' were in the main module script (i.e., the .R file whose filename is the name of
@@ -107,6 +137,11 @@
 #'
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
                              buildDocuments = TRUE) {
+  stopifnot(
+    requireNamespace("pkgload", quietly = TRUE),
+    requireNamespace("roxygen2", quietly = TRUE)
+  )
+
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
   packageFolderName <- dirname(mainModuleFile)
   aa <- parse(mainModuleFile, keep.source = TRUE)
@@ -116,6 +151,12 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   defModule <- grepl("^defineModule", aa)
   whDefModule <- which(defModule)
   whNotDefModule <- which(!defModule)
+
+  doEvent <- grepl(paste0("^doEvent.", module), aa)
+  whDoEvent <- which(doEvent)
+  whNoDoEvent <- which(!doEvent & !defModule)
+
+  # file.copy(mainModuleFile, file.path(path, unlist(module), "R", paste0(unlist(module), ".R")))
 
   NAMESPACEFile <- filenameFromFunction(packageFolderName, "NAMESPACE", fileExt = "")
   hasNamespaceFile <- file.exists(NAMESPACEFile)
@@ -127,7 +168,7 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   linesWithRoxygen <- parseWithRoxygen[, "line1"]
   nextElement <- c(whNotDefModule[-1], Inf)
 
-  fileNames <- Map(element = whNotDefModule, nextElement = nextElement,
+  fileNames <- Map(element = whDefModule, nextElement = whNotDefModule[1],
                    function(element, nextElement) {
                      i <- 0
                      fn <- filePath <- fnCh <- parseWithFn <- lineWithFn <- list()
@@ -161,44 +202,13 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
                              lineWithFn[[2]] <- lineWithFn[[2]][whAfterLine1[1]]
                          }
                        }
-
                      }
-                     wh <- which((lineWithFn[[1]] - linesWithRoxygen) == 1) # is the roxygen next to function
-                     whPrev <- which((lineWithFn[[2]] - linesWithRoxygen) == 1) # is the roxygen next to function
-
-                     if (length(wh) || length(whPrev)) {
-                       iAll <- if (length(wh) > 0) c(1, if (length(whPrev) > 0)  2 else NULL) else 2
-                       for (i in rev(iAll)) {
-                         # This means there is a roxygen block for this function -- must keep it with the function code
-                         lastRoxygenLine <- lineWithFn[[i]] - 1 == linesWithRoxygen
-                         ff <- if (length(linesWithRoxygen) == 1) 0 else
-                           diff(linesWithRoxygen)
-                         ff[ff == 1] <- 0
-                         ff[ff > 0] <- 1
-                         ff <- cumsum(ff)
-                         ff <- c(0, ff)
-
-                         # This removes lines if they are put into a file. That means, if there are
-                         #   any left over at the end, we will put them into their own file
-                         roxygenLinesForThisFn <- linesWithRoxygen[ff == ff[lastRoxygenLine]]
-                         if (i == 1) {
-                           linesWithRoxygen <<- setdiff(linesWithRoxygen, roxygenLinesForThisFn)
-                           cat(rlaa[roxygenLinesForThisFn], file = filePath[[1]], sep = "\n", append = FALSE)
-                         } else {
-                           lineWithFn[[2]] <- min(roxygenLinesForThisFn) - 1
-                         }
-                       }
-
-                     }
-
-                     if (isTRUE(grepl("^doEvent", fn[[1]]))) {
-                       if (!any(grepl("@export", aa[[element]][[3]])))
-                         cat("#' @export", file = filePath[[1]], sep = "\n", append = TRUE)
-                     }
-
-                     cat(format(rlaa[lineWithFn[[1]]:(lineWithFn[[2]] - 1)]), file = filePath[[1]], sep = "\n", append = TRUE)
-                     # cat(format(aa[[element]]), file = filePath[[1]], sep = "\n", append = TRUE)
-                     return(filePath[[1]])
+                     fn <- filenameForMainFunctions(module, path)
+                     cat("#' @export", file = fn, sep = "\n", append = FALSE)
+                     cat(rlaa[lineWithFn[[2]]:length(rlaa)],
+                         file = fn, sep = "\n", append = TRUE)
+                     cat(rlaa[1:(lineWithFn[[2]] - 1)], file = mainModuleFile,
+                         sep = "\n", append = FALSE)
                    })
 
   otherStuffFn <- filenameFromFunction(packageFolderName, "other", "R")
@@ -222,7 +232,7 @@ makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
 
   filePathImportSpadesCore <- filenameFromFunction(packageFolderName, "imports", "R")# file.path(dirname(mainModuleFile), "R", "imports.R")
 
-  cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
+  # cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]
   d <- list()
   d$Package <- .moduleNameNoUnderscore(module)
@@ -296,7 +306,7 @@ makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
     pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
   }
 
-  RBuildIgnoreFile <- filenameFromFunction(packageFolderName, ".Rbuildignore", fileExt = "")
+  RBuildIgnoreFile <- filenameFromFunction(packageFolderName, "", fileExt = ".Rbuildignore")
   cat("^.*\\.Rproj$
 ^\\.Rproj\\.user$
 ^_pkgdown\\.yml$
@@ -323,9 +333,11 @@ vignettes/.*\\.log$
       file = RBuildIgnoreFile, fill = TRUE)
 
   return(invisible())
-
 }
 
 filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fileExt = ".R") {
   normPath(file.path(packageFolderName, subFolder, paste0(gsub("\\.", "", fn), fileExt)))
 }
+
+filenameForMainFunctions <- function(module, modulePath = ".")
+  normPath(file.path(modulePath, unlist(module), "R", paste0(unlist(basename(module)), "Fns.R")))

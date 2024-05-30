@@ -1,0 +1,5 @@
+ggplotFn <- function(data, ...) {
+  ggplot2::ggplot(data, ggplot2::aes(TheSample)) +
+    ggplot2::geom_histogram(...)
+}
+

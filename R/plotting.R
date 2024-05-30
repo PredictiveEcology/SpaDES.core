@@ -42,8 +42,8 @@ setMethod(
     plotables <- sapply(plotList, function(x)
       is(get(x, envir = sim@.xData), ".quickPlottables"))
     if (any(plotables)) {
-      plotObjects <- mget(plotList[plotables], sim@.xData) %>%
-        append(., list(env = sim@.xData))
+      plotObjects <- mget(plotList[plotables], sim@.xData) |>
+        append(list(env = sim@.xData))
       Plot(plotObjects)
     }
 })

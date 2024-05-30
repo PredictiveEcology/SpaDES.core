@@ -23,23 +23,23 @@ test_that(".emptyEventList tests", {
 test_that("modify search path", {
   testInit(smcc = FALSE)
 
-  pkgToAttach <- "crayon"
+  pkgToAttach <- "cli"
   spPre <- search()
   a <- .modifySearchPath(pkgs = pkgToAttach, skipNamespacing = FALSE)
   spPost <- search()
   expect_true(identical(grep(pkgToAttach, spPost), 2L))
-  detach("package:crayon")
+  detach("package:cli")
   spPost2 <- search()
   expect_false(identical(grep(pkgToAttach, spPost2), 2L))
 
   # use removeOthers
-  pkgToAttach <- c("crayon", "reproducible", "quickPlot")
+  pkgToAttach <- c("cli", "reproducible", "quickPlot")
   spPre <- search()
   a <- .modifySearchPath(pkgs = pkgToAttach, removeOthers = TRUE, skipNamespacing = FALSE)
   spPost <- search()
   expect_true(any(grep(pkgToAttach[1], spPost) == 2L))
   expect_true(identical(grep("digest", spPost), integer()))
-  detach("package:crayon")
+  detach("package:cli")
   spPost2 <- search()
   expect_false(any(grep(pkgToAttach[1], spPost2) == 2L))
 })

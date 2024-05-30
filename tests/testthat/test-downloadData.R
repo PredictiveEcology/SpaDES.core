@@ -11,7 +11,7 @@ test_that("downloadData downloads and unzips module data", {
   testInit(c("googledrive", "terra"), opts = opts)
 
   m <- "test"
-  datadir <- file.path(tmpdir, m, "data") %>% checkPath(create = TRUE)
+  datadir <- file.path(tmpdir, m, "data") |> checkPath(create = TRUE)
 
   filenames <- c("DEM.tif", "habitatQuality.tif")
   Rversion <- getRversion()
@@ -25,7 +25,7 @@ test_that("downloadData downloads and unzips module data", {
       .Names = c("file", "checksum"),
       class = "data.frame", row.names = c(NA, -2L)
     )
-    write.table(chksums[order(chksums$file),], file = file.path(datadir, "CHECKSUMS.txt"))
+    write.table(chksums[order(chksums$file), ], file = file.path(datadir, "CHECKSUMS.txt"))
 
     expectsInputs <- data.frame(
       objectName = c("DEM", "habitatQuality"),
@@ -64,7 +64,9 @@ test_that("downloadData downloads and unzips module data", {
     expect_true(all(file.exists(file.path(datadir, filenames))))
 
     # if files are there with correct names, but wrong content
-    library(raster); on.exit(detach("package:raster"), add = TRUE)
+    library(raster)
+    on.exit(detach("package:raster"), add = TRUE)
+
     ras <- raster(file.path(datadir, filenames[2]))
     ras[5] <- maxValue(ras) + 1
     suppressWarnings({
@@ -76,6 +78,5 @@ test_that("downloadData downloads and unzips module data", {
     })
     expect_true(all(dwnload$result %in% "OK"))
     expect_true(all(file.exists(file.path(datadir, filenames))))
-
   }
 })

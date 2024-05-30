@@ -65,8 +65,7 @@ This is a single function call that allows a user to change which format in whic
 the plots will occur.
 Specifically, the two common formats would be to \code{"screen"} or to disk as an image file,
 such as \code{"png"}.
-\emph{THIS CURRENTLY HAS BEEN TESTED WITH \code{ggplot2}, \code{RasterLayer}, and
-\code{tmap} objects.}
+\emph{This has currently been tested with \code{ggplot2}, \code{RasterLayer}, and \code{tmap} objects.}
 The default (or change with e.g., \verb{fn = "print", usePlot = FALSE}) uses
 \code{Plot} internally, so individual plots may be rearranged. When saved to
 disk (e.g., via \code{type = 'png'}), then \code{Plot} will not be used and the single object
@@ -89,11 +88,10 @@ the data argument
 }
 }
 \note{
-THIS IS STILL EXPERIMENTAL and could change in the next release.
+\strong{This is still experimental and could change in the next release.}
 
-\code{Plots} now has experimental support for "just a \code{Plot} call",
-but with \code{types} specified.
-See example.
+\code{Plots} now has experimental support for "just a \code{Plot} call", but with \code{types} specified.
+See examples.
 The devices to save on disk will have some different behaviours to the screen representation,
 since "wiping" an individual plot on a device doesn't exist for a file device.
 

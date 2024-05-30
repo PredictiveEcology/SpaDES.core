@@ -66,7 +66,7 @@
 #' @importFrom fs path_common
 #' @importFrom qs qsave
 #' @importFrom stats runif
-#' @importFrom reproducible makeRelative
+#' @importFrom reproducible makeRelative .wrap
 #' @importFrom Require messageVerbose
 #' @importFrom tools file_ext
 #' @importFrom utils modifyList
@@ -80,8 +80,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
   ## user can explicitly override archiving files if FALSE
   if (isFALSE(dots$files)) {
-    cache <- inputs <- outputs <- FALSE
-    files <- FALSE
+    files <- cache <- inputs <- outputs <- FALSE
   } else {
     files <- TRUE
   }
@@ -105,6 +104,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       dots$fileBackedDir <- NULL
     }
   }
+
   if (!is.null(dots$filebackend))
     if (is.null(dots$fileBackend)) {
       dots$fileBackend <- dots$filebackend
@@ -146,7 +146,6 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     empties <- nchar(fns) == 0
     if (any(empties)) {
       fns <- fns[!empties]
-      fnsInSubFolders <- grepl(checkPath(dirname(filename)), fns) ## TODO: not used?
     }
   }
 
@@ -276,7 +275,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @rdname loadSimList
 #' @seealso [saveSimList()], [zipSimList()]
 #' @importFrom qs qread
-#' @importFrom reproducible updateFilenameSlots linkOrCopy
+#' @importFrom reproducible linkOrCopy remapFilenames updateFilenameSlots .unwrap
 #' @importFrom tools file_ext
 loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
                         paths = NULL, otherFiles = "",
@@ -288,13 +287,15 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   if (grepl(archiveExts, tolower(tools::file_ext(filename)))) {
     td <- tempdir2(sub = .rndstr())
     filename <- archiveExtract(filename, exdir = td)
+    on.exit(unlink(td, recursive = TRUE), add = TRUE)
     filenameRel <- gsub(paste0(td, "/"), "", filename[-1])  ## TODO: WRONG!
 
-    # This will put the files to relative path of projectPath
+    ## This will put the files to relative path of projectPath
     newFns <- file.path(projectPath, filenameRel)
     linkOrCopy(filename[-1], newFns, verbose = verbose - 1)
   } else {
-    filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
+    # filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
+    filenameRel <- getRelative(filename, projectPath)
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
@@ -307,21 +308,33 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   } else {
     paths <- list()
   }
-  paths(tmpsim) <- modifyList2(paths(tmpsim), paths)
+
+  ## TODO: figure out what is inserting 'NA' into some paths during saveSimList
+  paths(tmpsim) <- paths(tmpsim) |>
+    # sapply(function(pth) {
+    #   if (fs::path_has_parent(pth, "NA")) {
+    #     gsub("NA/", "./", pth) |> fs::path_norm() |> as.character()
+    #   } else {
+    #     pth
+    #   }
+    # }, simplify = FALSE) |>
+    modifyList2(paths)
 
   paths(tmpsim) <- absolutizePaths(paths(tmpsim), projectPath, tempPath)
 
-  # need to remap all the file-backed objects --> their paths in the objects will point
-  #   to their old locations, but they are now at newFns, which is remapped to projectPath
+  ## remap all the file-backed objects. their paths in the objects will point
+  ## to their old locations, but they are now at newFns, which is remapped to projectPath
   oldFns <- Filenames(tmpsim, returnList = TRUE)
-  oldFns <- oldFns[lengths(oldFns) > 0]
+  oldFns <- oldFns[lengths(oldFns) > 0] ## TODO: need to deal with nested lists e.g. scfm objs
+
   for (nam in names(oldFns)) {
     tags <- attr(tmpsim[[nam]], "tags")
     if (!is.null(tags)) {
-      if (identical(projectPath, getwd()))
+      if (identical(projectPath, getwd())) {
         pths <- paths(tmpsim)
-      else
+      } else {
         pths <- list(projectPath = projectPath)
+      }
       newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
       tmpsim[[nam]][] <- newFiles$newName[]
@@ -330,19 +343,17 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 
-  # Work around for bug in qs that recovers data.tables as lists
+  ## Work around for bug in qs that recovers data.tables as lists
   tmpsim <- recoverDataTableFromQs(tmpsim)
 
-  mods <- setdiff(tmpsim@modules, .coreModules())
-
-  # Deal with all the RasterBacked Files that will be wrong
+  ## Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {
     .dealWithRasterBackends(tmpsim) # no need to assign to sim b/c uses list2env
   }
+  makeSimListActiveBindings(tmpsim)
 
   return(tmpsim)
 }
-
 
 #' `unzipSimList` will unzip a zipped `simList`
 #'
@@ -382,6 +393,7 @@ checkArchiveAlternative <- function(filename) {
 
 archiveExts <- "(tar$|tar\\.gz$|zip$|gz$)"
 
+#' @importFrom data.table as.data.table data.table rbindlist
 recoverDataTableFromQs <- function(sim) {
   objectName <- ls(sim)
   names(objectName) <- objectName
@@ -396,15 +408,16 @@ recoverDataTableFromQs <- function(sim) {
   objs <- unique(objs, by = "objectName")[, c("objectName", "objectClass")]
 
   objs <- objs[dt, on = "objectName"]
-  objs <- objs[objectClass == "data.table"]
+  objs <- objs[objectClass == "data.table" & objectClassInSim != "disk.frame"]
   objs <- objs[objectClass != objectClassInSim]
   if (NROW(objs)) {
     message("There is a bug in qs package that recovers data.table objects incorrectly when in a list")
     message("Converting all known data.table objects (according to metadata) from list to data.table")
     simEnv <- envir(sim)
     out <- lapply(objs$objectName, function(on) {
-      tryCatch(assign(on, copy(as.data.table(sim[[on]])), envir = simEnv),
-               error = function(e) warning(e))
+      tryCatch({
+        assign(on, copy(as.data.table(sim[[on]])), envir = simEnv)
+      }, error = function(e) warning(e))
     })
   }
   sim
@@ -550,8 +563,8 @@ relativizePaths <- function(paths, projectPath = NULL) {
 
 #' @importFrom fs path_abs
 absolutizePaths <- function(paths, projectPath, tempdir = tempdir()) {
-  p <- unlist(paths)
-  p[corePaths] <- fs::path_abs(p[corePaths], projectPath)
-  p[tmpPaths] <- fs::path_abs(p[tmpPaths], tempdir)
-  normPath(p)
+  p <- paths
+  p[corePaths] <- sapply(paths[corePaths], fs::path_abs, start = projectPath)
+  p[tmpPaths] <- sapply(paths[tmpPaths], fs::path_abs, start = tempdir)
+  lapply(p, normPath)
 }

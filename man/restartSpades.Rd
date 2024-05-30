@@ -8,7 +8,7 @@ restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
 }
 \arguments{
 \item{sim}{A \code{simList.} If not supplied (the default), this will take the \code{sim} from
-\code{SpaDES.core:::.pkgEnv$.sim}, i.e., the one that was interrupted}
+\code{savedSimEnv()$.sim}, i.e., the one that was interrupted}
 
 \item{module}{A character string length one naming the module that caused the error and
 whose source code was fixed. This module will be re-parsed and placed into the \code{simList}}
@@ -58,6 +58,6 @@ s <- simInit()
 s <- spades(s) # if this is interrupted or fails
 # the following line will not work if the previous line didn't fail
 s <- restartSpades(s) # don't need to specify `sim` if previous line fails
-                     # will take from SpaDES.core:::.pkgEnv$.sim automatically
+                     # will take from savedSimEnv()$.sim automatically
 }
 }

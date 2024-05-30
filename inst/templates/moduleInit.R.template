@@ -1,0 +1,8 @@
+### template initialization
+Init <- function(sim) {
+  # # ! ----- EDIT BELOW ----- ! #
+
+  # ! ----- STOP EDITING ----- ! #
+
+  return(invisible(sim))
+}

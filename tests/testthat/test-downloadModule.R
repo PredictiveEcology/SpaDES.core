@@ -18,7 +18,7 @@ test_that("downloadModule downloads and unzips a single module", {
       skip("Forbidden HTTP 403 on GitHub during downloadModule")
     }
   }
-  f <- f$value[[1]] %>% unlist() %>% as.character() %>% basename()
+  f <- f$value[[1]] |> unlist() |> as.character() |> basename()
 
   f_expected <- c("LICENSE", "README.md", "citation.bib", "CHECKSUMS.txt",
                   "test.R", "test.Rmd")
@@ -35,7 +35,7 @@ test_that("downloadModule downloads and unzips a parent module", {
   testInit(c("terra", "httr"), smcc = FALSE)
   m <- "LCC2005"
 
-  ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] %>% unlist() %>% as.character()
+  ## f <- downloadModule(m, tmpdir, quiet = TRUE)[[1]] |> unlist() |> as.character()
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE))
   dirTD <- dir(tmpdir, recursive = TRUE)
   gotAllMods <- all(unlist(Map(yy = c("caribouMovementLcc", "cropReprojectLccAge", "fireSpreadLcc",
@@ -48,12 +48,12 @@ test_that("downloadModule downloads and unzips a parent module", {
       skip("Forbidden HTTP 403 on GitHub during downloadModule")
     }
   }
-  f <- f$value[[1]] %>% unlist() %>% as.character()
+  f <- f$value[[1]] |> unlist() |> as.character()
 
-  d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
+  d <- f |> dirname() |> basename() |> unique() |> sort()
 
-  d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules %>%
-    c(m, "data", "testthat") %>% sort()
+  d_expected <- moduleMetadata(module = "LCC2005", path = tmpdir)$childModules |>
+    c(m, "data", "testthat") |> sort()
 
   valToCompare <- 45 # if (.Platform$OS.type == "unix" || isWindows()) 45 else 43
   expect_equal(length(f), valToCompare)
@@ -71,7 +71,7 @@ test_that("downloadModule can overwrite existing modules", {
   testInit("httr")
 
   m <- "LccToBeaconsReclassify"
-  tmpdir <- file.path(tempdir(), "modules") %>% checkPath(create = TRUE)
+  tmpdir <- file.path(tempdir(), "modules") |> checkPath(create = TRUE)
   on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
 
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
@@ -81,8 +81,8 @@ test_that("downloadModule can overwrite existing modules", {
     }
   }
 
-  original_f <- file.path(tmpdir, m) %>%
-    list.files(., full.names = TRUE, pattern = "[.]R$") %>%
+  original_f <- file.path(tmpdir, m) |>
+    list.files(full.names = TRUE, pattern = "[.]R$") |>
     file.info()
 
   expect_error(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
@@ -95,8 +95,8 @@ test_that("downloadModule can overwrite existing modules", {
     }
   }
 
-  new_f <- file.path(tmpdir, m) %>%
-    list.files(., full.names = TRUE, pattern = "[.]R$") %>%
+  new_f <- file.path(tmpdir, m) |>
+    list.files(full.names = TRUE, pattern = "[.]R$") |>
     file.info()
 
   expect_true(original_f$mtime < new_f$mtime)
@@ -128,8 +128,8 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
       skip(skipMessReGoogledrive)
     }
   }
-  f <- f$value[[1]] %>% unlist() %>% as.character()
-  d <- f %>% dirname() %>% basename() %>% unique() %>% sort()
+  f <- f$value[[1]] |> unlist() |> as.character()
+  d <- f |> dirname() |> basename() |> unique() |> sort()
 
   d_expected <- sort(c(m, "data"))
 

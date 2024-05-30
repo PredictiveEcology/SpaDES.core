@@ -20,10 +20,10 @@ This release fixes a problem with an occasionally failing test.
 * Windows                 (win-builder), R 4.4.0
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2024-04-23 r86473)
-* Ubuntu 20.04                  (local), R-devel (2024-04-24 r86484)
-* Windows                      (GitHub), R-devel (2024-04-24 r86483 ucrt)
-* Windows                 (win-builder), R-devel (2024-04-23 r86473 ucrt)
+* Ubuntu 20.04                 (GitHub), R-devel (2024-05-28 r86639)
+* Ubuntu 20.04                  (local), R-devel (2024-05-28 r86640)
+* Windows                      (GitHub), R-devel (2024-05-28 r86639 ucrt)
+* Windows                 (win-builder), R-devel (2024-05-28 r86639 ucrt)
 
 ## R CMD check results
 
@@ -46,7 +46,7 @@ There are some NOTEs:
 3. We have made an effort to reduce the package as much as possible, but the installed package size is larger than the 5MB limit.
 
         checking installed package size ... NOTE
-            installed size is  6.4Mb
+            installed size is  6.5Mb
             sub-directories of 1Mb or more:
               R   4.7Mb
 

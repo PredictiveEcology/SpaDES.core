@@ -36,8 +36,35 @@ is not a package.
 invoked for the side effect of converting a module to a package
 }
 \description{
-\emph{EXPERIMENTAL -- USE WITH CAUTION}. This function will only create the
-necessary source files so that all the code can be used (and installed) like an R package.
+\emph{EXPERIMENTAL -- USE WITH CAUTION}. This function attempts to convert a
+SpaDES module to the closest rendition of the same functionality, but in an
+R package. The main change is that instead of \code{SpaDES.core} parsing the functions
+using custom parsing tools, it will use \code{pkgload::load_all} on the package functions.
+These
+}
+\details{
+\code{convertToPackage} will:
+\enumerate{
+\item move any functions that were defined within the main module file
+(\code{moduleName.R}) into the R folder, with the same name, but ending with \code{Fns.R};
+\item keep the \code{defineModule(...)} function call with all the metadata in
+the same file, \code{moduleName.R}, but with all other content removed,
+i.e., only the \code{defineModule(...)} will be here.
+\item build documentation from all the \pkg{roxygen2} tags
+\item places one \pkg{roxygen2} tag, \verb{@export} in front of the \code{doEvent.moduleName}
+function, so that the function can be found by \code{SpaDES.core}
+\item All other functions will be kept "private", i.e., not exported, unless
+the user manually adds \verb{@export}, as per a normal package
+\item will make a \code{DESCRIPTION} file from the SpaDES module metadata
+\item will make a \code{NAMESPACE} file from the \pkg{roxygen2} tags (e.g., \verb{@export})
+}
+
+A user can continue to use the module code as before, i.e., by editing it and
+putting \code{browser()} etc. It will be parsed during \code{simInit}. Because the functions
+are "in a package", they are automatically namespaced with each other, so that
+when you want to use a function from that package, there is no need to put a
+prefix with the package name.
+
 This function does not install anything (e.g., \code{devtools::install}). After
 running this function, \code{simInit} will automatically detect that this is now
 a package and will load the functions (via \code{pkgload::load_all}) from the source files.
@@ -47,12 +74,8 @@ impact on module behaviour, other than event-level and module-level Caching will
 changes and will be rerun. Function-level Caching appears unaffected.
 In other words, this should cause no changes to running the module code via
 \code{simInit} and \code{spades}.
-}
-\details{
-This will move all functions that are not already in an \code{.R} file
-in the \code{R} folder into that folder, one function per file, including the
-\code{doEvent.xxx} function. It will not
-touch any other functions already in the \code{"R"} folder. It will also create
+
+This function will create
 and fill a minimal \code{DESCRIPTION} file. This will leave the \code{defineModule}
 function call as the only code in the main module file. This \code{defineModule}
 and a \code{doEvent.xxx} are the only 2 elements that are required for an R
@@ -71,6 +94,16 @@ e.g., via \code{devtools::install} or the like. So one can simply remove the
 package from \code{.libPaths} and delete the \code{DESCRIPTION} file and
 \code{SpaDES.core} will treat it as a normal module.
 }
+\section{Reverting}{
+
+Currently, this is not a reversible process. We recommend trying one module at
+a time, running your code. If all seems to work, then great. Commit the changes.
+If things don't seem to work, then revert the changes and continue on as before.
+Ideally, file a bug report on the \code{SpaDES.core} GitHub.com pages.
+
+Currently
+}
+
 \section{Exported functions}{
 
 
