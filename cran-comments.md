@@ -10,7 +10,7 @@ This release fixes a problem with an occasionally failing test.
 * Windows                 (win-builder), R 4.3.3
 
 ### Current R versions
-* macOS 12.6.3                 (GitHub), R 4.4.0
+* macOS 14.5                   (GitHub), R 4.4.0
 * macOS 13.3.1            (mac-builder), R 4.4.0
 * macOS 14.4.1                  (local), R 4.4.0
 * Ubuntu 20.04                 (GitHub), R 4.4.0
