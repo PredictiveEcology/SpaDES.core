@@ -2,6 +2,10 @@
 % Please edit documentation in R/cache.R
 \name{.wrap.simList}
 \alias{.wrap.simList}
+\alias{.wrap..simDeps}
+\alias{.unwrap..simDeps}
+\alias{.wrap..moduleDeps}
+\alias{.unwrap..moduleDeps}
 \alias{.unwrap.simList}
 \title{Methods for \code{.wrap} and \code{.unwrap}}
 \usage{
@@ -15,6 +19,14 @@
   outputObjects = NULL,
   ...
 )
+
+\method{.wrap}{.simDeps}(objTmp)
+
+\method{.unwrap}{.simDeps}(objTmp)
+
+\method{.wrap}{.moduleDeps}(objTmp)
+
+\method{.unwrap}{.moduleDeps}(objTmp)
 
 \method{.unwrap}{simList}(
   obj,

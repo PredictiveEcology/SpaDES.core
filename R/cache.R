@@ -979,6 +979,9 @@ objSize.simList <- function(x, quick = TRUE, ...) {
     try(rm(list = c("Par", "mod"), envir = objTmp$.mods[[mo]]))
   }
 
+  # .wrap the metadata ... i.e,. @depends
+  objTmp <- .wrapOrUnwrapSimListAts(objTmp, .wrap)
+
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
   objTmp$.mods <- .wrap(objTmp$.mods, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
@@ -990,6 +993,73 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
   objTmp
+}
+
+
+.wrapOrUnwrapSimListAts <- function(objTmp, wrapOrUnwrap = .wrap) {
+  sns <- slotNames(objTmp)
+  sns <- sns[!startsWith(sns, ".")]
+  for (sn in sns) {
+    slot(objTmp, sn) <- wrapOrUnwrap(slot(objTmp, sn))
+  }
+  objTmp
+}
+
+
+
+#' @export
+#' @inheritParams reproducible::.unwrap
+#' @importFrom reproducible .unwrap
+#' @rdname dealWithClass
+.wrap..simDeps <- function(objTmp) {
+  wrapAndUnwrapAtDepends(objTmp, .wrap)
+}
+
+#' @export
+#' @inheritParams reproducible::.unwrap
+#' @importFrom reproducible .unwrap
+#' @rdname dealWithClass
+.unwrap..simDeps <- function(objTmp) {
+  wrapAndUnwrapAtDepends(objTmp, .unwrap)
+}
+
+wrapAndUnwrapAtDepends <- function(objTmp, wrapOrUnwrap = .wrap) {
+  sn <- "dependencies"
+  deps <- slot(objTmp, sn)
+  fn <- wrapOrUnwrap
+  for (mod in names(deps)) {
+    deps[[mod]] <- fn(deps[[mod]])
+  }
+  slot(objTmp, sn) <- deps
+  objTmp
+}
+
+
+
+#' @export
+#' @inheritParams reproducible::.unwrap
+#' @importFrom reproducible .unwrap
+#' @rdname dealWithClass
+.wrap..moduleDeps <- function(objTmp) {
+  wrapAndUnwrapDotMmoduleDeps(objTmp, .wrap)
+}
+
+#' @export
+#' @inheritParams reproducible::.unwrap
+#' @importFrom reproducible .unwrap
+#' @rdname dealWithClass
+.unwrap..moduleDeps <- function(objTmp) {
+  wrapAndUnwrapDotMmoduleDeps(objTmp, .unwrap)
+}
+
+
+wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
+  snsInner <- slotNames(deps)
+  fn <- wrapOrUnwrap
+  for (snInner in snsInner) {
+    slot(deps, snInner) <- fn(slot(deps, snInner))
+  }
+  deps
 }
 
 #' @export
@@ -1006,6 +1076,10 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
                      drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
+
+  # .unwrap the metadata ... i.e,. @depends
+  obj <- .wrapOrUnwrapSimListAts(obj, wrapOrUnwrap = .unwrap)
+
   obj
 }
 
