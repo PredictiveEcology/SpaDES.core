@@ -129,8 +129,9 @@ setMethod(
     object@outputs$file <- basename(object@outputs$file)
     object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
 
-    if (NROW(object@inputs))
+    if (NROW(object@inputs)) {
       object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
+    }
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
@@ -165,7 +166,6 @@ setMethod(
     if (!is.null(classOptions$.globals)) {
       object@params <- append(list(.globals = newGlobals), object@params)
     }
-
 
     nonDotList <- grep(".list|.Data", slotNames(object), invert = TRUE, value = TRUE)
     obj <- list()
@@ -208,7 +208,7 @@ setMethod(
           .robustDigest(lapply(object@depends@dependencies,
                                function(mo) {
                                  mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
-                               } ))
+                               }))
       }
 
       obj[["depends"]] <- invertList(dependsFirst)
@@ -226,14 +226,18 @@ setMethod(
     # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
     obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
-    if (!is.null(classOptions$events))
+    if (!is.null(classOptions$events)) {
       if (FALSE %in% classOptions$events) obj$events <- NULL
-    if (!is.null(classOptions$current))
+    }
+    if (!is.null(classOptions$current)) {
       if (FALSE %in% classOptions$current) obj$current <- NULL
-    if (!is.null(classOptions$completed))
+    }
+    if (!is.null(classOptions$completed)) {
       if (FALSE %in% classOptions$completed) obj$completed <- NULL
-    if (!is.null(classOptions$simtimes))
+    }
+    if (!is.null(classOptions$simtimes)) {
       if (FALSE %in% classOptions$simtimes) obj$simtimes <- NULL
+    }
     # browser(expr = exists("._robustDigest_4"))
     obj
 })
