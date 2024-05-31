@@ -20,13 +20,13 @@
   ...
 )
 
-\method{.wrap}{.simDeps}(objTmp)
+\method{.wrap}{.simDeps}(obj, ...)
 
-\method{.unwrap}{.simDeps}(objTmp)
+\method{.unwrap}{.simDeps}(obj, ...)
 
-\method{.wrap}{.moduleDeps}(objTmp)
+\method{.wrap}{.moduleDeps}(obj, ...)
 
-\method{.unwrap}{.moduleDeps}(objTmp)
+\method{.unwrap}{.moduleDeps}(obj, ...)
 
 \method{.unwrap}{simList}(
   obj,

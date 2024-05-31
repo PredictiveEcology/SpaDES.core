@@ -996,13 +996,13 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 }
 
 
-.wrapOrUnwrapSimListAts <- function(objTmp, wrapOrUnwrap = .wrap) {
-  sns <- slotNames(objTmp)
+.wrapOrUnwrapSimListAts <- function(obj, wrapOrUnwrap = .wrap) {
+  sns <- slotNames(obj)
   sns <- sns[!startsWith(sns, ".")]
   for (sn in sns) {
-    slot(objTmp, sn) <- wrapOrUnwrap(slot(objTmp, sn))
+    slot(obj, sn) <- wrapOrUnwrap(slot(obj, sn))
   }
-  objTmp
+  obj
 }
 
 
@@ -1011,27 +1011,27 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @inheritParams reproducible::.unwrap
 #' @importFrom reproducible .unwrap
 #' @rdname dealWithClass
-.wrap..simDeps <- function(objTmp) {
-  wrapAndUnwrapAtDepends(objTmp, .wrap)
+.wrap..simDeps <- function(obj, ...) {
+  wrapAndUnwrapAtDepends(obj, .wrap)
 }
 
 #' @export
 #' @inheritParams reproducible::.unwrap
 #' @importFrom reproducible .unwrap
 #' @rdname dealWithClass
-.unwrap..simDeps <- function(objTmp) {
-  wrapAndUnwrapAtDepends(objTmp, .unwrap)
+.unwrap..simDeps <- function(obj, ...) {
+  wrapAndUnwrapAtDepends(obj, .unwrap)
 }
 
-wrapAndUnwrapAtDepends <- function(objTmp, wrapOrUnwrap = .wrap) {
+wrapAndUnwrapAtDepends <- function(obj, wrapOrUnwrap = .wrap) {
   sn <- "dependencies"
-  deps <- slot(objTmp, sn)
+  deps <- slot(obj, sn)
   fn <- wrapOrUnwrap
   for (mod in names(deps)) {
     deps[[mod]] <- fn(deps[[mod]])
   }
-  slot(objTmp, sn) <- deps
-  objTmp
+  slot(obj, sn) <- deps
+  obj
 }
 
 
@@ -1040,16 +1040,16 @@ wrapAndUnwrapAtDepends <- function(objTmp, wrapOrUnwrap = .wrap) {
 #' @inheritParams reproducible::.unwrap
 #' @importFrom reproducible .unwrap
 #' @rdname dealWithClass
-.wrap..moduleDeps <- function(objTmp) {
-  wrapAndUnwrapDotMmoduleDeps(objTmp, .wrap)
+.wrap..moduleDeps <- function(obj, ...) {
+  wrapAndUnwrapDotMmoduleDeps(obj, .wrap)
 }
 
 #' @export
 #' @inheritParams reproducible::.unwrap
 #' @importFrom reproducible .unwrap
 #' @rdname dealWithClass
-.unwrap..moduleDeps <- function(objTmp) {
-  wrapAndUnwrapDotMmoduleDeps(objTmp, .unwrap)
+.unwrap..moduleDeps <- function(obj, ...) {
+  wrapAndUnwrapDotMmoduleDeps(obj, .unwrap)
 }
 
 
