@@ -31,9 +31,10 @@ openIsRequested <- function(open, suff) {
 #'
 #' Generate a skeleton for a new SpaDES module, a template for a
 #' documentation file, a citation file, a license file, a \file{README.md} file,
-#' and a folder that contains unit tests information.
-#' The `newModuleDocumentation` will not generate the module file, but will
-#' create the other files.
+#' and a folder that contains unit tests information. `newModule` is largely a
+#' wrapper around `newModuleCode` and `newModuleDocumentation`.
+#' `newModuleCode` will not generate the module code.
+#' `newModuleDocumentation` will create the other files.
 #'
 #' All files will be created within a subdirectory named `name` within the `path`:
 #'
@@ -66,6 +67,9 @@ openIsRequested <- function(open, suff) {
 #'   Default `TRUE`.}
 #'   \item{`type`}{Character string specifying one of `"child"` (default),
 #'   or `"parent"`.}
+#' }
+#' For `newModule` can also be:\cr\cr
+#' \describe{
 #'   \item{`unitTests`}{Logical. Should the new module include unit test files?
 #'   Default `TRUE`. Unit testing relies on the \pkg{testthat} package.}
 #'   \item{`useGitHub`}{Logical. Is module development happening on GitHub?
@@ -234,34 +238,11 @@ setMethod(
     newModule(name = name, path = ".", ..., events = events, envir = envir)
 })
 
-#' Create new module code file
-#'
-#' @param name  Character string specifying the name of the new module.
-#'
-#' @param path  Character string. Subdirectory in which to place the new module code file.
-#'              The default is the current working directory.
-#'
-#' @param ...   Additional arguments. Currently, these can be either named
-#'    function definitions (which will be added to the `simList`) or one or
-#'    more of the following:\cr\cr
-#' \describe{
-#'   \item{`children`}{Required when `type = "parent"`. A character vector
-#'   specifying the names of child modules.}
-#'   \item{`open`}{Logical. Should the new module file be opened after creation?
-#'   Default `TRUE`.}
-#'   \item{`type`}{Character string specifying one of `"child"` (default),
-#'   or `"parent"`.}
-#' }
-#'
-#' @param events A list of named expressions, each of which is surrounded by `{ }`.
-#'   A user can specify events here, instead of accepting the default `doEvent` function
-#'   that comes with the module template. See example for [newModule()].
-#'
-#' @return NULL (invisibly). Invoked for its side effect of creating new module code files.
+#' @return `newModuleCode` is invoked for its side effect of creating new module code files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
-#' @rdname newModuleCode
+#' @rdname newModule
 setGeneric("newModuleCode", function(name, path, ..., events) {
   standardGeneric("newModuleCode")
 })
@@ -271,7 +252,7 @@ setGeneric("newModuleCode", function(name, path, ..., events) {
 #' @importFrom cli col_green col_yellow style_bold
 #' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
-#' @rdname newModuleCode
+#' @rdname newModule
 setMethod(
   "newModuleCode",
   signature = c(name = "character", path = "character"),
@@ -455,24 +436,20 @@ setMethod(
     return(invisible(NULL))
 })
 
-#' Create new module documentation
+#' @return `newModuleDocumentation` is nvoked for its side effect of
+#'   creating new module documentation files.
 #'
-#' @inheritParams newModuleCode
-#'
-#' @return NULL (invisibly). Invoked for its side effect of creating new module code files.
-#'
-#' @author Eliot McIntire and Alex Chubaty
 #' @importFrom reproducible checkPath
 #' @export
 #' @family module creation helpers
-#' @rdname newModuleDocumentation
+#' @rdname newModule
 #'
 setGeneric("newModuleDocumentation", function(name, path, ...) {
   standardGeneric("newModuleDocumentation")
 })
 
 #' @export
-#' @rdname newModuleDocumentation
+#' @rdname newModule
 setMethod(
   "newModuleDocumentation",
   signature = c(name = "character", path = "character"),
@@ -545,7 +522,7 @@ setMethod(
 })
 
 #' @export
-#' @rdname newModuleDocumentation
+#' @rdname newModule
 setMethod("newModuleDocumentation",
           signature = c(name = "character", path = "missing"),
           definition = function(name, ...) {
