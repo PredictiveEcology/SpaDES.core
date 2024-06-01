@@ -111,7 +111,7 @@ openIsRequested <- function(open, suff) {
 #' #   functions that are not specified from the module template (e.g., plotFun below)
 #' nm <- "test"
 #' modulePath <- Require::tempdir2()
-#' newModule(nm, path = modulePath, open = F,
+#' newModule(nm, path = modulePath, open = FALSE,
 #'           events = list(
 #'             init = {
 #'                 sim <- Init(sim)                            # finds definition below

@@ -72,7 +72,7 @@ test_that("empty defineModule", {
 test_that("newModule with events and functions", {
   nm <- "test"
   unlink(dir(Require::tempdir2(), pattern = nm, full.names = TRUE), recursive = TRUE)
-  newModule(nm, path = Require::tempdir2(), open = F,
+  newModule(nm, path = Require::tempdir2(), open = FALSE,
             events = list(
               init =
                 {
