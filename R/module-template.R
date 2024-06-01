@@ -132,10 +132,10 @@ openIsRequested <- function(open, suff) {
 #'             }
 #'   )
 #'   out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
+#'   # clean up
+#'   unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
 #' }
 #'
-#' # clean up
-#' unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
 #'
 #'
 setGeneric("newModule", function(name, path, ..., events, envir = parent.frame()) {

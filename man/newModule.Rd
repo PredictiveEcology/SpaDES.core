@@ -115,10 +115,10 @@ if (requireNamespace("ggplot2")) {
             }
   )
   out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
+  # clean up
+  unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
 }
 
-# clean up
-unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
 
 
 }
