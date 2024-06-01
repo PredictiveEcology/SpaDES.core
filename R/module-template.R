@@ -120,7 +120,6 @@ setMethod(
     argsFull <- substitute(list(...))
     argsNames <- ...names()
 
-    simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
     args <- lapply(args, eval, envir = envir) # Things like T --> TRUE
@@ -246,7 +245,7 @@ setMethod(
   definition = function(name, path, ..., events) {
     argsFull <- list(...)
     argsNames <- ...names()
-    simpleArgs <- c("children", "open", "type")
+
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
 
@@ -338,6 +337,7 @@ setMethod(
 
       if (!is.null(...names())) {
         other <- ...names()[nzchar(...names())]
+        other <- setdiff(other, simpleArgs)
         ord <- c(templDE, evs, other, templs)
         if (length(other)) {
           for (n in other) {
@@ -446,7 +446,6 @@ setMethod(
   definition = function(name, path, ...) {
     argsFull <- list(...)
     argsNames <- ...names()
-    simpleArgs <- c("children", "open", "type")
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
 
@@ -886,3 +885,5 @@ setMethod("zipModule",
             vers <- moduleVersion(name, path) |> as.character()
             zipModule(name = name, path = path, version = vers, data = data, ...)
 })
+
+simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
