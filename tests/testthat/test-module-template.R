@@ -68,3 +68,69 @@ test_that("empty defineModule", {
     }
   })
 })
+
+test_that("newModule with events and functions", {
+  nm <- "test"
+  unlink(dir(Require::tempdir2(), pattern = nm, full.names = TRUE), recursive = TRUE)
+  newModule(nm, path = Require::tempdir2(), open = F,
+            events = list(
+              init =
+                {
+                  sim <- Init(sim)
+                  sim <- scheduleEvent(sim, start(sim) + 1, moduleName = "test", eventType = "next1")
+                  sim <- scheduleEvent(sim, start(sim) + 1, moduleName = "test", eventType = "plot")
+                }
+              ,
+              plot =
+                {
+                  sim$d <- 33
+                  plotFun(sim)
+                  func()
+                  sim <- scheduleEvent(sim, time(sim) + 1, moduleName = "test", eventType = "plot")
+                }
+              ,
+              next1 =
+                {
+                  sim$b <- 2
+                  sim$a <- sim$a + 1
+                  sim <- Init2(sim)
+
+                }
+            ),
+            func = function(x) {
+              message("hi")
+
+            },
+            Init = function(sim) {
+              sim$dd <- "no way"
+              sim$a <- 1
+              return(sim)
+            },
+            Init2 = function(sim) {
+              a <- 1
+              sim$dd <- "no way 2"
+              sim$b <- max(sim$b, a) + 1
+              return(sim)
+            }
+  )
+
+  pdfFile <- tempfile(fileext = ".pdf")
+  pdf(pdfFile)
+  mess <- capture_messages(
+    out <- simInitAndSpades(module = "test", times = list(start = 0, end = 2),
+                            paths = list(modulePath = Require::tempdir2()))
+  )
+  dev.off()
+  expect_true(file.exists(pdfFile))
+  expect_true(file.size(pdfFile) > 0)
+
+  expect_is(out, "simList")
+  expect_true(out$a == 2)
+  expect_true(out$b == 3)
+  yrsSimulated <- (end(out) - start(out))
+  expect_true(sum(grepl("hi", mess)) == yrsSimulated)
+  expect_true(NROW(completed(out)) == yrsSimulated + 6)
+  expect_true(NROW(events(out)) == 1)
+  expect_true(NROW(completed(out)[eventType == "next1"]) == 1)
+  expect_true(NROW(completed(out)[eventType == "plot"]) == yrsSimulated)
+})

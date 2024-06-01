@@ -74,7 +74,9 @@ openIsRequested <- function(open, suff) {
 #'
 #' @param events A list of named expressions, each of which is surrounded by `{ }`.
 #'   A user can specify events here, instead of accepting the default `doEvent` function
-#'   that comes with the module template. See example.
+#'   that comes with the module template. If this is specified, all events must
+#'   be specified, i.e., it will not inherit partially from the template `doEvent.<moduleName>`.
+#'   See example.
 #' @param envir An environment where objects being passed to `newModule` can be found.
 #'   Default `parent.frame()`, which should be fine for most cases.
 #'
@@ -104,6 +106,35 @@ openIsRequested <- function(open, suff) {
 #'   newModule("myParentModule", tmpdir, type = "parent", children = c("child1", "child2"))
 #'   unlink(tmpdir, recursive = TRUE)
 #' }
+#'
+#' # We can also specify events and functions in `newModule`; it will still get all
+#' #   functions that are not specified from the module template (e.g., plotFun below)
+#' nm <- "test"
+#' modulePath <- Require::tempdir2()
+#' newModule(nm, path = modulePath, open = F,
+#'           events = list(
+#'             init = {
+#'                 sim <- Init(sim)                            # finds definition below
+#'                 sim <- scheduleEvent(sim, start(sim) + 1,
+#'                                      eventType = "plot")
+#'               },
+#'             plot = {
+#'                 plotFun(sim)                                # finds the templated plotFun
+#'                 sim <- scheduleEvent(sim, time(sim) + 1,
+#'                                      eventType = "plot")
+#'               }
+#'             ,
+#'           ),
+#'           Init = function(sim) { # replaces Init definition from template
+#'             sim$a <- 1
+#'             return(sim)
+#'           }
+#' )
+#' out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
+#'
+#' # clean up
+#' unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
+#'
 #'
 setGeneric("newModule", function(name, path, ..., events, envir = parent.frame()) {
   standardGeneric("newModule")
