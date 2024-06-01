@@ -70,6 +70,7 @@ test_that("empty defineModule", {
 })
 
 test_that("newModule with events and functions", {
+  testInit("ggplot2")
   nm <- "test"
   unlink(dir(Require::tempdir2(), pattern = nm, full.names = TRUE), recursive = TRUE)
   newModule(nm, path = Require::tempdir2(), open = FALSE,

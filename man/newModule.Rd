@@ -90,30 +90,32 @@ A message with the correct lines to copy and paste is provided.
   unlink(tmpdir, recursive = TRUE)
 }
 
-# We can also specify events and functions in `newModule`; it will still get all
-#   functions that are not specified from the module template (e.g., plotFun below)
-nm <- "test"
-modulePath <- Require::tempdir2()
-newModule(nm, path = modulePath, open = FALSE,
-          events = list(
-            init = {
-                sim <- Init(sim)                            # finds definition below
-                sim <- scheduleEvent(sim, start(sim) + 1,
-                                     eventType = "plot")
-              },
-            plot = {
-                plotFun(sim)                                # finds the templated plotFun
-                sim <- scheduleEvent(sim, time(sim) + 1,
-                                     eventType = "plot")
-              }
-            ,
-          ),
-          Init = function(sim) { # replaces Init definition from template
-            sim$a <- 1
-            return(sim)
-          }
-)
-out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
+if (requireNamespace("ggplot2")) {
+  # We can also specify events and functions in `newModule`; it will still get all
+  #   functions that are not specified from the module template (e.g., plotFun below)
+  nm <- "test"
+  modulePath <- Require::tempdir2()
+  newModule(nm, path = modulePath, open = FALSE,
+            events = list(
+              init = {
+                  sim <- Init(sim)                            # finds definition below
+                  sim <- scheduleEvent(sim, start(sim) + 1,
+                                       eventType = "plot")
+                },
+              plot = {
+                  plotFun(sim)                                # finds the templated plotFun
+                  sim <- scheduleEvent(sim, time(sim) + 1,
+                                       eventType = "plot")
+                }
+              ,
+            ),
+            Init = function(sim) { # replaces Init definition from template
+              sim$a <- 1
+              return(sim)
+            }
+  )
+  out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
+}
 
 # clean up
 unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
