@@ -142,7 +142,7 @@ openIsRequested <- function(open, suff) {
 #'
 #'
 #'
-setGeneric("newModule", function(name, path, ..., events, envir = parent.frame()) {
+setGeneric("newModule", function(name, path, ..., events = NULL, envir = parent.frame()) {
   standardGeneric("newModule")
 })
 
@@ -242,8 +242,9 @@ setMethod(
 setMethod(
   "newModule",
   signature = c(name = "character", path = "missing"),
-  definition = function(name, ..., events = list(), envir = parent.frame()) {
+  definition = function(name, ..., events = NULL, envir = parent.frame()) {
 
+    browser()
     # Take "." if not set, but it could be set by user with setPaths(modulePath = ...)
     path <- checkModulePath()
     events <- substitute(events)
@@ -341,7 +342,7 @@ setMethod(
                                                     paste0("module", templ, ".R.template")))
     }
 
-    if (!missing(events)) {
+    if (!missing(events) && !is.null(events) && !(length(events) == 0)) {
       evs <- names(events)[nzchar(names(events))]
       ord <- c(evs, templs)
       if (length(evs)) {
