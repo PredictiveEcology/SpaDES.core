@@ -135,3 +135,39 @@ test_that("newModule with events and functions", {
   expect_true(NROW(completed(out)[eventType == "next1"]) == 1)
   expect_true(NROW(completed(out)[eventType == "plot"]) == yrsSimulated)
 })
+
+test_that("newModule without path specified as arg", {
+  testInit("ggplot2")
+  nm <- "test"
+  setPaths(modulePath = file.path(Require::tempdir2(), "lolololo"))
+  unlink(dir(getPaths()$modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
+  expect_false(file.exists(file.path(getPaths()$modulePath, nm, paste0(nm, ".R"))))
+  newModule(nm, open = FALSE,
+            events = list(
+              init =
+                {
+                  sim <- Init(sim)
+                }
+            ),
+            Init = function(sim) {
+              sim$dd <- "no way"
+              sim$a <- 1
+              return(sim)
+            }
+  )
+  expect_true(file.exists(file.path(getPaths()$modulePath, nm, paste0(nm, ".R"))))
+
+  mess <- capture_messages(
+    out <- simInitAndSpades(module = "test", times = list(start = 0, end = 2))
+  )
+  expect_is(out, "simList")
+  expect_identical(out$dd, "no way")
+  expect_true(sum(grepl("init", mess)) == 1)
+
+
+  unlink(dir(getPaths()$modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
+  expect_false(file.exists(file.path(getPaths()$modulePath, nm, paste0(nm, ".R"))))
+  newModule(nm, open = FALSE)
+  expect_true(file.exists(file.path(getPaths()$modulePath, nm, paste0(nm, ".R"))))
+
+})
