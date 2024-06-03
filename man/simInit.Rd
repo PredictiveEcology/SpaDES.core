@@ -6,6 +6,7 @@
 \alias{simInit,ANY,ANY,ANY,character,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,character,ANY,ANY,ANY,ANY,ANY-method}
 \alias{simInit,ANY,ANY,ANY,ANY,ANY,ANY,ANY,ANY-method}
+\alias{simInit2}
 \alias{simInitDefaults}
 \title{Initialize a new simulation}
 \usage{
@@ -73,6 +74,8 @@ simInit(
   notOlderThan = NULL,
   ...
 )
+
+simInit2(l)
 
 simInitDefaults()
 }
@@ -155,6 +158,8 @@ e.g., \code{lowMemory} can be specified instead of \code{spades.lowMemory}. In c
 share option name (\code{reproducible.verbose} and \code{Require.verbose} both exist),
 passing \code{verbose = FALSE} will set both. Obviously this may cause unexpected
 problems if a module is also expecting a value.}
+
+\item{l}{A list of arguments to passed to \code{simInit}.}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values

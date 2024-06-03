@@ -11,11 +11,11 @@
 \alias{newModuleDocumentation,character,missing-method}
 \title{Create new module from template}
 \usage{
-newModule(name, path, ..., events, envir = parent.frame())
+newModule(name, path, ..., events = NULL, envir = parent.frame())
 
-\S4method{newModule}{character,character}(name, path, ..., events, envir = parent.frame())
+\S4method{newModule}{character,character}(name, path, ..., events = NULL, envir = parent.frame())
 
-\S4method{newModule}{character,missing}(name, path, ..., events, envir = parent.frame())
+\S4method{newModule}{character,missing}(name, path, ..., events = NULL, envir = parent.frame())
 
 newModuleCode(name, path, ..., events)
 

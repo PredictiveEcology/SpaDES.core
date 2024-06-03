@@ -142,7 +142,7 @@ openIsRequested <- function(open, suff) {
 #'
 #'
 #'
-setGeneric("newModule", function(name, path, ..., events, envir = parent.frame()) {
+setGeneric("newModule", function(name, path, ..., events = NULL, envir = parent.frame()) {
   standardGeneric("newModule")
 })
 
@@ -154,7 +154,15 @@ setMethod(
   signature = c(name = "character", path = "character"),
   definition = function(name, path, ..., events, envir) {
     events <- substitute(events)
+
+    # This if for methods that passed to here
+    if (is.null(names(events)))
+      events <- eval(events, parent.frame())
+
     argsFull <- substitute(list(...))
+    # if (is.null(names(argsFull)))
+    #   argsFull <- eval(argsFull, parent.frame())
+
     argsNames <- ...names()
 
     simpleArgsHere <- intersect(argsNames, simpleArgs)
@@ -234,8 +242,13 @@ setMethod(
 setMethod(
   "newModule",
   signature = c(name = "character", path = "missing"),
-  definition = function(name, ..., events = list(), envir) {
-    newModule(name = name, path = ".", ..., events = events, envir = envir)
+  definition = function(name, ..., events = NULL, envir = parent.frame()) {
+
+    browser()
+    # Take "." if not set, but it could be set by user with setPaths(modulePath = ...)
+    path <- checkModulePath()
+    events <- substitute(events)
+    newModule(name = name, path = path, ..., events = events, envir = envir)
 })
 
 #' @return `newModuleCode` is invoked for its side effect of creating new module code files.
@@ -329,7 +342,7 @@ setMethod(
                                                     paste0("module", templ, ".R.template")))
     }
 
-    if (!missing(events)) {
+    if (!missing(events) && !is.null(events) && !(length(events) == 0)) {
       evs <- names(events)[nzchar(names(events))]
       ord <- c(evs, templs)
       if (length(evs)) {
@@ -372,21 +385,6 @@ setMethod(
     } else {
       "## this is a parent module and as such does not have any events."
     }
-
-    # if (length(argsNames)) {
-    #
-    #   pp <- parse(text = moduleEvents)
-    #   doEvent <- grep("doEvent\\.", pp)
-    #   df <- deparse(as.list(argsFull)[[argsNames]])
-    #   # fn <- defineEventFnMaker(df)
-    #   eventFnName <-  makeEventFn(name, argsNames)
-    #   fn <- defineEventFnMaker(df, eventFnName)
-    #
-    #   pp[[doEvent]] <- fn
-    #   eventFnName <-  makeEventFn(name, argsNames)
-    #
-    #
-    # }
 
     moduleData <- list(
       authors = deparse(moduleDefaults[["authors"]], width.cutoff = 500),
@@ -526,7 +524,9 @@ setMethod(
 setMethod("newModuleDocumentation",
           signature = c(name = "character", path = "missing"),
           definition = function(name, ...) {
-            newModuleDocumentation(name = name, path = ".", ...)
+            path <- checkModulePath()
+
+            newModuleDocumentation(name = name, path = path, ...)
 })
 
 #' Use GitHub actions for automated module checking
@@ -696,7 +696,9 @@ setMethod(
 setMethod("openModules",
           signature = c(name = "missing", path = "missing"),
           definition = function() {
-            openModules(name = "all", path = ".")
+            path <- checkModulePath()
+
+            openModules(name = "all", path = path)
 })
 
 #' @export
@@ -712,7 +714,9 @@ setMethod("openModules",
 setMethod("openModules",
           signature = c(name = "character", path = "missing"),
           definition = function(name) {
-            openModules(name = name, path = ".")
+            path <- checkModulePath()
+
+            openModules(name = name, path = path)
 })
 
 #' @export
@@ -720,6 +724,7 @@ setMethod("openModules",
 setMethod("openModules",
           signature = c(name = "simList", path = "missing"),
           definition = function(name) {
+
             mods <- unlist(modules(name))
             openModules(name = mods, path = modulePath(name))
 })
@@ -803,6 +808,8 @@ setMethod(
 setMethod("copyModule",
           signature = c(from = "character", to = "character", path = "missing"),
           definition = function(from, to, ...) {
+            path <- checkModulePath()
+
             copyModule(from, to, path = getOption("spades.modulePath"), ...)
 })
 
@@ -876,6 +883,8 @@ setMethod(
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "character"),
           definition = function(name, version, data, ...) {
+            path <- checkModulePath()
+
             zipModule(name = name, path = "..", version = version, data = data, ...)
 })
 
@@ -884,6 +893,8 @@ setMethod("zipModule",
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "missing"),
           definition = function(name, data, ...) {
+            path <- checkModulePath()
+
             zipModule(name = name, path = "..", data = data, ...)
 })
 
@@ -897,3 +908,17 @@ setMethod("zipModule",
 })
 
 simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
+
+
+#' Uses "." if getPath not set
+#'
+#' Will compare default in spadesOptions to getPaths ... these will be same if use
+#' has not set them. For such case, use ".". They will be different if the user has
+#' used `setPaths`. If that is the case, then use `getPaths()[["modulePath"]]`
+checkModulePath <- function() {
+  gp <- getPaths()
+  mp1 <- normalizePath(gp[["modulePath"]], winslash = "/", mustWork = FALSE)
+  mp2 <- normalizePath(spadesOptions()[["spades.modulePath"]], winslash = "/", mustWork = FALSE)
+  path <- if (identical(mp1, mp2)) "." else gp[["modulePath"]]
+  path
+}
