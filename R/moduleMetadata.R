@@ -103,6 +103,8 @@ setMethod(
   "moduleMetadata",
   signature = c(sim = "missing", module = "character", path = "missing"),
   definition = function(module, defineModuleListItems) {
+    path <- checkModulePath()
+
     moduleMetadata(module = module, path = getOption("spades.modulePath"),
                    defineModuleListItems = defineModuleListItems)
 })
@@ -193,6 +195,8 @@ setMethod(
   "moduleVersion",
   signature = c(module = "character", path = "missing", sim = "missing", envir = "ANY"),
   definition = function(module, envir) {
+    path <- checkModulePath()
+
     moduleVersion(module = module, path = getOption("spades.modulePath"), envir = envir)
 })
 
@@ -202,6 +206,8 @@ setMethod(
   "moduleVersion",
   signature = c(module = "character", path = "missing", sim = "simList", envir = "ANY"),
   definition = function(module, sim, envir) {
+    path <- checkModulePath()
+
     v <- .parseModulePartial(sim = sim, modules = list(module),
                              defineModuleElement = "version", envir = envir) |>
       (function(x) x[[module]])()
