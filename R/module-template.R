@@ -244,7 +244,6 @@ setMethod(
   signature = c(name = "character", path = "missing"),
   definition = function(name, ..., events = NULL, envir = parent.frame()) {
 
-    browser()
     # Take "." if not set, but it could be set by user with setPaths(modulePath = ...)
     path <- checkModulePath()
     events <- substitute(events)
