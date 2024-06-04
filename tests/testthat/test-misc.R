@@ -60,3 +60,79 @@ test_that("test all.equal.simList", {
   expect_true(all.equal(a2, b2))
 })
 
+test_that("FilterRecursive works", {
+  oldFns <- list(
+    scfmDriverPars = list(
+      `1` = list(
+        pSpread = character(0),
+        p0 = character(0),
+        naiveP0 = character(0),
+        pIgnition = character(0),
+        maxBurnCells = character(0),
+        uniroot.Res = list(
+          root = character(0),
+          f.root = character(0),
+          iter = character(0),
+          init.it = character(0),
+          estim.prec = character(0)
+        )
+      ),
+      `2` = list(
+        pSpread = character(0),
+        p0 = character(0),
+        naiveP0 = character(0),
+        pIgnition = character(0),
+        maxBurnCells = character(0),
+        uniroot.Res = list(
+          root = character(0),
+          f.root = character(0), iter = character(0), init.it = character(0),
+          estim.prec = character(0)
+        )
+      ),
+      `3` = list(
+        pSpread = character(0),
+        p0 = character(0), naiveP0 = character(0), pIgnition = character(0),
+        maxBurnCells = character(0),
+        uniroot.Res = list(
+          root = character(0),
+          f.root = character(0), iter = character(0), init.it = character(0),
+          estim.prec = character(0)
+        )
+      ),
+      `4` = list(
+        pSpread = character(0),
+        p0 = character(0), naiveP0 = character(0), pIgnition = character(0),
+        maxBurnCells = character(0),
+        uniroot.Res = list(
+          root = character(0),
+          f.root = character(0), iter = character(0), init.it = character(0),
+          estim.prec = character(0)
+        )
+      )
+    ),
+    scfmRegimePars = list(
+      `1` = list(
+        ignitionRate = character(0), pEscape = character(0), xBar = character(0),
+        lxBar = character(0), xMax = character(0), emfs_ha = character(0),
+        empiricalBurnRate = character(0)
+      ),
+      `2` = list(
+        ignitionRate = character(0),
+        pEscape = character(0), xBar = character(0), lxBar = character(0),
+        xMax = character(0), emfs_ha = character(0), empiricalBurnRate = character(0)
+      ),
+      `3` = list(
+        ignitionRate = character(0), pEscape = character(0),
+        xBar = character(0), lxBar = character(0), xMax = character(0),
+        emfs_ha = character(0), empiricalBurnRate = character(0)
+      ),
+      `4` = list(
+        ignitionRate = character(0), pEscape = character(0),
+        xBar = character(0), lxBar = character(0), xMax = character(0),
+        emfs_ha = character(0), empiricalBurnRate = character(0)
+      )
+    )
+  )
+
+  expect_equivalent(FilterRecursive(length, oldFns), list())
+})
