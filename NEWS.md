@@ -1,4 +1,4 @@
-# SpaDES.core (development version)
+# SpaDES.core 2.1.1
 
 ## Bugfixes
 * `newModule`, new `events` argument bugs that caused unwanted objects to be put in the module. Fixed.
