@@ -31,9 +31,10 @@ openIsRequested <- function(open, suff) {
 #'
 #' Generate a skeleton for a new SpaDES module, a template for a
 #' documentation file, a citation file, a license file, a \file{README.md} file,
-#' and a folder that contains unit tests information.
-#' The `newModuleDocumentation` will not generate the module file, but will
-#' create the other files.
+#' and a folder that contains unit tests information. `newModule` is largely a
+#' wrapper around `newModuleCode` and `newModuleDocumentation`.
+#' `newModuleCode` will not generate the module code.
+#' `newModuleDocumentation` will create the other files.
 #'
 #' All files will be created within a subdirectory named `name` within the `path`:
 #'
@@ -66,6 +67,9 @@ openIsRequested <- function(open, suff) {
 #'   Default `TRUE`.}
 #'   \item{`type`}{Character string specifying one of `"child"` (default),
 #'   or `"parent"`.}
+#' }
+#' For `newModule` can also be:\cr\cr
+#' \describe{
 #'   \item{`unitTests`}{Logical. Should the new module include unit test files?
 #'   Default `TRUE`. Unit testing relies on the \pkg{testthat} package.}
 #'   \item{`useGitHub`}{Logical. Is module development happening on GitHub?
@@ -74,7 +78,9 @@ openIsRequested <- function(open, suff) {
 #'
 #' @param events A list of named expressions, each of which is surrounded by `{ }`.
 #'   A user can specify events here, instead of accepting the default `doEvent` function
-#'   that comes with the module template. See example.
+#'   that comes with the module template. If this is specified, all events must
+#'   be specified, i.e., it will not inherit partially from the template `doEvent.<moduleName>`.
+#'   See example.
 #' @param envir An environment where objects being passed to `newModule` can be found.
 #'   Default `parent.frame()`, which should be fine for most cases.
 #'
@@ -105,7 +111,38 @@ openIsRequested <- function(open, suff) {
 #'   unlink(tmpdir, recursive = TRUE)
 #' }
 #'
-setGeneric("newModule", function(name, path, ..., events, envir = parent.frame()) {
+#' if (requireNamespace("ggplot2")) {
+#'   # We can also specify events and functions in `newModule`; it will still get all
+#'   #   functions that are not specified from the module template (e.g., plotFun below)
+#'   nm <- "test"
+#'   modulePath <- Require::tempdir2()
+#'   newModule(nm, path = modulePath, open = FALSE,
+#'             events = list(
+#'               init = {
+#'                   sim <- Init(sim)                            # finds definition below
+#'                   sim <- scheduleEvent(sim, start(sim) + 1,
+#'                                        eventType = "plot")
+#'                 },
+#'               plot = {
+#'                   plotFun(sim)                                # finds the templated plotFun
+#'                   sim <- scheduleEvent(sim, time(sim) + 1,
+#'                                        eventType = "plot")
+#'                 }
+#'               ,
+#'             ),
+#'             Init = function(sim) { # replaces Init definition from template
+#'               sim$a <- 1
+#'               return(sim)
+#'             }
+#'   )
+#'   out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
+#'   # clean up
+#'   unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
+#' }
+#'
+#'
+#'
+setGeneric("newModule", function(name, path, ..., events = NULL, envir = parent.frame()) {
   standardGeneric("newModule")
 })
 
@@ -117,10 +154,17 @@ setMethod(
   signature = c(name = "character", path = "character"),
   definition = function(name, path, ..., events, envir) {
     events <- substitute(events)
+
+    # This if for methods that passed to here
+    if (is.null(names(events)))
+      events <- eval(events, parent.frame())
+
     argsFull <- substitute(list(...))
+    # if (is.null(names(argsFull)))
+    #   argsFull <- eval(argsFull, parent.frame())
+
     argsNames <- ...names()
 
-    simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
     args <- lapply(args, eval, envir = envir) # Things like T --> TRUE
@@ -198,38 +242,19 @@ setMethod(
 setMethod(
   "newModule",
   signature = c(name = "character", path = "missing"),
-  definition = function(name, ..., events = list(), envir) {
-    newModule(name = name, path = ".", ..., events = events, envir = envir)
+  definition = function(name, ..., events = NULL, envir = parent.frame()) {
+
+    # Take "." if not set, but it could be set by user with setPaths(modulePath = ...)
+    path <- checkModulePath()
+    events <- substitute(events)
+    newModule(name = name, path = path, ..., events = events, envir = envir)
 })
 
-#' Create new module code file
-#'
-#' @param name  Character string specifying the name of the new module.
-#'
-#' @param path  Character string. Subdirectory in which to place the new module code file.
-#'              The default is the current working directory.
-#'
-#' @param ...   Additional arguments. Currently, these can be either named
-#'    function definitions (which will be added to the `simList`) or one or
-#'    more of the following:\cr\cr
-#' \describe{
-#'   \item{`children`}{Required when `type = "parent"`. A character vector
-#'   specifying the names of child modules.}
-#'   \item{`open`}{Logical. Should the new module file be opened after creation?
-#'   Default `TRUE`.}
-#'   \item{`type`}{Character string specifying one of `"child"` (default),
-#'   or `"parent"`.}
-#' }
-#'
-#' @param events A list of named expressions, each of which is surrounded by `{ }`.
-#'   A user can specify events here, instead of accepting the default `doEvent` function
-#'   that comes with the module template. See example for [newModule()].
-#'
-#' @return NULL (invisibly). Invoked for its side effect of creating new module code files.
+#' @return `newModuleCode` is invoked for its side effect of creating new module code files.
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
-#' @rdname newModuleCode
+#' @rdname newModule
 setGeneric("newModuleCode", function(name, path, ..., events) {
   standardGeneric("newModuleCode")
 })
@@ -239,14 +264,14 @@ setGeneric("newModuleCode", function(name, path, ..., events) {
 #' @importFrom cli col_green col_yellow style_bold
 #' @importFrom reproducible checkPath
 #' @importFrom whisker whisker.render
-#' @rdname newModuleCode
+#' @rdname newModule
 setMethod(
   "newModuleCode",
   signature = c(name = "character", path = "character"),
   definition = function(name, path, ..., events) {
     argsFull <- list(...)
     argsNames <- ...names()
-    simpleArgs <- c("children", "open", "type")
+
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
 
@@ -316,7 +341,7 @@ setMethod(
                                                     paste0("module", templ, ".R.template")))
     }
 
-    if (!missing(events)) {
+    if (!missing(events) && !is.null(events) && !(length(events) == 0)) {
       evs <- names(events)[nzchar(names(events))]
       ord <- c(evs, templs)
       if (length(evs)) {
@@ -338,6 +363,7 @@ setMethod(
 
       if (!is.null(...names())) {
         other <- ...names()[nzchar(...names())]
+        other <- setdiff(other, simpleArgs)
         ord <- c(templDE, evs, other, templs)
         if (length(other)) {
           for (n in other) {
@@ -358,21 +384,6 @@ setMethod(
     } else {
       "## this is a parent module and as such does not have any events."
     }
-
-    # if (length(argsNames)) {
-    #
-    #   pp <- parse(text = moduleEvents)
-    #   doEvent <- grep("doEvent\\.", pp)
-    #   df <- deparse(as.list(argsFull)[[argsNames]])
-    #   # fn <- defineEventFnMaker(df)
-    #   eventFnName <-  makeEventFn(name, argsNames)
-    #   fn <- defineEventFnMaker(df, eventFnName)
-    #
-    #   pp[[doEvent]] <- fn
-    #   eventFnName <-  makeEventFn(name, argsNames)
-    #
-    #
-    # }
 
     moduleData <- list(
       authors = deparse(moduleDefaults[["authors"]], width.cutoff = 500),
@@ -422,31 +433,26 @@ setMethod(
     return(invisible(NULL))
 })
 
-#' Create new module documentation
+#' @return `newModuleDocumentation` is nvoked for its side effect of
+#'   creating new module documentation files.
 #'
-#' @inheritParams newModuleCode
-#'
-#' @return NULL (invisibly). Invoked for its side effect of creating new module code files.
-#'
-#' @author Eliot McIntire and Alex Chubaty
 #' @importFrom reproducible checkPath
 #' @export
 #' @family module creation helpers
-#' @rdname newModuleDocumentation
+#' @rdname newModule
 #'
 setGeneric("newModuleDocumentation", function(name, path, ...) {
   standardGeneric("newModuleDocumentation")
 })
 
 #' @export
-#' @rdname newModuleDocumentation
+#' @rdname newModule
 setMethod(
   "newModuleDocumentation",
   signature = c(name = "character", path = "character"),
   definition = function(name, path, ...) {
     argsFull <- list(...)
     argsNames <- ...names()
-    simpleArgs <- c("children", "open", "type")
     simpleArgsHere <- intersect(argsNames, simpleArgs)
     args <- eval(as.list(argsFull[simpleArgsHere]))
 
@@ -513,11 +519,13 @@ setMethod(
 })
 
 #' @export
-#' @rdname newModuleDocumentation
+#' @rdname newModule
 setMethod("newModuleDocumentation",
           signature = c(name = "character", path = "missing"),
           definition = function(name, ...) {
-            newModuleDocumentation(name = name, path = ".", ...)
+            path <- checkModulePath()
+
+            newModuleDocumentation(name = name, path = path, ...)
 })
 
 #' Use GitHub actions for automated module checking
@@ -687,7 +695,9 @@ setMethod(
 setMethod("openModules",
           signature = c(name = "missing", path = "missing"),
           definition = function() {
-            openModules(name = "all", path = ".")
+            path <- checkModulePath()
+
+            openModules(name = "all", path = path)
 })
 
 #' @export
@@ -703,7 +713,9 @@ setMethod("openModules",
 setMethod("openModules",
           signature = c(name = "character", path = "missing"),
           definition = function(name) {
-            openModules(name = name, path = ".")
+            path <- checkModulePath()
+
+            openModules(name = name, path = path)
 })
 
 #' @export
@@ -711,6 +723,7 @@ setMethod("openModules",
 setMethod("openModules",
           signature = c(name = "simList", path = "missing"),
           definition = function(name) {
+
             mods <- unlist(modules(name))
             openModules(name = mods, path = modulePath(name))
 })
@@ -794,6 +807,8 @@ setMethod(
 setMethod("copyModule",
           signature = c(from = "character", to = "character", path = "missing"),
           definition = function(from, to, ...) {
+            path <- checkModulePath()
+
             copyModule(from, to, path = getOption("spades.modulePath"), ...)
 })
 
@@ -867,6 +882,8 @@ setMethod(
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "character"),
           definition = function(name, version, data, ...) {
+            path <- checkModulePath()
+
             zipModule(name = name, path = "..", version = version, data = data, ...)
 })
 
@@ -875,6 +892,8 @@ setMethod("zipModule",
 setMethod("zipModule",
           signature = c(name = "character", path = "missing", version = "missing"),
           definition = function(name, data, ...) {
+            path <- checkModulePath()
+
             zipModule(name = name, path = "..", data = data, ...)
 })
 
@@ -886,3 +905,19 @@ setMethod("zipModule",
             vers <- moduleVersion(name, path) |> as.character()
             zipModule(name = name, path = path, version = vers, data = data, ...)
 })
+
+simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
+
+
+#' Uses "." if getPath not set
+#'
+#' Will compare default in spadesOptions to getPaths ... these will be same if use
+#' has not set them. For such case, use ".". They will be different if the user has
+#' used `setPaths`. If that is the case, then use `getPaths()[["modulePath"]]`
+checkModulePath <- function() {
+  gp <- getPaths()
+  mp1 <- normalizePath(gp[["modulePath"]], winslash = "/", mustWork = FALSE)
+  mp2 <- normalizePath(spadesOptions()[["spades.modulePath"]], winslash = "/", mustWork = FALSE)
+  path <- if (identical(mp1, mp2)) "." else gp[["modulePath"]]
+  path
+}

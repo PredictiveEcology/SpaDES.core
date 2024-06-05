@@ -395,7 +395,9 @@ setMethod(
                 repo = "missing", data = "missing", quiet = "missing",
                 quickCheck = "ANY", overwrite = "ANY"),
   definition = function(name, quickCheck, overwrite) {
-    files <- downloadModule(name, path = getOption("spades.modulePath"),
+    path <- checkModulePath()
+
+    files <- downloadModule(name, path = path,
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo",
                                              defaultGitRepoToSpaDESModules),

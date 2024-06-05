@@ -4,13 +4,28 @@
 \alias{newModule}
 \alias{newModule,character,character-method}
 \alias{newModule,character,missing-method}
+\alias{newModuleCode}
+\alias{newModuleCode,character,character-method}
+\alias{newModuleDocumentation}
+\alias{newModuleDocumentation,character,character-method}
+\alias{newModuleDocumentation,character,missing-method}
 \title{Create new module from template}
 \usage{
-newModule(name, path, ..., events, envir = parent.frame())
+newModule(name, path, ..., events = NULL, envir = parent.frame())
 
-\S4method{newModule}{character,character}(name, path, ..., events, envir = parent.frame())
+\S4method{newModule}{character,character}(name, path, ..., events = NULL, envir = parent.frame())
 
-\S4method{newModule}{character,missing}(name, path, ..., events, envir = parent.frame())
+\S4method{newModule}{character,missing}(name, path, ..., events = NULL, envir = parent.frame())
+
+newModuleCode(name, path, ..., events)
+
+\S4method{newModuleCode}{character,character}(name, path, ..., events)
+
+newModuleDocumentation(name, path, ...)
+
+\S4method{newModuleDocumentation}{character,character}(name, path, ...)
+
+\S4method{newModuleDocumentation}{character,missing}(name, path, ...)
 }
 \arguments{
 \item{name}{Character string specifying the name of the new module.}
@@ -28,6 +43,9 @@ specifying the names of child modules.}
 Default \code{TRUE}.}
 \item{\code{type}}{Character string specifying one of \code{"child"} (default),
 or \code{"parent"}.}
+}
+For \code{newModule} can also be:\cr\cr
+\describe{
 \item{\code{unitTests}}{Logical. Should the new module include unit test files?
 Default \code{TRUE}. Unit testing relies on the \pkg{testthat} package.}
 \item{\code{useGitHub}}{Logical. Is module development happening on GitHub?
@@ -36,7 +54,9 @@ Default \code{TRUE}.}
 
 \item{events}{A list of named expressions, each of which is surrounded by \code{{ }}.
 A user can specify events here, instead of accepting the default \code{doEvent} function
-that comes with the module template. See example.}
+that comes with the module template. If this is specified, all events must
+be specified, i.e., it will not inherit partially from the template \verb{doEvent.<moduleName>}.
+See example.}
 
 \item{envir}{An environment where objects being passed to \code{newModule} can be found.
 Default \code{parent.frame()}, which should be fine for most cases.}
@@ -45,13 +65,19 @@ Default \code{parent.frame()}, which should be fine for most cases.}
 NULL (invisibly). The new module file is created at
 \file{path/name.R}, as well as ancillary files for documentation, citation,
 \file{LICENSE}, \file{README}, and \file{tests} directory.
+
+\code{newModuleCode} is invoked for its side effect of creating new module code files.
+
+\code{newModuleDocumentation} is nvoked for its side effect of
+creating new module documentation files.
 }
 \description{
 Generate a skeleton for a new SpaDES module, a template for a
 documentation file, a citation file, a license file, a \file{README.md} file,
-and a folder that contains unit tests information.
-The \code{newModuleDocumentation} will not generate the module file, but will
-create the other files.
+and a folder that contains unit tests information. \code{newModule} is largely a
+wrapper around \code{newModuleCode} and \code{newModuleDocumentation}.
+\code{newModuleCode} will not generate the module code.
+\code{newModuleDocumentation} will create the other files.
 }
 \details{
 All files will be created within a subdirectory named \code{name} within the \code{path}:
@@ -88,14 +114,51 @@ A message with the correct lines to copy and paste is provided.
   unlink(tmpdir, recursive = TRUE)
 }
 
+if (requireNamespace("ggplot2")) {
+  # We can also specify events and functions in `newModule`; it will still get all
+  #   functions that are not specified from the module template (e.g., plotFun below)
+  nm <- "test"
+  modulePath <- Require::tempdir2()
+  newModule(nm, path = modulePath, open = FALSE,
+            events = list(
+              init = {
+                  sim <- Init(sim)                            # finds definition below
+                  sim <- scheduleEvent(sim, start(sim) + 1,
+                                       eventType = "plot")
+                },
+              plot = {
+                  plotFun(sim)                                # finds the templated plotFun
+                  sim <- scheduleEvent(sim, time(sim) + 1,
+                                       eventType = "plot")
+                }
+              ,
+            ),
+            Init = function(sim) { # replaces Init definition from template
+              sim$a <- 1
+              return(sim)
+            }
+  )
+  out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
+  # clean up
+  unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
+}
+
+
+
 }
 \seealso{
 Other module creation helpers: 
-\code{\link{newModuleCode}()},
-\code{\link{newModuleDocumentation}()},
+\code{\link{newModuleTests}()}
+
+Other module creation helpers: 
+\code{\link{newModuleTests}()}
+
+Other module creation helpers: 
 \code{\link{newModuleTests}()}
 }
 \author{
 Alex Chubaty and Eliot McIntire
+
+Eliot McIntire and Alex Chubaty
 }
 \concept{module creation helpers}

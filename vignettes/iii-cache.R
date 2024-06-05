@@ -53,8 +53,9 @@ system.time({
 
 ## ----test-module-level--------------------------------------------------------
 layers <- list("DEM", "forestAge", "habitatQuality", "percentPine", "Fires")
-same <- lapply(layers, function(l)
-  identical(randomSim$landscape[[l]], randomSimCached$landscape[[l]]))
+same <- lapply(layers, function(l) {
+  identical(randomSim$landscape[[l]], randomSimCached$landscape[[l]])
+})
 names(same) <- layers
 print(same) # Fires is not same because all non-init events in fireSpread are not cached
 
@@ -86,7 +87,8 @@ system.time({
                      userTags = "neutralLandscapeMap")
 })
 
-all.equal(map[], mapCached[]) # note --> can't use all.equal on SpatRaster -- they are pointers 
+## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()
+all.equal(map[], mapCached[]) 
 
 ## ----manual-cache-------------------------------------------------------------
 cacheDB <- showCache(mySim, userTags = "neutralLandscapeMap")

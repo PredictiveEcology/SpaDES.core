@@ -457,3 +457,43 @@ test_that("Filenames for simList", {
                           })))
   }
 })
+
+test_that("loadSimList handles symlinked files sensibly", {
+  skip_on_cran()
+  skip_on_ci()
+
+  prjDir <- "~/GitHub/BC_HRV"
+
+  skip_if_not(dir.exists(prjDir))
+
+  withr::local_dir(prjDir)
+
+  outputDir <- file.path(prjDir, "outputs/NRD_Quesnel_scfm_hrv_FRT_res125/rep01")
+  fsim <- file.path(outputDir, "simOutDataPrep_NRD_Quesnel.rds")
+
+  expect_no_error({
+    foo <- loadSimList(fsim)
+  })
+
+  withr::deferred_run()
+})
+
+test_that("loadSimList handles nested lists (i.e. scfm poly lists) sensibly", {
+  skip_on_cran()
+  skip_on_ci()
+
+  prjDir <- "~/GitHub/BC_HRV"
+
+  skip_if_not(dir.exists(prjDir))
+
+  withr::local_dir(prjDir)
+
+  outputDir <- file.path(prjDir, "outputs/NRD_Quesnel_scfm_hrv_FRT_res125/rep01")
+  fsim <- file.path(outputDir, "simOutMainSim_1200.rds")
+
+  expect_no_error({
+    foo <- loadSimList(fsim)
+  })
+
+  withr::deferred_run()
+})

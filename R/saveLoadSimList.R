@@ -325,7 +325,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   ## remap all the file-backed objects. their paths in the objects will point
   ## to their old locations, but they are now at newFns, which is remapped to projectPath
   oldFns <- Filenames(tmpsim, returnList = TRUE)
-  oldFns <- oldFns[lengths(oldFns) > 0] ## TODO: need to deal with nested lists e.g. scfm objs
+  oldFns <- FilterRecursive(length, oldFns) ## handles nested lists (e.g. scfm objs, biomassModel)
 
   for (nam in names(oldFns)) {
     tags <- attr(tmpsim[[nam]], "tags")
@@ -335,6 +335,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
       } else {
         pths <- list(projectPath = projectPath)
       }
+
       newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
       tmpsim[[nam]][] <- newFiles$newName[]
