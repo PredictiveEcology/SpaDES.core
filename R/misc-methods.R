@@ -412,3 +412,18 @@ moduleCodeFiles <- function(paths, modules) {
   path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
 }
+
+#' Recursively Filter a list
+#' @inheritParams Filter
+#' @keywords internal
+FilterRecursive <- function(f, x) {
+  Filter(f, x) |>
+    lapply(X = _, function(z) {
+      if (is.list(z)) {
+        return(FilterRecursive(f, z))
+      } else {
+        return(z)
+      }
+    }) |>
+    Filter(f, x = _)
+}
