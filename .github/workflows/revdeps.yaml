@@ -4,7 +4,7 @@
 ## Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   pull_request:
-    branches: [main, master, development]
+    branches: [main, development]
   schedule:
     - cron: '23 23 * * 0 '
 
