@@ -1,3 +1,7 @@
+# SpaDES.core 2.1.2
+
+* fixed bug in `restartSpades()`;
+
 # SpaDES.core 2.1.1
 
 ## Bugfixes
