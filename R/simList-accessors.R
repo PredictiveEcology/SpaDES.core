@@ -3351,22 +3351,20 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
     if (identical(units, "auto")) {
       unt <- "secs"
       if (any(a > minutesInSeconds)) {
-        if (any(a > hoursInSeconds)) {
-          if (any(a > daysInSeconds)) {
-            unt <- "days"
-          }
-        } else {
-          unt <- "hours"
-        }
-      } else {
         unt <- "mins"
+      } else if (any(a > hoursInSeconds)) {
+        unt <- "hours"
+      } else if (any(a > daysInSeconds)) {
+        unt <- "days"
       }
-      st <- Sys.time()
-      a <- round(difftime(a + st, st, units = unt), 3) # work around for forcing a non seconds unit, allowing "auto"
     } else {
       # This one won't allow "auto"
+      unt <- units
       units(a) <- units
     }
+    st <- Sys.time()
+    a <- round(difftime(a + st, st, units = unt), 3) # work around for forcing a non seconds unit, allowing "auto"
+
     ret[, elapsedTime := a]
   } else {
     ret <- NULL
