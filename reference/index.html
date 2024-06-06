@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.2</span>
       </span>
     </div>
 
@@ -135,6 +135,10 @@
         </td>
         <td><p>Check for the existence of a module locally</p></td>
       </tr><tr><td>
+          <p><code><a href="checkModulePath.html">checkModulePath()</a></code> </p>
+        </td>
+        <td><p>Uses "." if getPath not set</p></td>
+      </tr><tr><td>
           <p><code><a href="checkObject.html">checkObject()</a></code> </p>
         </td>
         <td><p>Check for existence of object(s) referenced by a <code>objects</code> slot of a <code>simList</code> object</p></td>
@@ -175,7 +179,7 @@
         </td>
         <td><p>Define an output object of a module</p></td>
       </tr><tr><td>
-          <p><code><a href="dealWithClass.html">.wrap(<i>&lt;simList&gt;</i>)</a></code> <code><a href="dealWithClass.html">.unwrap(<i>&lt;simList&gt;</i>)</a></code> </p>
+          <p><code><a href="dealWithClass.html">.wrap(<i>&lt;simList&gt;</i>)</a></code> <code><a href="dealWithClass.html">.wrap(<i>&lt;.simDeps&gt;</i>)</a></code> <code><a href="dealWithClass.html">.unwrap(<i>&lt;.simDeps&gt;</i>)</a></code> <code><a href="dealWithClass.html">.wrap(<i>&lt;.moduleDeps&gt;</i>)</a></code> <code><a href="dealWithClass.html">.unwrap(<i>&lt;.moduleDeps&gt;</i>)</a></code> <code><a href="dealWithClass.html">.unwrap(<i>&lt;simList&gt;</i>)</a></code> </p>
         </td>
         <td><p>Methods for <code>.wrap</code> and <code>.unwrap</code></p></td>
       </tr><tr><td>
@@ -307,17 +311,9 @@
         </td>
         <td><p>Parse and extract a module's version</p></td>
       </tr><tr><td>
-          <p><code><a href="newModule.html">newModule()</a></code> </p>
+          <p><code><a href="newModule.html">newModule()</a></code> <code><a href="newModule.html">newModuleCode()</a></code> <code><a href="newModule.html">newModuleDocumentation()</a></code> </p>
         </td>
         <td><p>Create new module from template</p></td>
-      </tr><tr><td>
-          <p><code><a href="newModuleCode.html">newModuleCode()</a></code> </p>
-        </td>
-        <td><p>Create new module code file</p></td>
-      </tr><tr><td>
-          <p><code><a href="newModuleDocumentation.html">newModuleDocumentation()</a></code> </p>
-        </td>
-        <td><p>Create new module documentation</p></td>
       </tr><tr><td>
           <p><code><a href="newModuleTests.html">newModuleTests()</a></code> </p>
         </td>
@@ -451,13 +447,13 @@
         </td>
         <td><p>Generate simulation file name</p></td>
       </tr><tr><td>
-          <p><code><a href="simInit.html">simInit()</a></code> <code><a href="simInit.html">simInitDefaults()</a></code> </p>
+          <p><code><a href="simInit.html">simInit()</a></code> <code><a href="simInit.html">simInit2()</a></code> <code><a href="simInit.html">simInitDefaults()</a></code> </p>
         </td>
         <td><p>Initialize a new simulation</p></td>
       </tr><tr><td>
-          <p><code><a href="simInitAndSpades.html">simInitAndSpades()</a></code> </p>
+          <p><code><a href="simInitAndSpades.html">simInitAndSpades2()</a></code> <code><a href="simInitAndSpades.html">simInitAndSpades()</a></code> </p>
         </td>
-        <td><p>Call <code>simInit</code> and <code>spades</code> together</p></td>
+        <td><p><code>simInitAndSpades2</code> is a convenience wrapper for <code>do.call(simInitAndSpades, listOfArgs)</code>, i.e., a user can pass a list of all the arguments.</p></td>
       </tr><tr><td>
           <p><code><a href="simList-accessors-envir.html">envir()</a></code> <code><a href="simList-accessors-envir.html">`envir&lt;-`()</a></code> </p>
         </td>
@@ -503,9 +499,9 @@
         </td>
         <td><p>Classes defined in SpaDES</p></td>
       </tr><tr><td>
-          <p><code><a href="spades.html">spades()</a></code> </p>
+          <p><code><a href="spades.html">spades2()</a></code> <code><a href="spades.html">spades()</a></code> </p>
         </td>
-        <td><p>Run a spatial discrete event simulation</p></td>
+        <td><p><code>spades2</code> is a convenience wrapper for <code>do.call(spades, listOfArgs)</code>, i.e., a user can pass a list of all the arguments.</p></td>
       </tr><tr><td>
           <p><code><a href="spadesOptions.html">spadesOptions()</a></code> </p>
         </td>

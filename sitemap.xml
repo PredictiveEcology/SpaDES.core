@@ -40,6 +40,9 @@
     <loc>https://spades-core.predictiveecology.org/reference/Copy.html</loc>
   </url>
   <url>
+    <loc>https://spades-core.predictiveecology.org/reference/FilterRecursive.html</loc>
+  </url>
+  <url>
     <loc>https://spades-core.predictiveecology.org/reference/Plot.html</loc>
   </url>
   <url>
@@ -80,6 +83,9 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/checkModuleLocal.html</loc>
+  </url>
+  <url>
+    <loc>https://spades-core.predictiveecology.org/reference/checkModulePath.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/checkObject.html</loc>
@@ -290,12 +296,6 @@
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/newModule.html</loc>
-  </url>
-  <url>
-    <loc>https://spades-core.predictiveecology.org/reference/newModuleCode.html</loc>
-  </url>
-  <url>
-    <loc>https://spades-core.predictiveecology.org/reference/newModuleDocumentation.html</loc>
   </url>
   <url>
     <loc>https://spades-core.predictiveecology.org/reference/newModuleTests.html</loc>
