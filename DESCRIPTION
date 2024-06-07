@@ -59,6 +59,7 @@ Suggests:
     httr,
     knitr,
     lattice,
+    lme4,
     logging,
     magrittr,
     NLMR (>= 1.1.1),

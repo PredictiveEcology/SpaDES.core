@@ -1,3 +1,8 @@
+# SpaDES.core 2.1.3
+
+* fix issue with Windows short paths in tests;
+* improved documentation;
+
 # SpaDES.core 2.1.2
 
 * fixed bug in `restartSpades()`;

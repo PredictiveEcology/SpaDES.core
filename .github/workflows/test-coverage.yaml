@@ -1,11 +1,11 @@
 on:
   push:
     branches:
-      - master
+      - main
       - development
   pull_request:
     branches:
-      - master
+      - main
       - development
 
 name: test-coverage
@@ -34,12 +34,12 @@ jobs:
         with:
           extra-packages: |
             any::covr
+            PredictiveEcology/reproducible@development
             fastshp=?ignore
             NLMR=?ignore
 
       - name: Install additional package dependencies
         run: |
-          pak::pkg_install("PredictiveEcology/reproducible@development")
           pak::pkg_install("ropensci/NLMR")
           pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}

@@ -2,9 +2,9 @@
 # Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
 on:
   push:
-    branches: [main, master]
+    branches: main
   pull_request:
-    branches: [main, master]
+    branches: main
   release:
     types: [published]
   workflow_dispatch:
@@ -36,13 +36,13 @@ jobs:
           extra-packages: |
             any::pkgdown
             local::.
+            PredictiveEcology/reproducible@development
             fastshp=?ignore
             NLMR=?ignore
           needs: website
 
       - name: Install additional package dependencies
         run: |
-          pak::pkg_install("PredictiveEcology/reproducible@development")
           pak::pkg_install("ropensci/NLMR")
           pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}
