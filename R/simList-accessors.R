@@ -525,7 +525,7 @@ P.simList <- function(sim, param, module) {
         modFilePaths <- checkPath(names(mods))
 
         scalls <- sys.calls()
-        whereInSC <- .grepSysCalls(scalls, "^P\\(")
+        whereInSC <- .grepSysCalls(scalls, "^P\\(|^SpaDES.core::P\\(")
         while (whereInSC > 1) {
           poss <- scalls[whereInSC - 1]
           fn <- as.character(poss[[1]][[1]])
