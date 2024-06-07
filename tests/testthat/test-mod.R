@@ -75,6 +75,10 @@ test_that("local mod object", {
 
   ## Need "Copy" in this sequence because the event queue is actually an environment :)
   ## so the LHS will have the updated event queue, but the parameters will be at initial conditions
+
+  # quick test for SpaDES.core::P utilization
+  expect_true(SpaDES.core::P(mySim3, "testParB", "test2") == 1197)
+
   expect_true(P(mySim3)$test2$testParB == 1197) # .globals + .inputObjects
   mySim4 <- spades(Copy(mySim3), events = "init")
   expect_true(P(mySim4)$test2$testParB == 1953) ## .globals + .inputObjects + init
