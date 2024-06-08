@@ -234,69 +234,76 @@ makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
 
   # cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]
-  d <- list()
-  d$Package <- .moduleNameNoUnderscore(module)
-  d$Type <- "Package"
-
-  d$Title <- md$name
-  d$Description <- md$description
-  d$Version <- as.character(eval(md$version[[2]]))
-  d$Date <- Sys.Date()
-  d$Authors <- md$authors
-  d$Authors <- c(paste0("  ", format(d$Authors)[1]), format(d$Authors)[-1])
   deps <- unlist(eval(md$reqdPkgs))
-  d$Imports <- Require::extractPkgName(deps)
-  versionNumb <- Require::extractVersionNumber(deps)
-  hasVersionNumb <- !is.na(versionNumb)
-  inequality <- paste0("(", gsub("(.+)\\((.+)\\)", "\\2", deps[hasVersionNumb]), ")")
-  missingSpace <- !grepl("[[:space:]]", inequality)
-  if (any(missingSpace))
-    inequality[missingSpace] <- gsub("([=><]+)", "\\1 ", inequality[missingSpace])
-  hasSC <- grepl("SpaDES.core", d$Imports)
-  if (all(!hasSC))
-    d$Imports <- c("SpaDES.core", d$Imports)
-
-  namespaceImports <- d$Imports
-  # Create "import all" for each of the packages, unless it is already in an @importFrom
-  if (hasNamespaceFile) {
-    nsTxt <- readLines(NAMESPACEFile)
-    hasImportFrom <- grepl("importFrom", nsTxt)
-    if (any(hasImportFrom)) {
-      pkgsNotNeeded <- unique(gsub(".+\\((.+)\\,.+\\)", "\\1", nsTxt[hasImportFrom]))
-      namespaceImports <- grep(paste(pkgsNotNeeded, collapse = "|"),
-                               namespaceImports, invert = TRUE, value = TRUE)
-    }
-  }
-
-  cat(paste0("#' @import ", namespaceImports, "\nNULL\n"), sep = "\n",
-      file = filePathImportSpadesCore, fill = TRUE)
-
-  d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
-
-  dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
-
-  cat(paste("Package:", d$Package), file = dFile, sep = "\n")
-  cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Title:", d$Title), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Version:", d$Version), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Description:", paste(d$Description, collapse = " ")), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
-  cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
-
-  if (length(d$Imports))
-    cat(c("Imports:", paste("   ", d$Imports, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
-
-  Suggests <- c('knitr', 'rmarkdown')
-  cat(c("Suggests:", paste("   ", Suggests, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
-
-  cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
-  cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
-  cat("VignetteBuilder: knitr, rmarkdown", sep = "\n", file = dFile, append = TRUE)
-  cat("ByteCompile: yes", sep = "\n", file = dFile, append = TRUE)
-  cat("Roxygen: list(markdown = TRUE)", sep = "\n", file = dFile, append = TRUE)
 
 
-  message("New/updated DESCRIPTION file is: ", dFile)
+  dFile <- DESCRIPTIONfileFromModule(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
+                                        packageFolderName)
+  # d <- list()
+  # d$Package <- .moduleNameNoUnderscore(module)
+  # d$Type <- "Package"
+  #
+  # d$Title <- md$name
+  # d$Description <- md$description
+  # d$Version <- as.character(eval(md$version[[2]]))
+  # d$Date <- Sys.Date()
+  # d$Authors <- md$authors
+  # d$Authors <- c(paste0("  ", format(d$Authors)[1]), format(d$Authors)[-1])
+  #
+  #
+  # hasSC <- grepl("SpaDES.core", deps)
+  # if (all(!hasSC))
+  #   deps <- c("SpaDES.core", deps)
+  #
+  # d$Imports <- Require::extractPkgName(deps)
+  # versionNumb <- Require::extractVersionNumber(deps)
+  # hasVersionNumb <- !is.na(versionNumb)
+  # inequality <- paste0("(", gsub("(.+)\\((.+)\\)", "\\2", deps[hasVersionNumb]), ")")
+  # missingSpace <- !grepl("[[:space:]]", inequality)
+  # if (any(missingSpace))
+  #   inequality[missingSpace] <- gsub("([=><]+)", "\\1 ", inequality[missingSpace])
+  #
+  # namespaceImports <- d$Imports
+  # # Create "import all" for each of the packages, unless it is already in an @importFrom
+  # if (hasNamespaceFile) {
+  #   nsTxt <- readLines(NAMESPACEFile)
+  #   hasImportFrom <- grepl("importFrom", nsTxt)
+  #   if (any(hasImportFrom)) {
+  #     pkgsNotNeeded <- unique(gsub(".+\\((.+)\\,.+\\)", "\\1", nsTxt[hasImportFrom]))
+  #     namespaceImports <- grep(paste(pkgsNotNeeded, collapse = "|"),
+  #                              namespaceImports, invert = TRUE, value = TRUE)
+  #   }
+  # }
+  #
+  # cat(paste0("#' @import ", namespaceImports, "\nNULL\n"), sep = "\n",
+  #     file = filePathImportSpadesCore, fill = TRUE)
+  #
+  # d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
+  #
+  # dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
+  #
+  # cat(paste("Package:", d$Package), file = dFile, sep = "\n")
+  # cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
+  # cat(paste("Title:", d$Title), file = dFile, sep = "\n", append = TRUE)
+  # cat(paste("Version:", d$Version), file = dFile, sep = "\n", append = TRUE)
+  # cat(paste("Description:", paste(d$Description, collapse = " ")), file = dFile, sep = "\n", append = TRUE)
+  # cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
+  # cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
+  #
+  # if (length(d$Imports))
+  #   cat(c("Imports:", paste("   ", d$Imports, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+  #
+  # Suggests <- c('knitr', 'rmarkdown')
+  # cat(c("Suggests:", paste("   ", Suggests, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+  #
+  # cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
+  # cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
+  # cat("VignetteBuilder: knitr, rmarkdown", sep = "\n", file = dFile, append = TRUE)
+  # cat("ByteCompile: yes", sep = "\n", file = dFile, append = TRUE)
+  # cat("Roxygen: list(markdown = TRUE)", sep = "\n", file = dFile, append = TRUE)
+  #
+  #
+  # message("New/updated DESCRIPTION file is: ", dFile)
 
   if (isTRUE(buildDocuments)) {
     message("Building documentation")
@@ -341,3 +348,74 @@ filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fil
 
 filenameForMainFunctions <- function(module, modulePath = ".")
   normPath(file.path(modulePath, unlist(module), "R", paste0(unlist(basename(module)), "Fns.R")))
+
+
+
+
+DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
+                                      packageFolderName) {
+  d <- list()
+  d$Package <- .moduleNameNoUnderscore(module)
+  d$Type <- "Package"
+
+  d$Title <- md$name
+  d$Description <- md$description
+  d$Version <- as.character(eval(md$version[[2]]))
+  d$Date <- Sys.Date()
+  d$Authors <- md$authors
+  d$Authors <- c(paste0("  ", format(d$Authors)[1]), format(d$Authors)[-1])
+
+
+  hasSC <- grepl("SpaDES.core", deps)
+  if (all(!hasSC))
+    deps <- c("SpaDES.core", deps)
+
+  d$Imports <- Require::extractPkgName(deps)
+  versionNumb <- Require::extractVersionNumber(deps)
+  hasVersionNumb <- !is.na(versionNumb)
+  inequality <- paste0("(", gsub("(.+)\\((.+)\\)", "\\2", deps[hasVersionNumb]), ")")
+  missingSpace <- !grepl("[[:space:]]", inequality)
+  if (any(missingSpace))
+    inequality[missingSpace] <- gsub("([=><]+)", "\\1 ", inequality[missingSpace])
+
+  namespaceImports <- d$Imports
+  # Create "import all" for each of the packages, unless it is already in an @importFrom
+  if (hasNamespaceFile) {
+    nsTxt <- readLines(NAMESPACEFile)
+    hasImportFrom <- grepl("importFrom", nsTxt)
+    if (any(hasImportFrom)) {
+      pkgsNotNeeded <- unique(gsub(".+\\((.+)\\,.+\\)", "\\1", nsTxt[hasImportFrom]))
+      namespaceImports <- grep(paste(pkgsNotNeeded, collapse = "|"),
+                               namespaceImports, invert = TRUE, value = TRUE)
+    }
+  }
+
+  cat(paste0("#' @import ", namespaceImports, "\nNULL\n"), sep = "\n",
+      file = filePathImportSpadesCore, fill = TRUE)
+
+  d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
+
+  dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
+
+  cat(paste("Package:", d$Package), file = dFile, sep = "\n")
+  cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
+  cat(paste("Title:", d$Title), file = dFile, sep = "\n", append = TRUE)
+  cat(paste("Version:", d$Version), file = dFile, sep = "\n", append = TRUE)
+  cat(paste("Description:", paste(d$Description, collapse = " ")), file = dFile, sep = "\n", append = TRUE)
+  cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
+  cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
+
+  if (length(d$Imports))
+    cat(c("Imports:", paste("   ", d$Imports, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+
+  Suggests <- c('knitr', 'rmarkdown')
+  cat(c("Suggests:", paste("   ", Suggests, collapse = ",\n")), sep = "\n", file = dFile, append = TRUE)
+
+  cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
+  cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
+  cat("VignetteBuilder: knitr, rmarkdown", sep = "\n", file = dFile, append = TRUE)
+  cat("ByteCompile: yes", sep = "\n", file = dFile, append = TRUE)
+  cat("Roxygen: list(markdown = TRUE)", sep = "\n", file = dFile, append = TRUE)
+  message("New/updated DESCRIPTION file is: ", dFile)
+  return(dFile)
+}

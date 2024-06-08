@@ -30,6 +30,7 @@ defineModule(sim, list(
   reqdPkgs = list("methods", "RColorBrewer", "SpaDES.tools (>= 2.0.0)", "terra"),
   parameters = rbind(
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
+    defineParameter("burnStats", "character", "nPixelsBurned", NA, NA, "name of the burn statistics reported"),
     defineParameter("nFires", "numeric", 10L, 1L, 100L, "number of fires to initiate"),
     defineParameter("its", "numeric", 1e6, 1e6, 1e6, "number of iterations for fire spread"),
     defineParameter("persistprob", "numeric", 0.00, 0, 1, "probability of fire persisting in a pixel"),
@@ -51,13 +52,13 @@ defineModule(sim, list(
   inputObjects = bindrows(
     expectsInput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName,
                  objectClass = "SpatRaster", desc = NA_character_, sourceURL = NA_character_),
-    expectsInput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
+    expectsInput(objectName = P(sim)$burnStats, objectClass = "numeric",
                  desc = NA_character_, sourceURL = NA_character_)
   ),
   outputObjects = bindrows(
-    createsOutput(objectName = SpaDES.core::P(sim, module = "fireSpread")$stackName,
+    createsOutput(objectName = P(sim, module = "fireSpread")$stackName,
                   objectClass = "SpatRaster", desc = NA_character_, other = NA_character_),
-    createsOutput(objectName = SpaDES.core::globals(sim)$burnStats, objectClass = "numeric",
+    createsOutput(objectName = P(sim)$burnStats, objectClass = "numeric",
                   desc = NA_character_, other = NA_character_)
   )
 ))
@@ -72,10 +73,10 @@ doEvent.fireSpread <- function(sim, eventTime, eventType, debug = FALSE) {
       ### (use `checkObject` or similar)
       SpaDES.core::checkObject(sim, Par$stackName, layer = "habitatQuality")
 
-      if (is.null(sim[[SpaDES.core::globals(sim)$burnStats]])) {
-        sim[[SpaDES.core::globals(sim)$burnStats]] <- numeric()
+      if (is.null(sim[[P(sim)$burnStats]])) {
+        sim[[P(sim)$burnStats]] <- numeric()
       } else {
-        npix <- sim[[(SpaDES.core::globals(sim)$burnStats)]]
+        npix <- sim[[(P(sim)$burnStats)]]
         stopifnot("numeric" %in% is(npix), "vector" %in% is(npix))
       }
 
@@ -189,11 +190,11 @@ Burn <- function(sim) {
 }
 
 Stats <- function(sim) {
-  npix <- sim[[SpaDES.core::globals(sim)$burnStats]]
+  npix <- sim[[P(sim)$burnStats]]
 
   landscapes <- sim[[Par$stackName]]
 
-  sim[[SpaDES.core::globals(sim)$burnStats]] <- c(npix, length(which(values(landscapes$Fires) > 0)))
+  sim[[P(sim)$burnStats]] <- c(npix, length(which(values(landscapes$Fires) > 0)))
 
   return(invisible(sim))
 }
