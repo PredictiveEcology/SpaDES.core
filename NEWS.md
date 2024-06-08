@@ -1,7 +1,8 @@
-# SpaDES.core 2.1.3
+# SpaDES.core 2.1.5
 
 * fix issue with Windows short paths in tests;
 * improved documentation;
+* removal of `globals(sim)` in Sample modules
 
 # SpaDES.core 2.1.2
 
