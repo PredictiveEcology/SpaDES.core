@@ -252,9 +252,6 @@ makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
   missingSpace <- !grepl("[[:space:]]", inequality)
   if (any(missingSpace))
     inequality[missingSpace] <- gsub("([=><]+)", "\\1 ", inequality[missingSpace])
-  hasSC <- grepl("SpaDES.core", d$Imports)
-  if (all(!hasSC))
-    d$Imports <- c("SpaDES.core", d$Imports)
 
   namespaceImports <- d$Imports
   # Create "import all" for each of the packages, unless it is already in an @importFrom
@@ -272,6 +269,10 @@ makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
       file = filePathImportSpadesCore, fill = TRUE)
 
   d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
+
+  hasSC <- grepl("SpaDES.core", d$Imports)
+  if (all(!hasSC))
+    d$Imports <- c("SpaDES.core", d$Imports)
 
   dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
 
