@@ -307,7 +307,8 @@ Plots <- function(data, fn, filename,
         names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
         Plot(ggListToScreen, addTo = gg$labels$title)
       } else {
-        print(gg)
+        if (!(identical(fn, plot) || identical(fn, terra::plot)))
+          print(gg)
       }
     }
   }
