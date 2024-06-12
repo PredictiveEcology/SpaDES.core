@@ -1,3 +1,7 @@
+# SpaDES.core (development version)
+
+* minor documentation improvements
+
 # SpaDES.core 2.1.5
 
 * fix issue with Windows short paths in tests;
