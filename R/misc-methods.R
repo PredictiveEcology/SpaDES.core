@@ -414,7 +414,10 @@ moduleCodeFiles <- function(paths, modules) {
 }
 
 #' Recursively Filter a list
-#' @inheritParams funprog
+#'
+#' @param f	 a unary function
+#' @param x  a vector
+#'
 #' @keywords internal
 FilterRecursive <- function(f, x) {
   Filter(f, x) |>

@@ -1848,10 +1848,10 @@ setMethod("figurePath",
           signature = "simList",
           definition = function(sim) {
             moduleName <- current(sim)[["moduleName"]]
-            fp <- if (length(moduleName) == 0) {
-              file.path(sim@paths$outputPath, "figures")
+            if (length(moduleName) == 0) {
+              fp <- file.path(sim@paths$outputPath, "figures")
             } else {
-              file.path(sim@paths$outputPath, "figures", moduleName)
+              fp <- file.path(sim@paths$outputPath, "figures", moduleName)
             }
             fp <- checkPath(fp, create = TRUE)
             return(fp)
@@ -1873,10 +1873,8 @@ setGeneric("logPath", function(sim) {
 setMethod("logPath",
           signature = "simList",
           definition = function(sim) {
-            lp <- getOption("spades.logPath")
-            if (is.null(lp))
-              lp <- file.path(sim@paths$outputPath, "log")
-            lp <- checkPath(lp, create = TRUE)
+            lp <- getOption("spades.logPath", file.path(sim@paths[["outputPath"]], "log")) |>
+              checkPath(create = TRUE)
             return(lp)
 })
 

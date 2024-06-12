@@ -6,6 +6,11 @@
 \usage{
 FilterRecursive(f, x)
 }
+\arguments{
+\item{f}{a unary function}
+
+\item{x}{a vector}
+}
 \description{
 Recursively Filter a list
 }
