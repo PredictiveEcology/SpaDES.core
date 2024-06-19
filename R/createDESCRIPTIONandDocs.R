@@ -1,32 +1,13 @@
 #' Convert standard module code into an R package
 #'
-#' *EXPERIMENTAL -- USE WITH CAUTION*. This function attempts to convert a
-#' SpaDES module to the closest rendition of the same functionality, but in an
-#' R package. The main change is that instead of `SpaDES.core` parsing the functions
-#' using custom parsing tools, it will use `pkgload::load_all` on the package functions.
-#' These
-#'
-#' `convertToPackage` will:
-#' \enumerate{
-#'   \item move any functions that were defined within the main module file
-#'   (`moduleName.R`) into the R folder, with the same name, but ending with `Fns.R`;
-#'   \item keep the `defineModule(...)` function call with all the metadata in
-#'         the same file, `moduleName.R`, but with all other content removed,
-#'         i.e., only the `defineModule(...)` will be here.
-#'   \item build documentation from all the \pkg{roxygen2} tags
-#'   \item places one \pkg{roxygen2} tag, `@export` in front of the `doEvent.moduleName`
-#'         function, so that the function can be found by `SpaDES.core`
-#'   \item All other functions will be kept "private", i.e., not exported, unless
-#'         the user manually adds `@export`, as per a normal package
-#'   \item will make a `DESCRIPTION` file from the SpaDES module metadata
-#'   \item will make a `NAMESPACE` file from the \pkg{roxygen2} tags (e.g., `@export`)
-#' }
-#'
-#' A user can continue to use the module code as before, i.e., by editing it and
-#' putting `browser()` etc. It will be parsed during `simInit`. Because the functions
-#' are "in a package", they are automatically namespaced with each other, so that
-#' when you want to use a function from that package, there is no need to put a
-#' prefix with the package name.
+#' *EXPERIMENTAL -- USE WITH CAUTION*. This function will create a `DESCRIPTION`
+#' file if one does not exist, based on the module metadata. If one exists, it will
+#' update it with any additional information: **it will not remove packages that are
+#' removed from the metadata**. It will create, if one does not
+#' exist, or update a `.Rbuildignore` file. If `importAll = TRUE` It will create a file named `R/imports.R`,
+#' which will import all functions.  This function will make no changes to
+#' any existing source file of a SpaDES.module. If `buildDocumentation = TRUE`,
+#' it will build documentation `.Rd` files from `roxygen2` tags.
 #'
 #' This function does not install anything (e.g., `devtools::install`). After
 #' running this function, `simInit` will automatically detect that this is now
@@ -122,21 +103,24 @@
 #'
 #' @param buildDocuments A logical. If `TRUE`, the default, then the documentation
 #'   will be built, if any exists, using `roxygen2::roxygenise`.
+#' @param importAll A logical. If `TRUE`, then every package named in `reqdPkgs` will
+#' have an `@importFrom <pkgName>`, meaning **every** function from every package will
+#' be imported. If `FALSE`, then only functions explicitly imported using
+#' `@importFrom <pkgName> <functionName>` will be imported.
 #'
-#' @return invoked for the side effect of converting a module to a package
+#' @return invoked for the side effect of creating DESCRIPTION file, a `.Rbuildingore`
+#' file and possibly building documentatation from roxygen tags.
 #'
 #' @export
 #' @examples
 #' if (requireNamespace("ggplot2") && requireNamespace("pkgload") ) {
 #'   tmpdir <- tempdir2()
 #'   newModule("test", tmpdir, open = FALSE)
-#'   convertToPackage("test", path = tmpdir)
-#'   pkgload::load_all(file.path(tmpdir, "test"))
-#'   pkgload::unload("test")
+#'   createDESCRIPTIONandDocs("test", path = tmpdir)
 #' }
-#'
-convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
-                             buildDocuments = TRUE) {
+createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.modulePath"),
+                                     importAll = TRUE,
+                                     buildDocuments = TRUE) {
   stopifnot(
     requireNamespace("pkgload", quietly = TRUE),
     requireNamespace("roxygen2", quietly = TRUE)
@@ -170,76 +154,14 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   linesWithRoxygen <- parseWithRoxygen[, "line1"]
   nextElement <- c(whNotDefModule[-1], Inf)
 
-  # fileNames <- Map(element = whDefModule, nextElement = whNotDefModule[1],
-  #                  function(element, nextElement) {
-  #                    i <- 0
-  #                    fn <- filePath <- fnCh <- parseWithFn <- lineWithFn <- list()
-  #                    for (elem in c(element, nextElement)) {
-  #                      i <- i + 1
-  #                      if (is.infinite(elem)) {
-  #                        lineWithFn[[i]] <- length(rlaa) + 1
-  #                        break
-  #                      }
-  #                      fn[[i]] <- aa[[elem]][[2]]
-  #                      filePath[[i]] <- filenameFromFunction(packageFolderName, fn[[i]], "R")
-  #                      fnCh[[i]] <- as.character(fn[[i]])
-  #                      gpdLines <- which(gpd$text == fnCh[[i]] & gpd$token == "SYMBOL")
-  #                      if (length(gpdLines) > 1)
-  #                        for (gl in gpdLines) {
-  #                          line1 <- gpd[gl, "line1"]
-  #                          isTop <- any(gpd[gpd[, "line1"] == line1, "parent"] == 0)
-  #                          if (isTRUE(isTop)) {
-  #                            gpdLines <- gl
-  #                            break
-  #                          }
-  #                        }
-  #                      parseWithFn[[i]] <- gpd[gpdLines, ]
-  #                      lineWithFn[[i]] <- parseWithFn[[i]][, "line1"]
-  #                      if (length(lineWithFn[[i]]) > 1) {
-  #                        if (i == 1) {
-  #                          lineWithFn[[1]] <- lineWithFn[[1]][1]
-  #                        } else {
-  #                          whAfterLine1 <- which(lineWithFn[[2]] > lineWithFn[[1]])
-  #                          if (length(whAfterLine1))
-  #                            lineWithFn[[2]] <- lineWithFn[[2]][whAfterLine1[1]]
-  #                        }
-  #                      }
-  #                    }
-  #                    fn <- filenameForMainFunctions(module, path)
-  #                    cat("#' @export", file = fn, sep = "\n", append = FALSE)
-  #                    cat(rlaa[lineWithFn[[2]]:length(rlaa)],
-  #                        file = fn, sep = "\n", append = TRUE)
-  #                    cat(rlaa[1:(lineWithFn[[2]] - 1)], file = mainModuleFile,
-  #                        sep = "\n", append = FALSE)
-  #                  })
-
-#   otherStuffFn <- filenameFromFunction(packageFolderName, "other", "R")
-#   cat("
-# makeActiveBinding('mod', SpaDES.core:::activeModBindingFunction, ",
-#       paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'', module, '\'))'), ")
-#
-# makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
-#       paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'', module, '\'))'), ")
-#
-# ", file = otherStuffFn)
-
-  # if (length(linesWithRoxygen) > 0) {
-  #   message("There was some roxygen2 documentation that was not immediately above ",
-  #           "a function; it is being saved in R/documentation.R ... please confirm that ",
-  #           "the documentation is correct.")
-  #   cat(rlaa[linesWithRoxygen], file = filenameFromFunction(packageFolderName, "documentation", "R")
-  #       , sep = "\n", append = FALSE)
-  #   linesWithRoxygen <- character()
-  # }
 
   filePathImportSpadesCore <- filenameFromFunction(packageFolderName, "imports", "R")# file.path(dirname(mainModuleFile), "R", "imports.R")
 
-  # cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]
   deps <- unlist(eval(md$reqdPkgs))
 
   dFile <- DESCRIPTIONfileFromModule(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
-                                        packageFolderName)
+                                     packageFolderName)
 
   if (isTRUE(buildDocuments)) {
     message("Building documentation")
