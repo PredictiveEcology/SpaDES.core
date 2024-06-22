@@ -1110,7 +1110,8 @@ setMethod(
         prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
         # prevEnd <- get(as.character(existingCompleted[length(existingCompleted)]), envir = sim@completed)
         if (length(.grepSysCalls(sys.calls(), "restartSpades")) == 0 &&
-            length(sim@.xData$._ranInitDuringSimInit) == 0)  { # don't crop off completed events if Init(s) ran during simInit
+            length(sim@.xData$._ranInitDuringSimInit) == 0 &&
+            prevStart$eventType != ".inputObjects")  { # don't crop off completed events if Init(s) ran during simInit
           prevEvUnit <- attr(prevStart[["eventTime"]], "unit")
           stTime <- start(sim, unit = prevEvUnit)
           if (stTime <= prevStart[["eventTime"]] && (time(sim, unit = prevEvUnit) == stTime))
