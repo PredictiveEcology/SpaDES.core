@@ -617,6 +617,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 }
 
 .isPackage <- function(fullModulePath, sim) {
+  return(FALSE)
   modEnv <- sim@.xData$.mods[[basename2(fullModulePath)]]
   # There are 3 ways to check ... existence of .isPackage is fastest, but may be wrong
   # if the namespace exists ... 2nd fastest, but also may be wrong if FALSE

@@ -269,7 +269,7 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
 
   dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
-  origDESCtxt <- read.dcf(dFile)
+  origDESCtxt <- if (file.exists(dFile)) read.dcf(dFile) else character()
 
   cat(paste("Package:", d$Package), file = dFile, sep = "\n")
   cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
@@ -279,12 +279,15 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
   cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
 
-  mergeField(origDESCtxt = origDESCtxt, field = d$Imports, fieldName = "Imports", dFile)
+  if (length(d$Imports) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = d$Imports, fieldName = "Imports", dFile)
 
   suggs <- c('knitr', 'rmarkdown', 'testthat', 'withr', 'roxygen2')
-  mergeField(origDESCtxt = origDESCtxt, field = suggs, fieldName = "Suggests", dFile)
+  if (length(suggs) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = suggs, fieldName = "Suggests", dFile)
 
-  mergeField(origDESCtxt = origDESCtxt, field = d$Remotes, fieldName = "Remotes", dFile)
+  if (length(d$Remotes) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = d$Remotes, fieldName = "Remotes", dFile)
 
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
   cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)

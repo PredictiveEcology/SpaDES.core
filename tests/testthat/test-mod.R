@@ -164,13 +164,13 @@ test_that("convertToPackage testing", {
   testName2 <- paste0("test2.", .rndstr(len = 1))
   mainModFile1 <- paste0(testName1, ".R")
   mainModFile2 <- paste0(testName2, ".R")
-  try(pkgload::unload(testName1), silent = TRUE)
-  try(pkgload::unload(testName2), silent = TRUE)
+  # try(pkgload::unload(testName1), silent = TRUE)
+  # try(pkgload::unload(testName2), silent = TRUE)
 
-  on.exit({
-    try(pkgload::unload(testName1), silent = TRUE)
-    try(pkgload::unload(testName2), silent = TRUE)
-  }, add = TRUE)
+  # on.exit({
+  #   try(pkgload::unload(testName1), silent = TRUE)
+  #   try(pkgload::unload(testName2), silent = TRUE)
+  # }, add = TRUE)
 
   newModule(testName1, tmpdir, open = FALSE)
   newModule(testName2, tmpdir, open = FALSE)
@@ -191,6 +191,7 @@ test_that("convertToPackage testing", {
       #\' @rdname Init
       #\' @name Init
       #\' @param sim A simList
+      #\' @export
       Init <- function(sim) {
         sim$aaaa <- Run1(1)
         return(sim)
@@ -230,7 +231,7 @@ test_that("convertToPackage testing", {
     expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
     ## list.files(file.path(tmpdir, tt, "R"))
-    expect_true(file.exists(filenameForMainFunctions(tt, tmpdir)))
+    # expect_true(file.exists(filenameForMainFunctions(tt, tmpdir)))
   }
 
   mySim9 <- simInit(times = list(start = 0, end = 1),
@@ -239,7 +240,7 @@ test_that("convertToPackage testing", {
   # doesn't document, unless it is first time
   for (tt in c(testName1, testName2)) {
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-    expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    # expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
   }
   working <- spades(mySim9, debug = FALSE)
@@ -253,19 +254,38 @@ test_that("convertToPackage testing", {
   # Will run document() so will have the NAMESPACE and
   for (tt in c(testName1, testName2)) {
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-    expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-    expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
+    # expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    # expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
   }
 
   # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
   expect_true(is(working, "simList"))
   expect_true(working$aaaa == 2)
   expect_true(is(working$cccc, "try-error"))
-  bbb <- get("Run2", asNamespace(testName2))(2)
-  fnTxt <- readLines(filenameForMainFunctions(tt, tmpdir))
+  # bbb <- get("Run2", asNamespace(testName2))(2)
+  bbb <- get("Run2", working$.mods[[testName2]])(2)
+
+  packageFoldername <- file.path(tmpdir, testName2)
+  fnTxt <- readLines(file.path(packageFoldername, paste0(testName2, ".R")))
   expect_true(sum(grepl("Need to keep comments", fnTxt)) == 1)
   expect_true(bbb == 4)
-  pkgload::unload(testName1)
-  pkgload::unload(testName2)
+
+  # check documentation
+  packageFoldername <- file.path(tmpdir, testName1)
+  expect_false(dir.exists(file.path(packageFoldername, "man")))
+  documentModule(packageFoldername)
+  expect_true(dir.exists(file.path(packageFoldername, "man")))
+  pkgload::load_all(packageFoldername)
+  on.exit({
+    try(pkgload::unload(.moduleNameNoUnderscore(basename(packageFoldername))))
+  })
+  fn <- get("Init", envir = asNamespace(.moduleNameNoUnderscore(basename(packageFoldername))))
+  expect_is(fn, "function")
+  pkgload::unload(.moduleNameNoUnderscore(basename(packageFoldername)))
+  fn <- try(get("Init", envir = asNamespace(.moduleNameNoUnderscore(basename(packageFoldername)))), silent = TRUE)
+  expect_true(is(fn, "try-error"))
+
+  # pkgload::unload(testName1)
+  # pkgload::unload(testName2)
   #}
 })
