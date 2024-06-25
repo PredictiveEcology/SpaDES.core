@@ -130,7 +130,8 @@ test_that("newModule with events and functions", {
   expect_true(out$b == 3)
   yrsSimulated <- (end(out) - start(out))
   expect_true(sum(grepl("hi", mess)) == yrsSimulated)
-  expect_true(NROW(completed(out)) == yrsSimulated + 6)
+  expect_true(NROW(completed(out)) == yrsSimulated +
+                (NROW(.coreModules()) - 1) + length(c(".inputObjects", "next1", "init")))
   expect_true(NROW(events(out)) == 1)
   expect_true(NROW(completed(out)[eventType == "next1"]) == 1)
   expect_true(NROW(completed(out)[eventType == "plot"]) == yrsSimulated)
