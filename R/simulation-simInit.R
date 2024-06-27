@@ -1332,6 +1332,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
           }
           if (runFnCallAsExpr) {
+            pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
+            do.call(box::use, lapply(pkgs, as.name))
             sim <- Cache(.inputObjects, sim,
                          .objects = objectsToEvaluateForCaching,
                          notOlderThan = notOlderThan,
@@ -1547,14 +1549,14 @@ loadPkgs <- function(reqdPkgs) {
     # Check for SpaDES.core minimum version
     checkSpaDES.coreMinVersion(allPkgs)
     allPkgs <- grep("^SpaDES.core\\>", allPkgs, value = TRUE, invert = TRUE)
-    if (getOption("spades.useRequire")) {
-      getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
-      # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
-    } else {
-      allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
-    }
+    # if (getOption("spades.useRequire") && !isMacOSX()) {
+    #   getCRANrepos(ind = 1) # running this first is neutral if it is set
+    #   Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
+    #   # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
+    # } else {
+    #   allPkgs <- unique(Require::extractPkgName(allPkgs))
+    #   loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
+    # }
   }
 }
 
@@ -1905,3 +1907,6 @@ simNestingOverride <- function(sim, mBase) {
   sim[["._simNesting"]][len] <- paste0(modName8Chars, ":", cli::col_green(sim@current$eventType))
   sim[["._simNesting"]]
 }
+
+isMacOSX <- function()
+  isMac <- tolower(Sys.info()["sysname"]) == "darwin"

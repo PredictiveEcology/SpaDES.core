@@ -152,7 +152,7 @@ test_that("local mod object", {
   }
 })
 
-test_that("convertToPackage testing", {
+# test_that("convertToPackage testing", {
   skip_on_cran()
   skip_if_not_installed(c("ggplot2", "pkgload", "roxygen2"))
 

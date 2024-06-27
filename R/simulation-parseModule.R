@@ -267,9 +267,10 @@ setMethod(
           sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
           sim@.xData$.mods[[mBase]]$.isPackage <- TRUE
+          browser()
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      asNamespace(.moduleNameNoUnderscore(mBase)),
-                                                     sim = sim)
+                                                     sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
         } else {
           sim@.xData$.mods[[mBase]]$.isPackage <- FALSE
 
@@ -282,7 +283,7 @@ setMethod(
           # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData$.mods[[mBase]])
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      sim@.xData$.mods[[mBase]],
-                                                     sim = sim)
+                                                     sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
 
           # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
           doesntUseNamespacing <- !.isNamespaced(sim, mBase)
@@ -297,7 +298,7 @@ setMethod(
             #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
             out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                        sim@.xData$.mods,
-                                       sim = sim)
+                                       sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
             #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
           }
 
@@ -318,13 +319,13 @@ setMethod(
               if (doesntUseNamespacing) {
                 #eval(parsedFile1, envir = sim@.xData)
                 evalWithActiveCode(parsedFile1, sim@.xData$.mods,
-                                   sim = sim)
+                                   sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
               }
 
               # duplicate -- put in namespaces location
               #eval(parsedFile1, envir = sim@.xData$.mods[[mBase]])
               activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData$.mods[[mBase]],
-                                                         sim = sim)
+                                                         sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
             }
           }
 
@@ -558,7 +559,7 @@ setMethod(
 
 #' @keywords internal
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
-                               sim) {
+                               sim, pkgs) {
 
   # browser(expr = exists("._evalWithActiveCode_1"))
   # Create a temporary environment to source into, adding the sim object so that
@@ -574,6 +575,13 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   ll <- lapply(parsedModuleNoDefineModule,
                function(x) tryCatch(eval(x, envir = tmpEnvir),
                                     error = function(x) "ERROR"))
+  cm <- currentModule(tmpEnvir$sim)
+  if (!cm %in% unlist(.coreModules())) {
+    pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
+    lapply(pkgs, function(p) eval(as.call(parse(text = paste0("box::use(", p, "[...]", ")")))[[1]], envir = tmpEnvir))
+  }
+
+
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 
   rm("sim", envir = tmpEnvir)

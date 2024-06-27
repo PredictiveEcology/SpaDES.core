@@ -11,6 +11,7 @@ makeModActiveBinding <- function(sim, mod) {
   if (.isPackage(fullModulePath = mod, sim = sim)) {
     env <- asNamespace(.moduleNameNoUnderscore(mod))
   } else {
+    browser()
     env <- sim@.xData$.mods[[mod]]
     if (exists("mod", envir = env, inherits = FALSE))
       rm(list = "mod", envir = env, inherits = FALSE)
