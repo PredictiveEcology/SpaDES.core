@@ -576,10 +576,19 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
                function(x) tryCatch(eval(x, envir = tmpEnvir),
                                     error = function(x) "ERROR"))
   cm <- currentModule(tmpEnvir$sim)
-  if (!cm %in% unlist(.coreModules())) {
-    pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
-    lapply(pkgs, function(p) eval(as.call(parse(text = paste0("box::use(", p, "[...]", ")")))[[1]], envir = tmpEnvir))
-  }
+  if (length(cm))
+    if (!cm %in% unlist(.coreModules())) {
+      pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
+      lapply(pkgs, function(p) {
+        allFns <- ls(envir = asNamespace(p))
+        val <- paste0("box::use(", p, "[...]", ")")
+        eval(as.call(parse(text = val))[[1]], envir = tmpEnvir)
+        if (any("mod" == allFns)) {
+          rm(list = "mod", envir = parent.env(tmpEnvir))
+          messageVerbose("mod will be masked from ", p)
+        }
+      })
+    }
 
 
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
