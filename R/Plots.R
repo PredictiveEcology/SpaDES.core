@@ -315,17 +315,14 @@ Plots <- function(data, fn, filename,
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
     if (missing(filename)) {
-      filename <- tempfile(fileext = "")
+      filename <- tempfile(fileext = "") ## TODO: can we use e.g. the object name + sim time??
+    } else {
+      filename <- basename(filename) |> tools::file_path_sans_ext()
     }
     isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
       if (is(path, "call"))
         path <- eval(path, envir = simIsIn)
-    }
-
-    if (isAbsolutePath(filename)) {
-      path <- dirname(filename)
-      filename <- basename(filename)
     }
 
     if (is(path, "character")) {
@@ -338,16 +335,22 @@ Plots <- function(data, fn, filename,
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = tools::file_path_sans_ext(basename(rasterFilename)),
-                                     file = rasterFilename, fun = "terra::writeRaster", ...)
+        sim@outputs <- outputsAppend(
+          outputs = sim@outputs, saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(rasterFilename)),
+          file = rasterFilename, fun = "terra::writeRaster",
+          ...
+        )
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = tools::file_path_sans_ext(basename(rawFilename)),
-                                     file = rawFilename, fun = "qs::qsave", ...)
+        sim@outputs <- outputsAppend(
+          outputs = sim@outputs, saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(rawFilename)),
+          file = rawFilename, fun = "qs::qsave",
+          ...
+        )
     }
   }
 

@@ -1,6 +1,7 @@
 # SpaDES.core (development version)
 
-* minor documentation improvements
+* fix issue with `Plots()` where plots were discarded if no filename was specified;
+* minor documentation improvements;
 
 # SpaDES.core 2.1.5
 
