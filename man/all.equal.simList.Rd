@@ -4,7 +4,7 @@
 \alias{all.equal.simList}
 \title{All equal method for \code{simList} objects}
 \usage{
-\method{all}{equal.simList}(target, current, ...)
+\method{all.equal}{simList}(target, current, ...)
 }
 \arguments{
 \item{target}{\R object.}
