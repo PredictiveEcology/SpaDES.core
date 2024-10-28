@@ -303,7 +303,8 @@ setMethod(
 #'
 #' @return See [base::all.equal()]
 #'
-#' @export
+#' @method all.equal simList
+#' @exportS3Method all.equal simList
 #' @importFrom reproducible .wrap
 all.equal.simList <- function(target, current, ...) {
   attr(target, ".Cache")$newCache <- NULL
