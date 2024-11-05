@@ -148,7 +148,12 @@ test_that("local mod object", {
     sim <- savedSimEnv()$.sim
     sim@params$test2$testRestartSpades <- NULL
     sim3 <- restartSpades(sim, debug = FALSE)
-    expect_true(NROW(completed(sim3)) == 7)
+    expect_true(NROW(completed(sim3)) ==
+                  length(modules(sim)) + # .inputObjects
+                  length(setdiff(unlist(.coreModules()), "restartR")) + # core
+                  length(modules(sim)) + # init
+                  1 # test2 has an event
+                )
   }
 })
 
@@ -277,7 +282,7 @@ test_that("convertToPackage testing", {
   expect_true(dir.exists(file.path(packageFoldername, "man")))
   pkgload::load_all(packageFoldername)
   on.exit({
-    try(pkgload::unload(.moduleNameNoUnderscore(basename(packageFoldername))))
+    try(pkgload::unload(.moduleNameNoUnderscore(basename(packageFoldername))), silent = TRUE)
   })
   fn <- get("Init", envir = asNamespace(.moduleNameNoUnderscore(basename(packageFoldername))))
   expect_is(fn, "function")

@@ -77,28 +77,36 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
 
   mySimEvent7 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
-  expect_true(all("randomLandscapes" %in% completed(mySimEvent7)$moduleName))
-  expect_true(!all("fireSpread" %in% completed(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
+  compped <- completed(mySimEvent7)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
+  expect_true(all("randomLandscapes" %in% compped$moduleName))
+  expect_true(!all("fireSpread" %in% compped$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent8 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
-  expect_true(all("randomLandscapes" %in% completed(mySimEvent8)$moduleName))
-  expect_true(!all("fireSpread" %in% completed(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
+  compped <- completed(mySimEvent8)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
+  expect_true(all("randomLandscapes" %in% compped$moduleName))
+  expect_true(!all("fireSpread" %in% compped$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent9 <- simInitAndSpades(times, params, modules, objects = list(), paths,
                         debug = FALSE, .plotInitialTime = NA, events = "init")
-  expect_true(all("init" == completed(mySimEvent9)$eventType))
+  compped <- completed(mySimEvent9)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
+  expect_true(all("init" == compped$eventType))
   expect_true(max(events(mySimEvent9)$eventTime) <= end(mySimEvent9)) # didn't schedule next event
 
   # Test times
   #  Set end time to WAY after the init events
   mySimEvent10 <- simInitAndSpades(times = list(start = 0, end = 10), params, modules, objects = list(), paths,
                                   debug = FALSE, .plotInitialTime = NA, events = "init")
+  compped <- completed(mySimEvent10)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
   expect_true(time(mySimEvent10) == end(mySimEvent10)) # it is at 10, the end
-  expect_true(all("init" == completed(mySimEvent10)$eventType))
-  expect_true(max(completed(mySimEvent10)$eventTime) == start(mySimEvent10)) # didn't go past start time because init are all at start
+  expect_true(all("init" == compped$eventType))
+  expect_true(max(compped$eventTime) == start(mySimEvent10)) # didn't go past start time because init are all at start
   simOut <- spades(mySimEvent10)
   expect_true(time(simOut) == end(simOut)) # it is at 10, the end
   expect_true(!all("init" == completed(simOut)$eventType))

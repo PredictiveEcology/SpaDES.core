@@ -118,6 +118,9 @@ testCode <- '
       })
       return(invisible(sim))
       }
+      Init <- function(sim) {
+        return(invisible(sim))
+      }
 
       .inputObjects <- function(sim) {
         mod$x <- "sdf"
@@ -197,6 +200,10 @@ test2Code <- '
       })
       return(invisible(sim))
       }
+      Init <- function(sim) {
+        return(invisible(sim))
+      }
+
       .inputObjects <- function(sim) {
       if (isTRUE(P(sim)$testParB >= 543)) {
          P(sim, "testParB") <-  P(sim)$testParB + 654
