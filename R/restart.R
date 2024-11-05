@@ -102,7 +102,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   if (numMods > 0) {
     com <- completed(sim)
-    etSecs <- sum(com[, et := difftime(clockTime, ._prevEventTimeFinish, units = "secs"),
+    etSecs <- sum(com[, et := difftime(._clockTime, ._prevEventTimeFinish, units = "secs"),
                       by = seq_len(NROW(com))]$et)
 
     # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
