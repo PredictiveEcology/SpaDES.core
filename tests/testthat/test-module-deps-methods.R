@@ -118,7 +118,7 @@ test_that("depsEdgeList and depsGraph work", {
   testInit(sampleModReqdPkgs)
 
   origRepos <- getOption("repos")
-  print(origRepos)
+  # print(origRepos)
   if (any(unname(origRepos) == "@CRAN@")) {
     suppressMessages(utils::chooseCRANmirror(ind = 1))
     on.exit({
