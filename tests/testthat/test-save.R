@@ -255,7 +255,6 @@ test_that("saveSimList works correctly", {
 
   mySim <- simLoaded
   # Now keep as file-backed, but change name
-  # aaaa <<- 1
   saveSimList(mySim, filename = tmpfile[3])
 
   sim <- loadSimList(file = tmpfile[3])

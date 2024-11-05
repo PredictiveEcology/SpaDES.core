@@ -153,8 +153,6 @@ if (requireNamespace("ggplot2") && requireNamespace("pkgload") ) {
   tmpdir <- tempdir2()
   newModule("test", tmpdir, open = FALSE)
   convertToPackage("test", path = tmpdir)
-  pkgload::load_all(file.path(tmpdir, "test"))
-  pkgload::unload("test")
 }
 
 }
