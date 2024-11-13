@@ -139,7 +139,7 @@
 #'   `spades.reqdPkgsDontLoad` \tab `"box"` \tab Specify any packages that should not
 #'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
 #'   listed. The default (`"box"`) is a package that returns a warning if it is
-#'   loaded, and so it is excluded from loading.
+#'   loaded, and so it is excluded from loading.\cr
 #'
 #'   `spades.saveFileExtensions` \tab `NULL` \tab
 #'   a `data.frame` with 3 columns, `exts`, `fun`, and `package` indicating which

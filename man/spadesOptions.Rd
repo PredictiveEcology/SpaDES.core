@@ -142,7 +142,7 @@ There is a message which describes how to find that. \cr
 \code{spades.reqdPkgsDontLoad} \tab \code{"box"} \tab Specify any packages that should not
 be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
 listed. The default (\code{"box"}) is a package that returns a warning if it is
-loaded, and so it is excluded from loading.
+loaded, and so it is excluded from loading.\cr
 
 \code{spades.saveFileExtensions} \tab \code{NULL} \tab
 a \code{data.frame} with 3 columns, \code{exts}, \code{fun}, and \code{package} indicating which
