@@ -1556,9 +1556,11 @@ loadPkgs <- function(reqdPkgs) {
       allPkgs <- allPkgs[!Require::extractPkgName(allPkgs) %in% getOption("spades.reqdPkgsDontLoad", NULL)]
       needOnlyInstall <- getOption("spades.reqdPkgsDontLoad", NULL)
     }
+    useBox <- getOption("spades.useBox", FALSE)
+    require <- !useBox %in% TRUE
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
+      Require(allPkgs, require = require, standAlone = FALSE, upgrade = FALSE)
       if (!is.null(needOnlyInstall)) {
         verbose <- getOption("reproducible.verbose")
         Require::Require(needOnlyInstall, require = FALSE, standAlone = FALSE,
@@ -1566,8 +1568,10 @@ loadPkgs <- function(reqdPkgs) {
       }
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
+      if (!useBox) {
+        allPkgs <- unique(Require::extractPkgName(allPkgs))
+        loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
+      }
     }
   }
 }

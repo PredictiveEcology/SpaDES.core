@@ -6,11 +6,11 @@
 \alias{getModuleVersion,character,missing-method}
 \title{Find the latest module version from a SpaDES module repository}
 \usage{
-getModuleVersion(name, repo)
+getModuleVersion(name, repo, token)
 
-\S4method{getModuleVersion}{character,character}(name, repo)
+\S4method{getModuleVersion}{character,character}(name, repo, token)
 
-\S4method{getModuleVersion}{character,missing}(name)
+\S4method{getModuleVersion}{character,missing}(name, token)
 }
 \arguments{
 \item{name}{Character string giving the module name.}

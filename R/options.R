@@ -180,7 +180,17 @@
 #'     point number comparisons. \cr
 #'
 #'   `spades.useragent` \tab `"https://github.com/PredictiveEcology/SpaDES"`.
-#'     \tab : The default user agent to use for downloading modules from GitHub. \cr
+#'     \tab The default user agent to use for downloading modules from GitHub. \cr
+#'
+#'   `spades.useBox` \tab TRUE
+#'     \tab Whether to manage which packages are loaded using the package `box`.
+#'     This will have as an effect that `reqdPkgs` will be strict; if a given
+#'     module is missing a `reqdPkgs`, then the module will fail to run, with
+#'     an error saying the package/function doesn't exist. Without `box`,
+#'     modules may run, even though `reqdPkgs` is incorrect, because other modules
+#'     may have specified their own packages, which cover the needs of another
+#'     package. `useBox = TRUE` will force modules to be accurate with their
+#'     `reqdPkgs` \cr
 #'
 #'   `spades.useRequire` \tab `!tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false"`
 #'     \tab : The default for that environment variable is unset, so this returns
@@ -236,6 +246,7 @@ spadesOptions <- function() {
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
+    spades.useBox = TRUE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",
     spades.keepCompleted = TRUE
   )
