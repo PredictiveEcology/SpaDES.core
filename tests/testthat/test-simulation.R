@@ -1047,7 +1047,7 @@ test_that("debug using logging", {
 })
 
 test_that("options('reproducible.reqdPkgsDontLoad", {
-  dontLoad <- "sp"
+  dontLoad <- "ggplot2" # can't be sp, raster because already loaded
 
   skip_if_not_installed(dontLoad)
   unloadNamespace(dontLoad)
@@ -1070,8 +1070,8 @@ test_that("options('reproducible.reqdPkgsDontLoad", {
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = "year",
     citation = list("citation.bib"),
-    documentation = list("README.md", "test.Rmd"),
-    reqdPkgs = list("sp"),
+    documentation = list("README.md", "test.Rmd"),',
+paste0("    reqdPkgs = list(\'", dontLoad, "\'),"),'
     parameters = rbind(
     ),
     inputObjects = bindrows(

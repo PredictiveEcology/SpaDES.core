@@ -661,3 +661,15 @@ newEnvsByModule <- function(sim, modu) {
   sim@.xData$.mods[[modu]]$.objects <- new.env(parent = emptyenv())
   sim
 }
+
+
+reqdPkgsDontLoad <- function(allPkgs, pkgsDontLoad = getOption("spades.reqdPkgsDontLoad", NULL)) {
+  if (spadesReqdPkgsDontLoad(pkgsDontLoad)) {
+    allPkgs <- allPkgs[!Require::extractPkgName(allPkgs) %in% pkgsDontLoad]
+  }
+  allPkgs
+}
+
+spadesReqdPkgsDontLoad <- function(pkgsDontLoad) {
+  is.character(pkgsDontLoad)
+}
