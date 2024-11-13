@@ -136,6 +136,11 @@
 #'   and the differences can be seen in a hidden object in the stashed `simList`.
 #'   There is a message which describes how to find that. \cr
 #'
+#'   `spades.reqdPkgsDontLoad` \tab `"box"` \tab Specify any packages that should not
+#'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
+#'   listed. The default (`"box"`) is a package that returns a warning if it is
+#'   loaded, and so it is excluded from loading.
+#'
 #'   `spades.saveFileExtensions` \tab `NULL` \tab
 #'   a `data.frame` with 3 columns, `exts`, `fun`, and `package` indicating which
 #'   file extension, and which function from which package will be used when
@@ -217,6 +222,7 @@ spadesOptions <- function() {
     spades.plots = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
+    spades.reqdPkgsDontLoad = "box",
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",

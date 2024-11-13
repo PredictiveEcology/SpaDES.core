@@ -1037,3 +1037,63 @@ test_that("debug using logging", {
   })
   expect_true(length(mess1) == 0)
 })
+
+test_that("options('reproducible.reqdPkgsDontLoad", {
+  dontLoad <- "sp"
+
+  skip_if_not_installed(dontLoad)
+  unloadNamespace(dontLoad)
+  withr::local_options(spades.reqdPkgsDontLoad = dontLoad)
+
+  testInit()
+
+  newModule("test", tmpdir, open = FALSE)
+
+  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+    name = "test",
+    description = "insert module description here",
+    keywords = c("insert key words here"),
+    authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
+    childModules = character(0),
+    version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+    spatialExtent = terra::ext(rep(0, 4)),
+    timeframe = as.POSIXlt(c(NA, NA)),
+    timeunit = "year",
+    citation = list("citation.bib"),
+    documentation = list("README.md", "test.Rmd"),
+    reqdPkgs = list("sp"),
+    parameters = rbind(
+    ),
+    inputObjects = bindrows(
+    ),
+    outputObjects = bindrows(
+    )
+    ))
+
+    doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+    switch(
+    eventType,
+    init = {
+    })
+    return(invisible(sim))
+    }
+
+', fill = TRUE)
+  expect_false(isNamespaceLoaded(dontLoad))
+  warn <- capture_warnings(
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 1, timeunit = "year"))
+  )
+  expect_false(isNamespaceLoaded(dontLoad))
+
+  options(spades.reqdPkgsDontLoad = NULL)
+  warn <- capture_warnings(
+    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 1, timeunit = "year"))
+  )
+  expect_true(isNamespaceLoaded(dontLoad))
+  unloadNamespace(dontLoad)
+
+})
