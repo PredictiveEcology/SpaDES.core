@@ -1548,17 +1548,15 @@ loadPkgs <- function(reqdPkgs) {
     checkSpaDES.coreMinVersion(allPkgs)
     allPkgs <- grep("^SpaDES.core\\>", allPkgs, value = TRUE, invert = TRUE)
 
-    needOnlyInstall <- NULL
-    if (is.character(getOption("spades.reqdPkgsDontLoad", NULL))) {
-      allPkgs <- allPkgs[!Require::extractPkgName(allPkgs) %in% getOption("spades.reqdPkgsDontLoad", NULL)]
-      needOnlyInstall <- getOption("spades.reqdPkgsDontLoad", NULL)
-    }
+    pkgsDontLoad <- getOption("spades.reqdPkgsDontLoad", NULL)
+    allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
+
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
-      if (!is.null(needOnlyInstall)) {
+      Require(allPkgs, require = require, standAlone = FALSE, upgrade = FALSE)
+      if (!is.null(pkgsDontLoad)) {
         verbose <- getOption("reproducible.verbose")
-        Require::Require(needOnlyInstall, require = FALSE, standAlone = FALSE,
+        Require::Require(pkgsDontLoad, require = FALSE, standAlone = FALSE,
                          upgrade = FALSE, verbose = verbose - 1)
       }
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
