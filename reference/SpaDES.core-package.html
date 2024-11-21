@@ -24,7 +24,7 @@ Wiki: https://github.com/PredictiveEcology/SpaDES/wiki"><!-- mathjax --><script 
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -49,7 +49,7 @@ Wiki: https://github.com/PredictiveEcology/SpaDES/wiki"><!-- mathjax --><script 
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -74,20 +74,20 @@ Wiki: https://github.com/PredictiveEcology/SpaDES/wiki"><!-- mathjax --><script 
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Categorized overview of the <code>SpaDES.core</code> package</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/spades-core-package.R" class="external-link"><code>R/spades-core-package.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/spades-core-package.R" class="external-link"><code>R/spades-core-package.R</code></a></small>
     <div class="hidden name"><code>SpaDES.core-package.Rd</code></div>
     </div>
 
@@ -117,7 +117,7 @@ milliseconds to many seconds each event.</p>
     </div>
     <div id="-spatial-discrete-event-simulation-spades-">
     <h2>1 Spatial discrete event simulation (<code>SpaDES</code>)</h2>
-    
+
 
 
 <p>A collection of top-level functions for doing spatial discrete event simulation.</p>
@@ -137,7 +137,7 @@ Run multiple <code><a href="spades.html">spades()</a></code> calls</td></tr></ta
     </div>
     <div id="-the-simlist-object-class">
     <h2>2 The <code>simList</code> object class</h2>
-    
+
 
 
 <p>The principle exported object class is the <code>simList</code>.
@@ -145,7 +145,7 @@ All <code>SpaDES</code> simulations operate on this object class.</p>
 <table class="table table"><tr><td><code><a href="simList-class.html">simList()</a></code></td><td>The <code>simList</code> class</td></tr></table></div>
     <div id="-simlist-methods">
     <h2>3 <code>simList</code> methods</h2>
-    
+
 
 
 <p>Collections of commonly used functions to retrieve or set slots (and their elements)
@@ -213,7 +213,7 @@ within that slot. Sometimes, this not desired, and a true copy is required.</p>
     </div>
     <div id="-module-operations">
     <h2>4 Module operations</h2>
-    
+
 
 
 <div class="section">
@@ -243,7 +243,7 @@ information:</p>
     </div>
     <div id="-module-functions">
     <h2>5 Module functions</h2>
-    
+
 
 
 <p><em>A collection of functions that help with making modules can be found in
@@ -268,7 +268,7 @@ and many others), we provide the following GIS-related functions:</p>
 <table class="table table"><tr><td><code>equalExtent()</code></td><td>Assess whether a list of extents are all equal</td></tr></table></div>
 
 <div class="section">
-<h3 id="-map-reduce-type-operations">5.4 'Map-reduce'--type operations<a class="anchor" aria-label="anchor" href="#-map-reduce-type-operations"></a></h3>
+<h3 id="-map-reduce-type-operations">5.4 'Map-reduce'–type operations<a class="anchor" aria-label="anchor" href="#-map-reduce-type-operations"></a></h3>
 <p>These functions convert between reduced and mapped representations of the same data.
 This allows compact representation of, e.g., rasters that have many individual pixels
 that share identical information.</p>
@@ -307,7 +307,7 @@ You must know how to use SELES for these to be useful:</p>
     </div>
     <div id="-caching-simulations-and-simulation-components">
     <h2>6 Caching simulations and simulation components</h2>
-    
+
 
 
 <p><em>Simulation caching uses the <code>reproducible</code> package.</em></p>
@@ -322,7 +322,7 @@ functions.</p>
     </div>
     <div id="-plotting">
     <h2>7 Plotting</h2>
-    
+
 
 
 <p><strong>Much of the underlying plotting functionality is provided by <span class="pkg">quickPlot</span>.</strong></p>
@@ -331,7 +331,7 @@ and speed of plotting:</p>
 <p>Commonly used:</p><table class="table table"><tr><td><code>Plot()</code></td><td>The workhorse plotting function</td></tr></table><p>Simulation diagrams:</p><table class="table table"><tr><td><code><a href="eventDiagram.html">eventDiagram()</a></code></td><td>Gantt chart representing the events in a completed simulation.</td></tr><tr><td><code><a href="moduleDiagram.html">moduleDiagram()</a></code></td><td>Network diagram of simplified module (object) dependencies.</td></tr><tr><td><code><a href="objectDiagram.html">objectDiagram()</a></code></td><td>Sequence diagram of detailed object dependencies.</td></tr></table><p>Other useful plotting functions:</p><table class="table table"><tr><td><code>clearPlot()</code></td><td>Helpful for resolving many errors</td></tr><tr><td><code>clickValues()</code></td><td>Extract values from a raster object at the mouse click location(s)</td></tr><tr><td><code>clickExtent()</code></td><td>Zoom into a raster or polygon map that was plotted with <code>Plot()</code></td></tr><tr><td><code>clickCoordinates()</code></td><td>Get the coordinates, in map units, under mouse click</td></tr><tr><td><code>dev()</code></td><td>Specify which device to plot on, making a non-RStudio one as default</td></tr><tr><td><code>newPlot()</code></td><td>Open a new default plotting device</td></tr><tr><td><code>rePlot()</code></td><td>Re-plots all elements of device for refreshing or moving plot</td></tr></table></div>
     <div id="-file-operations">
     <h2>8 File operations</h2>
-    
+
 
 
 <p>In addition to R's file operations, we have added several here to aid in bulk
@@ -339,7 +339,7 @@ loading and saving of files for simulation purposes:</p>
 <table class="table table"><tr><td><code><a href="loadFiles.html">loadFiles()</a></code></td><td>Load simulation objects according to a file list</td></tr><tr><td><code><a href="rasterToMemory.html">rasterToMemory()</a></code></td><td>Read a raster from file to RAM</td></tr><tr><td><code><a href="saveFiles.html">saveFiles()</a></code></td><td>Save simulation objects according to outputs and parameters</td></tr></table></div>
     <div id="-sample-modules-included-in-package">
     <h2>9 Sample modules included in package</h2>
-    
+
 
 
 <p>Several dummy modules are included for testing of functionality.
@@ -347,7 +347,7 @@ These can be found with <code>file.path(find.package("SpaDES.core"), "sampleModu
 <table class="table table"><tr><td><code>randomLandscapes</code></td><td>Imports, updates, and plots several raster map layers</td></tr><tr><td><code>caribouMovement</code></td><td>A simple agent-based (a.k.a., individual-based) model</td></tr><tr><td><code>fireSpread</code></td><td>A simple model of a spatial spread process</td></tr></table></div>
     <div id="-package-options">
     <h2>10 Package options</h2>
-    
+
 
 
 <p><code>SpaDES</code> packages use the following <code><a href="https://rdrr.io/r/base/options.html" class="external-link">options()</a></code> to configure behaviour:</p>
@@ -433,15 +433,15 @@ modules from GitHub.com. Default <code>"https://github.com/PredictiveEcology/Spa
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

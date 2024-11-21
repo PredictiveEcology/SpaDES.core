@@ -11,7 +11,7 @@ values set to defaults"><!-- mathjax --><script src="https://cdnjs.cloudflare.co
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -36,7 +36,7 @@ values set to defaults"><!-- mathjax --><script src="https://cdnjs.cloudflare.co
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -61,20 +61,20 @@ values set to defaults"><!-- mathjax --><script src="https://cdnjs.cloudflare.co
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Define a new module.</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/module-define.R" class="external-link"><code>R/module-define.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/module-define.R" class="external-link"><code>R/module-define.R</code></a></small>
     <div class="hidden name"><code>defineModule.Rd</code></div>
     </div>
 
@@ -87,29 +87,29 @@ values set to defaults</p>
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">defineModule</span><span class="op">(</span><span class="va">sim</span>, <span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,list</span></span>
+<span><span class="co"># S4 method for class 'simList,list'</span></span>
 <span><span class="fu">defineModule</span><span class="op">(</span><span class="va">sim</span>, <span class="va">x</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A <code>simList</code> object from which to extract element(s) or in which to replace element(s).</p></dd>
 
 
-<dt>x</dt>
+<dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>A list with a number of named elements, referred to as the metadata. See details.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Updated <code>simList</code> object.</p>
+    <p>Updated <code>simList</code> object.</p>
     </div>
     <div id="required-metadata-elements">
     <h2>Required metadata elements</h2>
-    
+
 
 
 <table class="table table"><tr><td><code>name</code></td><td>Module name. Must match the filename (without the <code>.R</code> extension).
@@ -214,14 +214,14 @@ that will cause these objects to be put into the
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span>  <span class="co">## a default version of the defineModule is created with a call to newModule</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="newModule.html">newModule</a></span><span class="op">(</span><span class="st">"test"</span>, path <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, open <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmpd0rH1m</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp45trFG</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in</span> <span style="color: #BBBB00;">test.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in</span> <span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in</span> <span style="color: #BBBB00;">test.Rmd</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing</span> <span style="color: #BBBB00;">citation.bib</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see</span> <span style="color: #BBBB00;">LICENSE.md</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmpd0rH1m/test/test.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmpd0rH1m/test/test.Rmd</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmp45trFG/test/test.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmp45trFG/test/test.Rmd</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">## view the resulting module file</span></span></span>
 <span class="r-in"><span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/file.edit.html" class="external-link">file.edit</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">"test"</span>, <span class="st">"test.R"</span><span class="op">)</span><span class="op">)</span></span></span>
@@ -241,15 +241,15 @@ that will cause these objects to be put into the
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

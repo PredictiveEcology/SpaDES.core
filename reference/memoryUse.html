@@ -15,7 +15,7 @@ The default is 0, meaning no interval, "off".'><!-- mathjax --><script src="http
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -40,7 +40,7 @@ The default is 0, meaning no interval, "off".'><!-- mathjax --><script src="http
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -65,20 +65,20 @@ The default is 0, meaning no interval, "off".'><!-- mathjax --><script src="http
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Estimate memory used with <code>system("ps")</code></h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/memory.R" class="external-link"><code>R/memory.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/memory.R" class="external-link"><code>R/memory.R</code></a></small>
     <div class="hidden name"><code>memoryUse.Rd</code></div>
     </div>
 
@@ -100,16 +100,18 @@ The default is <code>0</code>, meaning no interval, "off".</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>thisPid</dt>
+
+
+<dl><dt id="arg-thispid">thisPid<a class="anchor" aria-label="anchor" href="#arg-thispid"></a></dt>
 <dd><p>Numeric or integer, the <code>PID</code> of the process.
 If omitted, it will be found with <code><a href="https://rdrr.io/r/base/Sys.getpid.html" class="external-link">Sys.getpid()</a></code>.</p></dd>
 
 
-<dt>sim</dt>
+<dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A completed <code>simList</code></p></dd>
 
 
-<dt>max</dt>
+<dt id="arg-max">max<a class="anchor" aria-label="anchor" href="#arg-max"></a></dt>
 <dd><p>Logical. If TRUE, then it the return value will be summarized by
 module/event, showing the maximum memory used. If <code>FALSE</code>, then
 the raw memory used during each event will be shown.</p></dd>
@@ -117,11 +119,7 @@ the raw memory used during each event will be shown.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>estimated memory use in MiB</p>
-
-
+    <p>estimated memory use in MiB</p>
 <p><code>data.table</code> summarizing the estimated memory use (in MiB) for each event type,
 for each module, during the simulation.</p>
     </div>
@@ -146,15 +144,15 @@ for each module, during the simulation.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

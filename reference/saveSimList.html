@@ -22,7 +22,7 @@ as the code will search based on the filename without the file extension."><!-- 
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -47,7 +47,7 @@ as the code will search based on the filename without the file extension."><!-- 
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -72,20 +72,20 @@ as the code will search based on the filename without the file extension."><!-- 
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Save a whole <code>simList</code> object to disk</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/saveLoadSimList.R" class="external-link"><code>R/saveLoadSimList.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/saveLoadSimList.R" class="external-link"><code>R/saveLoadSimList.R</code></a></small>
     <div class="hidden name"><code>saveSimList.Rd</code></div>
     </div>
 
@@ -121,55 +121,55 @@ as the code will search based on the filename without the file extension.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>Either a <code>simList</code> or a character string of the name
 of a <code>simList</code> that can be found in <code>envir</code>.
 Using a character string will assign that object name to the saved
 <code>simList</code>, so when it is recovered it will be given that name.</p></dd>
 
 
-<dt>filename</dt>
+<dt id="arg-filename">filename<a class="anchor" aria-label="anchor" href="#arg-filename"></a></dt>
 <dd><p>Character string with the path for saving <code>simList</code> to or
 reading the <code>simList</code> from. Currently, only <code>.rds</code> and <code>.qs</code> file types are supported.</p></dd>
 
 
-<dt>projectPath</dt>
+<dt id="arg-projectpath">projectPath<a class="anchor" aria-label="anchor" href="#arg-projectpath"></a></dt>
 <dd><p>Should be the "top level" or project path for the <code>simList</code>.
 Defaults to <code><a href="https://rdrr.io/r/base/getwd.html" class="external-link">getwd()</a></code>. All other paths will be made relative with respect to
 this if nested within this.</p></dd>
 
 
-<dt>outputs</dt>
+<dt id="arg-outputs">outputs<a class="anchor" aria-label="anchor" href="#arg-outputs"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, all files identified in
 <code>outputs(sim)</code> will be included in the zip.</p></dd>
 
 
-<dt>inputs</dt>
+<dt id="arg-inputs">inputs<a class="anchor" aria-label="anchor" href="#arg-inputs"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, all files identified in
 <code>inputs(sim)</code> will be included in the zip.</p></dd>
 
 
-<dt>cache</dt>
+<dt id="arg-cache">cache<a class="anchor" aria-label="anchor" href="#arg-cache"></a></dt>
 <dd><p>Logical. Not yet implemented. If <code>TRUE</code>, all files in <code>cachePath(sim)</code>
 will be included in the archive.
 Defaults to <code>FALSE</code> as this could be large, and may include many out of date elements.
 See Details.</p></dd>
 
 
-<dt>envir</dt>
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
 <dd><p>If <code>sim</code> is a character string, then this must be provided.
 It is the environment where the object named <code>sim</code> can be found.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments. See Details.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Invoked for side effects of saving both a <code>.qs</code> (or <code>.rds</code>) file,
+    <p>Invoked for side effects of saving both a <code>.qs</code> (or <code>.rds</code>) file,
 and a compressed archive (one of <code>.tar.gz</code> if using non-Windows OS or <code>.zip</code> on Windows).</p>
     </div>
     <div id="details">
@@ -202,15 +202,15 @@ E.g., <code>list(cachePath = "cache", inputPath = "inputs", outputPath = "output
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

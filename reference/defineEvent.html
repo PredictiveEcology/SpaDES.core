@@ -16,7 +16,7 @@ This may be a little bit cleaner, but both with still work."><!-- mathjax --><sc
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -41,7 +41,7 @@ This may be a little bit cleaner, but both with still work."><!-- mathjax --><sc
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -66,20 +66,20 @@ This may be a little bit cleaner, but both with still work."><!-- mathjax --><sc
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Alternative way to define events in SpaDES.core</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/simulation-spades.R" class="external-link"><code>R/simulation-spades.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/simulation-spades.R" class="external-link"><code>R/simulation-spades.R</code></a></small>
     <div class="hidden name"><code>defineEvent.Rd</code></div>
     </div>
 
@@ -106,26 +106,28 @@ This may be a little bit cleaner, but both with still work.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A <code>simList</code></p></dd>
 
 
-<dt>eventName</dt>
+<dt id="arg-eventname">eventName<a class="anchor" aria-label="anchor" href="#arg-eventname"></a></dt>
 <dd><p>Character string of the desired event name to define. Default is "init"</p></dd>
 
 
-<dt>code</dt>
+<dt id="arg-code">code<a class="anchor" aria-label="anchor" href="#arg-code"></a></dt>
 <dd><p>An expression that defines the code to execute during the event. This will
 be captured, and pasted into a new function (<code>doEvent.moduleName.eventName</code>),
 remaining unevaluated until that new function is called.</p></dd>
 
 
-<dt>moduleName</dt>
+<dt id="arg-modulename">moduleName<a class="anchor" aria-label="anchor" href="#arg-modulename"></a></dt>
 <dd><p>Character string of the name of the module. If this function is
 used within a module, then it will try to find the module name.</p></dd>
 
 
-<dt>envir</dt>
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
 <dd><p>An optional environment to specify where to put the resulting function.
 The default will place a function called <code>doEvent.moduleName.eventName</code> in the
 module function location, i.e., <code>sim$.mods[[moduleName]]</code>. However, if this
@@ -143,14 +145,14 @@ Normally, especially, if used within SpaDES module code, this should be left mis
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:45 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02404428 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02536082 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># these put the functions in the parent.frame() which is .GlobalEnv for an interactive user</span></span></span>
 <span class="r-in"><span><span class="fu">defineEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="st">"init"</span>, moduleName <span class="op">=</span> <span class="st">"thisTestModule"</span>, code <span class="op">=</span> <span class="op">{</span></span></span>
@@ -193,12 +195,12 @@ Normally, especially, if used within SpaDES module code, this should be left mis
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span>  <span class="co"># this is skipped when running in automated tests; it is fine in interactive use</span></span></span>
 <span class="r-in"><span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:45 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:45 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.025 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:45 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.027 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:45 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.029 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:45 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:45 thsTst:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 thisTestModule init 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.027 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.029 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 thsTst:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.035 secs | 0 thisTestModule init 5</span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in Init(sim):</span> could not find function "Init"</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">Because of an interrupted spades call, the sim object at the time of interruption was saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
@@ -219,15 +221,15 @@ Normally, especially, if used within SpaDES module code, this should be left mis
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

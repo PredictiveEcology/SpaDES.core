@@ -13,7 +13,7 @@ loadSimList(..., otherFiles = xxx). See zipSimList for details."><!-- mathjax --
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -38,7 +38,7 @@ loadSimList(..., otherFiles = xxx). See zipSimList for details."><!-- mathjax --
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -63,20 +63,20 @@ loadSimList(..., otherFiles = xxx). See zipSimList for details."><!-- mathjax --
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Load a saved <code>simList</code> and ancillary files</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/saveLoadSimList.R" class="external-link"><code>R/saveLoadSimList.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/saveLoadSimList.R" class="external-link"><code>R/saveLoadSimList.R</code></a></small>
     <div class="hidden name"><code>loadSimList.Rd</code></div>
     </div>
 
@@ -103,28 +103,30 @@ all the files are correctly identified and passed to
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>filename</dt>
+
+
+<dl><dt id="arg-filename">filename<a class="anchor" aria-label="anchor" href="#arg-filename"></a></dt>
 <dd><p>Character giving the name of a saved simulation file.
 Currently, only file types <code>.qs</code> or <code>.rds</code> are supported.</p></dd>
 
 
-<dt>projectPath</dt>
+<dt id="arg-projectpath">projectPath<a class="anchor" aria-label="anchor" href="#arg-projectpath"></a></dt>
 <dd><p>An optional path for the project within which the <code>simList</code>
 exists. This is used to identify relative paths for saving and loading the <code>simList</code>.</p></dd>
 
 
-<dt>tempPath</dt>
+<dt id="arg-temppath">tempPath<a class="anchor" aria-label="anchor" href="#arg-temppath"></a></dt>
 <dd><p>A character string specifying the new base directory for the
 temporary paths maintained in a <code>simList</code>.</p></dd>
 
 
-<dt>paths</dt>
+<dt id="arg-paths">paths<a class="anchor" aria-label="anchor" href="#arg-paths"></a></dt>
 <dd><p>A list of character vectors for all the <code>simList</code> paths. When
 loading a <code>simList</code>, this will replace the paths of everything to
 these new paths. Experimental still.</p></dd>
 
 
-<dt>otherFiles</dt>
+<dt id="arg-otherfiles">otherFiles<a class="anchor" aria-label="anchor" href="#arg-otherfiles"></a></dt>
 <dd><p>A character vector of (absolute) file names locating each of the
 existing file-backed <code>Raster*</code> files that are the real paths for the possibly
 incorrect paths in <code>Filenames(sim)</code> if the the <code>file</code> being read in is from
@@ -132,7 +134,7 @@ a different computer, path, or drive. This could be the output from <code>unzipS
 (which is calls <code>loadSimList</code> internally, passing the unzipped filenames)</p></dd>
 
 
-<dt>verbose</dt>
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Numeric, -1 silent (where possible), 0 being very quiet,
 1 showing more messaging, 2 being more messaging, etc.
 Default is 1. Above 3 will output much more information about the internals of
@@ -140,24 +142,22 @@ Caching, which may help diagnose Caching challenges. Can set globally with an
 option, e.g., <code>options('reproducible.verbose' = 0) to reduce to minimal</code></p></dd>
 
 
-<dt>zipfile</dt>
+<dt id="arg-zipfile">zipfile<a class="anchor" aria-label="anchor" href="#arg-zipfile"></a></dt>
 <dd><p>Filename of a zipped <code>simList</code></p></dd>
 
 
-<dt>load</dt>
+<dt id="arg-load">load<a class="anchor" aria-label="anchor" href="#arg-load"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, the default, then the <code>simList</code> will
 also be loaded into R.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>passed to <code>unzip</code></p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>For <code>loadSimList()</code>, a <code>simList</code> object.
+    <p>For <code>loadSimList()</code>, a <code>simList</code> object.
 For <code>unzipSimList()</code>, either a character vector of file names unzipped
 (if <code>load = FALSE</code>), or a <code>simList</code> object.</p>
     </div>
@@ -183,15 +183,15 @@ zipping, to include only cache elements that are relevant.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

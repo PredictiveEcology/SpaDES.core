@@ -9,7 +9,7 @@
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -34,7 +34,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,20 +59,20 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Parse and initialize a module</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/simulation-parseModule.R" class="external-link"><code>R/simulation-parseModule.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/simulation-parseModule.R" class="external-link"><code>R/simulation-parseModule.R</code></a></small>
     <div class="hidden name"><code>parseModule.Rd</code></div>
     </div>
 
@@ -83,10 +83,10 @@
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.parseModulePartial</span><span class="op">(</span><span class="va">sim</span>, <span class="va">modules</span>, <span class="va">filename</span>, <span class="va">defineModuleElement</span>, envir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,missing,character,character</span></span>
+<span><span class="co"># S4 method for class 'missing,missing,character,character'</span></span>
 <span><span class="fu">.parseModulePartial</span><span class="op">(</span><span class="va">filename</span>, <span class="va">defineModuleElement</span>, <span class="va">envir</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,list,missing,character</span></span>
+<span><span class="co"># S4 method for class 'simList,list,missing,character'</span></span>
 <span><span class="fu">.parseModulePartial</span><span class="op">(</span><span class="va">sim</span>, <span class="va">modules</span>, <span class="va">defineModuleElement</span>, envir <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">.parseModule</span><span class="op">(</span></span>
@@ -98,7 +98,7 @@
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,list</span></span>
+<span><span class="co"># S4 method for class 'simList,list'</span></span>
 <span><span class="fu">.parseModule</span><span class="op">(</span></span>
 <span>  <span class="va">sim</span>,</span>
 <span>  <span class="va">modules</span>,</span>
@@ -111,31 +111,33 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A <code>simList</code> simulation object.</p></dd>
 
 
-<dt>modules</dt>
+<dt id="arg-modules">modules<a class="anchor" aria-label="anchor" href="#arg-modules"></a></dt>
 <dd><p>A list of modules with a logical attribute "parsed".</p></dd>
 
 
-<dt>filename</dt>
+<dt id="arg-filename">filename<a class="anchor" aria-label="anchor" href="#arg-filename"></a></dt>
 <dd><p>The filename of the module to be parsed.</p></dd>
 
 
-<dt>defineModuleElement</dt>
+<dt id="arg-definemoduleelement">defineModuleElement<a class="anchor" aria-label="anchor" href="#arg-definemoduleelement"></a></dt>
 <dd><p>Character string indicating which of the list
 elements in <code>defineModule</code> should be extracted</p></dd>
 
 
-<dt>envir</dt>
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
 <dd><p>Optional environment in which to store parsed code. This may be
 useful if the same file is being parsed multiple times. This
 function will check in that environment for the parsed file before
 parsing again. If the <code>envir</code> is transient, then this will have no effect.</p></dd>
 
 
-<dt>userSuppliedObjNames</dt>
+<dt id="arg-usersuppliedobjnames">userSuppliedObjNames<a class="anchor" aria-label="anchor" href="#arg-usersuppliedobjnames"></a></dt>
 <dd><p>Character string (or <code>NULL</code>, the default)
 indicating the names of objects that user has passed
 into <code>simInit</code> via objects or inputs.
@@ -143,23 +145,19 @@ If all module <code>inputObject</code> dependencies are provided by user,
 then the <code>.inputObjects</code> code will be skipped.</p></dd>
 
 
-<dt>notOlderThan</dt>
+<dt id="arg-notolderthan">notOlderThan<a class="anchor" aria-label="anchor" href="#arg-notolderthan"></a></dt>
 <dd><p>Passed to <code>Cache</code> that may be used for <code>.inputObjects</code> function call.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>All <code>simInit</code> parameters.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>.parseModulePartial</code> extracts just the individual element
+    <p><code>.parseModulePartial</code> extracts just the individual element
 requested from the module. This can be useful if parsing the whole module
 would cause an error.</p>
-
-
 <p>A <code>simList</code> simulation object.</p>
     </div>
     <div id="author">
@@ -180,15 +178,15 @@ would cause an error.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

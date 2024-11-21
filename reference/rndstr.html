@@ -9,7 +9,7 @@
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -34,7 +34,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,20 +59,20 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Generate random strings</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/misc-methods.R" class="external-link"><code>R/misc-methods.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/misc-methods.R" class="external-link"><code>R/misc-methods.R</code></a></small>
     <div class="hidden name"><code>rndstr.Rd</code></div>
     </div>
 
@@ -85,53 +85,53 @@
 <span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">n</span>, <span class="va">len</span>, <span class="va">characterFirst</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for numeric,numeric,logical</span></span>
+<span><span class="co"># S4 method for class 'numeric,numeric,logical'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">n</span>, <span class="va">len</span>, <span class="va">characterFirst</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for numeric,numeric,missing</span></span>
+<span><span class="co"># S4 method for class 'numeric,numeric,missing'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">n</span>, <span class="va">len</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for numeric,missing,logical</span></span>
+<span><span class="co"># S4 method for class 'numeric,missing,logical'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">n</span>, <span class="va">characterFirst</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,numeric,logical</span></span>
+<span><span class="co"># S4 method for class 'missing,numeric,logical'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">len</span>, <span class="va">characterFirst</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for numeric,missing,missing</span></span>
+<span><span class="co"># S4 method for class 'numeric,missing,missing'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">n</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,numeric,missing</span></span>
+<span><span class="co"># S4 method for class 'missing,numeric,missing'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">len</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,missing,logical</span></span>
+<span><span class="co"># S4 method for class 'missing,missing,logical'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">characterFirst</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,missing,missing</span></span>
+<span><span class="co"># S4 method for class 'missing,missing,missing'</span></span>
 <span><span class="fu">rndstr</span><span class="op">(</span><span class="va">n</span>, <span class="va">len</span>, <span class="va">characterFirst</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>n</dt>
+
+
+<dl><dt id="arg-n">n<a class="anchor" aria-label="anchor" href="#arg-n"></a></dt>
 <dd><p>Number of strings to generate (default 1).
 Will attempt to coerce to integer value.</p></dd>
 
 
-<dt>len</dt>
+<dt id="arg-len">len<a class="anchor" aria-label="anchor" href="#arg-len"></a></dt>
 <dd><p>Length of strings to generate (default 8).
 Will attempt to coerce to integer value.</p></dd>
 
 
-<dt>characterFirst</dt>
+<dt id="arg-characterfirst">characterFirst<a class="anchor" aria-label="anchor" href="#arg-characterfirst"></a></dt>
 <dd><p>Logical, if <code>TRUE</code>, then a letter will be the
 first character of the string (useful if being used for object names).</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Character vector of random strings.</p>
+    <p>Character vector of random strings.</p>
     </div>
     <div id="author">
     <h2>Author</h2>
@@ -172,15 +172,15 @@ first character of the string (useful if being used for object names).</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

@@ -9,7 +9,7 @@
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-news">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -34,7 +34,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,20 +59,20 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
     <div class="section level2">
@@ -673,7 +673,7 @@
 <li><p><code>simInit</code> and <code>spades</code> now call <code>setPaths(paths)</code> or <code>setPaths(sim$paths)</code>, unsetting them <code>on.exit</code> internally to make the paths used for functions e.g., <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> to use the correct path</p></li>
 <li><p>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</p></li>
 <li><p>improved default path settings in <code>.inputObjects</code> (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/83" class="external-link">#83</a>)</p></li>
-<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on <code>simList</code> objects)</p></li>
+<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://rdrr.io/pkg/data.table/man/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on <code>simList</code> objects)</p></li>
 <li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul></div>
 <div class="section level3">
@@ -869,15 +869,15 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

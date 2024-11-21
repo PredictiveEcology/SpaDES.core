@@ -11,7 +11,7 @@ plotting the depsEdgeList directly with objectDiagram()."><!-- mathjax --><scrip
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -36,7 +36,7 @@ plotting the depsEdgeList directly with objectDiagram()."><!-- mathjax --><scrip
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -61,20 +61,20 @@ plotting the depsEdgeList directly with objectDiagram()."><!-- mathjax --><scrip
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Simulation module dependency diagram</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/plotting-diagrams.R" class="external-link"><code>R/plotting-diagrams.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/plotting-diagrams.R" class="external-link"><code>R/plotting-diagrams.R</code></a></small>
     <div class="hidden name"><code>moduleDiagram.Rd</code></div>
     </div>
 
@@ -87,41 +87,41 @@ plotting the <code>depsEdgeList</code> directly with <code><a href="objectDiagra
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">moduleDiagram</span><span class="op">(</span><span class="va">sim</span>, <span class="va">type</span>, showParents <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,character,logical</span></span>
+<span><span class="co"># S4 method for class 'simList,character,logical'</span></span>
 <span><span class="fu">moduleDiagram</span><span class="op">(</span><span class="va">sim</span>, type <span class="op">=</span> <span class="st">"plot"</span>, showParents <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,ANY,ANY</span></span>
+<span><span class="co"># S4 method for class 'simList,ANY,ANY'</span></span>
 <span><span class="fu">moduleDiagram</span><span class="op">(</span><span class="va">sim</span>, <span class="va">type</span>, showParents <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A <code>simList</code> object (typically corresponding to a
 completed simulation).</p></dd>
 
 
-<dt>type</dt>
+<dt id="arg-type">type<a class="anchor" aria-label="anchor" href="#arg-type"></a></dt>
 <dd><p>Character string, either <code>"rgl"</code> for <code><a href="https://r.igraph.org/reference/rglplot.html" class="external-link">igraph::rglplot</a></code>
 or <code>"tk"</code> for <code><a href="https://r.igraph.org/reference/tkplot.html" class="external-link">igraph::tkplot</a></code>, <code>"Plot"</code> to use <code><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">quickPlot::Plot()</a></code>
 or <code>"plot"</code> to use <code><a href="https://rdrr.io/r/base/plot.html" class="external-link">base::plot()</a></code>, the default.</p></dd>
 
 
-<dt>showParents</dt>
+<dt id="arg-showparents">showParents<a class="anchor" aria-label="anchor" href="#arg-showparents"></a></dt>
 <dd><p>Logical. If TRUE, then any children that are grouped into parent
 modules will be grouped together by coloured blobs. Internally,
 this is calling <code><a href="moduleGraph.html">moduleGraph()</a></code>. Default <code>FALSE</code>.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments passed to plotting function specified by <code>type</code>.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>invoked for its side effect of plotting the module dependency diagram.</p>
+    <p>invoked for its side effect of plotting the module dependency diagram.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -189,26 +189,26 @@ parent and children module structure.</p></div>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>     union</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpd0rH1m/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp45trFG/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpd0rH1m/SpaDES/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:55 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:55 simInit The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:55 simInit Key: &lt;global, module&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:55 simInit module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:55 simInit &lt;char&gt;    &lt;char&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:55 simInit 1:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:55 simInit 2: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.07201576 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmp45trFG/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:36 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:36 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:36 simInit Key: &lt;global, module&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:36 simInit module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:36 simInit &lt;char&gt;    &lt;char&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:36 simInit 1:  caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:36 simInit 2: randomLandscapes stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.09408545 secs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Plot encountered an error; trying base::plot</span>
 <span class="r-plt img"><img src="moduleDiagram-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="moduleDiagram-2.png" alt="" width="700" height="433"></span>
@@ -229,15 +229,15 @@ parent and children module structure.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

@@ -11,7 +11,7 @@ the correct one."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -36,7 +36,7 @@ the correct one."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -61,20 +61,20 @@ the correct one."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Download module data</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/downloadData.R" class="external-link"><code>R/downloadData.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/downloadData.R" class="external-link"><code>R/downloadData.R</code></a></small>
     <div class="hidden name"><code>downloadData.Rd</code></div>
     </div>
 
@@ -98,7 +98,7 @@ the correct one.</p>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,character,logical</span></span>
+<span><span class="co"># S4 method for class 'character,character,logical'</span></span>
 <span><span class="fu">downloadData</span><span class="op">(</span></span>
 <span>  <span class="va">module</span>,</span>
 <span>  <span class="va">path</span>,</span>
@@ -112,10 +112,10 @@ the correct one.</p>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,missing,missing</span></span>
+<span><span class="co"># S4 method for class 'character,missing,missing'</span></span>
 <span><span class="fu">downloadData</span><span class="op">(</span><span class="va">module</span>, <span class="va">quickCheck</span>, <span class="va">overwrite</span>, <span class="va">files</span>, <span class="va">checked</span>, <span class="va">urls</span>, <span class="va">children</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,missing,logical</span></span>
+<span><span class="co"># S4 method for class 'character,missing,logical'</span></span>
 <span><span class="fu">downloadData</span><span class="op">(</span></span>
 <span>  <span class="va">module</span>,</span>
 <span>  <span class="va">quiet</span>,</span>
@@ -127,7 +127,7 @@ the correct one.</p>
 <span>  <span class="va">children</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,character,missing</span></span>
+<span><span class="co"># S4 method for class 'character,character,missing'</span></span>
 <span><span class="fu">downloadData</span><span class="op">(</span></span>
 <span>  <span class="va">module</span>,</span>
 <span>  <span class="va">path</span>,</span>
@@ -142,61 +142,61 @@ the correct one.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>module</dt>
+
+
+<dl><dt id="arg-module">module<a class="anchor" aria-label="anchor" href="#arg-module"></a></dt>
 <dd><p>Character string giving the name of the module.</p></dd>
 
 
-<dt>path</dt>
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
 <dd><p>Character string giving the path to the module directory.</p></dd>
 
 
-<dt>quiet</dt>
+<dt id="arg-quiet">quiet<a class="anchor" aria-label="anchor" href="#arg-quiet"></a></dt>
 <dd><p>Logical. This is passed to <code>download.file</code>. Default is FALSE.</p></dd>
 
 
-<dt>quickCheck</dt>
+<dt id="arg-quickcheck">quickCheck<a class="anchor" aria-label="anchor" href="#arg-quickcheck"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, then the check with local data will only
 use <code>file.size</code> instead of <code><a href="https://rdrr.io/pkg/digest/man/digest.html" class="external-link">digest::digest</a></code>.
 This is faster, but potentially much less robust.</p></dd>
 
 
-<dt>overwrite</dt>
+<dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
 <dd><p>Logical. Should local data files be overwritten in case they exist?
 Default is <code>FALSE</code>.</p></dd>
 
 
-<dt>files</dt>
+<dt id="arg-files">files<a class="anchor" aria-label="anchor" href="#arg-files"></a></dt>
 <dd><p>A character vector of length 1 or more if only a subset of files should be
 checked in the <code class="file">CHECKSUMS.txt</code> file.</p></dd>
 
 
-<dt>checked</dt>
+<dt id="arg-checked">checked<a class="anchor" aria-label="anchor" href="#arg-checked"></a></dt>
 <dd><p>The result of a previous <code>checksums</code> call. This should only be used when
 there is no possibility that the file has changed, i.e., if <code>downloadData</code> is
 called from inside another function.</p></dd>
 
 
-<dt>urls</dt>
+<dt id="arg-urls">urls<a class="anchor" aria-label="anchor" href="#arg-urls"></a></dt>
 <dd><p>Character vector of urls from which to get the data. This is automatically
 found from module metadata when this function invoked with
 <code>SpaDES.core::downloadModule(..., data = TRUE)</code>. See also
 <code>prepInputs()</code>.</p></dd>
 
 
-<dt>children</dt>
+<dt id="arg-children">children<a class="anchor" aria-label="anchor" href="#arg-children"></a></dt>
 <dd><p>The character vector of child modules (without path) to also
 run <code>downloadData</code> on</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Passed to <code><a href="https://reproducible.predictiveecology.org/reference/preProcess.html" class="external-link">reproducible::preProcess()</a></code>, e.g., <code>purge</code></p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Invisibly, a list of downloaded files.</p>
+    <p>Invisibly, a list of downloaded files.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -251,15 +251,15 @@ for downloading modules and building a checksums file.</p></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

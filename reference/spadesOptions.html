@@ -11,7 +11,7 @@ See Details below."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -36,7 +36,7 @@ See Details below."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -61,20 +61,20 @@ See Details below."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1><code>SpaDES.core</code> options</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/options.R" class="external-link"><code>R/options.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/options.R" class="external-link"><code>R/options.R</code></a></small>
     <div class="hidden name"><code>spadesOptions.Rd</code></div>
     </div>
 
@@ -90,9 +90,7 @@ See Details below.</p>
 
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>named list of the <em>default</em> package options.</p>
+    <p>named list of the <em>default</em> package options.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -117,7 +115,7 @@ first time makes the error, the second time has <code>debugonce</code> and the t
 is after the error is addressed. <code>TRUE</code> is likely somewhat slower.</td></tr><tr><td><code>reproducible.cachePath</code></td><td><code>getOption('reproducible.cachePath')</code></td><td>The default local directory in which to cache simulation outputs.
 Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/cache</code>).</td></tr><tr><td><code>spades.debug</code></td><td><code>TRUE</code></td><td>The default debugging value <code>debug</code> argument in <code><a href="spades.html">spades()</a></code></td></tr><tr><td><code>spades.dotInputObjects</code></td><td><code>TRUE</code></td><td>This is used in <code>simInit</code>; if set to <code>TRUE</code> then the <code>.inputObjects</code>
 function will be run; if <code>FALSE</code>, then it will be skipped.</td></tr><tr><td><code>spades.DTthreads</code></td><td><code>1L</code></td><td>The default number of <span class="pkg">data.table</span> threads to use.
-See also <code><a href="https://rdatatable.gitlab.io/data.table/reference/openmp-utils.html" class="external-link">?data.table::setDTthreads</a></code>.</td></tr><tr><td><code>spades.futureEvents</code></td><td><code>FALSE</code></td><td>If set to <code>TRUE</code>, the event simulator will attempt to spawn events
+See also <code><a href="https://rdrr.io/pkg/data.table/man/openmp-utils.html" class="external-link">?data.table::setDTthreads</a></code>.</td></tr><tr><td><code>spades.futureEvents</code></td><td><code>FALSE</code></td><td>If set to <code>TRUE</code>, the event simulator will attempt to spawn events
 whose outputs are not needed (by other events in the <code>simList</code>) into a future.
 In some cases, this will speed up simulations, by running some events in parallel.
 Still VERY experimental. Use cautiously.</td></tr><tr><td><code>spades.logPath</code></td><td>Defaults to a subdirectory (<code>logs/</code>) of the simulation output directory.</td><td>The default local directory in which to look for simulation inputs.</td></tr><tr><td><code>spades.inputPath</code></td><td>Default is a temporary directory (typically <code>/tmp/RtmpXXX/SpaDES/inputs</code>)</td><td>The default local directory in which to look for simulation inputs.</td></tr><tr><td><code>spades.loadReqdPkgs</code></td><td>Default is <code>TRUE</code> meaning that any <code>reqdPkgs</code> will be loaded via <code>Require</code>
@@ -187,15 +185,15 @@ packages are not available.</td><td></td></tr></table></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

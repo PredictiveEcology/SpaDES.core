@@ -21,7 +21,7 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -46,7 +46,7 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -71,20 +71,20 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1><code>Plot</code> wrapper intended for use in a SpaDES module</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/Plots.R" class="external-link"><code>R/Plots.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/Plots.R" class="external-link"><code>R/Plots.R</code></a></small>
     <div class="hidden name"><code>Plots.Rd</code></div>
     </div>
 
@@ -121,7 +121,9 @@ See below and examples.</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>data</dt>
+
+
+<dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
 <dd><p>An (optional) arbitrary data object. If supplied, it will be passed as
 the first argument to <code>Plot</code> function, and should contain all the data
 required for the inner plotting. If passing a <code>RasterLayer</code>,
@@ -131,69 +133,67 @@ is used and all arguments for <code>fn</code> are supplied and named, then this 
 See examples.</p></dd>
 
 
-<dt>fn</dt>
+<dt id="arg-fn">fn<a class="anchor" aria-label="anchor" href="#arg-fn"></a></dt>
 <dd><p>An arbitrary plotting function. If not provided, defaults to using <code><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">quickPlot::Plot</a></code></p></dd>
 
 
-<dt>filename</dt>
+<dt id="arg-filename">filename<a class="anchor" aria-label="anchor" href="#arg-filename"></a></dt>
 <dd><p>A name that will be the base for the files that will be saved, i.e,
 do not supply the file extension, as this will be determined based on <code>types</code>.
 If a user provides this as an absolute path, it will override the <code>path</code>
 argument.</p></dd>
 
 
-<dt>types</dt>
+<dt id="arg-types">types<a class="anchor" aria-label="anchor" href="#arg-types"></a></dt>
 <dd><p>Character vector, zero or more of types. If used within a module, this
 will be deduced from the <code>P(sim)$type</code> and can be omitted. See below.</p></dd>
 
 
-<dt>path</dt>
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
 <dd><p>Currently a single path for the saved objects on disk. If <code>filename</code>
 is supplied as an absolute path, <code>path</code> will be set to <code>dirname(filename)</code>,
 overriding this argument value.</p></dd>
 
 
-<dt>.plotInitialTime</dt>
+<dt id="arg--plotinitialtime">.plotInitialTime<a class="anchor" aria-label="anchor" href="#arg--plotinitialtime"></a></dt>
 <dd><p>A numeric. If <code>NA</code> then no visual on screen. Anything
 else will have visuals plotted to screen device. This is here for backwards
 compatibility. A developer should set in the module to the intended initial
 plot time and leave it, i.e., <em>not</em> <code>NA</code>.</p></dd>
 
 
-<dt>ggsaveArgs</dt>
+<dt id="arg-ggsaveargs">ggsaveArgs<a class="anchor" aria-label="anchor" href="#arg-ggsaveargs"></a></dt>
 <dd><p>An optional list of arguments passed to <code><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggplot2::ggsave</a></code></p></dd>
 
 
-<dt>usePlot</dt>
+<dt id="arg-useplot">usePlot<a class="anchor" aria-label="anchor" href="#arg-useplot"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, the default, then the plot will occur
 with <code><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">quickPlot::Plot</a></code>, so it will be arranged with previously existing plots.</p></dd>
 
 
-<dt>deviceArgs</dt>
+<dt id="arg-deviceargs">deviceArgs<a class="anchor" aria-label="anchor" href="#arg-deviceargs"></a></dt>
 <dd><p>An optional list of arguments passed to one of <code>png</code>,
 <code>pdf</code>, <code>tiff</code>, <code>bmp</code>, or <code>jgeg</code>.
 This is useful when the plotting function is not creating a <code>ggplot</code> object,
 e.g., plotting a <code>RasterLayer</code>.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Anything needed by <code>fn</code>, all named.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Called for its side effect of plot creation.</p>
+    <p>Called for its side effect of plot creation.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    
-<ul><li><p><code>type</code></p><ul><li><p><code>"screen"</code> -- Will plot to the current device, normally a plot window</p></li>
-<li><p><code>"object"</code> -- Will save the plot object, e.g., <code>ggplot</code> object</p></li>
-<li><p><code>"raw"</code> -- Will save the raw data prior to plotting, e.g.,
+
+<ul><li><p><code>type</code></p><ul><li><p><code>"screen"</code> – Will plot to the current device, normally a plot window</p></li>
+<li><p><code>"object"</code> – Will save the plot object, e.g., <code>ggplot</code> object</p></li>
+<li><p><code>"raw"</code> – Will save the raw data prior to plotting, e.g.,
 the data argument</p></li>
-<li><p><code>"png"</code> -- or any other type save-able with <code>ggsave</code></p></li>
+<li><p><code>"png"</code> – or any other type save-able with <code>ggsave</code></p></li>
 </ul></li>
 </ul></div>
     <div id="note">
@@ -214,7 +214,7 @@ argument (e.g., <code>""</code> will omit all saving).</p>
     </div>
     <div id="recording-of-files-saved">
     <h2>Recording of files saved</h2>
-    
+
 
 <p>In cases where files are saved, and where <code>Plots</code> is used within a SpaDES module,
 the file(s) that is/are saved will be appended to the <code>outputs</code> slot of the
@@ -273,31 +273,31 @@ the file(s) that is/are saved will be appended to the <code>outputs</code> slot 
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required namespace: ggplot2</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:34 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.04368424 secs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:13 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.03662419 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 7 x 7 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpd0rH1m/file2d75360a969f.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp45trFG/filea78a5cc0946a.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 7 x 7 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpd0rH1m/file2d75503e80c2.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp45trFG/filea78a3eb814ed.png</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Error in pgmatrix(grobToPlot, col, real, size, minv, maxv, legend, legendText,  : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   object 'nrowLegText' not found</span>
+<span class="r-plt img"><img src="Plots-1.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Error in pgmatrix(grobToPlot, col, real, size, minv, maxv, legend, legendText,  : </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   object 'nrowLegText' not found</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpd0rH1m/file2d7520555c89.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp45trFG/filea78ae7b0c3e.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: ggplotify</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: lattice</span>
-<span class="r-plt img"><img src="Plots-1.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmpd0rH1m/file2d7549978edb.png</span>
 <span class="r-plt img"><img src="Plots-2.png" alt="" width="700" height="433"></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp45trFG/filea78a5784d6df.png</span>
 <span class="r-in"><span><span class="co"># } # end of dontrun</span></span></span>
 </code></pre></div>
     </div>
@@ -313,15 +313,15 @@ the file(s) that is/are saved will be appended to the <code>outputs</code> slot 
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

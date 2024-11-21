@@ -13,7 +13,7 @@ shows the user time in the units of the model as shown with timeunit(sim)"><!-- 
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -38,7 +38,7 @@ shows the user time in the units of the model as shown with timeunit(sim)"><!-- 
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -63,20 +63,20 @@ shows the user time in the units of the model as shown with timeunit(sim)"><!-- 
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Time usage in <code>SpaDES</code></h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/simList-accessors.R" class="external-link"><code>R/simList-accessors.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/simList-accessors.R" class="external-link"><code>R/simList-accessors.R</code></a></small>
     <div class="hidden name"><code>simList-accessors-times.Rd</code></div>
     </div>
 
@@ -91,98 +91,98 @@ shows the user time in the units of the model as shown with <code>timeunit(sim)<
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">times</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">times</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">times</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">times</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="co"># S3 method for simList</span></span>
+<span><span class="co"># S3 method for class 'simList'</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">unit</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="fu">end</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for simList</span></span>
+<span><span class="co"># S3 method for class 'simList'</span></span>
 <span><span class="fu">end</span><span class="op">(</span><span class="va">x</span>, <span class="va">unit</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">end</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">end</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="fu">start</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for simList</span></span>
+<span><span class="co"># S3 method for class 'simList'</span></span>
 <span><span class="fu">start</span><span class="op">(</span><span class="va">x</span>, unit <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">start</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">start</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="fu">timeunit</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">timeunit</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">timeunit</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">timeunit</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">value</span></span>
 <span></span>
 <span><span class="fu">timeunits</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">timeunits</span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">elapsedTime</span><span class="op">(</span><span class="va">x</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S3 method for simList</span></span>
+<span><span class="co"># S3 method for class 'simList'</span></span>
 <span><span class="fu">elapsedTime</span><span class="op">(</span><span class="va">x</span>, byEvent <span class="op">=</span> <span class="cn">TRUE</span>, units <span class="op">=</span> <span class="st">"auto"</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>x</dt>
+
+
+<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>A <code>simList</code></p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional parameters.</p></dd>
 
 
-<dt>value</dt>
+<dt id="arg-value">value<a class="anchor" aria-label="anchor" href="#arg-value"></a></dt>
 <dd><p>A time, given as a numeric, optionally with a unit attribute,
 but this will be deduced from the model time units or module
 time units (if used within a module).</p></dd>
 
 
-<dt>unit</dt>
+<dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
 <dd><p>Character. One of the time units used in <code>SpaDES</code>.</p></dd>
 
 
-<dt>byEvent</dt>
+<dt id="arg-byevent">byEvent<a class="anchor" aria-label="anchor" href="#arg-byevent"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, the elapsed time will be by module and event;
 <code>FALSE</code> will report only by module. Default is <code>TRUE</code>.</p></dd>
 
 
-<dt>units</dt>
+<dt id="arg-units">units<a class="anchor" aria-label="anchor" href="#arg-units"></a></dt>
 <dd><p>character string.  Units in which the results are
     desired.  Can be abbreviated.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Returns or sets the value of the slot from the <code>simList</code> object.</p>
+    <p>Returns or sets the value of the slot from the <code>simList</code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -228,7 +228,7 @@ of the simulation:</p>
     <h2>See also</h2>
     <div class="dont-index"><p><a href="SpaDES.core-package.html">SpaDES.core-package</a>, specifically the section 1.2.5 on Simulation times;
 <code>elapsedTime()</code>,</p>
-<p>Other functions to access elements of a 'simList' object: 
+<p>Other functions to access elements of a 'simList' object:
 <code><a href="addDepends.html">.addDepends</a>()</code>,
 <code><a href="checkpoint.html">checkpointFile</a>()</code>,
 <code><a href="simList-accessors-envir.html">envir</a>()</code>,
@@ -254,20 +254,20 @@ of the simulation:</p>
 <span class="r-in"><span><span class="va">s1</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:22:16 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02806187 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:57 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.05341601 secs</span>
 <span class="r-in"><span><span class="va">s2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">s1</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:22:16 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:22:16 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.029 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:22:16 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:22:16 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:22:16 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.034 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:57 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:57 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.055 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:57 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.056 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:57 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.058 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:57 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.06 secs | 0 load init 0</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -281,10 +281,10 @@ of the simulation:</p>
 <span class="r-in"><span><span class="fu">elapsedTime</span><span class="op">(</span><span class="va">s2</span>, units <span class="op">=</span> <span class="st">"mins"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    moduleName eventType       elapsedTime</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>        &lt;char&gt;    &lt;char&gt;        &lt;difftime&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 3.834963e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 2.885262e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 2.884865e-05 mins</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 2.654791e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: checkpoint      init 4.295905e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:       save      init 3.029505e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:   progress      init 2.960761e-05 mins</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:       load      init 2.787511e-05 mins</span>
 </code></pre></div>
     </div>
   </div>
@@ -299,15 +299,15 @@ of the simulation:</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

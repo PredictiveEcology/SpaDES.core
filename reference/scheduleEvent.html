@@ -9,7 +9,7 @@
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -34,7 +34,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,20 +59,20 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Schedule a simulation event</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/simulation-spades.R" class="external-link"><code>R/simulation-spades.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/simulation-spades.R" class="external-link"><code>R/simulation-spades.R</code></a></small>
     <div class="hidden name"><code>scheduleEvent.Rd</code></div>
     </div>
 
@@ -93,26 +93,28 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A <code>simList</code> simulation object.</p></dd>
 
 
-<dt>eventTime</dt>
+<dt id="arg-eventtime">eventTime<a class="anchor" aria-label="anchor" href="#arg-eventtime"></a></dt>
 <dd><p>A numeric specifying the time of the next event.</p></dd>
 
 
-<dt>moduleName</dt>
+<dt id="arg-modulename">moduleName<a class="anchor" aria-label="anchor" href="#arg-modulename"></a></dt>
 <dd><p>A character string specifying the module from which to
 call the event. If missing, it will use
 <code>currentModule(sim)</code></p></dd>
 
 
-<dt>eventType</dt>
+<dt id="arg-eventtype">eventType<a class="anchor" aria-label="anchor" href="#arg-eventtype"></a></dt>
 <dd><p>A character string specifying the type of event from
 within the module.</p></dd>
 
 
-<dt>eventPriority</dt>
+<dt id="arg-eventpriority">eventPriority<a class="anchor" aria-label="anchor" href="#arg-eventpriority"></a></dt>
 <dd><p>A numeric specifying the priority of the event.
 Lower number means higher priority. As a best practice, it is
 recommended that decimal values are conceptual
@@ -121,16 +123,14 @@ similar).
 See <code><a href="priority.html">priority()</a></code>.</p></dd>
 
 
-<dt>.skipChecks</dt>
+<dt id="arg--skipchecks">.skipChecks<a class="anchor" aria-label="anchor" href="#arg--skipchecks"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, then internal checks that arguments match
 expected types are skipped. Should only be used if speed is critical.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>Returns the modified <code>simList</code> object.</p>
+    <p>Returns the modified <code>simList</code> object.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -158,14 +158,14 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/myProject/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/myProject/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m/myProject/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/myProject/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:22:10 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.0283916 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:51 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02806449 secs</span>
 <span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">scheduleEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span>, <span class="st">"fireSpread"</span>, <span class="st">"burn"</span><span class="op">)</span> <span class="co"># default priority</span></span></span>
 <span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">scheduleEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span>, <span class="st">"fireSpread"</span>, <span class="st">"burn"</span>, <span class="fu"><a href="priority.html">.normal</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># default priority</span></span></span>
 <span class="r-in"><span></span></span>
@@ -201,15 +201,15 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

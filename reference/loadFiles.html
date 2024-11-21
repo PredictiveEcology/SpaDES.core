@@ -21,7 +21,7 @@ package: the package from which to load fun.
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -46,7 +46,7 @@ package: the package from which to load fun.
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -71,20 +71,20 @@ package: the package from which to load fun.
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>File extensions map</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/load.R" class="external-link"><code>R/load.R</code></a>, <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/save.R" class="external-link"><code>R/save.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/load.R" class="external-link"><code>R/load.R</code></a>, <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/save.R" class="external-link"><code>R/save.R</code></a></small>
     <div class="hidden name"><code>loadFiles.Rd</code></div>
     </div>
 
@@ -103,13 +103,13 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span></span>
 <span><span class="fu">loadFiles</span><span class="op">(</span><span class="va">sim</span>, <span class="va">filelist</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList,missing</span></span>
+<span><span class="co"># S4 method for class 'simList,missing'</span></span>
 <span><span class="fu">loadFiles</span><span class="op">(</span><span class="va">sim</span>, <span class="va">filelist</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,ANY</span></span>
+<span><span class="co"># S4 method for class 'missing,ANY'</span></span>
 <span><span class="fu">loadFiles</span><span class="op">(</span><span class="va">sim</span>, <span class="va">filelist</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,missing</span></span>
+<span><span class="co"># S4 method for class 'missing,missing'</span></span>
 <span><span class="fu">loadFiles</span><span class="op">(</span><span class="va">sim</span>, <span class="va">filelist</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">.saveFileExtensions</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -117,32 +117,26 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p><code>simList</code> object.</p></dd>
 
 
-<dt>filelist</dt>
+<dt id="arg-filelist">filelist<a class="anchor" aria-label="anchor" href="#arg-filelist"></a></dt>
 <dd><p><code>list</code> or <code>data.frame</code> to call <code>loadFiles</code> directly from the
 <code>filelist</code> as described in Details</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p><code>data.frame</code> of file extension, package, and function mappings</p>
-
-
+    <p><code>data.frame</code> of file extension, package, and function mappings</p>
 <p>the modified <code>sim</code>, invisibly.</p>
-
-
 <p><code>data.frame</code></p>
-
-
     </div>
     <div id="note">
     <h2>Note</h2>
@@ -171,19 +165,19 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="va">sim1</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># loads all the maps to sim1 simList</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit DEM read from /tmp/Rtmpd0rH1m/maps/DEM.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit forestAge read from /tmp/Rtmpd0rH1m/maps/forestAge.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit forestCover read from /tmp/Rtmpd0rH1m/maps/forestCover.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit habitatQuality read from /tmp/Rtmpd0rH1m/maps/habitatQuality.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit percentPine read from /tmp/Rtmpd0rH1m/maps/percentPine.tif using rasterToMemory</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.1383967 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit DEM read from /tmp/Rtmp45trFG/maps/DEM.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit forestAge read from /tmp/Rtmp45trFG/maps/forestAge.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit forestCover read from /tmp/Rtmp45trFG/maps/forestCover.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit habitatQuality read from /tmp/Rtmp45trFG/maps/habitatQuality.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit percentPine read from /tmp/Rtmp45trFG/maps/percentPine.tif using rasterToMemory</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.144654 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded</span></span></span>
 <span class="r-in"><span><span class="co">#  at time = 10 and 20 (via "intervals").</span></span></span>
@@ -203,29 +197,29 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu">loadFiles</span><span class="op">(</span>filelist <span class="op">=</span> <span class="va">filelist</span><span class="op">)</span> <span class="co"># only does the time = 0 loading; see next</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:53 simInit DEM read from /tmp/Rtmpd0rH1m/maps/DEM.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 simInit forestAge read from /tmp/Rtmpd0rH1m/maps/forestAge.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 simInit forestCover read from /tmp/Rtmpd0rH1m/maps/forestCover.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 simInit habitatQuality read from /tmp/Rtmpd0rH1m/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 simInit percentPine read from /tmp/Rtmpd0rH1m/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.0780797 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit DEM read from /tmp/Rtmp45trFG/maps/DEM.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit forestAge read from /tmp/Rtmp45trFG/maps/forestAge.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit forestCover read from /tmp/Rtmp45trFG/maps/forestCover.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit habitatQuality read from /tmp/Rtmp45trFG/maps/habitatQuality.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit percentPine read from /tmp/Rtmp45trFG/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.06026769 secs</span>
 <span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">10</span></span></span>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="co"># loads the object at time 10</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.079 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.081 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.083 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.084 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.086 secs | 10 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/Rtmpd0rH1m/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 load  :<span style="color: #00BB00;">inputs</span>    at time 10</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.061 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.063 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.065 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.067 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.068 secs | 10 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/Rtmp45trFG/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 load  :<span style="color: #00BB00;">inputs</span>    at time 10</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -235,10 +229,10 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 <span class="r-in"><span><span class="co">#  interval = 10</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="simList-accessors-times.html">end</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">20</span></span></span>
 <span class="r-in"><span><span class="va">sim2</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim2</span><span class="op">)</span> <span class="co"># loads the percentPine map 2 more times, once at 10, once at 20</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 20 load inputs 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/Rtmpd0rH1m/maps/percentPine.tif using rast(inMemory=FALSE)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:54 load  :<span style="color: #00BB00;">inputs</span>    at time 20</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 load  :<span style="color: #00BB00;">inputs</span> <span style="color: #00BB00;">total elpsd: 0.085 secs | 20 load inputs 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 load  :<span style="color: #00BB00;">inputs</span> percentPine read from /tmp/Rtmp45trFG/maps/percentPine.tif using rast(inMemory=FALSE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:34 load  :<span style="color: #00BB00;">inputs</span>    at time 20</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
@@ -257,15 +251,15 @@ containing the columns:</p><ul><li><p><code>exts</code>: the file extension;</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

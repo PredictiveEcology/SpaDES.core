@@ -9,7 +9,7 @@
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -34,7 +34,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,20 +59,20 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Parse and extract module metadata</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/moduleMetadata.R" class="external-link"><code>R/moduleMetadata.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/moduleMetadata.R" class="external-link"><code>R/moduleMetadata.R</code></a></small>
     <div class="hidden name"><code>moduleMetadata.Rd</code></div>
     </div>
 
@@ -90,13 +90,13 @@
 <span>    <span class="st">"reqdPkgs"</span>, <span class="st">"parameters"</span>, <span class="st">"inputObjects"</span>, <span class="st">"outputObjects"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,character,character</span></span>
+<span><span class="co"># S4 method for class 'missing,character,character'</span></span>
 <span><span class="fu">moduleMetadata</span><span class="op">(</span><span class="va">module</span>, <span class="va">path</span>, <span class="va">defineModuleListItems</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for missing,character,missing</span></span>
+<span><span class="co"># S4 method for class 'missing,character,missing'</span></span>
 <span><span class="fu">moduleMetadata</span><span class="op">(</span><span class="va">module</span>, <span class="va">defineModuleListItems</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for ANY,ANY,ANY</span></span>
+<span><span class="co"># S4 method for class 'ANY,ANY,ANY'</span></span>
 <span><span class="fu">moduleMetadata</span><span class="op">(</span></span>
 <span>  <span class="va">sim</span>,</span>
 <span>  <span class="va">module</span>,</span>
@@ -109,29 +109,29 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>sim</dt>
+
+
+<dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A <code>simList</code> simulation object, generally produced by <code>simInit</code>.</p></dd>
 
 
-<dt>module</dt>
+<dt id="arg-module">module<a class="anchor" aria-label="anchor" href="#arg-module"></a></dt>
 <dd><p>Character string. Your module's name.</p></dd>
 
 
-<dt>path</dt>
+<dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
 <dd><p>Character string specifying the file path to modules directory.
 Default is to use the <code>spades.modulePath</code> option.</p></dd>
 
 
-<dt>defineModuleListItems</dt>
+<dt id="arg-definemodulelistitems">defineModuleListItems<a class="anchor" aria-label="anchor" href="#arg-definemodulelistitems"></a></dt>
 <dd><p>A vector of metadata entries to return values
 about.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A list of module metadata, matching the structure in <code><a href="defineModule.html">defineModule()</a></code>.</p>
+    <p>A list of module metadata, matching the structure in <code><a href="defineModule.html">defineModule()</a></code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -167,25 +167,25 @@ about.</p></dd>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmpd0rH1m/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmpd0rH1m/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmpd0rH1m/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmpd0rH1m/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmpd0rH1m/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmpd0rH1m/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp45trFG/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmpd0rH1m/SpaDES/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:56 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:56 simInit The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:56 simInit Key: &lt;global, module&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:56 simInit module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:56 simInit &lt;char&gt;    &lt;char&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Jun07 03:21:56 simInit 1: caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.05345559 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmp45trFG/SpaDES/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:37 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:37 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:37 simInit Key: &lt;global, module&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:37 simInit module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:37 simInit &lt;char&gt;    &lt;char&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:37 simInit 1: caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.07747102 secs</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $name</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "caribouMovement"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -298,15 +298,15 @@ about.</p></dd>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

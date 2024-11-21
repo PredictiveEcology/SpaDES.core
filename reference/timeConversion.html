@@ -21,7 +21,7 @@ attr(time, "unit"), then it simply returns input time.'><!-- mathjax --><script 
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -46,7 +46,7 @@ attr(time, "unit"), then it simply returns input time.'><!-- mathjax --><script 
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -71,20 +71,20 @@ attr(time, "unit"), then it simply returns input time.'><!-- mathjax --><script 
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Convert time units</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/times.R" class="external-link"><code>R/times.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/times.R" class="external-link"><code>R/times.R</code></a></small>
     <div class="hidden name"><code>timeConversion.Rd</code></div>
     </div>
 
@@ -115,10 +115,10 @@ If the units passed to argument <code>units</code> are the same as
 <span></span>
 <span><span class="fu">checkTimeunit</span><span class="op">(</span><span class="va">unit</span>, <span class="va">envir</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,missing</span></span>
+<span><span class="co"># S4 method for class 'character,missing'</span></span>
 <span><span class="fu">checkTimeunit</span><span class="op">(</span><span class="va">unit</span>, <span class="va">envir</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for character,environment</span></span>
+<span><span class="co"># S4 method for class 'character,environment'</span></span>
 <span><span class="fu">checkTimeunit</span><span class="op">(</span><span class="va">unit</span>, <span class="va">envir</span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -128,31 +128,31 @@ If the units passed to argument <code>units</code> are the same as
     </div>
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>unit</dt>
+
+
+<dl><dt id="arg-unit">unit<a class="anchor" aria-label="anchor" href="#arg-unit"></a></dt>
 <dd><p>Character. One of the time units used in <code>SpaDES</code> or user
 defined time unit, given as the unit name only. See details.</p></dd>
 
 
-<dt>envir</dt>
+<dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
 <dd><p>An environment. This is where to look up the function definition for
 the time unit. See details.</p></dd>
 
 
-<dt>skipChecks</dt>
+<dt id="arg-skipchecks">skipChecks<a class="anchor" aria-label="anchor" href="#arg-skipchecks"></a></dt>
 <dd><p>For speed, the internal checks for classes and missingness can be skipped.
 Default <code>FALSE</code>.</p></dd>
 
 
-<dt>time</dt>
+<dt id="arg-time">time<a class="anchor" aria-label="anchor" href="#arg-time"></a></dt>
 <dd><p>Numeric. With a unit attribute, indicating the time unit of the
 input numeric. See Details.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A numeric vector of length 1, with <code>unit</code> attribute set to "seconds".</p>
+    <p>A numeric vector of length 1, with <code>unit</code> attribute set to "seconds".</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -182,15 +182,15 @@ seconds.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

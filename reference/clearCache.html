@@ -9,7 +9,7 @@
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -34,7 +34,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,20 +59,20 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1><code>clearCache</code> for <code>simList</code> objects</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/cache.R" class="external-link"><code>R/cache.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/cache.R" class="external-link"><code>R/cache.R</code></a></small>
     <div class="hidden name"><code>clearCache.Rd</code></div>
     </div>
 
@@ -81,7 +81,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for simList</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">clearCache</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  userTags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -98,7 +98,7 @@
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">showCache</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  userTags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -112,7 +112,7 @@
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># S4 method for simList</span></span>
+<span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">keepCache</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  userTags <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -128,13 +128,15 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>x</dt>
+
+
+<dl><dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
 <dd><p>A simList or a directory containing a valid Cache repository. Note:
 For compatibility with <code>Cache</code> argument, <code>cachePath</code> can also be
 used instead of <code>x</code>, though <code>x</code> will take precedence.</p></dd>
 
 
-<dt>userTags</dt>
+<dt id="arg-usertags">userTags<a class="anchor" aria-label="anchor" href="#arg-usertags"></a></dt>
 <dd><p>Character vector. If used, this will be used in place of the
 <code>after</code> and <code>before</code>.
 Specifying one or more <code>userTag</code> here will clear all
@@ -149,39 +151,39 @@ For <code>or</code> matching, use <code>|</code> in a single character string.
 See examples.</p></dd>
 
 
-<dt>after</dt>
+<dt id="arg-after">after<a class="anchor" aria-label="anchor" href="#arg-after"></a></dt>
 <dd><p>A time (POSIX, character understandable by data.table).
 Objects cached after this time will be shown or deleted.</p></dd>
 
 
-<dt>before</dt>
+<dt id="arg-before">before<a class="anchor" aria-label="anchor" href="#arg-before"></a></dt>
 <dd><p>A time (POSIX, character understandable by data.table).
 Objects cached before this time will be shown or deleted.</p></dd>
 
 
-<dt>fun</dt>
+<dt id="arg-fun">fun<a class="anchor" aria-label="anchor" href="#arg-fun"></a></dt>
 <dd><p>An optional character vector describing the function name to extract.
 Only functions with this/these functions will be returned.</p></dd>
 
 
-<dt>cacheId</dt>
+<dt id="arg-cacheid">cacheId<a class="anchor" aria-label="anchor" href="#arg-cacheid"></a></dt>
 <dd><p>An optional character vector describing the <code>cacheId</code>s to extract.
 Only entries with this/these <code>cacheId</code>s will be returned. If <code>useDBI(FALSE)</code>,
 this will also be dramatically faster than using <code>userTags</code>, for a large
 cache.</p></dd>
 
 
-<dt>ask</dt>
+<dt id="arg-ask">ask<a class="anchor" aria-label="anchor" href="#arg-ask"></a></dt>
 <dd><p>Logical. If <code>FALSE</code>, then it will not ask to confirm deletions using
 <code>clearCache</code> or <code>keepCache</code>. Default is <code>TRUE</code></p></dd>
 
 
-<dt>useCloud</dt>
+<dt id="arg-usecloud">useCloud<a class="anchor" aria-label="anchor" href="#arg-usecloud"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, then every object that is deleted locally will
 also be deleted in the <code>cloudFolderID</code>, if it is non-<code>NULL</code></p></dd>
 
 
-<dt>cloudFolderID</dt>
+<dt id="arg-cloudfolderid">cloudFolderID<a class="anchor" aria-label="anchor" href="#arg-cloudfolderid"></a></dt>
 <dd><p>A googledrive dribble of a folder, e.g., using <code>drive_mkdir()</code>.
 If left as <code>NULL</code>, the function will create a cloud folder with name from last
 two folder levels of the <code>cachePath</code> path, :
@@ -191,16 +193,16 @@ but this will not persist across sessions. If this is a character string, it wil
 treat this as a folder name to create or use on GoogleDrive.</p></dd>
 
 
-<dt>drv</dt>
+<dt id="arg-drv">drv<a class="anchor" aria-label="anchor" href="#arg-drv"></a></dt>
 <dd><p>an object that inherits from <code>DBIDriver</code>, or an existing
 <code>DBIConnection</code> object (in order to clone an existing connection).</p></dd>
 
 
-<dt>conn</dt>
+<dt id="arg-conn">conn<a class="anchor" aria-label="anchor" href="#arg-conn"></a></dt>
 <dd><p>A <code>DBIConnection</code> object, as returned by <code>dbConnect()</code>.</p></dd>
 
 
-<dt>verbose</dt>
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Numeric, -1 silent (where possible), 0 being very quiet,
 1 showing more messaging, 2 being more messaging, etc.
 Default is 1. Above 3 will output much more information about the internals of
@@ -208,7 +210,7 @@ Caching, which may help diagnose Caching challenges. Can set globally with an
 option, e.g., <code>options('reproducible.verbose' = 0) to reduce to minimal</code></p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Other arguments. Can be in the form of <code>tagKey = tagValue</code>, such as,
 <code>class = "numeric"</code> to find all entries that are numerics in the cache.
 Note: the special cases of <code>cacheId</code> and <code>fun</code> have their own
@@ -224,12 +226,8 @@ it can also be <code>sorted = FALSE</code> to return the object unsorted.</p></d
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>A <code>data.table</code> object showing the subset of items in the cache, located at <code>cachePath</code></p>
-
-
-<p>of the <code>sim</code> object, if <code>sim</code> is provided, or located in <code>cachePath</code>.
+    <p>A <code>data.table</code> object showing the subset of items in the cache, located at <code>cachePath</code>
+of the <code>sim</code> object, if <code>sim</code> is provided, or located in <code>cachePath</code>.
 For <code>clearCache</code> (invoked for its side effect of clearing objects matching <code>userTags</code>, or those
 between <code>after</code> or <code>before</code>), the returned <code>data.table</code> shows the removed items (invisibly).</p>
     </div>
@@ -246,15 +244,15 @@ between <code>after</code> or <code>before</code>), the returned <code>data.tabl
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

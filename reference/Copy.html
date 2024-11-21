@@ -14,7 +14,7 @@ When this is not the desired behaviour, use this function."><!-- mathjax --><scr
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -39,7 +39,7 @@ When this is not the desired behaviour, use this function."><!-- mathjax --><scr
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -64,20 +64,20 @@ When this is not the desired behaviour, use this function."><!-- mathjax --><scr
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Copy for <code>simList</code> class objects</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/copy.R" class="external-link"><code>R/copy.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/copy.R" class="external-link"><code>R/copy.R</code></a></small>
     <div class="hidden name"><code>Copy.Rd</code></div>
     </div>
 
@@ -91,41 +91,39 @@ When this is not the desired behaviour, use this function.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for simList</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">Copy</span><span class="op">(</span><span class="va">object</span>, <span class="va">objects</span>, <span class="va">queues</span>, <span class="va">modules</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>object</dt>
+
+
+<dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>An R object (likely containing environments) or an environment.</p></dd>
 
 
-<dt>objects</dt>
+<dt id="arg-objects">objects<a class="anchor" aria-label="anchor" href="#arg-objects"></a></dt>
 <dd><p>Whether the objects contained within the <code>simList</code> environment
 should be copied. Default <code>TRUE</code>, which may be slow.</p></dd>
 
 
-<dt>queues</dt>
+<dt id="arg-queues">queues<a class="anchor" aria-label="anchor" href="#arg-queues"></a></dt>
 <dd><p>Logical. Should the events queues (<code>events</code>, <code>current</code>, <code>completed</code>)
-be deep copied via <code><a href="https://rdatatable.gitlab.io/data.table/reference/copy.html" class="external-link">data.table::copy()</a></code></p></dd>
+be deep copied via <code><a href="https://rdrr.io/pkg/data.table/man/copy.html" class="external-link">data.table::copy()</a></code></p></dd>
 
 
-<dt>modules</dt>
+<dt id="arg-modules">modules<a class="anchor" aria-label="anchor" href="#arg-modules"></a></dt>
 <dd><p>Logical. Should list of modules be copied.</p></dd>
 
 
-<dt>...</dt>
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Only used for custom Methods</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>a copy of <code>object</code></p>
-
-
+    <p>a copy of <code>object</code></p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -138,7 +136,7 @@ of <code>Copy</code> in <code>reproducible</code>.</p>
     </div>
     <div id="note">
     <h2>Note</h2>
-    <p>uses capital C, to limit confusion with e.g., <code><a href="https://rdatatable.gitlab.io/data.table/reference/copy.html" class="external-link">data.table::copy()</a></code>.</p>
+    <p>uses capital C, to limit confusion with e.g., <code><a href="https://rdrr.io/pkg/data.table/man/copy.html" class="external-link">data.table::copy()</a></code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -162,15 +160,15 @@ of <code>Copy</code> in <code>reproducible</code>.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

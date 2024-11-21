@@ -9,7 +9,7 @@
 
   gtag('config', 'UA-58633549-6');
 </script></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-reference-topic">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -34,7 +34,7 @@
 <li class="dropdown">
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
-     
+
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu"><li>
@@ -59,20 +59,20 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/PredictiveEcology/SpaDES.core/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Plot method for <code>simList</code> objects</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/HEAD/R/plotting.R" class="external-link"><code>R/plotting.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/plotting.R" class="external-link"><code>R/plotting.R</code></a></small>
     <div class="hidden name"><code>Plot.Rd</code></div>
     </div>
 
@@ -81,7 +81,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for simList</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'simList'</span></span>
 <span><span class="fu">Plot</span><span class="op">(</span></span>
 <span>  <span class="va">...</span>,</span>
 <span>  new <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -112,7 +112,9 @@
 
     <div id="arguments">
     <h2>Arguments</h2>
-    <dl><dt>...</dt>
+
+
+<dl><dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>A combination of <code>spatialObjects</code> or non-spatial objects.
 For many object classes, there are specific <code>Plot</code> methods. Where
 there are no specific ones, the base plotting will be used internally.
@@ -121,7 +123,7 @@ many arguments, such as <code>addTo</code>, will not work.
 See details.</p></dd>
 
 
-<dt>new</dt>
+<dt id="arg-new">new<a class="anchor" aria-label="anchor" href="#arg-new"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, then the previous named plot area is wiped
 and a new one made; if <code>FALSE</code>, then the <code>...</code> plots will be
 added to the current device, adding or rearranging the plot layout
@@ -134,53 +136,53 @@ including the legend and the end points of the colour palette, will
 be removed and re-initiated</em>.</p></dd>
 
 
-<dt>addTo</dt>
+<dt id="arg-addto">addTo<a class="anchor" aria-label="anchor" href="#arg-addto"></a></dt>
 <dd><p>Character vector, with same length as <code>...</code>.
 This is for overplotting, when the overplot is not to occur on
 the plot with the same name, such as plotting a
 <code>SpatialPoints*</code> object on a <code>RasterLayer</code>.</p></dd>
 
 
-<dt>gp</dt>
+<dt id="arg-gp">gp<a class="anchor" aria-label="anchor" href="#arg-gp"></a></dt>
 <dd><p>A <code>gpar</code> object, created by <code><a href="https://rdrr.io/r/grid/gpar.html" class="external-link">gpar()</a></code>,
 to change plotting parameters (see <span class="pkg">grid</span> package).</p></dd>
 
 
-<dt>gpText</dt>
+<dt id="arg-gptext">gpText<a class="anchor" aria-label="anchor" href="#arg-gptext"></a></dt>
 <dd><p>A <code>gpar</code> object for the title text.
 Default <code>gpar(col = "black")</code>.</p></dd>
 
 
-<dt>gpAxis</dt>
+<dt id="arg-gpaxis">gpAxis<a class="anchor" aria-label="anchor" href="#arg-gpaxis"></a></dt>
 <dd><p>A <code>gpar</code> object for the axes.
 Default <code>gpar(col = "black")</code>.</p></dd>
 
 
-<dt>axes</dt>
+<dt id="arg-axes">axes<a class="anchor" aria-label="anchor" href="#arg-axes"></a></dt>
 <dd><p>Logical or <code>"L"</code>, representing the left and bottom axes, over all plots.</p></dd>
 
 
-<dt>speedup</dt>
+<dt id="arg-speedup">speedup<a class="anchor" aria-label="anchor" href="#arg-speedup"></a></dt>
 <dd><p>Numeric. The factor by which the number of pixels is divided
 by to plot rasters. See Details.</p></dd>
 
 
-<dt>size</dt>
+<dt id="arg-size">size<a class="anchor" aria-label="anchor" href="#arg-size"></a></dt>
 <dd><p>Numeric. The size, in points, for <code>SpatialPoints</code> symbols,
 if using a scalable symbol.</p></dd>
 
 
-<dt>cols</dt>
+<dt id="arg-cols">cols<a class="anchor" aria-label="anchor" href="#arg-cols"></a></dt>
 <dd><p>(also <code>col</code>) Character vector or list of character vectors of colours.
 See details.</p></dd>
 
 
-<dt>col</dt>
+<dt id="arg-col">col<a class="anchor" aria-label="anchor" href="#arg-col"></a></dt>
 <dd><p>(also <code>cols</code>) Alternative to <code>cols</code> to be consistent with <code>plot</code>.
 <code>cols</code> takes precedence, if both are provided.</p></dd>
 
 
-<dt>zoomExtent</dt>
+<dt id="arg-zoomextent">zoomExtent<a class="anchor" aria-label="anchor" href="#arg-zoomextent"></a></dt>
 <dd><p>An <code>Extent</code> object. Supplying a single extent that is
 smaller than the rasters will call a crop statement before
 plotting. Defaults to <code>NULL</code>.
@@ -188,24 +190,24 @@ This occurs after any downsampling of rasters, so it may
 produce very pixelated maps.</p></dd>
 
 
-<dt>visualSqueeze</dt>
+<dt id="arg-visualsqueeze">visualSqueeze<a class="anchor" aria-label="anchor" href="#arg-visualsqueeze"></a></dt>
 <dd><p>Numeric. The proportion of the white space to be used
 for plots. Default is 0.75.</p></dd>
 
 
-<dt>legend</dt>
+<dt id="arg-legend">legend<a class="anchor" aria-label="anchor" href="#arg-legend"></a></dt>
 <dd><p>Logical indicating whether a legend should be drawn.
 Default is <code>TRUE</code>.</p></dd>
 
 
-<dt>legendRange</dt>
+<dt id="arg-legendrange">legendRange<a class="anchor" aria-label="anchor" href="#arg-legendrange"></a></dt>
 <dd><p>Numeric vector giving values that, representing the lower
 and upper bounds of a legend (i.e., <code>1:10</code> or
 <code>c(1,10)</code> will give same result) that will override
 the data bounds contained within the <code>grobToPlot</code>.</p></dd>
 
 
-<dt>legendText</dt>
+<dt id="arg-legendtext">legendText<a class="anchor" aria-label="anchor" href="#arg-legendtext"></a></dt>
 <dd><p>Character vector of legend value labels.
 Defaults to <code>NULL</code>, which results in a pretty numeric
 representation.
@@ -216,11 +218,11 @@ The length of this must match the length of the legend, so
 this is mostly useful for discrete-valued rasters.</p></dd>
 
 
-<dt>pch</dt>
+<dt id="arg-pch">pch<a class="anchor" aria-label="anchor" href="#arg-pch"></a></dt>
 <dd><p>see <code><a href="https://rdrr.io/r/graphics/par.html" class="external-link">?par</a></code>.</p></dd>
 
 
-<dt>title</dt>
+<dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
 <dd><p>Logical or character string. If logical, it
 indicates whether to print the object name as the title
 above the plot. If a character string, it will print this
@@ -230,43 +232,41 @@ name as title, if no other already exists on the plot, in
 which case, keep the previous title.</p></dd>
 
 
-<dt>na.color</dt>
+<dt id="arg-na-color">na.color<a class="anchor" aria-label="anchor" href="#arg-na-color"></a></dt>
 <dd><p>Character string indicating the colour for <code>NA</code> values.
 Default transparent.</p></dd>
 
 
-<dt>zero.color</dt>
+<dt id="arg-zero-color">zero.color<a class="anchor" aria-label="anchor" href="#arg-zero-color"></a></dt>
 <dd><p>Character string indicating the colour for zero values,
 when zero is the minimum value, otherwise, zero is
 treated as any other colour. Default transparent.</p></dd>
 
 
-<dt>length</dt>
+<dt id="arg-length">length<a class="anchor" aria-label="anchor" href="#arg-length"></a></dt>
 <dd><p>Numeric. Optional length, in inches, of the arrow head.</p></dd>
 
 
-<dt>arr</dt>
+<dt id="arg-arr">arr<a class="anchor" aria-label="anchor" href="#arg-arr"></a></dt>
 <dd><p>A vector of length 2 indicating a desired arrangement of plot
 areas indicating number of rows, number of columns.
 Default NULL, meaning
 let Plot function do it automatically.</p></dd>
 
 
-<dt>plotFn</dt>
+<dt id="arg-plotfn">plotFn<a class="anchor" aria-label="anchor" href="#arg-plotfn"></a></dt>
 <dd><p>An optional function name to do the plotting internally, e.g.,
 "barplot" to get a barplot() call. Default "plot".</p></dd>
 
 
-<dt>verbose</dt>
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Numeric or logical. If <code>TRUE</code> or <code>&gt;0</code>, then messages will be
 shown. If <code>FALSE</code> or <code>0</code>, most messages will be suppressed.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    
-
-<p>invoked for side effect of plotting</p>
+    <p>invoked for side effect of plotting</p>
     </div>
     <div id="details">
     <h2>Details</h2>
@@ -292,15 +292,15 @@ This will likely still not allow identical digest results across R versions.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 
