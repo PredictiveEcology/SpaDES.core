@@ -684,8 +684,10 @@ setMethod(
           }
           # Now changed objects
           if (length(unlist(changedModEnvObjs))) {
+            # if (identical(currentModule(object), "canClimateData")) browser()
             Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
-              objNames <- names(objs$.objects)
+              objNames <- names(objs$.objects) # used to be "names(...)" -- but don't want `._` objs
+              objNames <- grep("^._.+", objNames, value = TRUE, invert = TRUE)
               if (!is.null(objNames))
                 list2env(mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
                          envir = simPost@.xData$.mods[[nam]][[".objects"]])
