@@ -1564,7 +1564,7 @@ loadPkgs <- function(reqdPkgs) {
       }
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      if (!useBox) {
+      if (!getOption("spades.useBox")) {
         allPkgs <- unique(Require::extractPkgName(allPkgs))
         loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
       }
