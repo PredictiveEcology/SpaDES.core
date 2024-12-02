@@ -203,6 +203,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
         doesntUseNamespacing <- !.isNamespaced(sim, module)
 
         # evaluate the rest of the parsed file
+        sim <- currentModuleTemporary(sim, mBase)
         if (doesntUseNamespacing) {
           out1 <- evalWithActiveCode(pp[[1]],
                                      sim@.xData,
@@ -225,6 +226,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
       invisible()
     })
+    sim@current <- list()
     options(opt)
 
     # reset activeBinding mod

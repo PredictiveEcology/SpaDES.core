@@ -214,12 +214,13 @@ setMethod(
       mBase <- basename(m)
 
       ## temporarily assign current module
-      sim@current <- list(
-        eventTime = start(sim),
-        moduleName = mBase,
-        eventType = ".inputObjects",
-        eventPriority = .normal()
-      )
+      sim <- currentModuleTemporary(sim, mBase)
+      # sim@current <- list(
+      #   eventTime = start(sim),
+      #   moduleName = mBase,
+      #   eventType = ".inputObjects",
+      #   eventPriority = .normal()
+      # )
 
       prevNamedModules <- if (!is.null(unlist(sim@depends@dependencies))) {
         unlist(lapply(sim@depends@dependencies, function(x) slot(x, "name")))
@@ -672,4 +673,14 @@ reqdPkgsDontLoad <- function(allPkgs, pkgsDontLoad = getOption("spades.reqdPkgsD
 
 spadesReqdPkgsDontLoad <- function(pkgsDontLoad) {
   is.character(pkgsDontLoad)
+}
+
+currentModuleTemporary <- function(sim, mBase) {
+  sim@current <- list(
+    eventTime = start(sim),
+    moduleName = mBase,
+    eventType = ".inputObjects",
+    eventPriority = .normal()
+  )
+  sim
 }
