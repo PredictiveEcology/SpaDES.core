@@ -1372,7 +1372,10 @@ setMethod(
                      classOptions = classOptions,
                      showSimilar = showSimilar,
                      cachePath = sim@paths[["cachePath"]],
-                     .functionName = moduleCall, verbose = verbose))
+                     .functionName = moduleCall, verbose = verbose,
+                     userTags = c(paste0("module:", cur[["moduleName"]]),
+                                  paste0("eventType:", cur[["eventType"]]),
+                                  paste0("eventTime:", time(sim)))))
   } else {
     ## Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
