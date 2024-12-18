@@ -576,7 +576,6 @@ setMethod(
 
       ## do multi-pass if there are parent modules; first for parents, then for children
       all_parsed <- FALSE
-      # browser(expr = exists("._simInit_5"))
       while (!all_parsed) {
         sim <- .parseModule(sim,
                             as.list(sim@modules),
