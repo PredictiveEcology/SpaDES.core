@@ -40,10 +40,14 @@ test_that("module templates work", {
   expect_true(file.exists(file.path(mpath, paste0(moduleName, "_0.0.2.zip"))))
 
   # Test that the .Rmd file actually can run with knitr
-  expect_equal(knitr::knit(input = file.path(mpath, paste0(moduleName, ".Rmd")),
-                           output = file.path(mpath, paste0(moduleName, ".md")),
-                           quiet = TRUE),
-               file.path(mpath, paste0(moduleName, ".md")))
+  no <- capture.output(
+    type = "message",
+    noisyOutput <- capture.output(
+      expect_equal(knitr::knit(input = file.path(mpath, paste0(moduleName, ".Rmd")),
+                               output = file.path(mpath, paste0(moduleName, ".md")),
+                               quiet = TRUE),
+                   file.path(mpath, paste0(moduleName, ".md")))
+    ))
   expect_true(file.exists(file.path(mpath, "README.md"))) ## file should exist now, post-knit
 
   # Test that the dummy unit tests work
@@ -130,7 +134,8 @@ test_that("newModule with events and functions", {
   expect_true(out$b == 3)
   yrsSimulated <- (end(out) - start(out))
   expect_true(sum(grepl("hi", mess)) == yrsSimulated)
-  expect_true(NROW(completed(out)) == yrsSimulated + 6)
+  expect_true(NROW(completed(out)) == yrsSimulated +
+                (NROW(.coreModules()) - 1) + length(c(".inputObjects", "next1", "init")))
   expect_true(NROW(events(out)) == 1)
   expect_true(NROW(completed(out)[eventType == "next1"]) == 1)
   expect_true(NROW(completed(out)[eventType == "plot"]) == yrsSimulated)

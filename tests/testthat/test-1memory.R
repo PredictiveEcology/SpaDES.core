@@ -2,10 +2,12 @@ test_that("testing memoryUse", {
   # Needs to run first or else memory use test fails
   skip_on_cran()
 
-  testInit(c(sampleModReqdPkgs, "future", "future.callr"),
-                          opts = list(spades.moduleCodeChecks = FALSE,
-                                      spades.memoryUseInterval = 0.2,
-                                      spades.futurePlan = "callr"))
+  noisyOutput <- capture.output(
+    testInit(c(sampleModReqdPkgs, "future", "future.callr"),
+             opts = list(spades.moduleCodeChecks = FALSE,
+                         spades.memoryUseInterval = 0.2,
+                         spades.futurePlan = "callr"))
+  )
   oldPlan <- future::plan()
   on.exit({
     if (!identical(future::plan(), oldPlan)) {

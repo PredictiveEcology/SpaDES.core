@@ -112,8 +112,8 @@ test_that("test objectSynonyms", {
   expect_true(isTRUE(sim$worked))
 
   sim <- Cache(simInit, times, params, modules = modules,
-                 objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
-                 paths = list(modulePath = tmpdir))
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
   expect_equal(sim$age, sim$ageMap)
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)

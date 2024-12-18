@@ -2,6 +2,11 @@
 
 * fix issue with `Plots()` where plots were discarded if no filename was specified;
 * minor documentation improvements;
+* new option: `spades.reqdPkgsDontLoad`, a character vector. If anything is specified, 
+then it will not be loaded with `require` or `library`, but it will be installed, if needed,
+and if `spades.useRequire = TRUE`, which is the default. Default for this new option is
+"box", which is one of potentially many in the R universe that throws an error if it is 
+loaded.
 
 # SpaDES.core 2.1.5
 

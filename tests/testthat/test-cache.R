@@ -47,7 +47,6 @@ test_that("test event-level cache & memory leaks", {
   landscapeMaps1 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
   fireMap1 <- sims$landscape$Fires
   #._doEvent_3 <<- ._prepareOutput_5 <<- 1
-  # bbbb <<- 1
   mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = TRUE)
   })
@@ -677,8 +676,6 @@ test_that("multifile cache saving", {
   s2 <- Cache(spades(s))
   expect_true(identical(Filenames(s2), Filenames(s)))
 })
-
-
 
 test_that("cache of terra objects in the depends", {
   testInit(sampleModReqdPkgs)

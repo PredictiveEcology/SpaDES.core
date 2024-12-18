@@ -32,20 +32,20 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
-setGeneric("getModuleVersion", function(name, repo) {
+setGeneric("getModuleVersion", function(name, repo, token) {
   standardGeneric("getModuleVersion")
 })
 
 #' @rdname getModuleVersion
 setMethod(
   "getModuleVersion",
-  signature = c(name = "character", repo = "character"),
-  definition = function(name, repo) {
+  signature = c(name = "character", repo = "character", token = "ANY"),
+  definition = function(name, repo, token) {
     if (length(name) > 1) {
       warning("name contains more than one module. Only the first will be used.")
       name <- name[1]
     }
-    moduleFiles <- checkModule(name, repo)
+    moduleFiles <- checkModule(name, repo, token = token)
     zipFiles <- grep(paste0(name, "_+.+.zip"), moduleFiles, value = TRUE) # moduleName_....zip only
     zipFiles <- grep(file.path(name, "data"), zipFiles, invert = TRUE, value = TRUE) # remove any zip in data folder
     # all zip files is not correct behaviour, only
@@ -62,10 +62,10 @@ setMethod(
 
 #' @rdname getModuleVersion
 setMethod("getModuleVersion",
-          signature = c(name = "character", repo = "missing"),
-          definition = function(name) {
-            v <- getModuleVersion(name, getOption("spades.moduleRepo",
-                                                  defaultGitRepoToSpaDESModules))
+          signature = c(name = "character", repo = "missing", token = "ANY"),
+          definition = function(name, token) {
+            v <- getModuleVersion(name, token = token,
+                                  getOption("spades.moduleRepo", defaultGitRepoToSpaDESModules))
             return(v)
 })
 
@@ -86,15 +86,15 @@ setMethod("getModuleVersion",
 #' @importFrom cli col_magenta
 #' @importFrom utils packageVersion
 #' @rdname checkModule
-setGeneric("checkModule", function(name, repo) {
+setGeneric("checkModule", function(name, repo, token) {
   standardGeneric("checkModule")
 })
 
 #' @rdname checkModule
 setMethod(
   "checkModule",
-  signature = c(name = "character", repo = "character"),
-  definition = function(name, repo) {
+  signature = c(name = "character", repo = "character", token = "ANY"),
+  definition = function(name, repo, token) {
     goAhead <- FALSE
     if (requireNamespace("httr", quietly = TRUE)) {
       if (packageVersion("httr") >= "1.2.1") {
@@ -107,11 +107,15 @@ setMethod(
         name <- name[1]
       }
       apiurl <- paste0("https://api.github.com/repos/", repo, "/git/trees/master?recursive=1") # nolint
+
       ua <- httr::user_agent(getOption("spades.useragent"))
-      pat <- Sys.getenv("GITHUB_PAT")
-      request <- if (identical(pat, "")) {
-        httr::GET(apiurl, ua)
+      if (missing(token))
+        token <- Require:::.getGitCredsToken()
+      request <- if (!is.null(token)) {
+        Require:::.GETWauthThenNonAuth(apiurl, token = token, verbose = verbose)
+        # httr::GET(apiurl, ua)
       } else {
+        pat <- Sys.getenv("GITHUB_PAT")
         message(cli::col_magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
         httr::GET(apiurl, ua, config = list(httr::config(token = pat)))
       }
@@ -141,8 +145,8 @@ setMethod(
 
 #' @rdname checkModule
 setMethod("checkModule",
-          signature = c(name = "character", repo = "missing"),
-          definition = function(name) {
+          signature = c(name = "character", repo = "missing", token = "ANY"),
+          definition = function(name, token) {
             v <- checkModule(name, getOption("spades.moduleRepo",
                                              defaultGitRepoToSpaDESModules))
             return(v)
@@ -298,8 +302,16 @@ setMethod(
     # or if overwrite is wanted
     if (!checkModuleLocal(name, path, version) | overwrite) {
       # check remotely for module
-      checkModule(name, repo)
-      if (is.na(version)) version <- getModuleVersion(name, repo)
+      # Authentication
+      token <- NULL
+      usesGitCreds <- requireNamespace("gitcreds", quietly = TRUE) &&
+        requireNamespace("httr", quietly = TRUE)
+      if (usesGitCreds) {
+        token <- Require:::.getGitCredsToken()
+      }
+
+      checkModule(name, repo, token = token)
+      if (is.na(version)) version <- getModuleVersion(name, repo, token = token)
 
       innerPaths <- c(paste0("/master/modules/", name, "/"), "/master/")
       for (tries in 1:2) {
@@ -310,10 +322,12 @@ setMethod(
         localzip <- file.path(path, basename(zip))
 
         ua <- httr::user_agent(getOption("spades.useragent"))
-        pat <- Sys.getenv("GITHUB_PAT")
-        request <- if (identical(pat, "")) {
-          httr::GET(zip, ua, httr::write_disk(localzip, overwrite = overwrite))
+        request <- if (!is.null(token)) {
+          message(cli::col_magenta("Using GitHub token stored with gitcreds", sep = ""))
+          Require:::.GETWauthThenNonAuth(zip, ua, httr::write_disk(localzip, overwrite = overwrite),
+                                        token = token)
         } else {
+          pat <- Sys.getenv("GITHUB_PAT")
           message(cli::col_magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
           httr::GET(zip, ua, config = list(httr::config(token = pat)),
                     httr::write_disk(localzip, overwrite = overwrite))
@@ -396,7 +410,6 @@ setMethod(
                 quickCheck = "ANY", overwrite = "ANY"),
   definition = function(name, quickCheck, overwrite) {
     path <- checkModulePath()
-
     files <- downloadModule(name, path = path,
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo",

@@ -203,10 +203,10 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
         doesntUseNamespacing <- !.isNamespaced(sim, module)
 
         # evaluate the rest of the parsed file
+        sim <- currentModuleTemporary(sim, module)
+        pkgs = slot(slot(depends(sim), "dependencies")[[module]], "reqdPkgs")
         if (doesntUseNamespacing) {
-          out1 <- evalWithActiveCode(pp[[1]],
-                                     sim@.xData,
-                                     sim = sim)
+          out1 <- evalWithActiveCode(pp[[1]], sim@.xData, sim = sim, pkgs = pkgs)
         }
 
 
@@ -216,15 +216,15 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
         #ee <- new.env()
         #ee$sim <- sim
         # sim@.xData[[module]]$sim <- sim
-        lapply(pp, function(pp1) evalWithActiveCode(pp1,
-                                                    sim@.xData$.mods[[module]],
-                                                    sim = sim))
+        lapply(pp, function(pp1)
+          evalWithActiveCode(pp1, sim@.xData$.mods[[module]], sim = sim, pkgs = pkgs))
         message(cli::col_blue("Reparsing", module, "source code"))
       }
       #rm(list = "sim", envir = ee)
       #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
       invisible()
     })
+    sim@current <- list()
     options(opt)
 
     # reset activeBinding mod
