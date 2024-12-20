@@ -555,6 +555,7 @@ setMethod(
     tmp[["defineModuleItem"]] <- grepl(pattern = "^defineModule", tmp[["parsedFile"]])
     tmp[["pf"]] <- tmp[["parsedFile"]][tmp[["defineModuleItem"]]]
   }
+
   return(tmp)
 }
 
@@ -566,31 +567,42 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   # Create a temporary environment to source into, adding the sim object so that
   #   code can be evaluated with the sim, e.g., currentModule(sim)
   #tmpEnvir <- new.env(parent = asNamespace("SpaDES.core"))
-  tmpEnvir <- new.env(parent = envir)
+  tmpEnvirForPkgs <- new.env(parent = envir)
+  # tmpEnvir <- new.env(parent = envir)
+  tmpEnvir <- new.env(parent = tmpEnvirForPkgs)
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
   simCopy <- Copy(sim, objects = FALSE)
   simCopy$.mods <- Copy(sim$.mods)
   tmpEnvir$sim <- simCopy
 
-  ll <- lapply(parsedModuleNoDefineModule,
-               function(x) tryCatch(eval(x, envir = tmpEnvir),
-                                    error = function(x) "ERROR"))
-  cm <- currentModule(tmpEnvir$sim)
-  if (length(cm))
-    if (!cm %in% unlist(.coreModules())) {
-      pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
-      lapply(pkgs, function(p) {
-        allFns <- ls(envir = asNamespace(p))
-        val <- paste0("box::use(", p, "[...]", ")")
-        eval(as.call(parse(text = val))[[1]], envir = tmpEnvir)
-        if (any("mod" == allFns)) {
-          rm(list = "mod", envir = parent.env(tmpEnvir))
-          messageVerbose("mod will be masked from ", p)
-        }
-      })
-    }
+  ll <- local({
+    lapply(parsedModuleNoDefineModule,
+                 function(x) tryCatch(eval(x, envir = tmpEnvir),
+                                      error = function(x) "ERROR"))
+  })
 
+  # This tests whether there is a leak -- this should be 1
+  #   it says, how big is the function, compared to how big is the environment that holds the function
+  #   If it is 1, it means there are only functions in that environment, no objects
+  # length(serialize(tmpEnvir$prepare_IgnitionFit, NULL))/object.size(mget(ls(tmpEnvir), tmpEnvir))
+
+  if (getOption("spades.useBox")) {
+    cm <- currentModule(tmpEnvir$sim)
+    if (length(cm))
+      if (!cm %in% unlist(.coreModules())) {
+        pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
+        lapply(pkgs, function(p) {
+          allFns <- ls(envir = asNamespace(p))
+          val <- paste0("box::use(", p, "[...]", ")")
+          eval(as.call(parse(text = val))[[1]], envir = tmpEnvirForPkgs)
+          if (any("mod" == allFns)) {
+            rm(list = "mod", envir = parent.env(tmpEnvirForPkgs))
+            messageVerbose("mod will be masked from ", p)
+          }
+        })
+      }
+  }
 
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 
