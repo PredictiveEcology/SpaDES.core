@@ -913,10 +913,13 @@ setMethod(
     }
 
     sim <- withCallingHandlers({
-      recoverModeWrong <- getOption("spades.recoverMode")
-      if (!is.null(recoverModeWrong)) {
-        warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
-      }
+
+      ## RecoverMode Step 1 -- set up
+      recoverModeTypo()
+      # recoverModeWrong <- getOption("spades.recoverMode")
+      # if (!is.null(recoverModeWrong)) {
+      #   warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+      # }
       recoverMode <- getOption("spades.recoveryMode", FALSE)
 
       ## If there already is a sim object saved in the package .savdeSimEnv, it may have objects,
@@ -926,6 +929,7 @@ setMethod(
       svdSimEnv <- savedSimEnv() # can't assign to a function
       svdSimEnv$.sim <- NULL
       svdSimEnv$.sim <- sim # set up pointer
+      ## RecoverMode Step 1 -- End
 
       ## set the options("spades.xxxPath") to the values in the sim@paths
       oldGetPaths <- getPaths()
@@ -1001,21 +1005,27 @@ setMethod(
         if (!.pkgEnv[["skipNamespacing"]])
           .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
         rm(".timeunits", envir = sim@.xData)
+
+
+        ## RecoverMode Step 2 -- on exit
         if (isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
-          if (!isTRUE(.pkgEnv$.cleanEnd)) {
-            if (recoverMode > 0) {
-              sim <- recoverModeOnExit(sim, rmo, recoverMode)
-            }
-            messageInterrupt1(recoverMode)
-          } else {
-            message(cli::col_magenta("simList saved in"), "\n",
-                    cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
-                    cli::col_magenta("It will be deleted at next spades() call."))
-          }
-          svdSimEnv <- savedSimEnv() # can't assign to a function
-          svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
-          .pkgEnv$.cleanEnd <- NULL
+          sim <- saveSimOnExit(recoverMode, sim, rmo)
+          # if (!isTRUE(.pkgEnv$.cleanEnd)) {
+          #   if (recoverMode > 0) {
+          #     sim <- recoverModeOnExit(sim, rmo, recoverMode)
+          #   }
+          #   messageInterrupt1(recoverMode)
+          # } else {
+          #   message(cli::col_magenta("simList saved in"), "\n",
+          #           cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
+          #           cli::col_magenta("It will be deleted at next spades() call."))
+          # }
+          # svdSimEnv <- savedSimEnv() # can't assign to a function
+          # svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
+          # .pkgEnv$.cleanEnd <- NULL
         }
+        ## RecoverMode Step 2 -- End
+
         # For restarting R -- a few extra pieces, including saving the simList as the last thing
         if (!is.null(sim$._restartRList)) {
           sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
@@ -1119,11 +1129,14 @@ setMethod(
         }
       }
 
+      ## RecoverMode Step 3 -- Initiate the RMO (recovery mode object)
       if (recoverMode > 0) {
         rmo <- NULL # The recovery mode object
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
       }
+      ## RecoverMode Step 3 -- End
+
       useFuture <- getOption("spades.futureEvents", FALSE)
       if (useFuture) {
         if (!requireNamespace("future", quietly = TRUE))
@@ -1151,6 +1164,7 @@ setMethod(
       on.exit(setDTthreads(origDTthreads), add = TRUE)
 
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
+        ## RecoverMode Step 4 -- Do Pre
         if (recoverMode > 0) {
           rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
         }
@@ -1158,6 +1172,7 @@ setMethod(
         sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
                        events = events, ...)  # process the next event
 
+        ## RecoverMode Step 5 -- Do Post
         if (recoverMode > 0) {
           rmo <- recoverModePost(sim, rmo, recoverMode)
         }
@@ -2473,4 +2488,28 @@ defineEventFnMaker <- function(code, eventFnName) {
   return(sim)
 }
 ")
+}
+
+
+saveSimOnExit <- function(recoverMode, sim, rmo) {
+  if (!isTRUE(.pkgEnv$.cleanEnd)) {
+    if (recoverMode > 0) {
+      sim <- recoverModeOnExit(sim, rmo, recoverMode)
+    }
+    messageInterrupt1(recoverMode)
+  } else {
+    message(cli::col_magenta("simList saved in"), "\n",
+            cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
+            cli::col_magenta("It will be deleted at next spades() call."))
+  }
+  svdSimEnv <- savedSimEnv() # can't assign to a function
+  svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
+  .pkgEnv$.cleanEnd <- NULL
+}
+
+recoverModeTypo <- function() {
+  recoverModeWrong <- getOption("spades.recoverMode")
+  if (!is.null(recoverModeWrong)) {
+    warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+  }
 }
