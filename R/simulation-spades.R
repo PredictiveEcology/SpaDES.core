@@ -851,7 +851,7 @@ setMethod(
                         ...) {
 
     # set the options; then set them back on exit
-    optsFromDots <- dealWithOptions(sim = sim)
+    optsFromDots <- dealWithOptions(sim = sim, dotNames = ...names())
     if (!is.null(optsFromDots$optsPrev)) {
       # remove from `sim` as these should not be there
       rm(list = unique(names(optsFromDots$optionsAsProvided)), envir = envir(sim))
@@ -1239,7 +1239,6 @@ setMethod(
       }
 
       if (useNormalMessaging) {
-        # if (grepl("projecting", m$message)) browser()
         if (isTRUE(any(grepl("\b", m$message)))) {
           m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
           # message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
@@ -1359,7 +1358,7 @@ setMethod(
                            modules = cur[["moduleName"]])
     }
   }
-  verbose <- if (is.numeric(debug)) debug else !debug %in% FALSE
+  verbose <- debugToVerbose(debug)
 
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
@@ -1381,7 +1380,7 @@ setMethod(
     expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
-  if (!(FALSE %in% debug || any(is.na(debug)))) {
+  if (debugToVerbose(debug)) {
     objsIsNullBefore <- objsAreNull(sim)
   }
 
@@ -1395,13 +1394,13 @@ setMethod(
       runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
     }
 
-    # if (cur$eventType %in% "prepSpreadFitData") browser()
     rr <- .Random.seed
     if (runFnCallAsExpr) {
+      # if (identical(cur$eventType, "prepIgnitionFitData")) browser()
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
     }
     if (identical(rr, .Random.seed)) {
-      message(cli::bg_yellow(cur[["moduleName"]])) # browser()
+      message(cli::bg_yellow(cur[["moduleName"]]))
     }
     if (allowSequentialCaching) {
         sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
@@ -1419,7 +1418,7 @@ setMethod(
     }
   }
 
-  if (!(FALSE %in% debug || any(is.na(debug)))) {
+  if (debugToVerbose(debug)) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore)
   }
 
@@ -1920,11 +1919,11 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
       outMess <- paste0("elpsd: ", format(Sys.time() - compareTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
     } else {
-      if (is(debug[[i]], "call")) {
+      if (is.call(debug[[i]])) {# || is(debug[[i]], "if") || is(debug[[i]], "{")) {
         outMess <- try(eval(debug[[i]]))
       } else if (identical(debug[[i]], "simList")) {
         outMess <- try(capture.output(sim))
-      } else if (isTRUE(grepl(debug[[i]], pattern = "\\("))) {
+      } else if (isTRUE(grepl(debug[[i]], pattern = "\\(")) && !cli::ansi_has_any(debug[i])) {
         outMess <- try(eval(parse(text = debug[[i]])))
       } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
         outMess <- NULL
@@ -2359,7 +2358,6 @@ clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"
 sequentialCacheText <- "SequentialCache_"
 
 appendCompleted <- function(sim, cur) {
-  # if (cur$moduleName == "checkpoint") browser()
 
   cur[["._clockTime"]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
 
@@ -2368,7 +2366,6 @@ appendCompleted <- function(sim, cur) {
   if (isTRUE(isLastWrong)) {
     last <- attr(sim, "completedCounter") <- NULL
   }
-  # if ("Biomass_borealDataPrep" %in% cur$moduleName && "init" %in% cur$eventType) browser()
   if (is.null(last)) {
     prevTime <- cur[["._clockTime"]]
   } else {
