@@ -54,6 +54,12 @@
 #' @param projectPath Should be the "top level" or project path for the `simList`.
 #'    Defaults to `getwd()`. All other paths will be made relative with respect to
 #'    this if nested within this.
+#' @param files Logical. Should all the files in the optional `outputs`, `inputs`,
+#'   `cache` be saved. If this is `TRUE`, then the resulting `filename` will be
+#'   silently converted to an archive file with the appropriate extension e.g.,
+#'   `.zip` or `.tar.gz`. This will automatically be `TRUE` if any of the `outputs`,
+#'   `inputs` or `cache` are `TRUE`. Setting this to `FALSE` will turn off the
+#'   saving of files specified in `inputs(sim)`, `outputs(sim)` or the cache.
 #'
 #' @param ... Additional arguments. See Details.
 #'
@@ -73,13 +79,14 @@
 #' @rdname saveSimList
 #' @seealso [loadSimList()]
 saveSimList <- function(sim, filename, projectPath = getwd(),
-                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir, ...) {
+                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir,
+                        files = TRUE, ...) {
   checkSimListExts(filename)
 
   dots <- list(...)
 
   ## user can explicitly override archiving files if FALSE
-  if (isFALSE(dots$files)) {
+  if (isFALSE(files)) {
     files <- cache <- inputs <- outputs <- FALSE
   } else {
     files <- TRUE
@@ -206,7 +213,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       if (isTRUE(inputs)) {
         ins <- inputs(sim)
         if (NROW(ins)) {
-          ins[ins$loaded %in% TRUE]$file
+          inputFNs <- ins[ins$loaded %in% TRUE, ]$file
           otherFns <- c(otherFns, inputFNs)
         }
       }
@@ -217,6 +224,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
           allFns <- gsub(origPaths[[p]], symlinks[[p]], allFns)
         }
       }
+      allFns <- na.omit(allFns)
 
       relFns <- makeRelative(c(fileToDelete, allFns), projectPath) |> unname()
 
