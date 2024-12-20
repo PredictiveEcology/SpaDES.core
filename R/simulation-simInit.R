@@ -806,6 +806,11 @@ setMethod(
         warningSplitOnColon(w)
         invokeRestart("muffleWarning")
       }
+      # This is a box mishap
+      if (isTRUE(any(grepl("'package:stats' may not be available when loading",
+                           w$message)))) {
+        invokeRestart("muffleWarning")
+      }
     }
     )
 
