@@ -927,7 +927,7 @@ if (!exists("objSize")) {
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
 #' utils::object.size(a)
-objSize.simList <- function(x, quick = TRUE, ...) {
+objSize.simList <- function(x, quick = FALSE, ...) {
 
   total <- try(obj_size(x, quick = TRUE), silent = TRUE) # failing due to lobstr issue #72
   if (!is(total, "try-error")) {
@@ -937,9 +937,12 @@ objSize.simList <- function(x, quick = TRUE, ...) {
     names(simSlots) <- simSlots
     otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
 
-    if (!quick)
-      attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
-                                      other = attr(otherParts, "objSize"))
+    # if (!quick)
+    attr(total, "objSize") <- list(sim = attr(aa, "objSize"),
+                                   other = attr(otherParts, "objSize"))
+      # browser()
+      # attr(total, "objSize") <- sum(unlist(attr(aa, "objSize")), unlist(attr(otherParts, "objSize")))
+      # class(attr(total, "objSize")) <- "lobstr_bytes"
 
   } else {
     total <- NA
