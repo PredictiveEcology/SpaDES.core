@@ -120,7 +120,8 @@
 #' }
 createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.modulePath"),
                                      importAll = TRUE,
-                                     buildDocuments = TRUE) {
+                                     buildDocuments = TRUE,
+                                     verbose = getOption("Require.verbose")) {
   stopifnot(
     requireNamespace("pkgload", quietly = TRUE),
     requireNamespace("roxygen2", quietly = TRUE)
@@ -161,7 +162,7 @@ createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.mod
   deps <- unlist(eval(md$reqdPkgs))
 
   dFile <- DESCRIPTIONfileFromModule(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
-                                     packageFolderName)
+                                     packageFolderName, verbose = verbose)
 
   if (isTRUE(buildDocuments)) {
     message("Building documentation")
@@ -175,8 +176,6 @@ createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.mod
   }
 
   RBuildIgnoreFile <- filenameFromFunction(packageFolderName, "", fileExt = ".Rbuildignore")
-
-  startCat <- readLines(RBuildIgnoreFile)
 
   rbi <- paste("^.*\\.Rproj$
 ^\\.Rproj\\.user$
@@ -206,7 +205,12 @@ vignettes/.*\\.log$
 
   modFiles <- c(paste0(module, ".*"), ".*zip")
 
-  rbi <- unique(c(startCat, rbi, modFiles))
+  if (file.exists(RBuildIgnoreFile)) {
+    startCat <- readLines(RBuildIgnoreFile)
+    rbi <- unique(c(startCat, rbi))
+  }
+
+  rbi <- unique(c(rbi, modFiles))
   cat(rbi, file = RBuildIgnoreFile, fill = TRUE, sep = "\n")
 
   return(invisible())
@@ -223,7 +227,7 @@ filenameForMainFunctions <- function(module, modulePath = ".")
 
 
 DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
-                                      packageFolderName) {
+                                      packageFolderName, verbose = getOption("Require.verbose")) {
   d <- list()
   d$Package <- .moduleNameNoUnderscore(module)
   d$Type <- "Package"
@@ -297,7 +301,7 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   cat(paste0("RoxygenNote: ", as.character(packageVersion("roxygen2"))), sep = "\n", file = dFile, append = TRUE)
 
 
-  message("New/updated DESCRIPTION file is: ", dFile)
+  messageVerbose("New/updated DESCRIPTION file is: ", dFile, verbose = verbose)
   return(dFile)
 }
 
