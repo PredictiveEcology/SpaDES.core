@@ -1338,7 +1338,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           if (runFnCallAsExpr) {
             pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
             pkgs <- c(pkgs, "stats")
-            do.call(box::use, lapply(pkgs, as.name))
+            if (getOption("spades.useBox"))
+              do.call(box::use, lapply(pkgs, as.name))
             sim <- Cache(.inputObjects, sim,
                          .objects = objectsToEvaluateForCaching,
                          notOlderThan = notOlderThan,
