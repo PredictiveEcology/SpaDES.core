@@ -139,6 +139,11 @@ at the start of the current event. This can be recovered with \code{restartSpade
 and the differences can be seen in a hidden object in the stashed \code{simList}.
 There is a message which describes how to find that. \cr
 
+\code{spades.reqdPkgsDontLoad} \tab \code{"box"} \tab Specify any packages that should not
+be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
+listed. The default (\code{"box"}) is a package that returns a warning if it is
+loaded, and so it is excluded from loading.\cr
+
 \code{spades.saveFileExtensions} \tab \code{NULL} \tab
 a \code{data.frame} with 3 columns, \code{exts}, \code{fun}, and \code{package} indicating which
 file extension, and which function from which package will be used when
@@ -177,7 +182,17 @@ and suggests alternatives with a warning \cr
 point number comparisons. \cr
 
 \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
-\tab : The default user agent to use for downloading modules from GitHub. \cr
+\tab The default user agent to use for downloading modules from GitHub. \cr
+
+\code{spades.useBox} \tab TRUE
+\tab Whether to manage which packages are loaded using the package \code{box}.
+This will have as an effect that \code{reqdPkgs} will be strict; if a given
+module is missing a \code{reqdPkgs}, then the module will fail to run, with
+an error saying the package/function doesn't exist. Without \code{box},
+modules may run, even though \code{reqdPkgs} is incorrect, because other modules
+may have specified their own packages, which cover the needs of another
+package. \code{useBox = TRUE} will force modules to be accurate with their
+\code{reqdPkgs} \cr
 
 \code{spades.useRequire} \tab \code{!tolower(Sys.getenv("SPADES_USE_REQUIRE")) \%in\% "false"}
 \tab : The default for that environment variable is unset, so this returns
