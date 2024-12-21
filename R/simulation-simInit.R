@@ -815,6 +815,11 @@ setMethod(
         warningSplitOnColon(w)
         invokeRestart("muffleWarning")
       }
+      # This is a box mishap
+      if (isTRUE(any(grepl("'package:stats' may not be available when loading",
+                           w$message)))) {
+        invokeRestart("muffleWarning")
+      }
     }
     )
 
@@ -1361,7 +1366,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           if (runFnCallAsExpr) {
             pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
             pkgs <- c(pkgs, "stats")
-            do.call(box::use, lapply(pkgs, as.name))
+            if (getOption("spades.useBox"))
+              do.call(box::use, lapply(pkgs, as.name))
             debugForCache <- debugToVerbose(debug)
             sim <- Cache(.inputObjects, sim,
                          .objects = objectsToEvaluateForCaching,
