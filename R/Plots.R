@@ -333,7 +333,7 @@ Plots <- function(data, fn, filename,
   }
 
   if (needSaveRaw) {
-    if (is(data, "Raster")) {
+    if (is(data, "Raster") || is(data, "SpatRaster")) {
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
@@ -355,7 +355,6 @@ Plots <- function(data, fn, filename,
         )
     }
   }
-
   if (needSave) {
     if (is.null(simIsIn)) {
       if (is.call(path))
