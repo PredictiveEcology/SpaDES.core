@@ -69,9 +69,9 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
                      # on my windows system -- shows something similar to sys.calls()
   forms <- formals()
   forms[names(mc)] <- mc
-  partialMatching <- c("s", "i", "u")
+  partialMatching <- c("s", "i", "u", "c")
   forms$where <- partialMatching[which(!is.na(pmatch(partialMatching, forms$where)))]
-  if (length(forms$where) == 0) stop("where must be either sim, user or initEvent")
+  if (length(forms$where) == 0) stop("where must be either sim, user, initEvent, or cyclic")
   objDeparsed <- substitute(object)
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
@@ -113,17 +113,42 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   inUserSupplied <- if ("u" %in% forms$where) {
     objDeparsed %in% sim$.userSuppliedObjNames
   } else {
-    FALSE
+    rep(FALSE, length(objDeparsed))
   }
 
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
-  inFutureInit <- if ("i" %in% forms$where) {
-    # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
-    #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
-    #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
-    isTRUE(depsEdgeList(sim, plot = FALSE)[!(from %in% c("_INPUT_", currentModule(sim))), ][
-      objName == objDeparsed][, all(from != to), by = from][V1 == TRUE]$V1)
+  inFutureInit <- if (any(c("i", "c") %in% forms$where)) {
+    del <- depsEdgeList(sim, plot = FALSE)
+    # if ("c" %in% forms$where) {
+      # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
+      #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
+      #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
+      dd <- del[objName %in% objDeparsed][from != to][!(from %in% c("_INPUT_")), ]
+      d <- depends(sim)
+      otherModsDeps <- d@dependencies[which(!names(d@dependencies) %in% currentModule(sim))]
+
+      for (mod in otherModsDeps) {
+        lo <- mod@loadOrder
+        if (!is.null(lo$after))
+          del <- dd[from %in% lo$after]
+        else
+          del <- dd
+      }
+    # }
+
+    # if (any(c("i", "c") %in% forms$where)) {
+      # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
+      #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
+      #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
+      # if (exists("aaaa", envir = .GlobalEnv)) browser()
+      out <- del[!(from %in% c("_INPUT_", currentModule(sim))), ][
+        objName %in% objDeparsed]
+      out <- out[, .(objName, noFeedback = all(from != to)), by = from][noFeedback %in% TRUE]
+      objDeparsed %in% out$objName
+    # } else {
+    #   FALSE
+    # }
   } else {
     FALSE
   }

@@ -1309,6 +1309,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(".mods$", m))
+        # excludeSuppliedElsewhere <- Map(x = moduleSpecificInputObjects, function(x) suppliedElsewhere(x, sim = sim, where = "init"))
+        # excludeSuppliedElsewhere <-
+        #   names(excludeSuppliedElsewhere[unlist(excludeSuppliedElsewhere)])
+        # moduleSpecificInputObjects <- setdiff(moduleSpecificInputObjects, excludeSuppliedElsewhere)
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -1332,7 +1336,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           ## This next line will make the Caching sensitive to userSuppliedObjs
           ##  (which are already in the simList) or objects supplied by another module
-          inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
+          #browser()
+          #aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
+          inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "i", "c"))
+          # inCyclic <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "c")
           if (any(inSimList)) {
             objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
                                              moduleSpecificInputObjects[inSimList])
@@ -1612,6 +1619,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
   depsGr <- depsGraph(sim, plot = FALSE)
   depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
+  #depsGrDF1 <- depsEdgeList(sim, FALSE)
+  #depsGrDF <- depsGrDF1[from != to]
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
     cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
     hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
