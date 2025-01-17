@@ -8,7 +8,8 @@ createDESCRIPTIONandDocs(
   module = NULL,
   path = getOption("spades.modulePath"),
   importAll = TRUE,
-  buildDocuments = TRUE
+  buildDocuments = TRUE,
+  verbose = getOption("Require.verbose")
 )
 }
 \arguments{

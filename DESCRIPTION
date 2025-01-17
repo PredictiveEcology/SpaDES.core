@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 4.2),
     quickPlot (>= 1.0.2),
-    reproducible (>= 2.1.1)
+    reproducible (>= 2.1.2.9006)
 Imports:
     box,
     cli,

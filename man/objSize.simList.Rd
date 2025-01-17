@@ -4,7 +4,7 @@
 \alias{objSize.simList}
 \title{Object size for \code{simList}}
 \usage{
-\method{objSize}{simList}(x, quick = TRUE, ...)
+\method{objSize}{simList}(x, quick = FALSE, ...)
 }
 \arguments{
 \item{x}{An object}
