@@ -182,7 +182,7 @@ test_that("simList object initializes correctly (1)", {
   }) |>
     unlist() |>
     sort() |>
-    SpaDES.core:::.cleanPkgs() |>
+    .cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
@@ -192,7 +192,7 @@ test_that("simList object initializes correctly (1)", {
   reqdPkgs <- lapply(modules, function(m) packages(module = m)) |>
     unlist() |>
     sort() |>
-    SpaDES.core:::.cleanPkgs() |>
+    .cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 

@@ -65,7 +65,7 @@ test_that("test event-level cache & memory leaks", {
   # Noting that there was a bug in `objSize` in reproducible that would
   #   get this part wrong
   # Take a function from the package -- shouldn't trigger memory leak stuff
-  sims$crazyFunction2 <- SpaDES.core:::bindrows
+  sims$crazyFunction2 <- bindrows
   end(sims) <- end(sims) + 0.1
 
   mess <- capture.output({

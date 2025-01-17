@@ -6,11 +6,11 @@
 \alias{getModuleVersion,character,missing-method}
 \title{Find the latest module version from a SpaDES module repository}
 \usage{
-getModuleVersion(name, repo, token)
+getModuleVersion(name, repo, token, moduleFiles = NULL)
 
-\S4method{getModuleVersion}{character,character}(name, repo, token)
+\S4method{getModuleVersion}{character,character}(name, repo, token, moduleFiles = NULL)
 
-\S4method{getModuleVersion}{character,missing}(name, token)
+\S4method{getModuleVersion}{character,missing}(name, token, moduleFiles = NULL)
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -19,6 +19,9 @@ getModuleVersion(name, repo, token)
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.
 Only \code{master}/\code{main} branches can be used at this point.}
+
+\item{moduleFiles}{Optional. List of files of the \code{name} and \code{repo}. If not
+supplied, this function will get that information by using \code{checkModule}.}
 }
 \value{
 \code{numeric_version}

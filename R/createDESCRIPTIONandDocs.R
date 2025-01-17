@@ -310,7 +310,7 @@ mergeField <- function(origDESCtxt, field, dFile, fieldName = "Imports") {
   if (fieldName %in% colnames(origDESCtxt))
     fieldVals <- strsplit(origDESCtxt[, fieldName], split = ",+\n")[[1]]
   if (length(field)) {
-    field <- Require:::trimRedundancies(unique(c(field, fieldVals)))
+    field <- trimRedundancies(unique(c(field, fieldVals)))
   }
   cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
       sep = "\n", file = dFile, append = TRUE)

@@ -212,28 +212,8 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   #                        sep = "\n", append = FALSE)
   #                  })
 
-#   otherStuffFn <- filenameFromFunction(packageFolderName, "other", "R")
-#   cat("
-# makeActiveBinding('mod', SpaDES.core:::activeModBindingFunction, ",
-#       paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'', module, '\'))'), ")
-#
-# makeActiveBinding('Par', SpaDES.core:::activeParBindingFunction, ",
-#       paste0('asNamespace(SpaDES.core:::.moduleNameNoUnderscore(\'', module, '\'))'), ")
-#
-# ", file = otherStuffFn)
-
-  # if (length(linesWithRoxygen) > 0) {
-  #   message("There was some roxygen2 documentation that was not immediately above ",
-  #           "a function; it is being saved in R/documentation.R ... please confirm that ",
-  #           "the documentation is correct.")
-  #   cat(rlaa[linesWithRoxygen], file = filenameFromFunction(packageFolderName, "documentation", "R")
-  #       , sep = "\n", append = FALSE)
-  #   linesWithRoxygen <- character()
-  # }
-
   filePathImportSpadesCore <- filenameFromFunction(packageFolderName, "imports", "R")# file.path(dirname(mainModuleFile), "R", "imports.R")
 
-  # cat(format(aa[[whDefModule]]), file = mainModuleFile, sep = "\n")
   md <- aa[[whDefModule]][[3]]
   deps <- unlist(eval(md$reqdPkgs))
 
@@ -243,14 +223,6 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
 
   if (isTRUE(buildDocuments)) {
     documentModule(packageFolderName, gpd, linesWithDefModule)
-    # message("Building documentation")
-    # m <- packageFolderName
-    # tmpSrcForDoc <- "R/tmp.R"
-    # cat(rlaa[-(linesWithDefModule[[1]]:linesWithDefModule[[2]])], sep = "\n", file = tmpSrcForDoc)
-    # on.exit(unlink(tmpSrcForDoc))
-    # roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
-    # pkgload::dev_topic_index_reset(m)
-    # pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
   }
 
   RBuildIgnoreFile <- filenameFromFunction(packageFolderName, "", fileExt = ".Rbuildignore")
@@ -382,7 +354,7 @@ mergeField <- function(origDESCtxt, field, dFile, fieldName = "Imports") {
   if (fieldName %in% colnames(origDESCtxt))
     fieldVals <- strsplit(origDESCtxt[, fieldName], split = ",+\n")[[1]]
   if (length(field)) {
-    field <- Require:::trimRedundancies(unique(c(field, fieldVals)))
+    field <- trimRedundancies(unique(c(field, fieldVals)))
   }
   cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
       sep = "\n", file = dFile, append = TRUE)

@@ -2342,10 +2342,10 @@ allowSequentialCachingFinal <- function(sim) {
                    tagValue = c(thisCacheId, cur[["moduleName"]], cur[["eventType"]]),
                    cachePath = cp)
       if (all(c(cur[["moduleName"]], cur[["eventType"]]) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
-        fn <- reproducible:::.updateTagsRepo
+        fn <- .updateTagsRepo
         args$add = TRUE
       } else {
-        fn <- reproducible:::.addTagsRepo
+        fn <- .addTagsRepo
       }
 
       # put all tags in
