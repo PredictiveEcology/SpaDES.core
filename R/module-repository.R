@@ -14,6 +14,8 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
 #'              Only `master`/`main` branches can be used at this point.
+#' @param moduleFiles Optional. List of files of the `name` and `repo`. If not
+#'   supplied, this function will get that information by using `checkModule`.
 #'
 #' @return `numeric_version`
 #'
@@ -32,7 +34,7 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
-setGeneric("getModuleVersion", function(name, repo, token) {
+setGeneric("getModuleVersion", function(name, repo, token, moduleFiles = NULL) {
   standardGeneric("getModuleVersion")
 })
 
@@ -40,12 +42,13 @@ setGeneric("getModuleVersion", function(name, repo, token) {
 setMethod(
   "getModuleVersion",
   signature = c(name = "character", repo = "character", token = "ANY"),
-  definition = function(name, repo, token) {
+  definition = function(name, repo, token, moduleFiles = NULL) {
     if (length(name) > 1) {
       warning("name contains more than one module. Only the first will be used.")
       name <- name[1]
     }
-    moduleFiles <- checkModule(name, repo, token = token)
+    if (is.null(moduleFiles))
+      moduleFiles <- checkModule(name, repo, token = token)
     zipFiles <- grep(paste0(name, "_+.+.zip"), moduleFiles, value = TRUE) # moduleName_....zip only
     zipFiles <- grep(file.path(name, "data"), zipFiles, invert = TRUE, value = TRUE) # remove any zip in data folder
     # all zip files is not correct behaviour, only
@@ -63,9 +66,10 @@ setMethod(
 #' @rdname getModuleVersion
 setMethod("getModuleVersion",
           signature = c(name = "character", repo = "missing", token = "ANY"),
-          definition = function(name, token) {
+          definition = function(name, token, moduleFiles = NULL) {
             v <- getModuleVersion(name, token = token,
-                                  getOption("spades.moduleRepo", defaultGitRepoToSpaDESModules))
+                                  getOption("spades.moduleRepo", defaultGitRepoToSpaDESModules),
+                                  moduleFiles = moduleFiles)
             return(v)
 })
 
