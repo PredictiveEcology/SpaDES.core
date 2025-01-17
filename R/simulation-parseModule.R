@@ -268,7 +268,6 @@ setMethod(
           sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
 
           sim@.xData$.mods[[mBase]]$.isPackage <- TRUE
-          browser()
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      asNamespace(.moduleNameNoUnderscore(mBase)),
                                                      sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
@@ -281,10 +280,11 @@ setMethod(
           # The simpler line commented below will not allow actual code to be put into module,
           #  e.g., startSim <- start(sim)
           #  The more complex one following will allow that.
+          reqdPkgsHere <- eval(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
           # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData$.mods[[mBase]])
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      sim@.xData$.mods[[mBase]],
-                                                     sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                                     sim = sim, pkgs = reqdPkgsHere)
 
           # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
           doesntUseNamespacing <- !.isNamespaced(sim, mBase)
@@ -571,6 +571,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   # tmpEnvir <- new.env(parent = envir)
   tmpEnvir <- new.env(parent = tmpEnvirForPkgs)
 
+
   # This needs to be unconnected to main sim so that object sizes don't blow up
   simCopy <- Copy(sim, objects = FALSE)
   simCopy$.mods <- Copy(sim$.mods)
@@ -586,12 +587,14 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   #   it says, how big is the function, compared to how big is the environment that holds the function
   #   If it is 1, it means there are only functions in that environment, no objects
   # length(serialize(tmpEnvir$prepare_IgnitionFit, NULL))/object.size(mget(ls(tmpEnvir), tmpEnvir))
+  pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
+  pkgs <- reqdPkgsDontLoad(pkgs) # some are explicitly not to be loaded
 
   if (getOption("spades.useBox")) {
     cm <- currentModule(tmpEnvir$sim)
     if (length(cm))
       if (!cm %in% unlist(.coreModules())) {
-        pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
+        # pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
         lapply(pkgs, function(p) {
           allFns <- ls(envir = asNamespace(p))
           val <- paste0("box::use(", p, "[...]", ")")

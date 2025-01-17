@@ -313,9 +313,9 @@ test_that("test .robustDigest for simLists", {
   msgGrep11 <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
                      "with user supplied tags",
-                     "There is no similar item in the cachePath",
+                     "There is no similar item in the cachePath", "elpsd",
                      "Saving", "Done", "Elapsed time for", sep = "|")
-  expect_true(all(grepl(msgGrep11, mess1)))
+  expect_true(all(cli::ansi_grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
   #a <- capture.output(
@@ -569,8 +569,8 @@ test_that("Cache sim objs via .Cache attr", {
                      objects = list(co4 = 3, co3 = 2, co1 = 4), params =
                        list(test = list(.useCache = c(".inputObjects", "init"))))
   })
-  expect_true(sum(grepl("loaded cached copy of .inputObjects", mess11)) == 0)
-  expect_true(sum(grepl("Running .inputObjects", mess11)) == 1)
+  expect_true(sum(cli::ansi_grepl("loaded cached copy of .inputObjects", mess11)) == 0)
+  expect_true(sum(cli::ansi_grepl(grepDotInputObjectsModule(m[1]), mess11)) == 1)
   expect_true(!exists("newFun", envir = mySim$.mods$test))
   expect_true(sum(grepl("aaa <- 2", format(mySim$.mods$test$.inputObjects))) == 1)
 })

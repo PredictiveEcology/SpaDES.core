@@ -669,6 +669,10 @@ setMethod(
 
       ## load user-defined modules
       # browser(expr = exists("._simInit_4"))
+      if (!(all(unlist(lapply(debug, identical, FALSE))))) {
+        # .pkgEnv[[".spadesDebugFirst"]] <- TRUE
+        sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
+      }
 
       for (m in loadOrder) {
         mFullPath <- loadOrderNames[match(m, loadOrder)]
@@ -1337,7 +1341,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           ## This next line will make the Caching sensitive to userSuppliedObjs
           ##  (which are already in the simList) or objects supplied by another module
           #browser()
-          #aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
           inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "i", "c"))
           # inCyclic <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "c")
           if (any(inSimList)) {

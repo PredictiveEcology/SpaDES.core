@@ -262,3 +262,8 @@ runTestsWithTimings <- function(pkgPath = ".",
 LoadedMgsCheck <- function(msg, event) {
   sum(grepl(paste0("Loaded! Cached|for ", event," event"), msg)) == 2
 }
+
+
+grepDotInputObjectsModule <- function(m) {
+  paste0(".inputObjects.+", m, ".+.inputObjects")
+}

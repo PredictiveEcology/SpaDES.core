@@ -424,6 +424,7 @@ setMethod(
   definition = function(object, preDigest, origArguments, ...) {
     dots <- list(...)
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
+    whSimList <- names(whSimList)
 
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
@@ -997,7 +998,7 @@ objSize.simList <- function(x, quick = FALSE, ...) {
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects,
+  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects, cacheId = cacheId,
                drv = drv, conn = conn, verbose = verbose, ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL

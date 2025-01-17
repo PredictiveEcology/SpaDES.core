@@ -498,7 +498,8 @@ test_that("conflicting function types", {
     "defineParameter: 'saveInitialTime' is not of specified type 'numeric'",
     "defineParameter: 'saveInterval' is not of specified type 'numeric'",
     "child4: module code: Init: local variable.*qwerqwer.*assigned but may not be used",
-    "Running .inputObjects for child4",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
     "child4: module code: Init: local variable.*poiuoiu.*assigned but may not be used",
     "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in metadata outputObjects",
     "child4: inputObjects: b, d, f, d1, test are used from sim inside Init, but are not declared in metadata inputObjects"
@@ -549,8 +550,8 @@ test_that("conflicting function types", {
                         pattern = c(paste0(m, ": module code: b is declared in metadata outputObjects|",
                                            "so not checking minimum package|",
                                            m, ": module code: a is declared in metadata inputObjects|",
-                                           "Running .inputObjects|",
-                                           "Setting:|Paths set to:|",
+                                           grepDotInputObjectsModule(m), #"Running .inputObjects|",
+                                           "|Setting:|Paths set to:|",
                                            "Using setDTthreads|",
                                            m, ": using dataPath|", "Elapsed")))))
 
@@ -625,7 +626,8 @@ test_that("conflicting function types", {
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c(
-    "Running .inputObjects for child4",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
     "child4: module code: co2, co3 are declared in metadata outputObjects, but are not assigned in the module",
     "child4: module code: ei2, ei3, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
     "child4: module code: ei3 is declared in metadata inputObjects, but is not used in the module",
@@ -644,7 +646,6 @@ test_that("conflicting function types", {
   md1 <- moduleMetadata(module = m, path = tmpdir) # no sim in metadata
   md2 <- moduleMetadata(path = getSampleModules(tmpdir),
                         module = "randomLandscapes")
-
 
   mm <- capture_messages({
     mySim <- simInit(paths = list(modulePath = tmpdir), modules = m)
@@ -691,9 +692,9 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
   # show that it is logical
   sim <- simInit(times = list(start = 0, end = 2))
   expect_true(is.numeric(eval(xxx3)$default[[1]]))
-
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
-  expect_true(all(unlist(lapply(c("Running .inputObjects", "module code appears clean"),
+  expect_true(all(unlist(lapply(c(grepDotInputObjectsModule(m),#"Running .inputObjects",
+                                  "module code appears clean"),
                                 function(x) any(grepl(mm, pattern = x))))))
 })
 
@@ -801,7 +802,8 @@ test_that("messaging with multiple modules", {
   fullMessage <- c(
     # "defineParameter: 'plotInitialTime' is not of specified type 'character'",
     "defineParameter: 'saveInitialTime' is not of specified type 'character'",
-    "Running .inputObjects for test",
+    grepDotInputObjectsModule("test"),
+    # "Running .inputObjects for test",
     "test: module code: co2, co3 are declared in metadata outputObjects, but are not assigned in the module",
     "test: module code: ei2, ei3, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
     "test: module code: ei3 is declared in metadata inputObjects, but is not used in the module",
@@ -814,7 +816,8 @@ test_that("messaging with multiple modules", {
     "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in metadata inputObjects",
     "test: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects",
     # "defineParameter: 'plotInitialTime' is not of specified type 'character'",
-    "Running .inputObjects for test2",
+    grepDotInputObjectsModule("test2"),
+    # "Running .inputObjects for test2",
     "test2: module code: co1, co4 are declared in metadata outputObjects, but are not assigned in the module",
     "test2: module code: ei1, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
     "test2: module code: ei1 is declared in metadata inputObjects, but is not used in the module",
@@ -825,9 +828,11 @@ test_that("messaging with multiple modules", {
     "test2: inputObjects: b is used from sim inside .inputObjects, but is not declared in metadata inputObjects",
     # "defineParameter: 'plotInitialTime' is not of specified type 'character'",
     "defineParameter: 'hello' is not of specified type 'character'",
-    "Running .inputObjects for test3",
+    grepDotInputObjectsModule("test3"),
+    # "Running .inputObjects for test3",
     "test3: module code appears clean",
-    "Running .inputObjects for test4",
+    grepDotInputObjectsModule("test4"),
+    # "Running .inputObjects for test4",
     "test4: module code appears clean"
   )
 
@@ -890,11 +895,13 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   mm <- cleanMessage(mm)
 
   fullMessage1 <- c(
-    "Running .inputObjects for child4",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
     "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
     "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in metadata outputObjects")
   fullMessageNonInteractive <- c(
-    "Running .inputObjects for child4",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
     "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx <- matrix.*", #possibly at .*147",
     "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx2 <- matrix.*", #possibly at .*148",
     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
@@ -1096,7 +1103,7 @@ paste0("    reqdPkgs = list(\'", dontLoad, "\'),"),'
   )
   expect_false(isNamespaceLoaded(dontLoad))
 
-  options(spades.reqdPkgsDontLoad = NULL)
+  withr::local_options(spades.reqdPkgsDontLoad = NULL)
   warn <- capture_warnings(
     sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
                    times = list(start = 0, end = 1, timeunit = "year"))
