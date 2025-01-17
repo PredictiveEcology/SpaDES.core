@@ -271,7 +271,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           # selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
           objsNeeded <- na.omit(unique(c(objsNeeded, objsNeededForNextMod)))#, selfObjects)))
           if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
-            spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
+            spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1] + 1), collapse = "")
             messageVerbose(
               cli::col_magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
                             "next module (", nextScheduledEvent, ")")),
@@ -1106,7 +1106,7 @@ setMethod(
 
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
         .pkgEnv[[".spadesDebugFirst"]] <- TRUE
-        sim[[".spadesDebugWidth"]] <- c(9, 10, 9, 13)
+        # sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
       }
 
       sim@.xData[["._firstEventClockTime"]] <- Sys.time()
@@ -1411,7 +1411,6 @@ setMethod(
 
     rr <- .Random.seed
     if (runFnCallAsExpr) {
-      # if (identical(cur$eventType, "prepIgnitionFitData")) browser()
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
     }
     if (identical(rr, .Random.seed)) {
@@ -1748,7 +1747,7 @@ resolveFutureNow <- function(sim, cause = "") {
   futureRunningSimTU <- futureRunning
   setDT(futureRunningSimTU)
   setDT(futureRunning)
-  spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1] + 1), collapse = "")
+  spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1] + 1), collapse = "")
 
   outMess <- debugMessTRUE(sim, events = futureRunningSimTU)
 
@@ -1826,7 +1825,7 @@ getFutureNeeds <- function(deps, curModName) {
 
 .runEventFuture <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                             showSimilar = showSimilar, .pkgEnv, envir, futureNeeds) {
-  spacing <- paste(rep(" ", sim[[".spadesDebugWidth"]][1]), collapse = "")
+  spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1]), collapse = "")
   message(cli::col_magenta(spacing, "-- Spawning in a future"))
   sim$.futureEventsSkipped <- sim$.futureEventsSkipped + 1
   modEnv <- sim$.mods[[cur[["moduleName"]]]]
@@ -2191,14 +2190,14 @@ debugMessTRUE <- function(sim, events) {
     events <- current(sim)
   evnts1 <- data.frame(events)
   widths <- unname(unlist(lapply(format(evnts1), nchar)))
-  sim[[".spadesDebugWidth"]] <- pmax(widths, sim[[".spadesDebugWidth"]])
-  evnts1[1L, ] <- sprintf(paste0("%-", sim[[".spadesDebugWidth"]],"s"), evnts1)
+  sim[["._spadesDebugWidth"]] <- pmax(widths, sim[["._spadesDebugWidth"]], na.rm = TRUE)
+  evnts1[1L, ] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]],"s"), evnts1)
   evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
-  evnts1[1L, 1L] <- sprintf(paste0("%-", sim[[".spadesDebugWidth"]][1L], "s"), evnts1[1L, 1L])
+  evnts1[1L, 1L] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]][1L], "s"), evnts1[1L, 1L])
   if (.pkgEnv[[".spadesDebugFirst"]]) {
     evnts2 <- evnts1
-    evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",sim[[".spadesDebugWidth"]], "s"), names(evnts2)),
-                             sprintf(paste0("%-",sim[[".spadesDebugWidth"]], "s"), evnts2))
+    evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",sim[["._spadesDebugWidth"]], "s"), names(evnts2)),
+                             sprintf(paste0("%-",sim[["._spadesDebugWidth"]], "s"), evnts2))
 
     outMess <- paste(unname(evnts2[1, ]), collapse = ' ')
     outMess <- c(outMess, paste(unname(evnts2[2, ]), collapse = ' '))
