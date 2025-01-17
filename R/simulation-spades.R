@@ -1231,6 +1231,9 @@ setMethod(
       if (grepl("In .+:", w$message)) {
         warningSplitOnColon(w)
         invokeRestart("muffleWarning")
+      } else if (isTRUE(any(grepl("'package:stats' may not be available when loading",
+                                  w$message)))) {
+        invokeRestart("muffleWarning")
       } else {
         warning(w)
         tryCatch(invokeRestart("muffleWarning"), error = function(e) NULL)
