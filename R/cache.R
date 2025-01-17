@@ -917,7 +917,7 @@ if (!exists("objSize")) {
 #' and the other slots in the `simList` (e.g., events, completed, modules, etc.).
 #' The returned object also has an attribute, "total", which shows the total size.
 #'
-#' @importFrom reproducible objSize
+#' @importFrom reproducible objSize .objSizeWithTry
 #' @importFrom lobstr obj_size
 #' @inheritParams reproducible::objSize
 #'
@@ -928,11 +928,12 @@ if (!exists("objSize")) {
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
 #' utils::object.size(a)
-objSize.simList <- function(x, quick = FALSE, ...) {
+objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 
-  total <- try(obj_size(x, quick = TRUE), silent = TRUE) # failing due to lobstr issue #72
-  if (!is(total, "try-error")) {
-    aa <- objSize(x@.xData, quick = quick, ...)
+  total <- .objSizeWithTry(x)
+  # total <- try(obj_size(x, quick = TRUE), silent = TRUE) # failing due to lobstr issue #72
+  if (!is(total, "try-error") && isTRUE(recursive)) {
+    aa <- objSize(x@.xData, quick = quick, recursive = recursive, ...)
 
     simSlots <- grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE)
     names(simSlots) <- simSlots
@@ -945,9 +946,9 @@ objSize.simList <- function(x, quick = FALSE, ...) {
       # attr(total, "objSize") <- sum(unlist(attr(aa, "objSize")), unlist(attr(otherParts, "objSize")))
       # class(attr(total, "objSize")) <- "lobstr_bytes"
 
-  } else {
-    total <- NA
-  }
+  } # else {
+  #   total <- NA
+  # }
 
   return(total)
 }
