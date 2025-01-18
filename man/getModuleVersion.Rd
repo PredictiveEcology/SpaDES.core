@@ -20,6 +20,8 @@ Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.
 Only \code{master}/\code{main} branches can be used at this point.}
 
+\item{token}{A github repository token as from \code{gitcreds::gitcreds_get()}}
+
 \item{moduleFiles}{Optional. List of files of the \code{name} and \code{repo}. If not
 supplied, this function will get that information by using \code{checkModule}.}
 }

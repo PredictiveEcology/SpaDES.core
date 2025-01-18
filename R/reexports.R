@@ -1,3 +1,7 @@
+utils::globalVariables(c(
+  ".", "keepBasedOnRedundantInequalities", "inequality", "verbose", "inequality"
+))
+
 ## non-exported imports from other packages -------------------------------------
 
 .message <- getFromNamespace(".message", "reproducible") ## envir for messages + message-funs

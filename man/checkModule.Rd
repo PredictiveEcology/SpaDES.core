@@ -18,6 +18,8 @@ checkModule(name, repo, token)
 \item{repo}{GitHub repository name.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.}
+
+\item{token}{A github repository token as from \code{gitcreds::gitcreds_get()}}
 }
 \value{
 a character vector of module file paths (invisibly).

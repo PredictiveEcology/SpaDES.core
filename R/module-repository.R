@@ -31,6 +31,7 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'
 #' @author Alex Chubaty
 #' @export
+#' @inheritParams checkModule
 #' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
@@ -82,6 +83,8 @@ setMethod("getModuleVersion",
 #' @param repo  GitHub repository name.
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
+#'
+#' @param token A github repository token as from `gitcreds::gitcreds_get()`
 #'
 #' @return a character vector of module file paths (invisibly).
 #'

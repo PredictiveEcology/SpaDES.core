@@ -107,6 +107,7 @@
 #' have an `@importFrom <pkgName>`, meaning **every** function from every package will
 #' be imported. If `FALSE`, then only functions explicitly imported using
 #' `@importFrom <pkgName> <functionName>` will be imported.
+#' @inheritParams reproducible::Cache
 #'
 #' @return invoked for the side effect of creating DESCRIPTION file, a `.Rbuildingore`
 #' file and possibly building documentatation from roxygen tags.

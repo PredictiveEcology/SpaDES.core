@@ -86,7 +86,10 @@ test_that("downloadModule can overwrite existing modules", {
     list.files(full.names = TRUE, pattern = "[.]R$") |>
     file.info()
 
-  expect_error(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
+  warns <- capture_warnings(
+    downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
+  expect_match(paste(warns, collapse = "_"), all = FALSE, fixed = FALSE, regexp = "not overwriting")
+
 
 
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = TRUE))

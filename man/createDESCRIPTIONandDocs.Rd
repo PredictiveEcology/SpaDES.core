@@ -24,6 +24,12 @@ be imported. If \code{FALSE}, then only functions explicitly imported using
 
 \item{buildDocuments}{A logical. If \code{TRUE}, the default, then the documentation
 will be built, if any exists, using \code{roxygen2::roxygenise}.}
+
+\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 }
 \value{
 Invoked for its side effects. There will be a new or modified
