@@ -328,7 +328,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
         # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
-        # cur$._clockTime <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+        # cur[[._txtClockTime]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         sim <- appendCompleted(sim, cur)
       }
 
@@ -1931,7 +1931,7 @@ debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
                          attr(sim, "completedCounter") == 1) {
         sim@.xData$._startClockTime
       } else {
-        .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]]$._clockTime)
+        .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]][[._txtClockTime]])
       }
       outMess <- paste0("elpsd: ", format(Sys.time() - compareTime, digits = 2),
                         " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
@@ -2376,7 +2376,7 @@ sequentialCacheText <- "SequentialCache_"
 
 appendCompleted <- function(sim, cur) {
 
-  cur[["._clockTime"]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
+  cur[[._txtClockTime]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
 
   last <- attr(sim, "completedCounter")
   isLastWrong <- length(sim@completed) != last
@@ -2384,11 +2384,11 @@ appendCompleted <- function(sim, cur) {
     last <- attr(sim, "completedCounter") <- NULL
   }
   if (is.null(last)) {
-    prevTime <- cur[["._clockTime"]]
+    prevTime <- cur[[._txtClockTime]]
   } else {
-    prevTime <- sim@completed[[as.character(last)]]$._clockTime
+    prevTime <- sim@completed[[as.character(last)]][[._txtClockTime]]
   }
-  cur[["._prevEventTimeFinish"]] <- prevTime
+  cur[[._txtPrevEventTimeFinish]] <- prevTime
 
   if (!is.null(attr(sim, "completedCounter"))) { # use attr(sim, "completedCounter")
     #instead of sim@.xData because collisions with parallel sims from same sim object

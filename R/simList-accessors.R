@@ -2758,9 +2758,9 @@ setMethod(
         # note the above line captures empty eventTime, whereas `is.na` does not
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
-            if (!is.null(obj$._clockTime))
+            if (!is.null(obj[[._txtClockTime]]))
               obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData),
-                         clockTime = obj$._clockTime,
+                         clockTime = obj[[._txtClockTime]],
                          ._clockTime = NULL)]
           }
         }

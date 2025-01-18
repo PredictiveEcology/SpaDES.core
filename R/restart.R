@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  ".", "._clockTime", "._prevEventTimeFinish", ".attachedPkgsFilename", "et", ".First", ".oldWd",
+  ".", ".attachedPkgsFilename", "et", ".First", ".oldWd",
   ".spadesCall", ".spades.restartRInterval", ".spades.simFilename"
 ))
 
@@ -108,13 +108,13 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   if (numMods > 0) {
     com <- completed(sim)
-    etSecs <- sum(com[, et := difftime(clockTime, ._prevEventTimeFinish, units = "secs"),
+    etSecs <- sum(com[, et := difftime(get(._txtClockTime), get(._txtPrevEventTimeFinish), units = "secs"),
                       by = seq_len(NROW(com))]$et)
 
     # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
     # et <- difftime(tail(com$._clockTime, numMods - 1)[1], com$._clockTime[1])
     st <- Sys.time()
-    sim$._startClockTime <- st - etSecs
+    sim[[._txtStartClockTime]] <- st - etSecs
 
     simCompletedList <- as.list(sim@completed)
     simCompletedList <- simCompletedList[order(as.integer(names(simCompletedList)))]
@@ -124,7 +124,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     rm(list = names(eventsToReverse), envir = sim@completed)
 
     last <- as.character(length(sim@completed))
-    sim@completed[[last]]$._clockTime <- st
+    sim@completed[[last]][[._txtClockTime]] <- st
 
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
     if (numMods > length(sim$.recoverableObjs))
@@ -302,7 +302,7 @@ saveState <- function(filename, ...){
 #' the arguments to `restartR` and the arguments to `saveSimList`, these latter two
 #' using a dot to separate the function name and its argument. The defaults for
 #' two key options are: `options("spades.restartR.restartDir" = NULL`, meaning
-#' use `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`
+#' use `file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))`
 #' and `options("spades.saveSimList.fileBackend" = 0)`, which means don't do anything
 #' with raster-backed files.
 #' See specific functions for defaults and argument meanings.
@@ -349,7 +349,7 @@ saveState <- function(filename, ...){
 #'     taking the first one that is not inside the `tempdir()`, which will
 #'     disappear during restart of R.
 #'     The actual directory for a given `spades` call that is restarting will be:
-#'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
+#'     `file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))`.
 #'     The random string is to prevent parallel processes that started at the same clock
 #'     time from colliding.
 #'
@@ -373,7 +373,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   attached <- srch
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = "package:", replacement = "")))
-  .newDir <- file.path(restartDir, "restartR", gsub(":| ", "_", paste0(sim$._startClockTime, "_",
+  .newDir <- file.path(restartDir, "restartR", gsub(":| ", "_", paste0(sim[[._txtStartClockTime]], "_",
                                                                        .rndString))) |>
     checkPath(create = TRUE)
   .attachedPkgsFilename <- file.path(.newDir, '.attachedPkgs.RData')

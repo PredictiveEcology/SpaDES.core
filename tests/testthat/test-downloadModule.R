@@ -29,6 +29,7 @@ test_that("downloadModule downloads and unzips a single module", {
   expect_true(all(f %in% f_expected))
 })
 
+
 test_that("downloadModule downloads and unzips a parent module", {
   skip_on_cran()
 

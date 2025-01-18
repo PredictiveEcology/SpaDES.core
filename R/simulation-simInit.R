@@ -369,20 +369,23 @@ setMethod(
                         notOlderThan, ...) {
 
     dots <- list(...)
-    if (is.null(dots$._startClockTime))
-      ._startClockTime <- Sys.time()
+    if (is.null(dots[[._txtStartClockTime]]))
+      assign(._txtStartClockTime, Sys.time())
+      # ._startClockTime <- Sys.time()
     else
-      ._startClockTime <- dots$._startClockTime
-    dots$._startClockTime <- NULL
-    dotNames <- setdiff(...names(), "._startClockTime")
+      assign(._txtStartClockTime, dots[[._txtStartClockTime]])
+      # ._startClockTime <- dots[[._txtStartClockTime]]
+    dots[[._txtStartClockTime]] <- NULL
+    dotNames <- setdiff(...names(), ._txtStartClockTime)
     # create  <- List object for the simulation
     sim <- new("simList")
-    sim@.xData[["._startClockTime"]] <- ._startClockTime
+    sim@.xData[[._txtStartClockTime]] <- get(._txtStartClockTime, inherits = FALSE)
     sim$._simInitElapsedTime <- 0
 
     # loggingMessage helpers
-    ._simNesting <- simNestingSetup(...)
-    sim[["._simNesting"]] <- ._simNesting
+    # assign(._txtSimNesting, simNestingSetup(...))
+    ._simNestingLocal <- simNestingSetup(...)
+    sim[[._txtSimNesting]] <- ._simNestingLocal
 
     opt <- options("encoding" = "UTF-8")
     if (isTRUE(getOption("spades.allowSequentialCaching"))) {
@@ -391,10 +394,10 @@ setMethod(
 
     on.exit({
       options(opt)
-      sim <- elapsedTimeInSimInit(._startClockTime, sim)
-      ._startClockTime <- Sys.time()
-      sim@.xData[["._startClockTime"]] <- NULL
-      dt <- difftime(._startClockTime, ._startClockTime - sim$._simInitElapsedTime)
+      sim <- elapsedTimeInSimInit(get(._txtStartClockTime, inherits = FALSE), sim)
+      ._startClockTimeLocal <- Sys.time()
+      sim@.xData[[._txtStartClockTime]] <- NULL
+      dt <- difftime(._startClockTimeLocal, ._startClockTimeLocal - sim$._simInitElapsedTime)
       message("Elapsed time for simInit: ", format(dt, format = "auto"))
     }, add = TRUE)
 
@@ -1268,10 +1271,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   )
 
   # loggingMessage helpers
-  simNestingRevert <- sim[["._simNesting"]]
-  on.exit(sim[["._simNesting"]] <- simNestingRevert, add = TRUE)
-  sim[["._simNesting"]] <- simNestingOverride(sim, mBase)
-  ._simNesting <- sim[["._simNesting"]]
+  simNestingRevert <- sim[[._txtSimNesting]]
+  on.exit(sim[[._txtSimNesting]] <- simNestingRevert, add = TRUE)
+  sim[[._txtSimNesting]] <- simNestingOverride(sim, mBase)
+  ._simNestingLocal <- sim[[._txtSimNesting]]
 
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
@@ -1649,17 +1652,17 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       if  (is.call(debug))
         debug <- eval(debug)
 
-      len <- length(sim[["._simNesting"]])
-      ._simNesting <- sim[["._simNesting"]]
+      len <- length(sim[[._txtSimNesting]])
+      ._simNestingLocal <- sim[[._txtSimNesting]]
       val <- "intsDrngSmInt"
-      ._simNesting[len] <- val
+      ._simNestingLocal[len] <- val
 
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                           objects = objects, inputs = inputs, outputs = outputs,
                           times = list(start = as.numeric(start(sim)),
                                        end = as.numeric(end(sim)), timeunit = timeunit(sim)),
-                          ._startClockTime = sim$._startClockTime)
+                          ._startClockTime = sim[[._txtStartClockTime]])
         simAlt@.xData$._ranInitDuringSimInit <- completed(simAlt)$moduleName
         messageVerbose(cli::col_yellow("**** Running spades call for:", safeToRunModules, "****"))
         simAltOut <- spades(simAlt, events = "init", debug = debug)
@@ -1953,23 +1956,23 @@ prefixSimInit <- " simInit:"
 spaceDashDashSpace <- " -- "
 
 simNestingSetup <- function(...) {
-  prevSimEnv <- tryCatch(whereInStack("._simNesting"), error = function(x) character())
+  prevSimEnv <- tryCatch(whereInStack(._txtSimNesting), error = function(x) character())
   if (is.environment(prevSimEnv)) {
-    prevSimEnv <- get0("._simNesting", envir = prevSimEnv, inherits = FALSE)
+    prevSimEnv <- get0(._txtSimNesting, envir = prevSimEnv, inherits = FALSE)
   }
-  simNestingArg <- list(...)$._simNesting
+  simNestingArg <- list(...)[[._txtSimNesting]]
   messageTxt <- if (is.null(simNestingArg)) "simInit" else simNestingArg
   c(prevSimEnv, messageTxt)
 }
 
 #' @importFrom cli col_green
 simNestingOverride <- function(sim, mBase) {
-  len <- length(sim[["._simNesting"]])
-  ._simNestingTail <- sim[["._simNesting"]][len]
+  len <- length(sim[[._txtSimNesting]])
+  ._simNestingTail <- sim[[._txtSimNesting]][len]
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
   modName8Chars <- moduleNameStripped(mBase, numCharsMax)
-  sim[["._simNesting"]][len] <- paste0(modName8Chars, ":", cli::col_green(sim@current$eventType))
-  sim[["._simNesting"]]
+  sim[[._txtSimNesting]][len] <- paste0(modName8Chars, ":", cli::col_green(sim@current$eventType))
+  sim[[._txtSimNesting]]
 }
 
 isMacOSX <- function()
