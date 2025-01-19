@@ -2758,10 +2758,11 @@ setMethod(
         # note the above line captures empty eventTime, whereas `is.na` does not
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
-            if (!is.null(obj[[._txtClockTime]]))
-              obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData),
-                         clockTime = obj[[._txtClockTime]],
-                         ._clockTime = NULL)]
+            if (!is.null(obj[[._txtClockTime]])) {
+              obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData))]
+                         #clockTime = obj[[._txtClockTime]],
+                         #._clockTime = NULL)]
+            }
           }
         }
       }
@@ -3338,7 +3339,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
   if (!is.null(comp)) {
     comp <- comp[, list(moduleName, eventType,
-                          diffTime = diff(c(x@.xData[["._firstEventClockTime"]], clockTime)))]
+                          diffTime = diff(c(x@.xData[["._firstEventClockTime"]], get(._txtClockTime))))]
     theBy <- if (isTRUE(byEvent)) {
       c("moduleName", "eventType")
     } else {
