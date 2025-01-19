@@ -427,6 +427,12 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
+  et <- elapsedTime(mySimOut)
+  mins <- "mins"
+  et2 <- elapsedTime(mySimOut, units = mins)
+  expect_is(et, "data.table")
+  expect_identical(units(et2$elapsedTime), mins)
+  expect_identical(colnames(et), c("moduleName", "eventType", "elapsedTime"))
   expect_false(any(grepl("Skipped digest", mess)))
 
   ## Rerun with Cached copies being recovered
