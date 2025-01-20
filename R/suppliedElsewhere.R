@@ -1,4 +1,4 @@
-utils::globalVariables(c("objName", "V1"))
+utils::globalVariables(c("objName", "V1", "noFeedback"))
 
 
 #' Assess whether an object has or will be supplied from elsewhere
