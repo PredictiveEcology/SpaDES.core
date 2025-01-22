@@ -147,6 +147,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'             .plotInitialTime = 1)
 #'     }
 #'   } # end ggplot
+#'   unlink("figures") # clean up
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),

@@ -86,9 +86,16 @@ test_that("downloadModule can overwrite existing modules", {
     list.files(full.names = TRUE, pattern = "[.]R$") |>
     file.info()
 
-  warns <- capture_warnings(
-    downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
-  expect_match(paste(warns, collapse = "_"), all = FALSE, fixed = FALSE, regexp = "not overwriting")
+  errs <- capture_error(
+    warns <- capture_warnings(
+      downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
+  )
+  if (!is.null(getGitCredsToken())) {
+    expect_match(paste(warns, collapse = "_"), all = FALSE, fixed = FALSE, regexp = "not overwriting")
+  } else {
+    expect_match(paste(errs, collapse = "_"), all = FALSE, fixed = FALSE, regexp = "overwrite is FALSE")
+  }
+
 
 
 

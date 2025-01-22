@@ -165,5 +165,6 @@ the file(s) that is/are saved will be appended to the \code{outputs} slot of the
             .plotInitialTime = 1)
     }
   } # end ggplot
+  unlink("figures") # clean up
 } # end of dontrun
 }
