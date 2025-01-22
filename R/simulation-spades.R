@@ -235,9 +235,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         }
 
         # This is to create a namespaced module call
-        if (!.pkgEnv[["skipNamespacing"]])
-          .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
-                            removeOthers = FALSE)
+        # if (!.pkgEnv[["skipNamespacing"]])
+        #   .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
+        #                     removeOthers = FALSE)
 
         skipEvent <- FALSE
         if (!is.null(eventSeed)) {
@@ -274,7 +274,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
             spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1] + 1), collapse = "")
             messageVerbose(
               cli::col_magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
-                            "next module (", nextScheduledEvent, ")")),
+                                      "next module (", nextScheduledEvent, ")")),
               verbose = 1 - (debug %in% FALSE))
             simFuture <- sim$.simFuture
             sim$.simFuture <- list()
@@ -326,7 +326,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         }
       }
 
-        # add to list of completed events
+      # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         # cur[[._txtClockTime]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         sim <- appendCompleted(sim, cur)
@@ -833,7 +833,7 @@ setGeneric(
            .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
            events = NULL, .plots = getOption("spades.plots", NULL), ...) {
     standardGeneric("spades")
-})
+  })
 
 #' @rdname spades
 setMethod(
@@ -981,7 +981,7 @@ setMethod(
       .pkgEnv[["spades.browserOnError"]] <- (interactive() & !identical(debug, FALSE) &
                                                getOption("spades.browserOnError"))
       .pkgEnv[["spades.nCompleted"]] <- getOption("spades.nCompleted")
-      .pkgEnv[["skipNamespacing"]] <- !getOption("spades.switchPkgNamespaces")
+      # .pkgEnv[["skipNamespacing"]] <- !getOption("spades.switchPkgNamespaces")
       .pkgEnv[["spades.keepCompleted"]] <- getOption("spades.keepCompleted", TRUE)
 
       # Memory Use
@@ -1002,8 +1002,8 @@ setMethod(
       # timeunits gets accessed every event -- this should only be needed once per simList
       sim@.xData$.timeunits <- timeunits(sim)
       on.exit({
-        if (!.pkgEnv[["skipNamespacing"]])
-          .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
+        # if (!.pkgEnv[["skipNamespacing"]])
+        #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
         rm(".timeunits", envir = sim@.xData)
 
 
