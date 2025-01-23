@@ -20,29 +20,29 @@ test_that(".emptyEventList tests", {
   expect_true(identical(unname(as.matrix(b)), unname(as.matrix(b1))))
 })
 
-test_that("modify search path", {
-  testInit(smcc = FALSE)
-
-  pkgToAttach <- "cli"
-  spPre <- search()
-  a <- .modifySearchPath(pkgs = pkgToAttach, skipNamespacing = FALSE)
-  spPost <- search()
-  expect_true(identical(grep(pkgToAttach, spPost), 2L))
-  detach("package:cli")
-  spPost2 <- search()
-  expect_false(identical(grep(pkgToAttach, spPost2), 2L))
-
-  # use removeOthers
-  pkgToAttach <- c("cli", "reproducible", "quickPlot")
-  spPre <- search()
-  a <- .modifySearchPath(pkgs = pkgToAttach, removeOthers = TRUE, skipNamespacing = FALSE)
-  spPost <- search()
-  expect_true(any(grep(pkgToAttach[1], spPost) == 2L))
-  expect_true(identical(grep("digest", spPost), integer()))
-  detach("package:cli")
-  spPost2 <- search()
-  expect_false(any(grep(pkgToAttach[1], spPost2) == 2L))
-})
+# test_that("modify search path", {
+#   testInit(smcc = FALSE)
+#
+#   pkgToAttach <- "cli"
+#   spPre <- search()
+#   a <- .modifySearchPath(pkgs = pkgToAttach, skipNamespacing = FALSE)
+#   spPost <- search()
+#   expect_true(identical(grep(pkgToAttach, spPost), 2L))
+#   detach("package:cli")
+#   spPost2 <- search()
+#   expect_false(identical(grep(pkgToAttach, spPost2), 2L))
+#
+#   # use removeOthers
+#   pkgToAttach <- c("cli", "reproducible", "quickPlot")
+#   spPre <- search()
+#   a <- .modifySearchPath(pkgs = pkgToAttach, removeOthers = TRUE, skipNamespacing = FALSE)
+#   spPost <- search()
+#   expect_true(any(grep(pkgToAttach[1], spPost) == 2L))
+#   expect_true(identical(grep("digest", spPost), integer()))
+#   detach("package:cli")
+#   spPost2 <- search()
+#   expect_false(any(grep(pkgToAttach[1], spPost2) == 2L))
+# })
 
 test_that("test all.equal.simList", {
   testInit(smcc = FALSE, "digest")

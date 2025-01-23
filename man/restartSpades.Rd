@@ -2,12 +2,17 @@
 % Please edit documentation in R/restart.R
 \name{restartSpades}
 \alias{restartSpades}
+\alias{saveState}
 \title{Restart an interrupted simulation}
 \usage{
 restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
+
+saveState(filename, ...)
 }
 \arguments{
-\item{sim}{A \code{simList.} If not supplied (the default), this will take the \code{sim} from
+\item{sim}{A \code{simList} or a filename that will load a \code{simList}, e.g., from
+\code{saveState} or \code{saveSimList}. If not supplied (the default),
+this will take the \code{sim} from
 \code{savedSimEnv()$.sim}, i.e., the one that was interrupted}
 
 \item{module}{A character string length one naming the module that caused the error and
@@ -24,6 +29,12 @@ restarting the simulation. If \code{FALSE}, then it will return a new \code{simL
 with the module code parsed into the \code{simList}}
 
 \item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
+
+\item{filename}{The filename to save the sim state.
+
+\code{saveState} is a wrapper around \code{restartSpades} and \code{saveSimList}. You can
+pass arguments to the \code{...} that will be passed to \code{saveSimList}, such as
+\code{modules}, \code{inputs}, \code{outputs}.}
 }
 \value{
 A \code{simList} as if \code{spades} had been called on a \code{simList}.

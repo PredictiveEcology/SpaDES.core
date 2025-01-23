@@ -2,11 +2,13 @@ test_that("downloadData downloads and unzips module data", {
   skip_on_cran()
 
   opts <- list(reproducible.inputPaths = NULL)
-  if (isWindows()) {
-    opts <- append(opts, list(download.file.method = "auto"))
-  } else {
-    opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
-  }
+  noisyOutput <- capture.output(
+    if (isWindows()) {
+      opts <- append(opts, list(download.file.method = "auto"))
+    } else {
+      opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
+    }
+  )
 
   testInit(c("googledrive", "terra"), opts = opts)
 

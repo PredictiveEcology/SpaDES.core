@@ -115,10 +115,10 @@ memoryUse <- function(sim, max = TRUE) {
   } else {
     # make sure same tz
     if (any(grepl("^time$", names(mem))))
-      setnames(mem, old = "time", new = "clockTime")
-    mem[, clockTime := as.POSIXct(as.character(clockTime))] # In case these two objects are in different tz
-    compl[, clockTime := as.POSIXct(as.character(clockTime))]
-    a <- mem[compl, on = c("clockTime"), roll = TRUE, allow.cartesian = TRUE]
+      setnames(mem, old = "time", new = ._txtClockTime)
+    mem[, eval(._txtClockTime) := as.POSIXct(as.character(get(._txtClockTime)))] # In case these two objects are in different tz
+    compl[, eval(._txtClockTime) := as.POSIXct(as.character(get(._txtClockTime)))]
+    a <- mem[compl, on = c(._txtClockTime), roll = TRUE, allow.cartesian = TRUE]
     if (isTRUE(max)) {
       a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
     } else {

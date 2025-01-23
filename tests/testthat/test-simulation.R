@@ -36,7 +36,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   set.seed(123)
   mySimEvent <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = "init")
-  expect_true(all("init" == completed(mySimEvent)$eventType))
+  expect_true(all(c(".inputObjects", "init") %in% completed(mySimEvent)$eventType))
   expect_true(max(events(mySimEvent)$eventTime) <= end(mySimEvent)) # didn't schedule next event
 
 
@@ -54,8 +54,8 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   eventTypes <- c("nothing")
   mySimEvent4 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
-  expect_true(NROW(completed(mySimEvent4)) == 0) # nothing completed
-  expect_true(all("init" == events(mySimEvent4)$eventType)) # nothing happened; only inits in queue
+  expect_true(NROW(completed(mySimEvent4)) == length(modules)) # only .inputObjects completed
+  expect_true(all(c(".inputObjects", "init") %in% completed(mySimEvent)$eventType))
 
   eventTypes <- list(randomLandscapes = c("init"),
                      fireSpread = c("init", "burn")
@@ -72,33 +72,41 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   mySimEvent6 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes)
   expect_true(all("randomLandscapes" %in% completed(mySimEvent6)$moduleName))
-  expect_true(!all("fireSpread" %in% completed(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
+  expect_true(sum("fireSpread" %in% completed(mySimEvent6)$moduleName) == 1) # only .inputObjects; didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent6)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent7 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
-  expect_true(all("randomLandscapes" %in% completed(mySimEvent7)$moduleName))
-  expect_true(!all("fireSpread" %in% completed(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
+  compped <- completed(mySimEvent7)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
+  expect_true(all("randomLandscapes" %in% compped$moduleName))
+  expect_true(!all("fireSpread" %in% compped$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent7)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent8 <- simInit(times, params, modules, objects = list(), paths) |>
     spades(debug = FALSE, .plotInitialTime = NA, events = eventTypes, cache = TRUE)
-  expect_true(all("randomLandscapes" %in% completed(mySimEvent8)$moduleName))
-  expect_true(!all("fireSpread" %in% completed(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
+  compped <- completed(mySimEvent8)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
+  expect_true(all("randomLandscapes" %in% compped$moduleName))
+  expect_true(!all("fireSpread" %in% compped$moduleName)) # didn't run any fireSpread events b/c misspelled
   expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent9 <- simInitAndSpades(times, params, modules, objects = list(), paths,
                         debug = FALSE, .plotInitialTime = NA, events = "init")
-  expect_true(all("init" == completed(mySimEvent9)$eventType))
+  compped <- completed(mySimEvent9)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
+  expect_true(all("init" == compped$eventType))
   expect_true(max(events(mySimEvent9)$eventTime) <= end(mySimEvent9)) # didn't schedule next event
 
   # Test times
   #  Set end time to WAY after the init events
   mySimEvent10 <- simInitAndSpades(times = list(start = 0, end = 10), params, modules, objects = list(), paths,
                                   debug = FALSE, .plotInitialTime = NA, events = "init")
+  compped <- completed(mySimEvent10)
+  compped <- compped[!compped$eventType %in% ".inputObjects"]
   expect_true(time(mySimEvent10) == end(mySimEvent10)) # it is at 10, the end
-  expect_true(all("init" == completed(mySimEvent10)$eventType))
-  expect_true(max(completed(mySimEvent10)$eventTime) == start(mySimEvent10)) # didn't go past start time because init are all at start
+  expect_true(all("init" == compped$eventType))
+  expect_true(max(compped$eventTime) == start(mySimEvent10)) # didn't go past start time because init are all at start
   simOut <- spades(mySimEvent10)
   expect_true(time(simOut) == end(simOut)) # it is at 10, the end
   expect_true(!all("init" == completed(simOut)$eventType))
@@ -147,7 +155,7 @@ test_that("spades calls - diff't signatures", {
 
   if (requireNamespace("logging", quietly = TRUE)) {
     expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
-        "eventTime *moduleName *eventType *eventPriority")
+                   "eventTime *moduleName *eventType *eventPriority")
   } else {
     expect_message(spades(Copy(a), debug = list(debug = list("current", "events")), .plotInitialTime = NA),
                    "eventTime *moduleName *eventType *eventPriority")
@@ -486,14 +494,15 @@ test_that("conflicting function types", {
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
 
   fullMessage <- c(# "defineParameter: 'value' is not of specified type 'numeric'",
-                   "defineParameter: 'plotInterval' is not of specified type 'numeric'",
-                   "defineParameter: 'saveInitialTime' is not of specified type 'numeric'",
-                   "defineParameter: 'saveInterval' is not of specified type 'numeric'",
-                   "child4: module code: Init: local variable.*qwerqwer.*assigned but may not be used",
-                   "Running .inputObjects for child4",
-                   "child4: module code: Init: local variable.*poiuoiu.*assigned but may not be used",
-                   "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in metadata outputObjects",
-                   "child4: inputObjects: b, d, f, d1, test are used from sim inside Init, but are not declared in metadata inputObjects"
+    "defineParameter: 'plotInterval' is not of specified type 'numeric'",
+    "defineParameter: 'saveInitialTime' is not of specified type 'numeric'",
+    "defineParameter: 'saveInterval' is not of specified type 'numeric'",
+    "child4: module code: Init: local variable.*qwerqwer.*assigned but may not be used",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
+    "child4: module code: Init: local variable.*poiuoiu.*assigned but may not be used",
+    "child4: outputObjects: g, g1 are assigned to sim inside Init, but are not declared in metadata outputObjects",
+    "child4: inputObjects: b, d, f, d1, test are used from sim inside Init, but are not declared in metadata inputObjects"
   )
 
   mm <- cleanMessage(mm)
@@ -541,8 +550,8 @@ test_that("conflicting function types", {
                         pattern = c(paste0(m, ": module code: b is declared in metadata outputObjects|",
                                            "so not checking minimum package|",
                                            m, ": module code: a is declared in metadata inputObjects|",
-                                           "Running .inputObjects|",
-                                           "Setting:|Paths set to:|",
+                                           grepDotInputObjectsModule(m), #"Running .inputObjects|",
+                                           "|Setting:|Paths set to:|",
                                            "Using setDTthreads|",
                                            m, ": using dataPath|", "Elapsed")))))
 
@@ -603,7 +612,7 @@ test_that("conflicting function types", {
       url1 <- extractURL('ei4', sim = sim)
       if (!identical(url1, 'test.com'))
         stop('extractURL without module fails')",
-paste0("      url1 <- extractURL('ei4', sim = sim, module = \"", m, "\")") ,"
+      paste0("      url1 <- extractURL('ei4', sim = sim, module = \"", m, "\")") ,"
       if (!identical(url1, 'test.com'))
         stop('extractURL fails')
       sim$g <- 1
@@ -617,7 +626,8 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"", m, "\")") ,"
       sep = "\n", fill = FALSE, file = fileName)
 
   fullMessage <- c(
-    "Running .inputObjects for child4",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
     "child4: module code: co2, co3 are declared in metadata outputObjects, but are not assigned in the module",
     "child4: module code: ei2, ei3, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
     "child4: module code: ei3 is declared in metadata inputObjects, but is not used in the module",
@@ -636,7 +646,6 @@ paste0("      url1 <- extractURL('ei4', sim = sim, module = \"", m, "\")") ,"
   md1 <- moduleMetadata(module = m, path = tmpdir) # no sim in metadata
   md2 <- moduleMetadata(path = getSampleModules(tmpdir),
                         module = "randomLandscapes")
-
 
   mm <- capture_messages({
     mySim <- simInit(paths = list(modulePath = tmpdir), modules = m)
@@ -683,9 +692,9 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
   # show that it is logical
   sim <- simInit(times = list(start = 0, end = 2))
   expect_true(is.numeric(eval(xxx3)$default[[1]]))
-
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
-  expect_true(all(unlist(lapply(c("Running .inputObjects", "module code appears clean"),
+  expect_true(all(unlist(lapply(c(grepDotInputObjectsModule(m),#"Running .inputObjects",
+                                  "module code appears clean"),
                                 function(x) any(grepl(mm, pattern = x))))))
 })
 
@@ -793,7 +802,8 @@ test_that("messaging with multiple modules", {
   fullMessage <- c(
     # "defineParameter: 'plotInitialTime' is not of specified type 'character'",
     "defineParameter: 'saveInitialTime' is not of specified type 'character'",
-    "Running .inputObjects for test",
+    grepDotInputObjectsModule("test"),
+    # "Running .inputObjects for test",
     "test: module code: co2, co3 are declared in metadata outputObjects, but are not assigned in the module",
     "test: module code: ei2, ei3, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
     "test: module code: ei3 is declared in metadata inputObjects, but is not used in the module",
@@ -806,7 +816,8 @@ test_that("messaging with multiple modules", {
     "test: inputObjects: b, aaa are used from sim inside Init, but are not declared in metadata inputObjects",
     "test: inputObjects: b, co3 are used from sim inside .inputObjects, but are not declared in metadata inputObjects",
     # "defineParameter: 'plotInitialTime' is not of specified type 'character'",
-    "Running .inputObjects for test2",
+    grepDotInputObjectsModule("test2"),
+    # "Running .inputObjects for test2",
     "test2: module code: co1, co4 are declared in metadata outputObjects, but are not assigned in the module",
     "test2: module code: ei1, ei4 are declared in metadata inputObjects, but no default\\(s\\) are provided in .inputObjects",
     "test2: module code: ei1 is declared in metadata inputObjects, but is not used in the module",
@@ -817,9 +828,11 @@ test_that("messaging with multiple modules", {
     "test2: inputObjects: b is used from sim inside .inputObjects, but is not declared in metadata inputObjects",
     # "defineParameter: 'plotInitialTime' is not of specified type 'character'",
     "defineParameter: 'hello' is not of specified type 'character'",
-    "Running .inputObjects for test3",
+    grepDotInputObjectsModule("test3"),
+    # "Running .inputObjects for test3",
     "test3: module code appears clean",
-    "Running .inputObjects for test4",
+    grepDotInputObjectsModule("test4"),
+    # "Running .inputObjects for test4",
     "test4: module code appears clean"
   )
 
@@ -882,11 +895,13 @@ test_that("Module code checking -- pipe with matrix product with backtick & data
   mm <- cleanMessage(mm)
 
   fullMessage1 <- c(
-    "Running .inputObjects for child4",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
     "child4: module code: Init: local variable.*result1.*assigned but may not be used ",
     "child4: outputObjects: bvcx, bvcx2, b, a are assigned to sim inside Init, but are not declared in metadata outputObjects")
   fullMessageNonInteractive <- c(
-    "Running .inputObjects for child4",
+    grepDotInputObjectsModule("child4"),
+    # "Running .inputObjects for child4",
     "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx <- matrix.*", #possibly at .*147",
     "child4: module code: Init", cantCodeCheckMessage, "'sim\\$bvcx2 <- matrix.*", #possibly at .*148",
     "child4: module code: Init: local variable.*result1.*assigned but may not be used",
@@ -1022,7 +1037,7 @@ test_that("debug using logging", {
         mySim2 <- spades(Copy(mySim),
                          debug = list("console" = list(level = "INFO"), debug = 1),
                          .plotInitialTime = NA)
-        })
+      })
     })
   })
   expect_true(length(mess1) == 0)
@@ -1036,4 +1051,64 @@ test_that("debug using logging", {
     })
   })
   expect_true(length(mess1) == 0)
+})
+
+test_that("options('reproducible.reqdPkgsDontLoad", {
+  dontLoad <- "ggplot2" # can't be sp, raster because already loaded
+
+  skip_if_not_installed(dontLoad)
+  unloadNamespace(dontLoad)
+  withr::local_options(spades.reqdPkgsDontLoad = dontLoad)
+
+  testInit()
+
+  newModule("test", tmpdir, open = FALSE)
+
+  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+    name = "test",
+    description = "insert module description here",
+    keywords = c("insert key words here"),
+    authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
+    childModules = character(0),
+    version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
+    spatialExtent = terra::ext(rep(0, 4)),
+    timeframe = as.POSIXlt(c(NA, NA)),
+    timeunit = "year",
+    citation = list("citation.bib"),
+    documentation = list("README.md", "test.Rmd"),',
+paste0("    reqdPkgs = list(\'", dontLoad, "\'),"),'
+    parameters = rbind(
+    ),
+    inputObjects = bindrows(
+    ),
+    outputObjects = bindrows(
+    )
+    ))
+
+    doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
+    switch(
+    eventType,
+    init = {
+    })
+    return(invisible(sim))
+    }
+
+', fill = TRUE)
+  expect_false(isNamespaceLoaded(dontLoad))
+  warn <- capture_warnings(
+    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 1, timeunit = "year"))
+  )
+  expect_false(isNamespaceLoaded(dontLoad))
+
+  withr::local_options(spades.reqdPkgsDontLoad = NULL)
+  warn <- capture_warnings(
+    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 1, timeunit = "year"))
+  )
+  expect_true(isNamespaceLoaded(dontLoad))
+  unloadNamespace(dontLoad)
+
 })

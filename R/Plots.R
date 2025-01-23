@@ -147,6 +147,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'             .plotInitialTime = 1)
 #'     }
 #'   } # end ggplot
+#'   unlink("figures") # clean up
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
@@ -333,7 +334,7 @@ Plots <- function(data, fn, filename,
   }
 
   if (needSaveRaw) {
-    if (is(data, "Raster")) {
+    if (is(data, "Raster") || is(data, "SpatRaster")) {
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
@@ -355,7 +356,6 @@ Plots <- function(data, fn, filename,
         )
     }
   }
-
   if (needSave) {
     if (is.null(simIsIn)) {
       if (is.call(path))

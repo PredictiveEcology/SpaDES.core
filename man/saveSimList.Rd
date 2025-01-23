@@ -13,6 +13,7 @@ saveSimList(
   inputs = TRUE,
   cache = FALSE,
   envir,
+  files = TRUE,
   ...
 )
 }
@@ -42,6 +43,13 @@ See Details.}
 
 \item{envir}{If \code{sim} is a character string, then this must be provided.
 It is the environment where the object named \code{sim} can be found.}
+
+\item{files}{Logical. Should all the files in the optional \code{outputs}, \code{inputs},
+\code{cache} be saved. If this is \code{TRUE}, then the resulting \code{filename} will be
+silently converted to an archive file with the appropriate extension e.g.,
+\code{.zip} or \code{.tar.gz}. This will automatically be \code{TRUE} if any of the \code{outputs},
+\code{inputs} or \code{cache} are \code{TRUE}. Setting this to \code{FALSE} will turn off the
+saving of files specified in \code{inputs(sim)}, \code{outputs(sim)} or the cache.}
 
 \item{...}{Additional arguments. See Details.}
 }
