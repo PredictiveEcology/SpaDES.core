@@ -145,14 +145,14 @@ Normally, especially, if used within SpaDES module code, this should be left mis
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp45trFG/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp45trFG/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp45trFG/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp45trFG/SpaDES/modules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp45trFG/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpIQ0Aky/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpIQ0Aky/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpIQ0Aky/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpIQ0Aky/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpIQ0Aky/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02536082 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan27 19:03:46 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elpsed time for simInit: 0.02543187 secs</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># these put the functions in the parent.frame() which is .GlobalEnv for an interactive user</span></span></span>
 <span class="r-in"><span><span class="fu">defineEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="st">"init"</span>, moduleName <span class="op">=</span> <span class="st">"thisTestModule"</span>, code <span class="op">=</span> <span class="op">{</span></span></span>
@@ -195,12 +195,12 @@ Normally, especially, if used within SpaDES module code, this should be left mis
 <span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span>  <span class="co"># this is skipped when running in automated tests; it is fine in interactive use</span></span></span>
 <span class="r-in"><span>  <span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="spades.html">spades</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.027 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.029 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Nov21 04:22:26 thsTst:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.035 secs | 0 thisTestModule init 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan27 19:03:46 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan27 19:03:46 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.027 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan27 19:03:46 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.029 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan27 19:03:46 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.031 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan27 19:03:46 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.033 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Jan27 19:03:46 thsTst:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.035 secs | 0 thisTestModule init 5</span></span>
 <span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in Init(sim):</span> could not find function "Init"</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">Because of an interrupted spades call, the sim object at the time of interruption was saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
