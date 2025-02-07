@@ -243,6 +243,10 @@ Plots <- function(data, fn, filename,
       if (missing(data)) {
         gg <- fn(...)
       } else {
+        if (is(data, "ggplot")) {
+          gg <- data
+        }
+        else
         gg <- fn(data, ...)
       }
 
@@ -310,7 +314,8 @@ Plots <- function(data, fn, filename,
         names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
         Plot(ggListToScreen, addTo = gg$labels$title)
       } else {
-        if (!(identical(fn, plot) || identical(fn, terra::plot)))
+        if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
+            !is(gg, ".quickPlot"))
           print(gg)
       }
     }
