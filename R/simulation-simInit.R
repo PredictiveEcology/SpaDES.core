@@ -1409,7 +1409,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
         }
       } else {
-        .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
+        # .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
         .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {
           sim <- .inputObjects(sim)

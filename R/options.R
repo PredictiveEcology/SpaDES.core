@@ -162,11 +162,7 @@
 #'     undesirable for some situations where speed is critical. If `FALSE`, then
 #'     this is not assigned to the `simList`.\cr
 #'
-#'   `spades.switchPkgNamespaces` \tab `FALSE` to keep computational
-#'   overhead down. \tab Should the search path be modified
-#'     to ensure a module's required packages are listed first?
-#'     If `TRUE`, there should be no name conflicts among package objects,
-#'     but it is much slower, especially if the events are themselves fast. \cr
+#'   `spades.switchPkgNamespaces` \tab Defunct. \tab  Use `spades.useBox` option \cr
 #'
 #'   `spades.testMemoryLeaks` \tab `TRUE`.
 #'     \tab  There is a very easy way to create a memory leak with R and SpaDES,
