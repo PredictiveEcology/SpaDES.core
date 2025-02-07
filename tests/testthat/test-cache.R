@@ -47,7 +47,6 @@ test_that("test event-level cache & memory leaks", {
   landscapeMaps1 <- sims$landscape[[-which(names(sims$landscape) %in% "Fires")]]
   fireMap1 <- sims$landscape$Fires
   #._doEvent_3 <<- ._prepareOutput_5 <<- 1
-  # bbbb <<- 1
   mess1 <- capture_messages({
     sims <- spades(Copy(mySim), debug = TRUE)
   })
@@ -66,7 +65,7 @@ test_that("test event-level cache & memory leaks", {
   # Noting that there was a bug in `objSize` in reproducible that would
   #   get this part wrong
   # Take a function from the package -- shouldn't trigger memory leak stuff
-  sims$crazyFunction2 <- SpaDES.core:::bindrows
+  sims$crazyFunction2 <- bindrows
   end(sims) <- end(sims) + 0.1
 
   mess <- capture.output({
@@ -314,9 +313,9 @@ test_that("test .robustDigest for simLists", {
   msgGrep11 <- paste("Running .input", "module code", "so not checking minimum package", "ggplot2",
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
                      "with user supplied tags",
-                     "There is no similar item in the cachePath",
+                     "There is no similar item in the cachePath", "elpsd",
                      "Saving", "Done", "Elapsed time for", sep = "|")
-  expect_true(all(grepl(msgGrep11, mess1)))
+  expect_true(all(cli::ansi_grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
   #a <- capture.output(
@@ -570,8 +569,8 @@ test_that("Cache sim objs via .Cache attr", {
                      objects = list(co4 = 3, co3 = 2, co1 = 4), params =
                        list(test = list(.useCache = c(".inputObjects", "init"))))
   })
-  expect_true(sum(grepl("loaded cached copy of .inputObjects", mess11)) == 0)
-  expect_true(sum(grepl("Running .inputObjects", mess11)) == 1)
+  expect_true(sum(cli::ansi_grepl("loaded cached copy of .inputObjects", mess11)) == 0)
+  expect_true(sum(cli::ansi_grepl(grepDotInputObjectsModule(m[1]), mess11)) == 1)
   expect_true(!exists("newFun", envir = mySim$.mods$test))
   expect_true(sum(grepl("aaa <- 2", format(mySim$.mods$test$.inputObjects))) == 1)
 })
@@ -677,8 +676,6 @@ test_that("multifile cache saving", {
   s2 <- Cache(spades(s))
   expect_true(identical(Filenames(s2), Filenames(s)))
 })
-
-
 
 test_that("cache of terra objects in the depends", {
   testInit(sampleModReqdPkgs)

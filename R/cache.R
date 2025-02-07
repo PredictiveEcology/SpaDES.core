@@ -129,9 +129,6 @@ setMethod(
     object@outputs$file <- basename(object@outputs$file)
     object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
 
-    if (NROW(object@inputs)) {
-      object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
-    }
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
@@ -151,6 +148,16 @@ setMethod(
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
+    }
+
+    if (NROW(object@inputs)) {
+      # Only include objects that are in the `inputs` slot that this module uses
+      if (length(curMod)) { # If it is a simInitAndSpades call, it doesn't have a curMod
+        expectsInputs <- deps[[curMod]]@inputObjects$objectName
+        # if (is(expectsInputs, "try-error")) browser()
+        object@inputs <- object@inputs[object@inputs$objectName %in% expectsInputs,]
+      }
+      object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
     }
 
     # if this call is within a single module, only keep module-specific params
@@ -424,6 +431,7 @@ setMethod(
   definition = function(object, preDigest, origArguments, ...) {
     dots <- list(...)
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
+    whSimList <- names(whSimList)
 
     # remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
@@ -685,7 +693,8 @@ setMethod(
           # Now changed objects
           if (length(unlist(changedModEnvObjs))) {
             Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
-              objNames <- names(objs$.objects)
+              objNames <- names(objs$.objects) # used to be "names(...)" -- but don't want `._` objs
+              objNames <- grep("^._.+", objNames, value = TRUE, invert = TRUE)
               if (!is.null(objNames))
                 list2env(mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
                          envir = simPost@.xData$.mods[[nam]][[".objects"]])
@@ -914,7 +923,7 @@ if (!exists("objSize")) {
 #' and the other slots in the `simList` (e.g., events, completed, modules, etc.).
 #' The returned object also has an attribute, "total", which shows the total size.
 #'
-#' @importFrom reproducible objSize
+#' @importFrom reproducible objSize .objSizeWithTry
 #' @importFrom lobstr obj_size
 #' @inheritParams reproducible::objSize
 #'
@@ -925,18 +934,26 @@ if (!exists("objSize")) {
 #' a <- simInit(objects = list(d = 1:10, b = 2:20))
 #' objSize(a)
 #' utils::object.size(a)
-objSize.simList <- function(x, quick = TRUE, ...) {
+objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 
-  total <- obj_size(x, quick = TRUE)
-  aa <- objSize(x@.xData, quick = quick, ...)
+  total <- .objSizeWithTry(x)
+  # total <- try(obj_size(x, quick = TRUE), silent = TRUE) # failing due to lobstr issue #72
+  if (!is(total, "try-error") && isTRUE(recursive)) {
+    aa <- objSize(x@.xData, quick = quick, recursive = recursive, ...)
 
-  simSlots <- grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE)
-  names(simSlots) <- simSlots
-  otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
+    simSlots <- grep("^\\.envir$|^\\.xData$", slotNames(x), value = TRUE, invert = TRUE)
+    names(simSlots) <- simSlots
+    otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
 
-  if (!quick)
-    attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
-                                    other = attr(otherParts, "objSize"))
+    # if (!quick)
+    attr(total, "objSize") <- list(sim = attr(aa, "objSize"),
+                                   other = attr(otherParts, "objSize"))
+      # attr(total, "objSize") <- sum(unlist(attr(aa, "objSize")), unlist(attr(otherParts, "objSize")))
+      # class(attr(total, "objSize")) <- "lobstr_bytes"
+
+  } # else {
+  #   total <- NA
+  # }
 
   return(total)
 }
@@ -961,7 +978,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 .wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
                           conn = getOption("reproducible.conn", NULL),
                           verbose = getOption("reproducible.verbose"),
-                          outputObjects = NULL,
+                          outputObjects = NULL, cacheId,
                           ...) {
 
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
@@ -987,7 +1004,7 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects,
+  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects, cacheId = cacheId,
                drv = drv, conn = conn, verbose = verbose, ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL

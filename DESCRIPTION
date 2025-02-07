@@ -14,8 +14,8 @@ Description: Provides the core framework for a discrete event system to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2024-10-13
-Version: 2.1.5.9002
+Date: 2025-01-17
+Version: 2.1.5.9008
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -31,8 +31,9 @@ Authors@R: c(
 Depends:
     R (>= 4.2),
     quickPlot (>= 1.0.2),
-    reproducible (>= 2.1.1)
+    reproducible (>= 2.1.2.9006)
 Imports:
+    box,
     cli,
     data.table (>= 1.11.0),
     fs,
@@ -51,11 +52,13 @@ Suggests:
     CircStats,
     codetools,
     covr,
+    DBI,
     DiagrammeR (>= 0.8.2),
     future,
     future.callr,
     ggplot2,
     ggplotify,
+    gitcreds,
     httr,
     knitr,
     lattice,
@@ -102,6 +105,7 @@ Collate:
     'code-checking.R'
     'convertToPackage.R'
     'copy.R'
+    'createDESCRIPTIONandDocs.R'
     'debugging.R'
     'downloadData.R'
     'simulation-parseModule.R'

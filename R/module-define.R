@@ -441,10 +441,16 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
       paramDesc = character(0), stringsAsFactors = FALSE))
   if (is.character(name) && is.character(class) && missing(min) && missing(max)) {
     NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
-    if (class %in% NAtypes) {
+    if (any(class %in% NAtypes)) {
+
+      NAtypeToUse <- vapply(class, function(cla) is(default, cla), FUN.VALUE = logical(1))
+      NAtypeToUse <- if (any(NAtypeToUse))
+        names(NAtypeToUse)[NAtypeToUse]
+      else
+        class[1]
       # coerce `min` and `max` to same type as `default`
-      min <- as(NA, class)
-      max <- as(NA, class)
+      min <- as(NA, NAtypeToUse) # if a vector of possible classes, take first
+      max <- as(NA, NAtypeToUse) # if a vector of possible classes, take first
     } else {
       min <- NA
       max <- NA
