@@ -1547,13 +1547,18 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
     curMod <- sim@events[[1]][["moduleName"]]
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod  ]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
+
     mess <- capture.output(type = "message", {
       newList <- list(if (any(objsInSimListAndModule)) {
-        Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-             filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+        # files may disappear for one reason or another; this will fail, silently
+        try(Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
+             filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo")))
       } else {
         list()
       })
+      if (is(newList, "try-error"))
+        stop(newList)
+
       names(newList) <- curMod
       rmo$recoverableObjs <- append(newList, rmo$recoverableObjs)
     })
