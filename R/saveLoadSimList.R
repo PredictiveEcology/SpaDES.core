@@ -353,7 +353,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 
   ## Work around for bug in qs that recovers data.tables as lists
-  tmpsim <- recoverDataTableFromQs(tmpsim)
+  # tmpsim <- recoverDataTableFromQs(tmpsim)
 
   ## Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {

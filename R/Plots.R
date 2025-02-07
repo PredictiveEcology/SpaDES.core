@@ -247,7 +247,7 @@ Plots <- function(data, fn, filename,
           gg <- data
         }
         else
-        gg <- fn(data, ...)
+          gg <- fn(data, ...)
       }
 
       if (!is(gg, ".quickPlot")) {
@@ -437,7 +437,7 @@ Plots <- function(data, fn, filename,
   if (exists("gg", inherits = FALSE))
     return(invisible(gg))
   else
-  return(invisible(NULL))
+    return(invisible(NULL))
 }
 
 #' Test whether there should be any plotting from `.plots` module parameter
