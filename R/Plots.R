@@ -422,6 +422,9 @@ Plots <- function(data, fn, filename,
   if (exists("sim", inherits = FALSE))
     assign("sim", sim, envir = simIsIn)
 
+  if (exists("gg", inherits = FALSE))
+    return(invisible(gg))
+  else
   return(invisible(NULL))
 }
 
