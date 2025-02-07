@@ -323,10 +323,22 @@ Plots <- function(data, fn, filename,
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
     if (missing(filename)) {
-      filename <- tempfile(fileext = "") ## TODO: can we use e.g. the object name + sim time??
+      dataObjName <- deparse(substitute(data))
+      filename <- paste0(dataObjName, "_", basename(gsub("file", "", tempfile(fileext = "")))) ## TODO: can we use e.g. the object name + sim time??
+      if (exists("sim", inherits = FALSE)) {
+        simTime <- round(as.numeric(time(sim)), 3)
+        filename <- paste0("sim", "_", filename)
+      }
     } else {
-      filename <- basename(filename) |> tools::file_path_sans_ext()
+      filename <- filename |> tools::file_path_sans_ext()
     }
+
+    if (isAbsolutePath(filename)) {
+      path <- dirname(filename)
+    }
+
+    filename <- basename(filename)
+
     isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
       if (is(path, "call"))
