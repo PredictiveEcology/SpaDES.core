@@ -129,9 +129,6 @@ setMethod(
     object@outputs$file <- basename(object@outputs$file)
     object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
 
-    if (NROW(object@inputs)) {
-      object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
-    }
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
@@ -151,6 +148,16 @@ setMethod(
     if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
       object@modules <- list(classOptions$modules)
       object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
+    }
+
+    if (NROW(object@inputs)) {
+      # Only include objects that are in the `inputs` slot that this module uses
+      if (length(curMod)) { # If it is a simInitAndSpades call, it doesn't have a curMod
+        expectsInputs <- deps[[curMod]]@inputObjects$objectName
+        # if (is(expectsInputs, "try-error")) browser()
+        object@inputs <- object@inputs[object@inputs$objectName %in% expectsInputs,]
+      }
+      object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
     }
 
     # if this call is within a single module, only keep module-specific params
@@ -685,7 +692,6 @@ setMethod(
           }
           # Now changed objects
           if (length(unlist(changedModEnvObjs))) {
-            # if (identical(currentModule(object), "canClimateData")) browser()
             Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
               objNames <- names(objs$.objects) # used to be "names(...)" -- but don't want `._` objs
               objNames <- grep("^._.+", objNames, value = TRUE, invert = TRUE)
@@ -942,7 +948,6 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
     # if (!quick)
     attr(total, "objSize") <- list(sim = attr(aa, "objSize"),
                                    other = attr(otherParts, "objSize"))
-      # browser()
       # attr(total, "objSize") <- sum(unlist(attr(aa, "objSize")), unlist(attr(otherParts, "objSize")))
       # class(attr(total, "objSize")) <- "lobstr_bytes"
 
