@@ -590,7 +590,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
   pkgs <- reqdPkgsDontLoad(pkgs) # some are explicitly not to be loaded
 
-  if (getOption("spades.useBox")) {
+  if (getOption("spades.useBox") && FALSE) { # TURN THIS OFF AS THERE ARE MEMORY HOGGING ISSUES WITH BOX
     cm <- currentModule(tmpEnvir$sim)
     if (length(cm))
       if (!cm %in% unlist(.coreModules())) {

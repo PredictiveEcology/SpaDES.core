@@ -242,7 +242,7 @@ spadesOptions <- function() {
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
-    spades.useBox = TRUE,
+    spades.useBox = FALSE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",
     spades.keepCompleted = TRUE
   )
