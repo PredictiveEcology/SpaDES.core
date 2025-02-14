@@ -10,18 +10,18 @@ This release fixes a problem with an occasionally failing test.
 * Windows                 (win-builder), R 4.3.3
 
 ### Current R versions
-* macOS 14.5                   (GitHub), R 4.4.0
-* macOS 13.3.1            (mac-builder), R 4.4.0
-* macOS 14.4.1                  (local), R 4.4.0
-* Ubuntu 20.04                 (GitHub), R 4.4.0
-* Ubuntu 20.04                  (local), R 4.4.0
-* Windows                      (GitHub), R 4.4.0
-* Windows                       (local), R 4.4.0
-* Windows                 (win-builder), R 4.4.0
+* macOS 13.3.1            (mac-builder), R 4.4.2
+* macOS 14.7.2                 (GitHub), R 4.4.2
+* macOS 14.4.1                  (local), R 4.4.2
+* Ubuntu 22.04                 (GitHub), R 4.4.2
+* Ubuntu 24.04                  (local), R 4.4.2
+* Windows                      (GitHub), R 4.4.2
+* Windows                       (local), R 4.4.2
+* Windows                 (win-builder), R 4.4.2
 
 ### Development R version
 * Ubuntu 20.04                 (GitHub), R-devel (2024-05-28 r86639)
-* Ubuntu 20.04                  (local), R-devel (2024-05-28 r86640)
+* Ubuntu 24.04                  (local), R-devel (2024-05-28 r86640)
 * Windows                      (GitHub), R-devel (2024-05-28 r86639 ucrt)
 * Windows                 (win-builder), R-devel (2024-05-28 r86639 ucrt)
 
