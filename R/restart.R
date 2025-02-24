@@ -94,12 +94,13 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   if (is.null(sim)) {
     sim <- savedSimEnv()$.sim
   }
-  if (!is(sim, "simList"))
-    stop("The simList does not exist or is corrupt; please pass a simList")
 
   if (is.character(sim)) {
     sim <- SpaDES.core::loadSimList(sim)
   }
+
+  if (!is(sim, "simList"))
+    stop("The simList does not exist or is corrupt; please pass a simList")
 
   if (is.null(module)) {
     # Source the file you changed, into the correct location in the simList
