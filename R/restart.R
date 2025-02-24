@@ -94,7 +94,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   if (is.null(sim)) {
     sim <- savedSimEnv()$.sim
   }
-
   if (is.character(sim)) {
     sim <- SpaDES.core::loadSimList(sim)
   }
