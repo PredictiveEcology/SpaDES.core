@@ -1707,11 +1707,15 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
 }
 
 updateParamsFromGlobals <- function(sim, dontUseGlobals = list()) {
-  sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals)
+  modDefaultParams <- Map(mod = sim@depends@dependencies, function(mod) mod@parameters$paramName)
+  sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals,
+                                            modDefaultParams = modDefaultParams)
   sim
 }
 
-updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates, dontUseGlobals = list()) {
+updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates,
+                                        dontUseGlobals = list(),
+                                        modDefaultParams) {
   if (missing(paramsWithUpdates)) {
     paramsWithUpdates <- paramsOrig
   }
@@ -1719,7 +1723,7 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates, dontUseGl
   globalsDF <- list()
   knownParamsWOdotPlotInitialTime <- setdiff(.knownDotParams, ".plotInitialTime")
   for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
-    modParams <- names(paramsOrig[[mod]])
+    modParams <- modDefaultParams[[mod]]
     modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
     userOverrides <- if (is.null(dontUseGlobals[[mod]])) NULL else dontUseGlobals[[mod]]
     common <- intersect(modParams, names(paramsWithUpdates$.globals))
@@ -1933,10 +1937,8 @@ dealWithOptions <- function(objects, dotNames, sim,
 elapsedTimeInSimInit <- function(._startClockTime, sim) {
   elapsed <- difftime(Sys.time(), ._startClockTime, units = "sec")
   #if (is.null(sim@.xData[["._simInitElapsedTime"]])) {
-  #  browser()
     sim@.xData[["._simInitElapsedTime"]] <- elapsed
   #} else {
-  #  browser()
   #  sim@.xData[["._simInitElapsedTime"]] <- sim@.xData[["._simInitElapsedTime"]] + elapsed
   #}
   sim
