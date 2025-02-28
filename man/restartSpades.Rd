@@ -13,11 +13,11 @@ restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
 \item{module}{A character string length one naming the module that caused the error and
 whose source code was fixed. This module will be re-parsed and placed into the \code{simList}}
 
-\item{numEvents}{Numeric. Default is Inf (i.e., all available). In the \code{simList}, if
-\code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then
+\item{numEvents}{Numeric. Default is Inf (i.e., all available). The number of events
+to be rewound. In the \code{simList}, if \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then
 there will be a list in the \code{simList} called \code{.recoverableObjs}. These will be
 replayed backwards in time to reproduce the initial state of the \code{simList} before
-the event that is \code{numEvents} back from the first event in \code{events(sim)}.}
+the event that is \code{numEvents} prior from the first event in \code{events(sim)}.}
 
 \item{restart}{Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
 restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
@@ -29,27 +29,24 @@ with the module code parsed into the \code{simList}}
 A \code{simList} as if \code{spades} had been called on a \code{simList}.
 }
 \description{
-This is very experimental and has not been thoroughly tested. Use with caution.
-This function will re-parse a single module (currently) into the \code{simList}
-where its source code should reside, and then optionally restart a simulation
-that stopped on an error, presumably after the developer has modified the
-source code of the module that caused the break.
-This will restart the simulation at the next event in the event queue
-(i.e., returned by \code{events(sim)}). Because of this, this function will
-not do anything if the event queue is empty.
+This is experimental and has not been thoroughly tested. Use with caution.
+If there is an error during an event, this function will rewind the simulation to a state
+\code{numEvents} prior to the event that led to the error. The developer may then modify the
+source code of the module that caused the break and resume the simulation.
 }
 \details{
-This will only parse the source code from the named module. It will not affect any
-objects that are in the \code{mod} or \code{sim}.
+If \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric (default 1), then
+there will be a list in the \code{simList} called \code{.recoverableObjs}. These record the elements of simList that have
+changed over a number of events equal to the number chosen for \code{options('spades.recoveryMode')}.
+The \code{restartSpades} function then uses this list to rewind \code{numEvents} backwards from the
+first event in \code{events(sim)} (likely the one that caused the error).
 
 The random number seed will be reset to the state it was at the start of the
 earliest event recovered, thereby returning to the exact stochastic simulation
 trajectory.
 }
 \note{
-This will only work reliably
-\emph{if the \code{simList} was not modified yet during the event which caused the error}.
-The \code{simList} will be in the state it was at the time of the error.
+The \code{simList} will be in the state it was \code{numEvents} prior to the event that led to the error.
 }
 \examples{
 \donttest{
