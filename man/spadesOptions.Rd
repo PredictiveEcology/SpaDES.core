@@ -164,11 +164,7 @@ the name \code{sim$._sessionInfo}. This takes about 75 milliseconds, which may b
 undesirable for some situations where speed is critical. If \code{FALSE}, then
 this is not assigned to the \code{simList}.\cr
 
-\code{spades.switchPkgNamespaces} \tab \code{FALSE} to keep computational
-overhead down. \tab Should the search path be modified
-to ensure a module's required packages are listed first?
-If \code{TRUE}, there should be no name conflicts among package objects,
-but it is much slower, especially if the events are themselves fast. \cr
+\code{spades.switchPkgNamespaces} \tab Defunct. \tab  Use \code{spades.useBox} option \cr
 
 \code{spades.testMemoryLeaks} \tab \code{TRUE}.
 \tab  There is a very easy way to create a memory leak with R and SpaDES,

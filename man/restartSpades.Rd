@@ -3,11 +3,14 @@
 \name{restartSpades}
 \alias{restartSpades}
 \alias{saveState}
+\alias{restartOrSimInitAndSpades}
 \title{Restart an interrupted simulation}
 \usage{
 restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
 
 saveState(filename, ...)
+
+restartOrSimInitAndSpades(out, file, reset = getOption("spades.resetRestart"))
 }
 \arguments{
 \item{sim}{A \code{simList} or a filename that will load a \code{simList}, e.g., from
@@ -35,9 +38,20 @@ with the module code parsed into the \code{simList}}
 \code{saveState} is a wrapper around \code{restartSpades} and \code{saveSimList}. You can
 pass arguments to the \code{...} that will be passed to \code{saveSimList}, such as
 \code{modules}, \code{inputs}, \code{outputs}.}
+
+\item{file}{An optional file that has a saved \code{simList}, e.g., from \code{saveSimList}
+or \code{saveState}.}
+
+\item{reset}{Logical. If \code{TRUE}, then it will force \code{simInitAndSpades} to be called
+even if there is saved \code{sim} available.}
+
+\item{ll}{A list of elements that would be passed to \code{simInit}, such as \code{modules}.}
 }
 \value{
 A \code{simList} as if \code{spades} had been called on a \code{simList}.
+
+A \code{simList}, that has been "executed" until \code{end(sim)}, if it does not
+hit an error.
 }
 \description{
 This is very experimental and has not been thoroughly tested. Use with caution.

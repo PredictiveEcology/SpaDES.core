@@ -475,6 +475,53 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   }
 }
 
+
+#' `restartOrSimInitAndSpades` is a wrapper that runs either `restartSpades` or
+#' `simInitAndSpades`. It determines which one should run by, first, assessing whether
+#' an identical `ll` has already been passed in a previous call to this function.
+#' If an identical `ll` has never been passed, then this will run
+#' `simInitAndSpades`. If a previous `ll` as been run, then this will 2)
+#' assess whether there is a copy of an `simList` at `SpaDES.core:::savedSimEnv()$.sim`
+#' (i.e., like `restartSpades`). If there is, then it will run `restartSpades()`.
+#' If there is no `simList` at `SpaDES.core:::savedSimEnv()$.sim`, then it will
+#' pass the `file` argument to `restartSpades(file)`.
+#'
+#' @return A `simList`, that has been "executed" until `end(sim)`, if it does not
+#' hit an error.
+#'
+#' @rdname restartSpades
+#' @export
+#' @param ll A list of elements that would be passed to `simInit`, such as `modules`.
+#' @param file An optional file that has a saved `simList`, e.g., from `saveSimList`
+#'   or `saveState`.
+#' @param reset Logical. If `TRUE`, then it will force `simInitAndSpades` to be called
+#'   even if there is saved `sim` available.
+restartOrSimInitAndSpades <- function(out, file,
+                                      reset = getOption("spades.resetRestart")) {
+  # there are tempdir paths
+  pathsOrig <- out$paths
+  out$paths <- sapply(out$paths, grep, invert = TRUE, value = TRUE, pattern = tempdir(), simplify = TRUE)
+  fn <- function(out) out
+  cached <- attr(reproducible::Cache(fn(out), .functionName = "restartOrSimInitAndSpades"), ".Cache")$newCache %in% FALSE
+  if (isTRUE(reset))
+    cached <- FALSE
+  out$paths <- pathsOrig
+  hasSavedToRAMState <- !is.null(SpaDES.core:::savedSimEnv()$.sim)
+  hasSavedToFileState <- file.exists(file)
+  if (!cached || !(hasSavedToFileState || hasSavedToRAMState)) {
+    message("out has changed; rerunning simInitAndSpades")
+    sim <- do.call(SpaDES.core::simInitAndSpades, out)
+  } else {
+    message("out has not changed; trying restartSpades")
+    if (isFALSE(hasSavedToRAMState)) {
+      sim <- SpaDES.core::restartSpades(file)
+    } else  {
+      sim <- SpaDES.core::restartSpades()
+    }
+  }
+}
+
+
 #' @keywords internal
 FirstFromR <- function(...) {
   ca <- commandArgs()

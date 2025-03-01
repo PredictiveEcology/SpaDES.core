@@ -1,5 +1,6 @@
 # SpaDES.core (development version)
 
+* fix edge case with caching of events; `outputs` would create false positives (i.e., a change, when there wasn't one); this meant that caching would only be successful after the 2nd time running the event, if another module had put objects in the `outputs` list, especially by using `Plots`
 * fix issue with `Plots()` where plots were discarded if no filename was specified;
 * minor documentation improvements;
 * new option: `spades.reqdPkgsDontLoad`, a character vector. If anything is specified, 
