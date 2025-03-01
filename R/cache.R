@@ -126,8 +126,10 @@ setMethod(
     object@paths <- list()
 
     # don't cache contents of output because file may already exist
-    object@outputs$file <- basename(object@outputs$file)
-    object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
+    if (NROW(object@outputs)) {
+      object@outputs$file <- basename(object@outputs$file)
+      object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
+    }
 
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
@@ -157,7 +159,9 @@ setMethod(
         # if (is(expectsInputs, "try-error")) browser()
         object@inputs <- object@inputs[object@inputs$objectName %in% expectsInputs,]
       }
-      object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
+      if (NROW(object@inputs)) { # previous line may have removed row(s) from object@inputs, leaving potentially zero
+        object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
+      }
     }
 
     # if this call is within a single module, only keep module-specific params
@@ -219,6 +223,12 @@ setMethod(
       }
 
       obj[["depends"]] <- invertList(dependsFirst)
+    }
+
+    # outputs -- we only care if it was an output from this module
+    if (length(curMod) > 0) {
+      outputsFromThisMod <- object@depends@dependencies[[curMod]]$outputObjects$objectName
+      object@outputs <- object@outputs[object@outputs$objectName %in% outputsFromThisMod,]
     }
 
     otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
@@ -742,6 +752,16 @@ setMethod(
           #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
         simPost@current <- simFromCache@current
+
+        # Outputs -- there may have been outputs added by another module that should be recovered
+        if (exists("aaaa", envir = .GlobalEnv)) browser()
+        if (length(currModules) > 0) {
+          outputsFromThisMod <- object@depends@dependencies[[currModules]]@outputObjects$objectName
+          simPost@outputs <- rbindlist(list(
+            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromThisMod,]),
+            use.names = TRUE, fill = TRUE)
+        }
+
 
         # This is for objects that are not in the return environment yet because they are unrelated to the
         #   current module -- these need to be copied over
