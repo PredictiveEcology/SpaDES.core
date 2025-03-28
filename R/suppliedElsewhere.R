@@ -118,31 +118,65 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
+  curMod <- currentModule(sim)
+
   inFutureInit <- if (any(c("i", "c") %in% forms$where)) {
     del <- depsEdgeList(sim, plot = FALSE)
     # if ("c" %in% forms$where) {
-      # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
-      #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
-      #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
+
+    # THIS IS THE PREVIOUS APPROACH THAT MISSED SEVERAL CASES ESPECIALLY WITH loadOrder
+    # outPrev <- isTRUE(depsEdgeList(sim, plot = FALSE)[!(from %in% c("_INPUT_", curMod)), ][
+    #   objName %in% objDeparsed][, all(from != to), by = from][V1 == TRUE]$V1)
+
+    # This next line:
+    #  1. only evaluate the objects that are named in `object`
+    #  2. Remove within-module circular references (from != to)
+    #  3. Remove cases where it is coming from INPUT data
       dd <- del[objName %in% objDeparsed][from != to][!(from %in% c("_INPUT_")), ]
       d <- depends(sim)
-      otherModsDeps <- d@dependencies[which(!names(d@dependencies) %in% currentModule(sim))]
+      allModsDeps <- d@dependencies
+      otherModsDeps <- allModsDeps[which(!names(d@dependencies) %in% curMod)]
 
-      for (mod in otherModsDeps) {
+      for (mod in allModsDeps) {
         lo <- mod@loadOrder
-        if (!is.null(lo$after))
-          del <- dd[from %in% lo$after]
-        else
-          del <- dd
+        modNam <- mod@name
+        #if (any(curMod %in% modNam)) { # if this module is named
+          if (any(dd[["from"]] %in% lo[["after"]])) {
+            toRm <- dd[, to %in% modNam & from %in% lo$after]
+            if (any(toRm))
+              dd <- dd[which(toRm)]
+          }
+
+          if (any(dd[["to"]] %in% lo[["before"]])) {
+            toRm <- dd[, from %in% modNam & to %in% lo$before]
+            if (any(toRm))
+              dd <- dd[which(toRm)]
+          }
+
+        #}
+        # curcularity dd[, any(from %in% to) && any(to %in% from), by = objName]
+        #if (!is.null(lo$after) && curMod == modNam)
+        #  dd <- dd[from %in% lo$after]
+        # else
+        #   del <- dd
       }
     # }
+      # test for circularity
+      circular <- dd[, any(from %in% to) && any(to %in% from), by = objName]
+      rmObjs <- circular[V1 %in% TRUE]$objName
+      if (length(rmObjs))
+        dd <- dd[!objName %in% rmObjs]
 
+      rmSelf <- which(dd[["from"]] == curMod)
+      if (length(rmSelf))
+        dd <- dd[-rmSelf]
+      del <- dd
     # if (any(c("i", "c") %in% forms$where)) {
       # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
       #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
       #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
       # if (exists("aaaa", envir = .GlobalEnv)) browser()
-      out <- del[!(from %in% c("_INPUT_", currentModule(sim))), ][
+      out <- del[!(from %in% c("_INPUT_", curMod)), ][
         objName %in% objDeparsed]
       out <- out[, .(objName, noFeedback = all(from != to)), by = from][noFeedback %in% TRUE]
       objDeparsed %in% out$objName

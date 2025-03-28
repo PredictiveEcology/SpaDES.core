@@ -31,7 +31,7 @@ if (!isGeneric(".robustDigest")) {
 setMethod(
   ".robustDigest",
   signature = "simList",
-  definition = function(object, .objects, length, algo, quick, classOptions) {
+  definition = function(object, .objects, length, algo = "xxhash64", quick, classOptions) {
 
     # browser(expr = exists("._robustDigest_1"))
     curMod <- currentModule(object)
@@ -96,7 +96,7 @@ setMethod(
                        out <- if (length(objs) > 0) {
                          a <- mget(objs, envir = allEnvsInSimList[[name]])
                          nonZero <- unlist(lapply(a, function(x) length(x) > 0))
-                         .robustDigest(a[nonZero],
+                         .robustDigest(a[nonZero], algo = algo,
                                        quick = !isFALSE(quick), # can be character or TRUE --> TRUE
                                        length = length, classOptions = classOptions) # need classOptions
                        } else {
@@ -160,7 +160,7 @@ setMethod(
         object@inputs <- object@inputs[object@inputs$objectName %in% expectsInputs,]
       }
       if (NROW(object@inputs)) { # previous line may have removed row(s) from object@inputs, leaving potentially zero
-        object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
+        object@inputs$file <- unlist(.robustDigest(object@inputs$file, algo = algo, quick = quick, length = length)) #nolint
       }
     }
 
@@ -219,7 +219,7 @@ setMethod(
           .robustDigest(lapply(object@depends@dependencies,
                                function(mo) {
                                  mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
-                               }))
+                               }), algo = algo)
       }
 
       obj[["depends"]] <- invertList(dependsFirst)
@@ -237,12 +237,13 @@ setMethod(
       .robustDigest(lapply(object@depends@dependencies,
                            function(mo) {
                              mo[otherDependsToDig]
-                           } ))
+                           } ), algo = algo)
 
     obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
     # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
-    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
+    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")],
+                                    quick = TRUE, algo = algo)
     if (!is.null(classOptions$events)) {
       if (FALSE %in% classOptions$events) obj$events <- NULL
     }
@@ -754,12 +755,14 @@ setMethod(
         simPost@current <- simFromCache@current
 
         # Outputs -- there may have been outputs added by another module that should be recovered
-        if (exists("aaaa", envir = .GlobalEnv)) browser()
         if (length(currModules) > 0) {
-          outputsFromThisMod <- object@depends@dependencies[[currModules]]@outputObjects$objectName
+          outputsFromTheseMods <- lapply(currModules, function(cmod) {
+            object@depends@dependencies[[cmod]]@outputObjects$objectName
+          })
+          outputsFromTheseMods <- unlist(outputsFromTheseMods)
           simPost@outputs <- rbindlist(list(
-            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromThisMod,]),
-            use.names = TRUE, fill = TRUE)
+            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
+            use.names = TRUE, fill = TRUE) |> unique()
         }
 
 
