@@ -754,12 +754,14 @@ setMethod(
         simPost@current <- simFromCache@current
 
         # Outputs -- there may have been outputs added by another module that should be recovered
-        if (exists("aaaa", envir = .GlobalEnv)) browser()
         if (length(currModules) > 0) {
-          outputsFromThisMod <- object@depends@dependencies[[currModules]]@outputObjects$objectName
+          outputsFromTheseMods <- lapply(currModules, function(cmod) {
+            object@depends@dependencies[[cmod]]@outputObjects$objectName
+          })
+          outputsFromTheseMods <- unlist(outputsFromTheseMods)
           simPost@outputs <- rbindlist(list(
-            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromThisMod,]),
-            use.names = TRUE, fill = TRUE)
+            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
+            use.names = TRUE, fill = TRUE) |> unique()
         }
 
 
