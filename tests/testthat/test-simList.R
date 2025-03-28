@@ -503,7 +503,7 @@ test_that("test sped-up Caching of sequentially cached events", {
               ".inputObjects <- function(sim) {",
               "  a = asPath(file.path(inputPath(sim), \"test\")) ",
               paste0("  if (!suppliedElsewhere(", params$.globals$stackName, "))"),
-              paste0("  sim[[", params$.globals$stackName, "]] <- sim[[", params$.globals$stackName, "]]"),
+              paste0("  sim[['", params$.globals$stackName, "']] <- sim[['", params$.globals$stackName, "']]"),
               "sim",
               "}")
 

@@ -15,7 +15,7 @@ URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
 Date: 2025-03-27
-Version: 2.1.5.9013
+Version: 2.1.5.9014
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),

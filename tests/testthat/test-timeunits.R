@@ -16,8 +16,8 @@ test_that("timeunit works correctly", {
   expect_equal(maxTimeunit(sim = mySim), "year")
 
   # Test for numerics, or character strings that are not recognized
-  expect_message(timeunit(mySim) <- 1, "^unknown timeunit provided:")
-  expect_message(timeunit(mySim) <- "LeapYear", "^unknown timeunit provided:")
+  expect_warning(timeunit(mySim) <- 1, "^unknown timeunit provided:")
+  expect_warning(timeunit(mySim) <- "LeapYear", "^unknown timeunit provided:")
 
 
   # check for new unit being put into simList
@@ -28,8 +28,8 @@ test_that("timeunit works correctly", {
   expect_equivalent(as.numeric(mySim$dfortnight(1)), 1209600)
   rm(dfortnight, envir = envir(mySim))
 
-  # test that NA_real_ gets coerced to NA_character_
-  timeunit(mySim) <- NA_real_
+  # test that NA_real_ gets coerced to NA_character_; with a warning
+  expect_warning(timeunit(mySim) <- NA_real_)
   expect_identical(timeunit(mySim), NA_character_)
 
   # check that the minTimeunit captures one of the timestepUnits in the loaded modules
