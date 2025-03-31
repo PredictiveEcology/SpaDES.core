@@ -139,7 +139,6 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
       otherModsDeps <- allModsDeps[which(!names(d@dependencies) %in% curMod)]
 
       for (mod in allModsDeps) {
-        browser()
         lo <- mod@loadOrder
         modNam <- mod@name
         #if (any(curMod %in% modNam)) { # if this module is named

@@ -587,10 +587,10 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   #   it says, how big is the function, compared to how big is the environment that holds the function
   #   If it is 1, it means there are only functions in that environment, no objects
   # length(serialize(tmpEnvir$prepare_IgnitionFit, NULL))/object.size(mget(ls(tmpEnvir), tmpEnvir))
-  pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
-  pkgs <- reqdPkgsDontLoad(pkgs) # some are explicitly not to be loaded
 
-  if (getOption("spades.useBox") && FALSE) { # TURN THIS OFF AS THERE ARE MEMORY HOGGING ISSUES WITH BOX
+  if (getOption("spades.useBox", FALSE) && FALSE) { # TURN THIS OFF AS THERE ARE MEMORY HOGGING ISSUES WITH BOX
+    pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
+    pkgs <- reqdPkgsDontLoad(pkgs) # some are explicitly not to be loaded
     cm <- currentModule(tmpEnvir$sim)
     if (length(cm))
       if (!cm %in% unlist(.coreModules())) {

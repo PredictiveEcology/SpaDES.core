@@ -1054,7 +1054,7 @@ test_that("debug using logging", {
 })
 
 test_that("options('reproducible.reqdPkgsDontLoad", {
-  dontLoad <- "ggplot2" # can't be sp, raster because already loaded
+  dontLoad <- "logging" # ggplot2 has many rev deps; can't be sp, raster because already loaded
 
   skip_if_not_installed(dontLoad)
   unloadNamespace(dontLoad)
