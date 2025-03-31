@@ -10,7 +10,7 @@ restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
 
 saveState(filename, ...)
 
-restartOrSimInitAndSpades(out, file, reset = getOption("spades.resetRestart"))
+restartOrSimInitAndSpades(ll, file, reset = getOption("spades.resetRestart"))
 }
 \arguments{
 \item{sim}{A \code{simList} or a filename that will load a \code{simList}, e.g., from
@@ -39,13 +39,13 @@ with the module code parsed into the \code{simList}}
 pass arguments to the \code{...} that will be passed to \code{saveSimList}, such as
 \code{modules}, \code{inputs}, \code{outputs}.}
 
+\item{ll}{A list of elements that would be passed to \code{simInit}, such as \code{modules}.}
+
 \item{file}{An optional file that has a saved \code{simList}, e.g., from \code{saveSimList}
 or \code{saveState}.}
 
 \item{reset}{Logical. If \code{TRUE}, then it will force \code{simInitAndSpades} to be called
 even if there is saved \code{sim} available.}
-
-\item{ll}{A list of elements that would be passed to \code{simInit}, such as \code{modules}.}
 }
 \value{
 A \code{simList} as if \code{spades} had been called on a \code{simList}.

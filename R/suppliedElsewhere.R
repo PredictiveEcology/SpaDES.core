@@ -122,6 +122,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   inFutureInit <- if (any(c("i", "c") %in% forms$where)) {
     del <- depsEdgeList(sim, plot = FALSE)
+    if (NROW(del)) {
     # if ("c" %in% forms$where) {
 
     # THIS IS THE PREVIOUS APPROACH THAT MISSED SEVERAL CASES ESPECIALLY WITH loadOrder
@@ -138,6 +139,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
       otherModsDeps <- allModsDeps[which(!names(d@dependencies) %in% curMod)]
 
       for (mod in allModsDeps) {
+        browser()
         lo <- mod@loadOrder
         modNam <- mod@name
         #if (any(curMod %in% modNam)) { # if this module is named
@@ -183,6 +185,9 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     # } else {
     #   FALSE
     # }
+    } else {
+      FALSE
+    }
   } else {
     FALSE
   }
