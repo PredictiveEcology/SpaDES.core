@@ -226,6 +226,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           }
         }
 
+
         # browser(expr = exists("._doEvent_2"))
         showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
                            isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
@@ -1380,6 +1381,10 @@ setMethod(
 
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
+    if (any(cur[["moduleName"]] %in% getOption("spades.debugModule"))) {
+      browser()
+    }
+    # if (isTRUE(cur$moduleName %in% "randomLandscapes")) browser()
     expression(Cache(FUN = modCall,
                      sim = sim,
                      eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
