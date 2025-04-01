@@ -1343,7 +1343,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           ## This next line will make the Caching sensitive to userSuppliedObjs
           ##  (which are already in the simList) or objects supplied by another module
-          #browser()
           inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "i", "c"))
           # inCyclic <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "c")
           if (any(inSimList)) {
@@ -1382,6 +1381,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             if (getOption("spades.useBox", FALSE) && FALSE)
               do.call(box::use, lapply(pkgs, as.name))
             debugForCache <- debugToVerbose(debug)
+            # if (identical(mBase, "mpbRedTopSpread")) browser()
             sim <- Cache(.inputObjects, sim,
                          .objects = objectsToEvaluateForCaching,
                          notOlderThan = notOlderThan,
