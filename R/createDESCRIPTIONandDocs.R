@@ -170,7 +170,9 @@ createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.mod
     message("Building documentation")
     m <- packageFolderName
     tmpSrcForDoc <- "R/tmp.R"
-    checkPath(dirname(tmpSrcForDoc), create = TRUE)
+    theDir <- dirname(tmpSrcForDoc)
+    checkPath(theDir, create = TRUE)
+    on.exit(unlink(theDir, recursive = TRUE))
     cat(rlaa[-(linesWithDefModule[[1]]:linesWithDefModule[[2]])], sep = "\n", file = tmpSrcForDoc)
     on.exit(unlink(tmpSrcForDoc))
     roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
