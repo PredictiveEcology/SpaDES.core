@@ -1601,7 +1601,7 @@ loadPkgs <- function(reqdPkgs) {
     pkgsDontLoad <- getOption("spades.reqdPkgsDontLoad", NULL)
     allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
 
-    if (getOption("spades.useRequire") && !getOption("spades.useBox")) {
+    if (getOption("spades.useRequire") && !getOption("spades.useBox", FALSE)) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
       Require(allPkgs, require = TRUE, standAlone = FALSE, upgrade = FALSE)
       if (!is.null(pkgsDontLoad)) {
@@ -1611,7 +1611,7 @@ loadPkgs <- function(reqdPkgs) {
       }
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      if (!getOption("spades.useBox")) {
+      if (!getOption("spades.useBox", FALSE)) {
         allPkgs <- unique(Require::extractPkgName(allPkgs))
         loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
       }
