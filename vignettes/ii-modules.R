@@ -45,16 +45,16 @@ mySim <- simInit(times = times, params = parameters, modules = modules,
                  objects = objects, paths = paths)
 
 ## ----accessing-params, eval=FALSE, echo=TRUE----------------------------------
-#  ## Access parameters
-#  P(mySim)                    # shows all parameters
-#  P(mySim, module = "caribouMovement") # only parameters in caribouMovement module
-#  P(mySim)$caribouMovement    # same
-#  P(mySim)$caribouMovement$N  # Only one parameter
-#  
-#  ## If used within the module source code, then module name can be omitted:
-#  ## This will return NULL here, but will return the actual value if used
-#  ## in a module
-#  P(mySim)$N  # Only one parameter if used within a module
+# ## Access parameters
+# P(mySim)                    # shows all parameters
+# P(mySim, module = "caribouMovement") # only parameters in caribouMovement module
+# P(mySim)$caribouMovement    # same
+# P(mySim)$caribouMovement$N  # Only one parameter
+# 
+# ## If used within the module source code, then module name can be omitted:
+# ## This will return NULL here, but will return the actual value if used
+# ## in a module
+# P(mySim)$N  # Only one parameter if used within a module
 
 ## ----event-types, echo=FALSE, results="asis"----------------------------------
 cat(c(
@@ -107,25 +107,25 @@ unlink(normalizePath(ftmp))
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 
 ## ----checksums, eval=FALSE----------------------------------------------------
-#  ## 1. specify your module here
-#  moduleName <- "my_module"
-#  
-#  ## 2. use a temp dir to ensure all modules get fresh copies of the data
-#  tmpdir <- file.path(tempdir(), "SpaDES_modules")
-#  
-#  ## 3. download your module's data to the temp dir
-#  downloadData(moduleName, tmpdir)
-#  
-#  ## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run
-#  simInit(modules = moduleName)
-#  
-#  ## 5. recalculate your checksums and overwrite the file
-#  checksums(moduleName, tmpdir, write = TRUE)
-#  
-#  ## 6. copy the new checksums file to your working module directory (the one not in the temp dir)
-#  file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
-#            to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
-#            overwrite = TRUE)
+# ## 1. specify your module here
+# moduleName <- "my_module"
+# 
+# ## 2. use a temp dir to ensure all modules get fresh copies of the data
+# tmpdir <- file.path(tempdir(), "SpaDES_modules")
+# 
+# ## 3. download your module's data to the temp dir
+# downloadData(moduleName, tmpdir)
+# 
+# ## 4. initialize a dummy simulation to ensure any 'data prep' steps in the .inputObjects section are run
+# simInit(modules = moduleName)
+# 
+# ## 5. recalculate your checksums and overwrite the file
+# checksums(moduleName, tmpdir, write = TRUE)
+# 
+# ## 6. copy the new checksums file to your working module directory (the one not in the temp dir)
+# file.copy(from = file.path(tmpdir, moduleName, 'data', 'CHECKSUMS.txt'),
+#           to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
+#           overwrite = TRUE)
 
 ## ----module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7------------
 ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
@@ -225,79 +225,79 @@ dev.off()
 unlink(normalizePath(ftmp))
 
 ## ----save-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
-#  ### WITHIN A MODULE:
-#  
-#  # schedule a recurring save event
-#  nextSave <- time(mySim) + params(mySim)$randomLandscapes$.saveInterval
-#  sim <- scheduleEvent(mySim, nextSave, "randomLandscapes", "save")
+# ### WITHIN A MODULE:
+# 
+# # schedule a recurring save event
+# nextSave <- time(mySim) + params(mySim)$randomLandscapes$.saveInterval
+# sim <- scheduleEvent(mySim, nextSave, "randomLandscapes", "save")
 
 ## ----plotting, echo=TRUE, eval=FALSE, message=FALSE---------------------------
-#  # initialize a new simulation, setting the load and save parameters
-#  mySim <- simInit(times = list(start = 0, end = 5),
-#                   params = list(
-#                     .globals = list(stackName = "landscape"),
-#                     randomLandscapes = list(.plotInitialTime = 0, .plotInterval = 1)
-#                   ),
-#                   modules = list("randomLandscapes"),
-#                   paths = list(modulePath = getSampleModules(tempdir()))
-#  )
-#  
-#  # retrieve the plotting params from the simulation object
-#  params(mySim)$randomLandscapes$.plotInitialTime
-#  params(mySim)$randomLandscapes$.plotInterval
+# # initialize a new simulation, setting the load and save parameters
+# mySim <- simInit(times = list(start = 0, end = 5),
+#                  params = list(
+#                    .globals = list(stackName = "landscape"),
+#                    randomLandscapes = list(.plotInitialTime = 0, .plotInterval = 1)
+#                  ),
+#                  modules = list("randomLandscapes"),
+#                  paths = list(modulePath = getSampleModules(tempdir()))
+# )
+# 
+# # retrieve the plotting params from the simulation object
+# params(mySim)$randomLandscapes$.plotInitialTime
+# params(mySim)$randomLandscapes$.plotInterval
 
 ## ----plot-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
-#  ### WITHIN A MODULE:
-#  
-#  # schedule a recurring plot event
-#  nextPlot <- time(mySim) + params(mySim)$randomLandscapes$.plotInterval
-#  mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "save")
+# ### WITHIN A MODULE:
+# 
+# # schedule a recurring plot event
+# nextPlot <- time(mySim) + params(mySim)$randomLandscapes$.plotInterval
+# mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "save")
 
 ## ----caribouMovement, echo=TRUE, eval=FALSE-----------------------------------
-#  openModules(getSampleModules(tempdir()), "moduleName")
+# openModules(getSampleModules(tempdir()), "moduleName")
 
 ## ----download-module, echo=TRUE, eval=FALSE-----------------------------------
-#  downloadModule("moduleName")
+# downloadModule("moduleName")
 
 ## ----create-new-module, eval=FALSE, echo=TRUE, message=FALSE------------------
-#  # create a new module called "randomLandscape" in the "custom-modules" subdirectory
-#  # and open the resulting file immediately for editing.
-#  newModule(name = "randomLandscapes", path = "custom-modules", open = TRUE)
+# # create a new module called "randomLandscape" in the "custom-modules" subdirectory
+# # and open the resulting file immediately for editing.
+# newModule(name = "randomLandscapes", path = "custom-modules", open = TRUE)
 
 ## ----module-group-init, eval=FALSE--------------------------------------------
-#  library(DiagrammeR)
-#  library(SpaDES.core)
-#  
-#  outputDir <- file.path(tempdir(), "simOutputs")
-#  times <- list(start = 0.0, end = 20.0)
-#  parameters <- list(
-#    .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
-#    .progress = list(NA),
-#    randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
-#    fireSpread = list(
-#      nFires = 10L, spreadprob = 0.225, its = 1e6, persistprob = 0,
-#      returnInterval = 10, startTime = 0,
-#      .plotInitialTime = 0, .plotInterval = 10
-#    ),
-#    caribouMovement = list(
-#      N = 100L, moveInterval = 1, torus = TRUE,
-#      .plotInitialTime = 1, .plotInterval = 1
-#    )
-#  )
-#  modules <- list("SpaDES_sampleModules")
-#  objects <- list()
-#  paths <- list(
-#    modulePath = getSampleModules(tempdir()),
-#    outputPath = outputDir
-#  )
-#  
-#  mySim <- simInit(times = times, params = parameters, modules = modules,
-#                   objects = objects, paths = paths)
-#  
-#  modules(mySim) # note the child modules are initialized
+# library(DiagrammeR)
+# library(SpaDES.core)
+# 
+# outputDir <- file.path(tempdir(), "simOutputs")
+# times <- list(start = 0.0, end = 20.0)
+# parameters <- list(
+#   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
+#   .progress = list(NA),
+#   randomLandscapes = list(nx = 100L, ny = 100L, inRAM = TRUE),
+#   fireSpread = list(
+#     nFires = 10L, spreadprob = 0.225, its = 1e6, persistprob = 0,
+#     returnInterval = 10, startTime = 0,
+#     .plotInitialTime = 0, .plotInterval = 10
+#   ),
+#   caribouMovement = list(
+#     N = 100L, moveInterval = 1, torus = TRUE,
+#     .plotInitialTime = 1, .plotInterval = 1
+#   )
+# )
+# modules <- list("SpaDES_sampleModules")
+# objects <- list()
+# paths <- list(
+#   modulePath = getSampleModules(tempdir()),
+#   outputPath = outputDir
+# )
+# 
+# mySim <- simInit(times = times, params = parameters, modules = modules,
+#                  objects = objects, paths = paths)
+# 
+# modules(mySim) # note the child modules are initialized
 
 ## ----module-group-dl, eval=FALSE----------------------------------------------
-#  downloadModule("SpaDES_sampleModules")
+# downloadModule("SpaDES_sampleModules")
 
 ## ----cleanup, echo=FALSE------------------------------------------------------
 unlink(outputDir, recursive = TRUE)
