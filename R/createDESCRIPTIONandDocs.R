@@ -138,7 +138,8 @@ createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.mod
   whDefModule <- which(defModule)
   whNotDefModule <- which(!defModule)
 
-  linesWithDefModule <- gpd[grep("defineModule", gpd$text) - 1, ][, c("line1", "line2")]
+  defModLine <- which(grepl("defineModule", gpd$text) & gpd$token == "SYMBOL_FUNCTION_CALL")
+  linesWithDefModule <- gpd[defModLine - 1, ][, c("line1", "line2")]
 
   doEvent <- grepl(paste0("^doEvent.", module), aa)
   whDoEvent <- which(doEvent)
@@ -169,6 +170,7 @@ createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.mod
     message("Building documentation")
     m <- packageFolderName
     tmpSrcForDoc <- "R/tmp.R"
+    checkPath(dirname(tmpSrcForDoc), create = TRUE)
     cat(rlaa[-(linesWithDefModule[[1]]:linesWithDefModule[[2]])], sep = "\n", file = tmpSrcForDoc)
     on.exit(unlink(tmpSrcForDoc))
     roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
@@ -312,7 +314,8 @@ mergeField <- function(origDESCtxt, field, dFile, fieldName = "Imports") {
     fieldVals <- strsplit(origDESCtxt[, fieldName], split = ",+\n")[[1]]
   if (length(field)) {
     field <- trimRedundancies(unique(c(field, fieldVals)))
+    cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
+        sep = "\n", file = dFile, append = file.exists(dFile))
   }
-  cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
-      sep = "\n", file = dFile, append = TRUE)
+  field
 }

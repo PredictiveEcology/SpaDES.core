@@ -122,6 +122,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   inFutureInit <- if (any(c("i", "c") %in% forms$where)) {
     del <- depsEdgeList(sim, plot = FALSE)
+    if (NROW(del)) {
     # if ("c" %in% forms$where) {
 
     # THIS IS THE PREVIOUS APPROACH THAT MISSED SEVERAL CASES ESPECIALLY WITH loadOrder
@@ -183,6 +184,9 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     # } else {
     #   FALSE
     # }
+    } else {
+      FALSE
+    }
   } else {
     FALSE
   }

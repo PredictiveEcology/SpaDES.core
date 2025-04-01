@@ -180,7 +180,7 @@ point number comparisons. \cr
 \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
 \tab The default user agent to use for downloading modules from GitHub. \cr
 
-\code{spades.useBox} \tab TRUE
+\code{spades.useBox} \tab FALSE
 \tab Whether to manage which packages are loaded using the package \code{box}.
 This will have as an effect that \code{reqdPkgs} will be strict; if a given
 module is missing a \code{reqdPkgs}, then the module will fail to run, with

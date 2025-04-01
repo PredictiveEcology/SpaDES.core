@@ -178,7 +178,7 @@
 #'   `spades.useragent` \tab `"https://github.com/PredictiveEcology/SpaDES"`.
 #'     \tab The default user agent to use for downloading modules from GitHub. \cr
 #'
-#'   `spades.useBox` \tab TRUE
+#'   `spades.useBox` \tab FALSE
 #'     \tab Whether to manage which packages are loaded using the package `box`.
 #'     This will have as an effect that `reqdPkgs` will be strict; if a given
 #'     module is missing a `reqdPkgs`, then the module will fail to run, with

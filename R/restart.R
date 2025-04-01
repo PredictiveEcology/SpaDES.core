@@ -496,23 +496,23 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
 #'   or `saveState`.
 #' @param reset Logical. If `TRUE`, then it will force `simInitAndSpades` to be called
 #'   even if there is saved `sim` available.
-restartOrSimInitAndSpades <- function(out, file,
+restartOrSimInitAndSpades <- function(ll, file,
                                       reset = getOption("spades.resetRestart")) {
   # there are tempdir paths
-  pathsOrig <- out$paths
-  out$paths <- sapply(out$paths, grep, invert = TRUE, value = TRUE, pattern = tempdir(), simplify = TRUE)
-  fn <- function(out) out
-  cached <- attr(reproducible::Cache(fn(out), .functionName = "restartOrSimInitAndSpades"), ".Cache")$newCache %in% FALSE
+  pathsOrig <- ll$paths
+  ll$paths <- sapply(ll$paths, grep, invert = TRUE, value = TRUE, pattern = tempdir(), simplify = TRUE)
+  fn <- function(ll) ll
+  cached <- attr(reproducible::Cache(fn(ll), .functionName = "restartOrSimInitAndSpades"), ".Cache")$newCache %in% FALSE
   if (isTRUE(reset))
     cached <- FALSE
-  out$paths <- pathsOrig
-  hasSavedToRAMState <- !is.null(SpaDES.core:::savedSimEnv()$.sim)
+  ll$paths <- pathsOrig
+  hasSavedToRAMState <- !is.null(savedSimEnv()$.sim)
   hasSavedToFileState <- file.exists(file)
   if (!cached || !(hasSavedToFileState || hasSavedToRAMState)) {
-    message("out has changed; rerunning simInitAndSpades")
-    sim <- do.call(SpaDES.core::simInitAndSpades, out)
+    message("ll has changed; rerunning simInitAndSpades")
+    sim <- do.call(SpaDES.core::simInitAndSpades, ll)
   } else {
-    message("out has not changed; trying restartSpades")
+    message("ll has not changed; trying restartSpades")
     if (isFALSE(hasSavedToRAMState)) {
       sim <- SpaDES.core::restartSpades(file)
     } else  {
