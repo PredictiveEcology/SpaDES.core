@@ -1378,8 +1378,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           if (runFnCallAsExpr) {
             pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
             pkgs <- c(pkgs, "stats")
-            if (getOption("spades.useBox", FALSE) && FALSE)
-              do.call(box::use, lapply(pkgs, as.name))
+            # if (getOption("spades.useBox", FALSE) && FALSE)
+            #   do.call(box::use, lapply(pkgs, as.name))
             debugForCache <- debugToVerbose(debug)
             # if (identical(mBase, "mpbRedTopSpread")) browser()
             sim <- Cache(.inputObjects, sim,

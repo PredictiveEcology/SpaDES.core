@@ -164,7 +164,7 @@ the name \code{sim$._sessionInfo}. This takes about 75 milliseconds, which may b
 undesirable for some situations where speed is critical. If \code{FALSE}, then
 this is not assigned to the \code{simList}.\cr
 
-\code{spades.switchPkgNamespaces} \tab Defunct. \tab  Use \code{spades.useBox} option \cr
+\code{spades.switchPkgNamespaces} \tab Defunct.
 
 \code{spades.testMemoryLeaks} \tab \code{TRUE}.
 \tab  There is a very easy way to create a memory leak with R and SpaDES,
@@ -181,7 +181,9 @@ point number comparisons. \cr
 \tab The default user agent to use for downloading modules from GitHub. \cr
 
 \code{spades.useBox} \tab FALSE
-\tab Whether to manage which packages are loaded using the package \code{box}.
+\tab Unimplemented while memory problems with \code{box} are resolved.
+When it is turned on, this option determines
+whether to manage which packages are loaded using the package \code{box}.
 This will have as an effect that \code{reqdPkgs} will be strict; if a given
 module is missing a \code{reqdPkgs}, then the module will fail to run, with
 an error saying the package/function doesn't exist. Without \code{box},

@@ -33,7 +33,6 @@ Depends:
     quickPlot (>= 1.0.2),
     reproducible (>= 2.1.2.9027)
 Imports:
-    box,
     cli,
     data.table (>= 1.11.0),
     fs,

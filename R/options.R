@@ -162,7 +162,7 @@
 #'     undesirable for some situations where speed is critical. If `FALSE`, then
 #'     this is not assigned to the `simList`.\cr
 #'
-#'   `spades.switchPkgNamespaces` \tab Defunct. \tab  Use `spades.useBox` option \cr
+#'   `spades.switchPkgNamespaces` \tab Defunct.
 #'
 #'   `spades.testMemoryLeaks` \tab `TRUE`.
 #'     \tab  There is a very easy way to create a memory leak with R and SpaDES,
@@ -179,7 +179,9 @@
 #'     \tab The default user agent to use for downloading modules from GitHub. \cr
 #'
 #'   `spades.useBox` \tab FALSE
-#'     \tab Whether to manage which packages are loaded using the package `box`.
+#'     \tab Unimplemented while memory problems with `box` are resolved.
+#'     When it is turned on, this option determines
+#'     whether to manage which packages are loaded using the package `box`.
 #'     This will have as an effect that `reqdPkgs` will be strict; if a given
 #'     module is missing a `reqdPkgs`, then the module will fail to run, with
 #'     an error saying the package/function doesn't exist. Without `box`,
@@ -242,7 +244,7 @@ spadesOptions <- function() {
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
-    spades.useBox = FALSE,
+    # spades.useBox = FALSE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",
     spades.keepCompleted = TRUE
   )
