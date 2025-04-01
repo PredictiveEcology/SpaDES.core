@@ -34,7 +34,7 @@ jobs:
         with:
           extra-packages: |
             any::covr
-            PredictiveEcology/reproducible@development
+            PredictiveEcology/reproducible@AI
             fastshp=?ignore
             NLMR=?ignore
 

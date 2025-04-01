@@ -36,7 +36,7 @@ jobs:
           extra-packages: |
             any::pkgdown
             local::.
-            PredictiveEcology/reproducible@development
+            PredictiveEcology/reproducible@AI
             fastshp=?ignore
             NLMR=?ignore
           needs: website

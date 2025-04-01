@@ -172,9 +172,9 @@ createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.mod
     tmpSrcForDoc <- "R/tmp.R"
     theDir <- dirname(tmpSrcForDoc)
     checkPath(theDir, create = TRUE)
-    on.exit(unlink(theDir, recursive = TRUE))
+    on.exit(unlink(theDir, recursive = TRUE), add = TRUE)
     cat(rlaa[-(linesWithDefModule[[1]]:linesWithDefModule[[2]])], sep = "\n", file = tmpSrcForDoc)
-    on.exit(unlink(tmpSrcForDoc))
+    on.exit(unlink(tmpSrcForDoc), add = TRUE)
     roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
     pkgload::dev_topic_index_reset(m)
     pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting

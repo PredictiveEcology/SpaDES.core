@@ -39,7 +39,7 @@ jobs:
           extra-packages: |
             any::cffr
             any::V8
-            PredictiveEcology/reproducible@development
+            PredictiveEcology/reproducible@AI
             fastshp=?ignore
             NLMR=?ignore
 
