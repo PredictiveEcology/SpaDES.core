@@ -67,7 +67,7 @@
 #'      \tab The default local directory in which to look for simulation inputs.  \cr
 #'
 #'   `spades.loadReqdPkgs`
-#'      \tab Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
+#'      \tab Default is `TRUE` \tab Any `reqdPkgs` will be loaded via `Require`
 #'      or `require`. If `FALSE`, no package loading will occur. This will mean that
 #'      modules must prefix every function call from a package with that package name
 #'      with double colon (::).  \cr
@@ -162,7 +162,7 @@
 #'     undesirable for some situations where speed is critical. If `FALSE`, then
 #'     this is not assigned to the `simList`.\cr
 #'
-#'   `spades.switchPkgNamespaces` \tab Defunct.
+#'   `spades.switchPkgNamespaces` \tab Defunct. \tab Do not use \cr
 #'
 #'   `spades.testMemoryLeaks` \tab `TRUE`.
 #'     \tab  There is a very easy way to create a memory leak with R and SpaDES,
@@ -240,7 +240,6 @@ spadesOptions <- function() {
     spades.saveSimOnExit = TRUE,
     spades.scratchPath = file.path(.spadesTempDir(), "scratch"),
     spades.sessionInfo = TRUE,
-    spades.switchPkgNamespaces = FALSE,
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",

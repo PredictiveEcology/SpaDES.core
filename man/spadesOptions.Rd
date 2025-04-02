@@ -72,7 +72,7 @@ Still VERY experimental. Use cautiously. \cr
 \tab The default local directory in which to look for simulation inputs.  \cr
 
 \code{spades.loadReqdPkgs}
-\tab Default is \code{TRUE} meaning that any \code{reqdPkgs} will be loaded via \code{Require}
+\tab Default is \code{TRUE} \tab Any \code{reqdPkgs} will be loaded via \code{Require}
 or \code{require}. If \code{FALSE}, no package loading will occur. This will mean that
 modules must prefix every function call from a package with that package name
 with double colon (::).  \cr
@@ -164,7 +164,7 @@ the name \code{sim$._sessionInfo}. This takes about 75 milliseconds, which may b
 undesirable for some situations where speed is critical. If \code{FALSE}, then
 this is not assigned to the \code{simList}.\cr
 
-\code{spades.switchPkgNamespaces} \tab Defunct.
+\code{spades.switchPkgNamespaces} \tab Defunct. \tab Do not use \cr
 
 \code{spades.testMemoryLeaks} \tab \code{TRUE}.
 \tab  There is a very easy way to create a memory leak with R and SpaDES,
