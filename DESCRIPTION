@@ -14,8 +14,8 @@ Description: Provides the core framework for a discrete event system to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2025-04-02
-Version: 2.1.5.9019
+Date: 2025-04-04
+Version: 2.1.5.9020
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -40,7 +40,7 @@ Imports:
     lobstr,
     methods,
     qs (>= 0.21.1),
-    Require (>= 0.3.1),
+    Require (>= 1.0.1.9000),
     stats,
     terra (>= 1.7-46),
     tools,
@@ -82,6 +82,7 @@ Suggests:
 Remotes:
     ropensci/NLMR,
     PredictiveEcology/reproducible@AI
+    PredictiveEcology/Require@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
