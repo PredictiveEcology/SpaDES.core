@@ -12,7 +12,7 @@ output:
     keep_md: yes
 editor_options:
   chunk_output_type: console
-  bibliography: citations/references_{{{name}}}.bib
+bibliography: citations/references_{{{name}}}.bib
 link-citations: true
 always_allow_html: true
 ---
