@@ -81,7 +81,7 @@ Suggests:
     withr
 Remotes:
     ropensci/NLMR,
-    PredictiveEcology/reproducible@AI
+    PredictiveEcology/reproducible@AI,
     PredictiveEcology/Require@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
