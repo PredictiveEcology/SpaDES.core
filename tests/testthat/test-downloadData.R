@@ -40,9 +40,11 @@ test_that("downloadData downloads and unzips module data", {
     )
 
     a <- capture.output({
-      t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
+      t1 <- system.time(dd1 <- try(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
                                      files = c("DEM.tif", "habitatQuality.tif")))
+      )
     })
+
     result <- checksums(m, tmpdir)$result
     expect_true(all(file.exists(file.path(datadir, filenames))))
     expect_true(all(result == "OK"))
