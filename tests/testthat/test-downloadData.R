@@ -33,15 +33,15 @@ test_that("downloadData downloads and unzips module data", {
       objectName = c("DEM", "habitatQuality"),
       objectClass = "RasterLayer",
       sourceURL = c(
-        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/DEM.tif",
-        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/habitatQuality.tif"
+        "https://drive.google.com/file/d/18roW33nu0qJ2ybUk8SG1WJa-HZq_PZ12",
+        "https://drive.google.com/file/d/1wpkVWeXNNfFaDQePNw9rwA6sFGtFCd2B"
       ),
       stringsAsFactors = FALSE
     )
 
     a <- capture.output({
-      t1 <- system.time(dd1 <- try(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
-                                     files = c("DEM.tif", "habitatQuality.tif")))
+      t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
+                                     files = c("DEM.tif", "habitatQuality.tif"))
       )
     })
 
