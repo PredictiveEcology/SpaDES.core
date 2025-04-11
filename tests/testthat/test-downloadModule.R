@@ -29,7 +29,6 @@ test_that("downloadModule downloads and unzips a single module", {
   expect_true(all(f %in% f_expected))
 })
 
-
 test_that("downloadModule downloads and unzips a parent module", {
   skip_on_cran()
 
@@ -115,15 +114,14 @@ test_that("downloadModule can overwrite existing modules", {
 
 test_that("downloadModule does not fail when data URLs cannot be accessed", {
   skip_on_cran()
-
   opts <- list(reproducible.inputPaths = NULL, "reproducible.verbose" = TRUE)
   if (isWindows()) {
     opts <- append(opts, list(download.file.method = "auto"))
   } else {
     opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
+  testInit(c("httr2"), opts = opts)
 
-  testInit(c("httr"), opts = opts)
   m <- "test"
 
   skipMessReGoogledrive <-
@@ -139,7 +137,7 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
       skip(skipMessReGoogledrive)
     }
   }
-  f <- f$value[[1]] |> unlist() |> as.character()
+  f <- f[[1]] |> unlist() |> as.character()
   d <- f |> dirname() |> basename() |> unique() |> sort()
 
   d_expected <- sort(c(m, "data"))
