@@ -10,7 +10,7 @@ test_that("downloadData downloads and unzips module data", {
     }
   )
 
-  testInit(c("googledrive", "terra"), opts = opts)
+  testInit(c("httr2", "terra"), opts = opts)
 
   m <- "test"
   datadir <- file.path(tmpdir, m, "data") |> checkPath(create = TRUE)
@@ -40,9 +40,8 @@ test_that("downloadData downloads and unzips module data", {
     )
 
     a <- capture.output({
-      t1 <- system.time(dd1 <- try(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
+      t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
                                      files = c("DEM.tif", "habitatQuality.tif")))
-      )
     })
 
     result <- checksums(m, tmpdir)$result

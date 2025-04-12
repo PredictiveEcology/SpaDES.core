@@ -137,7 +137,7 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
       skip(skipMessReGoogledrive)
     }
   }
-  f <- f[[1]] |> unlist() |> as.character()
+  f <- f[[1]][[1]] |> unlist() |> as.character()
   d <- f |> dirname() |> basename() |> unique() |> sort()
 
   d_expected <- sort(c(m, "data"))
