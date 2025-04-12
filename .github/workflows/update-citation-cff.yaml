@@ -40,13 +40,11 @@ jobs:
             any::cffr
             any::V8
             PredictiveEcology/reproducible@AI
-            fastshp=?ignore
             NLMR=?ignore
 
       - name: Install additional package dependencies
         run: |
           pak::pkg_install("ropensci/NLMR")
-          pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}
 
       - name: Update CITATION.cff
