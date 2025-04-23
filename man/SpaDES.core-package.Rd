@@ -269,8 +269,8 @@ Agents have several methods and functions specific to them:
 \code{\link[SpaDES.tools:crw]{SpaDES.tools::crw()}} \tab Simple correlated random walk function\cr
 \code{\link[SpaDES.tools:heading]{SpaDES.tools::heading()}} \tab Determines the heading between \verb{SpatialPoints*}\cr
 \code{\link[quickPlot:makeLines]{quickPlot::makeLines()}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
-\code{\link[SpaDES.tools:crw]{move()}} \tab A meta function that can currently only take "crw"\cr
-\code{\link[SpaDES.tools:specnumperpatch-probs]{specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
+\code{\link[SpaDES.tools:move]{move()}} \tab A meta function that can currently only take "crw"\cr
+\code{\link[SpaDES.tools:specificNumPerPatch]{specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
 }
 }
 
@@ -331,11 +331,11 @@ They are intended to make translations from SELES (https://www.gowlland.ca/).
 You must know how to use SELES for these to be useful:
 
 \tabular{ll}{
-\code{\link[SpaDES.tools:SELESagentLocation]{agentLocation()}} \tab Agent location\cr
+\code{\link[SpaDES.tools:agentLocation]{agentLocation()}} \tab Agent location\cr
 \code{\link[SpaDES.tools:initiateAgents]{SpaDES.tools::initiateAgents()}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
-\code{\link[SpaDES.tools:SELESnumAgents]{numAgents()}} \tab Number of agents\cr
-\code{\link[SpaDES.tools:SELESprobInit]{probInit()}} \tab Probability of initiating an agent or event\cr
-\code{\link[SpaDES.tools:SELEStransitions]{transitions()}} \tab Transition probability\cr
+\code{\link[SpaDES.tools:numAgents]{numAgents()}} \tab Number of agents\cr
+\code{\link[SpaDES.tools:probInit]{probInit()}} \tab Probability of initiating an agent or event\cr
+\code{\link[SpaDES.tools:transitions]{transitions()}} \tab Transition probability\cr
 }
 }
 
