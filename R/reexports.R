@@ -15,6 +15,8 @@ extractInequality <- getFromNamespace("extractInequality", "Require")
 GETWauthThenNonAuth <- getFromNamespace("GETWauthThenNonAuth", "Require")
 getGitCredsToken <- getFromNamespace("getGitCredsToken", "Require")
 trimRedundancies <- getFromNamespace("trimRedundancies", "Require")
+isAre <- getFromNamespace("isAre", "Require")
+singularPlural <- getFromNamespace("singularPlural", "Require")
 
 getDrv <- getFromNamespace("getDrv", "reproducible")
 isWindows <- getFromNamespace("isWindows", "reproducible")
