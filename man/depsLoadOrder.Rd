@@ -12,7 +12,7 @@
 \arguments{
 \item{sim}{A \code{simList} object.}
 
-\item{simGraph}{An \code{\link[=igraph]{igraph()}} object produced by \code{\link[=depsGraph]{depsGraph()}}.}
+\item{simGraph}{An \link[igraph:aaa-igraph-package]{igraph::igraph} object produced by \code{\link[=depsGraph]{depsGraph()}}.}
 }
 \value{
 Character vector of module names, sorted in correct load order.

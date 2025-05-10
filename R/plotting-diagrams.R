@@ -285,7 +285,7 @@ setMethod(
 #'
 #' @return invoked for its side effect of plotting the module dependency diagram.
 #'
-#' @seealso [igraph()], [moduleGraph()] for a version that accounts for
+#' @seealso [igraph::igraph], [moduleGraph()] for a version that accounts for
 #' parent and children module structure.
 #'
 #' @include simList-accessors.R
@@ -484,7 +484,7 @@ setMethod(
 #'
 #' @param ... Arguments passed to `Plot`
 #'
-#' @return A list with 2 elements, an [igraph()] object and an `igraph` communities object.
+#' @return A list with 2 elements, an [igraph::igraph] object and an `igraph` communities object.
 #'
 #' @author Eliot McIntire
 #' @export

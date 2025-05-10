@@ -13,16 +13,14 @@ if (!isGeneric("Copy")) {
 #' As one `simList` object changes so will the other.
 #' When this is not the desired behaviour, use this function.
 #'
-#' @note uses capital C, to limit confusion with e.g., `data.table::copy()`.
-#'
-#' @seealso [reproducible::Copy()]
+#' @note uses capital C, to limit confusion with e.g., [data.table::copy()].
 #'
 #' @inheritParams reproducible::Copy
 #'
 #' @param objects  Whether the objects contained within the `simList` environment
 #'                 should be copied. Default `TRUE`, which may be slow.
 #' @param queues Logical. Should the events queues (`events`, `current`, `completed`)
-#'               be deep copied via `data.table::copy()`
+#'               be deep copied via [data.table::copy()]
 #'
 #' @param modules Logical. Should list of modules be copied.
 #'
