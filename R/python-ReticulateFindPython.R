@@ -11,7 +11,7 @@
 #' If Git is available, `reticulate` will clone the
 #' \href{https://github.com/pyenv-win/pyenv-win}{pyenv-win Github repository}
 #' and use the tool to install Python.
-#' If Git is not available, this function will instead download the tool
+#' If Git is not available, this function will instead download the latest version
 #' directly from the repository and make it available to `reticulate`.
 #'
 #' @param version character. Python version or a comma separated list of version constraints.
@@ -127,8 +127,15 @@ reticulate_python_path <- function(version = NULL, pyenvRoot = NULL, pyenvOnly =
 
 #' Reticulate: Install Python on Windows
 #'
-#' Download and use the \href{https://pypi.org/project/pyenv-win/}{pyenv-win}
-#' Python version management tool from Github if necessary.
+#' Download and use the latest version of the
+#' \href{https://pypi.org/project/pyenv-win/}{pyenv-win}
+#' Python version management tool to install Python on Windows.
+#'
+#' If Git is available, `reticulate` will clone the
+#' \href{https://github.com/pyenv-win/pyenv-win}{pyenv-win Github repository}
+#' and use the tool to install Python.
+#' If Git is not available, this function will instead download the latest version
+#' directly from the repository and make it available to `reticulate`.
 #'
 #' @param version character. Python version string.
 #' @param pyenvRoot character. Path of location for install of the pyenv-win tool.
@@ -151,61 +158,73 @@ reticulate_install_python_windows <- function(
   if (is.null(pyenvRoot)) pyenvRoot <- R_user_dir("SpaDES.core")
   pyenvDir <- file.path(pyenvRoot, "pyenv-win")
 
-  if (!file.exists(pyenvDir)){
+  # Check if Git is available on system
+  reqAvailable <- c(
+    git = ifelse(!useGit, FALSE, suppressWarnings(tryCatch({
+      system("git --version", intern = TRUE)
+      TRUE
+    }, error = function(e) FALSE)))
+  )
 
-    # Check if Git is available on system
-    reqAvailable <- c(
-      git = ifelse(!useGit, FALSE, suppressWarnings(tryCatch({
-        system("git --version", intern = TRUE)
-        TRUE
-      }, error = function(e) FALSE)))
-    )
+  # If Git not available: check if pyenv is available
+  if (!reqAvailable[["git"]]){
 
-    # If Git not available: check if pyenv is available
-    if (!reqAvailable[["git"]]){
+    reqAvailable[["pyenv"]] <- suppressWarnings(tryCatch({
+      system("pyenv --version", intern = TRUE)
+      TRUE
+    }, error = function(e) FALSE))
+  }
 
-      reqAvailable[["pyenv"]] <- suppressWarnings(tryCatch({
-        system("pyenv --version", intern = TRUE)
-        TRUE
-      }, error = function(e) FALSE))
+  # If neither Git or pyenv is available: install pyenv-win directly from Github
+  dlPyenv <- !any(reqAvailable)
+
+  if (dlPyenv & !file.exists(pyenvDir) & prompt){
+
+    ans <- readline("Type Y to download the pyenv-win tool for managing Python installations ")
+
+    if (!identical(trimws(tolower(ans)), "y")){
+      message(col_yellow(
+        "pyenv-win not downloaded; reticulate will try to install Python without it"))
+      dlPyenv <- FALSE
     }
+  }
 
-    # If neither Git or pyenv is available: install pyenv-win directly from Github
-    if (!any(reqAvailable)){
+  if (dlPyenv){
 
-      dlPyenv <- TRUE
+    # Create temporary directory
+    tempDir <- tempfile()
+    dir.create(tempDir)
+    on.exit(unlink(tempDir, recursive = TRUE))
 
-      if (prompt){
+    # Download URL & unzip
+    tempZip <- file.path(tempDir, "master.zip")
+    download.file("https://github.com/pyenv-win/pyenv-win/archive/master.zip",
+                  destfile = tempZip, quiet = TRUE)
+    unzip(tempZip, exdir = tempDir)
 
-        ans <- readline("Type Y to download the pyenv-win tool for managing Python installations ")
+    if (!file.exists(pyenvDir)){
 
-        if (!identical(trimws(tolower(ans)), "y")){
+      # Unzip and move to destination path
+      dir.create(pyenvRoot, recursive = TRUE, showWarnings = FALSE)
+      res <- suppressWarnings(
+        file.rename(file.path(tempDir, "pyenv-win-master"), pyenvDir))
+      if (!res) message(col_yellow(
+        "pyenv-win download failed; reticulate will try to install Python without it"))
 
-          dlPyenv <- FALSE
+    }else{
 
-          warning("reticulate may not be able install Python without pyenv-win")
-        }
-      }
+      # Replace libexec and bin directories
+      ## https://github.com/pyenv-win/pyenv-win?tab=readme-ov-file#how-to-update-pyenv
+      for (dir in c("libexec", "bin")){
 
-      if (dlPyenv){
-
-        # Create temporary directory
-        tempDir <- tempfile()
-        dir.create(tempDir)
-        on.exit(unlink(tempDir, recursive = TRUE))
-
-        # Download URL
-        tempZip <- file.path(tempDir, "master.zip")
-        download.file("https://github.com/pyenv-win/pyenv-win/archive/master.zip",
-                      destfile = tempZip, quiet = TRUE)
-
-        # Unzip and move to destination path
-        unzip(tempZip, exdir = tempDir)
-
-        dir.create(pyenvRoot, recursive = TRUE, showWarnings = FALSE)
-        tryCatch(
-          file.rename(file.path(tempDir, "pyenv-win-master"), pyenvDir),
-          warning = function(w) stop(w, call. = FALSE))
+        res <- suppressWarnings(
+          file.copy(file.path(tempDir, "pyenv-win-master", "pyenv-win", dir),
+                    file.path(pyenvDir, "pyenv-win"),
+                    recursive = TRUE, overwrite = TRUE))
+        if (!res) stop(
+          "pyenv-win update failed due to being unable to overwrite directory: ",
+          file.path(pyenvDir, "pyenv-win", dir),
+          "\nTry refreshing R session")
       }
     }
   }

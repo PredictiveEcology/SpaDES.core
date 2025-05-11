@@ -44,6 +44,6 @@ without pyenv-win already installed.
 If Git is available, \code{reticulate} will clone the
 \href{https://github.com/pyenv-win/pyenv-win}{pyenv-win Github repository}
 and use the tool to install Python.
-If Git is not available, this function will instead download the tool
+If Git is not available, this function will instead download the latest version
 directly from the repository and make it available to \code{reticulate}.
 }

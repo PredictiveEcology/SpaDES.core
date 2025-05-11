@@ -22,7 +22,15 @@ Defaults to the R user data directory.}
 \item{prompt}{logical. Prompt user to approve download of pyenv-win tool.}
 }
 \description{
-Download and use the \href{https://pypi.org/project/pyenv-win/}{pyenv-win}
-Python version management tool from Github if necessary.
+Download and use the latest version of the
+\href{https://pypi.org/project/pyenv-win/}{pyenv-win}
+Python version management tool to install Python on Windows.
+}
+\details{
+If Git is available, \code{reticulate} will clone the
+\href{https://github.com/pyenv-win/pyenv-win}{pyenv-win Github repository}
+and use the tool to install Python.
+If Git is not available, this function will instead download the latest version
+directly from the repository and make it available to \code{reticulate}.
 }
 \keyword{internal}
