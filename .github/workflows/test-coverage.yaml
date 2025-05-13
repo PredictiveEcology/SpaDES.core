@@ -35,13 +35,11 @@ jobs:
           extra-packages: |
             any::covr
             PredictiveEcology/reproducible@development
-            fastshp=?ignore
             NLMR=?ignore
 
       - name: Install additional package dependencies
         run: |
           pak::pkg_install("ropensci/NLMR")
-          pak::pkg_install("s-u/fastshp")
         shell: Rscript {0}
 
       - name: Test coverage
