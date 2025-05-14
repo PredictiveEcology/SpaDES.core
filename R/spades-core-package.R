@@ -154,7 +154,7 @@
 #'
 #'   \tabular{ll}{
 #'      [envir()] \tab Access the environment of the `simList` directly (advanced)\cr
-#'      [copy()] \tab Deep copy of a `simList.` (advanced)\cr
+#'      [SpaDES.core::Copy()] \tab Deep copy of a `simList`. (advanced)\cr
 #'   }
 #' }
 #'
@@ -242,7 +242,7 @@
 #'   \tabular{ll}{
 #'     [SpaDES.tools::adj()] \tab An optimized (i.e., faster) version of [terra::adjacent()]\cr
 #'     [SpaDES.tools::cir()] \tab Identify pixels in a circle around a [`SpatialPoints*()`][sp::SpatialPoints-class] object\cr
-#'     [`directionFromEachPoint()`][SpaDES.tools::distanceFromEachPoint] \tab Fast calculation of direction and distance surfaces\cr
+#'     [SpaDES.tools::directionFromEachPoint()] \tab Fast calculation of direction and distance surfaces\cr
 #'     [SpaDES.tools::distanceFromEachPoint()] \tab Fast calculation of distance surfaces\cr
 #'     [SpaDES.tools::rings()] \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
 #'     [SpaDES.tools::spokes()] \tab Identify outward radiating spokes from initial points\cr
@@ -259,8 +259,8 @@
 #'     [SpaDES.tools::crw()] \tab Simple correlated random walk function\cr
 #'     [SpaDES.tools::heading()] \tab Determines the heading between `SpatialPoints*`\cr
 #'     [quickPlot::makeLines()] \tab Makes `SpatialLines` object for, e.g., drawing arrows\cr
-#'     [`move()`][SpaDES.tools::move] \tab A meta function that can currently only take "crw"\cr
-#'     [`specificNumPerPatch()`][SpaDES.tools::specificNumPerPatch] \tab Initiate a specific number of agents per patch\cr
+#'     [SpaDES.tools::move()] \tab A meta function that can currently only take "crw"\cr
+#'     [SpaDES.tools::specificNumPerPatch()] \tab Initiate a specific number of agents per patch\cr
 #'   }
 #' }
 #'
@@ -270,7 +270,7 @@
 #'   and many others), we provide the following GIS-related functions:
 #'
 #'   \tabular{ll}{
-#'     [equalExtent()] \tab Assess whether a list of extents are all equal\cr
+#'     [quickPlot::equalExtent()] \tab Assess whether a list of extents are all equal\cr
 #'   }
 #' }
 #'
@@ -289,9 +289,9 @@
 #'   Here are several helper functions to add to, set and get colours of `Raster*` objects:
 #'
 #'   \tabular{ll}{
-#'     [`setColors()`][quickPlot::setColors] \tab Set colours for plotting `Raster*` objects\cr
-#'     [getColors()] \tab Get colours in a `Raster*` objects\cr
-#'     [divergentColors()] \tab Create a colour palette with diverging colours around a middle\cr
+#'     [quickPlot::setColors()] \tab Set colours for plotting `Raster*` objects\cr
+#'     [quickPlot::getColors()] \tab Get colours in a `Raster*` objects\cr
+#'     [quickPlot::divergentColors()] \tab Create a colour palette with diverging colours around a middle\cr
 #'   }
 #' }
 #'
@@ -310,7 +310,7 @@
 #'   These are helpers for assessing this:
 #'
 #'   \tabular{ll}{
-#'     [checkObject()] \tab Check for a existence of an object within a `simList` \cr
+#'     [SpaDES.core::checkObject()] \tab Check for a existence of an object within a `simList` \cr
 #'     [reproducible::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
 #'   }
 #' }
@@ -321,11 +321,11 @@
 #'   You must know how to use SELES for these to be useful:
 #'
 #'   \tabular{ll}{
-#'     [`agentLocation()`][SpaDES.tools::agentLocation] \tab Agent location\cr
+#'     [SpaDES.tools::agentLocation()] \tab Agent location\cr
 #'     [SpaDES.tools::initiateAgents()] \tab Initiate agents into a `SpatialPointsDataFrame`\cr
-#'     [`numAgents()`][SpaDES.tools::numAgents] \tab Number of agents\cr
-#'     [`probInit()`][SpaDES.tools::probInit] \tab Probability of initiating an agent or event\cr
-#'     [`transitions()`][SpaDES.tools::transitions] \tab Transition probability\cr
+#'     [SpaDES.tools::numAgents()] \tab Number of agents\cr
+#'     [SpaDES.tools::probInit()] \tab Probability of initiating an agent or event\cr
+#'     [SpaDES.tools::transitions()] \tab Transition probability\cr
 #'   }
 #' }
 #'
@@ -334,9 +334,9 @@
 #'
 #'   \tabular{ll}{
 #'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range `[a,b]`\cr
-#'     [layerNames()] \tab Get layer names for numerous object classes\cr
-#'     [numLayers()] \tab Return number of layers\cr
-#'     [paddedFloatToChar()] \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
+#'     [quickPlot::layerNames()] \tab Get layer names for numerous object classes\cr
+#'     [quickPlot::numLayers()] \tab Return number of layers\cr
+#'     [reproducible::paddedFloatToChar()] \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
 #'   }
 #' }
 #'
@@ -371,25 +371,25 @@
 #'
 #' Commonly used:
 #' \tabular{ll}{
-#'   [Plot()] \tab The workhorse plotting function\cr
+#'   [quickPlot::Plot()] \tab The workhorse plotting function\cr
 #' }
 #'
 #' Simulation diagrams:
 #' \tabular{ll}{
-#'   [eventDiagram()] \tab Gantt chart representing the events in a completed simulation.\cr
-#'   [moduleDiagram()] \tab Network diagram of simplified module (object) dependencies.\cr
-#'   [objectDiagram()] \tab Sequence diagram of detailed object dependencies.\cr
+#'   [SpaDES.core::eventDiagram()] \tab Gantt chart representing the events in a completed simulation.\cr
+#'   [SpaDES.core::moduleDiagram()] \tab Network diagram of simplified module (object) dependencies.\cr
+#'   [SpaDES.core::objectDiagram()] \tab Sequence diagram of detailed object dependencies.\cr
 #' }
 #'
 #' Other useful plotting functions:
 #' \tabular{ll}{
-#'   [clearPlot()] \tab Helpful for resolving many errors\cr
-#'   [clickValues()] \tab Extract values from a raster object at the mouse click location(s)\cr
-#'   [clickExtent()] \tab Zoom into a raster or polygon map that was plotted with [Plot()]\cr
-#'   [clickCoordinates()] \tab Get the coordinates, in map units, under mouse click\cr
-#'   [dev()] \tab Specify which device to plot on, making a non-RStudio one as default\cr
-#'   [newPlot()] \tab Open a new default plotting device\cr
-#'   [rePlot()] \tab Re-plots all elements of device for refreshing or moving plot\cr
+#'   [quickPlot::clearPlot()] \tab Helpful for resolving many errors\cr
+#'   [quickPlot::clickValues()] \tab Extract values from a raster object at the mouse click location(s)\cr
+#'   [quickPlot::clickExtent()] \tab Zoom into a raster or polygon map that was plotted with [quickPlot::Plot()]\cr
+#'   [quickPlot::clickCoordinates()] \tab Get the coordinates, in map units, under mouse click\cr
+#'   [quickPlot::dev()] \tab Specify which device to plot on, making a non-RStudio one as default\cr
+#'   [quickPlot::newPlot()] \tab Open a new default plotting device\cr
+#'   [quickPlot::rePlot()] \tab Re-plots all elements of device for refreshing or moving plot\cr
 #' }
 #'
 #' @section 8 File operations:
