@@ -1,5 +1,5 @@
 ##  SpaDES.core/R/SpaDES-core-package.R by Alex M Chubaty and Eliot J B McIntire
-##  Copyright (C) 2015-2023 His Majesty the Queen in Right of Canada,
+##  Copyright (C) 2015-2025 His Majesty the Queen in Right of Canada,
 ##  as represented by the Minister of Natural Resources Canada
 ##
 
