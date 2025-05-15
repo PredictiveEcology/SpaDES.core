@@ -154,7 +154,7 @@
 #'
 #'   \tabular{ll}{
 #'      [envir()] \tab Access the environment of the `simList` directly (advanced)\cr
-#'      [SpaDES.core::Copy()] \tab Deep copy of a `simList`. (advanced)\cr
+#'      \code{\link[SpaDES.core:Copy]{Copy()}} \tab Deep copy of a `simList`. (advanced)\cr
 #'   }
 #' }
 #'
