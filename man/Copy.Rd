@@ -36,7 +36,7 @@ in pass-by-reference objects (e.g., \code{data.table} class), and objects that a
 file-backed, such as some \verb{Raster*}-class objects. For all the objects that
 are file-backed, it is likely \emph{very} important to give unique file-backed
 directories. This should be passed here, which gets passed on to the many methods
-of \code{Copy} in \code{reproducible}.
+of \code{\link[reproducible:Copy]{reproducible::Copy()}}.
 }
 \note{
 uses capital C, to limit confusion with e.g., \code{\link[data.table:copy]{data.table::copy()}}.

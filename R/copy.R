@@ -32,7 +32,7 @@ if (!isGeneric("Copy")) {
 #' file-backed, such as some `Raster*`-class objects. For all the objects that
 #' are file-backed, it is likely *very* important to give unique file-backed
 #' directories. This should be passed here, which gets passed on to the many methods
-#' of `Copy` in `reproducible`.
+#' of [reproducible::Copy()].
 #'
 #' @author Eliot McIntire
 #' @exportMethod Copy
@@ -56,14 +56,14 @@ setMethod("Copy",
               sim_@current <- object@current
               list2env(as.list(object@completed), envir = sim_@completed)
             }
-            #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
-            #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
+            # sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            # sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
             sim_@.xData <- new.env(parent = emptyenv())
             sim_@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
             attr(sim_@.xData, "name") <- "sim"
 
 
-            # # set up mod environments, including .objects
+            ## set up mod environments, including .objects
             for (modNam in names(object@.xData$.mods)) {
               sim_ <- newEnvsByModule(sim_, modNam)
             }
@@ -75,7 +75,6 @@ setMethod("Copy",
                        envir = sim_@.xData)
             }
             if (objects > 0) {
-
               # browser(expr = exists("._Copy_6"))
               objNames <- ls(object@.xData$.mods, all.names = TRUE)
               if (isTRUE(is.character(modules))) {
@@ -86,16 +85,16 @@ setMethod("Copy",
                                      function(obj) {
                                        is.environment(get(obj, envir = object@.xData$.mods))
                                      }))
-              # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
+              ## Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
 
               if (objects == 1) {
-                # Copy the whole environment, recursively through environments
+                ## Copy the whole environment, recursively through environments
                 sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
               }
 
-              # This chunk makes the environment of each function in a module,
-              #   the module itself. This is unique to functions in `simList` objs
-              #   i.e., can't rely on generic reproducible::Copy
+              ## This chunk makes the environment of each function in a module,
+              ##   the module itself. This is unique to functions in `simList` objs
+              ##   i.e., can't rely on generic reproducible::Copy
               lapply(objNames[isEnv], function(en) {
                 list2env(as.list(object@.xData$.mods[[en]], all.names = TRUE),
                          envir = sim_@.xData$.mods[[en]])
@@ -103,11 +102,10 @@ setMethod("Copy",
                   if (is.function(get(obj, envir = sim_@.xData$.mods[[en]]))) {
                     environment(sim_@.xData$.mods[[en]][[obj]]) <- sim_@.xData$.mods[[en]]
                   }
-                }
-                ))
+                }))
               })
 
-              # Copy .objects
+              ## Copy .objects
               modsToCopy <- modules(sim_)
               if (is.character(modules)) {
                 modsToCopy <- intersect(modules, modsToCopy)
@@ -121,7 +119,7 @@ setMethod("Copy",
                 }
               })
 
-              # Deal with activeBindings
+              ## Deal with activeBindings
               makeSimListActiveBindings(sim_)
             }
             sim_@.envir <- sim_@.xData
