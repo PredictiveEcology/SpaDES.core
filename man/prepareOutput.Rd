@@ -6,20 +6,12 @@
 \usage{
 \S4method{.prepareOutput}{simList}(object, cachePath, ...)
 }
-\arguments{
-\item{object}{Any R object returned from a function}
-
-\item{cachePath}{A repository used for storing cached objects.
-This is optional if \code{Cache} is used inside a SpaDES module.}
-
-\item{...}{Anything passed to methods.}
-}
 \value{
 the modified \code{object}
 }
 \description{
-See \code{\link[reproducible:exportedMethods]{reproducible::.prepareOutput()}}.
+See \code{\link[reproducible:.prepareOutput]{reproducible::.prepareOutput()}}.
 }
 \seealso{
-\link[reproducible:exportedMethods]{reproducible::.prepareOutput}
+\link[reproducible:.prepareOutput]{reproducible::.prepareOutput}
 }

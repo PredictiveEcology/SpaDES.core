@@ -7,8 +7,6 @@
 \S4method{Copy}{simList}(object, objects, queues, modules, ...)
 }
 \arguments{
-\item{object}{An R object (likely containing environments) or an environment.}
-
 \item{objects}{Whether the objects contained within the \code{simList} environment
 should be copied. Default \code{TRUE}, which may be slow.}
 
@@ -16,8 +14,6 @@ should be copied. Default \code{TRUE}, which may be slow.}
 be deep copied via \code{data.table::copy()}}
 
 \item{modules}{Logical. Should list of modules be copied.}
-
-\item{...}{Only used for custom Methods}
 }
 \value{
 a copy of \code{object}

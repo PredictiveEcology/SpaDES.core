@@ -366,9 +366,9 @@ See example in \code{\link[=spades]{spades()}}, achieved by using \code{cache = 
 
 \tabular{ll}{
 \code{\link[reproducible:Cache]{reproducible::Cache()}} \tab Caches a function, but often accessed as argument in \code{\link[=spades]{spades()}}\cr
-\code{\link[reproducible:viewCache]{reproducible::showCache()}} \tab Shows information about the objects in the cache\cr
-\code{\link[reproducible:viewCache]{reproducible::clearCache()}} \tab Removes objects from the cache\cr
-\code{\link[reproducible:viewCache]{reproducible::keepCache()}} \tab Keeps only the objects described\cr
+\code{\link[reproducible:showCache]{reproducible::showCache()}} \tab Shows information about the objects in the cache\cr
+\code{\link[reproducible:clearCache]{reproducible::clearCache()}} \tab Removes objects from the cache\cr
+\code{\link[reproducible:keepCache]{reproducible::keepCache()}} \tab Keeps only the objects described\cr
 }
 
 A module developer can build caching into their module by creating cached versions of their

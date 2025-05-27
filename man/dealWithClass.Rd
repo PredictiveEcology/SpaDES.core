@@ -39,43 +39,10 @@
 )
 }
 \arguments{
-\item{obj}{Any arbitrary R object.}
-
-\item{cachePath}{A repository used for storing cached objects.
-This is optional if \code{Cache} is used inside a SpaDES module.}
-
-\item{preDigest}{The list of \code{preDigest} that comes from \code{CacheDigest} of an object}
-
 \item{drv}{an object that inherits from \code{DBIDriver}, or an existing
 \code{DBIConnection} object (in order to clone an existing connection).}
 
 \item{conn}{A \code{DBIConnection} object, as returned by \code{dbConnect()}.}
-
-\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
-1 showing more messaging, 2 being more messaging, etc.
-Default is 1. Above 3 will output much more information about the internals of
-Caching, which may help diagnose Caching challenges. Can set globally with an
-option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
-
-\item{outputObjects}{Optional character vector indicating which objects to
-return. This is only relevant for list, environment (or similar) objects}
-
-\item{cacheId}{An optional character vector describing the \code{cacheId}s to extract.
-Only entries with this/these \code{cacheId}s will be returned. If \code{useDBI(FALSE)},
-this will also be dramatically faster than using \code{userTags}, for a large
-cache.}
-
-\item{...}{Other arguments. Can be in the form of \code{tagKey = tagValue}, such as,
-\code{class = "numeric"} to find all entries that are numerics in the cache.
-Note: the special cases of \code{cacheId} and \code{fun} have their own
-named arguments in these functions.
-Also can be \code{regexp = xx}, where \code{xx} is \code{TRUE} if the user
-is passing a regular expression.
-Otherwise, \code{userTags} will need to be exact matches. Default is
-missing, which is the same as \code{TRUE}. If there are errors due
-to regular expression problem, try \code{FALSE}. For \code{cc}, it is
-passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
-it can also be \code{sorted = FALSE} to return the object unsorted.}
 }
 \value{
 The same object as passed into the function, but dealt with so that it can be
