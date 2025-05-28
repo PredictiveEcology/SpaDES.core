@@ -42,8 +42,10 @@ activeModBindingFunction <- function(value) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
         mod <- currentModule(sim)
-        if (length(mod) && !is.null(sim@.xData$.mods[[mod]]))
-          ret <- get(".objects", envir = sim@.xData$.mods[[mod]], inherits = FALSE)
+        if (length(mod) && !is.null(sim@.xData[[dotObjs]][[mod]])) {
+          ret <- get(mod, envir = sim@.xData[[dotObjs]], inherits = FALSE)
+          # ret <- get(".objects", envir = sim@.xData[[dotObjs]][[mod]], inherits = FALSE)
+        }
       }
     }
   } else {
