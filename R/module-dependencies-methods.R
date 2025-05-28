@@ -269,33 +269,64 @@ setMethod(".depsLoadOrder",
               loadOrdersInMetaData <- Map(mod = sim@depends@dependencies, function(mod) {
                 if (length(mod@loadOrder)) mod@loadOrder else NULL})
               loadOrdersInMetaData <- loadOrdersInMetaData[!vapply(loadOrdersInMetaData, is.null, FUN.VALUE = logical(1))]
+              loadOrdersInMetaDataOrig <- loadOrdersInMetaData
 
               if (length(loadOrdersInMetaData)) {
-                dt <- as.data.table(as_data_frame(simGraph))
 
-                Map(lo = loadOrdersInMetaData, nam = names(loadOrdersInMetaData),
-                    function(lo, nam) {
-                      lapply(lo[["after"]], function(aft) {
-                        a <- setDT(list(from = aft, to = nam, objName = .rndstr(1)))
-                        dt <<- rbindlist(list(dt, a), fill = TRUE)
+                # keepTrying <- TRUE
+                iter <- 0L
+                needFindFail <- FALSE
+                rmTry <- as.data.table(expand.grid(nam = names(loadOrdersInMetaDataOrig),
+                                                   befAf = c("before", "after")))
+                iters <- seq(0L, NROW(rmTry))
+                for (iter in iters) {
+                  # while(keepTrying %in% TRUE) {
+                  dt <- as.data.table(as_data_frame(simGraph))
+
+                  Map(lo = loadOrdersInMetaData, nam = names(loadOrdersInMetaData),
+                      function(lo, nam) {
+                        if (iter == 0 || iter > 0 && rmTry$befAf[iter] == "after")
+                          lapply(lo[["after"]], function(aft) {
+                            a <- setDT(list(from = aft, to = nam, objName = .rndstr(1)))
+                            dt <<- rbindlist(list(dt, a), fill = TRUE)
+                          })
+                        if (iter == 0 || iter > 0 && rmTry$befAf[iter] == "before")
+                          lapply(lo[["before"]], function(bef) {
+                            a <- setDT(list(from = nam, to = bef, objName = .rndstr(1)))
+                            dt <<- rbindlist(list(dt, a), fill = TRUE)
+                          })
                       })
-                      lapply(lo[["before"]], function(bef) {
-                        a <- setDT(list(from = nam, to = bef, objName = .rndstr(1)))
-                        dt <<- rbindlist(list(dt, a), fill = TRUE)
-                      })
-                    })
-                simGraph2 <- graph_from_data_frame(dt)
-                tsort <- try(topo_sort(simGraph2, "out"), silent = TRUE)
-                if (exists("tsort", inherits = FALSE))
-                  if (!is(tsort, "try-error")) {
-                    doTopoSort <- FALSE
-                    simGraph <- simGraph2
-                  } else {
-                    message("Could not automatically determine module order, even with `loadOrder` metadata; ",
-                            "it may be wise to set the order manually and pass to `simInit(... loadOrder = xxx)`")
+                  simGraph2 <- graph_from_data_frame(dt)
+                  tsort <- try(topo_sort(simGraph2, "out"), silent = TRUE)
+                  if (exists("tsort", inherits = FALSE))
+                    if (!is(tsort, "try-error") && iter == 0) {
+                      doTopoSort <- FALSE
+                      simGraph <- simGraph2
+                      # keepTrying <- FALSE
+                      break
+                    } else {
+                      if (iter > 0)
+                        set(rmTry, iter, "OK", !is(tsort, "try-error"))
+                      # iter <- iter + 1L
+                      needFindFail <- TRUE
+                      tryRmMod <- names(loadOrdersInMetaDataOrig)[iter]
+                      loadOrdersInMetaData <- loadOrdersInMetaDataOrig[tryRmMod]
+                      # message("Could not automatically determine module order, even with `loadOrder` metadata; ",
+                      #         "it may be wise to set the order manually and pass to `simInit(... loadOrder = xxx)`")
+                    }
+                }
+                if (iter > 0L) {
+                  if (any(rmTry$OK %in% FALSE)) {
+                    imposs <- rmTry[rmTry$OK %in% FALSE]
+                    warning("There is an impossible cyclic dependency in the metadata entry for loadOrder in ",
+                            paste0(imposs$nam, ": ", imposs$befAf, collapse = ", "))
                   }
+                  message("Could not automatically determine module order, even with `loadOrder` metadata; ",
+                          "it may be wise to set the order manually and pass to `simInit(... loadOrder = xxx)`")
+                }
               }
             }
+
             if (doTopoSort) {
               tsort <- topo_sort(simGraph, "out")
             }
@@ -352,4 +383,4 @@ setMethod(".depsLoadOrder",
               loadOrder <- c(loadOrder, noDeps)
             }
             return(loadOrder)
-})
+          })
