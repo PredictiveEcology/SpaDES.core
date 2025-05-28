@@ -18,6 +18,12 @@ selectMethod("show", "igraph")
 #'              so that only a single arrow is drawn connecting the modules.
 #'              Default is `FALSE`.
 #'
+#' @param includeOutputs Logical indicating whether objects that are only "outputs"
+#'   will be kept and labelled as _OUTPUTS_ analogous to _INPUTS_. This is relevant
+#'   in the case of `objectSynonyms`. If an object is not used by another module
+#'   then it will be removed from this `depsEdgeList` return; this keeps these
+#'   so can be determined if they are e.g., `suppliedElsewhere`.
+#'
 #' @return A `data.table` whose first two columns give a list of edges
 #'          and remaining columns the attributes of the dependency objects
 #'          (object name, class, etc.).
@@ -28,7 +34,7 @@ selectMethod("show", "igraph")
 #' @include simList-class.R
 #' @rdname depsEdgeList
 #'
-setGeneric("depsEdgeList", function(sim, plot) {
+setGeneric("depsEdgeList", function(sim, plot, includeOutputs = FALSE) {
   standardGeneric("depsEdgeList")
 })
 
@@ -36,9 +42,9 @@ setGeneric("depsEdgeList", function(sim, plot) {
 setMethod(
   "depsEdgeList",
   signature(sim = "simList", plot = "logical"),
-  definition = function(sim, plot) {
+  definition = function(sim, plot, includeOutputs = FALSE) {
     deps <- sim@depends
-    DT <- .depsEdgeList(deps, plot)
+    DT <- .depsEdgeList(deps, plot, includeOutputs = includeOutputs)
     correctOrd <- unlist(sim@modules, use.names = FALSE)
     DT[, fromOrd := factor(from, levels = correctOrd)]
     DT[, toOrd := factor(to, levels = correctOrd)]
@@ -50,11 +56,11 @@ setMethod(
 setMethod("depsEdgeList",
           signature(sim = "simList", plot = "missing"),
           definition = function(sim, plot) {
-            depsEdgeList(sim, plot = FALSE)
+            depsEdgeList(sim, plot = FALSE, includeOutputs = FALSE)
 })
 
 #' @importFrom data.table as.data.table data.table rbindlist setkeyv setorder
-.depsEdgeList <- function(deps, plot) {
+.depsEdgeList <- function(deps, plot, includeOutputs = FALSE) {
   sim.in <- sim.out <- data.table(objectName = character(0),
                                   objectClass = character(0),
                                   module = character(0))
@@ -83,6 +89,17 @@ setMethod("depsEdgeList",
   if ((nrow(sim.in)) && (nrow(sim.out))) {
     dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]
     dx[is.na(module), module := "_INPUT_"]
+
+    if (isTRUE(includeOutputs)) {
+      dy <- sim.in[sim.out, nomatch = NA_character_, allow.cartesian = TRUE]
+      dy[is.na(module), module := "_OUTPUT_"]
+      modImod <- c("module", "i.module")
+      setnames(dy, old = modImod, new = rev(modImod))
+
+      dx <- unique(rbindlist(list(dx, dy), use.names = TRUE))
+    }
+    # dy[grep("nonForest_timeSinceDisturbance", objectName)]
+
     DT <- dx[, list(from = module, to = i.module,
                     objName = objectName, objClass = i.objectClass)]
 
