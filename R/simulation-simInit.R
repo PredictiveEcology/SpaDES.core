@@ -1444,6 +1444,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       if (!(FALSE %in% debug || any(is.na(debug)))) {
         sim <- objectsCreatedPost(sim, objsIsNullBefore)
       }
+      printDebugPrint() # this is getOption("spades.debugPrint")
     }
   } else {
     message(

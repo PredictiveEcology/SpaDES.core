@@ -1443,6 +1443,7 @@ setMethod(
   if (debugToVerbose(debug)) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore)
   }
+  printDebugPrint() # this is getOption("spades.debugPrint")
 
   ## Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
