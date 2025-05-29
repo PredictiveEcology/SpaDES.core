@@ -1481,15 +1481,31 @@ lsModObjectsChanged <- function(namesAllMods, changedObjs, hasDotObjs) {
 #' This will clear only the event- and module-level caching that is triggered
 #' using a module parameter, `.useCache`.
 #'
-#' @inheritParams clearCache
+#' @inheritParams reproducible::clearCache
+#' @param dryRun logical. If `FALSE`, the default, then the function will deleted
+#'   entries in the Cache. If `TRUE`, the function will identify which events and .inputObjects
+#'   will be deleted, without deleting them.
 #' @export
 #' @returns A list of individual `clearCache` outputs, one for each event that was
 #'   cleared.
 clearCacheEventsOnly <- function(ask = TRUE,
-                                 x = getOption("reproducible.cachePath"),
+                                 x = getOption("reproducible.cachePath"), dryRun = FALSE,
                                  verbose = getOption("reproducible.verbose")) {
-  rr <- lapply(unique(showCache(x)[grepl("function", tagKey) &
-                                    (grepl(".inputObjects", tagValue) |
-                                       grepl("doEvent", tagValue)),
-  ]$cacheId), function(y) clearCache(cacheId = y, ask = ask))
+  sc <- showCache(x, verbose = verbose)
+  grepDoEventOrDotInputObjects <- quote(grepl("function", tagKey) & (grepl(".inputObjects", tagValue) |
+                                                                       grepl("doEvent", tagValue)))
+  cacheIds <- unique(sc[eval(grepDoEventOrDotInputObjects)
+  ]$cacheId)
+  if (isTRUE(dryRun))
+    messageVerbose(verbose = verbose, "dryRun = TRUE, no clearing...")
+
+  rr <- lapply(cacheIds, function(y) {
+    df <- sc[cacheId == y & eval(grepDoEventOrDotInputObjects)]
+    mess <- paste0(df$tagValue)
+    if (isTRUE(dryRun))
+      mess <- paste0("Would remove: ", mess)
+    messageVerbose(verbose = verbose, mess)
+    if (isFALSE(dryRun))
+      clearCache(cacheId = y, ask = ask, verbose = verbose - 1)
+  })
 }
