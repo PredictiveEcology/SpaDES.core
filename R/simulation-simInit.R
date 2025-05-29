@@ -1286,8 +1286,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   # loggingMessage helpers
   simNestingRevert <- sim[[._txtSimNesting]]
   on.exit(sim[[._txtSimNesting]] <- simNestingRevert, add = TRUE)
-  sim[[._txtSimNesting]] <- simNestingOverride(sim, mBase)
-  ._simNestingLocal <- sim[[._txtSimNesting]]
+  sim[[._txtSimNesting]] <- simNestingOverride(sim, sim@current$moduleName)
+  assign(._txtSimNesting, sim[[._txtSimNesting]])
+  # ._simNesting <- sim[[._txtSimNesting]]
 
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
