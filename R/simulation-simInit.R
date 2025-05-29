@@ -1329,11 +1329,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
-        moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(".mods$", m))
-        # excludeSuppliedElsewhere <- Map(x = moduleSpecificInputObjects, function(x) suppliedElsewhere(x, sim = sim, where = "init"))
-        # excludeSuppliedElsewhere <-
-        #   names(excludeSuppliedElsewhere[unlist(excludeSuppliedElsewhere)])
-        # moduleSpecificInputObjects <- setdiff(moduleSpecificInputObjects, excludeSuppliedElsewhere)
+        moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(dotMods, "$", m), paste0(dotObjs, "$", m))
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
