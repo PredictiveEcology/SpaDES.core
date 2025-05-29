@@ -484,7 +484,7 @@ setMethod(
       changedObjs <- out[lengths(out) > 0 | (names(out) %in% modulesInObject)]
 
       changed <- changedObjs
-      if (!any(modulesInObject %in% names(changed))) { # it needs to be nested list
+      if (!any(modulesInObject %in% names(changed)) && NROW(object@current)) { # NROW object@current is for Caching of sim, pre-module running
         currMod <- object@current[[2]]
         changed <- append(changed, list(list()) |> setNames(currMod))
       }
