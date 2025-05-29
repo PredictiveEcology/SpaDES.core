@@ -134,10 +134,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   cur <- sim@current
 
   # loggingMessage helpers
-  simNestingRevert <- sim[["._simNesting"]]
-  on.exit(sim[["._simNesting"]] <- simNestingRevert, add = TRUE)
-  sim[["._simNesting"]] <- simNestingOverride(sim, sim@current$moduleName)
-  ._simNesting <- sim[["._simNesting"]]
+  simNestingRevert <- sim[[._txtSimNesting]]
+  on.exit(sim[[._txtSimNesting]] <- simNestingRevert, add = TRUE)
+  sim[[._txtSimNesting]] <- simNestingOverride(sim, sim@current$moduleName)
+  ._simNesting <- sim[[._txtSimNesting]]
 
   curModuleName <- cur[["moduleName"]]
   if  (length(cur) == 0) {
@@ -319,7 +319,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
             if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
                                       silent = TRUE, error = function(x) FALSE)
             ))
-              stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
+              warning("The module named ", curModuleName, " just deleted the object named 'mod' from ",
                    "sim$", curModuleName, ". ",
                    "Please remove the section of code that does this in the event named: ",
                    cur[["eventType"]])
@@ -867,7 +867,8 @@ setMethod(
 
     # loggingMessage helpers
     ._simNesting <- simNestingSetup(...)
-    sim[["._simNesting"]] <- ._simNesting
+    # sim[[._txtSimNesting]] <- ._simNesting
+    sim[[._txtSimNesting]] <- ._simNesting
 
     opt <- options("encoding" = "UTF-8")
     if (isTRUE(getOption("spades.allowSequentialCaching"))) {
