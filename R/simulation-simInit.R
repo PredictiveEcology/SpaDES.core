@@ -1119,9 +1119,62 @@ spades2 <- function(l) {
 #' @rdname simInitAndSpades
 #' @param l A list of arguments to passed to `simInitAndSpades`.
 simInitAndSpades2 <- function(l) {
-  do.call(simInitAndSpades, l)
+  doCallSafe(simInitAndSpades, l)
 }
 
+
+
+#' Memory safe alternative to `do.call`
+#'
+#' `doCallSafe` is an alternative implementation for `do.call` that does not
+#' evaluate the `args` prior to running. This means that R does not become unresponsive
+#' when there are large objects in the `args`. This should be used *always* instead
+#' of `do.call`, whenever there are possibly large objects within the `args`. This is
+#' a verbatim copy from package `Gmisc` at
+#' \url{https://search.r-project.org/CRAN/refmans/Gmisc/html/fastDoCall.html}
+#'
+#' @returns Same as `do.call`, but without the memory inefficiency.
+#'
+#' @export
+#' @rdname do.call
+#' @inheritParams base::do.call
+doCallSafe <- function (what, args, quote = FALSE, envir = parent.frame()) {
+  # Copied directly from: https://search.r-project.org/CRAN/refmans/Gmisc/html/fastDoCall.html
+  if (quote) {
+    args <- lapply(args, enquote)
+  }
+  if (is.null(names(args)) || is.data.frame(args)) {
+    argn <- args
+    args <- list()
+  }
+  else {
+    argn <- lapply(names(args)[names(args) != ""], as.name)
+    names(argn) <- names(args)[names(args) != ""]
+    argn <- c(argn, args[names(args) == ""])
+    args <- args[names(args) != ""]
+  }
+  if ("character" %in% class(what)) {
+    if (is.character(what)) {
+      fn <- strsplit(what, "[:]{2,3}")[[1]]
+      what <- if (length(fn) == 1) {
+        get(fn[[1]], envir = envir, mode = "function")
+      }
+      else {
+        get(fn[[2]], envir = asNamespace(fn[[1]]), mode = "function")
+      }
+    }
+    call <- as.call(c(list(what), argn))
+  }
+  else if ("function" %in% class(what)) {
+    f_name <- deparse(substitute(what))
+    call <- as.call(c(list(as.name(f_name)), argn))
+    args[[f_name]] <- what
+  }
+  else if ("name" %in% class(what)) {
+    call <- as.call(c(list(what, argn)))
+  }
+  eval(call, envir = args, enclos = envir)
+}
 #' Call `simInit` and `spades` together
 #'
 #' These functions are convenience wrappers that may allow for more efficient caching.
