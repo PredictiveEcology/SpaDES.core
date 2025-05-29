@@ -641,6 +641,8 @@ setMethod(
 
       ## check user-supplied load order & init dependencies
       sim@.xData$._ranInitDuringSimInit <- character()
+      missingInLoadOrder <- setdiff(sim@modules, loadOrder)
+
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
@@ -648,7 +650,17 @@ setMethod(
         sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs)
         if (length(sim@completed))
           sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$module, .coreModules())
-        loadOrder <- unlist(unname(sim@modules))
+        loadOrderPoss <- unlist(unname(sim@modules))
+        if (length(missingInLoadOrder)) {
+          if (any(match(loadOrder, loadOrderPoss) != seq_along(loadOrder))) {
+            warning("loadOrder argument is used, but does not have all the modules in it; ",
+                    "setting modules in loadOrder first, with remaining modules place after... ",
+                    "this may be incorrect behaviour and should likely be changed")
+            modsAfter <- setdiff(loadOrderPoss, loadOrder)
+            loadOrderPoss <- c(loadOrder, modsAfter)
+          }
+        }
+        loadOrder <- loadOrderPoss
       }
 
       mBase <- basename2(unlist(sim@modules))
