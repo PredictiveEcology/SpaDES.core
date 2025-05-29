@@ -1372,7 +1372,10 @@ setMethod(
 
       #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
-      moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
+      moduleSpecificOutputObjects <- c(createsOutputs, paste0(dotMods, "$", cur[["moduleName"]]),
+                                       paste0(dotObjs, "$", cur[["moduleName"]]),
+                                       objSynName
+                                       )
       # globalParams <- sim@params[[".globals"]]
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
       paramsDontCacheOnActual <- names(modParamsFull) %in% paramsDontCacheOn
