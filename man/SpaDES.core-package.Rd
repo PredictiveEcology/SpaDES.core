@@ -160,7 +160,7 @@ within that slot. Sometimes, this not desired, and a true copy is required.
 
 \tabular{ll}{
 \code{\link[=envir]{envir()}} \tab Access the environment of the \code{simList} directly (advanced)\cr
-\code{\link[=Copy]{Copy()}} \tab Deep copy of a \code{simList}. (advanced)\cr
+\code{\link[SpaDES.core:Copy]{Copy()}} \tab Deep copy of a \code{simList}. (advanced)\cr
 }
 }
 

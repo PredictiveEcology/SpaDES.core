@@ -32,7 +32,7 @@ if (!isGeneric("Copy")) {
 #' file-backed, such as some `Raster*`-class objects. For all the objects that
 #' are file-backed, it is likely *very* important to give unique file-backed
 #' directories. This should be passed here, which gets passed on to the many methods
-#' of `Copy` in `reproducible`.
+#' of [reproducible::Copy()].
 #'
 #' @author Eliot McIntire
 #' @exportMethod Copy
@@ -56,72 +56,79 @@ setMethod("Copy",
               sim_@current <- object@current
               list2env(as.list(object@completed), envir = sim_@completed)
             }
-            #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
-            #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
+            # sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            # sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
             sim_@.xData <- new.env(parent = emptyenv())
-            sim_@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
+            sim_@.xData[[dotMods]] <- new.env(parent = asNamespace("SpaDES.core"))
+            # Setup dotObjs later because it is not vectorized over module
             attr(sim_@.xData, "name") <- "sim"
 
 
             # # set up mod environments, including .objects
-            for (modNam in names(object@.xData$.mods)) {
-              sim_ <- newEnvsByModule(sim_, modNam)
-            }
+            for (dotType in dotObjsAndMods)
+              for (modNam in names(object@.xData[[dotType]])) {
+                sim_ <- newEnvsByModule(sim_, modNam)
+              }
 
             if (objects == 2) {
-              dotObjsNotDotMods <- grep("\\.mods", ls(object@.xData, pattern = "^\\.", all.names = TRUE),
+              dotObjsNotDotMods <- grep(paste0("\\", dotMods, "|", "\\", dotObjs), # "\\.mods",
+                                        ls(object@.xData, pattern = "^\\.", all.names = TRUE),
                                         invert = TRUE, value = TRUE)
               list2env(Copy(mget(dotObjsNotDotMods, envir = object@.xData)),
                        envir = sim_@.xData)
             }
             if (objects > 0) {
-
               # browser(expr = exists("._Copy_6"))
-              objNames <- ls(object@.xData$.mods, all.names = TRUE)
+              # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
+              if (objects == 1) {
+                # Copy the whole environment, recursively through environments
+                sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
+              }
+
+              objNames <- ls(object@.xData[[dotObjs]], all.names = TRUE)
               if (isTRUE(is.character(modules))) {
                 objNames <- objNames[match(modules, objNames)]
               }
               names(objNames) <- objNames
               isEnv <- unlist(lapply(objNames,
                                      function(obj) {
-                                       is.environment(get(obj, envir = object@.xData$.mods))
+                                       is.environment(get(obj, envir = object@.xData[[dotObjs]]))
                                      }))
-              # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
-
-              if (objects == 1) {
-                # Copy the whole environment, recursively through environments
-                sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
-              }
 
               # This chunk makes the environment of each function in a module,
               #   the module itself. This is unique to functions in `simList` objs
               #   i.e., can't rely on generic reproducible::Copy
               lapply(objNames[isEnv], function(en) {
-                list2env(as.list(object@.xData$.mods[[en]], all.names = TRUE),
-                         envir = sim_@.xData$.mods[[en]])
-                isFn <- unlist(lapply(ls(sim_@.xData$.mods[[en]]), function(obj) {
-                  if (is.function(get(obj, envir = sim_@.xData$.mods[[en]]))) {
-                    environment(sim_@.xData$.mods[[en]][[obj]]) <- sim_@.xData$.mods[[en]]
+                list2env(as.list(object@.xData[[dotObjs]][[en]], all.names = TRUE),
+                         envir = sim_@.xData[[dotObjs]][[en]])
+                isFn <- unlist(lapply(ls(sim_@.xData[[dotObjs]][[en]]), function(obj) {
+                  if (is.function(get(obj, envir = sim_@.xData[[dotObjs]][[en]]))) {
+                    environment(sim_@.xData[[dotObjs]][[en]][[obj]]) <- sim_@.xData[[dotObjs]][[en]]
                   }
-                }
-                ))
+                }))
               })
 
-              # Copy .objects
+              ## Copy .objects
               modsToCopy <- modules(sim_)
               if (is.character(modules)) {
                 modsToCopy <- intersect(modules, modsToCopy)
               }
               lapply(modsToCopy, function(mod) {
-                if (exists(mod, envir = sim_@.xData$.mods, inherits = FALSE)) {
-                  rm(list = ".objects", envir = sim_@.xData$.mods[[mod]], inherits = FALSE)
-                  sim_@.xData$.mods[[mod]]$.objects <- new.env(parent = emptyenv())
-                  list2env(as.list(object@.xData$.mods[[mod]]$.objects, all.names = TRUE),
-                           envir = sim_@.xData$.mods[[mod]]$.objects)
+                if (exists(mod, envir = sim_@.xData[[dotObjs]], inherits = FALSE)) {
+                  # rm(list = ".objects", envir = sim_@.xData[[dotMods]][[mod]], inherits = FALSE)
+                  # sim_@.xData[[dotMods]][[mod]]$.objects <- new.env(parent = emptyenv())
+                  # list2env(as.list(object@.xData[[dotMods]][[mod]]$.objects, all.names = TRUE),
+                  #          envir = sim_@.xData[[dotMods]][[mod]]$.objects)
+                  rm(list = mod, envir = sim_@.xData[[dotObjs]], inherits = FALSE)
+                  sim_ <- setupModObjsEnv(sim_, moduleName = mod)
+                  # rm(list = ".objects", envir = sim_@.xData[[dotMods]][[mod]], inherits = FALSE)
+                  # sim_@.xData[[dotMods]][[mod]]$.objects <- new.env(parent = emptyenv())
+                  list2env(as.list(object@.xData[[dotObjs]][[mod]], all.names = TRUE),
+                           envir = sim_@.xData[[dotObjs]][[mod]])
                 }
               })
 
-              # Deal with activeBindings
+              ## Deal with activeBindings
               makeSimListActiveBindings(sim_)
             }
             sim_@.envir <- sim_@.xData

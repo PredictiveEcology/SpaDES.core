@@ -95,9 +95,22 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   objDeparsed <- as.character(objDeparsed)
 
+  namesInList <- names(sim@.xData)
+  if (!is.null(sim$objectSynonyms)) {
+    namesInListHasOS <- lapply(sim$objectSynonyms, function(os) {
+      osInNamesInList <- os %in% namesInList
+      if (any(osInNamesInList)) {
+        os
+      } else {
+        os <- NULL
+      }
+    })
+    if (length(unlist(namesInListHasOS)))
+      namesInList <- unique(c(namesInList, unlist(namesInListHasOS)))
+  }
   # Equivalent to !is.null(sim$xxx)
   inPrevDotInputObjects <- if ("s" %in% forms$where) {
-    out <- match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
+    out <- match(objDeparsed, namesInList, nomatch = 0L) > 0L
     # check not in because it is just declared as a objectSynonym
     if (isTRUE(out)) {
       if (!is.null(sim$objectSynonyms)) {
@@ -121,7 +134,33 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   curMod <- currentModule(sim)
 
   inFutureInit <- if (any(c("i", "c") %in% forms$where)) {
-    del <- depsEdgeList(sim, plot = FALSE)
+
+    # The includeOutputs = TRUE is because depsEdgeList removes objects
+    #   that are not used by another module, so it will miss objects
+    #   that are part of objectSynonyms. With includeOutputs, it puts _OUTPUTS_
+    #   analogous to _INPUTS_, so even dangling outputs will be kept, so they can
+    #   be checked against objectSynonyms
+    del <- depsEdgeList(sim, plot = FALSE, includeOutputs = TRUE)
+
+    # Need to deal with objectSynonyms
+    if (!is.null(sim$objectSynonyms)) {
+      objsInOS <- sim$objectSynonyms
+      ddel1 <- list()
+      iter <- 0
+      for (OS in objsInOS) {
+        if (objDeparsed %in% OS)  {
+          iter <- iter + 1
+          ddel1[[iter]] <- list()
+          for (OSitem in OS) {
+            ddel1[[iter]][[OSitem]] <- del[objName %in% OSitem]
+            ddel1[[iter]][[OSitem]] <- ddel1[[iter]][[OSitem]][rep(seq_len(NROW(ddel1[[iter]][[OSitem]])), length(OS) - 1)]
+            ddel1[[iter]][[OSitem]][, objName := setdiff(OS, OSitem)]
+          }
+
+        }
+      }
+      del <- rbindlist(list(del, rbindlist(unlist(ddel1, recursive = FALSE))))
+    }
     if (NROW(del)) {
     # if ("c" %in% forms$where) {
 

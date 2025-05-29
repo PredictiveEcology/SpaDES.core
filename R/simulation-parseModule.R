@@ -674,7 +674,17 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 newEnvsByModule <- function(sim, modu) {
   sim@.xData$.mods[[modu]] <- new.env(parent = asNamespace("SpaDES.core"))
   attr(sim@.xData$.mods[[modu]], "name") <- modu
-  sim@.xData$.mods[[modu]]$.objects <- new.env(parent = emptyenv())
+
+  if (FALSE) {
+    sim@.xData$.mods[[modu]]$.objects <- new.env(parent = emptyenv())
+  } else {
+
+    sim <- setupModObjsEnv(sim, moduleName = modu)
+    # if (!exists(dotObjs, envir = sim@.xData))
+    #   sim@.xData[[]] <- new.env(parent = emptyenv())
+    # sim@.xData[[dotObjs]][[modu]] <- new.env(parent = emptyenv())
+    # sim@.xData[[dotObjs]][[modu]]$.objects <- new.env(parent = emptyenv())
+  }
   sim
 }
 
@@ -699,3 +709,23 @@ currentModuleTemporary <- function(sim, mBase) {
   )
   sim
 }
+
+
+
+setupModObjsEnv <- function(sim, moduleName) {
+  if (!exists(dotObjs, envir = sim@.xData))
+    sim@.xData[[dotObjs]] <- new.env(parent = emptyenv())
+  sim@.xData[[dotObjs]][[moduleName]] <- new.env(parent = emptyenv())
+  sim
+}
+
+dotObjs <- ".modObjs"
+dotMods <- ".mods"
+dotObjsAndMods <- c(dotObjs, dotMods)
+modAB <- "mod"
+ParAB <- "Par"
+modAndParAB <- c(modAB, ParAB)
+.moduleObjectsNam <- "moduleObjects"
+.moduleFunctionsNam <- "moduleFunctions"
+.objectsSlot <- ".objects"
+.objectsArg <- ".objects"

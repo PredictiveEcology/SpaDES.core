@@ -134,10 +134,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   cur <- sim@current
 
   # loggingMessage helpers
-  simNestingRevert <- sim[["._simNesting"]]
-  on.exit(sim[["._simNesting"]] <- simNestingRevert, add = TRUE)
-  sim[["._simNesting"]] <- simNestingOverride(sim, sim@current$moduleName)
-  ._simNesting <- sim[["._simNesting"]]
+  simNestingRevert <- sim[[._txtSimNesting]]
+  on.exit(sim[[._txtSimNesting]] <- simNestingRevert, add = TRUE)
+  sim[[._txtSimNesting]] <- simNestingOverride(sim, sim@current$moduleName)
+  ._simNesting <- sim[[._txtSimNesting]]
 
   curModuleName <- cur[["moduleName"]]
   if  (length(cur) == 0) {
@@ -319,7 +319,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
             if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
                                       silent = TRUE, error = function(x) FALSE)
             ))
-              stop("The module named ", curModuleName, " just deleted the object named 'mod' from ",
+              warning("The module named ", curModuleName, " just deleted the object named 'mod' from ",
                    "sim$", curModuleName, ". ",
                    "Please remove the section of code that does this in the event named: ",
                    cur[["eventType"]])
@@ -867,7 +867,8 @@ setMethod(
 
     # loggingMessage helpers
     ._simNesting <- simNestingSetup(...)
-    sim[["._simNesting"]] <- ._simNesting
+    # sim[[._txtSimNesting]] <- ._simNesting
+    sim[[._txtSimNesting]] <- ._simNesting
 
     opt <- options("encoding" = "UTF-8")
     if (isTRUE(getOption("spades.allowSequentialCaching"))) {
@@ -1132,6 +1133,12 @@ setMethod(
 
       ## RecoverMode Step 3 -- Initiate the RMO (recovery mode object)
       if (recoverMode > 0) {
+        thisSpadesCallRandomStr <- basename(tempfile(pattern = "rmo"))
+        on.exit({
+          toDel <- dir(dotRMOFilepath(thisSpadesCallRandomStr), full.names = TRUE)
+          if (length(toDel) > 0)
+            unlink(toDel)
+                 }, add = TRUE) # for file-backed files)
         rmo <- NULL # The recovery mode object
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
@@ -1356,14 +1363,19 @@ setMethod(
     if (cacheIt) { # means that a module or event is to be cached
 
       fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
+      objs <- setdiff(ls(sim@.xData[[dotObjs]][[cur[["moduleName"]]]], all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
+          paste0(attr(fnEnv, "name"), ":", objs), # objects in the namespaced location
           na.omit(expectsInputs)) # objects that should exist at the time of calling the module
 
       #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
       #                      grep("^\\._", fns, value = TRUE, invert = TRUE))
-      moduleSpecificOutputObjects <- c(createsOutputs, paste0(".mods$", cur[["moduleName"]]))
+      moduleSpecificOutputObjects <- c(createsOutputs, paste0(dotMods, "$", cur[["moduleName"]]),
+                                       paste0(dotObjs, "$", cur[["moduleName"]]),
+                                       objSynName
+                                       )
       # globalParams <- sim@params[[".globals"]]
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
       paramsDontCacheOnActual <- names(modParamsFull) %in% paramsDontCacheOn
@@ -1381,20 +1393,21 @@ setMethod(
 
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
-    if (any(cur[["moduleName"]] %in% getOption("spades.debugModule"))) {
-      browser()
-    }
-    # if (isTRUE(cur$moduleName %in% "randomLandscapes")) browser()
-    expression(Cache(FUN = modCall,
-                     sim = sim,
-                     eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
+    # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
+
+    expression(Cache(FUN =
+                       modCall(
+                         sim = sim,
+                         eventTime = cur[["eventTime"]], eventType = cur[["eventType"]]),
+                     # debugCache = "quick",
                      .objects = moduleSpecificObjects,
                      notOlderThan = notOlderThan,
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
                      showSimilar = showSimilar,
                      cachePath = sim@paths[["cachePath"]],
-                     .functionName = moduleCall, verbose = verbose,
+                     .functionName = paste0(moduleCall, "::", cur[["eventType"]]),
+                     verbose = verbose,
                      userTags = c(paste0("module:", cur[["moduleName"]]),
                                   paste0("eventType:", cur[["eventType"]]),
                                   paste0("eventTime:", time(sim)))))
@@ -1407,6 +1420,10 @@ setMethod(
     objsIsNullBefore <- objsAreNull(sim)
   }
 
+  if (any(cur[["moduleName"]] %in% getOption("spades.debugModule"))) {
+    # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
+    browser()
+  }
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
@@ -1443,6 +1460,7 @@ setMethod(
   if (debugToVerbose(debug)) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore)
   }
+  printDebugPrint() # this is getOption("spades.debugPrint")
 
   ## Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
@@ -1557,7 +1575,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
       newList <- list(if (any(objsInSimListAndModule)) {
         # files may disappear for one reason or another; this will fail, silently
         try(Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-             filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo")))
+             filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events)))
       } else {
         list()
       })
@@ -1576,7 +1594,9 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
           mess2 <- capture.output(type = "message",
                                   rmo$recoverableModObjs <- append(list(if (length(objsInModObjects)) {
                                     Copy(mget(objsInModObjects, envir = modEnv),
-                                         filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                                         # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                                         filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
+
                                   } else {
                                     list()
                                   }), rmo$recoverableModObjs)
@@ -2003,57 +2023,61 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 loggingMessagePrefixLength <- 15
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
-  st <- Sys.time()
-  stForm1 <- "%h%d"
-  stForm2 <- paste(stForm1, "%H:%M:%S")
-  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
-  middleFix <- ""
-  noNew <- FALSE
-  if (numCharsMax > 0) {
-    sim2 <- list() # don't put a `sim` here because whereInStack will find this one
-    while (!is(sim2, "simList")) {
-      simEnv <- try(whereInStack("sim"), silent = TRUE)
-      if (is(simEnv, "try-error"))
-        break
-      sim <- get0("sim", envir = simEnv, inherits = FALSE)
-      if (is(sim, "simList"))
-        sim2 <- sim
-    }
+  if (!isTRUE(any(grepl(.txtNoPrefix, mess)))) {
+    st <- Sys.time()
+    stForm1 <- "%h%d"
+    stForm2 <- paste(stForm1, "%H:%M:%S")
+    numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
+    middleFix <- ""
+    noNew <- FALSE
+    if (numCharsMax > 0) {
+      sim2 <- list() # don't put a `sim` here because whereInStack will find this one
+      while (!is(sim2, "simList")) {
+        simEnv <- try(whereInStack("sim"), silent = TRUE)
+        if (is(simEnv, "try-error"))
+          break
+        sim <- get0("sim", envir = simEnv, inherits = FALSE)
+        if (is(sim, "simList"))
+          sim2 <- sim
+      }
 
-    if (!is(sim, "try-error") && !is.null(sim)) {
-      # If this is a nested spades call, will have time already at start
-      if (startsWith(mess, strftime(st, format = "%h%d"))) {
-        noNew <- TRUE
-      } else {
-        middleFix <- paste(sim[["._simNesting"]], collapse = "/")
+      if (!is(sim, "try-error") && !is.null(sim)) {
+        # If this is a nested spades call, will have time already at start
+        if (startsWith(mess, strftime(st, format = "%h%d"))) {
+          noNew <- TRUE
+        } else {
+          middleFix <- paste(sim[[._txtSimNesting]], collapse = "/")
+        }
       }
     }
-  }
-  prependTime <- strftime(st, format = stForm2)
+    prependTime <- strftime(st, format = stForm2)
 
-  # need to remove final \n, but strsplit on any internal \n
-  slashN <- gregexpr("\n", mess)[[1]]
-  if (isTRUE(slashN[1] > 0)) {
-    # Eliot -- I tried various ways of doing this ... they are similar execution time; this is simplest
-    len <- length(slashN)
-    mess <- gsub(pattern = "\\n$", replacement = "", mess)
-    if (len > 1) {
-      mess <- strsplit(mess, "\n")[[1]]
-      mess[-len] <- paste0(mess[-len], "\n")
+    # need to remove final \n, but strsplit on any internal \n
+    slashN <- gregexpr("\n", mess)[[1]]
+    if (isTRUE(slashN[1] > 0)) {
+      # Eliot -- I tried various ways of doing this ... they are similar execution time; this is simplest
+      len <- length(slashN)
+      mess <- gsub(pattern = "\\n$", replacement = "", mess)
+      if (len > 1) {
+        mess <- strsplit(mess, "\n")[[1]]
+        mess[-len] <- paste0(mess[-len], "\n")
+      }
     }
-  }
 
-  # Prepend the middle
-  if (isTRUE(any(grepl("\b", mess)))) {
-    # noNew <- TRUE
-    mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
+    # Prepend the middle
+    if (isTRUE(any(grepl("\b", mess)))) {
+      # noNew <- TRUE
+      mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
+    } else {
+      messPoss <- paste0(middleFix, " ", mess)
+      if (!isTRUE(noNew)) {
+        # Prepend the time
+        mess <- paste0(prependTime, " ", messPoss)
+
+      }
+    }
   } else {
-    messPoss <- paste0(middleFix, " ", mess)
-    if (!isTRUE(noNew)) {
-      # Prepend the time
-      mess <- paste0(prependTime, " ", messPoss)
-
-    }
+    mess <- gsub(.txtNoPrefix, "", mess)
   }
 
   mess
@@ -2526,5 +2550,55 @@ recoverModeTypo <- function() {
   recoverModeWrong <- getOption("spades.recoverMode")
   if (!is.null(recoverModeWrong)) {
     warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
+  }
+}
+
+
+
+# fixPointers <- function(sim, cachePath = getOption("reproducible.cachePath"),
+#                         verbose = getOption("reproducible.verbose")) {
+#   lsSim <- ls(sim)
+#   a <- Map(x = lsSim, function(x) if (isS4(sim[[x]])) {# This is a fast way to filter out non terra objects
+#     if (is(sim[[x]], "SpatRaster") ||
+#         is(sim[[x]], "SpatVector") ||
+#         is(sim[[x]], "SpatExtent")) {
+#       rr <- try(sim[[x]]@pntr$size(), silent = TRUE)
+#       !is.null(rr) && is(rr, "try-error")
+#     }
+#   } else {FALSE})
+#
+#   a <- a[unlist(a)]
+#   if (length(a)) {
+#     opt <- options(reproducible.useMemoise = FALSE)
+#     on.exit(options(opt))
+#
+#     failedNams <- names(a)
+#     for (nam in failedNams) {
+#       cid <- cacheId(sim[[nam]])
+#       if (!is.null(cid)) {
+#         sim[[nam]] <- loadFromCache(cachePath, cid, verbose = verbose - 1)
+#         messageCache("Pointer to ", nam, " was corrupt: fixed from Cached object", verbose = verbose)
+#       }
+#     }
+#   }
+#   sim
+# }
+#
+
+
+
+dotRMOFilepath <- function(thisSpadesCallRandomStr, events) {
+  sub <- if (missing(events))
+    sub <- ""
+  else
+    paste(events[[1]][["moduleName"]], events[[1]][["eventType"]],
+                 sep = "_", round(events[[1]][["eventTime"]]))
+  file.path(getOption("spades.scratchPath"), "._rmo", thisSpadesCallRandomStr, sub)
+}
+
+printDebugPrint <- function(envir = parent.frame()) {
+  if (!is.null(getOption("spades.debugPrint"))) {
+    print(getOption("spades.debugPrint"))
+    print(eval(getOption("spades.debugPrint"), envir = envir))
   }
 }

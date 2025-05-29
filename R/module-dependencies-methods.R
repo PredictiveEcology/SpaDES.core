@@ -18,6 +18,12 @@ selectMethod("show", "igraph")
 #'              so that only a single arrow is drawn connecting the modules.
 #'              Default is `FALSE`.
 #'
+#' @param includeOutputs Logical indicating whether objects that are only "outputs"
+#'   will be kept and labelled as _OUTPUTS_ analogous to _INPUTS_. This is relevant
+#'   in the case of `objectSynonyms`. If an object is not used by another module
+#'   then it will be removed from this `depsEdgeList` return; this keeps these
+#'   so can be determined if they are e.g., `suppliedElsewhere`.
+#'
 #' @return A `data.table` whose first two columns give a list of edges
 #'          and remaining columns the attributes of the dependency objects
 #'          (object name, class, etc.).
@@ -28,7 +34,7 @@ selectMethod("show", "igraph")
 #' @include simList-class.R
 #' @rdname depsEdgeList
 #'
-setGeneric("depsEdgeList", function(sim, plot) {
+setGeneric("depsEdgeList", function(sim, plot, includeOutputs = FALSE) {
   standardGeneric("depsEdgeList")
 })
 
@@ -36,9 +42,9 @@ setGeneric("depsEdgeList", function(sim, plot) {
 setMethod(
   "depsEdgeList",
   signature(sim = "simList", plot = "logical"),
-  definition = function(sim, plot) {
+  definition = function(sim, plot, includeOutputs = FALSE) {
     deps <- sim@depends
-    DT <- .depsEdgeList(deps, plot)
+    DT <- .depsEdgeList(deps, plot, includeOutputs = includeOutputs)
     correctOrd <- unlist(sim@modules, use.names = FALSE)
     DT[, fromOrd := factor(from, levels = correctOrd)]
     DT[, toOrd := factor(to, levels = correctOrd)]
@@ -50,11 +56,11 @@ setMethod(
 setMethod("depsEdgeList",
           signature(sim = "simList", plot = "missing"),
           definition = function(sim, plot) {
-            depsEdgeList(sim, plot = FALSE)
+            depsEdgeList(sim, plot = FALSE, includeOutputs = FALSE)
 })
 
 #' @importFrom data.table as.data.table data.table rbindlist setkeyv setorder
-.depsEdgeList <- function(deps, plot) {
+.depsEdgeList <- function(deps, plot, includeOutputs = FALSE) {
   sim.in <- sim.out <- data.table(objectName = character(0),
                                   objectClass = character(0),
                                   module = character(0))
@@ -83,6 +89,17 @@ setMethod("depsEdgeList",
   if ((nrow(sim.in)) && (nrow(sim.out))) {
     dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]
     dx[is.na(module), module := "_INPUT_"]
+
+    if (isTRUE(includeOutputs)) {
+      dy <- sim.in[sim.out, nomatch = NA_character_, allow.cartesian = TRUE]
+      dy[is.na(module), module := "_OUTPUT_"]
+      modImod <- c("module", "i.module")
+      setnames(dy, old = modImod, new = rev(modImod))
+
+      dx <- unique(rbindlist(list(dx, dy), use.names = TRUE))
+    }
+    # dy[grep("nonForest_timeSinceDisturbance", objectName)]
+
     DT <- dx[, list(from = module, to = i.module,
                     objName = objectName, objClass = i.objectClass)]
 
@@ -252,33 +269,64 @@ setMethod(".depsLoadOrder",
               loadOrdersInMetaData <- Map(mod = sim@depends@dependencies, function(mod) {
                 if (length(mod@loadOrder)) mod@loadOrder else NULL})
               loadOrdersInMetaData <- loadOrdersInMetaData[!vapply(loadOrdersInMetaData, is.null, FUN.VALUE = logical(1))]
+              loadOrdersInMetaDataOrig <- loadOrdersInMetaData
 
               if (length(loadOrdersInMetaData)) {
-                dt <- as.data.table(as_data_frame(simGraph))
 
-                Map(lo = loadOrdersInMetaData, nam = names(loadOrdersInMetaData),
-                    function(lo, nam) {
-                      lapply(lo[["after"]], function(aft) {
-                        a <- setDT(list(from = aft, to = nam, objName = .rndstr(1)))
-                        dt <<- rbindlist(list(dt, a), fill = TRUE)
+                # keepTrying <- TRUE
+                iter <- 0L
+                needFindFail <- FALSE
+                rmTry <- as.data.table(expand.grid(nam = names(loadOrdersInMetaDataOrig),
+                                                   befAf = c("before", "after")))
+                iters <- seq(0L, NROW(rmTry))
+                for (iter in iters) {
+                  # while(keepTrying %in% TRUE) {
+                  dt <- as.data.table(as_data_frame(simGraph))
+
+                  Map(lo = loadOrdersInMetaData, nam = names(loadOrdersInMetaData),
+                      function(lo, nam) {
+                        if (iter == 0 || iter > 0 && rmTry$befAf[iter] == "after")
+                          lapply(lo[["after"]], function(aft) {
+                            a <- setDT(list(from = aft, to = nam, objName = .rndstr(1)))
+                            dt <<- rbindlist(list(dt, a), fill = TRUE)
+                          })
+                        if (iter == 0 || iter > 0 && rmTry$befAf[iter] == "before")
+                          lapply(lo[["before"]], function(bef) {
+                            a <- setDT(list(from = nam, to = bef, objName = .rndstr(1)))
+                            dt <<- rbindlist(list(dt, a), fill = TRUE)
+                          })
                       })
-                      lapply(lo[["before"]], function(bef) {
-                        a <- setDT(list(from = nam, to = bef, objName = .rndstr(1)))
-                        dt <<- rbindlist(list(dt, a), fill = TRUE)
-                      })
-                    })
-                simGraph2 <- graph_from_data_frame(dt)
-                tsort <- try(topo_sort(simGraph2, "out"), silent = TRUE)
-                if (exists("tsort", inherits = FALSE))
-                  if (!is(tsort, "try-error")) {
-                    doTopoSort <- FALSE
-                    simGraph <- simGraph2
-                  } else {
-                    message("Could not automatically determine module order, even with `loadOrder` metadata; ",
-                            "it may be wise to set the order manually and pass to `simInit(... loadOrder = xxx)`")
+                  simGraph2 <- graph_from_data_frame(dt)
+                  tsort <- try(topo_sort(simGraph2, "out"), silent = TRUE)
+                  if (exists("tsort", inherits = FALSE))
+                    if (!is(tsort, "try-error") && iter == 0) {
+                      doTopoSort <- FALSE
+                      simGraph <- simGraph2
+                      # keepTrying <- FALSE
+                      break
+                    } else {
+                      if (iter > 0)
+                        set(rmTry, iter, "OK", !is(tsort, "try-error"))
+                      # iter <- iter + 1L
+                      needFindFail <- TRUE
+                      tryRmMod <- names(loadOrdersInMetaDataOrig)[iter]
+                      loadOrdersInMetaData <- loadOrdersInMetaDataOrig[tryRmMod]
+                      # message("Could not automatically determine module order, even with `loadOrder` metadata; ",
+                      #         "it may be wise to set the order manually and pass to `simInit(... loadOrder = xxx)`")
+                    }
+                }
+                if (iter > 0L) {
+                  if (any(rmTry$OK %in% FALSE)) {
+                    imposs <- rmTry[rmTry$OK %in% FALSE]
+                    warning("There is an impossible cyclic dependency in the metadata entry for loadOrder in ",
+                            paste0(imposs$nam, ": ", imposs$befAf, collapse = ", "))
                   }
+                  message("Could not automatically determine module order, even with `loadOrder` metadata; ",
+                          "it may be wise to set the order manually and pass to `simInit(... loadOrder = xxx)`")
+                }
               }
             }
+
             if (doTopoSort) {
               tsort <- topo_sort(simGraph, "out")
             }
@@ -335,4 +383,4 @@ setMethod(".depsLoadOrder",
               loadOrder <- c(loadOrder, noDeps)
             }
             return(loadOrder)
-})
+          })
