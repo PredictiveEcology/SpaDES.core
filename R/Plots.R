@@ -112,7 +112,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'
 #'     Plots(data = sim$something, fn = fn,
 #'           types = c("png"),
-#'           path = file.path("figures"),
+#'           path = file.path(tempdir(), "figures"),
 #'           filename = tempfile(),
 #'           .plotInitialTime = 1)
 #'
@@ -120,7 +120,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'     Plots(
 #'       data = sim$something, fn = fn,
 #'       types = c("png", "screen"),
-#'       path = file.path("figures"),
+#'       path = file.path(tempdir(), "figures"),
 #'       filename = tempfile(),
 #'       .plotInitialTime = 1
 #'     )

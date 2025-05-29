@@ -19,7 +19,6 @@ test_that("timeunit works correctly", {
   expect_warning(timeunit(mySim) <- 1, "^unknown timeunit provided:")
   expect_warning(timeunit(mySim) <- "LeapYear", "^unknown timeunit provided:")
 
-
   # check for new unit being put into simList
   assign("dfortnight", function(x) dday(14),
          envir = envir(mySim))

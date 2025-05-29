@@ -1,5 +1,5 @@
 ##  SpaDES.core/R/SpaDES-core-package.R by Alex M Chubaty and Eliot J B McIntire
-##  Copyright (C) 2015-2023 His Majesty the Queen in Right of Canada,
+##  Copyright (C) 2015-2025 His Majesty the Queen in Right of Canada,
 ##  as represented by the Minister of Natural Resources Canada
 ##
 
@@ -154,7 +154,7 @@
 #'
 #'   \tabular{ll}{
 #'      [envir()] \tab Access the environment of the `simList` directly (advanced)\cr
-#'      [SpaDES.core::Copy()] \tab Deep copy of a `simList`. (advanced)\cr
+#'      \code{\link[SpaDES.core:Copy]{Copy()}} \tab Deep copy of a `simList`. (advanced)\cr
 #'   }
 #' }
 #'
