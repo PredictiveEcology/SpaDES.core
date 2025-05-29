@@ -377,14 +377,18 @@ setMethod(
       # ._startClockTime <- dots[[._txtStartClockTime]]
     dots[[._txtStartClockTime]] <- NULL
     dotNames <- setdiff(...names(), ._txtStartClockTime)
+
+
+    # loggingMessage helpers
+    ._simNestingLocal <- simNestingSetup(...) # checks in call stack for "sim"
+    assign(._txtSimNesting, ._simNestingLocal)
+
     # create  <- List object for the simulation
     sim <- new("simList")
     sim@.xData[[._txtStartClockTime]] <- get(._txtStartClockTime, inherits = FALSE)
     sim$._simInitElapsedTime <- 0
 
     # loggingMessage helpers
-    # assign(._txtSimNesting, simNestingSetup(...))
-    ._simNestingLocal <- simNestingSetup(...)
     sim[[._txtSimNesting]] <- ._simNestingLocal
 
     opt <- options("encoding" = "UTF-8")
