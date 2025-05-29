@@ -2535,6 +2535,41 @@ recoverModeTypo <- function() {
     warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
   }
 }
+
+
+
+# fixPointers <- function(sim, cachePath = getOption("reproducible.cachePath"),
+#                         verbose = getOption("reproducible.verbose")) {
+#   lsSim <- ls(sim)
+#   a <- Map(x = lsSim, function(x) if (isS4(sim[[x]])) {# This is a fast way to filter out non terra objects
+#     if (is(sim[[x]], "SpatRaster") ||
+#         is(sim[[x]], "SpatVector") ||
+#         is(sim[[x]], "SpatExtent")) {
+#       rr <- try(sim[[x]]@pntr$size(), silent = TRUE)
+#       !is.null(rr) && is(rr, "try-error")
+#     }
+#   } else {FALSE})
+#
+#   a <- a[unlist(a)]
+#   if (length(a)) {
+#     opt <- options(reproducible.useMemoise = FALSE)
+#     on.exit(options(opt))
+#
+#     failedNams <- names(a)
+#     for (nam in failedNams) {
+#       cid <- cacheId(sim[[nam]])
+#       if (!is.null(cid)) {
+#         sim[[nam]] <- loadFromCache(cachePath, cid, verbose = verbose - 1)
+#         messageCache("Pointer to ", nam, " was corrupt: fixed from Cached object", verbose = verbose)
+#       }
+#     }
+#   }
+#   sim
+# }
+#
+
+
+
 dotRMOFilepath <- function(thisSpadesCallRandomStr, events) {
   sub <- if (missing(events))
     sub <- ""
