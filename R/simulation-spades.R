@@ -1393,20 +1393,21 @@ setMethod(
 
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
-    if (any(cur[["moduleName"]] %in% getOption("spades.debugModule"))) {
-      browser()
-    }
-    # if (isTRUE(cur$moduleName %in% "randomLandscapes")) browser()
-    expression(Cache(FUN = modCall,
-                     sim = sim,
-                     eventTime = cur[["eventTime"]], eventType = cur[["eventType"]],
+    # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
+
+    expression(Cache(FUN =
+                       modCall(
+                         sim = sim,
+                         eventTime = cur[["eventTime"]], eventType = cur[["eventType"]]),
+                     # debugCache = "quick",
                      .objects = moduleSpecificObjects,
                      notOlderThan = notOlderThan,
                      outputObjects = moduleSpecificOutputObjects,
                      classOptions = classOptions,
                      showSimilar = showSimilar,
                      cachePath = sim@paths[["cachePath"]],
-                     .functionName = moduleCall, verbose = verbose,
+                     .functionName = paste0(moduleCall, "::", cur[["eventType"]]),
+                     verbose = verbose,
                      userTags = c(paste0("module:", cur[["moduleName"]]),
                                   paste0("eventType:", cur[["eventType"]]),
                                   paste0("eventTime:", time(sim)))))
