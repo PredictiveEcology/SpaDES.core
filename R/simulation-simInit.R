@@ -1354,15 +1354,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           ## This next line will make the Caching sensitive to userSuppliedObjs
           ##  (which are already in the simList) or objects supplied by another module
           inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "i", "c"))
-          # inCyclic <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "c")
           if (any(inSimList)) {
             objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
+                                             # objSynName,
                                              moduleSpecificInputObjects[inSimList])
           }
+          moduleSpecificInputObjects <- c(moduleSpecificInputObjects, objSynName)
 
-          #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
-          # showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
-          # browser(expr = exists("._runModuleInputObjects_3"))
+
           showSimilar <- if (is.null(sim@params[[mBase]][[".showSimilar"]]) ||
                              isTRUE(is.na(sim@params[[mBase]][[".showSimilar"]]))) {
             isTRUE(getOption("reproducible.showSimilar", FALSE))
@@ -1376,7 +1375,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           modParams <- sim@params[[mBase]]
           paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
             paramsDontCacheOn
-          # simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           # nextEvent <- NULL
