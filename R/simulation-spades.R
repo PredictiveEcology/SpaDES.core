@@ -2544,3 +2544,9 @@ dotRMOFilepath <- function(thisSpadesCallRandomStr, events) {
   file.path(getOption("spades.scratchPath"), "._rmo", thisSpadesCallRandomStr, sub)
 }
 
+printDebugPrint <- function(envir = parent.frame()) {
+  if (!is.null(getOption("spades.debugPrint"))) {
+    print(getOption("spades.debugPrint"))
+    print(eval(getOption("spades.debugPrint"), envir = envir))
+  }
+}
