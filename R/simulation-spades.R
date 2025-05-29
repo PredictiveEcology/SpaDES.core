@@ -1363,9 +1363,11 @@ setMethod(
     if (cacheIt) { # means that a module or event is to be cached
 
       fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
+      objs <- setdiff(ls(sim@.xData[[dotObjs]][[cur[["moduleName"]]]], all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
+          paste0(attr(fnEnv, "name"), ":", objs), # objects in the namespaced location
           na.omit(expectsInputs)) # objects that should exist at the time of calling the module
 
       #fnsWOhidden <- paste0(cur[["moduleName"]], ":",
