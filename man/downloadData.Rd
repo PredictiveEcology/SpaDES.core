@@ -82,7 +82,7 @@ called from inside another function.}
 \item{urls}{Character vector of urls from which to get the data. This is automatically
 found from module metadata when this function invoked with
 \code{SpaDES.core::downloadModule(..., data = TRUE)}. See also
-\code{\link[=prepInputs]{prepInputs()}}.}
+\code{\link[reproducible:prepInputs]{reproducible::prepInputs()}}.}
 
 \item{children}{The character vector of child modules (without path) to also
 run \code{downloadData} on}
@@ -127,7 +127,7 @@ downloadData("caribouMovement", path = modulePath)
 
 }
 \seealso{
-\code{\link[=prepInputs]{prepInputs()}}, \code{\link[=checksums]{checksums()}}, and \code{\link[=downloadModule]{downloadModule()}}
+\code{\link[reproducible:prepInputs]{reproducible::prepInputs()}}, \code{\link[=checksums]{checksums()}}, and \code{\link[=downloadModule]{downloadModule()}}
 for downloading modules and building a checksums file.
 }
 \author{

@@ -694,3 +694,64 @@ test_that("cache of terra objects in the depends", {
     expect_false(is(err, "simpleError"))
   }
 })
+
+
+
+
+test_that("caching simInitAndSpades specifically", {
+  skip_on_cran() # too long
+  testInit(sampleModReqdPkgs)
+
+  set.seed(42)
+
+  times <- list(start = 0.0, end = 1, timeunit = "year")
+  params <- list(
+    #   .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .seed = list("init" = 321)),
+    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+  )
+  modules <- list("randomLandscapes", #"caribouMovement",
+                  "fireSpread")
+
+  fns <- c(simInitAndSpades, simInit)
+  for (fn in fns) {
+    paths <- list(modulePath = getSampleModules(tmpdir))
+    fileNames <- file.path(paths$modulePath, modules, paste0(modules, ".R"))
+    mySimEvent <- list()
+    for (i in 1:3) {
+      if (identical(i, 3L)) {
+        cat(append = TRUE, sep = "\n", fill = FALSE, file = fileNames[1],
+            "newFun <- function(sim) return(invisible(sim))")
+      }
+      mySimEvent[[i]] <- fn(modules = modules, paths = paths, times = times) |>
+        reproducible::Cache()
+      if (identical(i, 2L))
+        expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
+      if (identical(i, 3L))
+        expect_false(identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[3]])))
+    }
+
+  }
+
+
+  fns <- c(simInitAndSpades2, simInit2)
+  for (fn in fns) {
+    paths <- list(modulePath = getSampleModules(tmpdir))
+    fileNames <- file.path(paths$modulePath, modules, paste0(modules, ".R"))
+    mySimEvent <- list()
+    for (i in 1:3) {
+      if (identical(i, 3L)) {
+        cat(append = TRUE, sep = "\n", fill = FALSE, file = fileNames[1],
+            "newFun <- function(sim) return(invisible(sim))")
+      }
+      mySimEvent[[i]] <- do.call(fn, list(l = list(modules = modules, paths = paths, times = times))) |>
+        reproducible::Cache()
+      if (identical(i, 2L))
+        expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
+      if (identical(i, 3L))
+        expect_false(identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[3]])))
+    }
+
+  }
+})

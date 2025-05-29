@@ -245,7 +245,7 @@ setMethod(
 #'
 #' @param sim         A `simList` object.
 #'
-#' @param simGraph    An [igraph()] object produced by [depsGraph()].
+#' @param simGraph    An [igraph::igraph] object produced by [depsGraph()].
 #'
 #' @return Character vector of module names, sorted in correct load order.
 #'

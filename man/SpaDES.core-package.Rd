@@ -160,7 +160,7 @@ within that slot. Sometimes, this not desired, and a true copy is required.
 
 \tabular{ll}{
 \code{\link[=envir]{envir()}} \tab Access the environment of the \code{simList} directly (advanced)\cr
-\code{\link[=copy]{copy()}} \tab Deep copy of a \code{simList.} (advanced)\cr
+\code{\link[=Copy]{Copy()}} \tab Deep copy of a \code{simList}. (advanced)\cr
 }
 }
 
@@ -252,7 +252,7 @@ Several \code{SpaDES.tools} functions assist with these:
 \tabular{ll}{
 \code{\link[SpaDES.tools:adj]{SpaDES.tools::adj()}} \tab An optimized (i.e., faster) version of \code{\link[terra:adjacent]{terra::adjacent()}}\cr
 \code{\link[SpaDES.tools:cir]{SpaDES.tools::cir()}} \tab Identify pixels in a circle around a \code{\link[sp:SpatialPoints-class]{SpatialPoints*()}} object\cr
-\code{\link[SpaDES.tools:distanceFromEachPoint]{directionFromEachPoint()}} \tab Fast calculation of direction and distance surfaces\cr
+\code{\link[SpaDES.tools:directions]{SpaDES.tools::directionFromEachPoint()}} \tab Fast calculation of direction and distance surfaces\cr
 \code{\link[SpaDES.tools:distanceFromEachPoint]{SpaDES.tools::distanceFromEachPoint()}} \tab Fast calculation of distance surfaces\cr
 \code{\link[SpaDES.tools:rings]{SpaDES.tools::rings()}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
 \code{\link[SpaDES.tools:spokes]{SpaDES.tools::spokes()}} \tab Identify outward radiating spokes from initial points\cr
@@ -269,8 +269,8 @@ Agents have several methods and functions specific to them:
 \code{\link[SpaDES.tools:crw]{SpaDES.tools::crw()}} \tab Simple correlated random walk function\cr
 \code{\link[SpaDES.tools:heading]{SpaDES.tools::heading()}} \tab Determines the heading between \verb{SpatialPoints*}\cr
 \code{\link[quickPlot:makeLines]{quickPlot::makeLines()}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
-\code{\link[SpaDES.tools:crw]{move()}} \tab A meta function that can currently only take "crw"\cr
-\code{\link[SpaDES.tools:specnumperpatch-probs]{specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
+\code{\link[SpaDES.tools:crw]{SpaDES.tools::move()}} \tab A meta function that can currently only take "crw"\cr
+\code{\link[SpaDES.tools:specnumperpatch-probs]{SpaDES.tools::specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
 }
 }
 
@@ -280,7 +280,7 @@ contributed packages such as \code{sf}, \code{terra}, (also \code{sp}, \code{ras
 and many others), we provide the following GIS-related functions:
 
 \tabular{ll}{
-\code{\link[=equalExtent]{equalExtent()}} \tab Assess whether a list of extents are all equal\cr
+\code{\link[quickPlot:equalExtent]{quickPlot::equalExtent()}} \tab Assess whether a list of extents are all equal\cr
 }
 }
 
@@ -299,9 +299,9 @@ We likely will not want the default colours for every map.
 Here are several helper functions to add to, set and get colours of \verb{Raster*} objects:
 
 \tabular{ll}{
-\code{\link[quickPlot:getSetColors]{setColors()}} \tab Set colours for plotting \verb{Raster*} objects\cr
-\code{\link[=getColors]{getColors()}} \tab Get colours in a \verb{Raster*} objects\cr
-\code{\link[=divergentColors]{divergentColors()}} \tab Create a colour palette with diverging colours around a middle\cr
+\code{\link[quickPlot:getSetColors]{quickPlot::setColors()}} \tab Set colours for plotting \verb{Raster*} objects\cr
+\code{\link[quickPlot:getSetColors]{quickPlot::getColors()}} \tab Get colours in a \verb{Raster*} objects\cr
+\code{\link[quickPlot:divergentColors]{quickPlot::divergentColors()}} \tab Create a colour palette with diverging colours around a middle\cr
 }
 }
 
@@ -331,11 +331,11 @@ They are intended to make translations from SELES (https://www.gowlland.ca/).
 You must know how to use SELES for these to be useful:
 
 \tabular{ll}{
-\code{\link[SpaDES.tools:SELESagentLocation]{agentLocation()}} \tab Agent location\cr
+\code{\link[SpaDES.tools:SELESagentLocation]{SpaDES.tools::agentLocation()}} \tab Agent location\cr
 \code{\link[SpaDES.tools:initiateAgents]{SpaDES.tools::initiateAgents()}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
-\code{\link[SpaDES.tools:SELESnumAgents]{numAgents()}} \tab Number of agents\cr
-\code{\link[SpaDES.tools:SELESprobInit]{probInit()}} \tab Probability of initiating an agent or event\cr
-\code{\link[SpaDES.tools:SELEStransitions]{transitions()}} \tab Transition probability\cr
+\code{\link[SpaDES.tools:SELESnumAgents]{SpaDES.tools::numAgents()}} \tab Number of agents\cr
+\code{\link[SpaDES.tools:SELESprobInit]{SpaDES.tools::probInit()}} \tab Probability of initiating an agent or event\cr
+\code{\link[SpaDES.tools:SELEStransitions]{SpaDES.tools::transitions()}} \tab Transition probability\cr
 }
 }
 
@@ -344,9 +344,9 @@ Functions that may be useful within a \code{SpaDES} context:
 
 \tabular{ll}{
 \code{\link[SpaDES.tools:inRange]{SpaDES.tools::inRange()}} \tab Test whether a number lies within range \verb{[a,b]}\cr
-\code{\link[=layerNames]{layerNames()}} \tab Get layer names for numerous object classes\cr
-\code{\link[=numLayers]{numLayers()}} \tab Return number of layers\cr
-\code{\link[=paddedFloatToChar]{paddedFloatToChar()}} \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
+\code{\link[quickPlot:layerNames]{quickPlot::layerNames()}} \tab Get layer names for numerous object classes\cr
+\code{\link[quickPlot:numLayers]{quickPlot::numLayers()}} \tab Return number of layers\cr
+\code{\link[reproducible:paddedFloatToChar]{reproducible::paddedFloatToChar()}} \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
 }
 }
 }
@@ -385,7 +385,7 @@ and speed of plotting:
 
 Commonly used:
 \tabular{ll}{
-\code{\link[=Plot]{Plot()}} \tab The workhorse plotting function\cr
+\code{\link[quickPlot:Plot]{quickPlot::Plot()}} \tab The workhorse plotting function\cr
 }
 
 Simulation diagrams:
@@ -397,13 +397,13 @@ Simulation diagrams:
 
 Other useful plotting functions:
 \tabular{ll}{
-\code{\link[=clearPlot]{clearPlot()}} \tab Helpful for resolving many errors\cr
-\code{\link[=clickValues]{clickValues()}} \tab Extract values from a raster object at the mouse click location(s)\cr
-\code{\link[=clickExtent]{clickExtent()}} \tab Zoom into a raster or polygon map that was plotted with \code{\link[=Plot]{Plot()}}\cr
-\code{\link[=clickCoordinates]{clickCoordinates()}} \tab Get the coordinates, in map units, under mouse click\cr
-\code{\link[=dev]{dev()}} \tab Specify which device to plot on, making a non-RStudio one as default\cr
-\code{\link[=newPlot]{newPlot()}} \tab Open a new default plotting device\cr
-\code{\link[=rePlot]{rePlot()}} \tab Re-plots all elements of device for refreshing or moving plot\cr
+\code{\link[quickPlot:clearPlot]{quickPlot::clearPlot()}} \tab Helpful for resolving many errors\cr
+\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickValues()}} \tab Extract values from a raster object at the mouse click location(s)\cr
+\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickExtent()}} \tab Zoom into a raster or polygon map that was plotted with \code{\link[quickPlot:Plot]{quickPlot::Plot()}}\cr
+\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickCoordinates()}} \tab Get the coordinates, in map units, under mouse click\cr
+\code{\link[quickPlot:dev]{quickPlot::dev()}} \tab Specify which device to plot on, making a non-RStudio one as default\cr
+\code{\link[quickPlot:newPlot]{quickPlot::newPlot()}} \tab Open a new default plotting device\cr
+\code{\link[quickPlot:Plot]{quickPlot::rePlot()}} \tab Re-plots all elements of device for refreshing or moving plot\cr
 }
 }
 
