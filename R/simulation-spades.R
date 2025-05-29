@@ -1133,6 +1133,12 @@ setMethod(
 
       ## RecoverMode Step 3 -- Initiate the RMO (recovery mode object)
       if (recoverMode > 0) {
+        thisSpadesCallRandomStr <- basename(tempfile(pattern = "rmo"))
+        on.exit({
+          toDel <- dir(dotRMOFilepath(thisSpadesCallRandomStr), full.names = TRUE)
+          if (length(toDel) > 0)
+            unlink(toDel)
+                 }, add = TRUE) # for file-backed files)
         rmo <- NULL # The recovery mode object
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
@@ -1559,7 +1565,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
       newList <- list(if (any(objsInSimListAndModule)) {
         # files may disappear for one reason or another; this will fail, silently
         try(Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-             filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo")))
+             filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events)))
       } else {
         list()
       })
@@ -1578,7 +1584,9 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
           mess2 <- capture.output(type = "message",
                                   rmo$recoverableModObjs <- append(list(if (length(objsInModObjects)) {
                                     Copy(mget(objsInModObjects, envir = modEnv),
-                                         filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                                         # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                                         filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
+
                                   } else {
                                     list()
                                   }), rmo$recoverableModObjs)
@@ -2527,3 +2535,12 @@ recoverModeTypo <- function() {
     warning("Please set options('recoveryMode') with a 'y', not options('recoverMode')")
   }
 }
+dotRMOFilepath <- function(thisSpadesCallRandomStr, events) {
+  sub <- if (missing(events))
+    sub <- ""
+  else
+    paste(events[[1]][["moduleName"]], events[[1]][["eventType"]],
+                 sep = "_", round(events[[1]][["eventTime"]]))
+  file.path(getOption("spades.scratchPath"), "._rmo", thisSpadesCallRandomStr, sub)
+}
+
