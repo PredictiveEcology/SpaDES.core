@@ -1389,20 +1389,34 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             # if (getOption("spades.useBox", FALSE) && FALSE)
             #   do.call(box::use, lapply(pkgs, as.name))
             debugForCache <- debugToVerbose(debug)
-            # if (identical(mBase, "mpbRedTopSpread")) browser()
-            sim <- Cache(.inputObjects, sim,
-                         .objects = objectsToEvaluateForCaching,
-                         notOlderThan = notOlderThan,
-                         outputObjects = moduleSpecificInputObjects,
-                         quick = getOption("reproducible.quick", FALSE),
-                         cachePath = sim@paths$cachePath,
-                         classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                                             params = paramsWoKnowns,
-                                             # .globals = globsWoKnowns,
-                                             modules = mBase),
-                         showSimilar = showSimilar,
-                         userTags = c(paste0("module:", mBase),
-                                      "eventType:.inputObjects"), verbose = debugForCache)
+            # if (!file.exists("/home/emcintir/GitHub/FireSenseTesting/inputs/rstLCC2011_FireSenseTestingdf7443ce0c5d1a0c7169884pix_propFlam.tif"))
+            #   browser()
+            if (any(mBase %in% getOption("spades.debugModule"))) {
+              browser()
+            }
+
+            # if (isTRUE("Biomass_borealDataPrep" %in% mBase)) {
+            #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
+            #   browser()
+            # }
+           # if (isTRUE(mBase %in% "fireSense_dataPrepPredict")) browser()
+            # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
+            sim <- .inputObjects(sim) |>
+              Cache(
+                .objects = objectsToEvaluateForCaching,
+                notOlderThan = notOlderThan,
+                outputObjects = moduleSpecificInputObjects,
+                quick = getOption("reproducible.quick", FALSE),
+                cachePath = sim@paths$cachePath,
+                classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                                    params = paramsWoKnowns,
+                                    # .globals = globsWoKnowns,
+                                    modules = mBase),
+                showSimilar = showSimilar,
+                .functionName = paste0(".inputObjects_", mBase),
+                userTags = c(paste0("module:", mBase),
+                             "eventType:.inputObjects"),
+                verbose = debugForCache)
           }
           if (allowSequentialCaching) {
             sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
