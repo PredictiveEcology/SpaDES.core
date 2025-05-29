@@ -9,6 +9,10 @@
 
 \method{unmakeMemoisable}{simList_}(x)
 }
+\arguments{
+\item{x}{An object to make memoisable.
+See individual methods in other packages.}
+}
 \value{
 A \code{simList_} object or a \code{simList}, in the case of \code{unmakeMemoisable}.
 }
@@ -18,5 +22,5 @@ memoise a \code{simList}.
 This method for \code{simList} converts the object to a \code{simList_} first.
 }
 \seealso{
-\code{\link[reproducible:makeMemoisable]{reproducible::makeMemoisable()}}
+\code{\link[reproducible:exportedMethods]{reproducible::makeMemoisable()}}
 }

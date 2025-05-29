@@ -36,6 +36,12 @@ incorrect paths in \code{Filenames(sim)} if the the \code{file} being read in is
 a different computer, path, or drive. This could be the output from \code{unzipSimList}
 (which is calls \code{loadSimList} internally, passing the unzipped filenames)}
 
+\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
+
 \item{zipfile}{Filename of a zipped \code{simList}}
 
 \item{load}{Logical. If \code{TRUE}, the default, then the \code{simList} will

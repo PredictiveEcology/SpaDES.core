@@ -6,6 +6,17 @@
 \usage{
 \S4method{.addChangedAttr}{simList}(object, preDigest, origArguments, ...)
 }
+\arguments{
+\item{object}{Any R object returned from a function}
+
+\item{preDigest}{The full, element by element hash of the input arguments to that same function,
+e.g., from \code{.robustDigest}}
+
+\item{origArguments}{These are the actual arguments (i.e., the values, not the names) that
+were the source for \code{preDigest}}
+
+\item{...}{Anything passed to methods.}
+}
 \value{
 returns the object with attribute added
 }
@@ -17,5 +28,5 @@ When this function is subsequently called again, only these changed objects
 will be returned. All other \code{simList} objects will remain unchanged.
 }
 \seealso{
-\link[reproducible:.addChangedAttr]{reproducible::.addChangedAttr}
+\link[reproducible:exportedMethods]{reproducible::.addChangedAttr}
 }

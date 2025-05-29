@@ -6,6 +6,9 @@
 \usage{
 \S4method{.preDigestByClass}{simList}(object)
 }
+\arguments{
+\item{object}{Any R object returned from a function}
+}
 \value{
 character vector corresponding to the names of objects stored in the \code{.xData} slot
 }
@@ -13,10 +16,10 @@ character vector corresponding to the names of objects stored in the \code{.xDat
 Takes a snapshot of \code{simList} objects.
 }
 \details{
-See \code{\link[reproducible:.preDigestByClass]{reproducible::.preDigestByClass()}}.
+See \code{\link[reproducible:exportedMethods]{reproducible::.preDigestByClass()}}.
 }
 \seealso{
-\link[reproducible:.preDigestByClass]{reproducible::.preDigestByClass}
+\link[reproducible:exportedMethods]{reproducible::.preDigestByClass}
 }
 \author{
 Eliot McIntire

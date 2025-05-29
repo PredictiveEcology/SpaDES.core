@@ -5,10 +5,29 @@
 \title{Convenience wrapper around \code{clearCache} for SpaDES events}
 \usage{
 clearCacheEventsOnly(
-  ask,
+  ask = TRUE,
   x = getOption("reproducible.cachePath"),
+  dryRun = FALSE,
   verbose = getOption("reproducible.verbose")
 )
+}
+\arguments{
+\item{ask}{Logical. If \code{FALSE}, then it will not ask to confirm deletions using
+\code{clearCache} or \code{keepCache}. Default is \code{TRUE}}
+
+\item{x}{A simList or a directory containing a valid Cache repository. Note:
+For compatibility with \code{Cache} argument, \code{cachePath} can also be
+used instead of \code{x}, though \code{x} will take precedence.}
+
+\item{dryRun}{logical. If \code{FALSE}, the default, then the function will deleted
+entries in the Cache. If \code{TRUE}, the function will identify which events and .inputObjects
+will be deleted, without deleting them.}
+
+\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 }
 \value{
 A list of individual \code{clearCache} outputs, one for each event that was

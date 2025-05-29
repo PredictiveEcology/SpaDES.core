@@ -6,11 +6,21 @@
 \usage{
 \S4method{.addTagsToOutput}{simList}(object, outputObjects, FUN, preDigestByClass)
 }
+\arguments{
+\item{object}{Any R object returned from a function}
+
+\item{outputObjects}{Optional character vector indicating which objects to
+return. This is only relevant for list, environment (or similar) objects}
+
+\item{FUN}{A function}
+
+\item{preDigestByClass}{A list, usually from \code{.preDigestByClass}}
+}
 \value{
 modified \code{object}, with attributes added
 }
 \description{
-See \code{\link[reproducible:.addTagsToOutput]{reproducible::.addTagsToOutput()}}.
+See \code{\link[reproducible:exportedMethods]{reproducible::.addTagsToOutput()}}.
 }
 \author{
 Eliot McIntire
