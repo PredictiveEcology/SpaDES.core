@@ -2020,57 +2020,61 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 loggingMessagePrefixLength <- 15
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
-  st <- Sys.time()
-  stForm1 <- "%h%d"
-  stForm2 <- paste(stForm1, "%H:%M:%S")
-  numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
-  middleFix <- ""
-  noNew <- FALSE
-  if (numCharsMax > 0) {
-    sim2 <- list() # don't put a `sim` here because whereInStack will find this one
-    while (!is(sim2, "simList")) {
-      simEnv <- try(whereInStack("sim"), silent = TRUE)
-      if (is(simEnv, "try-error"))
-        break
-      sim <- get0("sim", envir = simEnv, inherits = FALSE)
-      if (is(sim, "simList"))
-        sim2 <- sim
-    }
+  if (!isTRUE(any(grepl(.txtNoPrefix, mess)))) {
+    st <- Sys.time()
+    stForm1 <- "%h%d"
+    stForm2 <- paste(stForm1, "%H:%M:%S")
+    numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
+    middleFix <- ""
+    noNew <- FALSE
+    if (numCharsMax > 0) {
+      sim2 <- list() # don't put a `sim` here because whereInStack will find this one
+      while (!is(sim2, "simList")) {
+        simEnv <- try(whereInStack("sim"), silent = TRUE)
+        if (is(simEnv, "try-error"))
+          break
+        sim <- get0("sim", envir = simEnv, inherits = FALSE)
+        if (is(sim, "simList"))
+          sim2 <- sim
+      }
 
-    if (!is(sim, "try-error") && !is.null(sim)) {
-      # If this is a nested spades call, will have time already at start
-      if (startsWith(mess, strftime(st, format = "%h%d"))) {
-        noNew <- TRUE
-      } else {
-        middleFix <- paste(sim[["._simNesting"]], collapse = "/")
+      if (!is(sim, "try-error") && !is.null(sim)) {
+        # If this is a nested spades call, will have time already at start
+        if (startsWith(mess, strftime(st, format = "%h%d"))) {
+          noNew <- TRUE
+        } else {
+          middleFix <- paste(sim[[._txtSimNesting]], collapse = "/")
+        }
       }
     }
-  }
-  prependTime <- strftime(st, format = stForm2)
+    prependTime <- strftime(st, format = stForm2)
 
-  # need to remove final \n, but strsplit on any internal \n
-  slashN <- gregexpr("\n", mess)[[1]]
-  if (isTRUE(slashN[1] > 0)) {
-    # Eliot -- I tried various ways of doing this ... they are similar execution time; this is simplest
-    len <- length(slashN)
-    mess <- gsub(pattern = "\\n$", replacement = "", mess)
-    if (len > 1) {
-      mess <- strsplit(mess, "\n")[[1]]
-      mess[-len] <- paste0(mess[-len], "\n")
+    # need to remove final \n, but strsplit on any internal \n
+    slashN <- gregexpr("\n", mess)[[1]]
+    if (isTRUE(slashN[1] > 0)) {
+      # Eliot -- I tried various ways of doing this ... they are similar execution time; this is simplest
+      len <- length(slashN)
+      mess <- gsub(pattern = "\\n$", replacement = "", mess)
+      if (len > 1) {
+        mess <- strsplit(mess, "\n")[[1]]
+        mess[-len] <- paste0(mess[-len], "\n")
+      }
     }
-  }
 
-  # Prepend the middle
-  if (isTRUE(any(grepl("\b", mess)))) {
-    # noNew <- TRUE
-    mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
+    # Prepend the middle
+    if (isTRUE(any(grepl("\b", mess)))) {
+      # noNew <- TRUE
+      mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
+    } else {
+      messPoss <- paste0(middleFix, " ", mess)
+      if (!isTRUE(noNew)) {
+        # Prepend the time
+        mess <- paste0(prependTime, " ", messPoss)
+
+      }
+    }
   } else {
-    messPoss <- paste0(middleFix, " ", mess)
-    if (!isTRUE(noNew)) {
-      # Prepend the time
-      mess <- paste0(prependTime, " ", messPoss)
-
-    }
+    mess <- gsub(.txtNoPrefix, "", mess)
   }
 
   mess
