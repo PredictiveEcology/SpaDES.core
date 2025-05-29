@@ -874,9 +874,9 @@ setMethod(
                         notOlderThan, ...) {
     namesMatchCall <- names(match.call())
     namesMatchCall <- setdiff(namesMatchCall, ...names())
-
-    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
-    names(li) <- namesMatchCall[-1]
+    li <- Map(x = namesMatchCall[-1], function(x) eval(parse(text = x)))
+    # li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    # names(li) <- namesMatchCall[-1]
     # find the simInit call that was responsible for this, get the objects
     #   in the environment of the parents of that call, and pass them to new
     #   environment.
@@ -921,9 +921,8 @@ setMethod(
                         notOlderThan, ...) {
     namesMatchCall <- names(match.call())
     namesMatchCall <- setdiff(namesMatchCall, ...names())
-
-    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
-    names(li) <- namesMatchCall[-1]
+    li <- Map(x = namesMatchCall[-1], function(x) eval(parse(text = x)))
+    # names(li) <- namesMatchCall[-1]
     li$modules <- as.list(modules)
 
     li <- .fillInSimInit(li, namesMatchCall)
@@ -965,9 +964,7 @@ setMethod(
     namesMatchCall <- names(match.call())
     namesMatchCall <- setdiff(namesMatchCall, ...names())
 
-    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
-    names(li) <- namesMatchCall[-1]
-
+    li <- Map(x = namesMatchCall[-1], function(x) eval(parse(text = x)))
     li <- .fillInSimInit(li, namesMatchCall)
 
     expectedClasses <- c("list",
