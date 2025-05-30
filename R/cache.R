@@ -571,7 +571,6 @@ setMethod(
     whSimList <- which(unlist(lapply(simPre, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
 
-    # if (exists("aaaa", envir = .GlobalEnv)) browser()
     if (simListInput) {
       simPreOrigEnv <- simPre[[whSimList]]@.xData
 
@@ -662,11 +661,6 @@ setMethod(
 
         # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
         list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
-
-        # if ("fireSense_dataPrepFit" %in% currModules) {
-        #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-        #   browser()
-        # }
 
         otherModules <- setdiff(namesAllMods, currModules)
         # Need to pull all things from "other modules" i.e., functions and .objects etc. from non currModules
