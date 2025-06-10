@@ -1013,6 +1013,7 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
   objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
