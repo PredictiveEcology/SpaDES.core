@@ -8,7 +8,7 @@ makeSimListActiveBindings <- function(sim) {
 }
 
 makeModActiveBinding <- function(sim, mod) {
-  if (.isPackage(fullModulePath = mod, sim = sim)) {
+  if (all(.isPackage(fullModulePath = mod, sim = sim))) {
     env <- asNamespace(.moduleNameNoUnderscore(mod))
   } else {
     env <- sim@.xData$.mods[[mod]]
