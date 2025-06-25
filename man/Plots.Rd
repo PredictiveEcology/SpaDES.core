@@ -130,7 +130,7 @@ the file(s) that is/are saved will be appended to the \code{outputs} slot of the
 
     Plots(data = sim$something, fn = fn,
           types = c("png"),
-          path = file.path("figures"),
+          path = file.path(tempdir(), "figures"),
           filename = tempfile(),
           .plotInitialTime = 1)
 
@@ -138,7 +138,7 @@ the file(s) that is/are saved will be appended to the \code{outputs} slot of the
     Plots(
       data = sim$something, fn = fn,
       types = c("png", "screen"),
-      path = file.path("figures"),
+      path = file.path(tempdir(), "figures"),
       filename = tempfile(),
       .plotInitialTime = 1
     )

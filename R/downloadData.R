@@ -183,7 +183,7 @@ remoteFileSize <- function(url) {
 #' @param urls Character vector of urls from which to get the data. This is automatically
 #'             found from module metadata when this function invoked with
 #'            `SpaDES.core::downloadModule(..., data = TRUE)`. See also
-#'            [prepInputs()].
+#'            [reproducible::prepInputs()].
 #'
 #' @param children The character vector of child modules (without path) to also
 #'                 run `downloadData` on
@@ -192,7 +192,7 @@ remoteFileSize <- function(url) {
 #'
 #' @return Invisibly, a list of downloaded files.
 #'
-#' @seealso [prepInputs()], [checksums()], and [downloadModule()]
+#' @seealso [reproducible::prepInputs()], [checksums()], and [downloadModule()]
 #' for downloading modules and building a checksums file.
 #'
 #' @author Alex Chubaty & Eliot McIntire

@@ -77,7 +77,7 @@ plot(ig)
 
 }
 \seealso{
-\code{\link[=igraph]{igraph()}}, \code{\link[=moduleGraph]{moduleGraph()}} for a version that accounts for
+\link[igraph:aaa-igraph-package]{igraph::igraph}, \code{\link[=moduleGraph]{moduleGraph()}} for a version that accounts for
 parent and children module structure.
 }
 \author{
