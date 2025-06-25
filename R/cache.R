@@ -720,9 +720,18 @@ setMethod(
           simPost@simtimes <- simFromCache@simtimes
         } else {
           # if this is FALSE, it means that events were added by the event
-          eventsAddedByThisModule <- events(simFromCache)$moduleName == current(simPost)$moduleName
-          if (isTRUE(any(eventsAddedByThisModule))) {
-            if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
+
+          esfc <- events(simFromCache)
+          cur <- current(simFromCache)
+
+          # anti-join to find new ones
+          eventsAddedByThisModuleDT <- esfc[!events(simPost), on = colnames(esfc)]
+
+          eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
+
+          if (NROW(eventsAddedByThisModuleDT)) {
+            # browser()
+            # if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
               b <- simFromCache@events
               b <- lapply(b, function(x) {x[["order"]] <- 2; x})
 
@@ -741,7 +750,7 @@ setMethod(
               })
               # simPost@events <- do.call(unique,
               #                           args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
-            }
+            # }
           }
           #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
