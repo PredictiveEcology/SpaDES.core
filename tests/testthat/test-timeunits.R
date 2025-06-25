@@ -15,9 +15,9 @@ test_that("timeunit works correctly", {
 
   expect_equal(maxTimeunit(sim = mySim), "year")
 
-  expect_message(timeunit(mySim) <- 1, "^unknown timeunit provided:")
-  expect_message(timeunit(mySim) <- "LeapYear", "^unknown timeunit provided:")
   ## test for numerics, or character strings that are not recognized
+  expect_warning(timeunit(mySim) <- 1, "^unknown timeunit provided:")
+  expect_warning(timeunit(mySim) <- "LeapYear", "^unknown timeunit provided:")
 
   ## check for new unit being put into simList
   assign("dfortnight", function(x) dday(14), envir = envir(mySim))
