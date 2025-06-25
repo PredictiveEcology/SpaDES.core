@@ -74,6 +74,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
+#' @importFrom reproducible::Cache
 #' @importFrom cli col_blue
 #'
 #' @examples
@@ -85,14 +86,16 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- restartSpades(s) # don't need to specify `sim` if previous line fails
 #'                      # will take from savedSimEnv()$.sim automatically
 #' }
-restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...) {
-  message("This is very experimental and will only work if the event that caused ",
-          "the error has not yet changed the simList.\n",
-          "This should be used with caution.")
+restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE,
+                          verbose = getOption("reproducible.verbose", 1L), ...) {
+  message("Running restartSpades ... this is very experimental; ",
+          "this should be used with caution.")
 
   # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
     sim <- savedSimEnv()$.sim
+    messageVerbose("sim not supplied, using \n",
+            "sim <- savedSimEnv()$.sim", verbose = verbose)
   }
   if (is.character(sim)) {
     sim <- SpaDES.core::loadSimList(sim)
