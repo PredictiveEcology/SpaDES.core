@@ -184,13 +184,15 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
           list2env(objsToCopy[names(fd1)], envir = sim@.xData)
       }
 
-      modObjNames <- names(sim$.recoverableModObjs[[event]])
-      modObjEnv <- sim$.mods[[modules[event]]]$.objects
-      modObjLs <- ls(modObjEnv)
-      if (length(modObjLs)) { # there are some --> maybe need to delete them
-        toDelete <- setdiff(modObjLs, modObjNames)
-        if (length(toDelete)) {
-          rm(list = toDelete, envir = modObjEnv)
+      if (length(sim$.recoverableModObjs)) {
+        modObjNames <- names(sim$.recoverableModObjs[[event]])
+        modObjEnv <- sim[[dotObjs]][[modules[event]]] # $.objects
+        modObjLs <- ls(modObjEnv)
+        if (length(modObjLs)) { # there are some --> maybe need to delete them
+          toDelete <- setdiff(modObjLs, modObjNames)
+          if (length(toDelete)) {
+            rm(list = toDelete, envir = modObjEnv)
+          }
         }
       }
 
@@ -249,7 +251,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       #ee$sim <- sim
       # sim@.xData[[module]]$sim <- sim
       lapply(pp, function(pp1)
-        evalWithActiveCode(pp1, sim@.xData$.mods[[module]], sim = sim, pkgs = pkgs))
+        evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim, pkgs = pkgs))
       message(cli::col_blue("Reparsing ", module, " source code"))
     }
     #rm(list = "sim", envir = ee)
@@ -513,7 +515,7 @@ restartOrSimInitAndSpades <- function(ll, file,
   hasSavedToFileState <- file.exists(file)
   if (!cached || !(hasSavedToFileState || hasSavedToRAMState)) {
     message("ll has changed; rerunning simInitAndSpades")
-    sim <- do.call(SpaDES.core::simInitAndSpades, ll)
+    sim <- doCallSafe(SpaDES.core::simInitAndSpades, ll)
   } else {
     message("ll has not changed; trying restartSpades")
     if (isFALSE(hasSavedToRAMState)) {
