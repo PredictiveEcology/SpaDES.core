@@ -29,7 +29,7 @@ Authors@R: c(
                  "as represented by the Minister of Natural Resources Canada"), role = "cph")
   )
 Depends:
-    R (>= 4.2),
+    R (>= 4.3),
     quickPlot (>= 1.0.2),
     reproducible (>= 2.1.2.9027)
 Imports:

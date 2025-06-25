@@ -10,8 +10,11 @@
 * new function `doCallSafe` that can be used for `doCallSafe(simInitAndSpades, out)`, and it does not suffer from the slow downs of `do.call`; 
 * many changes to accommodate updates to `reproducible` package, specifically the `Cache` function. These include
   - 
+* drop support for R 4.2;
 * fix edge case with caching of events; `outputs` would create false positives (i.e., a change, when there wasn't one); this meant that caching would only be successful after the 2nd time running the event, if another module had put objects in the `outputs` list, especially by using `Plots`
 * fix issue with `Plots()` where plots were discarded if no filename was specified;
+* fixed timeunit test failures (#297);
+* add package anchors to Rd links (#300);
 * minor documentation improvements;
 * new option: `spades.reqdPkgsDontLoad`, a character vector. If anything is specified, 
 then it will not be loaded with `require` or `library`, but it will be installed, if needed,

@@ -2503,7 +2503,7 @@ setMethod(
 #'
 #' Currently, only get and set methods are defined. Subset methods are not.
 #'
-#' @note Each event is represented by a [data.table()] row consisting of:
+#' @note Each event is represented by a [data.table::data.table()] row consisting of:
 #'  \itemize{
 #'    \item `eventTime`: The time the event is to occur.
 #'    \item `moduleName`: The module from which the event is taken.

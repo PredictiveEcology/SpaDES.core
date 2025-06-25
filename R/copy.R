@@ -13,16 +13,14 @@ if (!isGeneric("Copy")) {
 #' As one `simList` object changes so will the other.
 #' When this is not the desired behaviour, use this function.
 #'
-#' @note uses capital C, to limit confusion with e.g., `data.table::copy()`.
-#'
-#' @seealso [reproducible::Copy()]
+#' @note uses capital C, to limit confusion with e.g., [data.table::copy()].
 #'
 #' @inheritParams reproducible::Copy
 #'
 #' @param objects  Whether the objects contained within the `simList` environment
 #'                 should be copied. Default `TRUE`, which may be slow.
 #' @param queues Logical. Should the events queues (`events`, `current`, `completed`)
-#'               be deep copied via `data.table::copy()`
+#'               be deep copied via [data.table::copy()]
 #'
 #' @param modules Logical. Should list of modules be copied.
 #'
@@ -34,7 +32,7 @@ if (!isGeneric("Copy")) {
 #' file-backed, such as some `Raster*`-class objects. For all the objects that
 #' are file-backed, it is likely *very* important to give unique file-backed
 #' directories. This should be passed here, which gets passed on to the many methods
-#' of `Copy` in `reproducible`.
+#' of [reproducible::Copy()].
 #'
 #' @author Eliot McIntire
 #' @exportMethod Copy
@@ -58,8 +56,8 @@ setMethod("Copy",
               sim_@current <- object@current
               list2env(as.list(object@completed), envir = sim_@completed)
             }
-            #sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
-            #sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
+            # sim_@.xData <- new.env(parent = asNamespace("SpaDES.core"))
+            # sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
             sim_@.xData <- new.env(parent = emptyenv())
             sim_@.xData[[dotMods]] <- new.env(parent = asNamespace("SpaDES.core"))
             # Setup dotObjs later because it is not vectorized over module
@@ -80,7 +78,6 @@ setMethod("Copy",
                        envir = sim_@.xData)
             }
             if (objects > 0) {
-
               # browser(expr = exists("._Copy_6"))
               # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
               if (objects == 1) {
@@ -108,11 +105,10 @@ setMethod("Copy",
                   if (is.function(get(obj, envir = sim_@.xData[[dotObjs]][[en]]))) {
                     environment(sim_@.xData[[dotObjs]][[en]][[obj]]) <- sim_@.xData[[dotObjs]][[en]]
                   }
-                }
-                ))
+                }))
               })
 
-              # Copy .objects
+              ## Copy .objects
               modsToCopy <- modules(sim_)
               if (is.character(modules)) {
                 modsToCopy <- intersect(modules, modsToCopy)
@@ -132,7 +128,7 @@ setMethod("Copy",
                 }
               })
 
-              # Deal with activeBindings
+              ## Deal with activeBindings
               makeSimListActiveBindings(sim_)
             }
             sim_@.envir <- sim_@.xData

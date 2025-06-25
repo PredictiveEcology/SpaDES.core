@@ -1648,9 +1648,12 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
   message(cli::col_magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
                                   format(rmo$recoverModeTiming, units = "auto", digits = 3),
                                   " and ", format(recoverableObjsSize, units = "auto"))))
+  recmod <- as.integer(recoverMode)
   message(cli::cli_text(cli::col_magenta(
     paste(
-      "The initial state of the last", as.integer(recoverMode), "events are cached and saved",
+      "The initial state of the last ", recmod,
+      singularPlural(c("event", "events"), v = recmod),
+      isAre(v = recmod)," cached and saved",
       "in the {.var simList} located at {.code savedSimEnv()$.sim} as",
       "{.code sim$.recoverableObjs} with the most recent event as the first element in the list,",
       "second most recent event as the second element, etc.",
