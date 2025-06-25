@@ -149,7 +149,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   } else {
     # if the current time is greater than end time, then don't run it
     if (cur[["eventTime"]] <= sim@simtimes[["end"]]) {
-      fnEnv <- sim@.xData$.mods[[curModuleName]]
+      fnEnv <- sim@.xData[[dotMods]][[curModuleName]]
 
       # This allows spades to run even if all the functions are in the .GlobalEnv;
       #   while this is generally bad practice, and none of the tools in spades
@@ -303,19 +303,19 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
         # browser(expr = exists("._doEvent_3"))
         if (!fnEnvIsSpaDES.core) {
-          if (!exists(curModuleName, envir = sim@.xData$.mods, inherits = FALSE))
+          if (!exists(curModuleName, envir = sim@.xData[[dotMods]], inherits = FALSE))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!is.environment(get(curModuleName, envir = sim@.xData$.mods)))
+          if (!is.environment(get(curModuleName, envir = sim@.xData[[dotMods]])))
             stop("The module named ", curModuleName, " just corrupted the object with that ",
                  "name from from the simList. ",
                  "Please remove the section of code that does this in the event named: ",
                  cur[["eventType"]])
 
-          if (!exists("mod", envir = sim@.envir$.mods[[curModuleName]], inherits = FALSE)) {
+          if (!exists("mod", envir = sim@.envir[[dotMods]][[curModuleName]], inherits = FALSE)) {
             if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
                                       silent = TRUE, error = function(x) FALSE)
             ))
@@ -881,11 +881,11 @@ setMethod(
       tf <- tempfile();
       on.exit(unlink(tf))
       cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-      sim$.mods[[modNam]]$sim <- sim
+      sim[[dotMods]][[modNam]]$sim <- sim
       opts <- options("spades.covr2" = FALSE) # turn off this chunk 2nd time through
       on.exit(options(opts), add = TRUE)
-      aa <- covr::environment_coverage(sim$.mods[[modNam]], test_files = tf)
-      rm(list = "sim", envir = sim$.mods[[modNam]])
+      aa <- covr::environment_coverage(sim[[dotMods]][[modNam]], test_files = tf)
+      rm(list = "sim", envir = sim[[dotMods]][[modNam]])
       options("spades.covr2" = TRUE)
       if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
       .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
@@ -941,7 +941,8 @@ setMethod(
       }, add = TRUE)
 
       if (!is.null(sim@.xData[["._randomSeed"]])) {
-        message("Resetting .Random.seed of session because sim$._randomSeed is not NULL. ",
+        message("Resetting .Random.seed of session to the pre-existing value \n",
+                "because sim$._randomSeed is not NULL. ",
                 "To get a different seed, run: sim$._randomSeed <- NULL to clear it.")
         assign(".Random.seed", sim@.xData$._randomSeed[[1]], envir = .GlobalEnv)
         if (!is.null(sim$._rng.kind)) {
@@ -1464,10 +1465,10 @@ setMethod(
 
   ## Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
-    if (!is.null(sim@.xData$.mods[[cur[["moduleName"]]]]$.objects)) {
+    if (!is.null(sim@.xData[[dotObjs]][[cur[["moduleName"]]]])) { # $.objects
       sim$._knownObjects <- testMemoryLeaks(
         simEnv = sim@.xData,
-        modEnv = sim@.xData$.mods[[cur[["moduleName"]]]]$.objects,
+        modEnv = sim@.xData[[dotObjs]][[cur[["moduleName"]]]], # .objects
         modName = cur[["moduleName"]],
         knownObjects = sim@.xData$._knownObjects
       )
@@ -1486,9 +1487,9 @@ setMethod(
     if (isTRUE(is(out, "try-error"))) {
       numTries <- numTries + 1
       if (numTries > 1) {
-        tmp <- .parseConditional(filename = sim@.xData$.mods[[cur[["moduleName"]]]]$._sourceFilename)
+        tmp <- .parseConditional(filename = sim@.xData[[dotMods]][[cur[["moduleName"]]]]$._sourceFilename)
         eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
-             envir = sim@.xData$.mods[[cur[["moduleName"]]]])
+             envir = sim@.xData[[dotMods]][[cur[["moduleName"]]]])
         numTries <- 0
       } else {
         message("There was an error in the code in the ", moduleCall, ".\n",
@@ -1586,14 +1587,14 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
       rmo$recoverableObjs <- append(newList, rmo$recoverableObjs)
     })
 
-    if (exists(curMod, envir = sim$.mods)) {
-      if (!is.null(sim$.mods[[curMod]])) {
-        if (exists(".objects", sim$.mods[[curMod]])) {
-          modEnv <- sim$.mods[[curMod]]$.objects
-          objsInModObjects <- ls(modEnv)
+    if (exists(curMod, envir = sim[[dotObjs]])) {
+      if (!is.null(sim[[dotObjs]][[curMod]])) {
+        # if (exists(".objects", sim[[dotObjs]][[curMod]])) {
+          modObjEnv <- sim[[dotObjs]][[curMod]]# $.objects
+          objsInModObjects <- ls(modObjEnv)
           mess2 <- capture.output(type = "message",
                                   rmo$recoverableModObjs <- append(list(if (length(objsInModObjects)) {
-                                    Copy(mget(objsInModObjects, envir = modEnv),
+                                    Copy(mget(objsInModObjects, envir = modObjEnv),
                                          # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
                                          filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
 
@@ -1601,7 +1602,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
                                     list()
                                   }), rmo$recoverableModObjs)
           )
-        }
+        # }
       }
     }
 
@@ -1861,9 +1862,9 @@ getFutureNeeds <- function(deps, curModName) {
   spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1]), collapse = "")
   message(cli::col_magenta(spacing, "-- Spawning in a future"))
   sim$.futureEventsSkipped <- sim$.futureEventsSkipped + 1
-  modEnv <- sim$.mods[[cur[["moduleName"]]]]
-  objsToGet <- grep("^\\._", ls(envir = modEnv, all.names = TRUE), value = TRUE, invert = TRUE)
-  modObjs <- mget(objsToGet, envir = modEnv)
+  modFnEnv <- sim[[dotMods]][[cur[["moduleName"]]]]
+  objsToGet <- grep("^\\._", ls(envir = modFnEnv, all.names = TRUE), value = TRUE, invert = TRUE)
+  modObjs <- mget(objsToGet, envir = modFnEnv)
   pkgs <- getFromNamespace("extractPkgName", "Require")(unlist(sim@depends@dependencies[[cur[["moduleName"]]]]@reqdPkgs))
   list2env(modObjs, envir = envir)
   objsKepts <- na.omit(inputObjects(sim, module = currentModule(sim))[["objectName"]])
@@ -2100,7 +2101,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'    remaining unevaluated until that new function is called.
 #' @param envir An optional environment to specify where to put the resulting function.
 #'     The default will place a function called `doEvent.moduleName.eventName` in the
-#'     module function location, i.e., `sim$.mods[[moduleName]]`. However, if this
+#'     module function location, i.e., `sim[[dotMods]][[moduleName]]`. However, if this
 #'     location does not exist, then it will place it in the `parent.frame()`, with a message.
 #'     Normally, especially, if used within SpaDES module code, this should be left missing.
 #' @export
@@ -2158,10 +2159,10 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
         useSimModsEnv <- TRUE
       }
     } else {
-      if (exists(moduleName, sim$.mods, inherits = FALSE))
+      if (exists(moduleName, sim[[dotMods]], inherits = FALSE))
         useSimModsEnv <- TRUE
     }
-    # envir <- if (useSimModsEnv) sim$.mods[[moduleName]] else parent.frame()
+    # envir <- if (useSimModsEnv) sim[[dotMods]][[moduleName]] else parent.frame()
   }
 
   eventFnName <-  makeEventFn(moduleName, eventName)
@@ -2255,8 +2256,8 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
   }
 
   if (missing(fn)) {
-    fn <- parse(text = deparse(sim$.mods[[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]]))[[1]]
-    env <- environment(sim$.mods[[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]])
+    fn <- parse(text = deparse(sim[[dotMods]][[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]]))[[1]]
+    env <- environment(sim[[dotMods]][[currnt[["moduleName"]]]][[paste0("doEvent.", currnt[["moduleName"]])]])
   }
   num <- grep(wh[1], fn)
   if (wh[1] != "scheduleEvent") {
