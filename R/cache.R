@@ -94,7 +94,6 @@ setMethod(
 
                        if (is.list(objs)) {
                          out <- Map(obj = objs, moduleNam = names(objs), function(obj, moduleNam) {
-                           # if (exists("aaaa", envir = .GlobalEnv)) browser()
                            if (!is.null(.objects[[xDataDotModDotObj]][[moduleNam]]) && length(obj)) {
                              digestEnviros(obj, .objects[[xDataDotModDotObj]][[moduleNam]],
                                            allEnvsInSimList[[xDataDotModDotObj]][[moduleNam]], algo, quick, length, classOptions)
@@ -233,6 +232,11 @@ setMethod(
     obj <- .sortDotsUnderscoreFirst(obj)
     obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")],
                                     quick = TRUE, algo = algo)
+    if (!is.null(classOptions$depends)) { # this is used for Cache(.inputObjects(...))
+      keep <- intersect(names(obj$depends[[curMod]]), classOptions$depends)
+      obj$depends[[curMod]] <- obj$depends[[curMod]][keep]
+    }
+
     if (!is.null(classOptions$events)) {
       if (FALSE %in% classOptions$events) obj$events <- NULL
     }
