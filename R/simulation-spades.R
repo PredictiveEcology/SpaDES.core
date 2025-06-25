@@ -1460,7 +1460,7 @@ setMethod(
   if (debugToVerbose(debug)) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore)
   }
-  printDebugPrint() # this is getOption("spades.debugPrint")
+  evalPostEvent() # this is getOption("spades.evalPostEvent")
 
   ## Test for memory leaks
   if (getOption("spades.testMemoryLeaks", TRUE)) {
@@ -2593,9 +2593,9 @@ dotRMOFilepath <- function(thisSpadesCallRandomStr, events) {
   file.path(getOption("spades.scratchPath"), "._rmo", thisSpadesCallRandomStr, sub)
 }
 
-printDebugPrint <- function(envir = parent.frame()) {
-  if (!is.null(getOption("spades.debugPrint"))) {
-    print(getOption("spades.debugPrint"))
-    print(eval(getOption("spades.debugPrint"), envir = envir))
+evalPostEvent <- function(envir = parent.frame()) {
+  if (!is.null(getOption("spades.evalPostEvent"))) {
+    print(getOption("spades.evalPostEvent"))
+    eval(getOption("spades.evalPostEvent"), envir = envir)
   }
 }

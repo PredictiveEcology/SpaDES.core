@@ -52,6 +52,12 @@
 #'     \tab  The default number of \pkg{data.table} threads to use.
 #'     See also `?data.table::setDTthreads`. \cr
 #'
+#'   `spades.evalPostEvent` \tab `NULL`
+#'     \tab  User can put any `quote`d code to evaluate after each event
+#'      (.inputObjects included), e.g., `quote(print(.robustDigest(sim$rstLCC)))`
+#'      will print the digest value of the `sim$rstLCC` after each event so a
+#'      user can monitor its changes \cr
+#'
 #'   `spades.futureEvents` \tab `FALSE`
 #'     \tab  If set to `TRUE`, the event simulator will attempt to spawn events
 #'     whose outputs are not needed (by other events in the `simList`) into a future.
