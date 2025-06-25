@@ -779,8 +779,9 @@ setMethod(
         # keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData[[dotMods]], all.names = TRUE))
         # list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = simPreOrigEnv[[dotMods]]), envir = simPost@.xData[[dotMods]])
 
-        if (exists("objectSynonyms", envir = simPost@.xData)) {
-          objSyns <- lapply(attr(simPost$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+        if (exists(".objectSynonyms", envir = simPost@.xData)) {
+          # objSyns <- lapply(attr(simPost$.objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+          objSyns <- lapply(simPost$.objectSynonyms, function(x) unname(unlist(x)))
           # must remove the "other ones" first
           objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
           objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = simPost@.xData))
@@ -1455,6 +1456,9 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
   # take only the ones that the file changed, based on attr(simFromCache, ".Cache")$changed
   changedOutputs <- createOutputs[createOutputs %in% names(changedObjs)]
 
+  # Basically, inputs shouldn't be returned, except for .inputObjects ... but more
+  #   generally, we will be only be returning those that are changed anyway, which
+  #   should be none if the metadata are correct.
   expectsInputs <- if (length(hasCurrModule)) {
     deps[[hasCurrModule]]@inputObjects$objectName
   } else {
