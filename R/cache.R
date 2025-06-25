@@ -94,7 +94,6 @@ setMethod(
 
                        if (is.list(objs)) {
                          out <- Map(obj = objs, moduleNam = names(objs), function(obj, moduleNam) {
-                           # if (exists("aaaa", envir = .GlobalEnv)) browser()
                            if (!is.null(.objects[[xDataDotModDotObj]][[moduleNam]]) && length(obj)) {
                              digestEnviros(obj, .objects[[xDataDotModDotObj]][[moduleNam]],
                                            allEnvsInSimList[[xDataDotModDotObj]][[moduleNam]], algo, quick, length, classOptions)
@@ -233,6 +232,11 @@ setMethod(
     obj <- .sortDotsUnderscoreFirst(obj)
     obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")],
                                     quick = TRUE, algo = algo)
+    if (!is.null(classOptions$depends)) { # this is used for Cache(.inputObjects(...))
+      keep <- intersect(names(obj$depends[[curMod]]), classOptions$depends)
+      obj$depends[[curMod]] <- obj$depends[[curMod]][keep]
+    }
+
     if (!is.null(classOptions$events)) {
       if (FALSE %in% classOptions$events) obj$events <- NULL
     }
@@ -571,7 +575,6 @@ setMethod(
     whSimList <- which(unlist(lapply(simPre, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
 
-    # if (exists("aaaa", envir = .GlobalEnv)) browser()
     if (simListInput) {
       simPreOrigEnv <- simPre[[whSimList]]@.xData
 
@@ -663,11 +666,6 @@ setMethod(
         # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
         list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
 
-        # if ("fireSense_dataPrepFit" %in% currModules) {
-        #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-        #   browser()
-        # }
-
         otherModules <- setdiff(namesAllMods, currModules)
         # Need to pull all things from "other modules" i.e., functions and .objects etc. from non currModules
         if (length(currModules)) {
@@ -722,9 +720,18 @@ setMethod(
           simPost@simtimes <- simFromCache@simtimes
         } else {
           # if this is FALSE, it means that events were added by the event
-          eventsAddedByThisModule <- events(simFromCache)$moduleName == current(simPost)$moduleName
-          if (isTRUE(any(eventsAddedByThisModule))) {
-            if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
+
+          esfc <- events(simFromCache)
+          cur <- current(simFromCache)
+
+          # anti-join to find new ones
+          eventsAddedByThisModuleDT <- esfc[!events(simPost), on = colnames(esfc)]
+
+          eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
+
+          if (NROW(eventsAddedByThisModuleDT)) {
+            # browser()
+            # if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
               b <- simFromCache@events
               b <- lapply(b, function(x) {x[["order"]] <- 2; x})
 
@@ -743,7 +750,7 @@ setMethod(
               })
               # simPost@events <- do.call(unique,
               #                           args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
-            }
+            # }
           }
           #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
@@ -772,8 +779,9 @@ setMethod(
         # keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData[[dotMods]], all.names = TRUE))
         # list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = simPreOrigEnv[[dotMods]]), envir = simPost@.xData[[dotMods]])
 
-        if (exists("objectSynonyms", envir = simPost@.xData)) {
-          objSyns <- lapply(attr(simPost$objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+        if (exists(".objectSynonyms", envir = simPost@.xData)) {
+          # objSyns <- lapply(attr(simPost$.objectSynonyms, "bindings"), function(x) unname(unlist(x)))
+          objSyns <- lapply(simPost$.objectSynonyms, function(x) unname(unlist(x)))
           # must remove the "other ones" first
           objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
           objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = simPost@.xData))
@@ -1019,6 +1027,7 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
   objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
@@ -1447,6 +1456,9 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
   # take only the ones that the file changed, based on attr(simFromCache, ".Cache")$changed
   changedOutputs <- createOutputs[createOutputs %in% names(changedObjs)]
 
+  # Basically, inputs shouldn't be returned, except for .inputObjects ... but more
+  #   generally, we will be only be returning those that are changed anyway, which
+  #   should be none if the metadata are correct.
   expectsInputs <- if (length(hasCurrModule)) {
     deps[[hasCurrModule]]@inputObjects$objectName
   } else {
@@ -1454,10 +1466,14 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
       dep@inputObjects$objectName)
     unique(unlist(aa))
   }
+  changedInputs <- expectsInputs[expectsInputs %in% names(changedObjs)]
 
   dotObjects <- startsWith(lsObjectEnv, ".")
   dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs)
-  lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs |
+
+  if (exists("aaaa", envir = .GlobalEnv)) browser()
+  # lsObjectEnv --> this should only be objects that can be outputted, not expectsInputs
+  lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
                 dotObjectsChanged %in% TRUE]
 }
 
