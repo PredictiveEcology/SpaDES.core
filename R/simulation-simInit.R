@@ -1454,6 +1454,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             # }
            # if (isTRUE(mBase %in% "fireSense_dataPrepPredict")) browser()
             # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
+
+            # Remove outputObjects from @depends, as it should not affect the .inputObjects
+            dependsSlots <- metadataToDigest
+            dependsSlots <- setdiff(dependsSlots, "outputObjects")
+
             sim <- .inputObjects(sim) |>
               Cache(
                 .objects = objectsToEvaluateForCaching,
@@ -1461,8 +1466,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                 outputObjects = moduleSpecificInputObjects,
                 quick = getOption("reproducible.quick", FALSE),
                 cachePath = sim@paths$cachePath,
-                classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
+                classOptions = list(events = FALSE,
+                                    current = FALSE,
+                                    completed = FALSE,
+                                    simtimes = FALSE,
                                     params = paramsWoKnowns,
+                                    depends = dependsSlots,
                                     # .globals = globsWoKnowns,
                                     modules = mBase),
                 showSimilar = showSimilar,
@@ -2065,3 +2074,7 @@ debugToVerbose <- function(debug) {
   debugOut[is.na(debugOut)] <- FALSE
   any(as.logical(debugOut))
 }
+
+
+metadataToDigest <- c("inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
+                      "spatialExtent", "timeframe", "timeunit", "version")
