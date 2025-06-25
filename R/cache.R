@@ -1466,10 +1466,14 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
       dep@inputObjects$objectName)
     unique(unlist(aa))
   }
+  changedInputs <- expectsInputs[expectsInputs %in% names(changedObjs)]
 
   dotObjects <- startsWith(lsObjectEnv, ".")
   dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs)
-  lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs |
+
+  if (exists("aaaa", envir = .GlobalEnv)) browser()
+  # lsObjectEnv --> this should only be objects that can be outputted, not expectsInputs
+  lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
                 dotObjectsChanged %in% TRUE]
 }
 
