@@ -715,10 +715,10 @@ setMethod(
               # unlockBinding(mod, sim$.mods)
               if (length(objects))
                 list2env(objects, envir(sim))
-              sim$.mods[[mod]]$sim <- sim
-              aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
-              sim <- sim$.mods[[mod]]$sim
-              rm(list = "sim", envir = sim$.mods[[mod]])
+              sim[[dotMod]][[mod]]$sim <- sim
+              aa <- covr::environment_coverage(sim[[dotMod]][[mod]], test_files = tf)
+              sim <- sim[[dotMod]][[mod]]$sim
+              rm(list = "sim", envir = sim[[dotMod]][[mod]])
               if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
               .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
             } else {
@@ -1372,7 +1372,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
       cur <- sim@current
       curModNam <- cur$moduleName
-      debugMessage(debug, sim, cur, sim@.xData$.mods[[curModNam]], curModNam)
+      debugMessage(debug, sim, cur, sim@.xData[[dotMod]][[curModNam]], curModNam)
 
       if (!(FALSE %in% debug || any(is.na(debug))))
         objsIsNullBefore <- objsAreNull(sim)
@@ -1745,10 +1745,10 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       })
 
       Map(mod = canSafelyRunInit, function(mod) {
-        objEnv <- simAltOut$.mods[[mod]]$.objects
+        objEnv <- simAltOut[[dotObjs]][[mod]] # $.objects
         objsNames <- ls(objEnv, all.names = TRUE)
         objs <- mget(objsNames, objEnv)
-        list2env(objs, sim$.mods[[mod]]$.objects)
+        list2env(objs, sim[[dotObjs]][[mod]]) # $.objects)
       })
       # update parameters -- from simAltOut; then from user passed params
       # Don't use `globals(sim)<-` because it updates the parameters, which we don't want here
