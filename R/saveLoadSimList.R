@@ -346,7 +346,28 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
       newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
-      tmpsim[[nam]][] <- newFiles$newName[]
+      if (is(tmpsim[[nam]], "list")) {
+        # lists are weird; historicalClimateLayers was length 2 list; had 4 filenames, 2 repeated twice
+        #   need to fix this
+        newNames <- unique(newFiles$newName)
+        for (elem in names(tmpsim[[nam]])) {
+          fileHere <- tmpsim[[nam]][[elem]] # should only have 1 element's file(s)
+          dirToFileHere <- dirname(fileHere)
+          nParents <- attr(fileHere, "nParentDirs")
+          1
+          #if (nParents > 0) {
+          for (nPar in rev(seq(nParents + 1))) {
+            dirToFileHere <- dirname(dirToFileHere)
+          }
+          newNames1 <- fs::path_rel(newNames, dirToFileHere)
+          thisFile <- fs::path_rel(fileHere, dirToFileHere)
+          newNames1 <- newNames1[newNames1 %in% thisFile]
+          newNamesHere <- file.path(dirToFileHere, newNames1)
+          tmpsim[[nam]][[elem]][] <- unique(newNamesHere)
+        }
+      } else {
+        tmpsim[[nam]][] <- newFiles$newName[]
+      }
     }
   }
 
