@@ -74,7 +74,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
-#' @importFrom reproducible::Cache
+#' @importFrom reproducible Cache
 #' @importFrom cli col_blue
 #'
 #' @examples

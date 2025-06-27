@@ -154,7 +154,7 @@ Plots <- function(data, fn, filename,
                   path = quote(figurePath(sim)),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
-                  deviceArgs = list(),
+                  deviceArgs = list(), envir = parent.frame(),
                   ...) {
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
@@ -187,6 +187,7 @@ Plots <- function(data, fn, filename,
     if (is(simIsIn, "try-error")) {
       .plotInitialTime <- 0L
     } else {
+      envir <- simIsIn
       sim <- get("sim", envir = simIsIn)
       ## only look in the metadata -- not the simList (which will have a default of NA)
       isPlotITinSim <- ".plotInitialTime" %in% moduleMetadata(sim, currentModule(sim))$parameters$paramName
@@ -208,6 +209,9 @@ Plots <- function(data, fn, filename,
 
   ## has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
+
+  if (is.call(data))
+    data <- eval(data, envir)
   if (missing(fn)) {
     if (isTRUE(usePlot)) {
       fn <- Plot

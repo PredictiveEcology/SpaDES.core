@@ -6,7 +6,14 @@
 \alias{restartOrSimInitAndSpades}
 \title{Restart an interrupted simulation}
 \usage{
-restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
+restartSpades(
+  sim = NULL,
+  module = NULL,
+  numEvents = Inf,
+  restart = TRUE,
+  verbose = getOption("reproducible.verbose", 1L),
+  ...
+)
 
 saveState(filename, ...)
 

@@ -29,6 +29,7 @@
   before = NULL,
   fun = NULL,
   cacheId = NULL,
+  cacheSaveFormat = getOption("reproducible.cacheSaveFormat"),
   drv = getDrv(getOption("reproducible.drv", NULL)),
   conn = getOption("reproducible.conn", NULL),
   verbose = getOption("reproducible.verbose"),
@@ -115,6 +116,10 @@ missing, which is the same as \code{TRUE}. If there are errors due
 to regular expression problem, try \code{FALSE}. For \code{cc}, it is
 passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
 it can also be \code{sorted = FALSE} to return the object unsorted.}
+
+\item{cacheSaveFormat}{Character string: currently either \code{qs} or \code{rds}. Defaults to
+\code{getOption("reproducible.cacheSaveFormat")}. \code{qs} is faster but appears to have
+narrower range of conditions that work; \code{rds} is safer, but slower.}
 }
 \value{
 A \code{data.table} object showing the subset of items in the cache, located at \code{cachePath}

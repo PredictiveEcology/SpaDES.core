@@ -26,7 +26,7 @@ used within a module, then it will try to find the module name.}
 
 \item{envir}{An optional environment to specify where to put the resulting function.
 The default will place a function called \code{doEvent.moduleName.eventName} in the
-module function location, i.e., \code{sim$.mods[[moduleName]]}. However, if this
+module function location, i.e., \code{sim[[dotMods]][[moduleName]]}. However, if this
 location does not exist, then it will place it in the \code{parent.frame()}, with a message.
 Normally, especially, if used within SpaDES module code, this should be left missing.}
 }

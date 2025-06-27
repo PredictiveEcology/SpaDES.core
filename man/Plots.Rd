@@ -14,6 +14,7 @@ Plots(
   ggsaveArgs = list(),
   usePlot = getOption("spades.PlotsUsePlot", FALSE),
   deviceArgs = list(),
+  envir = parent.frame(),
   ...
 )
 }
