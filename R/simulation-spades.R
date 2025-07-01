@@ -1175,7 +1175,7 @@ setMethod(
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
         ## RecoverMode Step 4 -- Do Pre
         if (recoverMode > 0) {
-          rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode)
+          rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode, thisSpadesCallRandomStr = thisSpadesCallRandomStr)
         }
 
         sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
@@ -1539,7 +1539,7 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
 
 #' @keywords internal
 #' @importFrom stats runif
-recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode) {
+recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thisSpadesCallRandomStr) {
   if (is.null(allObjNames)) {
     allObjNames <- outputObjectNames(sim)
   }
