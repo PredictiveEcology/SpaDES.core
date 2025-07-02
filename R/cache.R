@@ -1115,7 +1115,8 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
                             conn = getOption("reproducible.conn", NULL), ...) {
   ## the as.list doesn't get everything. But with a simList, this is OK; rest will stay
   obj[[dotMods]] <- .unwrap(obj[[dotMods]], cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
-  objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
+  obj[[dotObjs]] <- .unwrap(obj[[dotObjs]], cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
+  objList <- as.list(obj, all.names = TRUE) # don't overwrite everything, just the ones in the list part
 
   outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
                      drv = drv, conn = conn, ...)
@@ -1471,7 +1472,6 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
   dotObjects <- startsWith(lsObjectEnv, ".")
   dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs)
 
-  if (exists("aaaa", envir = .GlobalEnv)) browser()
   # lsObjectEnv --> this should only be objects that can be outputted, not expectsInputs
   lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
                 dotObjectsChanged %in% TRUE]
