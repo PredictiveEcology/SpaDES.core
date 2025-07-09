@@ -594,8 +594,8 @@ P.simList <- function(sim, param, module) {
   }
 }
 
-#' @rdname params
 #' @export
+#' @rdname params
 `P<-` <- function(sim, param, module, value) {
   if (missing(sim)) stop("P takes a simList as first argument")
   if (missing(module)) {
@@ -3382,12 +3382,12 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 #' @inheritParams inputObjects
 #'
 #' @return
-#' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
-#' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
-#' will be determined either from a `simList` or from the module source code.
+#' `moduleObjects` returns a `data.table` with columns: `module`, `objectName`, `type`, and `desc`;
+#' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`.
+#' These will be determined either from a `simList` or from the module source code.
 #'
 #' @export
-#' @importFrom data.table set rbindlist setcolorder
+#' @importFrom data.table rbindlist set setcolorder
 #' @rdname objects
 moduleObjects <- function(sim, module, path) {
   simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check

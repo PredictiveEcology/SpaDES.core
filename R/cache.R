@@ -580,8 +580,8 @@ setMethod(
     simFromCache <- object # rename for internal purposes
     hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
     if (hasDotObjs %in% FALSE) {
-      messageColoured(colour = "red", "This object is using the old mod object structure; it must be \n",
-                   "deleted. Rerunning it now ... ")
+      messageColoured("This object is using the old mod object structure; it must be \n",
+                      "deleted. Rerunning it now ... ", colour = "red")
       clearCache(x = cachePath, cacheId = cacheId(object), ask = FALSE)
       return(invisible(reproducible:::.returnNothing))
     }
@@ -733,16 +733,16 @@ setMethod(
           simPost@completed <- simFromCache@completed
         }
         if (NROW(current(simPost)) == 0) {
-          # this is usually a spades call, i.e., not an event or module doEvent call
+          ## this is usually a spades call, i.e., not an event or module doEvent call
           simPost@events <- simFromCache@events
           simPost@simtimes <- simFromCache@simtimes
         } else {
-          # if this is FALSE, it means that events were added by the event
+          ## if this is FALSE, it means that events were added by the event
 
           esfc <- events(simFromCache)
           cur <- current(simFromCache)
 
-          # anti-join to find new ones
+          ## anti-join to find new ones
           eventsAddedByThisModuleDT <- esfc[!events(simPost), on = colnames(esfc)]
 
           eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
@@ -1508,7 +1508,6 @@ lsModObjectsChanged <- function(namesAllMods, changedObjs, hasDotObjs) {
   }
   changedModEnvObjs
 }
-
 
 #' Convenience wrapper around `clearCache` for SpaDES events
 #'

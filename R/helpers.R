@@ -32,9 +32,12 @@
 #'
 #' @keywords internal
 #' @rdname dot-params
-.knownDotParams <- c(".plotInitialTime", ".plotInterval", ".plots",
-                     ".saveInitialTime", ".saveInterval",
-                     ".useCache", ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
+.knownDotParams <- c(
+  ## TODO: add others here, e.g. .studyAreaName?
+  ".plotInitialTime", ".plotInterval", ".plots",
+  ".saveInitialTime", ".saveInterval",
+  ".useCache", ".useParallel"
+)
 
 #' @keywords internal
 #' @include environment.R

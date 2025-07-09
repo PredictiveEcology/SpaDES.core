@@ -74,5 +74,4 @@ sim <- objectSynonyms(sim, os2)
 # check
 sim$.objectSynonyms
 
-
 }

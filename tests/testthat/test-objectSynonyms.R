@@ -144,9 +144,9 @@ test_that("test objectSynonyms", {
   expect_equal(sim$studyArea, sim$studyArea2)
   expect_true(isTRUE(sim$worked))
 
-  # On June 20, 2023, the final expectation was changed to false from true because it seems
-  #   correct that sim$worked should not be TRUE -- ageMap is not going to suppliedElsewhere
-  # test simInitAndSpades with Caching/memoising with NULL objects in the active bindings
+  ## On June 20, 2023, the final expectation was changed to false from true because it seems
+  ##   correct that sim$worked should not be TRUE -- ageMap is not going to suppliedElsewhere
+  ## test simInitAndSpades with Caching/memoising with NULL objects in the active bindings
   sim <- Cache(simInitAndSpades, times, params, modules = modules,
                objects = list(objectSynonyms = os),
                paths = list(modulePath = tmpdir))

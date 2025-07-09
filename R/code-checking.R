@@ -527,9 +527,7 @@ cantCodeCheckMessage <- ": line could not be checked "
             " use non-conflicting function names"))
   }
 
-  #############################################################
   ###### Message if all clean #################################
-  #############################################################
   if (!hadPrevMessage) .parseMessage(m, "", allCleanMessage)
   return(invisible())
 }

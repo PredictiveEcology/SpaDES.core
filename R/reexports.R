@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  ".", "keepBasedOnRedundantInequalities", "inequality", "verbose", "inequality"
+  ".", "inequality", "keepBasedOnRedundantInequalities", "verbose"
 ))
 
 ## non-exported imports from other packages -------------------------------------

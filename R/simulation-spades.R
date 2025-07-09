@@ -2032,7 +2032,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     middleFix <- ""
     noNew <- FALSE
     if (numCharsMax > 0) {
-      sim2 <- list() # don't put a `sim` here because whereInStack will find this one
+      sim2 <- list() ## don't put a `sim` here because whereInStack will find this one
       while (!is(sim2, "simList")) {
         simEnv <- try(whereInStack("sim"), silent = TRUE)
         if (is(simEnv, "try-error"))

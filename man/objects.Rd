@@ -42,9 +42,9 @@ User can use regular expressions.}
 \value{
 Returns or sets a list of objects in the \code{simList} environment.
 
-\code{moduleObjects} returns a data.table with 4 columns, \code{module}, \code{objectName}, \code{type}, and \code{desc},
-pulled directly from the object metadata in the \code{createsOutputs} and \code{expectsInputs}. These
-will be determined either from a \code{simList} or from the module source code.
+\code{moduleObjects} returns a \code{data.table} with columns: \code{module}, \code{objectName}, \code{type}, and \code{desc};
+pulled directly from the object metadata in the \code{createsOutputs} and \code{expectsInputs}.
+These will be determined either from a \code{simList} or from the module source code.
 
 \code{findObjects} returns a data.table similar to \code{moduleObjects}, but with only the
 objects provided by \code{objects}.

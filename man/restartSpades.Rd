@@ -26,7 +26,7 @@ this will take the \code{sim} from
 \code{savedSimEnv()$.sim}, i.e., the one that was interrupted}
 
 \item{module}{A character string length one naming the module that caused the error and
-whose source code was fixed. This module will be re-parsed and placed into the \code{simList}}
+whose source code was fixed. This module will be re-parsed and placed into the \code{simList}.}
 
 \item{numEvents}{Numeric. Default is Inf (i.e., all available). In the \code{simList}, if
 \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then

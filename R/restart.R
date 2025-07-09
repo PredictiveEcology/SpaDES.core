@@ -57,11 +57,11 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'    `savedSimEnv()$.sim`, i.e., the one that was interrupted
 #'
 #' @param module A character string length one naming the module that caused the error and
-#'   whose source code was fixed. This module will be re-parsed and placed into the `simList`
+#'   whose source code was fixed. This module will be re-parsed and placed into the `simList`.
 #'
 #' @param restart Logical. If `TRUE`, then the call to `spades` will be made, i.e.,
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
-#'   with the module code parsed into the `simList`
+#'   with the module code parsed into the `simList`.
 #'
 #' @param numEvents Numeric. Default is Inf (i.e., all available). In the `simList`, if
 #'   `options('spades.recoveryMode')` is set to `TRUE` or a numeric, then

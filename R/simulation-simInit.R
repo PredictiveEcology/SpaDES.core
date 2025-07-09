@@ -1,4 +1,4 @@
-utils::globalVariables(c(".", "Package", "hasVersionSpec"))
+utils::globalVariables(c(".", "hasVersionSpec", "Package"))
 
 #' Initialize a new simulation
 #'
@@ -172,30 +172,29 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'                   which to load the modules. If not specified, the module
 #'                   load order will be determined automatically.
 #'
-#' @param notOlderThan A time, as in from `Sys.time()`. This is passed into
-#'                     the `Cache` function that wraps `.inputObjects`.
-#'                     If the module uses the `.useCache` parameter and it is
-#'                     set to `TRUE` or `".inputObjects"`,
-#'                     then the `.inputObjects` will be cached.
-#'                     Setting `notOlderThan = Sys.time()` will cause the
-#'                     cached versions of `.inputObjects` to be refreshed,
-#'                     i.e., rerun.
-#' @param ... An alternative way to pass `objects`, i.e., they can just be named
-#'   arguments rather than in a `objects = list(...)`. It can also be any
-#'   `options` that begins with `spades`, `reproducible` or `Require`, i.e.,
-#'   those identified in `spadesOptions()`,
-#'   `reproducibleOptions()` or `RequireOptions()`.
+#' @param notOlderThan A time, as in from `Sys.time()`.
+#'   This is passed into the `Cache` function that wraps `.inputObjects`.
+#'   If the module uses the `.useCache` parameter and it is set to `TRUE` or `".inputObjects"`,
+#'   then the `.inputObjects` will be cached.
+#'   Setting `notOlderThan = Sys.time()` will cause the cached versions of `.inputObjects`
+#'   to be refreshed, i.e., rerun.
+#'
+#' @param ... An alternative way to pass `objects` and certain options:
+#'   Rather than pass `objects = list(...)`, named objects can be passed here;
+#'   likewise, any `options` that begins with `spades`, `reproducible` or `Require`,
+#'   (i.e., those identified in [SpaDES.core::spadesOptions()],
+#'   [reproducible::reproducibleOptions()] or [Require::RequireOptions()]).
 #'   These will be assigned to the equivalent option *during* the `simInit` and `spades`
 #'   calls only, i.e., they will revert after the `simInit` or `spades` calls
 #'   are complete. NOTE: these are not passed to the `simList` per se, i.e., they are
-#'   not be available in the `simList` during either
-#'   the `simInit` or `spades` calls via `sim$xxx`, though they will be returned to the `simList`
-#'   at the end of each of these calls (so that the next call to e.g., `spades` can
-#'   see them). For convenience, these can be supplied without their package prefix,
-#'   e.g., `lowMemory` can be specified instead of `spades.lowMemory`. In cases that
-#'   share option name (`reproducible.verbose` and `Require.verbose` both exist),
-#'   passing `verbose = FALSE` will set both. Obviously this may cause unexpected
-#'   problems if a module is also expecting a value.
+#'   not available in the `simList` during either the `simInit` or `spades` calls via `sim$xxx`,
+#'   though they will be returned to the `simList` at the end of each of these calls
+#'   (so that the next call to e.g., `spades` can see them).
+#'   For convenience, these can be supplied without their package prefix,
+#'   e.g., `lowMemory` can be specified instead of `spades.lowMemory`.
+#'   In cases that share option name (`reproducible.verbose` and `Require.verbose` both exist),
+#'   passing `verbose = FALSE` will set both (which may cause unexpected
+#'   problems if a module is also expecting a value).
 #'
 #' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied.
@@ -569,11 +568,11 @@ setMethod(
       ## for now, assign only some core & global params
       sim@params$.globals <- params$.globals
 
-      # core modules
+      ## core modules
       core <- .pkgEnv$.coreModules
-      # remove the restartR module if it is not used. This is easier than adding it because
-      #   the simInit is not run again during restarts, so it won't hit this again. That
-      #   is problematic for restartR situation, but not for "normal" situation.
+      ## remove the restartR module if it is not used. This is easier than adding it because
+      ##   the simInit is not run again during restarts, so it won't hit this again. That
+      ##   is problematic for restartR situation, but not for "normal" situation.
       if (is.null(params$.restartR$.restartRInterval) &&
           getOption("spades.restartRInterval", 0) == 0) {
         core <- setdiff(core, "restartR")
@@ -674,7 +673,7 @@ setMethod(
         sim <- .checkObjectSynonyms(sim)
       }
 
-      # Make local activeBindings to mod
+      ## Make local activeBindings to mod
       makeSimListActiveBindings(sim)
       # lapply(as.character(sim@modules), function(mod) {
       #   makeModActiveBinding(sim = sim, mod = mod)
@@ -727,8 +726,9 @@ setMethod(
           }
 
         ## schedule each module's init event:
-        if (needInitAndInputObjects)
+        if (needInitAndInputObjects) {
           sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+        }
 
         ### add module name to the loaded list
         names(m) <- mFullPath
@@ -1405,6 +1405,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           ## This next line will make the Caching sensitive to userSuppliedObjs
           ##  (which are already in the simList) or objects supplied by another module
           inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "i", "c"))
+
           if (any(inSimList)) {
             objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
                                              # objSynName,
@@ -1424,8 +1425,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             debugonce(.inputObjects)
 
           modParams <- sim@params[[mBase]]
-          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
-            paramsDontCacheOn
+          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in% paramsDontCacheOn
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           # nextEvent <- NULL
@@ -1704,11 +1704,11 @@ loadPkgs <- function(reqdPkgs) {
 
 #' @importFrom Require messageVerbose
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
-  # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
+  ## THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL.
   depsGr <- depsGraph(sim, plot = FALSE)
   depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
-  #depsGrDF1 <- depsEdgeList(sim, FALSE)
-  #depsGrDF <- depsGrDF1[from != to]
+  # depsGrDF1 <- depsEdgeList(sim, FALSE)
+  # depsGrDF <- depsGrDF1[from != to]
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
     cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
     hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
@@ -2059,10 +2059,9 @@ simNestingOverride <- function(sim, mBase) {
   sim[[._txtSimNesting]]
 }
 
-isMacOSX <- function()
+isMacOSX <- function() {
   isMac <- tolower(Sys.info()["sysname"]) == "darwin"
-
-
+}
 
 debugToVerbose <- function(debug) {
   debugOut <- sapply(debug, function(de)
@@ -2072,6 +2071,7 @@ debugToVerbose <- function(debug) {
   any(as.logical(debugOut))
 }
 
-
-metadataToDigest <- c("inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
-                      "spatialExtent", "timeframe", "timeunit", "version")
+metadataToDigest <- c(
+  "inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
+  "spatialExtent", "timeframe", "timeunit", "version"
+)

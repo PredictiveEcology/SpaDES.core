@@ -84,14 +84,12 @@ See \code{\link[=outputs]{outputs()}} and
 which to load the modules. If not specified, the module
 load order will be determined automatically.}
 
-\item{notOlderThan}{A time, as in from \code{Sys.time()}. This is passed into
-the \code{Cache} function that wraps \code{.inputObjects}.
-If the module uses the \code{.useCache} parameter and it is
-set to \code{TRUE} or \code{".inputObjects"},
+\item{notOlderThan}{A time, as in from \code{Sys.time()}.
+This is passed into the \code{Cache} function that wraps \code{.inputObjects}.
+If the module uses the \code{.useCache} parameter and it is set to \code{TRUE} or \code{".inputObjects"},
 then the \code{.inputObjects} will be cached.
-Setting \code{notOlderThan = Sys.time()} will cause the
-cached versions of \code{.inputObjects} to be refreshed,
-i.e., rerun.}
+Setting \code{notOlderThan = Sys.time()} will cause the cached versions of \code{.inputObjects}
+to be refreshed, i.e., rerun.}
 
 \item{debug}{Optional tools for invoking debugging. Supplying a \code{list}
 will invoke the more powerful \code{logging} package. See details.

@@ -121,12 +121,12 @@ setMethod(
   "loadFiles",
   signature(sim = "simList", filelist = "missing"),
   definition = function(sim, ...) {
-    # Pull .fileExtensions() into function so that scoping is faster
+    ## Pull .fileExtensions() into function so that scoping is faster
     .fileExts <- .fileExtensions()
 
     if (NROW(inputs(sim)) != 0) {
       inputs(sim) <- .fillInputRows(inputs(sim), start(sim))
-      filelist <- inputs(sim) # does not create a copy - because data.table ... this is a pointer
+      filelist <- inputs(sim) ## does not create a copy - because data.table ... this is a pointer
       nonNAFileList <- filelist[!is.na(filelist$file),]
       if (NROW(nonNAFileList)) {
         doFilesExist <- file.exists(nonNAFileList$file)
@@ -139,8 +139,8 @@ setMethod(
 
       curTime <- time(sim, timeunit(sim))
       arguments <- inputArgs(sim)
-      # Check if arguments is a named list; the name may be concatenated
-      # with the "arguments", separated by a ".". This will extract that.
+      ## Check if arguments is a named list; the name may be concatenated
+      ## with the "arguments", separated by a ".". This will extract that.
       if ((length(arguments) > 0) & !is.null(names(arguments))) {
         if (grepl(".", fixed = TRUE, names(filelist)[pmatch("arguments", names(filelist))]))
           names(arguments) <- sapply(strsplit(
@@ -149,24 +149,24 @@ setMethod(
           )
       }
 
-      # check if arguments should be, i.e,. recycled
+      ## check if arguments should be, i.e,. recycled
       if (!is.null(arguments)) {
         if (length(arguments) < length(filelist$file)) {
           arguments <- rep(arguments, length.out = length(filelist$file))
         }
       }
 
-      # only load those that are to be loaded at their loadTime
+      ## only load those that are to be loaded at their loadTime
       cur <- (filelist$loadTime == curTime) & !(sapply(filelist$loaded, isTRUE))
 
       if (any(cur)) {
-        # load files
+        ## load files
         loadPackage <- filelist$package
         loadFun <- filelist$fun
         for (y in which(cur)) {
           nam <- names(arguments[y])
           if (is.na(filelist$file[y])) {
-            # i.e., only for objects
+            ## i.e., only for objects
             if (!is.na(loadFun[y])) {
               if (is.na(loadPackage[y])) {
                 if (exists(loadFun[y])) {
@@ -176,7 +176,7 @@ setMethod(
                        " explicitly in the 'fun' column, e.g., base::load")
                 }
               } else {
-                objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]])) # nolint
+                objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]]))
               }
             } else {
               objListEnv <- whereInStack(filelist$objectName[y])

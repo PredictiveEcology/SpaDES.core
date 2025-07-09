@@ -105,10 +105,10 @@ checkpointLoad <- function(file) {
 #' @importFrom stats runif
 #' @rdname checkpoint
 .checkpointSave <- function(sim, file) {
-  sim$._timestamp <- Sys.time() # nolint
+  sim$._timestamp <- Sys.time()
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
-  sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE) # nolint
-  sim$._rng.kind <- RNGkind() # nolint
+  sim$._rng.state <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
+  sim$._rng.kind <- RNGkind()
 
   tmpEnv <- new.env(parent = emptyenv())
   assign(.objectNames("spades", "simList", "sim")[[1]]$objs, sim, envir = tmpEnv)
@@ -116,6 +116,7 @@ checkpointLoad <- function(file) {
   if (file.exists(file[1])) {
     unlink(file)
   }
+
   saveSimList(.objectNames("spades", "simList", "sim")[[1]]$objs, filename = file,
               ## checkpoints are **local** only, so do not require archiving
               ## e.g., raster files along with the simList
