@@ -8,6 +8,7 @@
 \alias{params<-}
 \alias{params<-,simList-method}
 \alias{P}
+\alias{P.simList}
 \alias{P<-}
 \alias{parameters,simList-method}
 \title{Get and set simulation parameters}
@@ -21,6 +22,8 @@ params(sim) <- value
 \S4method{params}{simList}(sim) <- value
 
 P(sim, param, module)
+
+\method{P}{simList}(sim, param, module)
 
 P(sim, param, module) <- value
 

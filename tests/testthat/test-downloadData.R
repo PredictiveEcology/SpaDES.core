@@ -33,15 +33,22 @@ test_that("downloadData downloads and unzips module data", {
       objectName = c("DEM", "habitatQuality"),
       objectClass = "RasterLayer",
       sourceURL = c(
-        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/DEM.tif",
-        "https://raw.githubusercontent.com/PredictiveEcology/quickPlot/master/inst/maps/habitatQuality.tif"
+        "https://raw.githubusercontent.com/PredictiveEcology/SpaDES.core/main/inst/maps/DEM.tif",
+        "https://raw.githubusercontent.com/PredictiveEcology/SpaDES.core/main/inst/maps/habitatQuality.tif"
       ),
       stringsAsFactors = FALSE
     )
 
     a <- capture.output({
-      t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
-                                     files = c("DEM.tif", "habitatQuality.tif")))
+      t1 <- system.time({
+        downloadData(
+          m,
+          tmpdir,
+          quiet = FALSE,
+          urls = expectsInputs$sourceURL,
+          files = c("DEM.tif", "habitatQuality.tif")
+        )
+      })
     })
 
     result <- checksums(m, tmpdir)$result
@@ -50,8 +57,15 @@ test_that("downloadData downloads and unzips module data", {
 
     # shouldn't need a redownload because file exists
     a <- capture.output({
-      t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
-                                     files = c("DEM.tif", "habitatQuality.tif")))
+      t2 <- system.time({
+        downloadData(
+          m,
+          tmpdir,
+          quiet = TRUE,
+          urls = expectsInputs$sourceURL,
+          files = c("DEM.tif", "habitatQuality.tif")
+        )
+      })
     })
     expect_true(t1[3] > t2[3]) # compare elapsed times
 

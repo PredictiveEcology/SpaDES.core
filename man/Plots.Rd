@@ -2,7 +2,7 @@
 % Please edit documentation in R/Plots.R
 \name{Plots}
 \alias{Plots}
-\title{\code{Plot} wrapper intended for use in a SpaDES module}
+\title{Plotting wrapper intended for use in SpaDES modules}
 \usage{
 Plots(
   data,
@@ -12,7 +12,7 @@ Plots(
   path = quote(figurePath(sim)),
   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
   ggsaveArgs = list(),
-  usePlot = getOption("spades.PlotsUsePlot", FALSE),
+  usePlot = FALSE,
   deviceArgs = list(),
   envir = parent.frame(),
   ...
@@ -20,14 +20,14 @@ Plots(
 }
 \arguments{
 \item{data}{An (optional) arbitrary data object. If supplied, it will be passed as
-the first argument to \code{Plot} function, and should contain all the data
-required for the inner plotting. If passing a \code{RasterLayer},
-it may be a good idea to set \code{names(RasterLayer)} so that
-multiple layers can be plotted without overlapping each other. When a custom \code{fn}
-is used and all arguments for \code{fn} are supplied and named, then this can be omitted.
+the first argument to the plotting function, and should contain all the data
+required for the inner plotting.
+If passing a \code{RasterLayer}, it may be a good idea to set \code{names(RasterLayer)} so that
+multiple layers can be plotted without overlapping each other.
+When a custom \code{fn} is used and all arguments are supplied and named, this can be omitted.
 See examples.}
 
-\item{fn}{An arbitrary plotting function. If not provided, defaults to using \code{quickPlot::Plot}}
+\item{fn}{An arbitrary plotting function.}
 
 \item{filename}{A name that will be the base for the files that will be saved, i.e,
 do not supply the file extension, as this will be determined based on \code{types}.
@@ -37,8 +37,8 @@ argument.}
 \item{types}{Character vector, zero or more of types. If used within a module, this
 will be deduced from the \code{P(sim)$type} and can be omitted. See below.}
 
-\item{path}{Currently a single path for the saved objects on disk. If \code{filename}
-is supplied as an absolute path, \code{path} will be set to \code{dirname(filename)},
+\item{path}{Currently a single path for the saved objects on disk.
+If \code{filename} is supplied as an absolute path, \code{path} will be set to \code{dirname(filename)},
 overriding this argument value.}
 
 \item{.plotInitialTime}{A numeric. If \code{NA} then no visual on screen. Anything
@@ -48,13 +48,14 @@ plot time and leave it, i.e., \emph{not} \code{NA}.}
 
 \item{ggsaveArgs}{An optional list of arguments passed to \code{ggplot2::ggsave}}
 
-\item{usePlot}{Logical. If \code{TRUE}, the default, then the plot will occur
-with \code{quickPlot::Plot}, so it will be arranged with previously existing plots.}
+\item{usePlot}{Deprecated; not used. Will be removed in a future release.}
 
-\item{deviceArgs}{An optional list of arguments passed to one of \code{png},
-\code{pdf}, \code{tiff}, \code{bmp}, or \code{jgeg}.
+\item{deviceArgs}{An optional list of arguments passed to one of \code{\link[grDevices:png]{grDevices::png()}},
+\code{\link[grDevices:pdf]{grDevices::pdf()}}, \code{\link[grDevices:png]{grDevices::tiff()}}, \code{\link[grDevices:png]{grDevices::bmp()}}, or \code{\link[grDevices:png]{grDevices::jpeg()}}.
 This is useful when the plotting function is not creating a \code{ggplot} object,
 e.g., plotting a \code{RasterLayer}.}
+
+\item{envir}{The environment to search in.}
 
 \item{...}{Anything needed by \code{fn}, all named.}
 }
@@ -67,10 +68,6 @@ the plots will occur.
 Specifically, the two common formats would be to \code{"screen"} or to disk as an image file,
 such as \code{"png"}.
 \emph{This has currently been tested with \code{ggplot2}, \code{RasterLayer}, and \code{tmap} objects.}
-The default (or change with e.g., \verb{fn = "print", usePlot = FALSE}) uses
-\code{Plot} internally, so individual plots may be rearranged. When saved to
-disk (e.g., via \code{type = 'png'}), then \code{Plot} will not be used and the single object
-that is the result of this \code{Plots} call will be saved to disk.
 This function requires at least 2 things: a plotting function and arguments passed
 to that function (which could include \code{data}, but commonly would simply be named
 arguments required by \code{fn}).
@@ -80,19 +77,16 @@ See below and examples.
 \itemize{
 \item \code{type}
 \itemize{
-\item \code{"screen"} -- Will plot to the current device, normally a plot window
-\item \code{"object"} -- Will save the plot object, e.g., \code{ggplot} object
-\item \code{"raw"} -- Will save the raw data prior to plotting, e.g.,
-the data argument
-\item \code{"png"} -- or any other type save-able with \code{ggsave}
+\item \code{"screen"} -- Will plot to the current device, normally a plot window;
+\item \code{"object"} -- Will save the plot object, e.g., \code{ggplot} object;
+\item \code{"raw"} -- Will save the raw data prior to plotting, e.g., the data argument;
+\item \code{"png"} -- or any other type save-able with \code{ggsave};
 }
 }
 }
 \note{
 \strong{This is still experimental and could change in the next release.}
 
-\code{Plots} now has experimental support for "just a \code{Plot} call", but with \code{types} specified.
-See examples.
 The devices to save on disk will have some different behaviours to the screen representation,
 since "wiping" an individual plot on a device doesn't exist for a file device.
 
@@ -123,42 +117,35 @@ the file(s) that is/are saved will be appended to the \code{outputs} slot of the
   #  function inside another function. Put it outside in a normal
   #  module script. Otherwise, it will cause a memory leak.
   if (requireNamespace("ggplot2")) {
-    fn <- function(d)
+    fn <- function(d) {
       ggplot2::ggplot(d, ggplot2::aes(a)) +
       ggplot2::geom_histogram()
+    }
     sim <- simInit()
     sim$something <- data.frame(a = sample(1:10, replace = TRUE))
 
-    Plots(data = sim$something, fn = fn,
+    Plots(data = sim$something,
+          fn = fn,
           types = c("png"),
           path = file.path(tempdir(), "figures"),
           filename = tempfile(),
           .plotInitialTime = 1)
 
-    # plot to active device and to png
+    ## plot to active device and to png
     Plots(
-      data = sim$something, fn = fn,
+      data = sim$something,
+      fn = fn,
       types = c("png", "screen"),
       path = file.path(tempdir(), "figures"),
       filename = tempfile(),
       .plotInitialTime = 1
     )
 
-    # Can also be used like quickPlot::Plot, but with control over output type
-    r <- terra::rast(terra::ext(0,10,0,10),
-                     vals = sample(1:3, size = 100, replace = TRUE))
-    Plots(r, types = c("screen", "png"), filename = tempfile(),
-          deviceArgs = list(width = 700, height = 500),
-          usePlot = TRUE)
-
-    # with ggplotify, Plots can also be used to plot/save
-    # non-ggplot objects:
-
-
+    ## with ggplotify, can also be used to plot/save non-ggplot objects:
     if (require("ggplotify")) {
       if (!require("lattice")) stop("please install lattice")
 
-      p1 <- densityplot(~mpg|cyl, data=mtcars)
+      p1 <- densityplot(~mpg|cyl, data = mtcars)
       Plots(data = p1, fn = as.ggplot, filename = tempfile(),
             ggsaveArgs = list(width = 5, height = 4, dpi = 300,
                               bg = "white", units = "in"),

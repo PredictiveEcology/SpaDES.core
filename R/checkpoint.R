@@ -29,7 +29,6 @@
 #' @author Alex Chubaty
 #'
 #' @export
-#' @importFrom quickPlot .objectNames
 #' @importFrom reproducible checkPath
 #' @include environment.R
 #' @include priority.R

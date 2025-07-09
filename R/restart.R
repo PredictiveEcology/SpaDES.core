@@ -69,13 +69,16 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   replayed backwards in time to reproduce the initial state of the `simList` before
 #'   the event that is `numEvents` back from the first event in `events(sim)`.
 #'
-#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
+#' @param verbose Controls the level of information messaging that is printed.
+#'   See [reproducible::reproducibleOptions()].
+#'
+#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`.
 #'
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
-#' @importFrom reproducible Cache
 #' @importFrom cli col_blue
+#' @importFrom reproducible Cache
 #'
 #' @examples
 #' \donttest{

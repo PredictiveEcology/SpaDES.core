@@ -366,7 +366,7 @@ needInstall <- function(
 #' @importFrom reproducible checkPath
 #' @rdname getSampleFiles
 getMapPath <- function(tmpdir) {
-  mapPath <- system.file("maps", package = "quickPlot")
+  mapPath <- system.file("maps", package = "SpaDES.core")
   mapPathTmp <- checkPath(file.path(tmpdir, "maps"), create = TRUE)
   file.copy(dir(mapPath, full.names = TRUE), mapPathTmp)
   mapPathTmp
@@ -402,8 +402,14 @@ noEventWarning <- function(sim) {
   )
 }
 
-
 ._txtClockTime <- "._clockTime"
 ._txtStartClockTime <- "._startClockTime"
 ._txtPrevEventTimeFinish <- "._prevEventTimeFinish"
 ._txtSimNesting <- "._simNesting"
+
+#' Discard NULL or empty list elements
+#'
+#' @keywords internal
+.discard <- function(x) {
+  Filter(Negate(function(p) is.null(p) | length(p) == 0), x)
+}

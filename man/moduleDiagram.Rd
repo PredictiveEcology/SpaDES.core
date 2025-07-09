@@ -16,9 +16,8 @@ moduleDiagram(sim, type, showParents = TRUE, ...)
 \item{sim}{A \code{simList} object (typically corresponding to a
 completed simulation).}
 
-\item{type}{Character string, either \code{"rgl"} for \code{igraph::rglplot}
-or \code{"tk"} for \code{igraph::tkplot}, \code{"Plot"} to use \code{quickPlot::Plot()}
-or \code{"plot"} to use \code{base::plot()}, the default.}
+\item{type}{Character string: either \code{"rgl"} for \link[igraph:rglplot]{igraph::rglplot}
+or \code{"tk"} for \link[igraph:tkplot]{igraph::tkplot}, or \code{"plot"} to use \link[base:plot]{base::plot}, the default.}
 
 \item{showParents}{Logical. If TRUE, then any children that are grouped into parent
 modules will be grouped together by coloured blobs. Internally,

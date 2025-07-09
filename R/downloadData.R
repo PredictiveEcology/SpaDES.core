@@ -24,7 +24,6 @@ setGeneric(
 
 #' @export
 #' @exportMethod extractURL
-#' @importFrom quickPlot whereInStack
 #' @rdname extractURL
 setMethod(
   "extractURL",

@@ -497,6 +497,7 @@ setReplaceMethod("params",
 P <- function(sim, param, module) UseMethod("P")
 
 #' @export
+#' @rdname params
 P.simList <- function(sim, param, module) {
   if (missing(sim)) stop("P takes a simList as first argument")
   # Check for changed order

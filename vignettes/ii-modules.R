@@ -88,9 +88,7 @@ parameters <- list(
 
 ftmp <- tempfile("spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
-clearPlot()
-
-# run just 1 year for vignette
+## run just 1 year for vignette
 mySim <- simInitAndSpades(
   times = list(start = 0.0, end = 1.0, timeunit = "year"),
   params = parameters,
@@ -102,8 +100,8 @@ dev.off()
 unlink(normalizePath(ftmp))
 
 ## ----eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7----
-# overview of the events in the simulation
-# Needs DiagrammeR package
+## overview of the events in the simulation
+## Needs DiagrammeR package
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 
 ## ----checksums, eval=FALSE----------------------------------------------------
@@ -145,10 +143,9 @@ mySim <- simInit(times = times, params = parameters, modules = modules, paths = 
 
 ## examine simulation module (object) dependencies
 depsEdgeList(mySim, FALSE)      # all object dependency relationships
-clearPlot()
+
 moduleDiagram(mySim)            # simplified visual representation of modules
 
-clearPlot()
 moduleDiagram(mySim, showParents = TRUE) # similar, but showing parent module grouping
 
 # detailed visual representation of objects
@@ -211,7 +208,6 @@ params(mySim)$randomLandscapes$.saveObjects
 params(mySim)$randomLandscapes$.savePath
 ftmp <- tempfile(pattern = "spades_vignetteOutputs", fileext = ".pdf")
 pdf(ftmp)
-clearPlot()
 mySim2 <- spades(mySim)
 
 # More sophisticated, passing arguments to outputs()

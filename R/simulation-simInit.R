@@ -92,8 +92,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' assigned to the `simList.`
 #'
 #' It will also attempt to find potential, common function name conflicts with things like
-#' `scale` and `stack` (both in \pkg{base} and \pkg{raster}), and
-#' `Plot` (in \pkg{quickPlot} and some modules).
+#' `scale` and `stack` (both in \pkg{base} and \pkg{raster}).
 #'
 #' *This code checking is young and may get false positives and false negatives,
 #' i.e., miss things*.
@@ -253,7 +252,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' outSim <- spades(mySim)
 #'
 #' # A little more complicated with inputs and outputs
-#' mapPath <- system.file("maps", package = "quickPlot")
+#' mapPath <- system.file("maps", package = "SpaDES.core")
 #' mySim <- simInit(
 #'   times = list(start = 0.0, end = 2.0, timeunit = "year"),
 #'   params = list(
@@ -1703,7 +1702,6 @@ loadPkgs <- function(reqdPkgs) {
   }
 }
 
-#' @importFrom quickPlot whereInStack
 #' @importFrom Require messageVerbose
 resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, inputs, outputs) {
   # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL

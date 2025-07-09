@@ -20,7 +20,6 @@ experiment <- function(...) {
   .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
 }
 
-
 #' @export
 #' @rdname deprecated
 experiment2 <- function(...) {
@@ -42,4 +41,9 @@ simInitAndExperiment <- function(...) {
 #' @rdname deprecated
 loadPackages <- function(...) {
   .Deprecated("Require", "Require")
+}
+
+#' @rdname deprecated
+Plot <- function(...) {
+  .Deprecated("Plots", "SpaDES.core")
 }

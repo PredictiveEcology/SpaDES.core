@@ -30,12 +30,12 @@ Authors@R: c(
   )
 Depends:
     R (>= 4.3),
-    quickPlot (>= 1.0.2),
     reproducible (>= 2.1.2.9027)
 Imports:
     cli,
     data.table (>= 1.11.0),
     fs,
+    httr,
     igraph (>= 1.0.1),
     lobstr,
     methods,

@@ -1,13 +1,15 @@
 ## ----setup, include = FALSE---------------------------------------------------
-SuggestedPkgsNeeded <- c("NLMR", "RColorBrewer", "SpaDES.tools", "knitr")
+SuggestedPkgsNeeded <- c("knitr", "NLMR", "RColorBrewer", "SpaDES.tools")
 hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
 knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
-options("spades.moduleCodeChecks" = FALSE,
-        "spades.useRequire" = FALSE,
-        "spades.loadReqdPkgs" = FALSE)
+options(
+  spades.loadReqdPkgs = FALSE,
+  spades.moduleCodeChecks = FALSE,
+  spades.useRequire = FALSE
+)
 
 ## ----examples, echo=TRUE, message=FALSE---------------------------------------
 library(terra)
@@ -36,17 +38,22 @@ system.time({
 system.time({
   outSimCached <- spades(Copy(mySim), cache = TRUE)
 })
-all.equal(outSim, outSimCached)
+all.equal(outSim, outSimCached) ## TODO: not equal
+## [1] "Length mismatch: comparison on first 4 components"                                                                                         
+## [2] "Component “landscape”: Attributes: < Component “pntr”: Component “dataType”: Lengths (5, 1) differ (string compare on first 1) >"          
+## [3] "Component “landscape”: Attributes: < Component “pntr”: Component “inMemory”: Lengths (5, 1) differ (comparison on first 1 components) >"   
+## [4] "Component “landscape”: Attributes: < Component “pntr”: Component “isMD”: Lengths (5, 1) differ (comparison on first 1 components) >"       
+## [5] "Component “landscape”: Attributes: < Component “pntr”: Component “is_multidim”: Lengths (5, 1) differ (comparison on first 1 components) >"
 
 ## ----module-level, echo=TRUE--------------------------------------------------
-# Module-level
+## Module-level
 params(mySim)$randomLandscapes$.useCache <- TRUE
 system.time({
   randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
-# faster the second time
+## faster the second time
 system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
@@ -57,13 +64,19 @@ same <- lapply(layers, function(l) {
   identical(randomSim$landscape[[l]], randomSimCached$landscape[[l]])
 })
 names(same) <- layers
-print(same) # Fires is not same because all non-init events in fireSpread are not cached
+
+## Fires is not same because all non-init events in fireSpread are not cached
+print(same)
 
 ## ----event-level, echo=TRUE---------------------------------------------------
 params(mySim)$fireSpread$.useCache <- "init"
 system.time({
-  randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
-                      notOlderThan = Sys.time(), debug = TRUE)
+  randomSim <- spades(
+    Copy(mySim),
+    .plotInitialTime = NA,
+    notOlderThan = Sys.time(),
+    debug = TRUE
+  )
 })
 
 # faster the second time
@@ -95,9 +108,7 @@ cacheDB <- showCache(mySim, userTags = "neutralLandscapeMap")
 
 ## get the RasterLayer that was produced with neutralLandscapeMap()
 map <- loadFromCache(cacheId = cacheDB$cacheId, cachePath = cachePath(mySim))
-
-clearPlot()
-Plot(map)
+plot(map)
 
 ## ----eval=FALSE, echo=TRUE----------------------------------------------------
 # simInit() --> many .inputObjects calls

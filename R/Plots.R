@@ -1,17 +1,13 @@
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 
-#' `Plot` wrapper intended for use in a SpaDES module
+#' Plotting wrapper intended for use in SpaDES modules
 #'
 #' This is a single function call that allows a user to change which format in which
 #' the plots will occur.
 #' Specifically, the two common formats would be to `"screen"` or to disk as an image file,
 #' such as `"png"`.
 #' *This has currently been tested with `ggplot2`, `RasterLayer`, and `tmap` objects.*
-#' The default (or change with e.g., `fn = "print", usePlot = FALSE`) uses
-#' `Plot` internally, so individual plots may be rearranged. When saved to
-#' disk (e.g., via `type = 'png'`), then `Plot` will not be used and the single object
-#' that is the result of this `Plots` call will be saved to disk.
 #' This function requires at least 2 things: a plotting function and arguments passed
 #' to that function (which could include `data`, but commonly would simply be named
 #' arguments required by `fn`).
@@ -19,8 +15,6 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'
 #' @note **This is still experimental and could change in the next release.**
 #'
-#' `Plots` now has experimental support for "just a `Plot` call", but with `types` specified.
-#' See examples.
 #' The devices to save on disk will have some different behaviours to the screen representation,
 #' since "wiping" an individual plot on a device doesn't exist for a file device.
 #'
@@ -38,34 +32,35 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' argument (e.g., `""` will omit all saving).
 #'
 #' @param data An (optional) arbitrary data object. If supplied, it will be passed as
-#'   the first argument to `Plot` function, and should contain all the data
-#'   required for the inner plotting. If passing a `RasterLayer`,
-#'   it may be a good idea to set `names(RasterLayer)` so that
-#'   multiple layers can be plotted without overlapping each other. When a custom `fn`
-#'   is used and all arguments for `fn` are supplied and named, then this can be omitted.
+#'   the first argument to the plotting function, and should contain all the data
+#'   required for the inner plotting.
+#'   If passing a `RasterLayer`, it may be a good idea to set `names(RasterLayer)` so that
+#'   multiple layers can be plotted without overlapping each other.
+#'   When a custom `fn` is used and all arguments are supplied and named, this can be omitted.
 #'   See examples.
-#' @param fn An arbitrary plotting function. If not provided, defaults to using `quickPlot::Plot`
+#' @param fn An arbitrary plotting function.
 #' @param filename A name that will be the base for the files that will be saved, i.e,
 #'   do not supply the file extension, as this will be determined based on `types`.
 #'   If a user provides this as an absolute path, it will override the `path`
 #'   argument.
 #' @param types Character vector, zero or more of types. If used within a module, this
 #'   will be deduced from the `P(sim)$type` and can be omitted. See below.
-#' @param path Currently a single path for the saved objects on disk. If `filename`
-#'   is supplied as an absolute path, `path` will be set to `dirname(filename)`,
+#' @param path Currently a single path for the saved objects on disk.
+#'   If `filename` is supplied as an absolute path, `path` will be set to `dirname(filename)`,
 #'   overriding this argument value.
 #' @param .plotInitialTime A numeric. If `NA` then no visual on screen. Anything
 #'   else will have visuals plotted to screen device. This is here for backwards
 #'   compatibility. A developer should set in the module to the intended initial
 #'   plot time and leave it, i.e., *not* `NA`.
 #' @param ggsaveArgs An optional list of arguments passed to `ggplot2::ggsave`
-#' @param deviceArgs An optional list of arguments passed to one of `png`,
-#'       `pdf`, `tiff`, `bmp`, or `jgeg`.
+#' @param deviceArgs An optional list of arguments passed to one of [grDevices::png()],
+#'       [grDevices::pdf()], [grDevices::tiff()], [grDevices::bmp()], or [grDevices::jpeg()].
 #'       This is useful when the plotting function is not creating a `ggplot` object,
 #'       e.g., plotting a `RasterLayer`.
 #'
-#' @param usePlot Logical. If `TRUE`, the default, then the plot will occur
-#'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
+#' @param usePlot Deprecated; not used. Will be removed in a future release.
+#'
+#' @param envir The environment to search in.
 #'
 #' @param ... Anything needed by `fn`, all named.
 #'
@@ -76,11 +71,10 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' \itemize{
 #'   \item `type`
 #'     \itemize{
-#'       \item `"screen"` -- Will plot to the current device, normally a plot window
-#'       \item `"object"` -- Will save the plot object, e.g., `ggplot` object
-#'       \item `"raw"` -- Will save the raw data prior to plotting, e.g.,
-#'                           the data argument
-#'       \item `"png"` -- or any other type save-able with `ggsave`
+#'       \item `"screen"` -- Will plot to the current device, normally a plot window;
+#'       \item `"object"` -- Will save the plot object, e.g., `ggplot` object;
+#'       \item `"raw"` -- Will save the raw data prior to plotting, e.g., the data argument;
+#'       \item `"png"` -- or any other type save-able with `ggsave`;
 #'     }
 #' }
 #'
@@ -94,7 +88,6 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @include simList-accessors.R
 #' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs qsave
-#' @importFrom quickPlot clearPlot Plot whereInStack
 #' @importFrom terra writeRaster
 #' @importFrom tools file_path_sans_ext
 #'
@@ -104,42 +97,35 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'   #  function inside another function. Put it outside in a normal
 #'   #  module script. Otherwise, it will cause a memory leak.
 #'   if (requireNamespace("ggplot2")) {
-#'     fn <- function(d)
+#'     fn <- function(d) {
 #'       ggplot2::ggplot(d, ggplot2::aes(a)) +
 #'       ggplot2::geom_histogram()
+#'     }
 #'     sim <- simInit()
 #'     sim$something <- data.frame(a = sample(1:10, replace = TRUE))
 #'
-#'     Plots(data = sim$something, fn = fn,
+#'     Plots(data = sim$something,
+#'           fn = fn,
 #'           types = c("png"),
 #'           path = file.path(tempdir(), "figures"),
 #'           filename = tempfile(),
 #'           .plotInitialTime = 1)
 #'
-#'     # plot to active device and to png
+#'     ## plot to active device and to png
 #'     Plots(
-#'       data = sim$something, fn = fn,
+#'       data = sim$something,
+#'       fn = fn,
 #'       types = c("png", "screen"),
 #'       path = file.path(tempdir(), "figures"),
 #'       filename = tempfile(),
 #'       .plotInitialTime = 1
 #'     )
 #'
-#'     # Can also be used like quickPlot::Plot, but with control over output type
-#'     r <- terra::rast(terra::ext(0,10,0,10),
-#'                      vals = sample(1:3, size = 100, replace = TRUE))
-#'     Plots(r, types = c("screen", "png"), filename = tempfile(),
-#'           deviceArgs = list(width = 700, height = 500),
-#'           usePlot = TRUE)
-#'
-#'     # with ggplotify, Plots can also be used to plot/save
-#'     # non-ggplot objects:
-#'
-#'
+#'     ## with ggplotify, can also be used to plot/save non-ggplot objects:
 #'     if (require("ggplotify")) {
 #'       if (!require("lattice")) stop("please install lattice")
 #'
-#'       p1 <- densityplot(~mpg|cyl, data=mtcars)
+#'       p1 <- densityplot(~mpg|cyl, data = mtcars)
 #'       Plots(data = p1, fn = as.ggplot, filename = tempfile(),
 #'             ggsaveArgs = list(width = 5, height = 4, dpi = 300,
 #'                               bg = "white", units = "in"),
@@ -153,9 +139,15 @@ Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
                   path = quote(figurePath(sim)),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
-                  ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
-                  deviceArgs = list(), envir = parent.frame(),
+                  ggsaveArgs = list(),
+                  usePlot = FALSE,
+                  deviceArgs = list(),
+                  envir = parent.frame(),
                   ...) {
+  if (isTRUE(usePlot)) {
+    stop("usePlot is deprecated and must be FALSE; it will removed in a future release.")
+  }
+
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
@@ -176,14 +168,16 @@ Plots <- function(data, fn, filename,
       .plotInitialTime <- 0L
   }
 
-  if (!is.null(simIsIn))
-    if (is(types, "call"))
+  if (!is.null(simIsIn)) {
+    if (is(types, "call")) {
       types <- eval(types, envir = simIsIn)
-  if (is(types, "list"))
+    }
+  }
+  if (is(types, "list")) {
     types <- unlist(types)
+  }
 
   if (!is.null(simIsIn)) {
-
     if (is(simIsIn, "try-error")) {
       .plotInitialTime <- 0L
     } else {
@@ -213,122 +207,51 @@ Plots <- function(data, fn, filename,
   if (is.call(data))
     data <- eval(data, envir)
   if (missing(fn)) {
-    if (isTRUE(usePlot)) {
-      fn <- Plot
+    if (inherits(data, c("SpatRaster", "SpatVector", "sf", "Raster", "sp"))) {
+      fn <- terra::plot
     } else {
-      if (inherits(data, c("SpatRaster", "SpatVector", "sf", "Raster", "sp")))
-        fn <- terra::plot
-      else
-        fn <- plot
+      fn <- plot
     }
   }
-  fnIsPlot <- identical(fn, Plot) # || identical(fn, plot) || identical(fn, terra::plot)
-  if (fnIsPlot) {
-    ## make dummies
-    gg <- 1
-    objNamePassedToData1 <- substitute(data)
-    origEnv <- parent.frame()
-    objNamePassedToData <- evalAttempt(objNamePassedToData1, origEnv)
-    if (!is.character(objNamePassedToData)) {
-      objNamePassedToData <- deparse1(objNamePassedToData)
-    }
 
-    ## Try to see if the object is in the parent.frame(). If it isn't, default back to here.
-    if (!objNamePassedToData %in% ls(origEnv))
-      origEnv <- environment()
-    if (!(is(data, "list") && length(names(data)) == length(data))) {
-      ggListToScreen <- list(data)
-      names(ggListToScreen) <- objNamePassedToData
+  if ( (needScreen || needSave) ) {
+    if (missing(data)) {
+      gg <- fn(...)
     } else {
-      ggListToScreen <- data
-    }
-  } else {
-    if ( (needScreen || needSave) ) {
-      if (missing(data)) {
-        gg <- fn(...)
-      } else {
-        if (is(data, "ggplot")) {
-          gg <- data
-        }
-        else
-          gg <- fn(data, ...)
+      if (is(data, "ggplot")) {
+        gg <- data
       }
+      else
+        gg <- fn(data, ...)
+    }
 
-      if (!is(gg, ".quickPlot")) {
-        ggListToScreen <- setNames(list(gg), "gg")
-        if (!is.null(gg$labels$title) && needScreen) {
-          ggListToScreen <- setNames(ggListToScreen,
-                                     format(paste(gg$labels$title, collapse = " ")))
-          ggListToScreen[[1]]$labels$title <- NULL
-        }
+    if (!is(gg, ".quickPlot")) { ## TODO: remove this as part of quickPlot deprecation?
+      ggListToScreen <- setNames(list(gg), "gg")
+      if (!is.null(gg$labels$title) && needScreen) {
+        ggListToScreen <- setNames(ggListToScreen,
+                                   format(paste(gg$labels$title, collapse = " ")))
+        ggListToScreen[[1]]$labels$title <- NULL
       }
     }
   }
 
   if (needScreen) {
-    if (fnIsPlot) {
-      if (is.list(data)) {# || is(data, "RasterStack") || is(data, "RasterBrick") ||
-      #    (is(data, "SpatRaster") || is(data, "SpatVector")) && nlayers2(data) > 1)
-      #  {
-        dataListToScreen <- data
-      } else {
-        dataListToScreen <- list(data)
-      }
-      if (is(data, "ggplot")) {
-        dataListToScreen <- setNames(list(data), "gg")
-        if (!is.null(data$labels$title) && needScreen) {
-          dataListToScreen <- setNames(dataListToScreen, data$labels$title)
-          dataListToScreen[[1]]$labels$title <- NULL
-        }
-      } else {
-        if (!is.null(objNamePassedToData)) {
-          dataListToScreen <- setNames(dataListToScreen, objNamePassedToData)
-        } else {
-          if (!is.null(names(data))) {
-            dataListToScreen <- setNames(dataListToScreen, names(data))
-          } else {
-            dataListToScreen <- setNames(dataListToScreen, "data")
-          }
-        }
-      }
+    if (is(gg, "gg")) {
+      if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
+    }
 
-      ## Necessary for inheritance -- pass the environment with correct inheritance
-      if (!is.null(simIsIn)) {
-        newEnv <- new.env(parent = simIsIn)
-      } else {
-        newEnv <- environment()
-      }
-      newEnv$dataListToScreen <- dataListToScreen
-      gg <- fn(dataListToScreen, ..., env = newEnv)
-
-      if (FALSE) {
-        # .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
-        qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
-        objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
-        objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
-        curPlotDev <- paste0("quickPlot", dev.cur())
-        ignore <- lapply(objNamesInQuickPlotObj, function(x) {
-          slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
-        })
-      }
-    } else {
-      if (is(gg, "gg"))
-        if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
-      if (usePlot) {
-        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
-        Plot(ggListToScreen, addTo = gg$labels$title)
-      } else {
-        if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
-            !is(gg, ".quickPlot"))
-          print(gg)
-      }
+    if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
+        !is(gg, ".quickPlot")) { ## TODO: remove this as part of quickPlot deprecation?
+      print(gg)
     }
   }
+
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
     if (missing(filename)) {
       dataObjName <- deparse(substitute(data))
-      filename <- paste0(dataObjName, "_", basename(gsub("file", "", tempfile(fileext = "")))) ## TODO: can we use e.g. the object name + sim time??
+      ## TODO: can we use e.g. 'the object name + sim time' for the filename ??
+      filename <- paste0(dataObjName, "_", basename(gsub("file", "", tempfile(fileext = ""))))
       if (exists("sim", inherits = FALSE)) {
         simTime <- round(as.numeric(time(sim)), 3)
         filename <- paste0("sim", "_", filename)
@@ -384,14 +307,14 @@ Plots <- function(data, fn, filename,
       if (is.call(path))
         path <- "."
     }
-    if (fnIsPlot || is.null(gg)) {
+    if (is.null(gg)) {
       baseSaveFormats <- intersect(baseClassesCanHandle, types)
       for (bsf in baseSaveFormats) {
         type <- get(bsf)
         theFilename <- file.path(path, paste0(filename, ".", bsf))
         do.call(type, modifyList2(list(theFilename), deviceArgs))
         # curDev <- dev.cur()
-        if (isTRUE(fnIsPlot)) clearPlot()
+
         plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
         dev.off()
         if (!is(plotted, "try-error")) {
@@ -435,13 +358,15 @@ Plots <- function(data, fn, filename,
     }
   }
 
-  if (exists("sim", inherits = FALSE))
+  if (exists("sim", inherits = FALSE)) {
     assign("sim", sim, envir = simIsIn)
+  }
 
-  if (exists("gg", inherits = FALSE))
+  if (exists("gg", inherits = FALSE)) {
     return(invisible(gg))
-  else
+  } else {
     return(invisible(NULL))
+  }
 }
 
 #' Test whether there should be any plotting from `.plots` module parameter
@@ -451,8 +376,7 @@ Plots <- function(data, fn, filename,
 #' Testing any of the types as listed in [Plots()] argument `types`.
 #' Only the first 3 letters of the type are required.
 #'
-#' @param .plots Usually will be the `P(sim)$.plots` is used within
-#'   a module.
+#' @param .plots Usually will be the `P(sim)$.plots` is used within a module.
 #'
 #' @return logical of length 1
 #'

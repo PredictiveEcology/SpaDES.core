@@ -5,7 +5,6 @@ utils::globalVariables(c(
 ## non-exported imports from other packages -------------------------------------
 
 .message <- getFromNamespace(".message", "reproducible") ## envir for messages + message-funs
-.quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
 
 ## TODO: why aren't these properly exported if intended for use?
 ## see <https://github.com/PredictiveEcology/Require/issues/105>

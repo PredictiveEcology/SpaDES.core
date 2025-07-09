@@ -1,5 +1,5 @@
 test_that("loading inputs does not work correctly", {
-  testInit(c(sampleModReqdPkgs, "quickPlot"))
+  testInit(c(sampleModReqdPkgs))
 
   mapPath <- getMapPath(tmpdir)
 
@@ -114,7 +114,7 @@ test_that("loading inputs does not work correctly", {
 test_that("passing arguments to filelist in simInit does not work correctly", {
   skip_on_cran()
 
-  testInit(c(sampleModReqdPkgs, "quickPlot", "data.table"))
+  testInit(c(sampleModReqdPkgs, "data.table"))
 
   # Second, more sophisticated. All maps loaded at time = 0, and the last one is reloaded
   #  at time = 10 and 20 (via "intervals").
@@ -202,7 +202,7 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
 })
 
 test_that("passing objects to simInit does not work correctly", {
-  testInit(c(sampleModReqdPkgs, "quickPlot"))
+  testInit(c(sampleModReqdPkgs))
 
   mapPath <- mapPath <- getMapPath(tmpdir)
 
@@ -280,7 +280,7 @@ test_that("passing objects to simInit does not work correctly", {
 })
 
 test_that("passing nearly empty file to simInit does not work correctly", {
-  testInit(c("terra", "quickPlot"))
+  testInit(c("terra"))
 
   mapPath <- mapPath <- getMapPath(tmpdir)
 

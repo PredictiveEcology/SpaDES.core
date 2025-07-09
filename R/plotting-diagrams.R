@@ -272,14 +272,12 @@ setMethod(
 #' @param sim  A `simList` object (typically corresponding to a
 #'             completed simulation).
 #'
-#' @param type  Character string, either `"rgl"` for `igraph::rglplot`
-#' or `"tk"` for `igraph::tkplot`, `"Plot"` to use `quickPlot::Plot()`
-#' or `"plot"` to use `base::plot()`, the default.
+#' @param type  Character string: either `"rgl"` for [igraph::rglplot]
+#' or `"tk"` for [igraph::tkplot], or `"plot"` to use [base::plot], the default.
 #'
 #' @param showParents Logical. If TRUE, then any children that are grouped into parent
 #'                    modules will be grouped together by coloured blobs. Internally,
 #'                    this is calling [moduleGraph()]. Default `FALSE`.
-#'
 #'
 #' @param ...  Additional arguments passed to plotting function specified by `type`.
 #'
@@ -348,11 +346,10 @@ setMethod(
       rglplot(depsGraph(sim, TRUE), ...)
     } else if (type == "tk") {
       tkplot(depsGraph(sim, TRUE), ...)
+    } else  if (type == "plot") {
+      moduleDiagram(sim, showParents = showParents, plot = type, ... )
     } else {
-      if (grep("plot", type, ignore.case = TRUE))
-        moduleDiagram(sim, showParents = showParents, plot = type, ... )
-      else
-        stop("type must be one of 'rgl', 'tk', 'Plot' or 'plot'")
+      stop("type must be one of 'rgl', 'tk', 'plot'")
     }
 })
 
@@ -434,34 +431,16 @@ setMethod(
         ylim2 <- if (!("ylim" %in% nDots)) c(-1.1, 1.1) else dots$ylim
         asp2 <-  if (!("asp" %in% nDots)) 0 else dots$asp
 
-        notPlot <- isTRUE(dots$plot)
-        if (!isTRUE(notPlot)) {
-          plotTry <- try(Plot(modDia, plotFn = "plot", axes = FALSE,
-               vertex.color = vcol,
-               vertex.size = vertexSize,
-               vertex.size2 = vertexSize2,
-               vertex.shape = vertexShape,
-               vertex.label.cex = vertexLabelCex,
-               vertex.label.family = vertexLabelFamily,
-               layout = layout2,
-               rescale = rescale2,
-               xlim = xlim2, ylim = ylim2, asp = asp2, ...), silent = TRUE)
-          notPlot <- is(plotTry, "try-error")
-          if (notPlot)
-            message("Plot encountered an error; trying base::plot")
-        }
-        if (notPlot)
-          plot(modDia, axes = FALSE,
-               vertex.color = vcol,
-               vertex.size = vertexSize,
-               vertex.size2 = vertexSize2,
-               vertex.shape = vertexShape,
-               vertex.label.cex = vertexLabelCex,
-               vertex.label.family = vertexLabelFamily,
-               layout = layout2,
-               rescale = rescale2,
-               xlim = xlim2, ylim = ylim2, asp = asp2, ...)
-
+        plot(modDia, axes = FALSE,
+             vertex.color = vcol,
+             vertex.size = vertexSize,
+             vertex.size2 = vertexSize2,
+             vertex.shape = vertexShape,
+             vertex.label.cex = vertexLabelCex,
+             vertex.label.family = vertexLabelFamily,
+             layout = layout2,
+             rescale = rescale2,
+             xlim = xlim2, ylim = ylim2, asp = asp2, ...)
       }
 
       if ("title" %in% nDots) {

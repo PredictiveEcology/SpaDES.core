@@ -7,6 +7,7 @@
 \alias{POM}
 \alias{simInitAndExperiment}
 \alias{loadPackages}
+\alias{Plot}
 \title{Zip a \code{simList} and various files}
 \usage{
 zipSimList(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache = FALSE)
@@ -20,6 +21,8 @@ POM(...)
 simInitAndExperiment(...)
 
 loadPackages(...)
+
+Plot(...)
 }
 \arguments{
 \item{sim}{Either a \code{simList} or a character string of the name

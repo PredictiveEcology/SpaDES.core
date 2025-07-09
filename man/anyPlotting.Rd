@@ -7,8 +7,7 @@
 anyPlotting(.plots)
 }
 \arguments{
-\item{.plots}{Usually will be the \code{P(sim)$.plots} is used within
-a module.}
+\item{.plots}{Usually will be the \code{P(sim)$.plots} is used within a module.}
 }
 \value{
 logical of length 1

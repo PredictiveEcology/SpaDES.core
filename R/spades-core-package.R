@@ -258,7 +258,6 @@
 #'   \tabular{ll}{
 #'     [SpaDES.tools::crw()] \tab Simple correlated random walk function\cr
 #'     [SpaDES.tools::heading()] \tab Determines the heading between `SpatialPoints*`\cr
-#'     [quickPlot::makeLines()] \tab Makes `SpatialLines` object for, e.g., drawing arrows\cr
 #'     [SpaDES.tools::move()] \tab A meta function that can currently only take "crw"\cr
 #'     [SpaDES.tools::specificNumPerPatch()] \tab Initiate a specific number of agents per patch\cr
 #'   }
@@ -270,7 +269,9 @@
 #'   and many others), we provide the following GIS-related functions:
 #'
 #'   \tabular{ll}{
-#'     [quickPlot::equalExtent()] \tab Assess whether a list of extents are all equal\cr
+#'     [reproducible::cropTo()] \tab GIS crop\cr
+#'     [reproducible::maskTo()] \tab GIS mask\cr
+#'     [reproducible::projectTo()] \tab GIS project\cr
 #'   }
 #' }
 #'
@@ -281,17 +282,6 @@
 #'
 #'   \tabular{ll}{
 #'     [SpaDES.tools::rasterizeReduced()] \tab Convert reduced representation to full raster.\cr
-#'   }
-#' }
-#'
-#' \subsection{5.5 Colours in `Raster*` objects}{
-#'   We likely will not want the default colours for every map.
-#'   Here are several helper functions to add to, set and get colours of `Raster*` objects:
-#'
-#'   \tabular{ll}{
-#'     [quickPlot::setColors()] \tab Set colours for plotting `Raster*` objects\cr
-#'     [quickPlot::getColors()] \tab Get colours in a `Raster*` objects\cr
-#'     [quickPlot::divergentColors()] \tab Create a colour palette with diverging colours around a middle\cr
 #'   }
 #' }
 #'
@@ -335,7 +325,6 @@
 #'   \tabular{ll}{
 #'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range `[a,b]`\cr
 #'     [quickPlot::layerNames()] \tab Get layer names for numerous object classes\cr
-#'     [quickPlot::numLayers()] \tab Return number of layers\cr
 #'     [reproducible::paddedFloatToChar()] \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
 #'   }
 #' }
@@ -354,9 +343,9 @@
 #'
 #' \tabular{ll}{
 #'   [reproducible::Cache()] \tab Caches a function, but often accessed as argument in [spades()]\cr
-#'   [reproducible::showCache()] \tab Shows information about the objects in the cache\cr
 #'   [reproducible::clearCache()] \tab Removes objects from the cache\cr
 #'   [reproducible::keepCache()] \tab Keeps only the objects described\cr
+#'   [reproducible::showCache()] \tab Shows information about the objects in the cache\cr
 #' }
 #'
 #' A module developer can build caching into their module by creating cached versions of their
@@ -364,14 +353,11 @@
 #'
 #' @section 7 Plotting:
 #'
-#' **Much of the underlying plotting functionality is provided by \pkg{quickPlot}.**
-#'
-#' There are several user-accessible plotting functions that are optimized for modularity
-#' and speed of plotting:
+#' There are several user-accessible plotting functions that are optimized for modularity.
 #'
 #' Commonly used:
 #' \tabular{ll}{
-#'   [quickPlot::Plot()] \tab The workhorse plotting function\cr
+#'   [SpaDES.core::Plots()] \tab The workhorse plotting function.\cr
 #' }
 #'
 #' Simulation diagrams:
@@ -381,26 +367,15 @@
 #'   [SpaDES.core::objectDiagram()] \tab Sequence diagram of detailed object dependencies.\cr
 #' }
 #'
-#' Other useful plotting functions:
-#' \tabular{ll}{
-#'   [quickPlot::clearPlot()] \tab Helpful for resolving many errors\cr
-#'   [quickPlot::clickValues()] \tab Extract values from a raster object at the mouse click location(s)\cr
-#'   [quickPlot::clickExtent()] \tab Zoom into a raster or polygon map that was plotted with [quickPlot::Plot()]\cr
-#'   [quickPlot::clickCoordinates()] \tab Get the coordinates, in map units, under mouse click\cr
-#'   [quickPlot::dev()] \tab Specify which device to plot on, making a non-RStudio one as default\cr
-#'   [quickPlot::newPlot()] \tab Open a new default plotting device\cr
-#'   [quickPlot::rePlot()] \tab Re-plots all elements of device for refreshing or moving plot\cr
-#' }
-#'
 #' @section 8 File operations:
 #'
 #' In addition to R's file operations, we have added several here to aid in bulk
 #' loading and saving of files for simulation purposes:
 #'
 #' \tabular{ll}{
-#'   [loadFiles()] \tab Load simulation objects according to a file list\cr
-#'   [rasterToMemory()] \tab Read a raster from file to RAM\cr
-#'   [saveFiles()] \tab Save simulation objects according to outputs and parameters\cr
+#'   [SpaDES.core::loadFiles()] \tab Load simulation objects according to a file list\cr
+#'   [SpaDES.core::rasterToMemory()] \tab Read a raster from file to RAM\cr
+#'   [SpaDES.core::saveFiles()] \tab Save simulation objects according to outputs and parameters\cr
 #' }
 #'
 #' @section 9 Sample modules included in package:
@@ -432,11 +407,11 @@
 #'
 #'   \item `reproducible.cachePath`: The default local directory in which to
 #'   cache simulation outputs.
-#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).
+#'   Default is a temporary directory (e.g., `/tmp/RtmpXXX/SpaDES/cache`).
 #'
 #'   \item `spades.inputPath`: The default local directory in which to
 #'   look for simulation inputs.
-#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`).
+#'   Default is a temporary directory (e.g., `/tmp/RtmpXXX/SpaDES/inputs`).
 #'
 #'   \item `spades.debug`: The default debugging value `debug`
 #'   argument in `spades()`. Default is `TRUE`.
@@ -446,13 +421,20 @@
 #'
 #'   \item `spades.moduleCodeChecks`: Should the various code checks be run
 #'   during `simInit`. These are passed to `codetools::checkUsage()`.
-#'   Default is given by the function, plus these :`list(suppressParamUnused = FALSE,
-#'   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
-#'   skipWith = TRUE)`.
+#'   Default is given by the function, plus these:
+#'   ```r
+#'   list(
+#'     skipWith = TRUE,
+#'     suppressNoLocalFun = TRUE,
+#'     suppressParamUnused = FALSE,
+#'     suppressPartialMatchArgs = FALSE,
+#'     suppressUndefined = TRUE
+#'    )
+#'    ```
 #'
 #'   \item `spades.modulePath`: The default local directory where modules
 #'     and data will be downloaded and stored.
-#'     Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/modules`).
+#'     Default is a temporary directory (e.g., `/tmp/RtmpXXX/SpaDES/modules`).
 #'
 #'   \item `spades.moduleRepo`: The default GitHub repository to use when
 #'     downloading modules via `downloadModule`.
@@ -463,7 +445,7 @@
 #'
 #'   \item `spades.outputPath`: The default local directory in which to
 #'   save simulation outputs.
-#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/outputs`).
+#'   Default is a temporary directory (e.g., `/tmp/RtmpXXX/SpaDES/outputs`).
 #'
 #'   \item `spades.recoveryMode`: If this a numeric greater than 0 or TRUE, then the
 #'   discrete event simulator will take a snapshot of the objects in the `simList`
@@ -480,8 +462,8 @@
 #'
 #'   \item `spades.switchPkgNamespaces`: Should the search path be modified
 #'     to ensure a module's required packages are listed first?
-#'     Default `FALSE` to keep computational overhead down. If `TRUE`,
-#'     there should be no name conflicts among package objects,
+#'     Default `FALSE` to keep computational overhead down.
+#'     If `TRUE`, there should be no name conflicts among package objects,
 #'     but it is much slower, especially if the events are themselves fast.
 #'
 #'   \item `spades.tolerance`: The default tolerance value used for floating

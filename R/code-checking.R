@@ -3,7 +3,7 @@ utils::globalVariables(".")
 # These are known functions that will definitely cause conflicts unless they are
 # prefixed by their packages.
 conflictingFns <- c("\\<raster::levels\\>", "\\<raster::scale\\>", "\\<raster::which.max\\>")
-clashingFns <- c("\\<quickPlot::Plot\\>")
+clashingFns <- c("")
 mustBeReturnSim <- c("doEvent\\..*") # module functions that must end with return(sim) or the like
 mustAssignToSim <- c("scheduleEvent", "saveFiles") # module functions that must assign to sim <-
 ignoreObjectsGet <- c(".userSuppliedObjNames") # objects that shouldn't return an error if "used"
@@ -515,7 +515,7 @@ cantCodeCheckMessage <- ": line could not be checked "
     }
   }
 
-  # search for conflicts in module function names with common problems, like quickPlot::Plot
+  ## search for conflicts in module function names with common problems
   clashingFuns <- names(sim@.xData$.mods[[m]])[names(sim@.xData$.mods[[m]]) %in% clashingFnsSimple]
   if (length(clashingFuns)) {
     fnNames <- clashingFnsClean[clashingFnsSimple %in% names(sim@.xData$.mods[[m]])]

@@ -1,27 +1,51 @@
 # SpaDES.core (development version)
 
-* `Plots` can now have a `quote(data)` argument, allowing the whole call to be `Cache`d more easily
-* the `mod` object has been moved within the `sim` to remove a memory leak. The `mod` object was previously placed in `sim@.xData[[moduleName]]$.objects`; even though it had `parent.env` that was `emptyenv()`, because it was attached to the environment `sim@.xData[[moduleName]]`, this meant that the objects in `mod` would become part of the environment where the functions were defined. This created a memory leak, resulting in inflated caches when events for that module were cached. It is now in `sim@.xData$.modObjs`, which appears to no longer suffer from the memory leak. This change in location required many changes throughout all exported `reproducible` functions that had `simList` methods, e.g., `.robustDigest`, etc.
-* two internal helpers, `dotObjs` and `dotMod` which create a canonical pointer in the `sim` to these two parts of module-specific objects or functions, respectively;
-* `clearCacheEventsOnly` is a convenience wrapper that will remove all event-level cached objects in the cache repository;
-* `.depsEdgeList` gains a new argument, `outputObjects`, which will return "hanging" outputs as `_OUTPUTS_`, analogous to the hanging inputs as `_INPUTS_`. This is needed to address a new case of `suppliedElsewhere` where the object is contained within a `objectSynonym`, and has not yet been made but it is only listed as an `outputObject` in a module;
-* messaging updates when Caching events and .inputObjects;
-* `evalPostEvent` and `options(spades.evalPostEvent)`, where a user can pass `quote`d code that will be evaluated at the end of each event and `.inputObject` call;
-* several corrections to messaging when there is nested simLists, i.e., when simInit is called within a module; 
-* new function `doCallSafe` that can be used for `doCallSafe(simInitAndSpades, out)`, and it does not suffer from the slow downs of `do.call`; 
-* many changes to accommodate updates to `reproducible` package, specifically the `Cache` function. These include
-  - 
+## Breaking changes
+
 * drop support for R 4.2;
-* fix edge case with caching of events; `outputs` would create false positives (i.e., a change, when there wasn't one); this meant that caching would only be successful after the 2nd time running the event, if another module had put objects in the `outputs` list, especially by using `Plots`
+* many non-backwards compatible changes to accommodate updates to `reproducible` package,
+  specifically `reproducible::Cache()`;
+* The `mod` object has been moved within the `sim` to fix a memory leak:
+  The `mod` object was previously placed in `sim@.xData[[moduleName]]$.objects`;
+  even though it had `parent.env` that was `emptyenv()`, because it was attached to
+  the environment `sim@.xData[[moduleName]]`, this meant that the objects in `mod` would become
+  part of the environment where the functions were defined.
+  This created a memory leak, resulting in inflated caches when events for that module were cached.
+  It is now in `sim@.xData$.modObjs`, which appears to no longer suffer from the memory leak.
+  This change in location required many changes throughout all exported `reproducible` functions
+  that had `simList` methods, e.g., `.robustDigest`, etc.
+* two new internal helpers, `dotObjs` and `dotMods` which create a canonical pointer in the `sim`
+  to these two parts of module-specific objects or functions, respectively;
+* remove dependency on deprecated package `quickPlot`:
+  - `Plots()` argument `usePlot` has new default `FALSE`;
+
+## Other changes
+
+* add dependency package `httr`;
+* `Plots` can now have a `quote(data)` argument, allowing the whole call to be `Cache`d more easily;
+* `clearCacheEventsOnly` is a convenience wrapper that will remove all event-level cached objects in the cache repository;
+* `.depsEdgeList` gains a new argument, `outputObjects`, which will return "hanging" outputs as `_OUTPUTS_`,
+  analogous to the hanging inputs as `_INPUTS_`.
+  This is needed to address a new case of `suppliedElsewhere` where the object is contained within
+  an `objectSynonym`, and has not yet been made but it is only listed as an `outputObject` in a module;
+* messaging updates when `Cache`-ing events and `.inputObjects`;
+* `evalPostEvent` and `options(spades.evalPostEvent)`, where a user can pass `quote`d code that
+  will be evaluated at the end of each event and `.inputObject` call;
+* several corrections to messaging when there is nested `simLists`, e.g., when `simInit` is called within a module; 
+* new function `doCallSafe` that can be used for `doCallSafe(simInitAndSpades, out)`,
+  and it does not suffer from the slow downs of `do.call`; 
+* fix edge case with caching of events: `outputs` would create false positives
+  (i.e., a change, when there wasn't one); this meant that caching would only be successful
+  after the 2nd time running the event, if another module had put objects in the `outputs` list,
+  especially by using `Plots`.
 * fix issue with `Plots()` where plots were discarded if no filename was specified;
 * fixed timeunit test failures (#297);
 * add package anchors to Rd links (#300);
-* minor documentation improvements;
 * new option: `spades.reqdPkgsDontLoad`, a character vector. If anything is specified, 
-then it will not be loaded with `require` or `library`, but it will be installed, if needed,
-and if `spades.useRequire = TRUE`, which is the default. Default for this new option is
-"box", which is one of potentially many in the R universe that throws an error if it is 
-loaded.
+  then it will not be loaded with `require` or `library`, but it will be installed, if needed,
+  and if `spades.useRequire = TRUE`, which is the default. Default for this new option is
+  "box", which is one of potentially many in the R universe that throws an error if it is loaded.
+* documentation improvements;
 
 # SpaDES.core 2.1.5
 

@@ -36,9 +36,12 @@ the event that is \code{numEvents} back from the first event in \code{events(sim
 
 \item{restart}{Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
 restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
-with the module code parsed into the \code{simList}}
+with the module code parsed into the \code{simList}.}
 
-\item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
+\item{verbose}{Controls the level of information messaging that is printed.
+See \code{\link[reproducible:reproducibleOptions]{reproducible::reproducibleOptions()}}.}
+
+\item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}.}
 
 \item{filename}{The filename to save the sim state.
 

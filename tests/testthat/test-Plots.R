@@ -108,7 +108,7 @@ test_that("Plots function 1", {
     # Should clear plot windows and each of following will be a new plot on its own
     Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run3", usePlot = FALSE)
     Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
-    clearPlot()
+
     # avoid using `data` arg; just use all named args
     Plots(d1 = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
   }
@@ -137,10 +137,9 @@ test_that("testing .plotInitialTime & .plots", {
 
     # Makes plots
     expect_no_error(spades(mySim))
-    .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
+    .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot") ## TODO: remove .quickPLotEnv
     expect_true(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
     # Makes no plots
-    clearPlot()
     spades(mySim, .plots = NA)
     expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
     spades(mySim, .plotInitialTime = NA)
@@ -225,7 +224,6 @@ test_that("Plots function 3 - use as Plot", {
       stk1 <- stk(ras, lyr2 = ras)
       stk2 <- stk(ras, lyr2 = ras)
 
-      clearPlot()
       expect_no_error(Plots(data = stk1, types = "screen"))
       stk1[1:10] <- 0.5
       stk1 <- stk(stk1)
@@ -242,7 +240,6 @@ test_that("Plots function 3 - use as Plot", {
       stk2 <- stk(stk2)
       expect_no_error(Plot(stk2)) # should show first row on left plot only as lower -- 0.25
 
-      clearPlot()
       # should show plots as a using terra::plot
       expect_no_error(Plots(data = stk1, types = "screen", usePlot = FALSE, fn = terra::plot))
     }

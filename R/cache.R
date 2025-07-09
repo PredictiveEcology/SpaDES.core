@@ -1,3 +1,7 @@
+utils::globalVariables(c(
+  "cacheID"
+))
+
 if (!isGeneric(".robustDigest")) {
   setGeneric(
     ".robustDigest",
@@ -402,7 +406,8 @@ setMethod(
       }
     }
     checkPath(path = cachePath, create = create)
-  })
+  }
+)
 
 if (!isGeneric(".addChangedAttr")) {
   setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
@@ -437,12 +442,16 @@ setMethod(
     whSimList <- which(unlist(lapply(origArguments, is, "simList")))[1]
     whSimList <- names(whSimList)
 
-    # remove the "newCache" attribute, which is irrelevant for digest
+    ## TODO: move this WORKAROUND to the creation of preDigest; removes NULL elements
+    preDigest[[whSimList]]$.list <- lapply(preDigest[[whSimList]]$.list, .discard) |> .discard()
+
+    ## remove the "newCache" attribute, which is irrelevant for digest
     if (!is.null(attr(object, ".Cache")$newCache)) {
       object <- .setSubAttrInList(object, ".Cache", "newCache", NULL)
 
-      if (!identical(attr(object, ".Cache")$newCache, NULL))
+      if (!identical(attr(object, ".Cache")$newCache, NULL)) {
         stop("attributes on the cache object are not correct - 4")
+      }
     }
 
     if (exists("aaaa", envir = .GlobalEnv)) browser()
@@ -452,16 +461,22 @@ setMethod(
                                 quick = dots$quick,
                                 classOptions = dots$classOptions)
     changed <- if (length(postDigest$.list)) {
-      internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
-                                       function(x) !any(startsWith(names(x), "doEvent"))))
+      internalSimList <- lapply(preDigest[[whSimList]]$.list, function(x) {
+        !any(startsWith(names(x), "doEvent"))
+      }) |>
+        unlist()
       whSimList2 <- if (is.null(internalSimList) || isFALSE(internalSimList)) {
         1
       } else {
-        # this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st
+        ## this can be wrongly of length > 1 -- unclear why, but should be safe to take 1st
         which(internalSimList)[1]
       }
 
-      # remove all functions from the module environment; they aren't allowed to be redefined within a function
+      ## TODO: move this WORKAROUND to the creation of postDigest; removes NULL elements
+      postDigest$.list[[whSimList2]] <- .discard(postDigest$.list[[whSimList2]])
+
+      ## remove all functions from the module environment;
+      ##   they aren't allowed to be redefined within a function
       if (length(preDigest[[whSimList]]$.list)) {
         out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
                                      preDigest[[whSimList]]$.list[[whSimList2]])
@@ -488,7 +503,9 @@ setMethod(
       changedObjs <- out[lengths(out) > 0 | (names(out) %in% modulesInObject)]
 
       changed <- changedObjs
-      if (!any(modulesInObject %in% names(changed)) && NROW(object@current)) { # NROW object@current is for Caching of sim, pre-module running
+
+      ## NROW(object@current) is for Caching of sim, pre-module runnings
+      if (!any(modulesInObject %in% names(changed)) && NROW(object@current)) {
         currMod <- object@current[[2]]
         changed <- append(changed, list(list()) |> setNames(currMod))
       }
@@ -552,7 +569,7 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
 #' @exportMethod .prepareOutput
 #' @include simList-class.R
 #' @importFrom data.table setattr
-#' @importFrom reproducible .prepareOutput
+#' @importFrom reproducible .prepareOutput cacheId
 #' @importMethodsFrom reproducible .prepareOutput
 #' @rdname prepareOutput
 #' @seealso [reproducible::.prepareOutput]
@@ -625,7 +642,8 @@ setMethod(
           anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
           if (length(anyNewGlobals)) {
             suppressMessages(
-              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
+              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params)
+            )
           }
         }
 

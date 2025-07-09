@@ -270,8 +270,7 @@ objects or "gotten" from the \code{simList} and \code{outputObjects} for cases w
 assigned to the \code{simList.}
 
 It will also attempt to find potential, common function name conflicts with things like
-\code{scale} and \code{stack} (both in \pkg{base} and \pkg{raster}), and
-\code{Plot} (in \pkg{quickPlot} and some modules).
+\code{scale} and \code{stack} (both in \pkg{base} and \pkg{raster}).
 
 \emph{This code checking is young and may get false positives and false negatives,
 i.e., miss things}.
@@ -318,7 +317,7 @@ mySim <- simInit(
 outSim <- spades(mySim)
 
 # A little more complicated with inputs and outputs
-mapPath <- system.file("maps", package = "quickPlot")
+mapPath <- system.file("maps", package = "SpaDES.core")
 mySim <- simInit(
   times = list(start = 0.0, end = 2.0, timeunit = "year"),
   params = list(

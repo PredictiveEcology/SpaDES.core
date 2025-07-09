@@ -268,7 +268,6 @@ Agents have several methods and functions specific to them:
 \tabular{ll}{
 \code{\link[SpaDES.tools:crw]{SpaDES.tools::crw()}} \tab Simple correlated random walk function\cr
 \code{\link[SpaDES.tools:heading]{SpaDES.tools::heading()}} \tab Determines the heading between \verb{SpatialPoints*}\cr
-\code{\link[quickPlot:makeLines]{quickPlot::makeLines()}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
 \code{\link[SpaDES.tools:crw]{SpaDES.tools::move()}} \tab A meta function that can currently only take "crw"\cr
 \code{\link[SpaDES.tools:specnumperpatch-probs]{SpaDES.tools::specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
 }
@@ -280,7 +279,9 @@ contributed packages such as \code{sf}, \code{terra}, (also \code{sp}, \code{ras
 and many others), we provide the following GIS-related functions:
 
 \tabular{ll}{
-\code{\link[quickPlot:equalExtent]{quickPlot::equalExtent()}} \tab Assess whether a list of extents are all equal\cr
+\code{\link[reproducible:postProcessTo]{reproducible::cropTo()}} \tab GIS crop\cr
+\code{\link[reproducible:postProcessTo]{reproducible::maskTo()}} \tab GIS mask\cr
+\code{\link[reproducible:postProcessTo]{reproducible::projectTo()}} \tab GIS project\cr
 }
 }
 
@@ -291,17 +292,6 @@ that share identical information.
 
 \tabular{ll}{
 \code{\link[SpaDES.tools:rasterizeReduced]{SpaDES.tools::rasterizeReduced()}} \tab Convert reduced representation to full raster.\cr
-}
-}
-
-\subsection{5.5 Colours in \verb{Raster*} objects}{
-We likely will not want the default colours for every map.
-Here are several helper functions to add to, set and get colours of \verb{Raster*} objects:
-
-\tabular{ll}{
-\code{\link[quickPlot:getSetColors]{quickPlot::setColors()}} \tab Set colours for plotting \verb{Raster*} objects\cr
-\code{\link[quickPlot:getSetColors]{quickPlot::getColors()}} \tab Get colours in a \verb{Raster*} objects\cr
-\code{\link[quickPlot:divergentColors]{quickPlot::divergentColors()}} \tab Create a colour palette with diverging colours around a middle\cr
 }
 }
 
@@ -345,7 +335,6 @@ Functions that may be useful within a \code{SpaDES} context:
 \tabular{ll}{
 \code{\link[SpaDES.tools:inRange]{SpaDES.tools::inRange()}} \tab Test whether a number lies within range \verb{[a,b]}\cr
 \code{\link[quickPlot:layerNames]{quickPlot::layerNames()}} \tab Get layer names for numerous object classes\cr
-\code{\link[quickPlot:numLayers]{quickPlot::numLayers()}} \tab Return number of layers\cr
 \code{\link[reproducible:paddedFloatToChar]{reproducible::paddedFloatToChar()}} \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
 }
 }
@@ -366,9 +355,9 @@ See example in \code{\link[=spades]{spades()}}, achieved by using \code{cache = 
 
 \tabular{ll}{
 \code{\link[reproducible:Cache]{reproducible::Cache()}} \tab Caches a function, but often accessed as argument in \code{\link[=spades]{spades()}}\cr
-\code{\link[reproducible:viewCache]{reproducible::showCache()}} \tab Shows information about the objects in the cache\cr
 \code{\link[reproducible:viewCache]{reproducible::clearCache()}} \tab Removes objects from the cache\cr
 \code{\link[reproducible:viewCache]{reproducible::keepCache()}} \tab Keeps only the objects described\cr
+\code{\link[reproducible:viewCache]{reproducible::showCache()}} \tab Shows information about the objects in the cache\cr
 }
 
 A module developer can build caching into their module by creating cached versions of their
@@ -378,14 +367,11 @@ functions.
 \section{7 Plotting}{
 
 
-\strong{Much of the underlying plotting functionality is provided by \pkg{quickPlot}.}
-
-There are several user-accessible plotting functions that are optimized for modularity
-and speed of plotting:
+There are several user-accessible plotting functions that are optimized for modularity.
 
 Commonly used:
 \tabular{ll}{
-\code{\link[quickPlot:Plot]{quickPlot::Plot()}} \tab The workhorse plotting function\cr
+\code{\link[=Plots]{Plots()}} \tab The workhorse plotting function.\cr
 }
 
 Simulation diagrams:
@@ -393,17 +379,6 @@ Simulation diagrams:
 \code{\link[=eventDiagram]{eventDiagram()}} \tab Gantt chart representing the events in a completed simulation.\cr
 \code{\link[=moduleDiagram]{moduleDiagram()}} \tab Network diagram of simplified module (object) dependencies.\cr
 \code{\link[=objectDiagram]{objectDiagram()}} \tab Sequence diagram of detailed object dependencies.\cr
-}
-
-Other useful plotting functions:
-\tabular{ll}{
-\code{\link[quickPlot:clearPlot]{quickPlot::clearPlot()}} \tab Helpful for resolving many errors\cr
-\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickValues()}} \tab Extract values from a raster object at the mouse click location(s)\cr
-\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickExtent()}} \tab Zoom into a raster or polygon map that was plotted with \code{\link[quickPlot:Plot]{quickPlot::Plot()}}\cr
-\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickCoordinates()}} \tab Get the coordinates, in map units, under mouse click\cr
-\code{\link[quickPlot:dev]{quickPlot::dev()}} \tab Specify which device to plot on, making a non-RStudio one as default\cr
-\code{\link[quickPlot:newPlot]{quickPlot::newPlot()}} \tab Open a new default plotting device\cr
-\code{\link[quickPlot:Plot]{quickPlot::rePlot()}} \tab Re-plots all elements of device for refreshing or moving plot\cr
 }
 }
 
@@ -452,11 +427,11 @@ is after the error is addressed. \code{TRUE} is likely somewhat slower.
 
 \item \code{reproducible.cachePath}: The default local directory in which to
 cache simulation outputs.
-Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/cache}).
+Default is a temporary directory (e.g., \verb{/tmp/RtmpXXX/SpaDES/cache}).
 
 \item \code{spades.inputPath}: The default local directory in which to
 look for simulation inputs.
-Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/inputs}).
+Default is a temporary directory (e.g., \verb{/tmp/RtmpXXX/SpaDES/inputs}).
 
 \item \code{spades.debug}: The default debugging value \code{debug}
 argument in \code{spades()}. Default is \code{TRUE}.
@@ -466,11 +441,20 @@ efficient (but slower) algorithms. Default \code{FALSE}.
 
 \item \code{spades.moduleCodeChecks}: Should the various code checks be run
 during \code{simInit}. These are passed to \code{codetools::checkUsage()}.
-Default is given by the function, plus these :\code{list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)}.
+Default is given by the function, plus these:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{list(
+  skipWith = TRUE,
+  suppressNoLocalFun = TRUE,
+  suppressParamUnused = FALSE,
+  suppressPartialMatchArgs = FALSE,
+  suppressUndefined = TRUE
+ )
+}\if{html}{\out{</div>}}
 
 \item \code{spades.modulePath}: The default local directory where modules
 and data will be downloaded and stored.
-Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/modules}).
+Default is a temporary directory (e.g., \verb{/tmp/RtmpXXX/SpaDES/modules}).
 
 \item \code{spades.moduleRepo}: The default GitHub repository to use when
 downloading modules via \code{downloadModule}.
@@ -481,7 +465,7 @@ retain in the \code{completed} event queue. Default \code{1000L}.
 
 \item \code{spades.outputPath}: The default local directory in which to
 save simulation outputs.
-Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/outputs}).
+Default is a temporary directory (e.g., \verb{/tmp/RtmpXXX/SpaDES/outputs}).
 
 \item \code{spades.recoveryMode}: If this a numeric greater than 0 or TRUE, then the
 discrete event simulator will take a snapshot of the objects in the \code{simList}
@@ -498,8 +482,8 @@ There is a message which describes how to find that.
 
 \item \code{spades.switchPkgNamespaces}: Should the search path be modified
 to ensure a module's required packages are listed first?
-Default \code{FALSE} to keep computational overhead down. If \code{TRUE},
-there should be no name conflicts among package objects,
+Default \code{FALSE} to keep computational overhead down.
+If \code{TRUE}, there should be no name conflicts among package objects,
 but it is much slower, especially if the events are themselves fast.
 
 \item \code{spades.tolerance}: The default tolerance value used for floating

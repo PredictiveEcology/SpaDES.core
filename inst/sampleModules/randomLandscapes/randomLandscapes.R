@@ -75,7 +75,7 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
     },
     plot = {
       # do stuff for this event
-      Plots(sim[[Par$stackName]], usePlot = TRUE)
+      Plots(sim[[Par$stackName]], usePlot = FALSE)
     },
     save = {
       # do stuff for this event

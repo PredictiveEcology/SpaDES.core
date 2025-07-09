@@ -33,7 +33,7 @@ test_that(".emptyEventList tests", {
 #   expect_false(identical(grep(pkgToAttach, spPost2), 2L))
 #
 #   # use removeOthers
-#   pkgToAttach <- c("cli", "reproducible", "quickPlot")
+#   pkgToAttach <- c("cli", "reproducible")
 #   spPre <- search()
 #   a <- .modifySearchPath(pkgs = pkgToAttach, removeOthers = TRUE, skipNamespacing = FALSE)
 #   spPost <- search()

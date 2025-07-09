@@ -36,7 +36,6 @@
 #' (checkObject(sim, object = sim$s)) # TRUE
 #' (checkObject(sim, object = sim$s, layer = "r1")) # TRUE
 #'
-#' @importFrom quickPlot .objectNames
 #' @include simList-class.R
 #' @rdname checkObject
 setGeneric("checkObject", function(sim, name, object, layer, ...) {
