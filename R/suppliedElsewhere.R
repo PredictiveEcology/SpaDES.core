@@ -96,8 +96,8 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   objDeparsed <- as.character(objDeparsed)
 
   namesInList <- names(sim@.xData)
-  if (!is.null(sim$objectSynonyms)) {
-    namesInListHasOS <- lapply(sim$objectSynonyms, function(os) {
+  if (!is.null(sim[[objSynName]])) {
+    namesInListHasOS <- lapply(sim[[objSynName]], function(os) {
       osInNamesInList <- os %in% namesInList
       if (any(osInNamesInList)) {
         os
@@ -113,8 +113,8 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     out <- match(objDeparsed, namesInList, nomatch = 0L) > 0L
     # check not in because it is just declared as a objectSynonym
     if (isTRUE(out)) {
-      if (!is.null(sim$objectSynonyms)) {
-        if (is.null(sim[[objDeparsed]]) && (objDeparsed %in% unlist(sim$objectSynonyms)))
+      if (!is.null(sim[[objSynName]])) {
+        if (is.null(sim[[objDeparsed]]) && (objDeparsed %in% unlist(sim[[objSynName]])))
           out <- FALSE
       }
     }
@@ -143,12 +143,12 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     del <- depsEdgeList(sim, plot = FALSE, includeOutputs = TRUE)
 
     # Need to deal with objectSynonyms
-    if (!is.null(sim$objectSynonyms)) {
-      objsInOS <- sim$objectSynonyms
+    if (!is.null(sim[[objSynName]])) {
+      objsInOS <- sim[[objSynName]]
       ddel1 <- list()
       iter <- 0
       for (OS in objsInOS) {
-        if (objDeparsed %in% OS)  {
+        if (any(objDeparsed %in% OS)) {
           iter <- iter + 1
           ddel1[[iter]] <- list()
           for (OSitem in OS) {
@@ -156,7 +156,6 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
             ddel1[[iter]][[OSitem]] <- ddel1[[iter]][[OSitem]][rep(seq_len(NROW(ddel1[[iter]][[OSitem]])), length(OS) - 1)]
             ddel1[[iter]][[OSitem]][, objName := setdiff(OS, OSitem)]
           }
-
         }
       }
       del <- rbindlist(list(del, rbindlist(unlist(ddel1, recursive = FALSE))))

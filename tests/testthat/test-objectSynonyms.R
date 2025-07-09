@@ -40,11 +40,11 @@ test_that("test objectSynonyms", {
               c("systime", "systime2"),
               c("vegMap", "veg"))
   sim <- objectSynonyms(sim, os)
-  expect_true(length(sim$objectSynonyms) == length(os))
+  expect_true(length(sim[[objSynName]]) == length(os))
   sim <- objectSynonyms(sim, os2)
 
-  expect_true(length(sim$objectSynonyms) == 4)
-  expect_true(identical(sim$objectSynonyms[[2]], unique(c(os[[1]], os2[[1]]))))
+  expect_true(length(sim[[objSynName]]) == 4)
+  expect_true(identical(sim[[objSynName]][[2]], unique(c(os[[1]], os2[[1]]))))
 
   e <- new.env(parent = emptyenv())
   e <- objectSynonyms(e, list(c("age", "ageMap")))

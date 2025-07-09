@@ -68,16 +68,12 @@
 #' # check
 #' sim$.objectSynonyms
 #'
-#'
 objectSynonyms <- function(envir, synonyms) {
-
-  # First, this may be an overwrite of an existing set of synonyms.
-  #  If already in the envir[[objSynName]], then remove it first
-
+  ## First, this may be an overwrite of an existing set of synonyms.
+  ##  If already in the envir[[objSynName]], then remove it first
   if (exists(objSynName, envir = envir, inherits = FALSE)) {
-
     for (syns in seq_along(synonyms)) {
-      for(cur in envir[[objSynName]]) {
+      for (cur in envir[[objSynName]]) {
         if (any(cur %in% synonyms[[syns]])) {
           synonyms[[syns]] <- unique(c(cur, synonyms[[syns]]))
           whSyn <- unlist(lapply(envir[[objSynName]], identical, cur))
@@ -86,12 +82,10 @@ objectSynonyms <- function(envir, synonyms) {
           attr(envir[[objSynName]], "bindings") <- attrs[!whSyn]
         }
       }
-
     }
   }
   canonicalVersions <- Map(syns = synonyms, #name2 = names(synonyms),
       MoreArgs = list(envir = envir), function(syns, envir) {
-
         anyExist <- unlist(lapply(syns, exists, envir = envir))
         if (sum(anyExist) > 1)
           message(paste(syns[anyExist], collapse = ", "), " already exist; using the ",
@@ -128,19 +122,19 @@ objectSynonyms <- function(envir, synonyms) {
                             env = envir
           )
         }
-        list(canonicalVersion = canonicalVersion,
-             activeBindingObjects = activeBindingObjects)
+        list(
+          canonicalVersion = canonicalVersion,
+          activeBindingObjects = activeBindingObjects
+        )
       })
+  if (length(canonicalVersions) == 0) browser() ## TODO
   attrs <- attr(envir[[objSynName]], "bindings")
   envir[[objSynName]] <- append(envir[[objSynName]], synonyms)
   attr(envir[[objSynName]], "bindings") <- append(attrs, canonicalVersions)
   envir
 }
 
-
-
 .checkObjectSynonyms <- function(envir) {
-
   bindings <- attr(envir[[objSynName]], "bindings")
 
   # It may be passed in as a list with no attributes
@@ -165,6 +159,5 @@ objectSynonyms <- function(envir, synonyms) {
       })
   envir
 }
-
 
 objSynName <- ".objectSynonyms"
