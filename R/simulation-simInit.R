@@ -669,10 +669,9 @@ setMethod(
       loadOrder[] <- loadOrderBase
       loadOrderNames <- names(loadOrder)
 
-      # This is a quick override so that .runInputObjects has access to these
-      #   synonynms
+      ## This is a quick override so that .runInputObjects has access to these synonynms
       if (!is.null(objects$objectSynonyms)) {
-        sim$objectSynonyms <- objects$objectSynonyms
+        sim[[objSynName]] <- objects$objectSynonyms
         sim <- .checkObjectSynonyms(sim)
       }
 
