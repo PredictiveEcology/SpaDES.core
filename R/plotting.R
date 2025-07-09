@@ -273,7 +273,7 @@ setMethod(
 #' @examples
 #' b <- 1
 #' inner <- function(y) {
-#'   objEnv <- whereInStack("b")
+#'   objEnv <- SpaDES.core:::whereInStack("b")
 #'   get("b", envir = objEnv)
 #' }
 #' findB <- function(x) {
@@ -315,7 +315,7 @@ setMethod(
 #'
 #' findB <- function(x) {
 #'   b$a <- 2
-#'   env <- whereInStack("b$a")
+#'   env <- SpaDES.core:::whereInStack("b$a")
 #'   env
 #' }
 #' findB() # finds it

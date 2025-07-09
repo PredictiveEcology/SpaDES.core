@@ -32,7 +32,7 @@ search up the enclosing environments, i.e., it matters where the functions were 
 \examples{
 b <- 1
 inner <- function(y) {
-  objEnv <- whereInStack("b")
+  objEnv <- SpaDES.core:::whereInStack("b")
   get("b", envir = objEnv)
 }
 findB <- function(x) {
@@ -74,7 +74,7 @@ testthat::expect_error(findB3()) # fails because not an object name
 
 findB <- function(x) {
   b$a <- 2
-  env <- whereInStack("b$a")
+  env <- SpaDES.core:::whereInStack("b$a")
   env
 }
 findB() # finds it
