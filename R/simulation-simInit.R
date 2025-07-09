@@ -714,10 +714,10 @@ setMethod(
               # unlockBinding(mod, sim$.mods)
               if (length(objects))
                 list2env(objects, envir(sim))
-              sim[[dotMod]][[mod]]$sim <- sim
-              aa <- covr::environment_coverage(sim[[dotMod]][[mod]], test_files = tf)
-              sim <- sim[[dotMod]][[mod]]$sim
-              rm(list = "sim", envir = sim[[dotMod]][[mod]])
+              sim[[dotMods]][[mod]]$sim <- sim
+              aa <- covr::environment_coverage(sim[[dotMods]][[mod]], test_files = tf)
+              sim <- sim[[dotMods]][[mod]]$sim
+              rm(list = "sim", envir = sim[[dotMods]][[mod]])
               if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
               .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
             } else {
@@ -1371,7 +1371,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
       cur <- sim@current
       curModNam <- cur$moduleName
-      debugMessage(debug, sim, cur, sim@.xData[[dotMod]][[curModNam]], curModNam)
+      debugMessage(debug, sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam)
 
       if (!(FALSE %in% debug || any(is.na(debug))))
         objsIsNullBefore <- objsAreNull(sim)
