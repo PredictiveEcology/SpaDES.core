@@ -31,12 +31,11 @@ As one \code{simList} object changes so will the other.
 When this is not the desired behaviour, use this function.
 }
 \details{
-\code{simList} objects can contain a lot of information, much of which could be
-in pass-by-reference objects (e.g., \code{data.table} class), and objects that are
-file-backed, such as some \verb{Raster*}-class objects. For all the objects that
-are file-backed, it is likely \emph{very} important to give unique file-backed
-directories. This should be passed here, which gets passed on to the many methods
-of \code{\link[reproducible:Copy]{reproducible::Copy()}}.
+\code{simList} objects can contain a lot of information, much of which could be in
+pass-by-reference objects (e.g., \code{data.table} class), and objects that are file-backed,
+such as some \verb{Raster*}-class objects. For all the objects that are file-backed,
+it is likely \emph{very} important to give unique file-backed directories.
+This should be passed here, which gets passed on to the many methods of \code{\link[reproducible:Copy]{reproducible::Copy()}}.
 }
 \note{
 uses capital C, to limit confusion with e.g., \code{\link[data.table:copy]{data.table::copy()}}.

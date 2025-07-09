@@ -2771,7 +2771,7 @@ setMethod(
         set(obj, NULL, grep("^[.]_", names(obj)), NULL)
       }
       if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
-        # note the above line captures empty eventTime, whereas `is.na` does not
+        ## note the above line captures empty eventTime, whereas `is.na` does not
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
             if (!is.null(obj[[._txtClockTime]])) {
@@ -2783,7 +2783,7 @@ setMethod(
         }
       }
       obj[]
-      set(obj, NULL, "eventNumber", NULL) # remove the eventNumber column to match other event queues
+      set(obj, NULL, "eventNumber", NULL) ## remove the eventNumber column to match other event queues
     }
 
     ## catch NULL/empty data.table and use empty event list
@@ -3477,20 +3477,21 @@ findObjects <- function(objects, sim, module, path) {
 
 #' Extract an intact `simList` but with subset of objects
 #'
-#' This is copies the non-object components of a `simList` (e.g., events, etc.)
+#' This copies the non-object components of a `simList` (e.g., events, etc.)
 #' then selects only the objects listed in `i` using `Copy(mget(i, envir(sim)))`
 #' and adds them to the returned `simList`.
 #'
-#' @author Eliot McIntire
+#' @param x A `simList` object.
 #' @param i A character vector of objects to select.
-#' @param j Not used.
-#' @param ... Not used.
-#' @param drop Not used.
-#' @param x A `simList`
+#' @param drop,j,... Not used.
 #'
 #' @return
 #' The `[` method returns a complete `simList` class with all the slots
 #'   copied from the original, but only the named objects in `i` are returned.
+#'
+#' @author Eliot McIntire
+#' @export
+#'
 #' @examples
 #' s <- simInit()
 #' s$a <- 1
@@ -3498,8 +3499,6 @@ findObjects <- function(objects, sim, module, path) {
 #' s$d <- 3
 #' s[c("a", "d")] # a simList with only 2 objects
 #'
-#'
-#' @export
 setMethod(
   "[",
   signature = list(x = "simList", i = "character"),

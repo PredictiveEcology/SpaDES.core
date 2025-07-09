@@ -7,22 +7,18 @@
 \S4method{[}{simList,character,ANY}(x, i, j, ..., drop = TRUE)
 }
 \arguments{
-\item{x}{A \code{simList}}
+\item{x}{A \code{simList} object.}
 
 \item{i}{A character vector of objects to select.}
 
-\item{j}{Not used.}
-
-\item{...}{Not used.}
-
-\item{drop}{Not used.}
+\item{drop, j, ...}{Not used.}
 }
 \value{
 The \code{[} method returns a complete \code{simList} class with all the slots
 copied from the original, but only the named objects in \code{i} are returned.
 }
 \description{
-This is copies the non-object components of a \code{simList} (e.g., events, etc.)
+This copies the non-object components of a \code{simList} (e.g., events, etc.)
 then selects only the objects listed in \code{i} using \code{Copy(mget(i, envir(sim)))}
 and adds them to the returned \code{simList}.
 }
@@ -32,7 +28,6 @@ s$a <- 1
 s$b <- 2
 s$d <- 3
 s[c("a", "d")] # a simList with only 2 objects
-
 
 }
 \author{

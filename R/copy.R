@@ -27,12 +27,11 @@ if (!isGeneric("Copy")) {
 #' @return a copy of `object`
 #'
 #' @details
-#' `simList` objects can contain a lot of information, much of which could be
-#' in pass-by-reference objects (e.g., `data.table` class), and objects that are
-#' file-backed, such as some `Raster*`-class objects. For all the objects that
-#' are file-backed, it is likely *very* important to give unique file-backed
-#' directories. This should be passed here, which gets passed on to the many methods
-#' of [reproducible::Copy()].
+#' `simList` objects can contain a lot of information, much of which could be in
+#' pass-by-reference objects (e.g., `data.table` class), and objects that are file-backed,
+#' such as some `Raster*`-class objects. For all the objects that are file-backed,
+#' it is likely *very* important to give unique file-backed directories.
+#' This should be passed here, which gets passed on to the many methods of [reproducible::Copy()].
 #'
 #' @author Eliot McIntire
 #' @exportMethod Copy
@@ -44,8 +43,7 @@ if (!isGeneric("Copy")) {
 #' @seealso [reproducible::Copy()]
 setMethod("Copy",
           signature(object = "simList"),
-          definition = function(object,
-                                objects, queues, modules, ...) {
+          definition = function(object, objects, queues, modules, ...) {
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             if (missing(modules)) modules <-  TRUE
@@ -60,11 +58,10 @@ setMethod("Copy",
             # sim_@.xData <- new.env(parent = as.environment("package:SpaDES.core"))
             sim_@.xData <- new.env(parent = emptyenv())
             sim_@.xData[[dotMods]] <- new.env(parent = asNamespace("SpaDES.core"))
-            # Setup dotObjs later because it is not vectorized over module
+            ## Setup dotObjs later because it is not vectorized over module
             attr(sim_@.xData, "name") <- "sim"
 
-
-            # # set up mod environments, including .objects
+            ## set up mod environments, including .objects
             for (dotType in dotObjsAndMods)
               for (modNam in names(object@.xData[[dotType]])) {
                 sim_ <- newEnvsByModule(sim_, modNam)
@@ -74,14 +71,15 @@ setMethod("Copy",
               dotObjsNotDotMods <- grep(paste0("\\", dotMods, "|", "\\", dotObjs), # "\\.mods",
                                         ls(object@.xData, pattern = "^\\.", all.names = TRUE),
                                         invert = TRUE, value = TRUE)
-              list2env(Copy(mget(dotObjsNotDotMods, envir = object@.xData)),
-                       envir = sim_@.xData)
+              mget(dotObjsNotDotMods, envir = object@.xData) |>
+                Copy() |>
+                list2env(envir = sim_@.xData)
             }
             if (objects > 0) {
               # browser(expr = exists("._Copy_6"))
-              # # Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
+              ## Make sure that the file-backed objects get a copy too -- use Copy -- makes a list
               if (objects == 1) {
-                # Copy the whole environment, recursively through environments
+                ## Copy the whole environment, recursively through environments
                 sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
               }
 
@@ -95,9 +93,9 @@ setMethod("Copy",
                                        is.environment(get(obj, envir = object@.xData[[dotObjs]]))
                                      }))
 
-              # This chunk makes the environment of each function in a module,
-              #   the module itself. This is unique to functions in `simList` objs
-              #   i.e., can't rely on generic reproducible::Copy
+              ## This chunk makes the environment of each function in a module,
+              ##   the module itself. This is unique to functions in `simList` objs
+              ##   i.e., can't rely on generic reproducible::Copy
               lapply(objNames[isEnv], function(en) {
                 list2env(as.list(object@.xData[[dotObjs]][[en]], all.names = TRUE),
                          envir = sim_@.xData[[dotObjs]][[en]])
@@ -133,4 +131,5 @@ setMethod("Copy",
             }
             sim_@.envir <- sim_@.xData
             return(sim_)
-          })
+          }
+)
