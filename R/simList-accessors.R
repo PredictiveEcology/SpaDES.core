@@ -2694,7 +2694,15 @@ setMethod(
     } else {
       sim@current
     }
-    return(rbindlist(list(out)))
+
+    out2 <- rbindlist(list(out))
+
+    ## catch NULL/empty data.table and use empty event list
+    if (NROW(out2) == 0 && NCOL(out2) == 0) {
+      out2 <- .emptyEventListDT
+    }
+
+    return(out2)
 })
 
 #' @aliases simList-accessors-events
@@ -2777,6 +2785,12 @@ setMethod(
       obj[]
       set(obj, NULL, "eventNumber", NULL) # remove the eventNumber column to match other event queues
     }
+
+    ## catch NULL/empty data.table and use empty event list
+    if (NROW(obj) == 0 && NCOL(obj) == 0) {
+      obj <- .emptyEventListDT
+    }
+
     return(obj)
 })
 
