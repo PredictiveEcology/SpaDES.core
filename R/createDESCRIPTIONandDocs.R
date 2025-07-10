@@ -225,12 +225,14 @@ filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fil
   normPath(file.path(packageFolderName, subFolder, paste0(gsub("\\.", "", fn), fileExt)))
 }
 
-filenameForMainFunctions <- function(module, modulePath = ".")
+filenameForMainFunctions <- function(module, modulePath = ".") {
   normPath(file.path(modulePath, unlist(module), "R", paste0(unlist(basename(module)), "Fns.R")))
+}
 
 
-
-
+#' @importFrom Require extractPkgGitHub extractPkgName extractVersionNumber trimVersionNumber
+#'
+#' @keywords internal
 DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
                                       packageFolderName, verbose = getOption("Require.verbose")) {
   d <- list()

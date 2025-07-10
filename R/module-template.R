@@ -140,8 +140,6 @@ openIsRequested <- function(open, suff) {
 #'   unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
 #' }
 #'
-#'
-#'
 setGeneric("newModule", function(name, path, ..., events = NULL, envir = parent.frame()) {
   standardGeneric("newModule")
 })

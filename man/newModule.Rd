@@ -143,8 +143,6 @@ if (requireNamespace("ggplot2")) {
   unlink(dir(modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
 }
 
-
-
 }
 \seealso{
 Other module creation helpers: 

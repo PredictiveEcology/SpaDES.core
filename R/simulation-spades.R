@@ -1443,7 +1443,7 @@ setMethod(
       message(cli::bg_yellow(cur[["moduleName"]]))
     }
     if (allowSequentialCaching) {
-        sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
+      sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
     }
   }
 

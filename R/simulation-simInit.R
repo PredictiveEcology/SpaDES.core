@@ -1313,6 +1313,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #'
 #' @keywords internal
 #' @importFrom cli col_green
+#' @importFrom Require extractPkgName
 #' @importFrom reproducible basename2
 #' @rdname runModuleInputsObjects
 .runModuleInputObjects <- function(sim, m, objects, notOlderThan) {
@@ -1421,8 +1422,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             isTRUE(sim@params[[mBase]][[".showSimilar"]])
           }
 
-          if (any(".inputObjects" %in% debug))
+          if (any(".inputObjects" %in% debug)) {
             debugonce(.inputObjects)
+          }
 
           modParams <- sim@params[[mBase]]
           paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in% paramsDontCacheOn
@@ -1482,13 +1484,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
           }
 
-
-          # put back the current values of params that were not cached on
-          if (sum(paramsDontCacheOnActual))
+          ## put back the current values of params that were not cached on
+          if (sum(paramsDontCacheOnActual)) {
             sim@params[[mBase]][paramsDontCacheOnActual] <- modParams[paramsDontCacheOnActual]
-
-
-
+          }
         }
       } else {
         # .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
@@ -1545,11 +1544,12 @@ simInitDefaults <- function() {
 
   names(isMissing) <- formalsTF
 
-  if (any(isMissing))
+  if (any(isMissing)) {
     li[names(isMissing)[isMissing]] <- Map(x = isMissing[isMissing], nam = names(isMissing)[isMissing],
                          function(x, nam) {
                            get(paste0(".", nam, "Default"))()}
     )
+  }
   # if (isTRUE(isMissing["times"])) li$times <- .timesDefault
   # if (isTRUE(isMissing["params"])) li$params <- .paramsDefault
   # if (isTRUE(isMissing["modules"])) li$modules <- .modulesDefault
@@ -1640,7 +1640,7 @@ findSmallestTU <- function(sim, mods, childModules) { # recursive function
     minTU[[1]] <- .timeunitDefault()
   }
 
-  # no timeunits or no modules at all
+  ## no timeunits or no modules at all
   if (length(minTU) == 0) minTU <- list(moduleDefaults$timeunit)
 
   return(minTU)
@@ -1650,7 +1650,7 @@ findSmallestTU <- function(sim, mods, childModules) { # recursive function
 buildParentChildGraph <- function(sim, mods, childModules) {
   out <- childModules
 
-  # A child module will be a list inside a list of parent modules
+  ## A child module will be a list inside a list of parent modules
   isParent <- sapply(out, function(x) is.list(x))
   if (length(isParent)) {
     from <- rep(names(out)[isParent], unlist(lapply(out[isParent], length)))
@@ -1666,14 +1666,15 @@ buildParentChildGraph <- function(sim, mods, childModules) {
   outDF
 }
 
-#' @importFrom Require getCRANrepos
+#' @importFrom Require extractPkgName getCRANrepos Require
 loadPkgs <- function(reqdPkgs) {
   uniqueReqdPkgs <- unlist(reqdPkgs)
   uniqueReqdPkgs <- uniqueReqdPkgs[!duplicated(uniqueReqdPkgs)]
 
   if (length(uniqueReqdPkgs)) {
     allPkgs <- uniqueReqdPkgs
-    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) {# append SpaDES.core if it isn't already there
+    if (!any(grepl("SpaDES.core", uniqueReqdPkgs))) {
+      ## append SpaDES.core if it isn't already there
       allPkgs <- c(uniqueReqdPkgs, "SpaDES.core")
     }
 
