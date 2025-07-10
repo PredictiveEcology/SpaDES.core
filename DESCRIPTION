@@ -81,6 +81,7 @@ Suggests:
     withr
 Remotes:
     ropensci/NLMR,
+    tidyverse/ggplot2,
     PredictiveEcology/reproducible@AI,
     PredictiveEcology/Require@development
 Additional_repositories: https://predictiveecology.r-universe.dev/
