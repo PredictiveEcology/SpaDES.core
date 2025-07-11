@@ -38,7 +38,7 @@ if (Sys.info()[["sysname"]] == "Darwin") {
 } else {
   fs::path("revdep", "library", revdeps) |> fs::dir_create()
 }
-lapply(revdeps, revdepcheck:::deps_install, pkgdir = ".")
+try(lapply(revdeps, revdepcheck:::deps_install, pkgdir = "."))
 
 ## setup and run the checks
 revdepcheck.extras::revdep_init()
