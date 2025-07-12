@@ -107,33 +107,39 @@ openIsRequested <- function(open, suff) {
 #'   newModule("myModule", tmpdir)
 #'
 #'   ## create a new parent module in the "modules" subdirectory.
-#'   newModule("myParentModule", tmpdir, type = "parent", children = c("child1", "child2"))
+#'   newModule(
+#'     name = "myParentModule",
+#'     path = tmpdir,
+#'     type = "parent",
+#'     children = c("child1", "child2")
+#'  )
 #'   unlink(tmpdir, recursive = TRUE)
 #' }
 #'
 #' if (requireNamespace("ggplot2")) {
-#'   # We can also specify events and functions in `newModule`; it will still get all
-#'   #   functions that are not specified from the module template (e.g., plotFun below)
+#'   ## We can also specify events and functions in `newModule`;
+#'   ## it will still get all functions that are not specified
+#'   ## from the module template (e.g., plotFun below).
 #'   nm <- "test"
 #'   modulePath <- Require::tempdir2()
-#'   newModule(nm, path = modulePath, open = FALSE,
-#'             events = list(
-#'               init = {
-#'                   sim <- Init(sim)                            # finds definition below
-#'                   sim <- scheduleEvent(sim, start(sim) + 1,
-#'                                        eventType = "plot")
-#'                 },
-#'               plot = {
-#'                   plotFun(sim)                                # finds the templated plotFun
-#'                   sim <- scheduleEvent(sim, time(sim) + 1,
-#'                                        eventType = "plot")
-#'                 }
-#'               ,
-#'             ),
-#'             Init = function(sim) { # replaces Init definition from template
-#'               sim$a <- 1
-#'               return(sim)
-#'             }
+#'   newModule(
+#'     name = nm,
+#'     path = modulePath,
+#'     open = FALSE,
+#'     events = list(
+#'       init = {
+#'         sim <- Init(sim) ## finds definition below
+#'         sim <- scheduleEvent(sim, start(sim) + 1, eventType = "plot")
+#'       },
+#'       plot = {
+#'         plotFun(sim) ## finds the templated plotFun
+#'         sim <- scheduleEvent(sim, time(sim) + 1, eventType = "plot")
+#'       }
+#'     ),
+#'     Init = function(sim) { # replaces Init definition from template
+#'       sim$a <- 1
+#'       return(sim)
+#'     }
 #'   )
 #'   out <- simInitAndSpades(module = nm, paths = list(modulePath = modulePath))
 #'   # clean up
