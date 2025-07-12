@@ -83,7 +83,7 @@ Remotes:
     ropensci/NLMR,
     tidyverse/ggplot2,
     PredictiveEcology/reproducible@AI,
-    PredictiveEcology/Require@development
+    PredictiveEcology/Require@hasHEAD
 Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
