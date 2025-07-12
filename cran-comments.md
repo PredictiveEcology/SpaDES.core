@@ -5,25 +5,25 @@ This release fixes a problem with an occasionally failing test.
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 20.04                 (GitHub), R 4.2.3, 4.3.3
-* Windows                      (GitHub), R 4.2.3, 4.3.3
-* Windows                 (win-builder), R 4.3.3
+* Ubuntu 24.04                 (GitHub), R 4.3.3, 4.4.3
+* Windows                      (GitHub), R 4.3.3, 4.4.3
+* Windows                 (win-builder), R 4.4.3
 
 ### Current R versions
-* macOS 13.3.1            (mac-builder), R 4.4.2
-* macOS 14.7.2                 (GitHub), R 4.4.2
-* macOS 14.4.1                  (local), R 4.4.2
-* Ubuntu 22.04                 (GitHub), R 4.4.2
-* Ubuntu 24.04                  (local), R 4.4.2
-* Windows                      (GitHub), R 4.4.2
-* Windows                       (local), R 4.4.2
-* Windows                 (win-builder), R 4.4.2
+* macOS 13.3.1            (mac-builder), R 4.5.1
+* macOS 14.7.6                 (GitHub), R 4.5.1
+* macOS 15.5                    (local), R 4.5.1
+* Ubuntu 24.04                 (GitHub), R 4.5.1
+* Ubuntu 24.04                  (local), R 4.5.1
+* Windows                      (GitHub), R 4.5.1
+* Windows                       (local), R 4.5.1
+* Windows                 (win-builder), R 4.5.1
 
 ### Development R version
-* Ubuntu 20.04                 (GitHub), R-devel (2024-05-28 r86639)
-* Ubuntu 24.04                  (local), R-devel (2024-05-28 r86640)
-* Windows                      (GitHub), R-devel (2024-05-28 r86639 ucrt)
-* Windows                 (win-builder), R-devel (2024-05-28 r86639 ucrt)
+* Ubuntu 24.04                 (GitHub), R-devel (2025-07-10 r88399)
+* Ubuntu 24.04                  (local), R-devel (2025-07-10 r88399)
+* Windows                      (GitHub), R-devel (2025-07-10 r88399 ucrt)
+* Windows                 (win-builder), R-devel (2025-07-10 r88399 ucrt)
 
 ## R CMD check results
 
