@@ -1,4 +1,4 @@
-# SpaDES.core (development version)
+# SpaDES.core 2.1.6
 
 ## Breaking changes
 

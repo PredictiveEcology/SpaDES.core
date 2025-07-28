@@ -2364,6 +2364,7 @@ allowSequentialCachingUpdateTags <- function(sim, cacheIt) {
   sim
 }
 
+#' @importFrom utils getFromNamespace
 allowSequentialCachingFinal <- function(sim) {
   wasFromCache <- !is.null(attr(sim, "tags"))
   if (wasFromCache) {

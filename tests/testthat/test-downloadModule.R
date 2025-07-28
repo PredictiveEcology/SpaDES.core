@@ -114,7 +114,8 @@ test_that("downloadModule can overwrite existing modules", {
 
 test_that("downloadModule does not fail when data URLs cannot be accessed", {
   skip_on_cran()
-  opts <- list(reproducible.inputPaths = NULL, "reproducible.verbose" = TRUE)
+  opts <- list(reproducible.inputPaths = NULL, reproducible.verbose = TRUE)
+
   if (isWindows()) {
     opts <- append(opts, list(download.file.method = "auto"))
   } else {
