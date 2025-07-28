@@ -16,7 +16,7 @@ Various slot accessor methods (i.e., get and set functions) are provided
 Based on code from chapter 7.8.3 of Matloff (2011): "Discrete event simulation".
 Here, we implement a discrete event simulation in a more modular fashion so
 it's easier to add simulation components (i.e., "simulation modules").
-We use S4 classes and methods, and use \code{\link[=data.table]{data.table()}} instead of
+We use S4 classes and methods, and use \code{\link[data.table:data.table]{data.table::data.table()}} instead of
 \code{\link[=data.frame]{data.frame()}} to implement the event queue (because it is much
 more efficient).
 }
@@ -102,7 +102,7 @@ categorized into separate help pages:
 
 The main event list is a sorted \code{data.table} (keyed) on \code{eventTime}, and \code{eventPriority.}
 The completed event list is an ordered list in the exact order that the events were executed.
-Each event is represented by a \code{\link[=data.table]{data.table()}} row consisting of:
+Each event is represented by a \code{\link[data.table:data.table]{data.table::data.table()}} row consisting of:
 \tabular{ll}{
 \code{eventTime} \tab The time the event is to occur.\cr
 \code{moduleName} \tab The module from which the event is taken.\cr

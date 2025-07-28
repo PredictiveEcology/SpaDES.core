@@ -86,7 +86,7 @@ thus most users will not require direct use of these methods.
 Currently, only get and set methods are defined. Subset methods are not.
 }
 \note{
-Each event is represented by a \code{\link[=data.table]{data.table()}} row consisting of:
+Each event is represented by a \code{\link[data.table:data.table]{data.table::data.table()}} row consisting of:
 \itemize{
 \item \code{eventTime}: The time the event is to occur.
 \item \code{moduleName}: The module from which the event is taken.

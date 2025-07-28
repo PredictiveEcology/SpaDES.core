@@ -169,7 +169,8 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
           fd1 <- fd1[!unlist(unname(fd1)) %in% unlist(unname(fd2))]
         }
         # move the changed ones to the simList
-        list2env(objsToCopy[names(fd1)], envir = sim@.xData)
+        if (NROW(fd1))
+          list2env(objsToCopy[names(fd1)], envir = sim@.xData)
       }
 
       modObjNames <- names(sim$.recoverableModObjs[[event]])

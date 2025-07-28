@@ -2,12 +2,12 @@
 % Please edit documentation in R/module-template.R
 \name{checkModulePath}
 \alias{checkModulePath}
-\title{Uses "." if getPath not set}
+\title{Check module path}
 \usage{
 checkModulePath()
 }
 \description{
-Will compare default in spadesOptions to getPaths ... these will be same if use
-has not set them. For such case, use ".". They will be different if the user has
-used \code{setPaths}. If that is the case, then use \code{getPaths()[["modulePath"]]}
+Will compare default in \code{spadesOptions()} (i.e., \code{spades.modulePath}) to \code{getPaths()}.
+Uses \code{"."} if \code{modulePath} not set (e.g., via \code{setPaths}).
+If that is the case, then use \code{getPaths()[["modulePath"]]}.
 }

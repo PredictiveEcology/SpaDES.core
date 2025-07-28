@@ -1584,7 +1584,7 @@ recoverModePost <- function(sim, rmo, recoverMode) {
 }
 
 #' @keywords internal
-#' @importFrom cli cli_code
+#' @importFrom cli cli_code cli_text col_magenta
 recoverModeOnExit <- function(sim, rmo, recoverMode) {
   sim@.xData$.recoverableObjs <- rmo$recoverableObjs
   sim@.xData$.recoverableModObjs <- rmo$recoverableModObjs
@@ -1595,17 +1595,19 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
   sim@.xData$.addedEvents <- rmo$addedEvents
   sim@.xData$._randomSeed <- rmo$randomSeed
   message(cli::col_magenta(paste0("Setting options('spades.recoveryMode' = ",recoverMode,") used ",
-                                 format(rmo$recoverModeTiming, units = "auto", digits = 3),
-                                 " and ", format(recoverableObjsSize, units = "auto"))))
-  message(cli::col_magenta(
-    "The initial state of the last", as.numeric(recoverMode), "events are cached and saved",
-    "in the simList located at savedSimEnv()$.sim,",
-    "as sim$.recoverableObjs, with the most recent event",
-    "the first element in the list, 2nd most recent event = the second most recent event, etc.",
-    " The objects contained in each of those are only the objects that may have",
-    "changed, according to the metadata for each module. To recover, use:",
-    cli::cli_code("restartSpades()")
-  ))
+                                  format(rmo$recoverModeTiming, units = "auto", digits = 3),
+                                  " and ", format(recoverableObjsSize, units = "auto"))))
+  message(cli::cli_text(cli::col_magenta(
+    paste(
+      "The initial state of the last", as.integer(recoverMode), "events are cached and saved",
+      "in the {.var simList} located at {.code savedSimEnv()$.sim} as",
+      "{.code sim$.recoverableObjs} with the most recent event as the first element in the list,",
+      "second most recent event as the second element, etc.",
+      "The objects contained in each of those are only the objects that may have",
+      "changed, according to the metadata for each module.\n",
+      "To recover, use: {.code restartSpades()}"
+    )
+  )))
   return(sim)
 }
 
@@ -2304,6 +2306,7 @@ allowSequentialCachingUpdateTags <- function(sim, cacheIt) {
   sim
 }
 
+#' @importFrom utils getFromNamespace
 allowSequentialCachingFinal <- function(sim) {
   wasFromCache <- !is.null(attr(sim, "tags"))
   if (wasFromCache) {
@@ -2320,10 +2323,10 @@ allowSequentialCachingFinal <- function(sim) {
                    tagValue = c(thisCacheId, cur[["moduleName"]], cur[["eventType"]]),
                    cachePath = cp)
       if (all(c(cur[["moduleName"]], cur[["eventType"]]) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
-        fn <- reproducible:::.updateTagsRepo
+        fn <- utils::getFromNamespace(".updateTagsRepo", "reproducible")
         args$add = TRUE
       } else {
-        fn <- reproducible:::.addTagsRepo
+        fn <- utils::getFromNamespace(".addTagsRepo", "reproducible")
       }
 
       # put all tags in

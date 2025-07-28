@@ -7,7 +7,7 @@
 #' Based on code from chapter 7.8.3 of Matloff (2011): "Discrete event simulation".
 #' Here, we implement a discrete event simulation in a more modular fashion so
 #' it's easier to add simulation components (i.e., "simulation modules").
-#' We use S4 classes and methods, and use [data.table()] instead of
+#' We use S4 classes and methods, and use [data.table::data.table()] instead of
 #' [data.frame()] to implement the event queue (because it is much
 #' more efficient).
 #'
@@ -84,7 +84,7 @@
 #'
 #' The main event list is a sorted `data.table` (keyed) on `eventTime`, and `eventPriority.`
 #' The completed event list is an ordered list in the exact order that the events were executed.
-#' Each event is represented by a [data.table()] row consisting of:
+#' Each event is represented by a [data.table::data.table()] row consisting of:
 #' \tabular{ll}{
 #'   `eventTime` \tab The time the event is to occur.\cr
 #'   `moduleName` \tab The module from which the event is taken.\cr

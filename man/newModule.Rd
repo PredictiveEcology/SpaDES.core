@@ -68,7 +68,7 @@ NULL (invisibly). The new module file is created at
 
 \code{newModuleCode} is invoked for its side effect of creating new module code files.
 
-\code{newModuleDocumentation} is nvoked for its side effect of
+\code{newModuleDocumentation} is invoked for its side effect of
 creating new module documentation files.
 }
 \description{

@@ -13,7 +13,7 @@
 should be copied. Default \code{TRUE}, which may be slow.}
 
 \item{queues}{Logical. Should the events queues (\code{events}, \code{current}, \code{completed})
-be deep copied via \code{data.table::copy()}}
+be deep copied via \code{\link[data.table:copy]{data.table::copy()}}}
 
 \item{modules}{Logical. Should list of modules be copied.}
 
@@ -36,14 +36,12 @@ in pass-by-reference objects (e.g., \code{data.table} class), and objects that a
 file-backed, such as some \verb{Raster*}-class objects. For all the objects that
 are file-backed, it is likely \emph{very} important to give unique file-backed
 directories. This should be passed here, which gets passed on to the many methods
-of \code{Copy} in \code{reproducible}.
+of \code{\link[reproducible:Copy]{reproducible::Copy()}}.
 }
 \note{
-uses capital C, to limit confusion with e.g., \code{data.table::copy()}.
+uses capital C, to limit confusion with e.g., \code{\link[data.table:copy]{data.table::copy()}}.
 }
 \seealso{
-\code{\link[reproducible:Copy]{reproducible::Copy()}}
-
 \code{\link[reproducible:Copy]{reproducible::Copy()}}
 }
 \author{

@@ -1,7 +1,16 @@
-# SpaDES.core 2.1.3
+# SpaDES.core 2.1.6
+
+* drop support for R 4.2;
+* fixed issue with `Plots()` where plots were discarded if no filename was specified;
+* fixed timeunit test failures (#297);
+* add package anchors to Rd links (#300);
+* minor documentation improvements;
+
+# SpaDES.core 2.1.5
 
 * fix issue with Windows short paths in tests;
 * improved documentation;
+* removal of `globals(sim)` in Sample modules
 
 # SpaDES.core 2.1.2
 

@@ -30,7 +30,6 @@ test_that("Plots function 1", {
     authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
     childModules = character(0),
     version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-    spatialExtent = terra::ext(rep(0, 4)),
     timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = "year",
     citation = list("citation.bib"),
@@ -79,10 +78,12 @@ test_that("Plots function 1", {
     if (iii == 5) {
       expect_true(length(files) == 0L)
     }
-    if (any(grepl("object", out)))
+    if (any(grepl("object", out))) {
       expect_true(any(grepl("gg", files)))
-    if (any(grepl("raw", out)))
+    }
+    if (any(grepl("raw", out))) {
       expect_true(any(grepl("qs", files) & !grepl("gg", files)))
+    }
     if (any(grepl("png", out))) {
       expect_true(any(grepl("png", files)))
       expect_true(sum(grepl(wdth, mess)) == 1)

@@ -127,8 +127,9 @@ test_that("depsEdgeList and depsGraph work", {
     } , add = TRUE)
   }
   times <- list(start = 0.0, end = 10)
+  npb <- "nPixelsBurned"
   params <- list(
-    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    .globals = list(burnStats = npb, stackName = "landscape"),
     randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
     caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA),
     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
@@ -147,7 +148,7 @@ test_that("depsEdgeList and depsGraph work", {
              "fireSpread", "fireSpread", "caribouMovement",
              "caribouMovement")
   el_objName <- c("landscape", "landscape", "landscape",
-                  "npixelsburned", "landscape",
+                  npb, "landscape",
                   "caribou")
   el_objClass <- c("SpatRaster", "SpatRaster",
                    "SpatRaster", "numeric", "SpatRaster",

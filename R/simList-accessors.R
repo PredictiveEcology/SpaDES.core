@@ -525,7 +525,7 @@ P.simList <- function(sim, param, module) {
         modFilePaths <- checkPath(names(mods))
 
         scalls <- sys.calls()
-        whereInSC <- .grepSysCalls(scalls, "^P\\(")
+        whereInSC <- .grepSysCalls(scalls, "^P\\(|^SpaDES.core::P\\(")
         while (whereInSC > 1) {
           poss <- scalls[whereInSC - 1]
           fn <- as.character(poss[[1]][[1]])
@@ -1848,10 +1848,10 @@ setMethod("figurePath",
           signature = "simList",
           definition = function(sim) {
             moduleName <- current(sim)[["moduleName"]]
-            fp <- if (length(moduleName) == 0) {
-              file.path(sim@paths$outputPath, "figures")
+            if (length(moduleName) == 0) {
+              fp <- file.path(sim@paths$outputPath, "figures")
             } else {
-              file.path(sim@paths$outputPath, "figures", moduleName)
+              fp <- file.path(sim@paths$outputPath, "figures", moduleName)
             }
             fp <- checkPath(fp, create = TRUE)
             return(fp)
@@ -1873,10 +1873,8 @@ setGeneric("logPath", function(sim) {
 setMethod("logPath",
           signature = "simList",
           definition = function(sim) {
-            lp <- getOption("spades.logPath")
-            if (is.null(lp))
-              lp <- file.path(sim@paths$outputPath, "log")
-            lp <- checkPath(lp, create = TRUE)
+            lp <- getOption("spades.logPath", file.path(sim@paths[["outputPath"]], "log")) |>
+              checkPath(create = TRUE)
             return(lp)
 })
 
@@ -2505,7 +2503,7 @@ setMethod(
 #'
 #' Currently, only get and set methods are defined. Subset methods are not.
 #'
-#' @note Each event is represented by a [data.table()] row consisting of:
+#' @note Each event is represented by a [data.table::data.table()] row consisting of:
 #'  \itemize{
 #'    \item `eventTime`: The time the event is to occur.
 #'    \item `moduleName`: The module from which the event is taken.
@@ -3351,22 +3349,20 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
     if (identical(units, "auto")) {
       unt <- "secs"
       if (any(a > minutesInSeconds)) {
-        if (any(a > hoursInSeconds)) {
-          if (any(a > daysInSeconds)) {
-            unt <- "days"
-          }
-        } else {
-          unt <- "hours"
-        }
-      } else {
         unt <- "mins"
+      } else if (any(a > hoursInSeconds)) {
+        unt <- "hours"
+      } else if (any(a > daysInSeconds)) {
+        unt <- "days"
       }
-      st <- Sys.time()
-      a <- round(difftime(a + st, st, units = unt), 3) # work around for forcing a non seconds unit, allowing "auto"
     } else {
       # This one won't allow "auto"
+      unt <- units
       units(a) <- units
     }
+    st <- Sys.time()
+    a <- round(difftime(a + st, st, units = unt), 3) # work around for forcing a non seconds unit, allowing "auto"
+
     ret[, elapsedTime := a]
   } else {
     ret <- NULL

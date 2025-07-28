@@ -386,7 +386,7 @@ setMethod(
       sim <- elapsedTimeInSimInit(._startClockTime, sim)
       ._startClockTime <- Sys.time()
       dt <- difftime(._startClockTime, ._startClockTime - sim$._simInitElapsedTime)
-      message("Elpsed time for simInit: ", format(dt, format = "auto"))
+      message("Elapsed time for simInit: ", format(dt, format = "auto"))
     }, add = TRUE)
 
     paths <- lapply(paths, function(p) {

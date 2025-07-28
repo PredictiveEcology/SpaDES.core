@@ -112,22 +112,24 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'
 #'     Plots(data = sim$something, fn = fn,
 #'           types = c("png"),
-#'           path = file.path("figures"),
+#'           path = file.path(tempdir(), "figures"),
 #'           filename = tempfile(),
-#'           .plotInitialTime = 1
-#'           )
+#'           .plotInitialTime = 1)
 #'
 #'     # plot to active device and to png
-#'     Plots(data = sim$something, fn = fn,
-#'           types = c("png", "screen"),
-#'           path = file.path("figures"),
-#'           filename = tempfile(),
-#'           .plotInitialTime = 1
-#'           )
+#'     Plots(
+#'       data = sim$something, fn = fn,
+#'       types = c("png", "screen"),
+#'       path = file.path(tempdir(), "figures"),
+#'       filename = tempfile(),
+#'       .plotInitialTime = 1
+#'     )
 #'
 #'     # Can also be used like quickPlot::Plot, but with control over output type
-#'     r <- terra::rast(terra::ext(0,10,0,10), vals = sample(1:3, size = 100, replace = TRUE))
-#'     Plots(r, types = c("screen", "png"), deviceArgs = list(width = 700, height = 500),
+#'     r <- terra::rast(terra::ext(0,10,0,10),
+#'                      vals = sample(1:3, size = 100, replace = TRUE))
+#'     Plots(r, types = c("screen", "png"), filename = tempfile(),
+#'           deviceArgs = list(width = 700, height = 500),
 #'           usePlot = TRUE)
 #'
 #'     # with ggplotify, Plots can also be used to plot/save
@@ -137,12 +139,12 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'     if (require("ggplotify")) {
 #'       if (!require("lattice")) stop("please install lattice")
 #'
-#'       plotFile <- tempfile()
-#'
 #'       p1 <- densityplot(~mpg|cyl, data=mtcars)
-#'       Plots(data = p1, fn = as.ggplot, filename = plotFile,
-#'             ggsaveArgs = list(width = 5, height = 4, dpi = 300, bg = "white", units = "in"),
-#'             types = c("screen", "png"), .plotInitialTime = 1)
+#'       Plots(data = p1, fn = as.ggplot, filename = tempfile(),
+#'             ggsaveArgs = list(width = 5, height = 4, dpi = 300,
+#'                               bg = "white", units = "in"),
+#'             types = c("screen", "png"),
+#'             .plotInitialTime = 1)
 #'     }
 #'   } # end ggplot
 #' } # end of dontrun
@@ -307,24 +309,22 @@ Plots <- function(data, fn, filename,
         names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
         Plot(ggListToScreen, addTo = gg$labels$title)
       } else {
-        print(gg)
+        if (!(identical(fn, plot) || identical(fn, terra::plot)))
+          print(gg)
       }
     }
   }
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
     if (missing(filename)) {
-      filename <- tempfile(fileext = "")
+      filename <- tempfile(fileext = "") ## TODO: can we use e.g. the object name + sim time??
+    } else {
+      filename <- basename(filename) |> tools::file_path_sans_ext()
     }
     isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
       if (is(path, "call"))
         path <- eval(path, envir = simIsIn)
-    }
-
-    if (isAbsolutePath(filename)) {
-      path <- dirname(filename)
-      filename <- basename(filename)
     }
 
     if (is(path, "character")) {
@@ -337,16 +337,22 @@ Plots <- function(data, fn, filename,
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = tools::file_path_sans_ext(basename(rasterFilename)),
-                                     file = rasterFilename, fun = "terra::writeRaster", ...)
+        sim@outputs <- outputsAppend(
+          outputs = sim@outputs, saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(rasterFilename)),
+          file = rasterFilename, fun = "terra::writeRaster",
+          ...
+        )
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
       if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = tools::file_path_sans_ext(basename(rawFilename)),
-                                     file = rawFilename, fun = "qs::qsave", ...)
+        sim@outputs <- outputsAppend(
+          outputs = sim@outputs, saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(rawFilename)),
+          file = rawFilename, fun = "qs::qsave",
+          ...
+        )
     }
   }
 

@@ -449,6 +449,7 @@ setMethod("checkTimeunit",
               })
             }
 
-            if (!all(out)) message("unknown timeunit provided: ", unit[!out])
+            if (!all(out)) warning("unknown timeunit provided: ", unit[!out],
+                                   "; see:\nSpaDES.core:::.spadesTimes")
             return(invisible(out))
 })

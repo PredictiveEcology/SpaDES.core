@@ -76,7 +76,7 @@ Note: there is an active binding made to \code{Paths}, so a user can use
 }
 \examples{
 \donttest{
-getPaths()                       ## returns the current default working paths
+getPaths() ## returns the current default working paths
 
 ## set individual custom paths
 setPaths(cachePath = file.path(tempdir(), "cache"))

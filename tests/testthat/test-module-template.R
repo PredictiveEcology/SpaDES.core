@@ -1,5 +1,4 @@
 test_that("module templates work", {
-
   testInit(c("knitr", "rmarkdown"), smcc = FALSE)
 
   expect_true(dir.exists(tmpdir))
@@ -15,13 +14,19 @@ test_that("module templates work", {
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".R"))))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, ".Rmd"))))
   expect_true(file.exists(file.path(mpath, "NEWS.md")))
-  if (getRversion() > "4.1.3")
+  if (getRversion() > "4.1.3") {
     expect_true(
       utils::file_test("-h", file.path(mpath, "README.md")) | file.exists(file.path(mpath, "README.md"))
     )
-  expect_true(dir.exists(file.path(mpath, ".github")))
-  expect_true(dir.exists(file.path(mpath, ".github", "workflows")))
-  expect_true(file.exists(file.path(mpath, ".github", "workflows", "render-module-rmd.yaml")))
+  }
+
+  ghaWorkflowFile <- file.path(mpath, ".github", "workflows", "render-module-rmd.yaml")
+  expect_true(dir.exists(dirname(dirname(ghaWorkflowFile))))
+  expect_true(dir.exists(dirname(ghaWorkflowFile)))
+  expect_true(file.exists(ghaWorkflowFile))
+  expect_false(
+    sapply(readLines(ghaWorkflowFile), grepl, pattern = "[[name]]", fixed = TRUE) |> any()
+  )
 
   expect_true(dir.exists(file.path(mpath, "data")))
   expect_true(file.exists(file.path(mpath, "data", "CHECKSUMS.txt")))
@@ -39,15 +44,15 @@ test_that("module templates work", {
   skip_if_not(nzchar(Sys.which("zip")))
   expect_true(file.exists(file.path(mpath, paste0(moduleName, "_0.0.2.zip"))))
 
-  # Test that the .Rmd file actually can run with knitr
+  ## Test that the .Rmd file actually can run with knitr
   expect_equal(knitr::knit(input = file.path(mpath, paste0(moduleName, ".Rmd")),
                            output = file.path(mpath, paste0(moduleName, ".md")),
                            quiet = TRUE),
                file.path(mpath, paste0(moduleName, ".md")))
   expect_true(file.exists(file.path(mpath, "README.md"))) ## file should exist now, post-knit
 
-  # Test that the dummy unit tests work
-  #test_file(file.path(mpath, "tests", "testthat", "test-template.R")) # TODO: make it work
+  ## Test that the dummy unit tests work
+  # test_file(file.path(mpath, "tests", "testthat", "test-template.R")) # TODO: make it work
 })
 
 test_that("empty defineModule", {

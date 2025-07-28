@@ -53,7 +53,7 @@ spPaths <- c(corePaths, tmpPaths)
 #'
 #' @examples
 #' \donttest{
-#' getPaths()                       ## returns the current default working paths
+#' getPaths() ## returns the current default working paths
 #'
 #' ## set individual custom paths
 #' setPaths(cachePath = file.path(tempdir(), "cache"))
