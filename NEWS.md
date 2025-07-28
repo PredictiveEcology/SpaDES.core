@@ -1,4 +1,4 @@
-# SpaDES.core (development version)
+# SpaDES.core 2.1.6
 
 * drop support for R 4.2;
 * fixed issue with `Plots()` where plots were discarded if no filename was specified;

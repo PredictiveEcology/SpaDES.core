@@ -433,7 +433,7 @@ setMethod(
     return(invisible(NULL))
 })
 
-#' @return `newModuleDocumentation` is nvoked for its side effect of
+#' @return `newModuleDocumentation` is invoked for its side effect of
 #'   creating new module documentation files.
 #'
 #' @importFrom reproducible checkPath
@@ -908,12 +908,11 @@ setMethod("zipModule",
 
 simpleArgs <- c("children", "open", "type", "unitTests", "useGitHub")
 
-
-#' Uses "." if getPath not set
+#' Check module path
 #'
-#' Will compare default in spadesOptions to getPaths ... these will be same if use
-#' has not set them. For such case, use ".". They will be different if the user has
-#' used `setPaths`. If that is the case, then use `getPaths()[["modulePath"]]`
+#' Will compare default in `spadesOptions()` (i.e., `spades.modulePath`) to `getPaths()`.
+#' Uses `"."` if `modulePath` not set (e.g., via `setPaths`).
+#' If that is the case, then use `getPaths()[["modulePath"]]`.
 checkModulePath <- function() {
   gp <- getPaths()
   mp1 <- normalizePath(gp[["modulePath"]], winslash = "/", mustWork = FALSE)

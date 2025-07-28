@@ -36,8 +36,8 @@ jobs:
           extra-packages: |
             any::pkgdown
             local::.
-            PredictiveEcology/reproducible@development
             NLMR=?ignore
+            PredictiveEcology/reproducible@development
           needs: website
 
       - name: Install additional package dependencies
