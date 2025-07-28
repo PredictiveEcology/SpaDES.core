@@ -48,9 +48,9 @@ There are some NOTEs:
 3. We have made an effort to reduce the package as much as possible, but the installed package size is larger than the 5MB limit.
 
         checking installed package size ... NOTE
-            installed size is  6.5Mb
+            installed size is  6.9Mb
             sub-directories of 1Mb or more:
-              R   4.7Mb
+              R   5.1Mb
 
 ## Downstream dependencies
 
