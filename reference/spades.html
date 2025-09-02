@@ -74,7 +74,7 @@ instead of data.frame to implement the event queue (because it is much faster)."
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1><code>spades2</code> is a convenience wrapper for <code>do.call(spades, listOfArgs)</code>, i.e., a user can pass a list of all the arguments.</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/simulation-simInit.R" class="external-link"><code>R/simulation-simInit.R</code></a>, <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/simulation-spades.R" class="external-link"><code>R/simulation-spades.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.6/R/simulation-simInit.R" class="external-link"><code>R/simulation-simInit.R</code></a>, <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.6/R/simulation-spades.R" class="external-link"><code>R/simulation-spades.R</code></a></small>
     <div class="hidden name"><code>spades.Rd</code></div>
     </div>
 
@@ -356,56 +356,56 @@ uses <code><a href="https://reproducible.predictiveecology.org/reference/Cache.h
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpWy1HQz/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpEnR9g1/sampleModules'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpWy1HQz/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpWy1HQz/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpWy1HQz/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpWy1HQz'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpWy1HQz/sampleModules'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpWy1HQz/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpEnR9g1/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpEnR9g1/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpEnR9g1/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpEnR9g1'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpEnR9g1/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpEnR9g1/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpWy1HQz/scratch/terra'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit The following .globals were used:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit Key: &lt;global, module&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit               module    global</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit               &lt;char&gt;    &lt;char&gt;</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit  1:  caribouMovement    .plots</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit  2:       fireSpread    .plots</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit  3: randomLandscapes    .plots</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit  4:       fireSpread burnStats</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit  5:  caribouMovement stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit  6:       fireSpread stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit  7: randomLandscapes stackName</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.1018469 secs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:05 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 randomLandscapes init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 19:05:06 rndmLn:</span><span style="color: #00BB00;">init</span>  1:  landscape</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.25 secs | 0 fireSpread init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 frSprd:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">fireSpread</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 19:05:06 frSprd:</span><span style="color: #00BB00;">init</span>  1: nPixelsBurned</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.27 secs | 0 caribouMovement init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 19:05:06 crbMvm:</span><span style="color: #00BB00;">init</span>  1:    caribou</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 0.28 secs | 1 fireSpread burn 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">total elpsd: 0.31 secs | 1 caribouMovement move 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 19:05:06 crbMvm:</span><span style="color: #00BB00;">move</span>  1: habitatQuality</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 0.33 secs | 1 fireSpread stats 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 19:05:06 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpEnR9g1/scratch/terra'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit The following .globals were used:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit Key: &lt;global, module&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit               module    global</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit               &lt;char&gt;    &lt;char&gt;</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit  1:  caribouMovement    .plots</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit  2:       fireSpread    .plots</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit  3: randomLandscapes    .plots</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit  4:       fireSpread burnStats</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit  5:  caribouMovement stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit  6:       fireSpread stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:46 simInit  7: randomLandscapes stackName</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.1013141 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.11 secs | 0 randomLandscapes init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 rndmLn:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 20:57:47 rndmLn:</span><span style="color: #00BB00;">init</span>  1:  landscape</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.25 secs | 0 fireSpread init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 frSprd:<span style="color: #00BB00;">init</span> <span style="background-color: #BBBB00;">fireSpread</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 frSprd:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 20:57:47 frSprd:</span><span style="color: #00BB00;">init</span>  1: nPixelsBurned</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.27 secs | 0 caribouMovement init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 crbMvm:<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 20:57:47 crbMvm:</span><span style="color: #00BB00;">init</span>  1:    caribou</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 frSprd:<span style="color: #00BB00;">burn</span> <span style="color: #00BB00;">total elpsd: 0.29 secs | 1 fireSpread burn 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #00BB00;">total elpsd: 0.31 secs | 1 caribouMovement move 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 crbMvm:<span style="color: #00BB00;">move</span> <span style="color: #BBBB00;">&lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">Sep02 20:57:47 crbMvm:</span><span style="color: #00BB00;">move</span>  1: habitatQuality</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 frSprd:<span style="color: #00BB00;">stats</span> <span style="color: #00BB00;">total elpsd: 0.33 secs | 1 fireSpread stats 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Sep02 20:57:47 frSprd:<span style="color: #00BB00;">stats</span> <span style="background-color: #BBBB00;">fireSpread</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">It will be deleted at next spades() call.</span></span>
