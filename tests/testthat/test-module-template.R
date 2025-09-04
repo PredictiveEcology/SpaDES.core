@@ -128,7 +128,7 @@ test_that("newModule with events and functions", {
   pdf(pdfFile)
   mess <- capture_messages(
     out <- simInitAndSpades(
-      module = "test",
+      modules = "test",
       times = list(start = 0, end = 2),
       paths = list(modulePath = Require::tempdir2())
     )
