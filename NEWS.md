@@ -1,4 +1,4 @@
-# SpaDES.core 2.1.6
+# SpaDES.core (development version)
 
 ## Breaking changes
 
@@ -24,20 +24,17 @@
 * add dependency package `httr`;
 * `Plots` can now have a `quote(data)` argument, allowing the whole call to be `Cache`d more easily;
 * `clearCacheEventsOnly` is a convenience wrapper that will remove all event-level cached objects in the cache repository;
-* `.depsEdgeList` gains a new argument, `outputObjects`, which will return "hanging" outputs as `_OUTPUTS_`,
-  analogous to the hanging inputs as `_INPUTS_`.
-  This is needed to address a new case of `suppliedElsewhere` where the object is contained within
-  an `objectSynonym`, and has not yet been made but it is only listed as an `outputObject` in a module;
-* messaging updates when `Cache`-ing events and `.inputObjects`;
-* `evalPostEvent` and `options(spades.evalPostEvent)`, where a user can pass `quote`d code that
-  will be evaluated at the end of each event and `.inputObject` call;
-* several corrections to messaging when there is nested `simLists`, e.g., when `simInit` is called within a module; 
-* new function `doCallSafe` that can be used for `doCallSafe(simInitAndSpades, out)`,
-  and it does not suffer from the slow downs of `do.call`; 
-* fix edge case with caching of events: `outputs` would create false positives
-  (i.e., a change, when there wasn't one); this meant that caching would only be successful
-  after the 2nd time running the event, if another module had put objects in the `outputs` list,
-  especially by using `Plots`.
+* `.depsEdgeList` gains a new argument, `outputObjects`, which will return "hanging" outputs as `_OUTPUTS_`, analogous to the hanging inputs as `_INPUTS_`. This is needed to address a new case of `suppliedElsewhere` where the object is contained within a `objectSynonym`, and has not yet been made but it is only listed as an `outputObject` in a module;
+* messaging updates when Caching events and .inputObjects;
+* `evalPostEvent` and `options(spades.evalPostEvent)`, where a user can pass `quote`d code that will be evaluated at the end of each event and `.inputObject` call;
+* several corrections to messaging when there is nested simLists, i.e., when simInit is called within a module; 
+* new function `doCallSafe` that can be used for `doCallSafe(simInitAndSpades, out)`, and it does not suffer from the slow downs of `do.call`; 
+* many changes to accommodate updates to `reproducible` package, specifically the `Cache` function. These include
+  - 
+# SpaDES.core 2.1.6
+
+* drop support for R 4.2;
+* fix edge case with caching of events; `outputs` would create false positives (i.e., a change, when there wasn't one); this meant that caching would only be successful after the 2nd time running the event, if another module had put objects in the `outputs` list, especially by using `Plots`
 * fix issue with `Plots()` where plots were discarded if no filename was specified;
 * fixed timeunit test failures (#297);
 * add package anchors to Rd links (#300);

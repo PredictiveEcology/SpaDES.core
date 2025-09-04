@@ -17,3 +17,5 @@ vignettes/.*\.log$
 ^codecov\.yml$
 ^CRAN-SUBMISSION$
 timings.rds
+^[.]?air[.]toml$
+^\.vscode$
