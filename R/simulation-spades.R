@@ -2364,6 +2364,7 @@ allowSequentialCachingUpdateTags <- function(sim, cacheIt) {
   sim
 }
 
+#' @importFrom utils getFromNamespace
 allowSequentialCachingFinal <- function(sim) {
   wasFromCache <- !is.null(attr(sim, "tags"))
   if (wasFromCache) {
@@ -2380,10 +2381,10 @@ allowSequentialCachingFinal <- function(sim) {
                    tagValue = c(thisCacheId, cur[["moduleName"]], cur[["eventType"]]),
                    cachePath = cp)
       if (all(c(cur[["moduleName"]], cur[["eventType"]]) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
-        fn <- .updateTagsRepo
+        fn <- utils::getFromNamespace(".updateTagsRepo", "reproducible")
         args$add = TRUE
       } else {
-        fn <- .addTagsRepo
+        fn <- utils::getFromNamespace(".addTagsRepo", "reproducible")
       }
 
       # put all tags in
