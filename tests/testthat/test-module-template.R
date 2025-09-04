@@ -136,6 +136,7 @@ test_that("newModule with events and functions", {
   dev.off()
   expect_true(file.exists(pdfFile))
   expect_true(file.size(pdfFile) > 0)
+  unlink(pdfFile)
 
   expect_is(out, "simList")
   expect_true(out$a == 2)
