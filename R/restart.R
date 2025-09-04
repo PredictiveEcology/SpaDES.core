@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  ".", "._clockTime", "._prevEventTimeFinish", ".attachedPkgsFilename", "et", ".First", ".oldWd",
+  ".", ".attachedPkgsFilename", "et", ".First", ".oldWd",
   ".spadesCall", ".spades.restartRInterval", ".spades.simFilename"
 ))
 
@@ -51,7 +51,9 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' *if the `simList` was not modified yet during the event which caused the error*.
 #' The `simList` will be in the state it was at the time of the error.
 #'
-#' @param sim A `simList.` If not supplied (the default), this will take the `sim` from
+#' @param sim A `simList` or a filename that will load a `simList`, e.g., from
+#'    `saveState` or `saveSimList`. If not supplied (the default),
+#'    this will take the `sim` from
 #'    `savedSimEnv()$.sim`, i.e., the one that was interrupted
 #'
 #' @param module A character string length one naming the module that caused the error and
@@ -72,6 +74,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'
 #' @export
+#' @importFrom reproducible Cache
 #' @importFrom cli col_blue
 #'
 #' @examples
@@ -83,15 +86,23 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- restartSpades(s) # don't need to specify `sim` if previous line fails
 #'                      # will take from savedSimEnv()$.sim automatically
 #' }
-restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...) {
-  message("This is very experimental and will only work if the event that caused ",
-          "the error has not yet changed the simList.\n",
-          "This should be used with caution.")
+restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE,
+                          verbose = getOption("reproducible.verbose", 1L), ...) {
+  message("Running restartSpades ... this is very experimental; ",
+          "this should be used with caution.")
 
   # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
     sim <- savedSimEnv()$.sim
+    messageVerbose("sim not supplied, using \n",
+            "sim <- savedSimEnv()$.sim", verbose = verbose)
   }
+  if (is.character(sim)) {
+    sim <- SpaDES.core::loadSimList(sim)
+  }
+
+  if (!is(sim, "simList"))
+    stop("The simList does not exist or is corrupt; please pass a simList")
 
   if (is.null(module)) {
     # Source the file you changed, into the correct location in the simList
@@ -102,13 +113,13 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   numMods <- min(length(sim$.recoverableObjs), numEvents)
   if (numMods > 0) {
     com <- completed(sim)
-    etSecs <- sum(com[, et := difftime(clockTime, ._prevEventTimeFinish, units = "secs"),
+    etSecs <- sum(com[, et := difftime(get(._txtClockTime), get(._txtPrevEventTimeFinish), units = "secs"),
                       by = seq_len(NROW(com))]$et)
 
     # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
     # et <- difftime(tail(com$._clockTime, numMods - 1)[1], com$._clockTime[1])
     st <- Sys.time()
-    sim$._startClockTime <- st - etSecs
+    sim[[._txtStartClockTime]] <- st - etSecs
 
     simCompletedList <- as.list(sim@completed)
     simCompletedList <- simCompletedList[order(as.integer(names(simCompletedList)))]
@@ -118,7 +129,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     rm(list = names(eventsToReverse), envir = sim@completed)
 
     last <- as.character(length(sim@completed))
-    sim@completed[[last]]$._clockTime <- st
+    sim@completed[[last]][[._txtClockTime]] <- st
 
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
     if (numMods > length(sim$.recoverableObjs))
@@ -173,13 +184,15 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
           list2env(objsToCopy[names(fd1)], envir = sim@.xData)
       }
 
-      modObjNames <- names(sim$.recoverableModObjs[[event]])
-      modObjEnv <- sim$.mods[[modules[event]]]$.objects
-      modObjLs <- ls(modObjEnv)
-      if (length(modObjLs)) { # there are some --> maybe need to delete them
-        toDelete <- setdiff(modObjLs, modObjNames)
-        if (length(toDelete)) {
-          rm(list = toDelete, envir = modObjEnv)
+      if (length(sim$.recoverableModObjs)) {
+        modObjNames <- names(sim$.recoverableModObjs[[event]])
+        modObjEnv <- sim[[dotObjs]][[modules[event]]] # $.objects
+        modObjLs <- ls(modObjEnv)
+        if (length(modObjLs)) { # there are some --> maybe need to delete them
+          toDelete <- setdiff(modObjLs, modObjNames)
+          if (length(toDelete)) {
+            rm(list = toDelete, envir = modObjEnv)
+          }
         }
       }
 
@@ -189,43 +202,10 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       invisible()
     })
 
+    # Once reversed, remove the .recoverableObjs
+    sim$.recoverableObjs <- NULL
+
     # modules <- if (!is.list(module)) as.list(module) else module
-    opt <- options("spades.moduleCodeChecks" = FALSE)
-
-    out <- lapply(modules, function(module) {
-      pp <- list()
-      moduleFolder <- file.path(modulePath(sim, module = module), module)
-      if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
-        # pp[[1]] <- .parseConditional(sim, file.path(moduleFolder, paste0(module, ".R")))
-        pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
-        subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
-
-        doesntUseNamespacing <- !.isNamespaced(sim, module)
-
-        # evaluate the rest of the parsed file
-        if (doesntUseNamespacing) {
-          out1 <- evalWithActiveCode(pp[[1]],
-                                     sim@.xData,
-                                     sim = sim)
-        }
-
-
-        if (length(subFiles)) {
-          pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
-        }
-        #ee <- new.env()
-        #ee$sim <- sim
-        # sim@.xData[[module]]$sim <- sim
-        lapply(pp, function(pp1) evalWithActiveCode(pp1,
-                                                    sim@.xData$.mods[[module]],
-                                                    sim = sim))
-        message(cli::col_blue("Reparsing", module, "source code"))
-      }
-      #rm(list = "sim", envir = ee)
-      #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
-      invisible()
-    })
-    options(opt)
 
     # reset activeBinding mod
     out <- lapply(modules, function(mod) {
@@ -237,15 +217,68 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 
     # Remove all added events that occurred during the events, i.e., via scheduleEvent
     sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
-
+    sim@current <- list()
     assign(".Random.seed", sim@.xData$._randomSeed[[numMods]], envir = .GlobalEnv)
-
-    if (restart)
-      sim <- spades(sim, ...)
   } else {
-    message("There was no interrupted spades call; returning sim as is")
+    modules <- modules(sim)
   }
+
+  opt <- options("spades.moduleCodeChecks" = FALSE)
+
+
+  out <- lapply(modules, function(module) {
+    pp <- list()
+    moduleFolder <- file.path(modulePath(sim, module = module), module)
+    if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
+      # pp[[1]] <- .parseConditional(sim, file.path(moduleFolder, paste0(module, ".R")))
+      pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
+      subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
+
+      doesntUseNamespacing <- !.isNamespaced(sim, module)
+
+      # evaluate the rest of the parsed file
+      sim <- currentModuleTemporary(sim, module)
+      pkgs = slot(slot(depends(sim), "dependencies")[[module]], "reqdPkgs")
+      if (doesntUseNamespacing) {
+        out1 <- evalWithActiveCode(pp[[1]], sim@.xData, sim = sim, pkgs = pkgs)
+      }
+
+
+      if (length(subFiles)) {
+        pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
+      }
+      #ee <- new.env()
+      #ee$sim <- sim
+      # sim@.xData[[module]]$sim <- sim
+      lapply(pp, function(pp1)
+        evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim, pkgs = pkgs))
+      message(cli::col_blue("Reparsing ", module, " source code"))
+    }
+    #rm(list = "sim", envir = ee)
+    #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
+    invisible()
+  })
+  options(opt)
+
+  if (restart)
+    sim <- spades(sim, ...)
+  # } else {
+  #   message("There was no interrupted spades call; returning sim as is")
+  # }
   return(sim)
+}
+
+#' @export
+#' @rdname restartSpades
+#' @param filename The filename to save the sim state.
+#'
+#' `saveState` is a wrapper around `restartSpades` and `saveSimList`. You can
+#' pass arguments to the `...` that will be passed to `saveSimList`, such as
+#' `modules`, `inputs`, `outputs`.
+saveState <- function(filename, ...){
+  sim <- restartSpades(restart = FALSE)
+  saveSimList(sim, filename, ...)
+  message("Saved! ", filename)
 }
 
 #' Restart R programmatically
@@ -276,7 +309,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' the arguments to `restartR` and the arguments to `saveSimList`, these latter two
 #' using a dot to separate the function name and its argument. The defaults for
 #' two key options are: `options("spades.restartR.restartDir" = NULL`, meaning
-#' use `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`
+#' use `file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))`
 #' and `options("spades.saveSimList.fileBackend" = 0)`, which means don't do anything
 #' with raster-backed files.
 #' See specific functions for defaults and argument meanings.
@@ -323,7 +356,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #'     taking the first one that is not inside the `tempdir()`, which will
 #'     disappear during restart of R.
 #'     The actual directory for a given `spades` call that is restarting will be:
-#'     `file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))`.
+#'     `file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))`.
 #'     The random string is to prevent parallel processes that started at the same clock
 #'     time from colliding.
 #'
@@ -347,7 +380,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   attached <- srch
   attached <- grep("package:", attached, value = TRUE)
   attached <- unlist(lapply(attached, function(x) gsub(x, pattern = "package:", replacement = "")))
-  .newDir <- file.path(restartDir, "restartR", gsub(":| ", "_", paste0(sim$._startClockTime, "_",
+  .newDir <- file.path(restartDir, "restartR", gsub(":| ", "_", paste0(sim[[._txtStartClockTime]], "_",
                                                                        .rndString))) |>
     checkPath(create = TRUE)
   .attachedPkgsFilename <- file.path(.newDir, '.attachedPkgs.RData')
@@ -446,6 +479,53 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     q("no")
   }
 }
+
+
+#' `restartOrSimInitAndSpades` is a wrapper that runs either `restartSpades` or
+#' `simInitAndSpades`. It determines which one should run by, first, assessing whether
+#' an identical `ll` has already been passed in a previous call to this function.
+#' If an identical `ll` has never been passed, then this will run
+#' `simInitAndSpades`. If a previous `ll` as been run, then this will 2)
+#' assess whether there is a copy of an `simList` at `SpaDES.core:::savedSimEnv()$.sim`
+#' (i.e., like `restartSpades`). If there is, then it will run `restartSpades()`.
+#' If there is no `simList` at `SpaDES.core:::savedSimEnv()$.sim`, then it will
+#' pass the `file` argument to `restartSpades(file)`.
+#'
+#' @return A `simList`, that has been "executed" until `end(sim)`, if it does not
+#' hit an error.
+#'
+#' @rdname restartSpades
+#' @export
+#' @param ll A list of elements that would be passed to `simInit`, such as `modules`.
+#' @param file An optional file that has a saved `simList`, e.g., from `saveSimList`
+#'   or `saveState`.
+#' @param reset Logical. If `TRUE`, then it will force `simInitAndSpades` to be called
+#'   even if there is saved `sim` available.
+restartOrSimInitAndSpades <- function(ll, file,
+                                      reset = getOption("spades.resetRestart")) {
+  # there are tempdir paths
+  pathsOrig <- ll$paths
+  ll$paths <- sapply(ll$paths, grep, invert = TRUE, value = TRUE, pattern = tempdir(), simplify = TRUE)
+  fn <- function(ll) ll
+  cached <- attr(reproducible::Cache(fn(ll), .functionName = "restartOrSimInitAndSpades"), ".Cache")$newCache %in% FALSE
+  if (isTRUE(reset))
+    cached <- FALSE
+  ll$paths <- pathsOrig
+  hasSavedToRAMState <- !is.null(savedSimEnv()$.sim)
+  hasSavedToFileState <- file.exists(file)
+  if (!cached || !(hasSavedToFileState || hasSavedToRAMState)) {
+    message("ll has changed; rerunning simInitAndSpades")
+    sim <- doCallSafe(SpaDES.core::simInitAndSpades, ll)
+  } else {
+    message("ll has not changed; trying restartSpades")
+    if (isFALSE(hasSavedToRAMState)) {
+      sim <- SpaDES.core::restartSpades(file)
+    } else  {
+      sim <- SpaDES.core::restartSpades()
+    }
+  }
+}
+
 
 #' @keywords internal
 FirstFromR <- function(...) {

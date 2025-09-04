@@ -66,31 +66,26 @@
 #' sim <- objectSynonyms(sim, os2)
 #'
 #' # check
-#' sim$objectSynonyms
-#'
+#' sim$.objectSynonyms
 #'
 objectSynonyms <- function(envir, synonyms) {
-
-  # First, this may be an overwrite of an existing set of synonyms.
-  #  If already in the envir$objectSynonyms, then remove it first
-  if (exists("objectSynonyms", envir = envir, inherits = FALSE)) {
-
+  ## First, this may be an overwrite of an existing set of synonyms.
+  ##  If already in the envir[[objSynName]], then remove it first
+  if (exists(objSynName, envir = envir, inherits = FALSE)) {
     for (syns in seq_along(synonyms)) {
-      for(cur in envir$objectSynonyms) {
+      for (cur in envir[[objSynName]]) {
         if (any(cur %in% synonyms[[syns]])) {
           synonyms[[syns]] <- unique(c(cur, synonyms[[syns]]))
-          whSyn <- unlist(lapply(envir$objectSynonyms, identical, cur))
-          attrs <- attr(envir$objectSynonyms, "bindings")
-          envir$objectSynonyms <- envir$objectSynonyms[!whSyn]
-          attr(envir$objectSynonyms, "bindings") <- attrs[!whSyn]
+          whSyn <- unlist(lapply(envir[[objSynName]], identical, cur))
+          attrs <- attr(envir[[objSynName]], "bindings")
+          envir[[objSynName]] <- envir[[objSynName]][!whSyn]
+          attr(envir[[objSynName]], "bindings") <- attrs[!whSyn]
         }
       }
-
     }
   }
   canonicalVersions <- Map(syns = synonyms, #name2 = names(synonyms),
       MoreArgs = list(envir = envir), function(syns, envir) {
-
         anyExist <- unlist(lapply(syns, exists, envir = envir))
         if (sum(anyExist) > 1)
           message(paste(syns[anyExist], collapse = ", "), " already exist; using the ",
@@ -127,28 +122,28 @@ objectSynonyms <- function(envir, synonyms) {
                             env = envir
           )
         }
-        list(canonicalVersion = canonicalVersion,
-             activeBindingObjects = activeBindingObjects)
+        list(
+          canonicalVersion = canonicalVersion,
+          activeBindingObjects = activeBindingObjects
+        )
       })
-  attrs <- attr(envir$objectSynonyms, "bindings")
-  envir$objectSynonyms <- append(envir$objectSynonyms, synonyms)
-  attr(envir$objectSynonyms, "bindings") <- append(attrs, canonicalVersions)
+  if (length(canonicalVersions) == 0) browser() ## TODO
+  attrs <- attr(envir[[objSynName]], "bindings")
+  envir[[objSynName]] <- append(envir[[objSynName]], synonyms)
+  attr(envir[[objSynName]], "bindings") <- append(attrs, canonicalVersions)
   envir
 }
 
-
-
 .checkObjectSynonyms <- function(envir) {
-
-  bindings <- attr(envir$objectSynonyms, "bindings")
+  bindings <- attr(envir[[objSynName]], "bindings")
 
   # It may be passed in as a list with no attributes
   if (is.null(bindings)) {
-    envir <- objectSynonyms(envir, envir$objectSynonyms)
-    bindings <- attr(envir$objectSynonyms, "bindings")
+    envir <- objectSynonyms(envir, envir[[objSynName]])
+    bindings <- attr(envir[[objSynName]], "bindings")
   }
 
-  Map(syns = envir$objectSynonyms, bindings = bindings, #name2 = names(synonyms),
+  Map(syns = envir[[objSynName]], bindings = bindings, #name2 = names(synonyms),
       MoreArgs = list(envir = envir), function(syns, bindings, envir) {
         if (!exists(bindings$canonicalVersion, envir)) {
           envir <<- objectSynonyms(envir, list(syns))
@@ -164,3 +159,5 @@ objectSynonyms <- function(envir, synonyms) {
       })
   envir
 }
+
+objSynName <- ".objectSynonyms"

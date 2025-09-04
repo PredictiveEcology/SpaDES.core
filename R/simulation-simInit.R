@@ -368,13 +368,28 @@ setMethod(
                         loadOrder,
                         notOlderThan, ...) {
 
-    ._startClockTime <- Sys.time()
-    # create  <- List object for the simulation
-    sim <- new("simList")
+    dots <- list(...)
+    if (is.null(dots[[._txtStartClockTime]]))
+      assign(._txtStartClockTime, Sys.time())
+      # ._startClockTime <- Sys.time()
+    else
+      assign(._txtStartClockTime, dots[[._txtStartClockTime]])
+      # ._startClockTime <- dots[[._txtStartClockTime]]
+    dots[[._txtStartClockTime]] <- NULL
+    dotNames <- setdiff(...names(), ._txtStartClockTime)
+
 
     # loggingMessage helpers
-    ._simNesting <- simNestingSetup(...)
-    sim[["._simNesting"]] <- ._simNesting
+    ._simNestingLocal <- simNestingSetup(...) # checks in call stack for "sim"
+    assign(._txtSimNesting, ._simNestingLocal)
+
+    # create  <- List object for the simulation
+    sim <- new("simList")
+    sim@.xData[[._txtStartClockTime]] <- get(._txtStartClockTime, inherits = FALSE)
+    sim$._simInitElapsedTime <- 0
+
+    # loggingMessage helpers
+    sim[[._txtSimNesting]] <- ._simNestingLocal
 
     opt <- options("encoding" = "UTF-8")
     if (isTRUE(getOption("spades.allowSequentialCaching"))) {
@@ -383,9 +398,10 @@ setMethod(
 
     on.exit({
       options(opt)
-      sim <- elapsedTimeInSimInit(._startClockTime, sim)
-      ._startClockTime <- Sys.time()
-      dt <- difftime(._startClockTime, ._startClockTime - sim$._simInitElapsedTime)
+      sim <- elapsedTimeInSimInit(get(._txtStartClockTime, inherits = FALSE), sim)
+      ._startClockTimeLocal <- Sys.time()
+      sim@.xData[[._txtStartClockTime]] <- NULL
+      dt <- difftime(._startClockTimeLocal, ._startClockTimeLocal - sim$._simInitElapsedTime)
       message("Elapsed time for simInit: ", format(dt, format = "auto"))
     }, add = TRUE)
 
@@ -393,11 +409,11 @@ setMethod(
       checkPath(p, create = TRUE)
     })
 
-    if (length(...names())) {
-      objects <- append(objects, list(...))
+    if (length(dotNames)) {
+      objects <- append(objects, dots)
 
       # set the options; then set them back on exit
-      optsFromDots <- dealWithOptions(objects = objects, sim = sim, ...)
+      optsFromDots <- dealWithOptions(objects = objects, sim = sim, dotNames = dotNames)
       if (!is.null(optsFromDots$optsPrev)) {
         # remove from `objects` as these should not be there
         objects <- objects[optsFromDots$keepObjNames]
@@ -576,7 +592,6 @@ setMethod(
 
       ## do multi-pass if there are parent modules; first for parents, then for children
       all_parsed <- FALSE
-      # browser(expr = exists("._simInit_5"))
       while (!all_parsed) {
         sim <- .parseModule(sim,
                             as.list(sim@modules),
@@ -626,6 +641,8 @@ setMethod(
 
       ## check user-supplied load order & init dependencies
       sim@.xData$._ranInitDuringSimInit <- character()
+      missingInLoadOrder <- setdiff(sim@modules, loadOrder)
+
       if (!all(length(loadOrder),
                all(sim@modules %in% loadOrder),
                all(loadOrder %in% sim@modules))) {
@@ -633,7 +650,17 @@ setMethod(
         sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs)
         if (length(sim@completed))
           sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$module, .coreModules())
-        loadOrder <- unlist(unname(sim@modules))
+        loadOrderPoss <- unlist(unname(sim@modules))
+        if (length(missingInLoadOrder)) {
+          if (any(match(loadOrder, loadOrderPoss) != seq_along(loadOrder))) {
+            warning("loadOrder argument is used, but does not have all the modules in it; ",
+                    "setting modules in loadOrder first, with remaining modules place after... ",
+                    "this may be incorrect behaviour and should likely be changed")
+            modsAfter <- setdiff(loadOrderPoss, loadOrder)
+            loadOrderPoss <- c(loadOrder, modsAfter)
+          }
+        }
+        loadOrder <- loadOrderPoss
       }
 
       mBase <- basename2(unlist(sim@modules))
@@ -642,10 +669,9 @@ setMethod(
       loadOrder[] <- loadOrderBase
       loadOrderNames <- names(loadOrder)
 
-      # This is a quick override so that .runInputObjects has access to these
-      #   synonynms
+      ## This is a quick override so that .runInputObjects has access to these synonynms
       if (!is.null(objects$objectSynonyms)) {
-        sim$objectSynonyms <- objects$objectSynonyms
+        sim[[objSynName]] <- objects$objectSynonyms
         sim <- .checkObjectSynonyms(sim)
       }
 
@@ -661,6 +687,10 @@ setMethod(
 
       ## load user-defined modules
       # browser(expr = exists("._simInit_4"))
+      if (!(all(unlist(lapply(debug, identical, FALSE))))) {
+        # .pkgEnv[[".spadesDebugFirst"]] <- TRUE
+        sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
+      }
 
       for (m in loadOrder) {
         mFullPath <- loadOrderNames[match(m, loadOrder)]
@@ -684,10 +714,10 @@ setMethod(
               # unlockBinding(mod, sim$.mods)
               if (length(objects))
                 list2env(objects, envir(sim))
-              sim$.mods[[mod]]$sim <- sim
-              aa <- covr::environment_coverage(sim$.mods[[mod]], test_files = tf)
-              sim <- sim$.mods[[mod]]$sim
-              rm(list = "sim", envir = sim$.mods[[mod]])
+              sim[[dotMods]][[mod]]$sim <- sim
+              aa <- covr::environment_coverage(sim[[dotMods]][[mod]], test_files = tf)
+              sim <- sim[[dotMods]][[mod]]$sim
+              rm(list = "sim", envir = sim[[dotMods]][[mod]])
               if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
               .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
             } else {
@@ -794,8 +824,8 @@ setMethod(
 
       ## check the parameters supplied by the user
       checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
-      sim <- elapsedTimeInSimInit(._startClockTime, sim)
-      ._startClockTime <- Sys.time()
+      #sim <- elapsedTimeInSimInit(._startClockTime, sim)
+      #._startClockTime <- Sys.time()
     },
     message = function(m) {
       message(loggingMessage(m$message, prefix = prefixSimInit))
@@ -805,6 +835,11 @@ setMethod(
     warning = function(w) {
       if (grepl("In .+:", w$message)) {
         warningSplitOnColon(w)
+        invokeRestart("muffleWarning")
+      }
+      # This is a box mishap
+      if (isTRUE(any(grepl("'package:stats' may not be available when loading",
+                           w$message)))) {
         invokeRestart("muffleWarning")
       }
     }
@@ -838,9 +873,9 @@ setMethod(
                         notOlderThan, ...) {
     namesMatchCall <- names(match.call())
     namesMatchCall <- setdiff(namesMatchCall, ...names())
-
-    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
-    names(li) <- namesMatchCall[-1]
+    li <- Map(x = namesMatchCall[-1], function(x) eval(parse(text = x)))
+    # li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
+    # names(li) <- namesMatchCall[-1]
     # find the simInit call that was responsible for this, get the objects
     #   in the environment of the parents of that call, and pass them to new
     #   environment.
@@ -885,9 +920,8 @@ setMethod(
                         notOlderThan, ...) {
     namesMatchCall <- names(match.call())
     namesMatchCall <- setdiff(namesMatchCall, ...names())
-
-    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
-    names(li) <- namesMatchCall[-1]
+    li <- Map(x = namesMatchCall[-1], function(x) eval(parse(text = x)))
+    # names(li) <- namesMatchCall[-1]
     li$modules <- as.list(modules)
 
     li <- .fillInSimInit(li, namesMatchCall)
@@ -929,9 +963,7 @@ setMethod(
     namesMatchCall <- names(match.call())
     namesMatchCall <- setdiff(namesMatchCall, ...names())
 
-    li <- lapply(namesMatchCall[-1], function(x) eval(parse(text = x)))
-    names(li) <- namesMatchCall[-1]
-
+    li <- Map(x = namesMatchCall[-1], function(x) eval(parse(text = x)))
     li <- .fillInSimInit(li, namesMatchCall)
 
     expectedClasses <- c("list",
@@ -1086,9 +1118,62 @@ spades2 <- function(l) {
 #' @rdname simInitAndSpades
 #' @param l A list of arguments to passed to `simInitAndSpades`.
 simInitAndSpades2 <- function(l) {
-  do.call(simInitAndSpades, l)
+  doCallSafe(simInitAndSpades, l)
 }
 
+
+
+#' Memory safe alternative to `do.call`
+#'
+#' `doCallSafe` is an alternative implementation for `do.call` that does not
+#' evaluate the `args` prior to running. This means that R does not become unresponsive
+#' when there are large objects in the `args`. This should be used *always* instead
+#' of `do.call`, whenever there are possibly large objects within the `args`. This is
+#' a verbatim copy from package `Gmisc` at
+#' \url{https://search.r-project.org/CRAN/refmans/Gmisc/html/fastDoCall.html}
+#'
+#' @returns Same as `do.call`, but without the memory inefficiency.
+#'
+#' @export
+#' @rdname do.call
+#' @inheritParams base::do.call
+doCallSafe <- function (what, args, quote = FALSE, envir = parent.frame()) {
+  # Copied directly from: https://search.r-project.org/CRAN/refmans/Gmisc/html/fastDoCall.html
+  if (quote) {
+    args <- lapply(args, enquote)
+  }
+  if (is.null(names(args)) || is.data.frame(args)) {
+    argn <- args
+    args <- list()
+  }
+  else {
+    argn <- lapply(names(args)[names(args) != ""], as.name)
+    names(argn) <- names(args)[names(args) != ""]
+    argn <- c(argn, args[names(args) == ""])
+    args <- args[names(args) != ""]
+  }
+  if ("character" %in% class(what)) {
+    if (is.character(what)) {
+      fn <- strsplit(what, "[:]{2,3}")[[1]]
+      what <- if (length(fn) == 1) {
+        get(fn[[1]], envir = envir, mode = "function")
+      }
+      else {
+        get(fn[[2]], envir = asNamespace(fn[[1]]), mode = "function")
+      }
+    }
+    call <- as.call(c(list(what), argn))
+  }
+  else if ("function" %in% class(what)) {
+    f_name <- deparse(substitute(what))
+    call <- as.call(c(list(as.name(f_name)), argn))
+    args[[f_name]] <- what
+  }
+  else if ("name" %in% class(what)) {
+    call <- as.call(c(list(what, argn)))
+  }
+  eval(call, envir = args, enclos = envir)
+}
 #' Call `simInit` and `spades` together
 #'
 #' These functions are convenience wrappers that may allow for more efficient caching.
@@ -1112,26 +1197,39 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
   lsAllNames <- ls(all.names = TRUE)
-  lsAllNames <- lsAllNames[lsAllNames != "..."]
+  # lsAllNames <- lsAllNames[lsAllNames != "..."]
+  formsSimInit <- setdiff(formalArgs(simInit), "...")
+  formsSpades <- setdiff(formalArgs(spades), "...")
+  formsOnlySpades <- setdiff(formsSpades, formsSimInit)
 
-  objsAll <- mget(lsAllNames, envir = environment())
-  objsSimInit <- objsAll[formalArgs(simInit)]
-
+  # lsAllNames <- ls()
+  passedArgs <- as.list(match.call(simInit))[-1]
+  passedArgsNames <- setdiff(names(passedArgs), formsOnlySpades)
   namesMatchCall <- names(match.call())
-  objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
+  defaultArgs <- .fillInSimInit(list(), namesMatchCall)
+  simInitCall <- as.call(x = append(list(simInit), append(passedArgs[passedArgsNames], defaultArgs)))
+  sim <- eval(simInitCall, envir = parent.frame())
 
-  sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
-                 modules = objsSimInit$modules, objects = objsSimInit$objects,
-                 paths = objsSimInit$paths, inputs = objsSimInit$inputs,
-                 outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
-                 notOlderThan = objsSimInit$notOlderThan, ...)
+  # objsAll <- mget(lsAllNames, envir = environment())
+  # objsSimInit <- objsAll[formalArgs(simInit)]
+
+  # objsSimInit <- .fillInSimInit(objsSimInit, namesMatchCall)
+
+  # namesMatchCall <- names(match.call())
+
+  # sim <- simInit(times = objsSimInit$times, params = objsSimInit$params,
+  #                modules = objsSimInit$modules, objects = objsSimInit$objects,
+  #                paths = objsSimInit$paths, inputs = objsSimInit$inputs,
+  #                outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
+  #                notOlderThan = objsSimInit$notOlderThan, ...)
   opts <- options(spades.loadReqdPkgs = FALSE)
   on.exit(options(opts), add = TRUE)
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
-  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(objsAll)]
+  passedArgsToSpades <- as.list(match.call(spades))[-1]
+  spadesFormals <- formalArgs(spades)[formalArgs(spades) %in% names(passedArgsToSpades)]
   ## quote is so that entire simList is not serialized in do.call
-  objsSpades <- append(alist(sim = sim), objsAll[spadesFormals])
+  objsSpades <- append(alist(sim = sim), passedArgs[spadesFormals])
   sim <- do.call(spades, objsSpades)
 }
 
@@ -1238,10 +1336,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   )
 
   # loggingMessage helpers
-  simNestingRevert <- sim[["._simNesting"]]
-  on.exit(sim[["._simNesting"]] <- simNestingRevert, add = TRUE)
-  sim[["._simNesting"]] <- simNestingOverride(sim, mBase)
-  ._simNesting <- sim[["._simNesting"]]
+  simNestingRevert <- sim[[._txtSimNesting]]
+  on.exit(sim[[._txtSimNesting]] <- simNestingRevert, add = TRUE)
+  sim[[._txtSimNesting]] <- simNestingOverride(sim, sim@current$moduleName)
+  assign(._txtSimNesting, sim[[._txtSimNesting]])
+  # ._simNesting <- sim[[._txtSimNesting]]
 
   allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
     sim$.userSuppliedObjNames
@@ -1264,9 +1363,15 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         }
       }
 
-      message(cli::col_green("Running .inputObjects for ", mBase, sep = ""))
+      # message(cli::col_green("Running .inputObjects for ", mBase, sep = ""))
 
       debug <- getDebug() # from options first, then override if in a simInitAndSpades
+      if  (is.call(debug))
+        debug <- eval(debug)
+
+      cur <- sim@current
+      curModNam <- cur$moduleName
+      debugMessage(debug, sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam)
 
       if (!(FALSE %in% debug || any(is.na(debug))))
         objsIsNullBefore <- objsAreNull(sim)
@@ -1276,7 +1381,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
-        moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(".mods$", m))
+        moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(dotMods, "$", m), paste0(dotObjs, "$", m))
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -1300,15 +1405,15 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           ## This next line will make the Caching sensitive to userSuppliedObjs
           ##  (which are already in the simList) or objects supplied by another module
-          inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = "sim")
+          inSimList <- suppliedElsewhere(moduleSpecificInputObjects, sim, where = c("sim", "i", "c"))
           if (any(inSimList)) {
             objectsToEvaluateForCaching <- c(objectsToEvaluateForCaching,
+                                             # objSynName,
                                              moduleSpecificInputObjects[inSimList])
           }
+          moduleSpecificInputObjects <- c(moduleSpecificInputObjects, objSynName)
 
-          #sim <- Cache(FUN = do.call, .inputObjects, args, # remove the do.call
-          # showSimilar <- isTRUE(sim@params[[mBase]][[".showSimilar"]])
-          # browser(expr = exists("._runModuleInputObjects_3"))
+
           showSimilar <- if (is.null(sim@params[[mBase]][[".showSimilar"]]) ||
                              isTRUE(is.na(sim@params[[mBase]][[".showSimilar"]]))) {
             isTRUE(getOption("reproducible.showSimilar", FALSE))
@@ -1322,7 +1427,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           modParams <- sim@params[[mBase]]
           paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
             paramsDontCacheOn
-          # simParamsDontCacheOn <- modParams[paramsDontCacheOnActual]
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           # nextEvent <- NULL
@@ -1332,19 +1436,48 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
           }
           if (runFnCallAsExpr) {
-            sim <- Cache(.inputObjects, sim,
-                         .objects = objectsToEvaluateForCaching,
-                         notOlderThan = notOlderThan,
-                         outputObjects = moduleSpecificInputObjects,
-                         quick = getOption("reproducible.quick", FALSE),
-                         cachePath = sim@paths$cachePath,
-                         classOptions = list(events = FALSE, current = FALSE, completed = FALSE, simtimes = FALSE,
-                                             params = paramsWoKnowns,
-                                             # .globals = globsWoKnowns,
-                                             modules = mBase),
-                         showSimilar = showSimilar,
-                         userTags = c(paste0("module:", mBase),
-                                      "eventType:.inputObjects"), verbose = debug)
+            pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
+            pkgs <- c(pkgs, "stats")
+            # if (getOption("spades.useBox", FALSE) && FALSE)
+            #   do.call(box::use, lapply(pkgs, as.name))
+            debugForCache <- debugToVerbose(debug)
+            # if (!file.exists("/home/emcintir/GitHub/FireSenseTesting/inputs/rstLCC2011_FireSenseTestingdf7443ce0c5d1a0c7169884pix_propFlam.tif"))
+            #   browser()
+            if (any(mBase %in% getOption("spades.debugModule"))) {
+              browser()
+            }
+
+            # if (isTRUE("Biomass_borealDataPrep" %in% mBase)) {
+            #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
+            #   browser()
+            # }
+           # if (isTRUE(mBase %in% "fireSense_dataPrepPredict")) browser()
+            # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
+
+            # Remove outputObjects from @depends, as it should not affect the .inputObjects
+            dependsSlots <- metadataToDigest
+            dependsSlots <- setdiff(dependsSlots, "outputObjects")
+
+            sim <- .inputObjects(sim) |>
+              Cache(
+                .objects = objectsToEvaluateForCaching,
+                notOlderThan = notOlderThan,
+                outputObjects = moduleSpecificInputObjects,
+                quick = getOption("reproducible.quick", FALSE),
+                cachePath = sim@paths$cachePath,
+                classOptions = list(events = FALSE,
+                                    current = FALSE,
+                                    completed = FALSE,
+                                    simtimes = FALSE,
+                                    params = paramsWoKnowns,
+                                    depends = dependsSlots,
+                                    # .globals = globsWoKnowns,
+                                    modules = mBase),
+                showSimilar = showSimilar,
+                .functionName = paste0(".inputObjects_", mBase),
+                userTags = c(paste0("module:", mBase),
+                             "eventType:.inputObjects"),
+                verbose = debugForCache)
           }
           if (allowSequentialCaching) {
             sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
@@ -1359,7 +1492,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
         }
       } else {
-        .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
+        # .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
         .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {
           sim <- .inputObjects(sim)
@@ -1372,6 +1505,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       if (!(FALSE %in% debug || any(is.na(debug)))) {
         sim <- objectsCreatedPost(sim, objsIsNullBefore)
       }
+      evalPostEvent() # this is getOption("spades.debugPrint")
     }
   } else {
     message(
@@ -1547,13 +1681,24 @@ loadPkgs <- function(reqdPkgs) {
     # Check for SpaDES.core minimum version
     checkSpaDES.coreMinVersion(allPkgs)
     allPkgs <- grep("^SpaDES.core\\>", allPkgs, value = TRUE, invert = TRUE)
-    if (getOption("spades.useRequire")) {
+
+    pkgsDontLoad <- getOption("spades.reqdPkgsDontLoad", NULL)
+    allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
+
+    if (getOption("spades.useRequire") && !getOption("spades.useBox", FALSE)) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, standAlone = FALSE, upgrade = FALSE)
+      Require(allPkgs, require = TRUE, standAlone = FALSE, upgrade = FALSE)
+      if (!is.null(pkgsDontLoad)) {
+        verbose <- getOption("reproducible.verbose")
+        Require::Require(pkgsDontLoad, require = FALSE, standAlone = FALSE,
+                         upgrade = FALSE, verbose = verbose - 1)
+      }
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(allPkgs, require, character.only = TRUE)
+      if (!getOption("spades.useBox", FALSE)) {
+        allPkgs <- unique(Require::extractPkgName(allPkgs))
+        loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
+      }
     }
   }
 }
@@ -1564,6 +1709,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   # THIS FUNCTION PASSES THINGS TO THE OUTER sim OBJECT as side effects. CAREFUL
   depsGr <- depsGraph(sim, plot = FALSE)
   depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
+  #depsGrDF1 <- depsEdgeList(sim, FALSE)
+  #depsGrDF <- depsGrDF1[from != to]
   if (getOption("spades.allowInitDuringSimInit", TRUE)) {
     cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
     hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
@@ -1586,26 +1733,30 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       stripNcharsSpades <- 2 #stripNchars + 2
       stripNcharsSimInit <- stripNchars + 5
       debug <- getDebug() # from options first, then override if in a simInitAndSpades
-      len <- length(sim[["._simNesting"]])
-      ._simNesting <- sim[["._simNesting"]]
+      if  (is.call(debug))
+        debug <- eval(debug)
+
+      len <- length(sim[[._txtSimNesting]])
+      ._simNestingLocal <- sim[[._txtSimNesting]]
       val <- "intsDrngSmInt"
-      ._simNesting[len] <- val
+      ._simNestingLocal[len] <- val
 
       squash <- withCallingHandlers({
         simAlt <- simInit(modules = canSafelyRunInit, paths = paths, params = params,
                           objects = objects, inputs = inputs, outputs = outputs,
                           times = list(start = as.numeric(start(sim)),
-                                       end = as.numeric(end(sim)), timeunit = timeunit(sim)))
+                                       end = as.numeric(end(sim)), timeunit = timeunit(sim)),
+                          ._startClockTime = sim[[._txtStartClockTime]])
         simAlt@.xData$._ranInitDuringSimInit <- completed(simAlt)$moduleName
         messageVerbose(cli::col_yellow("**** Running spades call for:", safeToRunModules, "****"))
         simAltOut <- spades(simAlt, events = "init", debug = debug)
       })
 
       Map(mod = canSafelyRunInit, function(mod) {
-        objEnv <- simAltOut$.mods[[mod]]$.objects
+        objEnv <- simAltOut[[dotObjs]][[mod]] # $.objects
         objsNames <- ls(objEnv, all.names = TRUE)
         objs <- mget(objsNames, objEnv)
-        list2env(objs, sim$.mods[[mod]]$.objects)
+        list2env(objs, sim[[dotObjs]][[mod]]) # $.objects)
       })
       # update parameters -- from simAltOut; then from user passed params
       # Don't use `globals(sim)<-` because it updates the parameters, which we don't want here
@@ -1640,11 +1791,15 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
 }
 
 updateParamsFromGlobals <- function(sim, dontUseGlobals = list()) {
-  sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals)
+  modDefaultParams <- Map(mod = sim@depends@dependencies, function(mod) mod@parameters$paramName)
+  sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals,
+                                            modDefaultParams = modDefaultParams)
   sim
 }
 
-updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates, dontUseGlobals = list()) {
+updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates,
+                                        dontUseGlobals = list(),
+                                        modDefaultParams) {
   if (missing(paramsWithUpdates)) {
     paramsWithUpdates <- paramsOrig
   }
@@ -1652,7 +1807,7 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates, dontUseGl
   globalsDF <- list()
   knownParamsWOdotPlotInitialTime <- setdiff(.knownDotParams, ".plotInitialTime")
   for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
-    modParams <- names(paramsOrig[[mod]])
+    modParams <- modDefaultParams[[mod]]
     modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
     userOverrides <- if (is.null(dontUseGlobals[[mod]])) NULL else dontUseGlobals[[mod]]
     common <- intersect(modParams, names(paramsWithUpdates$.globals))
@@ -1777,7 +1932,7 @@ getDebug <- function() {
 
 #' @keywords internal
 #' @importFrom Require messageVerbose
-dealWithOptions <- function(objects, ..., sim,
+dealWithOptions <- function(objects, dotNames, sim,
                             thePkgs = c("SpaDES.core", "reproducible", "Require")) {
   finished <- FALSE
 
@@ -1790,10 +1945,10 @@ dealWithOptions <- function(objects, ..., sim,
   currOptionsLong <- names(unlist(unname(allOptions), recursive = FALSE))
 
   currOptionsShort <- gsub(thePkgsGrep, "", currOptionsLong)
-  namesPoss <- if (is.null(...names()) && !missing(sim)) {
+  namesPoss <- if (is.null(dotNames) && !missing(sim)) {
     names(sim)
   } else {
-    ...names()
+    dotNames
   }
 
   optionsDotsShort <- currOptionsShort %in% namesPoss
@@ -1865,11 +2020,11 @@ dealWithOptions <- function(objects, ..., sim,
 
 elapsedTimeInSimInit <- function(._startClockTime, sim) {
   elapsed <- difftime(Sys.time(), ._startClockTime, units = "sec")
-  if (is.null(sim@.xData[["._simInitElapsedTime"]])) {
+  #if (is.null(sim@.xData[["._simInitElapsedTime"]])) {
     sim@.xData[["._simInitElapsedTime"]] <- elapsed
-  } else {
-    sim@.xData[["._simInitElapsedTime"]] <- sim@.xData[["._simInitElapsedTime"]] + elapsed
-  }
+  #} else {
+  #  sim@.xData[["._simInitElapsedTime"]] <- sim@.xData[["._simInitElapsedTime"]] + elapsed
+  #}
   sim
 }
 
@@ -1887,21 +2042,38 @@ prefixSimInit <- " simInit:"
 spaceDashDashSpace <- " -- "
 
 simNestingSetup <- function(...) {
-  prevSimEnv <- tryCatch(whereInStack("._simNesting"), error = function(x) character())
+  prevSimEnv <- tryCatch(whereInStack(._txtSimNesting), error = function(x) character())
   if (is.environment(prevSimEnv)) {
-    prevSimEnv <- get0("._simNesting", envir = prevSimEnv, inherits = FALSE)
+    prevSimEnv <- get0(._txtSimNesting, envir = prevSimEnv, inherits = FALSE)
   }
-  simNestingArg <- list(...)$._simNesting
+  simNestingArg <- list(...)[[._txtSimNesting]]
   messageTxt <- if (is.null(simNestingArg)) "simInit" else simNestingArg
   c(prevSimEnv, messageTxt)
 }
 
 #' @importFrom cli col_green
 simNestingOverride <- function(sim, mBase) {
-  len <- length(sim[["._simNesting"]])
-  ._simNestingTail <- sim[["._simNesting"]][len]
+  len <- length(sim[[._txtSimNesting]])
+  ._simNestingTail <- sim[[._txtSimNesting]][len]
   numCharsMax <- max(0, getOption("spades.messagingNumCharsModule", 21) - loggingMessagePrefixLength)
   modName8Chars <- moduleNameStripped(mBase, numCharsMax)
-  sim[["._simNesting"]][len] <- paste0(modName8Chars, ":", cli::col_green(sim@current$eventType))
-  sim[["._simNesting"]]
+  sim[[._txtSimNesting]][len] <- paste0(modName8Chars, ":", cli::col_green(sim@current$eventType))
+  sim[[._txtSimNesting]]
 }
+
+isMacOSX <- function()
+  isMac <- tolower(Sys.info()["sysname"]) == "darwin"
+
+
+
+debugToVerbose <- function(debug) {
+  debugOut <- sapply(debug, function(de)
+    if (is.numeric(de) || is.logical(de)) de else !is.null(de)
+  )
+  debugOut[is.na(debugOut)] <- FALSE
+  any(as.logical(debugOut))
+}
+
+
+metadataToDigest <- c("inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
+                      "spatialExtent", "timeframe", "timeunit", "version")

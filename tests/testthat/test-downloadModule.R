@@ -85,7 +85,17 @@ test_that("downloadModule can overwrite existing modules", {
     list.files(full.names = TRUE, pattern = "[.]R$") |>
     file.info()
 
-  expect_error(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
+  errs <- capture_error(
+    warns <- capture_warnings(
+      downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = FALSE))
+  )
+  if (!is.null(getGitCredsToken())) {
+    expect_match(paste(warns, collapse = "_"), all = FALSE, fixed = FALSE, regexp = "not overwriting")
+  } else {
+    expect_match(paste(errs, collapse = "_"), all = FALSE, fixed = FALSE, regexp = "overwrite is FALSE")
+  }
+
+
 
 
   f <- .tryCatch(downloadModule(m, tmpdir, quiet = TRUE, data = FALSE, overwrite = TRUE))
@@ -111,8 +121,8 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
   } else {
     opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
   }
+  testInit(c("httr2"), opts = opts)
 
-  testInit(c("httr"), opts = opts)
   m <- "test"
 
   skipMessReGoogledrive <-
@@ -128,7 +138,7 @@ test_that("downloadModule does not fail when data URLs cannot be accessed", {
       skip(skipMessReGoogledrive)
     }
   }
-  f <- f$value[[1]] |> unlist() |> as.character()
+  f <- f[[1]][[1]] |> unlist() |> as.character()
   d <- f |> dirname() |> basename() |> unique() |> sort()
 
   d_expected <- sort(c(m, "data"))

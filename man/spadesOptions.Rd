@@ -57,6 +57,12 @@ function will be run; if \code{FALSE}, then it will be skipped.\cr
 \tab  The default number of \pkg{data.table} threads to use.
 See also \code{?data.table::setDTthreads}. \cr
 
+\code{spades.evalPostEvent} \tab \code{NULL}
+\tab  User can put any \code{quote}d code to evaluate after each event
+(.inputObjects included), e.g., \code{quote(print(.robustDigest(sim$rstLCC)))}
+will print the digest value of the \code{sim$rstLCC} after each event so a
+user can monitor its changes \cr
+
 \code{spades.futureEvents} \tab \code{FALSE}
 \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
 whose outputs are not needed (by other events in the \code{simList}) into a future.
@@ -72,7 +78,7 @@ Still VERY experimental. Use cautiously. \cr
 \tab The default local directory in which to look for simulation inputs.  \cr
 
 \code{spades.loadReqdPkgs}
-\tab Default is \code{TRUE} meaning that any \code{reqdPkgs} will be loaded via \code{Require}
+\tab Default is \code{TRUE} \tab Any \code{reqdPkgs} will be loaded via \code{Require}
 or \code{require}. If \code{FALSE}, no package loading will occur. This will mean that
 modules must prefix every function call from a package with that package name
 with double colon (::).  \cr
@@ -139,6 +145,11 @@ at the start of the current event. This can be recovered with \code{restartSpade
 and the differences can be seen in a hidden object in the stashed \code{simList}.
 There is a message which describes how to find that. \cr
 
+\code{spades.reqdPkgsDontLoad} \tab \code{"box"} \tab Specify any packages that should not
+be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
+listed. The default (\code{"box"}) is a package that returns a warning if it is
+loaded, and so it is excluded from loading.\cr
+
 \code{spades.saveFileExtensions} \tab \code{NULL} \tab
 a \code{data.frame} with 3 columns, \code{exts}, \code{fun}, and \code{package} indicating which
 file extension, and which function from which package will be used when
@@ -159,11 +170,7 @@ the name \code{sim$._sessionInfo}. This takes about 75 milliseconds, which may b
 undesirable for some situations where speed is critical. If \code{FALSE}, then
 this is not assigned to the \code{simList}.\cr
 
-\code{spades.switchPkgNamespaces} \tab \code{FALSE} to keep computational
-overhead down. \tab Should the search path be modified
-to ensure a module's required packages are listed first?
-If \code{TRUE}, there should be no name conflicts among package objects,
-but it is much slower, especially if the events are themselves fast. \cr
+\code{spades.switchPkgNamespaces} \tab Defunct. \tab Do not use \cr
 
 \code{spades.testMemoryLeaks} \tab \code{TRUE}.
 \tab  There is a very easy way to create a memory leak with R and SpaDES,
@@ -177,7 +184,19 @@ and suggests alternatives with a warning \cr
 point number comparisons. \cr
 
 \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
-\tab : The default user agent to use for downloading modules from GitHub. \cr
+\tab The default user agent to use for downloading modules from GitHub. \cr
+
+\code{spades.useBox} \tab FALSE
+\tab Unimplemented while memory problems with \code{box} are resolved.
+When it is turned on, this option determines
+whether to manage which packages are loaded using the package \code{box}.
+This will have as an effect that \code{reqdPkgs} will be strict; if a given
+module is missing a \code{reqdPkgs}, then the module will fail to run, with
+an error saying the package/function doesn't exist. Without \code{box},
+modules may run, even though \code{reqdPkgs} is incorrect, because other modules
+may have specified their own packages, which cover the needs of another
+package. \code{useBox = TRUE} will force modules to be accurate with their
+\code{reqdPkgs} \cr
 
 \code{spades.useRequire} \tab \code{!tolower(Sys.getenv("SPADES_USE_REQUIRE")) \%in\% "false"}
 \tab : The default for that environment variable is unset, so this returns

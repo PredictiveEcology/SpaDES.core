@@ -2,13 +2,15 @@ test_that("downloadData downloads and unzips module data", {
   skip_on_cran()
 
   opts <- list(reproducible.inputPaths = NULL)
-  if (isWindows()) {
-    opts <- append(opts, list(download.file.method = "auto"))
-  } else {
-    opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
-  }
+  noisyOutput <- capture.output(
+    if (isWindows()) {
+      opts <- append(opts, list(download.file.method = "auto"))
+    } else {
+      opts <- append(opts, list(download.file.method = "curl", download.file.extra = "-L"))
+    }
+  )
 
-  testInit(c("googledrive", "terra"), opts = opts)
+  testInit(c("httr2", "terra"), opts = opts)
 
   m <- "test"
   datadir <- file.path(tmpdir, m, "data") |> checkPath(create = TRUE)
@@ -41,6 +43,7 @@ test_that("downloadData downloads and unzips module data", {
       t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
                                      files = c("DEM.tif", "habitatQuality.tif")))
     })
+
     result <- checksums(m, tmpdir)$result
     expect_true(all(file.exists(file.path(datadir, filenames))))
     expect_true(all(result == "OK"))

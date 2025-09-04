@@ -2539,15 +2539,22 @@ setMethod(
   signature = c("simList", "character"),
   definition = function(sim, unit) {
     obj <- rbindlist(sim@events)
-    if (length(unit) != 1) stop("unit must be length 1")
+    if (length(unit) != 1) {
+      stop("unit must be length 1")
+    }
     if (is.na(pmatch("second", unit)) && (length(sim@events) > 0)) {
-      # note the above line captures empty eventTime, whereas is.na does not
+      ## note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(obj$eventTime))) {
         if (!is.null(obj$eventTime)) {
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.xData)]
           obj[]
         }
        } #else {
+    }
+
+    ## catch NULL/empty data.table and use empty event list
+    if (NROW(obj) == 0 && NCOL(obj) == 0) {
+      obj <- .emptyEventListDT
     }
     return(obj)
 })
@@ -2758,10 +2765,11 @@ setMethod(
         # note the above line captures empty eventTime, whereas `is.na` does not
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
-            if (!is.null(obj$._clockTime))
-              obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData),
-                         clockTime = obj$._clockTime,
-                         ._clockTime = NULL)]
+            if (!is.null(obj[[._txtClockTime]])) {
+              obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData))]
+                         #clockTime = obj[[._txtClockTime]],
+                         #._clockTime = NULL)]
+            }
           }
         }
       }
@@ -3338,7 +3346,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
   if (!is.null(comp)) {
     comp <- comp[, list(moduleName, eventType,
-                          diffTime = diff(c(x@.xData[["._firstEventClockTime"]], clockTime)))]
+                          diffTime = diff(c(x@.xData[["._firstEventClockTime"]], get(._txtClockTime))))]
     theBy <- if (isTRUE(byEvent)) {
       c("moduleName", "eventType")
     } else {

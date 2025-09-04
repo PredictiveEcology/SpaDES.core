@@ -182,7 +182,7 @@ test_that("simList object initializes correctly (1)", {
   }) |>
     unlist() |>
     sort() |>
-    SpaDES.core:::.cleanPkgs() |>
+    .cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
@@ -192,7 +192,7 @@ test_that("simList object initializes correctly (1)", {
   reqdPkgs <- lapply(modules, function(m) packages(module = m)) |>
     unlist() |>
     sort() |>
-    SpaDES.core:::.cleanPkgs() |>
+    .cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
@@ -427,6 +427,12 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
+  et <- elapsedTime(mySimOut)
+  mins <- "mins"
+  et2 <- elapsedTime(mySimOut, units = mins)
+  expect_is(et, "data.table")
+  expect_identical(units(et2$elapsedTime), mins)
+  expect_identical(colnames(et), c("moduleName", "eventType", "elapsedTime"))
   expect_false(any(grepl("Skipped digest", mess)))
 
   ## Rerun with Cached copies being recovered
@@ -497,7 +503,7 @@ test_that("test sped-up Caching of sequentially cached events", {
               ".inputObjects <- function(sim) {",
               "  a = asPath(file.path(inputPath(sim), \"test\")) ",
               paste0("  if (!suppliedElsewhere(", params$.globals$stackName, "))"),
-              paste0("  sim[[", params$.globals$stackName, "]] <- sim[[", params$.globals$stackName, "]]"),
+              paste0("  sim[['", params$.globals$stackName, "']] <- sim[['", params$.globals$stackName, "']]"),
               "sim",
               "}")
 

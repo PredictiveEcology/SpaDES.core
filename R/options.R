@@ -52,6 +52,12 @@
 #'     \tab  The default number of \pkg{data.table} threads to use.
 #'     See also `?data.table::setDTthreads`. \cr
 #'
+#'   `spades.evalPostEvent` \tab `NULL`
+#'     \tab  User can put any `quote`d code to evaluate after each event
+#'      (.inputObjects included), e.g., `quote(print(.robustDigest(sim$rstLCC)))`
+#'      will print the digest value of the `sim$rstLCC` after each event so a
+#'      user can monitor its changes \cr
+#'
 #'   `spades.futureEvents` \tab `FALSE`
 #'     \tab  If set to `TRUE`, the event simulator will attempt to spawn events
 #'     whose outputs are not needed (by other events in the `simList`) into a future.
@@ -67,7 +73,7 @@
 #'      \tab The default local directory in which to look for simulation inputs.  \cr
 #'
 #'   `spades.loadReqdPkgs`
-#'      \tab Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
+#'      \tab Default is `TRUE` \tab Any `reqdPkgs` will be loaded via `Require`
 #'      or `require`. If `FALSE`, no package loading will occur. This will mean that
 #'      modules must prefix every function call from a package with that package name
 #'      with double colon (::).  \cr
@@ -136,6 +142,11 @@
 #'   and the differences can be seen in a hidden object in the stashed `simList`.
 #'   There is a message which describes how to find that. \cr
 #'
+#'   `spades.reqdPkgsDontLoad` \tab `"box"` \tab Specify any packages that should not
+#'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
+#'   listed. The default (`"box"`) is a package that returns a warning if it is
+#'   loaded, and so it is excluded from loading.\cr
+#'
 #'   `spades.saveFileExtensions` \tab `NULL` \tab
 #'   a `data.frame` with 3 columns, `exts`, `fun`, and `package` indicating which
 #'   file extension, and which function from which package will be used when
@@ -157,11 +168,7 @@
 #'     undesirable for some situations where speed is critical. If `FALSE`, then
 #'     this is not assigned to the `simList`.\cr
 #'
-#'   `spades.switchPkgNamespaces` \tab `FALSE` to keep computational
-#'   overhead down. \tab Should the search path be modified
-#'     to ensure a module's required packages are listed first?
-#'     If `TRUE`, there should be no name conflicts among package objects,
-#'     but it is much slower, especially if the events are themselves fast. \cr
+#'   `spades.switchPkgNamespaces` \tab Defunct. \tab Do not use \cr
 #'
 #'   `spades.testMemoryLeaks` \tab `TRUE`.
 #'     \tab  There is a very easy way to create a memory leak with R and SpaDES,
@@ -175,7 +182,19 @@
 #'     point number comparisons. \cr
 #'
 #'   `spades.useragent` \tab `"https://github.com/PredictiveEcology/SpaDES"`.
-#'     \tab : The default user agent to use for downloading modules from GitHub. \cr
+#'     \tab The default user agent to use for downloading modules from GitHub. \cr
+#'
+#'   `spades.useBox` \tab FALSE
+#'     \tab Unimplemented while memory problems with `box` are resolved.
+#'     When it is turned on, this option determines
+#'     whether to manage which packages are loaded using the package `box`.
+#'     This will have as an effect that `reqdPkgs` will be strict; if a given
+#'     module is missing a `reqdPkgs`, then the module will fail to run, with
+#'     an error saying the package/function doesn't exist. Without `box`,
+#'     modules may run, even though `reqdPkgs` is incorrect, because other modules
+#'     may have specified their own packages, which cover the needs of another
+#'     package. `useBox = TRUE` will force modules to be accurate with their
+#'     `reqdPkgs` \cr
 #'
 #'   `spades.useRequire` \tab `!tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false"`
 #'     \tab : The default for that environment variable is unset, so this returns
@@ -217,6 +236,7 @@ spadesOptions <- function() {
     spades.plots = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
+    spades.reqdPkgsDontLoad = "box",
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",
@@ -226,10 +246,10 @@ spadesOptions <- function() {
     spades.saveSimOnExit = TRUE,
     spades.scratchPath = file.path(.spadesTempDir(), "scratch"),
     spades.sessionInfo = TRUE,
-    spades.switchPkgNamespaces = FALSE,
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps ^ 0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
+    # spades.useBox = FALSE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",
     spades.keepCompleted = TRUE
   )

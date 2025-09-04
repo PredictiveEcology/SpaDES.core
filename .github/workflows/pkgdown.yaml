@@ -36,6 +36,7 @@ jobs:
           extra-packages: |
             any::pkgdown
             local::.
+            PredictiveEcology/reproducible@AI
             NLMR=?ignore
             PredictiveEcology/reproducible@development
           needs: website

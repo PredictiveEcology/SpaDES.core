@@ -54,6 +54,12 @@
 #' @param projectPath Should be the "top level" or project path for the `simList`.
 #'    Defaults to `getwd()`. All other paths will be made relative with respect to
 #'    this if nested within this.
+#' @param files Logical. Should all the files in the optional `outputs`, `inputs`,
+#'   `cache` be saved. If this is `TRUE`, then the resulting `filename` will be
+#'   silently converted to an archive file with the appropriate extension e.g.,
+#'   `.zip` or `.tar.gz`. This will automatically be `TRUE` if any of the `outputs`,
+#'   `inputs` or `cache` are `TRUE`. Setting this to `FALSE` will turn off the
+#'   saving of files specified in `inputs(sim)`, `outputs(sim)` or the cache.
 #'
 #' @param ... Additional arguments. See Details.
 #'
@@ -73,13 +79,14 @@
 #' @rdname saveSimList
 #' @seealso [loadSimList()]
 saveSimList <- function(sim, filename, projectPath = getwd(),
-                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir, ...) {
+                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir,
+                        files = TRUE, ...) {
   checkSimListExts(filename)
 
   dots <- list(...)
 
   ## user can explicitly override archiving files if FALSE
-  if (isFALSE(dots$files)) {
+  if (isFALSE(files)) {
     files <- cache <- inputs <- outputs <- FALSE
   } else {
     files <- TRUE
@@ -206,7 +213,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       if (isTRUE(inputs)) {
         ins <- inputs(sim)
         if (NROW(ins)) {
-          ins[ins$loaded %in% TRUE]$file
+          inputFNs <- ins[ins$loaded %in% TRUE, ]$file
           otherFns <- c(otherFns, inputFNs)
         }
       }
@@ -217,6 +224,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
           allFns <- gsub(origPaths[[p]], symlinks[[p]], allFns)
         }
       }
+      allFns <- na.omit(allFns)
 
       relFns <- makeRelative(c(fileToDelete, allFns), projectPath) |> unname()
 
@@ -338,14 +346,35 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
       newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
-      tmpsim[[nam]][] <- newFiles$newName[]
+      if (is(tmpsim[[nam]], "list")) {
+        # lists are weird; historicalClimateLayers was length 2 list; had 4 filenames, 2 repeated twice
+        #   need to fix this
+        newNames <- unique(newFiles$newName)
+        for (elem in names(tmpsim[[nam]])) {
+          fileHere <- tmpsim[[nam]][[elem]] # should only have 1 element's file(s)
+          dirToFileHere <- dirname(fileHere)
+          nParents <- attr(fileHere, "nParentDirs")
+          1
+          #if (nParents > 0) {
+          for (nPar in rev(seq(nParents + 1))) {
+            dirToFileHere <- dirname(dirToFileHere)
+          }
+          newNames1 <- fs::path_rel(newNames, dirToFileHere)
+          thisFile <- fs::path_rel(fileHere, dirToFileHere)
+          newNames1 <- newNames1[newNames1 %in% thisFile]
+          newNamesHere <- file.path(dirToFileHere, newNames1)
+          tmpsim[[nam]][[elem]][] <- unique(newNamesHere)
+        }
+      } else {
+        tmpsim[[nam]][] <- newFiles$newName[]
+      }
     }
   }
 
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 
   ## Work around for bug in qs that recovers data.tables as lists
-  tmpsim <- recoverDataTableFromQs(tmpsim)
+  # tmpsim <- recoverDataTableFromQs(tmpsim)
 
   ## Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {

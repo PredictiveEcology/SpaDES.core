@@ -259,7 +259,8 @@ setMethod(
                    list(
                      quick = quickCheck,
                      overwrite = overwrite,
-                     destinationPath = dPath
+                     destinationPath = dPath,
+                     verbose = !quiet
                    ),
                    list(...)
                  )
