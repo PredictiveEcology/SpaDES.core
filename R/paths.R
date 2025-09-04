@@ -73,9 +73,11 @@ spPaths <- c(corePaths, tmpPaths)
 #'
 .paths <- function() {
   if (!is.null(.getOption("spades.cachePath"))) {
-    message("option('spades.cachePath') is being deprecated. Please use ",
-            "option('reproducible.cachePath').\n",
-            "Setting option('reproducible.cachePath' = getOption('spades.cachePath'))")
+    message(
+      "option('spades.cachePath') is being deprecated. Please use ",
+      "option('reproducible.cachePath').\n",
+      "Setting option('reproducible.cachePath' = getOption('spades.cachePath'))"
+    )
   }
 
   list(
@@ -131,7 +133,8 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     outputPath <- getOption("spades.outputPath") # nolint
     defaults$OP <- TRUE
   }
-  if (missing(rasterPath)) { ## TODO: deprecate
+  if (missing(rasterPath)) {
+    ## TODO: deprecate
     rasterPath <- file.path(getOption("spades.scratchPath"), "raster") # nolint
     defaults$RP <- TRUE
   }
@@ -147,15 +150,19 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
   allDefault <- all(unlist(defaults))
 
   originalPaths <- .paths()
-  newPaths <- lapply(list(
-    cachePath = cachePath,
-    inputPath = inputPath,
-    modulePath = modulePath,
-    outputPath = outputPath,
-    rasterPath = rasterPath,
-    scratchPath = scratchPath,
-    terraPath = terraPath
-  ), checkPath, create = TRUE)
+  newPaths <- lapply(
+    list(
+      cachePath = cachePath,
+      inputPath = inputPath,
+      modulePath = modulePath,
+      outputPath = outputPath,
+      rasterPath = rasterPath,
+      scratchPath = scratchPath,
+      terraPath = terraPath
+    ),
+    checkPath,
+    create = TRUE
+  )
   newPaths <- as.list(normPath(newPaths))
 
   ## set the new paths via options
@@ -187,7 +194,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
         if (!defaults$CP) paste0("    reproducible.cachePath = '", normPath(cachePath), "'\n"),
         if (!defaults$IP) paste0("    spades.inputPath = '", normPath(inputPath), "'\n"),
         if (!defaults$OP) paste0("    spades.outputPath = '", normPath(outputPath), "'\n"),
-        if (!defaults$MP) paste0("    spades.modulePath = '" , modPaths, "'\n"),
+        if (!defaults$MP) paste0("    spades.modulePath = '", modPaths, "'\n"),
         if (!defaults$SP) paste0("    spades.scratchPath = '", normPath(scratchPath), "'\n"),
         "  )"
       )
