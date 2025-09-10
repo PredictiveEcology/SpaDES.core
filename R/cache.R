@@ -32,14 +32,15 @@ setMethod(
   ".robustDigest",
   signature = "simList",
   definition = function(object, .objects, length, algo, quick, classOptions) {
-
     # browser(expr = exists("._robustDigest_1"))
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleObjs <- ls(object@.xData$.mods, all.names = TRUE)
-    moduleEnvirs <- mget(moduleObjs[moduleObjs %in% unlist(modules(object))],
-                         envir = object@.xData$.mods)
+    moduleEnvirs <- mget(
+      moduleObjs[moduleObjs %in% unlist(modules(object))],
+      envir = object@.xData$.mods
+    )
     moduleObjs <- lapply(moduleEnvirs, function(me) ls(me, all.names = TRUE))
     allObjsInSimList <- append(list(".xData" = outerObjs), moduleObjs)
     allObjsInSimList$.xData <- allObjsInSimList$.xData[!allObjsInSimList$.xData %in% ".mods"]
@@ -67,7 +68,9 @@ setMethod(
       objectsMods <- grep("\\.mods\\$", .objects, value = TRUE)
       objectsMods <- gsub("\\.mods\\$", "", objectsMods)
       names(objectsMods) <- objectsMods
-      objects1ByModWhole <- lapply(objectsMods, function(mod) ls(envir = object@.xData$.mods[[mod]], all.names = TRUE))
+      objects1ByModWhole <- lapply(objectsMods, function(mod) {
+        ls(envir = object@.xData$.mods[[mod]], all.names = TRUE)
+      })
 
       .objects <- grep("\\.mods\\$", .objects, value = TRUE, invert = TRUE)
       objects1 <- strsplit(.objects, split = ":")
@@ -79,32 +82,35 @@ setMethod(
       })
       names(objects2) <- mods
       .objects <- append(list(".xData" = unlist(objects1[lens == 1])), objects2)
-      if (length(objects1ByModWhole))
+      if (length(objects1ByModWhole)) {
         .objects <- suppressWarnings(modifyList2(.objects, objects1ByModWhole))
+      }
     } else {
       .objects <- allObjsInSimList
     }
-    envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList),
-                     function(objs, name) {
-                       # browser(expr = exists("._robustDigest_5"))
-                       dotUnderscoreObjs <- objs[startsWith(objs, "._")]
-                       objs <- objs[!objs %in% c(dotUnderscoreObjs, "mod", "Par")]
-                       objs <- objs[objs %in% .objects[[name]]]
-                       if (length(objs) > 1) {
-                         objs <- sort(objs, method = "radix")
-                       }
-                       out <- if (length(objs) > 0) {
-                         a <- mget(objs, envir = allEnvsInSimList[[name]])
-                         nonZero <- unlist(lapply(a, function(x) length(x) > 0))
-                         .robustDigest(a[nonZero],
-                                       quick = !isFALSE(quick), # can be character or TRUE --> TRUE
-                                       length = length, classOptions = classOptions) # need classOptions
-                       } else {
-                         list()
-                       }
-                     })
+    envirHash <- Map(objs = allObjsInSimList, name = names(allObjsInSimList), function(objs, name) {
+      # browser(expr = exists("._robustDigest_5"))
+      dotUnderscoreObjs <- objs[startsWith(objs, "._")]
+      objs <- objs[!objs %in% c(dotUnderscoreObjs, "mod", "Par")]
+      objs <- objs[objs %in% .objects[[name]]]
+      if (length(objs) > 1) {
+        objs <- sort(objs, method = "radix")
+      }
+      out <- if (length(objs) > 0) {
+        a <- mget(objs, envir = allEnvsInSimList[[name]])
+        nonZero <- unlist(lapply(a, function(x) length(x) > 0))
+        .robustDigest(
+          a[nonZero],
+          quick = !isFALSE(quick), # can be character or TRUE --> TRUE
+          length = length,
+          classOptions = classOptions
+        ) # need classOptions
+      } else {
+        list()
+      }
+    })
 
-    #names(envirHash) <- names(allObjsInSimList)
+    # names(envirHash) <- names(allObjsInSimList)
     lens <- unlist(lapply(envirHash, function(x) length(x) > 0))
     envirHash <- envirHash[lens]
 
@@ -114,31 +120,37 @@ setMethod(
     envirHash[names(eh)] <- NULL
 
     # browser(expr = exists("._robustDigest_3"))
-    # Copy all parts except environment, clear that, then convert to list
+    ## Copy all parts except environment, clear that, then convert to list
     objectTmp <- object
     object <- Copy(object, objects = FALSE, queues = FALSE)
     object <- as(object, "simList_")
-    # Replace the .list slot with the hashes of the slots
+    ## Replace the .list slot with the hashes of the slots
     object@.Data <- envirHash
 
-    # Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
-    #  i.e., if the same file is located in a different place, that is ok
+    ## Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
+    ##  i.e., if the same file is located in a different place, that is ok
     object@paths <- list()
 
-    # don't cache contents of output because file may already exist
+    ## don't cache contents of output because file may already exist
     object@outputs$file <- basename(object@outputs$file)
     object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
 
     if (NROW(object@inputs)) {
-      object@inputs$file <- unlist(.robustDigest(object@inputs$file, quick = quick, length = length)) #nolint
+      object@inputs$file <- unlist(.robustDigest(
+        object@inputs$file,
+        quick = quick,
+        length = length
+      )) #nolint
     }
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
       if (!is.null(deps[[i]])) {
         object@depends@dependencies[[i]] <- lapply(
-          slotNames(object@depends@dependencies[[i]]), function(x) {
+          slotNames(object@depends@dependencies[[i]]),
+          function(x) {
             slot(object@depends@dependencies[[i]], x)
-          })
+          }
+        )
         names(object@depends@dependencies[[i]]) <- slotNames(deps[[i]])
         object@depends@dependencies[[i]][["timeframe"]] <- as.Date(deps[[i]]@timeframe)
       }
@@ -148,16 +160,20 @@ setMethod(
       newGlobals <- object@params$.globals
     }
 
-    if (!is.null(classOptions$modules)) if (length(classOptions$modules)) {
-      object@modules <- list(classOptions$modules)
-      object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
+    if (!is.null(classOptions$modules)) {
+      if (length(classOptions$modules)) {
+        object@modules <- list(classOptions$modules)
+        object@depends@dependencies <- object@depends@dependencies[classOptions$modules]
+      }
     }
 
     # if this call is within a single module, only keep module-specific params
     if (length(curMod) > 0) {
       omitParams <- c(".showSimilar", ".useCache")
       object@params <- object@params[curMod]
-      object@params[[curMod]] <- object@params[[curMod]][!names(object@params[[curMod]]) %in% omitParams]
+      object@params[[curMod]] <- object@params[[curMod]][
+        !names(object@params[[curMod]]) %in% omitParams
+      ]
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
@@ -179,20 +195,26 @@ setMethod(
       objNamesInner <- lapply(obj$.list[[1]][], names)
       namesObjNamesInner <- names(objNamesInner)
       names(namesObjNamesInner) <- namesObjNamesInner
-      nestedDotUnderscoreObjs <- lapply(namesObjNamesInner,
-                                        function(x) {
-                                          if (!is.null(objNamesInner[[x]]))
-                                            objNamesInner[[x]][startsWith(objNamesInner[[x]], "._")]
-                                          })
-      nestedDotUnderscoreObjs <- nestedDotUnderscoreObjs[names(unlist(nestedDotUnderscoreObjs, recursive = FALSE))]
+      nestedDotUnderscoreObjs <- lapply(namesObjNamesInner, function(x) {
+        if (!is.null(objNamesInner[[x]])) {
+          objNamesInner[[x]][startsWith(objNamesInner[[x]], "._")]
+        }
+      })
+      nestedDotUnderscoreObjs <- nestedDotUnderscoreObjs[names(unlist(
+        nestedDotUnderscoreObjs,
+        recursive = FALSE
+      ))]
       noneToRm <- unlist(lapply(nestedDotUnderscoreObjs, function(x) length(x) == 0))
       nestedDotUnderscoreObjs[noneToRm] <- NULL
       obj$.list[[1]][names(nestedDotUnderscoreObjs)] <-
-        Map(na = obj$.list[[1]][names(nestedDotUnderscoreObjs)],
-            nduo = nestedDotUnderscoreObjs, function(na, nduo) {
-              na[nduo] <- NULL
-              na
-      })
+        Map(
+          na = obj$.list[[1]][names(nestedDotUnderscoreObjs)],
+          nduo = nestedDotUnderscoreObjs,
+          function(na, nduo) {
+            na[nduo] <- NULL
+            na
+          }
+        )
     }
 
     # outputs --> should not be treated like inputs; if they change, it is OK, so just outputs as a data.frame,
@@ -200,32 +222,41 @@ setMethod(
     nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
     dependsSeparate <- setdiff(nonDotListNoOutputs, "depends")
     obj[dependsSeparate] <- lapply(dependsSeparate, function(x) {
-      .robustDigest(slot(object, x), algo = algo)})
+      .robustDigest(slot(object, x), algo = algo)
+    })
     dependsFirst <- obj[["depends"]] <- list()
     if (!isTRUE(all(sapply(object@depends@dependencies, is.null)))) {
       for (ii in c("inputObjects", "outputObjects", "parameters")) {
         dependsFirst[[ii]] <-
-          .robustDigest(lapply(object@depends@dependencies,
-                               function(mo) {
-                                 mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
-                               }))
+          .robustDigest(lapply(object@depends@dependencies, function(mo) {
+            mo[[ii]][, grep("desc$", colnames(mo[[ii]]), value = TRUE, invert = TRUE)]
+          }))
       }
 
       obj[["depends"]] <- invertList(dependsFirst)
     }
 
-    otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
-                           "spatialExtent", "timeframe", "timeunit", "version")
+    otherDependsToDig <- c(
+      "childModules",
+      "loadOrder",
+      "reqdPkgs",
+      "spatialExtent",
+      "timeframe",
+      "timeunit",
+      "version"
+    )
     dependsSecond <-
-      .robustDigest(lapply(object@depends@dependencies,
-                           function(mo) {
-                             mo[otherDependsToDig]
-                           } ))
+      .robustDigest(lapply(object@depends@dependencies, function(mo) {
+        mo[otherDependsToDig]
+      }))
 
     obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
     # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
-    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")], quick = TRUE)
+    obj["outputs"] <- .robustDigest(
+      object@outputs[, c("objectName", "saveTime", "file", "arguments")],
+      quick = TRUE
+    )
     if (!is.null(classOptions$events)) {
       if (FALSE %in% classOptions$events) obj$events <- NULL
     }
@@ -240,7 +271,8 @@ setMethod(
     }
     # browser(expr = exists("._robustDigest_4"))
     obj
-})
+  }
+)
 
 if (!isGeneric(".tagsByClass")) {
   setGeneric(".tagsByClass", function(object) {
@@ -282,8 +314,10 @@ setMethod(
         inObj <- .grepSysCalls(scalls, pattern = "^.inputObjects")
         if (any(!is.na(inObj))) {
           userTags <- c("otherFunctions:.inputObjects")
-          userTags1 <- tryCatch(paste0("module:", get("m", sys.frame(parseModuleFrameNum))),
-                                error = function(x) NULL)
+          userTags1 <- tryCatch(
+            paste0("module:", get("m", sys.frame(parseModuleFrameNum))),
+            error = function(x) NULL
+          )
           userTags <- c(userTags, userTags1)
         }
       } else {
@@ -291,7 +325,8 @@ setMethod(
       }
     }
     userTags
-})
+  }
+)
 
 if (!isGeneric(".cacheMessage")) {
   setGeneric(".cacheMessage", function(object, functionName, fromMemoise, verbose) {
@@ -314,9 +349,12 @@ if (!isGeneric(".cacheMessage")) {
 setMethod(
   ".cacheMessage",
   signature = "simList",
-  definition = function(object, functionName,
-                        fromMemoise = getOption("reproducible.useMemoise", TRUE),
-                        verbose = getOption("reproducible.verbose")) {
+  definition = function(
+    object,
+    functionName,
+    fromMemoise = getOption("reproducible.useMemoise", TRUE),
+    verbose = getOption("reproducible.verbose")
+  ) {
     cur <- current(object)
     .cacheMessage(NULL, functionName, fromMemoise = fromMemoise, verbose = verbose)
 
@@ -327,7 +365,9 @@ setMethod(
       })
 
       whCurrent <- match(cur$moduleName, names(object@params)[whichCached])
-      if (is.na(fromMemoise)) fromMemoise <- FALSE
+      if (is.na(fromMemoise)) {
+        fromMemoise <- FALSE
+      }
       fromWhere <- c("cached", "memoised")[fromMemoise + 1]
       # if (isTRUE(useCacheVals[[whCurrent]])) {
       #   if (isTRUE(fromMemoise)) {
@@ -340,13 +380,22 @@ setMethod(
       #     message(cli::col_blue("     loaded ", fromWhere," copy of", cur$moduleName, "module"))
       #   }
       # } else {
-      messageCache(.message$HangingIndent, "for ", cur$eventType, " event in ", cur$moduleName, " module", verbose = verbose)
+      messageCache(
+        .message$HangingIndent,
+        "for ",
+        cur$eventType,
+        " event in ",
+        cur$moduleName,
+        " module",
+        verbose = verbose
+      )
 
       # }
     } else {
       messageCache(.message$HangingIndent, "from ", cur$moduleName, " module", verbose = verbose)
     }
-})
+  }
+)
 
 if (!isGeneric(".checkCacheRepo")) {
   setGeneric(".checkCacheRepo", function(object, create = FALSE) {
@@ -377,7 +426,7 @@ setMethod(
     whSimList <- unlist(lapply(object, is, "simList"))
 
     if (any(whSimList)) {
-      # just take the first simList, if there are >1
+      ## just take the first simList, if there are >1
       cachePath <- object[whSimList][[1]]@paths$cachePath
     } else {
       doEventFrameNum <- .grepSysCalls(sys.calls(), "(^doEvent)|(^.parseModule)")[2]
@@ -387,11 +436,11 @@ setMethod(
         cachePath <- sim@paths$cachePath
       } else {
         cachePath <- .getOption("reproducible.cachePath")
-        #checkPath(cachePath, create = TRUE) #SpaDES dependency
       }
     }
     checkPath(path = cachePath, create = create)
-})
+  }
+)
 
 if (!isGeneric(".addChangedAttr")) {
   setGeneric(".addChangedAttr", function(object, preDigest, origArguments, ...) {
@@ -429,18 +478,23 @@ setMethod(
     if (!is.null(attr(object, ".Cache")$newCache)) {
       object <- .setSubAttrInList(object, ".Cache", "newCache", NULL)
 
-      if (!identical(attr(object, ".Cache")$newCache, NULL))
+      if (!identical(attr(object, ".Cache")$newCache, NULL)) {
         stop("attributes on the cache object are not correct - 4")
+      }
     }
 
-    postDigest <- .robustDigest(object, .objects = dots$.objects,
-                                length = dots$length,
-                                algo = dots$algo,
-                                quick = dots$quick,
-                                classOptions = dots$classOptions)
+    postDigest <- .robustDigest(
+      object,
+      .objects = dots$.objects,
+      length = dots$length,
+      algo = dots$algo,
+      quick = dots$quick,
+      classOptions = dots$classOptions
+    )
     changed <- if (length(postDigest$.list)) {
-      internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list,
-                                       function(x) !any(startsWith(names(x), "doEvent"))))
+      internalSimList <- unlist(lapply(preDigest[[whSimList]]$.list, function(x) {
+        !any(startsWith(names(x), "doEvent"))
+      }))
       whSimList2 <- if (is.null(internalSimList) || isFALSE(internalSimList)) {
         1
       } else {
@@ -450,8 +504,10 @@ setMethod(
 
       # remove all functions from the module environment; they aren't allowed to be redefined within a function
       if (length(preDigest[[whSimList]]$.list)) {
-        out <- setdiffNamedRecursive(postDigest$.list[[whSimList2]],
-                                     preDigest[[whSimList]]$.list[[whSimList2]])
+        out <- setdiffNamedRecursive(
+          postDigest$.list[[whSimList2]],
+          preDigest[[whSimList]]$.list[[whSimList2]]
+        )
       } else {
         out <- postDigest$.list[[whSimList2]]
       }
@@ -459,8 +515,9 @@ setMethod(
         isModElement <- names(out) == modNam
         if (any(isModElement)) {
           isDotObjects <- names(out[isModElement][[modNam]]) == ".objects"
-          if (any(!isDotObjects))
+          if (any(!isDotObjects)) {
             out[isModElement][[modNam]][!isDotObjects] <- NULL
+          }
         }
       }
 
@@ -474,11 +531,13 @@ setMethod(
 
     object <- .setSubAttrInList(object, ".Cache", "changed", changed)
     #attr(object, ".Cache")$changed <- changed
-    if (!identical(attr(object, ".Cache")$changed, changed))
+    if (!identical(attr(object, ".Cache")$changed, changed)) {
       stop("attributes on the cache object are not correct - 5")
+    }
 
     object
-})
+  }
+)
 
 if (!isGeneric(".preDigestByClass")) {
   setGeneric(".preDigestByClass", function(object) {
@@ -535,10 +594,10 @@ setMethod(
   ".prepareOutput",
   signature = "simList",
   definition = function(object, cachePath, ...) {
-    simFromCache <- object # rename for internal purposes
+    simFromCache <- object ## rename for internal purposes
     simPre <- list(...)
     simPre <- .findSimList(simPre)
-    # only take first simList -- may be a problem:
+    ## only take first simList -- may be a problem:
     whSimList <- which(unlist(lapply(simPre, is, "simList")))[1]
     simListInput <- !isTRUE(is.na(whSimList))
 
@@ -554,10 +613,12 @@ setMethod(
       if (isListOfSimLists) {
         simPost <- list()
         for (i in seq_along(simFromCache)) {
-          stop("It looks like there are more than one simList in the Cached objects; ",
-               "Cache does not correctly deal with this currently.")
-          # need to keep the list(...) slots ...
-          # i.e., Caching of simLists is mostly about objects in .xData
+          stop(
+            "It looks like there are more than one simList in the Cached objects; ",
+            "Cache does not correctly deal with this currently."
+          )
+          ## need to keep the list(...) slots ...
+          ## i.e., Caching of simLists is mostly about objects in .xData
           simPost[[i]] <- Copy(simPre[[whSimList]], objects = FALSE)
           simPost[[i]]@.xData <- simFromCache[[i]]@.xData
           simPost[[i]]@completed <- simFromCache[[i]]@completed
@@ -569,52 +630,60 @@ setMethod(
           keepFromOrig <- !(lsSimPreOrigEnv %in% ls(simPost[[i]]@.xData, all.names = TRUE))
           # list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPreOrigEnv),
           #          envir = simPost[[i]]@.xData)
-          list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPre[[whSimList]]@.xData),
-                   envir = simPost[[i]]@.xData)
+          list2env(
+            mget(lsSimPreOrigEnv[keepFromOrig], envir = simPre[[whSimList]]@.xData),
+            envir = simPost[[i]]@.xData
+          )
         }
       } else {
-        # Setup some things to use throughout
+        ## Setup some things to use throughout
         currModules <- currentModule(simPre[[whSimList]])
 
-        # Step 1 -- copy the non-simEnv slots
+        ## Step 1 -- copy the non-simEnv slots
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
 
-        # This was unnecessary if the parameters never change; but they can
-        #  -- but draw from Cache only from this module -- other modules may have
-        #     changed during this simInit/spades call --> don't want their cached copies
-        #   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
-        #   cached copy of other modules
+        ## This was unnecessary if the parameters never change; but they can
+        ##  -- but draw from Cache only from this module -- other modules may have
+        ##     changed during this simInit/spades call --> don't want their cached copies
+        ##   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
+        ##   cached copy of other modules
         simPost@params[currModules] <- simFromCache@params[currModules]
-        if (FALSE) { # Eliot Dec 2023 -- removed this because it is already occuring during simInit;
-          #  also, user may have passed individual values for individual modules that should not
-          #  be overridden by globals
+        if (FALSE) {
+          ## Eliot Dec 2023 -- removed this because it is already occuring during simInit;
+          ##  also, user may have passed individual values for individual modules that should not
+          ##  be overridden by globals
           anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
           if (length(anyNewGlobals)) {
             suppressMessages(
-              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params))
+              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params)
+            )
           }
         }
 
-        # Step 2 -- copy the objects that are in simPre to simPost
+        ## Step 2 -- copy the objects that are in simPre to simPost
         # objsInPre <- ls(simPre[[whSimList]]@.xData, all.names = TRUE)
         # objsInPre <- grep("^\\._", objsInPre, value = TRUE, invert = TRUE)
-        # This needs to have different environments, i.e., like what Copy does
+        ## This needs to have different environments, i.e., like what Copy does
         # list2env(mget(objsInPre, envir = simPre[[whSimList]]@.xData), envir = simPost@.xData)
 
-        # Step 2 -- figure out where to get objects in simEnv from -- preSim or simRecoveredFromCache
-        # Convert to numeric index, as some modules don't have names
+        ## Step 2 -- figure out where to get objects in simEnv from -- preSim or simRecoveredFromCache
+        ## Convert to numeric index, as some modules don't have names
 
         # hasCurrModule <- match(currModules, modules(simPre[[whSimList]]))
 
         lsObjectEnv <- ls(simFromCache@.xData, all.names = TRUE)
-        if (!is.null(simFromCache@.xData$.mods))
+        if (!is.null(simFromCache@.xData$.mods)) {
           changedModEnvObjs <- ls(simFromCache@.xData$.mods, all.names = TRUE)
+        }
 
         deps <- simPre[[whSimList]]@depends@dependencies
         namesAllMods <- names(deps)
-        if (!is.null(namesAllMods)) { # i.e., no modules exist in the simList
+        if (!is.null(namesAllMods)) {
+          ## i.e., no modules exist in the simList
           hasCurrModule <- match(currModules, names(deps))
-          if (length(currModules) == 0) currModules <- namesAllMods
+          if (length(currModules) == 0) {
+            currModules <- namesAllMods
+          }
 
           createOutputs <- if (length(hasCurrModule)) {
             deps[[hasCurrModule]]@outputObjects$objectName
@@ -628,16 +697,21 @@ setMethod(
           createOutputs <- c(createOutputs, currModules)
 
           # take only the ones that the file changed, based on attr(simFromCache, ".Cache")$changed
-          changedOutputs <- createOutputs[createOutputs %in% names(attr(simFromCache, ".Cache")$changed)]
+          changedOutputs <- createOutputs[
+            createOutputs %in% names(attr(simFromCache, ".Cache")$changed)
+          ]
 
           expectsInputs <- if (length(hasCurrModule)) {
             deps[[hasCurrModule]]@inputObjects$objectName
           } else {
-            aa <- lapply(deps, function(dep)
-              dep@inputObjects$objectName)
+            aa <- lapply(deps, function(dep) {
+              dep@inputObjects$objectName
+            })
             unique(unlist(aa))
           }
-          lsObjectEnv <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs]
+          lsObjectEnv <- lsObjectEnv[
+            lsObjectEnv %in% changedOutputs | lsObjectEnv %in% expectsInputs
+          ]
           if (!is.null(simFromCache@.xData$.mods)) {
             privateObjectsInModules <- attr(simFromCache, ".Cache")$changed
             objsWithChangeInners <- intersect(namesAllMods, names(privateObjectsInModules))
@@ -656,9 +730,12 @@ setMethod(
             objsInModuleActive <- ls(currMods, all.names = TRUE)
             dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
             objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
-            if (length(objsInModuleActive))
-              list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[currModule]]),
-                       envir = simPost@.xData$.mods[[currModule]])
+            if (length(objsInModuleActive)) {
+              list2env(
+                mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[currModule]]),
+                envir = simPost@.xData$.mods[[currModule]]
+              )
+            }
           })
         }
         if (length(otherModules)) {
@@ -667,28 +744,36 @@ setMethod(
             objsInModuleActive <- ls(otherMods, all.names = TRUE)
             # dontCopyObjs <- c(".objects", "mod", "Par") # take these from the Cached copy (made 3 lines above)
             # objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
-            if (length(objsInModuleActive))
-              list2env(mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[otherModule]]),
-                       envir = simPost@.xData$.mods[[otherModule]])
+            if (length(objsInModuleActive)) {
+              list2env(
+                mget(objsInModuleActive, envir = simPre[[whSimList]]@.xData$.mods[[otherModule]]),
+                envir = simPost@.xData$.mods[[otherModule]]
+              )
+            }
           })
         }
         # Deal with .mods objects
         if (!is.null(simFromCache@.xData$.mods)) {
           # These are the unchanged objects
           for (modNam in currModules) {
-            objs <-
-              setdiffNamedRecursive(as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = TRUE),
-                                    changedModEnvObjs[[modNam]]$.objects)
-            if (length(objs))
+            objs <- setdiffNamedRecursive(
+              as.list(simPre[[1]]$.mods[[modNam]]$.objects, all.names = TRUE),
+              changedModEnvObjs[[modNam]]$.objects
+            )
+            if (length(objs)) {
               list2env(objs, simPost$.mods[[modNam]]$.objects)
+            }
           }
           # Now changed objects
           if (length(unlist(changedModEnvObjs))) {
             Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
               objNames <- names(objs$.objects)
-              if (!is.null(objNames))
-                list2env(mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
-                         envir = simPost@.xData$.mods[[nam]][[".objects"]])
+              if (!is.null(objNames)) {
+                list2env(
+                  mget(objNames, envir = simFromCache@.xData$.mods[[nam]][[".objects"]]),
+                  envir = simPost@.xData$.mods[[nam]][[".objects"]]
+                )
+              }
             })
             # override everything first -- this includes .objects -- take from Cache
             # list2env(mget(changedModEnvObjs, envir = simFromCache@.xData$.mods), envir = simPost@.xData$.mods)
@@ -711,10 +796,16 @@ setMethod(
           if (isTRUE(any(eventsAddedByThisModule))) {
             if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
               b <- simFromCache@events
-              b <- lapply(b, function(x) {x[["order"]] <- 2; x})
+              b <- lapply(b, function(x) {
+                x[["order"]] <- 2
+                x
+              })
 
               d <- simPost@events
-              d <- lapply(d, function(x) {x[["order"]] <- 1; x})
+              d <- lapply(d, function(x) {
+                x[["order"]] <- 1
+                x
+              })
 
               a <- do.call(unique, args = alist(append(b[eventsAddedByThisModule], d)))
 
@@ -750,11 +841,11 @@ setMethod(
           # must remove the "other ones" first
           objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
           objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = simPost@.xData))
-          if (any(objNonCanonicalExist))
+          if (any(objNonCanonicalExist)) {
             rm(list = objNonCanonical[objNonCanonicalExist], envir = simPost@.xData)
+          }
           suppressMessages(objectSynonyms(synonyms = objSyns, envir = simPost@.xData))
         }
-
       }
       if (!is.null(attr(simFromCache, "removedObjs"))) {
         if (length(attr(simFromCache, "removedObjs"))) {
@@ -769,15 +860,17 @@ setMethod(
       for (atts in attrsToGrab) {
         setattr(simPost, atts, attr(simFromCache, atts))
         #attr(simPost, atts) <- attr(simFromCache, atts)
-        if (!identical(attr(simPost, atts), attr(simFromCache, atts)))
+        if (!identical(attr(simPost, atts), attr(simFromCache, atts))) {
           stop("attributes on the cache simFromCache are not correct - 6")
+        }
       }
 
       return(simPost)
     } else {
       return(simFromCache)
     }
-})
+  }
+)
 
 #' Pre-digesting method for `simList`
 #'
@@ -803,7 +896,8 @@ setMethod(
   definition = function(object) {
     obj <- ls(object@.xData, all.names = TRUE)
     return(obj)
-})
+  }
+)
 
 if (!isGeneric(".addTagsToOutput")) {
   setGeneric(".addTagsToOutput", function(object, outputObjects, FUN) {
@@ -846,8 +940,10 @@ setMethod(
       # Deal with .mods
       outputObjectsMods <- grep(".mods", outputObjects, value = TRUE)
       outputObjectsMods <- gsub("(.*)\\$", "", outputObjectsMods)
-      list2env(mget(outputObjectsMods, envir = object@.xData$.mods),
-               envir = outputToSave@.xData$.mods)
+      list2env(
+        mget(outputObjectsMods, envir = object@.xData$.mods),
+        envir = outputToSave@.xData$.mods
+      )
 
       setattr(outputToSave, "tags", attr(object, "tags"))
       setattr(outputToSave, "call", attr(object, "call"))
@@ -857,10 +953,12 @@ setMethod(
         setattr(outputToSave, "function", attr(object, "function"))
         # attr(outputToSave, "function") <- attr(object, "function")
       }
-      if (!identical(attr(outputToSave, "tags"), attr(object, "tags")))
+      if (!identical(attr(outputToSave, "tags"), attr(object, "tags"))) {
         stop("attributes on the cache object are not correct - 1")
-      if (!identical(attr(outputToSave, "call"), attr(object, "call")))
+      }
+      if (!identical(attr(outputToSave, "call"), attr(object, "call"))) {
         stop("attributes on the cache object are not correct - 2")
+      }
     } else {
       outputToSave <- object
     }
@@ -873,7 +971,8 @@ setMethod(
     }
 
     outputToSave
-})
+  }
+)
 
 
 #' Find `simList` in a nested list
@@ -926,7 +1025,6 @@ if (!exists("objSize")) {
 #' objSize(a)
 #' utils::object.size(a)
 objSize.simList <- function(x, quick = TRUE, ...) {
-
   total <- obj_size(x, quick = TRUE)
   aa <- objSize(x@.xData, quick = quick, ...)
 
@@ -934,14 +1032,12 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   names(simSlots) <- simSlots
   otherParts <- objSize(lapply(simSlots, function(slotNam) slot(x, slotNam)), quick = quick, ...)
 
-  if (!quick)
-    attr(total, "objSizes") <- list(sim = attr(aa, "objSize"),
-                                    other = attr(otherParts, "objSize"))
+  if (!quick) {
+    attr(total, "objSizes") <- list(sim = attr(aa, "objSize"), other = attr(otherParts, "objSize"))
+  }
 
   return(total)
 }
-
-
 
 #' Methods for `.wrap` and `.unwrap`
 #'
@@ -958,12 +1054,16 @@ objSize.simList <- function(x, quick = TRUE, ...) {
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
-                          conn = getOption("reproducible.conn", NULL),
-                          verbose = getOption("reproducible.verbose"),
-                          outputObjects = NULL,
-                          ...) {
-
+.wrap.simList <- function(
+  obj,
+  cachePath,
+  preDigest,
+  drv = getOption("reproducible.drv", NULL),
+  conn = getOption("reproducible.conn", NULL),
+  verbose = getOption("reproducible.verbose"),
+  outputObjects = NULL,
+  ...
+) {
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
   modules <- TRUE
   if (!is.null(outputObjects)) {
@@ -983,18 +1083,30 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   objTmp <- .wrapOrUnwrapSimListAts(objTmp, .wrap)
 
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
-  objTmp$.mods <- .wrap(objTmp$.mods, cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  objTmp$.mods <- .wrap(
+    objTmp$.mods,
+    cachePath = cachePath,
+    drv = drv,
+    conn = conn,
+    verbose = verbose
+  )
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects,
-               drv = drv, conn = conn, verbose = verbose, ...)
+  out <- .wrap(
+    obj2,
+    cachePath = cachePath,
+    outputObjects = outputObjects,
+    drv = drv,
+    conn = conn,
+    verbose = verbose,
+    ...
+  )
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
   objTmp
 }
-
 
 .wrapOrUnwrapSimListAts <- function(obj, wrapOrUnwrap = .wrap) {
   sns <- slotNames(obj)
@@ -1004,8 +1116,6 @@ objSize.simList <- function(x, quick = TRUE, ...) {
   }
   obj
 }
-
-
 
 #' @export
 #' @inheritParams reproducible::.unwrap
@@ -1034,8 +1144,6 @@ wrapAndUnwrapAtDepends <- function(obj, wrapOrUnwrap = .wrap) {
   obj
 }
 
-
-
 #' @export
 #' @inheritParams reproducible::.unwrap
 #' @importFrom reproducible .unwrap
@@ -1052,7 +1160,6 @@ wrapAndUnwrapAtDepends <- function(obj, wrapOrUnwrap = .wrap) {
   wrapAndUnwrapDotMmoduleDeps(obj, .unwrap)
 }
 
-
 wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
   snsInner <- slotNames(deps)
   fn <- wrapOrUnwrap
@@ -1066,15 +1173,26 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #' @inheritParams reproducible::.unwrap
 #' @importFrom reproducible .unwrap
 #' @rdname dealWithClass
-.unwrap.simList <- function(obj, cachePath, cacheId,
-                            drv = getOption("reproducible.drv", NULL),
-                            conn = getOption("reproducible.conn", NULL), ...) {
+.unwrap.simList <- function(
+  obj,
+  cachePath,
+  cacheId,
+  drv = getOption("reproducible.drv", NULL),
+  conn = getOption("reproducible.conn", NULL),
+  ...
+) {
   ## the as.list doesn't get everything. But with a simList, this is OK; rest will stay
-  obj$.mods <- .unwrap(obj$.mods, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
+  obj$.mods <- .unwrap(
+    obj$.mods,
+    cachePath = cachePath,
+    cacheId = cacheId,
+    drv = drv,
+    conn = conn,
+    ...
+  )
   objList <- as.list(obj) # don't overwrite everything, just the ones in the list part
 
-  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
-                     drv = drv, conn = conn, ...)
+  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
 
   # .unwrap the metadata ... i.e,. @depends
@@ -1127,8 +1245,9 @@ unmakeMemoisable.simList_ <- function(x) {
 
   for (att in keepAttrs) {
     setattr(y, att, attr(x, att))
-    if (!identical(attr(y, att), attr(x, att)))
+    if (!identical(attr(y, att), attr(x, att))) {
       stop("attributes on the cache object are not correct - 3")
+    }
 
     #attr(y, att) <- attr(x, att)
   }
@@ -1138,10 +1257,16 @@ unmakeMemoisable.simList_ <- function(x) {
 if (!isGeneric("clearCache")) {
   setGeneric(
     "clearCache",
-    function(x, userTags = character(), after = NULL, before = NULL,
-             ask = getOption("reproducible.ask"),
-             useCloud = FALSE,
-             cloudFolderID = NULL, ...) {
+    function(
+      x,
+      userTags = character(),
+      after = NULL,
+      before = NULL,
+      ask = getOption("reproducible.ask"),
+      useCloud = FALSE,
+      cloudFolderID = NULL,
+      ...
+    ) {
       standardGeneric("clearCache")
     }
   )
@@ -1167,20 +1292,34 @@ if (!isGeneric("clearCache")) {
 setMethod(
   "clearCache",
   signature = "simList",
-  definition = function(x, userTags, after = NULL, before = NULL, ask, useCloud = FALSE,
-                        cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
-                        drv = getOption("reproducible.drv", NULL),
-                        conn = getOption("reproducible.conn", NULL), ...) {
+  definition = function(
+    x,
+    userTags,
+    after = NULL,
+    before = NULL,
+    ask,
+    useCloud = FALSE,
+    cloudFolderID = getOption("reproducible.cloudFolderID", NULL),
+    drv = getOption("reproducible.drv", NULL),
+    conn = getOption("reproducible.conn", NULL),
+    ...
+  ) {
     x <- x@paths$cachePath
-    clearCache(x = x, userTags = userTags, after = after, before = before,
-               ask = ask, useCloud = useCloud,
-               cloudFolderID = cloudFolderID,
-               ...)
-})
+    clearCache(
+      x = x,
+      userTags = userTags,
+      after = after,
+      before = before,
+      ask = ask,
+      useCloud = useCloud,
+      cloudFolderID = cloudFolderID,
+      ...
+    )
+  }
+)
 
 if (!isGeneric("showCache")) {
-  setGeneric("showCache", function(x, userTags = character(),
-                                   after = NULL, before = NULL, ...) {
+  setGeneric("showCache", function(x, userTags = character(), after = NULL, before = NULL, ...) {
     standardGeneric("showCache")
   })
 }
@@ -1197,11 +1336,11 @@ setMethod(
   definition = function(x, userTags, after = NULL, before = NULL, ...) {
     x <- x@paths$cachePath
     showCache(x = x, userTags = userTags, after = after, before = before, ...)
-})
+  }
+)
 
 if (!isGeneric("keepCache")) {
-  setGeneric("keepCache", function(x, userTags = character(),
-                                   after = NULL, before = NULL, ...) {
+  setGeneric("keepCache", function(x, userTags = character(), after = NULL, before = NULL, ...) {
     standardGeneric("keepCache")
   })
 }
@@ -1217,6 +1356,6 @@ setMethod(
   signature = "simList",
   definition = function(x, userTags, after = NULL, before = NULL, ...) {
     x <- x@paths$cachePath
-    keepCache(x = x, userTags = userTags, after = after, before = before,
-               ...)
-})
+    keepCache(x = x, userTags = userTags, after = after, before = before, ...)
+  }
+)
