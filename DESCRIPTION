@@ -67,6 +67,7 @@ Suggests:
     png,
     RColorBrewer (>= 1.1-2),
     raster (>= 2.5-8),
+    reticulate,
     rmarkdown,
     roxygen2,
     RSQLite,
@@ -124,6 +125,7 @@ Collate:
     'plotting.R'
     'progress.R'
     'project-template.R'
+    'python-ReticulateFindPython.R'
     'reexports.R'
     'restart.R'
     'save.R'
