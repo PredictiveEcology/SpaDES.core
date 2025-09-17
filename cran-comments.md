@@ -1,8 +1,7 @@
 ## Release information
 
-This is a maintenance release to fix use of package anchors in help files,
-and deal with changes in dependency packages.
-See `NEWS.md` for a full list of changes.
+This is a minor release to address an intermittent package failure on 
+one of CRAN's flavours.
 
 ## Test environments
 
@@ -12,28 +11,28 @@ See `NEWS.md` for a full list of changes.
 * Windows                 (win-builder), R 4.4.3
 
 ### Current R versions
-* macOS 13.3.1            (mac-builder), R 4.4.3
-* macOS 14.7.6                 (GitHub), R 4.4.3
-* macOS 15.5                    (local), R 4.4.3
-* Ubuntu 24.04                 (GitHub), R 4.4.3
-* Ubuntu 24.04                  (local), R 4.4.3
-* Windows                      (GitHub), R 4.4.3
-* Windows                       (local), R 4.4.3
-* Windows                 (win-builder), R 4.4.3
+* macOS 13.3.1            (mac-builder), R 4.5.1
+* macOS 14.7.6                 (GitHub), R 4.5.1
+* macOS 15.5                    (local), R 4.5.1
+* Ubuntu 24.04                 (GitHub), R 4.5.1
+* Ubuntu 24.04                  (local), R 4.5.1
+* Windows                      (GitHub), R 4.5.1
+* Windows                       (local), R 4.5.1
+* Windows                 (win-builder), R 4.5.1
 
 ### Development R version
-* Ubuntu 24.04                 (GitHub), R-devel (2025-07-15 r88411)
-* Ubuntu 24.04                  (local), R-devel (2025-07-15 r88411)
-* Windows                      (GitHub), R-devel (2025-07-27 r88459 ucrt)
-* Windows                 (win-builder), R-devel (2025-07-27 r88459 ucrt)
+* Ubuntu 24.04                 (GitHub), R-devel (2025-09-16 r88844)
+* Ubuntu 24.04                  (local), R-devel (2025-09-16 r88844)
+* Windows                      (GitHub), R-devel (2025-09-16 r88844 ucrt)
+* Windows                 (win-builder), R-devel (2025-09-16 r88844 ucrt)
 
 ## R CMD check results
 
 There are no errors, or warnings in any of the above.
 
-There are some NOTEs:
+There is one NOTE:
 
-1. The `NLMR` packages in Suggests are optionally installed from our R-universe repository
+1. The `NLMR` package in Suggests is optionally installed from our R-universe repository
   (until the maintainers of that package are able to get it back on CRAN).
   Instructions for installation are provided in the README, DESCRIPTION, and via a message to the user.
   We believe this should satisfy the CRAN policy requirement regarding additional dependencies.
@@ -43,14 +42,6 @@ There are some NOTEs:
         Availability using Additional_repositories specification:
           NLMR         yes   https://predictiveecology.r-universe.dev/
 
-2. Found (possibly) invalid URLs for multiple DOIs, which appear to be inaccessible from the CRAN check machines but are available in a web browser.
-
-3. We have made an effort to reduce the package as much as possible, but the installed package size is larger than the 5MB limit.
-
-        checking installed package size ... NOTE
-            installed size is  6.9Mb
-            sub-directories of 1Mb or more:
-              R   5.1Mb
 
 ## Downstream dependencies
 
