@@ -1,3 +1,7 @@
+# SpaDES.core 2.1.8
+
+* changes to a sporadically failing test;
+
 # SpaDES.core 2.1.6
 
 * drop support for R 4.2;
