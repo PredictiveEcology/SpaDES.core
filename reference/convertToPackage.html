@@ -76,7 +76,7 @@ These"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathj
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Convert standard module code into an R package</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.6/R/convertToPackage.R" class="external-link"><code>R/convertToPackage.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.8/R/convertToPackage.R" class="external-link"><code>R/convertToPackage.R</code></a></small>
     <div class="hidden name"><code>convertToPackage.Rd</code></div>
     </div>
 
@@ -241,18 +241,18 @@ simply use the <code>devtools::install(pathToModuleRoot)</code>. Even if it is i
 <span class="r-in"><span>  <span class="fu">pkgload</span><span class="fu">::</span><span class="fu"><a href="https://pkgload.r-lib.org/reference/load_all.html" class="external-link">load_all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html" class="external-link">file.path</a></span><span class="op">(</span><span class="va">tmpdir</span>, <span class="st">"test"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">pkgload</span><span class="fu">::</span><span class="fu"><a href="https://pkgload.r-lib.org/reference/unload.html" class="external-link">unload</a></span><span class="op">(</span><span class="st">"test"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpEnR9g1/reproducible/jq0XUoY9</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp0vsYmZ/reproducible/jq0XUoY9</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in</span> <span style="color: #BBBB00;">test.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in</span> <span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in</span> <span style="color: #BBBB00;">test.Rmd</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing</span> <span style="color: #BBBB00;">citation.bib</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see</span> <span style="color: #BBBB00;">LICENSE.md</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/RtmpEnR9g1/reproducible/jq0XUoY9/test/test.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/RtmpEnR9g1/reproducible/jq0XUoY9/test/test.Rmd</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> New/updated DESCRIPTION file is: /tmp/RtmpEnR9g1/reproducible/jq0XUoY9/test/DESCRIPTION</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmp0vsYmZ/reproducible/jq0XUoY9/test/test.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmp0vsYmZ/reproducible/jq0XUoY9/test/test.Rmd</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> New/updated DESCRIPTION file is: /tmp/Rtmp0vsYmZ/reproducible/jq0XUoY9/test/DESCRIPTION</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Building documentation</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> First time using roxygen2. Upgrading automatically...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting `RoxygenNote` to "7.3.2"</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> First time using <span style="color: #0000BB;">roxygen2</span>. Upgrading automatically...</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Setting <span style="color: #00BB00;">RoxygenNote</span> to <span style="color: #0000BB;">"7.3.3"</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Loading <span style="color: #0000BB;">test</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Writing <span style="color: #0000BB;">NAMESPACE</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Loading <span style="color: #0000BB;">test</span></span>
