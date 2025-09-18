@@ -24,7 +24,7 @@ a simList would look like once it is converted to a repeatably digestible object
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.8</span>
       </span>
     </div>
 
@@ -114,7 +114,11 @@ Default is <code>getOption("reproducible.length")</code>, which is set to <code>
 
 
 <dt id="arg-algo">algo<a class="anchor" aria-label="anchor" href="#arg-algo"></a></dt>
-<dd><p>The digest algorithm to use. Default <code>xxhash64</code> (see <code><a href="https://rdrr.io/pkg/digest/man/digest.html" class="external-link">digest::digest()</a></code> for others).</p></dd>
+<dd><p>The algorithms to be used; currently available choices are
+    <code>md5</code>, which is also the default, <code>sha1</code>, <code>crc32</code>,
+    <code>sha256</code>, <code>sha512</code>, <code>xxhash32</code>, <code>xxhash64</code>,
+    <code>murmur32</code>, <code>spookyhash</code>, <code>blake3</code>, <code>crc32c</code>,
+    <code>xxh3_64</code>, and <code>xxh3_128</code>.</p></dd>
 
 
 <dt id="arg-quick">quick<a class="anchor" aria-label="anchor" href="#arg-quick"></a></dt>
