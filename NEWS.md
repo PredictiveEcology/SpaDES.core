@@ -1,3 +1,7 @@
+# SpaDES.core (development version)
+
+* documentation improvements;
+
 # SpaDES.core 2.1.8
 
 * changes to a sporadically failing test;
