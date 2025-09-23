@@ -35,7 +35,6 @@ setMethod(
 
     # browser(expr = exists("._robustDigest_1"))
     curMod <- currentModule(object)
-    # if ("fireSense_dataPrepFit" %in% curMod) browser() # check .objects --> why doesn't it have the modObjects
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
     moduleFunctions <- ls(object@.xData[[dotMods]], all.names = TRUE) # module names
@@ -72,7 +71,6 @@ setMethod(
     # if ("fireSense_dataPrepFit" %in% curMod) {
     #   # after .addChangedAttr --> .objects is a list with `moduleFunctions` and `moduleObjects` ... with `.robustDigest` alone, it doesn't
     #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-    #   browser()
     # }
     isObjectEmpty <- if (!missing(.objects)) {
       if (!is.null(.objects)) {
@@ -445,7 +443,6 @@ setMethod(
         stop("attributes on the cache object are not correct - 4")
     }
 
-    if (exists("aaaa", envir = .GlobalEnv)) browser()
     postDigest <- .robustDigest(object, .objects = dots[[.objectsArg]],
                                 length = dots$length,
                                 algo = dots$algo,
@@ -474,7 +471,6 @@ setMethod(
         out <- postDigest$.list[[whSimList2]]
       }
       modulesInObject <- modules(object)
-      # if ("fireSense_dataPrepFit" %in% currentModule(object)) browser()
       for (modNam in modulesInObject) {
         isModElement <- names(out) == modNam
         if (any(isModElement)) {
@@ -560,6 +556,7 @@ setMethod(
   ".prepareOutput",
   signature = "simList",
   definition = function(object, cachePath, ...) {
+    # if ("Biomass_borealDataPrep" %in% currentModule(object)) browser()
     simFromCache <- object # rename for internal purposes
     hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
     if (hasDotObjs %in% FALSE) {
@@ -730,7 +727,6 @@ setMethod(
           eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
 
           if (NROW(eventsAddedByThisModuleDT)) {
-            # browser()
             # if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
               b <- simFromCache@events
               b <- lapply(b, function(x) {x[["order"]] <- 2; x})
@@ -739,15 +735,18 @@ setMethod(
               d <- lapply(d, function(x) {x[["order"]] <- 1; x})
 
               a <- do.call(unique, args = alist(append(b[eventsAddedByThisModule], d)))
+              if (length(a)) {
 
-              # a <- do.call(unique,
-              #              args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
-              a1 <- rbindlist(a)
-              f1 <- a[order(a1$eventTime, a1$eventPriority, a1$order)]
-              simPost@events <- lapply(f1, function(f) {
-                f$order <- NULL
-                f
-              })
+                # a <- do.call(unique,
+                #              args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
+                a1 <- rbindlist(a)
+                # f1 <- if (NROW(a1)) a[order(a1$eventTime, a1$eventPriority, a1$order)] else a1
+                f1 <- a[order(a1$eventTime, a1$eventPriority, a1$order)]
+                simPost@events <- lapply(f1, function(f) {
+                  f$order <- NULL
+                  f
+                })
+              }
               # simPost@events <- do.call(unique,
               #                           args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
             # }
