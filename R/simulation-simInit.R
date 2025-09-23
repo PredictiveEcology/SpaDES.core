@@ -772,7 +772,19 @@ setMethod(
       if (length(objects)) {
         if (is.list(objects)) {
           if (length(objNames) == length(objects)) {
-            objs(sim) <- objects
+            # don't override all objects with user supplied objects if the init events have
+            #   been run
+            if (isTRUE(getOption("spades.allowInitDuringSimInit"))) {
+              inputObjectsAllMods <- inputObjects(sim) |> rbindlist() #@depends@dependencies[names()]@inputObjects[["objectName"]]
+              inputObjectsAllMods <- unique(inputObjectsAllMods$objectName)
+              objectNamesToUse <- inputObjectsAllMods[inputObjectsAllMods %in% sim$.userSuppliedObjNames]
+              objectsToUse <- objects[objectNamesToUse]
+              objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
+            } else {
+              objectsToUse <- objects
+            }
+
+            objs(sim) <- objectsToUse
           } else {
             stop(
               paste(
@@ -1342,14 +1354,20 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   assign(._txtSimNesting, sim[[._txtSimNesting]])
   # ._simNesting <- sim[[._txtSimNesting]]
 
-  allObjsProvided <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]] %in%
-    sim$.userSuppliedObjNames
+  inputObjectsThisModule <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
+  allObjsProvided <- inputObjectsThisModule %in% sim$.userSuppliedObjNames
   if (!all(allObjsProvided)) {
     if (!is.null(.getModuleInputObjects(sim, m))) {
-      # browser(expr = exists("._runModuleInputObjects_2"))
-      if (!missing(objects))
-        list2env(objects[sim@depends@dependencies[[i]]@inputObjects[["objectName"]][allObjsProvided]],
-                 envir = sim@.xData)
+      if (!missing(objects)) {
+
+        # If the init events have gone already, then the "objects" shouldn't override
+        #   the outputs of those modules
+        objectsToUse <- objects[inputObjectsThisModule[allObjsProvided]]
+        if (isTRUE(getOption("spades.allowInitDuringSimInit"))) {
+          objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
+        }
+        list2env(objectsToUse, envir = sim@.xData)
+      }
       a <- P(sim, ".useCache", mBase)
       if (!is.null(a)) {
         if (!identical(FALSE, a)) {
@@ -1449,9 +1467,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
             # if (isTRUE("Biomass_borealDataPrep" %in% mBase)) {
             #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-            #   browser()
             # }
-           # if (isTRUE(mBase %in% "fireSense_dataPrepPredict")) browser()
             # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
 
             # Remove outputObjects from @depends, as it should not affect the .inputObjects
@@ -2077,3 +2093,19 @@ debugToVerbose <- function(debug) {
 
 metadataToDigest <- c("inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
                       "spatialExtent", "timeframe", "timeunit", "version")
+
+objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
+  comps <- rbindlist(as.list(sim@completed)) # completed(sim)
+  anyInits <- comps[["eventType"]] == "init"
+  if (sum(anyInits)) {
+    inits <- comps[anyInits]
+    coreMods <- unlist(.pkgEnv$.coreModules)
+    inits <- inits[!moduleName %in% coreMods]
+
+    outputsFromOtherInits <- Map(mod = sim@depends@dependencies[inits[["moduleName"]]], function(mod)
+      mod@outputObjects[["objectName"]]
+    ) |> unlist() |> unique()
+    objectsToUse <- objectsToUse[setdiff(names(objectsToUse), outputsFromOtherInits)]
+  }
+  objectsToUse
+}

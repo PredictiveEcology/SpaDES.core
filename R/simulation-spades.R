@@ -1422,7 +1422,6 @@ setMethod(
   }
 
   if (any(cur[["moduleName"]] %in% getOption("spades.debugModule"))) {
-    # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
     browser()
   }
   if (.pkgEnv[["spades.browserOnError"]]) {
