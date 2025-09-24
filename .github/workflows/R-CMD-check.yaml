@@ -58,7 +58,6 @@ jobs:
             any::rcmdcheck
             PredictiveEcology/reproducible@AI
             NLMR=?ignore
-            PredictiveEcology/reproducible@development
           needs: check
 
       - name: Install additional package dependencies
