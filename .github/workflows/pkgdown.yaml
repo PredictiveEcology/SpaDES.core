@@ -38,7 +38,6 @@ jobs:
             local::.
             PredictiveEcology/reproducible@AI
             NLMR=?ignore
-            PredictiveEcology/reproducible@development
           needs: website
 
       - name: Install additional package dependencies
