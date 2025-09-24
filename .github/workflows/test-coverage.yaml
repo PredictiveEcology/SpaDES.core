@@ -35,7 +35,6 @@ jobs:
             any::covr
             PredictiveEcology/reproducible@AI
             NLMR=?ignore
-            PredictiveEcology/reproducible@development
 
       - name: Install additional package dependencies
         run: |
