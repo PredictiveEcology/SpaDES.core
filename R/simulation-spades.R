@@ -2234,7 +2234,7 @@ debugMessTRUE <- function(sim, events) {
   evnts1[1L, ] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]],"s"), evnts1)
   evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
   evnts1[1L, 1L] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]][1L], "s"), evnts1[1L, 1L])
-  if (.pkgEnv[[".spadesDebugFirst"]]) {
+  if (isTRUE(.pkgEnv[[".spadesDebugFirst"]])) {
     evnts2 <- evnts1
     evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",sim[["._spadesDebugWidth"]], "s"), names(evnts2)),
                              sprintf(paste0("%-",sim[["._spadesDebugWidth"]], "s"), evnts2))

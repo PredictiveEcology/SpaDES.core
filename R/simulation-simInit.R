@@ -1389,6 +1389,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
       cur <- sim@current
       curModNam <- cur$moduleName
+      if (!(all(unlist(lapply(debug, identical, FALSE))))) {
+        .pkgEnv[[".spadesDebugFirst"]] <- TRUE
+        # sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
+      }
       debugMessage(debug, sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam)
 
       if (!(FALSE %in% debug || any(is.na(debug))))
@@ -1459,8 +1463,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             # if (getOption("spades.useBox", FALSE) && FALSE)
             #   do.call(box::use, lapply(pkgs, as.name))
             debugForCache <- debugToVerbose(debug)
-            # if (!file.exists("/home/emcintir/GitHub/FireSenseTesting/inputs/rstLCC2011_FireSenseTestingdf7443ce0c5d1a0c7169884pix_propFlam.tif"))
-            #   browser()
             if (any(mBase %in% getOption("spades.debugModule"))) {
               browser()
             }
