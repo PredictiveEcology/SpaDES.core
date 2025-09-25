@@ -127,7 +127,7 @@ setMethod(
 
     # Remove event queue from digest. The queue will be put back into the sim at the end (.prepareOutput),
     #    but it doesn't matter what it is for digesting
-    object@events <- list()
+    # object@events <- list()
 
     # don't cache contents of output because file may already exist
     if (NROW(object@outputs)) {
