@@ -130,8 +130,12 @@ test_that("test event-level cache & memory leaks", {
   expect_true(!grepl("crazyFunction", warnsFormula))
   expect_true(!grepl("function", warnsFormula))
 
-  sims$.mods$caribouMovement$.objects$crazyFunction <- function() rnorm(1)
+  # This memory leak seems to have been fixed by moving the functions
+  sims[[dotObjs]]$caribouMovement$crazyFunction <- function() rnorm(1)
+  # sims[[dotObjs]]$caribouMovement$.objects$crazyFunction <- function() rnorm(1)
+  # sim@.xData[[dotObjs]][[cur[["moduleName"]]]]
   end(sims) <- end(sims) + 0.1
+  # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
   mess <- capture.output({
     warnsFunction <- capture_warnings({
       simsOut <- spades(sims, debug = FALSE)
@@ -144,7 +148,8 @@ test_that("test event-level cache & memory leaks", {
   expect_true(grepl("mod", warnsFunction))
   expect_true(!grepl("formula", warnsFunction))
 
-  sims$.mods$caribouMovement$.objects$crazyFormula <- formula(hi ~ test)
+  sims[[dotObjs]]$caribouMovement$crazyFormula <- formula(hi ~ test)
+  # sims$.mods$caribouMovement$.objects$crazyFormula <- formula(hi ~ test)
   end(sims) <- end(sims) + 0.1
   mess <- capture.output({
     warnsFormula <- capture_warnings({
