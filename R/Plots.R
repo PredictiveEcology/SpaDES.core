@@ -210,8 +210,12 @@ Plots <- function(data, fn, filename,
   ## has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
 
-  if (is.call(data))
-    data <- eval(data, envir)
+  if (missing(data)) {
+    data <- NULL
+  } else {
+    if (is.call(data))
+      data <- eval(data, envir)
+  }
   if (missing(fn)) {
     if (isTRUE(usePlot)) {
       fn <- Plot
@@ -244,7 +248,7 @@ Plots <- function(data, fn, filename,
     }
   } else {
     if ( (needScreen || needSave) ) {
-      if (missing(data)) {
+      if (is.null(data)) {
         gg <- fn(...)
       } else {
         if (is(data, "ggplot")) {
