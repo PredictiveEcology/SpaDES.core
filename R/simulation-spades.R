@@ -2310,6 +2310,11 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
       # need to check for non-object (e.g., function, params, depends) that could have changed
       # checkParams
       sPoss <- .robustDigest(Copy(sim, objects = FALSE))
+      # outputs are not necessary in this evaluation; just like in .robustDigest
+      sPossNames <- names(sPoss[["depends"]][[cur[["moduleName"]]]])
+      sPoss[["depends"]][[cur[["moduleName"]]]] <-
+        sPoss[["depends"]][[cur[["moduleName"]]]][outputsRmDontNeedForCache(sPossNames, "outputObjects")]
+
       scNePreDigests <- scNe$tagValue["preDigest" == scNe$tagKey]
 
       wh <- c("params", "depends")

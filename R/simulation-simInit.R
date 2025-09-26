@@ -1474,7 +1474,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
             # Remove outputObjects from @depends, as it should not affect the .inputObjects
             dependsSlots <- metadataToDigest
-            dependsSlots <- setdiff(dependsSlots, "outputObjects")
+            dependsSlots <- outputsRmDontNeedForCache(dependsSlots, "outputObjects")
+            # dependsSlots <- setdiff(dependsSlots, "outputObjects")
 
             sim <- .inputObjects(sim) |>
               Cache(

@@ -194,7 +194,8 @@ setMethod(
 
     # outputs --> should not be treated like inputs; if they change, it is OK, so just outputs as a data.frame,
     #   not files
-    nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
+    nonDotListNoOutputs <- outputsRmDontNeedForCache(nonDotList, "outputs")
+    # nonDotListNoOutputs <- setdiff(nonDotList, "outputs")
     dependsSeparate <- setdiff(nonDotListNoOutputs, "depends")
     obj[dependsSeparate] <- lapply(dependsSeparate, function(x) {
       .robustDigest(slot(object, x), algo = algo)})
@@ -1345,11 +1346,19 @@ upgradeModsToXdata <- function(envirHash, upgradeModsToXdata, moduleFunctionEnvi
       nehn <- names(envirHashNew)
       dups <- duplicated(nehn)
       if (any(dups)) {
-        wh <- which(nehn %in% nehn[dups])
-        val <- nehn[dups]
-        envirHashNew <- unlist(envirHashNew[wh], recursive = FALSE)
-        names(envirHashNew) <- gsub(paste0(val, "."), "", x = names(envirHashNew))
-        envirHashNew <- list(envirHashNew) |> setNames(val)
+        # Need to merge them into one list element per module
+        uniqNams <- unique(nehn)
+        envirHashNew2 <- list()
+        for (un in uniqNams) {
+          wh <- which(un == nehn)
+          envirHashNew2 <- append(envirHashNew2, list(Reduce(modifyList, envirHashNew[wh])) |> setNames(un))
+        }
+        envirHashNew <- envirHashNew2
+        # wh <- which(nehn %in% nehn[dups])
+        # val <- nehn[dups]
+        # envirHashNew <- unlist(envirHashNew[wh], recursive = FALSE)
+        # names(envirHashNew) <- gsub(paste0(val, "."), "", x = names(envirHashNew))
+        # envirHashNew <- list(envirHashNew) |> setNames(val)
       }
       envirHash$.xData <- append(envirHash$.xData, envirHashNew)
       if (any(names(en2Nams) %in% names(envirHash)))
@@ -1540,4 +1549,9 @@ clearCacheEventsOnly <- function(ask = TRUE,
     if (isFALSE(dryRun))
       clearCache(cacheId = y, ask = ask, verbose = verbose - 1)
   })
+}
+
+outputsRmDontNeedForCache <- function(nonDotList, whichOutputs) {
+  # setdiff(nonDotList, "outputs")
+  setdiff(nonDotList, whichOutputs)
 }
