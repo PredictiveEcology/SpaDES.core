@@ -142,7 +142,7 @@ test_that("spades calls - diff't signatures", {
 
   a <- simInit()
   a1 <- Copy(a)
-  opts <- options(spades.saveSimOnExit = FALSE)
+  opts <- withr::local_options(spades.saveSimOnExit = FALSE)
   expect_message(spades(a, debug = TRUE), "eventTime")
   expect_silent(expect_message(spades(a, debug = FALSE), "DTthreads"))
   expect_silent(expect_message(spades(a, debug = FALSE, .plotInitialTime = NA), "DTthreads"))
@@ -169,7 +169,7 @@ test_that("spades calls - diff't signatures", {
     suppressWarnings(expect_output(spades(a, progress = "text", debug = TRUE), "20%"))
     suppressWarnings(expect_output(spades(a, progress = "text"), "..........| 100%"))
   }
-  opts <- options(spades.saveSimOnExit = FALSE)
+  opts <- withr::local_options(spades.saveSimOnExit = FALSE)
   expect_silent(expect_message(spades(a, debug = FALSE, progress = FALSE), "DTthreads"))
   expect_silent(expect_message(spades(a, debug = FALSE, progress = "rr"), "DTthreads"))
   opts <- options(opts)
