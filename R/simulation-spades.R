@@ -2323,9 +2323,9 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
       # preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
       # grepVal <- paste0("sim\\.\\.list\\.", cur[["moduleName"]], preModCall, moduleCall)
       # Check that function itself (.inputObject or doEvent.XXX) has not changed
-      grepVal <- paste0("sim..list.", cur[["moduleName"]], ".", moduleCall)
+      grepVal <- paste0("sim..list.", cur[["moduleName"]], ".", .moduleFunctionsNam, ".", moduleCall)
       scFn <- startsWith(scNePreDigests, grepVal) # grepl(scNePreDigests, pattern = grepVal)
-      a <- .robustDigest(sim[[".mods"]][[cur[["moduleName"]]]][[moduleCall]])
+      a <- .robustDigest(sim[[dotMods]][[cur[["moduleName"]]]][[moduleCall]])
       b <- gsub(".+:(.+)", "\\1", scNePreDigests[scFn])
       noChanges[length(noChanges)] <- (a %in% b)
       noChange <- all(noChanges)

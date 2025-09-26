@@ -85,28 +85,31 @@ setMethod("Copy",
                 sim_@.xData <- Copy(object@.xData, ...) # filebackedDir = filebackedDir)
               }
 
-              objNames <- ls(object@.xData[[dotObjs]], all.names = TRUE)
-              if (isTRUE(is.character(modules))) {
-                objNames <- objNames[match(modules, objNames)]
-              }
-              names(objNames) <- objNames
-              isEnv <- unlist(lapply(objNames,
-                                     function(obj) {
-                                       is.environment(get(obj, envir = object@.xData[[dotObjs]]))
-                                     }))
+              # If there are any dotObjs, then copy those
+              if (!is.null(object@.xData[[dotObjs]])) {
+                objNames <- ls(object@.xData[[dotObjs]], all.names = TRUE)
+                if (isTRUE(is.character(modules))) {
+                  objNames <- objNames[match(modules, objNames)]
+                }
+                names(objNames) <- objNames
+                isEnv <- unlist(lapply(objNames,
+                                       function(obj) {
+                                         is.environment(get(obj, envir = object@.xData[[dotObjs]]))
+                                       }))
 
-              # This chunk makes the environment of each function in a module,
-              #   the module itself. This is unique to functions in `simList` objs
-              #   i.e., can't rely on generic reproducible::Copy
-              lapply(objNames[isEnv], function(en) {
-                list2env(as.list(object@.xData[[dotObjs]][[en]], all.names = TRUE),
-                         envir = sim_@.xData[[dotObjs]][[en]])
-                isFn <- unlist(lapply(ls(sim_@.xData[[dotObjs]][[en]]), function(obj) {
-                  if (is.function(get(obj, envir = sim_@.xData[[dotObjs]][[en]]))) {
-                    environment(sim_@.xData[[dotObjs]][[en]][[obj]]) <- sim_@.xData[[dotObjs]][[en]]
-                  }
-                }))
-              })
+                # This chunk makes the environment of each function in a module,
+                #   the module itself. This is unique to functions in `simList` objs
+                #   i.e., can't rely on generic reproducible::Copy
+                lapply(objNames[isEnv], function(en) {
+                  list2env(as.list(object@.xData[[dotObjs]][[en]], all.names = TRUE),
+                           envir = sim_@.xData[[dotObjs]][[en]])
+                  isFn <- unlist(lapply(ls(sim_@.xData[[dotObjs]][[en]]), function(obj) {
+                    if (is.function(get(obj, envir = sim_@.xData[[dotObjs]][[en]]))) {
+                      environment(sim_@.xData[[dotObjs]][[en]][[obj]]) <- sim_@.xData[[dotObjs]][[en]]
+                    }
+                  }))
+                })
+              }
 
               ## Copy .objects
               modsToCopy <- modules(sim_)
