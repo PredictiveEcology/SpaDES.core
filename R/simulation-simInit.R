@@ -775,7 +775,9 @@ setMethod(
             # don't override all objects with user supplied objects if the init events have
             #   been run
             if (isTRUE(getOption("spades.allowInitDuringSimInit"))) {
-              inputObjectsAllMods <- inputObjects(sim) |> rbindlist() #@depends@dependencies[names()]@inputObjects[["objectName"]]
+              inputObjectsAllMods <- inputObjects(sim)
+              if (is(inputObjectsAllMods, "list"))
+                inputObjectsAllMods <- inputObjectsAllMods |> rbindlist() #@depends@dependencies[names()]@inputObjects[["objectName"]]
               inputObjectsAllMods <- unique(inputObjectsAllMods$objectName)
               objectNamesToUse <- inputObjectsAllMods[inputObjectsAllMods %in% sim$.userSuppliedObjNames]
               objectsToUse <- objects[objectNamesToUse]
