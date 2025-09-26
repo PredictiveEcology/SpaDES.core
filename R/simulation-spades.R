@@ -1270,9 +1270,7 @@ setMethod(
           m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
           # message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
         } # else {
-        # if (exists("aaaa", envir = .GlobalEnv)) browser()
-        lm <- loggingMessage(m$message)
-        message(gsub("\n$", "", lm))
+        message(loggingMessage(m$message))
         # }
       }
       # This will "muffle" the original message
