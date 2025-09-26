@@ -43,28 +43,32 @@ setMethod(
     moduleFunctions <- lapply(moduleFunctionEnvir, function(me) ls(me, all.names = TRUE)) # obj names in .mods
 
     # Eliot addition May 2025 for new dotObjs
-    moduleObjects <- ls(object@.xData[[dotObjs]], all.names = TRUE) # module names
-    moduleObjEnvirs <- mget(moduleObjects[moduleObjects %in% unlist(modules(object))],
-                            envir = object@.xData[[dotObjs]])  # module environments
+    allObjsInSimList <- list(".xData" = outerObjs)
+    allEnvsInSimList <- list(".xData" = object@.xData)
+    if (!is.null(object@.xData[[dotObjs]])) {
+      moduleObjects <- ls(object@.xData[[dotObjs]], all.names = TRUE) # module names
+      moduleObjEnvirs <- mget(moduleObjects[moduleObjects %in% unlist(modules(object))],
+                              envir = object@.xData[[dotObjs]])  # module environments
     moduleObjects <- lapply(moduleObjEnvirs, function(me) ls(me, all.names = TRUE)) # obj names in .mods
 
     modFunsAndObjs <- append(list(moduleFunctions) |> setNames(.moduleFunctionsNam),
-                             list(moduleObjects) |> setNames(.moduleObjectsNam))
-    modEnvirFunsAndObjs <- append(list(moduleFunctionEnvir) |> setNames(.moduleFunctionsNam),
-                                  list(moduleObjEnvirs) |> setNames(.moduleObjectsNam))
-    allObjsInSimList <- modifyList2(list(".xData" = outerObjs), modFunsAndObjs)
-    # allObjsInSimList <- append(append(list(".xData" = outerObjs), moduleFunctions),
-    #                            moduleObjects |> setNames(paste0(dotObjs, "_", names(moduleObjects))))
-    allObjsInSimList$.xData <- allObjsInSimList$.xData[!allObjsInSimList$.xData %in% dotObjsAndMods]
-    # allEnvsInSimList <- append(append(list(.xData = object@.xData), moduleFunctionEnvir),
-    #                                   moduleObjEnvirs |> setNames(paste0(dotObjs, "_", names(moduleObjEnvirs))))
-    allEnvsInSimList <- modifyList2(list(".xData" = object@.xData), modEnvirFunsAndObjs)
+                               list(moduleObjects) |> setNames(.moduleObjectsNam))
+      modEnvirFunsAndObjs <- append(list(moduleFunctionEnvir) |> setNames(.moduleFunctionsNam),
+                                    list(moduleObjEnvirs) |> setNames(.moduleObjectsNam))
+      allObjsInSimList <- modifyList2(allObjsInSimList, modFunsAndObjs)
+      # allObjsInSimList <- append(append(list(".xData" = outerObjs), moduleFunctions),
+      #                            moduleObjects |> setNames(paste0(dotObjs, "_", names(moduleObjects))))
+      allObjsInSimList$.xData <- allObjsInSimList$.xData[!allObjsInSimList$.xData %in% dotObjsAndMods]
+      # allEnvsInSimList <- append(append(list(.xData = object@.xData), moduleFunctionEnvir),
+      #                                   moduleObjEnvirs |> setNames(paste0(dotObjs, "_", names(moduleObjEnvirs))))
+      allEnvsInSimList <- modifyList2(allEnvsInSimList, modEnvirFunsAndObjs)
 
-    # ord1 <- .orderDotsUnderscoreFirst(allObjsInSimList)
-    # ord2 <- .orderDotsUnderscoreFirst(names(allEnvsInSimList))
-    # allObjsInSimList <- allObjsInSimList[ord1]
-    # allEnvsInSimList <- allEnvsInSimList[ord2]
+      # ord1 <- .orderDotsUnderscoreFirst(allObjsInSimList)
+      # ord2 <- .orderDotsUnderscoreFirst(names(allEnvsInSimList))
+      # allObjsInSimList <- allObjsInSimList[ord1]
+      # allEnvsInSimList <- allEnvsInSimList[ord2]
 
+    }
     allObjsInSimList <- sortInner(allObjsInSimList)
     allEnvsInSimList <- sortInner(allEnvsInSimList)
 
