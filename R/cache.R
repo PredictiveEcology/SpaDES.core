@@ -1326,10 +1326,18 @@ upgradeModsToXdata <- function(envirHash, upgradeModsToXdata, moduleFunctionEnvi
   if (is.list(envirHash) && recurse > 0) {
     eh <- lapply(envirHash, upgradeModsToXdata, moduleFunctionEnvir = moduleFunctionEnvir, recurse = 0)
     if (length(eh)) {
-      en2Nams <- unlist(lapply(eh, names))
-      envirHashNew <- mapply(USE.NAMES = FALSE, nam = names(en2Nams), val = en2Nams, function(nam, val) {
+      en2Vals <- unlist(lapply(eh, names))
+      en2Nams <- lapply(eh, names)
+      en2Nams <- rep(names(en2Nams), lengths(eh))
+
+      #if (!identical(.moduleFunctionsNam, unique(en2Nams))) {
+      envirHashNew <- mapply(USE.NAMES = FALSE, nam = en2Nams, val = en2Vals, function(nam, val) {
+        # dotVal <- paste0(".", val)
+        dotVal <- val
         if (identical(nam, .moduleObjectsNam)) {
-          list(list(envirHash[[nam]][[val]]) |> setNames(.objectsSlot)) |> setNames(val)
+          list(list(envirHash[[nam]][[val]]) |> setNames(.objectsSlot)) |> setNames(dotVal)
+        } else if (identical(nam, .moduleFunctionsNam)) {
+          list(list(envirHash[[nam]][[val]]) |> setNames(.moduleFunctionsNam)) |> setNames(dotVal)
         } else {
           envirHash[[nam]][val]
         }
@@ -1346,7 +1354,16 @@ upgradeModsToXdata <- function(envirHash, upgradeModsToXdata, moduleFunctionEnvi
       envirHash$.xData <- append(envirHash$.xData, envirHashNew)
       if (any(names(en2Nams) %in% names(envirHash)))
         envirHash[names(en2Nams)] <- NULL
+
+      # They have been promoted
+      if (!is.null(envirHash[[.moduleFunctionsNam]]))
+        envirHash[[.moduleFunctionsNam]] <- NULL
+      if (!is.null(envirHash[[.moduleObjectsNam]]))
+        envirHash[[.moduleObjectsNam]] <- NULL
+
       eh <- envirHash
+
+      #}
     }
   } else {
     eh <- envirHash[names(envirHash)[names(envirHash) %in% names(moduleFunctionEnvir)]]
