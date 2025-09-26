@@ -2023,7 +2023,7 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 loggingMessagePrefixLength <- 15
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
-  if (!isTRUE(any(grepl(.txtNoPrefix, mess)))) {
+  if (!isTRUE(any(grepl(.message$NoPrefix, mess)))) {
     st <- Sys.time()
     stForm1 <- "%h%d"
     stForm2 <- paste(stForm1, "%H:%M:%S")
@@ -2077,7 +2077,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
       }
     }
   } else {
-    mess <- gsub(.txtNoPrefix, "", mess)
+    mess <- gsub(.message$NoPrefix, "", mess)
   }
 
   mess

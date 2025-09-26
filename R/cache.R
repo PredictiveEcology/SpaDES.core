@@ -49,9 +49,9 @@ setMethod(
       moduleObjects <- ls(object@.xData[[dotObjs]], all.names = TRUE) # module names
       moduleObjEnvirs <- mget(moduleObjects[moduleObjects %in% unlist(modules(object))],
                               envir = object@.xData[[dotObjs]])  # module environments
-    moduleObjects <- lapply(moduleObjEnvirs, function(me) ls(me, all.names = TRUE)) # obj names in .mods
+      moduleObjects <- lapply(moduleObjEnvirs, function(me) ls(me, all.names = TRUE)) # obj names in .mods
 
-    modFunsAndObjs <- append(list(moduleFunctions) |> setNames(.moduleFunctionsNam),
+      modFunsAndObjs <- append(list(moduleFunctions) |> setNames(.moduleFunctionsNam),
                                list(moduleObjects) |> setNames(.moduleObjectsNam))
       modEnvirFunsAndObjs <- append(list(moduleFunctionEnvir) |> setNames(.moduleFunctionsNam),
                                     list(moduleObjEnvirs) |> setNames(.moduleObjectsNam))
