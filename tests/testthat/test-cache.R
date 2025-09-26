@@ -319,7 +319,7 @@ test_that("test .robustDigest for simLists", {
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
                      "with user supplied tags",
                      "There is no similar item in the cachePath", "elpsd",
-                     "Saving", "Done", "Elapsed time for", sep = "|")
+                     "Saving", "Done", "Elapsed time for", .message$dashes, sep = "|")
   expect_true(all(cli::ansi_grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -335,7 +335,9 @@ test_that("test .robustDigest for simLists", {
   xxx[editBelowLine + 1] <- newCode
   cat(xxx, file = fileName, sep = "\n")
 
+  oo <- capture.output(
   mess1 <- capture_messages(do.call(simInit, args))
+  )
   expect_true(all(grepl(msgGrep11, mess1)))
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
@@ -490,7 +492,8 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim2$co5 == 6)
 
   # Test mod
-  expect_true(mySim2$.mods$test$.objects$hello == 2)
+  # expect_true(mySim2$.mods$test$.objects$hello == 2)
+  expect_true(mySim2[[dotObjs]]$test$hello == 2)
 
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
@@ -615,14 +618,16 @@ test_that("test showSimilar", {
   })
   expect_false(any(grepl("Cache of.*differs", mess))) ## Now it is function-specific -- no previous spades call
   mySim$a <- 2
-  mess <- capture_messages({
-    out4 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
-  })
-  expect_true(any(grepl("Cache of.*differs", mess)))
+  oo <- capture.output(
+    mess <- capture_messages({
+      out4 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+    })
+  )
+  expect_true(any(grepl("Cache of.*differs|different elements", mess)))
   mess <- capture_messages({
     out5 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
-  expect_false(any(grepl("Cache of.*differs", mess)))
+  expect_false(any(grepl("Cache of.*differs|different elements", mess)))
 })
 
 test_that("test multipart cache file", {
