@@ -520,7 +520,6 @@ setMethod(
           isDotObjects <- names(out[isModElement][[modNam]]) == .objectsSlot
           if (any(!isDotObjects)) # removes functions
             out[isModElement][[modNam]][!isDotObjects] <- NULL
-          }
         }
       }
 
