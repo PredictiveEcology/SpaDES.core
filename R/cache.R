@@ -1604,8 +1604,7 @@ clearCacheEventsOnly <- function(ask = TRUE,
   sc <- showCache(x, verbose = verbose)
   grepDoEventOrDotInputObjects <- quote(grepl("function", tagKey) & (grepl(".inputObjects", tagValue) |
                                                                        grepl("doEvent", tagValue)))
-  cacheIds <- unique(sc[eval(grepDoEventOrDotInputObjects)
-  ]$cacheId)
+  cacheIds <- unique(sc[eval(grepDoEventOrDotInputObjects)]$cacheId)
   if (isTRUE(dryRun))
     messageVerbose(verbose = verbose, "dryRun = TRUE, no clearing...")
 

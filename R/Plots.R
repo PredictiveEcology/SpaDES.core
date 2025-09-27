@@ -67,6 +67,9 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @param usePlot Logical. If `TRUE`, the default, then the plot will occur
 #'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
 #'
+#' @param envir The environment where the `data` argument should be evaluated if it is
+#'   a `call`. Normally, this should be left at its default, `parent.frame()`.
+#'
 #' @param ... Anything needed by `fn`, all named.
 #'
 #' @return Called for its side effect of plot creation.

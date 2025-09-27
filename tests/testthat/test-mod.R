@@ -161,9 +161,8 @@ test_that("local mod object", {
 
 test_that("convertToPackage testing", {
   skip_on_cran()
-  skip_if_not_installed(c("ggplot2", "pkgload", "roxygen2"))
 
-  testInit(c("roxygen2", "ggplot2"), smcc = FALSE, debug = FALSE,
+  testInit(c("ggplot2", "pkgload", "roxygen2"), smcc = FALSE, debug = FALSE,
            opts = list(reproducible.useMemoise = FALSE,
                        spades.moduleDocument = TRUE))
 

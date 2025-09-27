@@ -38,6 +38,8 @@ the event that is \code{numEvents} back from the first event in \code{events(sim
 restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
 with the module code parsed into the \code{simList}}
 
+\item{verbose}{Logical or Numeric, follows \code{reproducible.verbose} value by default.}
+
 \item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
 
 \item{filename}{The filename to save the sim state.

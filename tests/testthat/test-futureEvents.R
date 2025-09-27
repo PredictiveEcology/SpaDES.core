@@ -2,7 +2,7 @@ test_that("test spades.futureEvents", {
   skip_on_cran() ## these are longer tests (~2m)
 
   needPkgs <- c(sampleModReqdPkgs, "future", "ggplot2", "future.callr")
-  capture_warnings(skip_if_not_installed(needPkgs))
+  # capture_warnings(skip_if_not_installed(needPkgs))
 
   # skip_on_os("windows")
   testInit(needPkgs, opts = list(reproducible.useMemoise = FALSE,

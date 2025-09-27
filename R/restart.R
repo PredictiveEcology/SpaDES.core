@@ -76,6 +76,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @export
 #' @importFrom reproducible Cache
 #' @importFrom cli col_blue
+#' @inheritParams paramCheckOtherMods
 #'
 #' @examples
 #' \donttest{
