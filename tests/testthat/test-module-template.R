@@ -109,7 +109,7 @@ test_that("newModule with events and functions", {
       }
     ),
     func = function(x) {
-      message("hi")
+      message("__.H._.E._.L._.L._.O.__")
     },
     Init = function(sim) {
       sim$dd <- "no way"
@@ -128,7 +128,7 @@ test_that("newModule with events and functions", {
   pdf(pdfFile)
   mess <- capture_messages(
     out <- simInitAndSpades(
-      modules = "test",
+      modules = nm,
       times = list(start = 0, end = 2),
       paths = list(modulePath = Require::tempdir2())
     )
