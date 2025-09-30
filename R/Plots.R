@@ -254,11 +254,12 @@ Plots <- function(data, fn, filename,
       if (is.null(data)) {
         gg <- fn(...)
       } else {
+        gg <- NULL
         if (is(data, "ggplot")) {
           gg <- data
+        } else if (needScreen) {
+          fn(data, ...) # This will plot to screen if it is base::plot or terra::plot
         }
-        else
-          gg <- fn(data, ...)
       }
 
       if (!is(gg, ".quickPlot")) {
@@ -391,7 +392,7 @@ Plots <- function(data, fn, filename,
       if (is.call(path))
         path <- "."
     }
-    if (fnIsPlot || is.null(gg)) {
+    if (fnIsPlot || !is(gg, "gg") ) {
       baseSaveFormats <- intersect(baseClassesCanHandle, types)
       for (bsf in baseSaveFormats) {
         type <- get(bsf)
