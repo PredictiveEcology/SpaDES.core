@@ -251,7 +251,7 @@ test_that("saveSimList works correctly", {
   expect_equivalent(
     gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(simLoaded$landscape, allowMultiple = FALSE))),
     tmpfile[1])
-  expect_true(bindingIsActive("mod", simLoaded@.xData$.mods$caribouMovement)) ## TODO: fails?
+  expect_true(bindingIsActive("mod", simLoaded@.xData[[dotMods]]$caribouMovement)) ## TODO: fails?
 
   mySim <- simLoaded
   # Now keep as file-backed, but change name
@@ -268,10 +268,10 @@ test_that("saveSimList works correctly", {
   file.remove(dir(dirname(tmpfile[c(1)]), pattern = ".gr.$", full.names = TRUE))
   # rm(mySim)
 
-  assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$.objects)
-  assign("a", 2, envir = sim@.xData$.mods$caribouMovement$.objects)
+  assign("a", 1, envir = mySim@.xData[[dotObjs]]$caribouMovement)
+  assign("a", 2, envir = sim@.xData[[dotObjs]]$caribouMovement)
 
-  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement)) ## TODO: fails?
+  expect_true(bindingIsActive("mod", sim@.xData[[dotMods]]$caribouMovement)) ## TODO: fails?
   # test file-backed raster is gone
   expect_error(mySim$landscape$DEM[])
 })

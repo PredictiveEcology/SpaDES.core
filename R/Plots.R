@@ -60,7 +60,8 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'
 #' @param usePlot Deprecated; not used. Will be removed in a future release.
 #'
-#' @param envir The environment to search in.
+#' @param envir The environment where the `data` argument should be evaluated if it is
+#'   a `call`. Normally, this should be left at its default, `parent.frame()`.
 #'
 #' @param ... Anything needed by `fn`, all named.
 #'
@@ -153,19 +154,23 @@ Plots <- function(data, fn, filename,
     simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
     if (!exists("sim", simIsIn, inherits = FALSE)) {
       simIsIn <- try(whereInStack("sim"), silent = TRUE)
-      if (is(simIsIn, "try-error"))
+      if (is(simIsIn, "try-error")) {
         simIsIn <- NULL
+      }
     }
   }
 
   ## Deal with non-sim cases
   if (is.null(simIsIn)) {
-    if (is.call(types) && any(grepl("sim", types)))
+    if (is.call(types) && any(grepl("sim", types))) {
       types <- "screen"
-    if (is.call(path) && any(grepl("sim", path)))
+    }
+    if (is.call(path) && any(grepl("sim", path))) {
       path = "."
-    if (is.call(.plotInitialTime) && any(grepl("sim", .plotInitialTime)))
+    }
+    if (is.call(.plotInitialTime) && any(grepl("sim", .plotInitialTime))) {
       .plotInitialTime <- 0L
+    }
   }
 
   if (!is.null(simIsIn)) {
@@ -184,14 +189,17 @@ Plots <- function(data, fn, filename,
       envir <- simIsIn
       sim <- get("sim", envir = simIsIn)
       ## only look in the metadata -- not the simList (which will have a default of NA)
-      isPlotITinSim <- ".plotInitialTime" %in% moduleMetadata(sim, currentModule(sim))$parameters$paramName
-      if (isFALSE(isPlotITinSim))
+      isPlotITinSim <- ".plotInitialTime" %in%
+        moduleMetadata(sim, currentModule(sim))$parameters$paramName
+      if (isFALSE(isPlotITinSim)) {
         .plotInitialTime <- NULL
+      }
 
       if (is(.plotInitialTime, "call")) {
         .plotInitialTime = try(eval(.plotInitialTime, envir = simIsIn), silent = TRUE)
-        if (is(.plotInitialTime, "try-error"))
+        if (is(.plotInitialTime, "try-error")) {
           .plotInitialTime <- 0L
+        }
       }
     }
   } else {
@@ -204,8 +212,13 @@ Plots <- function(data, fn, filename,
   ## has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
 
-  if (is.call(data))
-    data <- eval(data, envir)
+  if (missing(data)) {
+    data <- NULL
+  } else {
+    if (is.call(data)) {
+      data <- eval(data, envir)
+    }
+  }
   if (missing(fn)) {
     if (inherits(data, c("SpatRaster", "SpatVector", "sf", "Raster", "sp"))) {
       fn <- terra::plot
@@ -214,23 +227,46 @@ Plots <- function(data, fn, filename,
     }
   }
 
-  if ( (needScreen || needSave) ) {
-    if (missing(data)) {
-      gg <- fn(...)
-    } else {
-      if (is(data, "ggplot")) {
-        gg <- data
-      }
-      else
-        gg <- fn(data, ...)
+  fnIsPlot <- identical(fn, Plot) # || identical(fn, plot) || identical(fn, terra::plot)
+  if (fnIsPlot) {
+    ## make dummies
+    gg <- 1
+    objNamePassedToData1 <- substitute(data)
+    origEnv <- parent.frame()
+    objNamePassedToData <- evalAttempt(objNamePassedToData1, origEnv)
+    if (!is.character(objNamePassedToData)) {
+      objNamePassedToData <- deparse1(objNamePassedToData)
     }
 
-    if (!is(gg, ".quickPlot")) { ## TODO: remove this as part of quickPlot deprecation?
-      ggListToScreen <- setNames(list(gg), "gg")
-      if (!is.null(gg$labels$title) && needScreen) {
-        ggListToScreen <- setNames(ggListToScreen,
-                                   format(paste(gg$labels$title, collapse = " ")))
-        ggListToScreen[[1]]$labels$title <- NULL
+    ## Try to see if the object is in the parent.frame(). If it isn't, default back to here.
+    if (!objNamePassedToData %in% ls(origEnv)) {
+      origEnv <- environment()
+    }
+    if (!(is(data, "list") && length(names(data)) == length(data))) {
+      ggListToScreen <- list(data)
+      names(ggListToScreen) <- objNamePassedToData
+    } else {
+      ggListToScreen <- data
+    }
+  } else {
+    if ((needScreen || needSave)) {
+      if (is.null(data)) {
+        gg <- fn(...)
+      } else {
+        gg <- NULL
+        if (is(data, "ggplot")) {
+          gg <- data
+        } else if (needScreen) {
+          fn(data, ...) # This will plot to screen if it is base::plot or terra::plot
+        }
+      }
+
+      if (!is(gg, ".quickPlot")) {
+        ggListToScreen <- setNames(list(gg), "gg")
+        if (!is.null(gg$labels$title) && needScreen) {
+          ggListToScreen <- setNames(ggListToScreen, format(paste(gg$labels$title, collapse = " ")))
+          ggListToScreen[[1]]$labels$title <- NULL
+        }
       }
     }
   }
@@ -268,8 +304,9 @@ Plots <- function(data, fn, filename,
 
     isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
-      if (is(path, "call"))
+      if (is(path, "call")) {
         path <- eval(path, envir = simIsIn)
+      }
     }
 
     if (is(path, "character")) {
@@ -281,33 +318,41 @@ Plots <- function(data, fn, filename,
     if (is(data, "Raster") || is(data, "SpatRaster")) {
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
-      if (exists("sim", inherits = FALSE))
+      if (exists("sim", inherits = FALSE)) {
         sim@outputs <- outputsAppend(
-          outputs = sim@outputs, saveTime = time(sim),
+          outputs = sim@outputs,
+          saveTime = time(sim),
           objectName = tools::file_path_sans_ext(basename(rasterFilename)),
-          file = rasterFilename, fun = "terra::writeRaster",
+          file = rasterFilename,
+          fun = "terra::writeRaster",
           ...
         )
+      }
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs"))
       qs::qsave(data, rawFilename)
-      if (exists("sim", inherits = FALSE))
+      if (exists("sim", inherits = FALSE)) {
         sim@outputs <- outputsAppend(
-          outputs = sim@outputs, saveTime = time(sim),
+          outputs = sim@outputs,
+          saveTime = time(sim),
           objectName = tools::file_path_sans_ext(basename(rawFilename)),
-          file = rawFilename, fun = "qs::qsave",
+          file = rawFilename,
+          fun = "qs::qsave",
           ...
         )
+      }
     }
   }
   if (needSave) {
     if (is.null(simIsIn)) {
-      if (is.call(path))
+      if (is.call(path)) {
         path <- "."
-      if (is.call(path))
+      }
+      if (is.call(path)) {
         path <- "."
+      }
     }
-    if (is.null(gg)) {
+    if (fnIsPlot || !is(gg, "gg")) {
       baseSaveFormats <- intersect(baseClassesCanHandle, types)
       for (bsf in baseSaveFormats) {
         type <- get(bsf)
@@ -320,9 +365,14 @@ Plots <- function(data, fn, filename,
         if (!is(plotted, "try-error")) {
           if (exists("sim", inherits = FALSE)) {
             pkgAndFn <- .guessPkgFun(bsf)
-            sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                         objectName = tools::file_path_sans_ext(basename(theFilename)),
-                                         file = theFilename, fun = pkgAndFn, ...)
+            sim@outputs <- outputsAppend(
+              outputs = sim@outputs,
+              saveTime = time(sim),
+              objectName = tools::file_path_sans_ext(basename(theFilename)),
+              file = theFilename,
+              fun = pkgAndFn,
+              ...
+            )
           }
           message("Saved figure to: ", theFilename)
         }
@@ -331,18 +381,25 @@ Plots <- function(data, fn, filename,
       ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
       for (ggsf in ggSaveFormats) {
         theFilename <- file.path(path, paste0(filename, ".", ggsf))
-        if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
-        args <- list(plot = gg,
-                     filename = theFilename)
+        if (!requireNamespace("ggplot2")) {
+          stop("To save gg objects, need ggplot2 installed")
+        }
+        args <- list(plot = gg, filename = theFilename)
         if (length(ggsaveArgs)) {
           args <- modifyList2(args, ggsaveArgs)
         }
         do.call(ggplot2::ggsave, args = args)
 
-        if (exists("sim", inherits = FALSE))
-          sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                       objectName = tools::file_path_sans_ext(basename(theFilename)),
-                                       file = theFilename, fun = "ggplot2::ggsave", ...)
+        if (exists("sim", inherits = FALSE)) {
+          sim@outputs <- outputsAppend(
+            outputs = sim@outputs,
+            saveTime = time(sim),
+            objectName = tools::file_path_sans_ext(basename(theFilename)),
+            file = theFilename,
+            fun = "ggplot2::ggsave",
+            ...
+          )
+        }
         message("Saved figure to: ", theFilename)
       }
     }
@@ -351,10 +408,16 @@ Plots <- function(data, fn, filename,
       filename11 <- file.path(path, paste0(filename, "_gg.qs"))
       qs::qsave(gg, file = filename11)
 
-      if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = tools::file_path_sans_ext(basename(filename11)),
-                                     file = filename11, fun = "qs::qsave", ...)
+      if (exists("sim", inherits = FALSE)) {
+        sim@outputs <- outputsAppend(
+          outputs = sim@outputs,
+          saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(filename11)),
+          file = filename11,
+          fun = "qs::qsave",
+          ...
+        )
+      }
     }
   }
 
@@ -404,19 +467,21 @@ evalAttempt <- function(subs, envir) {
   if (length(subs) > 2) {
     subsOrig <- subs
     out <- try(eval(subs[[3]], envir = envir), silent = TRUE)
-    if (is(out, "try-error"))
+    if (is(out, "try-error")) {
       subs <- subsOrig
-    else
+    } else {
       subs[[3]] <- out
+    }
 
     if (is.call(subs[[2]])) {
       out <- try(evalAttempt(subs[[2]], envir = envir), silent = TRUE)
-      if (!is(out, "try-error"))
+      if (!is(out, "try-error")) {
         subs[[2]] <- out
-
+      }
     }
-    if (is(out, "try-error"))
+    if (is(out, "try-error")) {
       subs <- subsOrig
+    }
   }
   subs
 }

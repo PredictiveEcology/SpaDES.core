@@ -1,12 +1,16 @@
 utils::globalVariables(c("memory", "maxMemory"))
 
 #' @importFrom reproducible tempfile2
-ongoingMemoryThisPid <- function(seconds = 1000,
-                                 interval = getOption("spades.memoryUseInterval", 0.5),
-                                 thisPid,
-                                 outputFile) {
+ongoingMemoryThisPid <- function(
+  seconds = 1000,
+  interval = getOption("spades.memoryUseInterval", 0.5),
+  thisPid,
+  outputFile
+) {
   numTimes <- 1
-  if (missing(thisPid)) thisPid <- Sys.getpid()
+  if (missing(thisPid)) {
+    thisPid <- Sys.getpid()
+  }
   if (missing(outputFile)) {
     outputFile <- outputFilename(thisPid)
   }
@@ -14,12 +18,16 @@ ongoingMemoryThisPid <- function(seconds = 1000,
   if (interval > 0) {
     op <- options(digits.secs = 5)
     stopFilename <- stopFilename(outputFile)
-    while (numTimes < (seconds/interval) && !file.exists(stopFilename)) { # will go infinitely long!
+    while (numTimes < (seconds / interval) && !file.exists(stopFilename)) {
+      # will go infinitely long!
       Sys.sleep(getOption("spades.memoryUseInterval", 0.5))
       a <- memoryUseThisSession(thisPid)
-      data.table::fwrite(list(memory = a, time = Sys.time()),
-                         dateTimeAs = "write.csv",
-                         append = file.exists(outputFile), file = outputFile)
+      data.table::fwrite(
+        list(memory = a, time = Sys.time()),
+        dateTimeAs = "write.csv",
+        append = file.exists(outputFile),
+        file = outputFile
+      )
       numTimes <- numTimes + 1
     }
     options(op)
@@ -44,13 +52,19 @@ ongoingMemoryThisPid <- function(seconds = 1000,
 #' @rdname memoryUse
 memoryUseThisSession <- function(thisPid) {
   ps <- Sys.which("ps")
-  if (missing(thisPid)) thisPid <- Sys.getpid()
+  if (missing(thisPid)) {
+    thisPid <- Sys.getpid()
+  }
   needTasklist <- isWindows()
   if (nzchar(ps) && !needTasklist) {
-    aa <- try(suppressWarnings(system(paste(ps, "-eo rss,pid | grep", thisPid), intern = TRUE)), silent = TRUE)
+    aa <- try(
+      suppressWarnings(system(paste(ps, "-eo rss,pid | grep", thisPid), intern = TRUE)),
+      silent = TRUE
+    )
     needTasklist <- !is.null(attr(aa, "status"))
-    if (!needTasklist)
+    if (!needTasklist) {
       aa2 <- try(strsplit(aa, split = " +")[[1]][1], silent = TRUE)
+    }
   }
 
   if (!nzchar(ps) || needTasklist) {
@@ -64,28 +78,41 @@ memoryUseThisSession <- function(thisPid) {
   return(aa3)
 }
 
-futureOngoingMemoryThisPid <- function(outputFile = NULL,
-                                       seconds = Inf,
-                                       interval = getOption("spades.memoryUseInterval", 0.5)) {
-  thisPid <- Sys.getpid()
-  if (is.null(outputFile))
-    outputFile <- outputFilename(thisPid)
-  message("Writing memory to ", outputFile)
-  a <- future::future({
-    getFromNamespace("ongoingMemoryThisPid", "SpaDES.core")(seconds = seconds,
-                                                            interval = interval,
-                                                            thisPid = thisPid,
-                                                            outputFile = outputFile)
-  }, globals = list(memoryUseThisSession = memoryUseThisSession,
-                    outputFile = outputFile, thisPid = thisPid,
-                    seconds = seconds, interval = interval)
-  )
-  return(a)
+futureOngoingMemoryThisPid <- function(
+  outputFile = NULL,
+  seconds = Inf,
+  interval = getOption("spades.memoryUseInterval", 0.5)
+) {
+  if (requireNamespace("future", quietly = TRUE)) {
+    thisPid <- Sys.getpid()
+    if (is.null(outputFile)) {
+      outputFile <- outputFilename(thisPid)
+    }
+    message("Writing memory to ", outputFile)
+    a <- future::future(
+      {
+        getFromNamespace("ongoingMemoryThisPid", "SpaDES.core")(
+          seconds = seconds,
+          interval = interval,
+          thisPid = thisPid,
+          outputFile = outputFile
+        )
+      },
+      globals = list(
+        memoryUseThisSession = memoryUseThisSession,
+        outputFile = outputFile,
+        thisPid = thisPid,
+        seconds = seconds,
+        interval = interval
+      )
+    )
+    return(a)
+  } else {
+    stop("suggested package 'future' not found")
+  }
 }
 
 # b <- futureOngoingMemoryThisPid()
-
-
 
 #' Show memory use
 #'
@@ -122,8 +149,10 @@ memoryUse <- function(sim, max = TRUE) {
     if (isTRUE(max)) {
       a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
     } else {
-      a <- a[, list(maxMemory = max(memory, na.rm = TRUE)),
-             by = c("moduleName", "eventType", "eventTime")]
+      a <- a[,
+        list(maxMemory = max(memory, na.rm = TRUE)),
+        by = c("moduleName", "eventType", "eventTime")
+      ]
     }
     a[is.infinite(maxMemory), maxMemory := NA]
     return(a[])
@@ -133,21 +162,26 @@ memoryUse <- function(sim, max = TRUE) {
 isWindows <- function() identical(.Platform$OS.type, "windows")
 
 memoryUseSetup <- function(sim, originalFuturePlan) {
-  if (requireNamespace("future", quietly = TRUE) &&
-      requireNamespace("future.callr", quietly = TRUE)) {
-
+  if (
+    requireNamespace("future", quietly = TRUE) &&
+      requireNamespace("future.callr", quietly = TRUE)
+  ) {
     thePlan <- getOption("spades.futurePlan", NULL)
     # originalFuturePlan <- future::plan()
     if (!is(originalFuturePlan, "sequential")) {
       theActualPlan <- originalFuturePlan
-      message("getOption('spades.futurePlan') disagreed with future::plan(); ",
-              "using future::plan() and setting options('spades.futurePlan' = future::plan())")
+      message(
+        "getOption('spades.futurePlan') disagreed with future::plan(); ",
+        "using future::plan() and setting options('spades.futurePlan' = future::plan())"
+      )
       options("spades.futurePlan" = theActualPlan)
     } else if (!identical(thePlan, "sequential") && is.null(thePlan)) {
-      stop("To use options('spades.memoryUseInterval'), you must set a future::plan(...)",
-           " to something other than sequential")
+      stop(
+        "To use options('spades.memoryUseInterval'), you must set a future::plan(...)",
+        " to something other than sequential"
+      )
     }
-    if (is.character(thePlan))
+    if (is.character(thePlan)) {
       if (!is(originalFuturePlan, thePlan)) {
         if (grepl("callr", thePlan)) {
           future::plan(future.callr::callr)
@@ -155,6 +189,7 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
           future::plan(thePlan)
         }
       }
+    }
 
     # Set up element in simList for recording the memory use stuff
     sim@.xData$.memoryUse <- list()
@@ -166,9 +201,11 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
     checkPath(dirname(sim@.xData$.memoryUse$filename), create = TRUE)
 
     sim@.xData$.memoryUse$futureObj <-
-      futureOngoingMemoryThisPid(seconds = Inf,
-                                 interval = getOption("spades.memoryUseInterval", 0.2),
-                                 outputFile = sim@.xData$.memoryUse$filename)
+      futureOngoingMemoryThisPid(
+        seconds = Inf,
+        interval = getOption("spades.memoryUseInterval", 0.2),
+        outputFile = sim@.xData$.memoryUse$filename
+      )
     initialFileDoesntExist <- !file.exists(sim@.xData$.memoryUse$filename)
     if (initialFileDoesntExist) {
       message("Pausing while memoryUse infrastructure is set up (should take <5 seconds)")
@@ -185,9 +222,9 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       stop("memoryUse encountered an error; perhaps logPath(sim) not writable?")
     }
 
-    if (initialFileDoesntExist)
+    if (initialFileDoesntExist) {
       message("\bDone!")
-
+    }
   } else {
     stop(futureMessage)
   }
@@ -233,5 +270,5 @@ outputFilename <- function(thisPid) {
 
 futureMessage <- paste0(
   "To use 'spades.memoryUseInterval', packages 'future' and 'future.callr' must be installed:\n",
-  "  install.packages(c('future', 'future.callr'))")
-
+  "  install.packages(c('future', 'future.callr'))"
+)

@@ -30,7 +30,12 @@
 * several corrections to messaging when there is nested simLists, i.e., when simInit is called within a module; 
 * new function `doCallSafe` that can be used for `doCallSafe(simInitAndSpades, out)`, and it does not suffer from the slow downs of `do.call`; 
 * many changes to accommodate updates to `reproducible` package, specifically the `Cache` function. These include
-  - 
+* documentation improvements;
+
+# SpaDES.core 2.1.8
+
+* changes to a sporadically failing test;
+
 # SpaDES.core 2.1.6
 
 * drop support for R 4.2;

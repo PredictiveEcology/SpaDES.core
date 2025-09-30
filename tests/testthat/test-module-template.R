@@ -86,6 +86,7 @@ test_that("newModule with events and functions", {
   testInit("ggplot2")
   nm <- "test"
   unlink(dir(Require::tempdir2(), pattern = nm, full.names = TRUE), recursive = TRUE)
+  hello <- "__.H._.E._.L._.L._.O.__"
   newModule(
     nm,
     path = Require::tempdir2(),
@@ -109,7 +110,8 @@ test_that("newModule with events and functions", {
       }
     ),
     func = function(x) {
-      message("hi")
+      message("__.H._.E._.L._.L._.O.__")
+      # message(hello)
     },
     Init = function(sim) {
       sim$dd <- "no way"
@@ -128,7 +130,7 @@ test_that("newModule with events and functions", {
   pdf(pdfFile)
   mess <- capture_messages(
     out <- simInitAndSpades(
-      modules = "test",
+      modules = nm,
       times = list(start = 0, end = 2),
       paths = list(modulePath = Require::tempdir2())
     )
@@ -142,7 +144,7 @@ test_that("newModule with events and functions", {
   expect_true(out$a == 2)
   expect_true(out$b == 3)
   yrsSimulated <- (end(out) - start(out))
-  expect_true(sum(grepl("hi", mess)) == yrsSimulated)
+  expect_true(sum(grepl(hello, mess)) == yrsSimulated)
   expect_true(NROW(completed(out)) == yrsSimulated +
                 (NROW(.coreModules()) - 1) + length(c(".inputObjects", "next1", "init")))
   expect_true(NROW(events(out)) == 1)

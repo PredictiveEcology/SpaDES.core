@@ -55,7 +55,8 @@ plot time and leave it, i.e., \emph{not} \code{NA}.}
 This is useful when the plotting function is not creating a \code{ggplot} object,
 e.g., plotting a \code{RasterLayer}.}
 
-\item{envir}{The environment to search in.}
+\item{envir}{The environment where the \code{data} argument should be evaluated if it is
+a \code{call}. Normally, this should be left at its default, \code{parent.frame()}.}
 
 \item{...}{Anything needed by \code{fn}, all named.}
 }

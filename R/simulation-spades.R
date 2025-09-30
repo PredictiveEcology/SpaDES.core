@@ -1422,7 +1422,6 @@ setMethod(
   }
 
   if (any(cur[["moduleName"]] %in% getOption("spades.debugModule"))) {
-    # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
     browser()
   }
   if (.pkgEnv[["spades.browserOnError"]]) {
@@ -2024,7 +2023,7 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 loggingMessagePrefixLength <- 15
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
-  if (!isTRUE(any(grepl(.txtNoPrefix, mess)))) {
+  if (!isTRUE(any(grepl(.message$NoPrefix, mess)))) {
     st <- Sys.time()
     stForm1 <- "%h%d"
     stForm2 <- paste(stForm1, "%H:%M:%S")
@@ -2078,7 +2077,7 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
       }
     }
   } else {
-    mess <- gsub(.txtNoPrefix, "", mess)
+    mess <- gsub(.message$NoPrefix, "", mess)
   }
 
   mess
@@ -2235,7 +2234,7 @@ debugMessTRUE <- function(sim, events) {
   evnts1[1L, ] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]],"s"), evnts1)
   evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
   evnts1[1L, 1L] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]][1L], "s"), evnts1[1L, 1L])
-  if (.pkgEnv[[".spadesDebugFirst"]]) {
+  if (isTRUE(.pkgEnv[[".spadesDebugFirst"]])) {
     evnts2 <- evnts1
     evnts2[1L:2L, ] <- rbind(sprintf(paste0("%-",sim[["._spadesDebugWidth"]], "s"), names(evnts2)),
                              sprintf(paste0("%-",sim[["._spadesDebugWidth"]], "s"), evnts2))
@@ -2311,6 +2310,11 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
       # need to check for non-object (e.g., function, params, depends) that could have changed
       # checkParams
       sPoss <- .robustDigest(Copy(sim, objects = FALSE))
+      # outputs are not necessary in this evaluation; just like in .robustDigest
+      sPossNames <- names(sPoss[["depends"]][[cur[["moduleName"]]]])
+      sPoss[["depends"]][[cur[["moduleName"]]]] <-
+        sPoss[["depends"]][[cur[["moduleName"]]]][outputsRmDontNeedForCache(sPossNames, "outputObjects")]
+
       scNePreDigests <- scNe$tagValue["preDigest" == scNe$tagKey]
 
       wh <- c("params", "depends")
@@ -2324,9 +2328,9 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
       # preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
       # grepVal <- paste0("sim\\.\\.list\\.", cur[["moduleName"]], preModCall, moduleCall)
       # Check that function itself (.inputObject or doEvent.XXX) has not changed
-      grepVal <- paste0("sim..list.", cur[["moduleName"]], ".", moduleCall)
+      grepVal <- paste0("sim..list.", cur[["moduleName"]], ".", .moduleFunctionsNam, ".", moduleCall)
       scFn <- startsWith(scNePreDigests, grepVal) # grepl(scNePreDigests, pattern = grepVal)
-      a <- .robustDigest(sim[[".mods"]][[cur[["moduleName"]]]][[moduleCall]])
+      a <- .robustDigest(sim[[dotMods]][[cur[["moduleName"]]]][[moduleCall]])
       b <- gsub(".+:(.+)", "\\1", scNePreDigests[scFn])
       noChanges[length(noChanges)] <- (a %in% b)
       noChange <- all(noChanges)

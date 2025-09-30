@@ -112,7 +112,10 @@ cantCodeCheckMessage <- ": line could not be checked "
         isNull <- unlist(lapply(y, is.null))
         if (any(isNull))
           y <- y[!unlist(isNull)]
-        isNA <- unlist(lapply(y, is.na))
+
+        # Eliot changed this Sept 2025: functions/closures cannot have `is.na`
+        isNA <- unlist(lapply(y, function(yy) if (!is.function(yy)) is.na(yy) else FALSE))
+
         if (any(isNA))
           y <- y[!isNA]
         y <- y[unlist(lapply(y, is.character))]

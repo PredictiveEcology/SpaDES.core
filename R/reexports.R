@@ -26,7 +26,8 @@ layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
 .updateTagsRepo <- getFromNamespace(".updateTagsRepo", "reproducible")
 .addTagsRepo <- getFromNamespace(".addTagsRepo", "reproducible")
 ._prepInputsMetadata <- getFromNamespace("._prepInputsMetadata", "reproducible")
-.txtNoPrefix <- getFromNamespace(".txtNoPrefix", "reproducible")
+# .txtNoPrefix <- getFromNamespace(".txtNoPrefix", "reproducible")
+cacheId <- getFromNamespace("cacheId", "reproducible")
 
 makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 

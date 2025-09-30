@@ -35,10 +35,6 @@ test_that("test event-level cache & memory leaks", {
   )
 
   set.seed(1123)
-  # ._robustDigest_2 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<- ._Cache_11 <<- ._Cache_13 <<- 1
-  #._addTagsToOutput_2 <<- 1
-
-  # expect_false("Loaded!" %in%
   mess1 <- capture_messages({
                   sims <- spades(Copy(mySim), notOlderThan = Sys.time(), debug = FALSE)
                 })
@@ -130,8 +126,12 @@ test_that("test event-level cache & memory leaks", {
   expect_true(!grepl("crazyFunction", warnsFormula))
   expect_true(!grepl("function", warnsFormula))
 
-  sims$.mods$caribouMovement$.objects$crazyFunction <- function() rnorm(1)
+  # This memory leak seems to have been fixed by moving the functions
+  sims[[dotObjs]]$caribouMovement$crazyFunction <- function() rnorm(1)
+  # sims[[dotObjs]]$caribouMovement$.objects$crazyFunction <- function() rnorm(1)
+  # sim@.xData[[dotObjs]][[cur[["moduleName"]]]]
   end(sims) <- end(sims) + 0.1
+  # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
   mess <- capture.output({
     warnsFunction <- capture_warnings({
       simsOut <- spades(sims, debug = FALSE)
@@ -144,7 +144,8 @@ test_that("test event-level cache & memory leaks", {
   expect_true(grepl("mod", warnsFunction))
   expect_true(!grepl("formula", warnsFunction))
 
-  sims$.mods$caribouMovement$.objects$crazyFormula <- formula(hi ~ test)
+  sims[[dotObjs]]$caribouMovement$crazyFormula <- formula(hi ~ test)
+  # sims$.mods$caribouMovement$.objects$crazyFormula <- formula(hi ~ test)
   end(sims) <- end(sims) + 0.1
   mess <- capture.output({
     warnsFormula <- capture_warnings({
@@ -314,7 +315,7 @@ test_that("test .robustDigest for simLists", {
                      "Setting", "Paths", "using dataPath", "Using setDTthreads",
                      "with user supplied tags",
                      "There is no similar item in the cachePath", "elpsd",
-                     "Saving", "Done", "Elapsed time for", sep = "|")
+                     "Saving", "Done", "Elapsed time for", .message$dashes, sep = "|")
   expect_true(all(cli::ansi_grepl(msgGrep11, mess1)))
 
   msgGrep <- "Running .input|loaded cached copy|module code|Setting|Paths"
@@ -330,7 +331,9 @@ test_that("test .robustDigest for simLists", {
   xxx[editBelowLine + 1] <- newCode
   cat(xxx, file = fileName, sep = "\n")
 
+  oo <- capture.output(
   mess1 <- capture_messages(do.call(simInit, args))
+  )
   expect_true(all(grepl(msgGrep11, mess1)))
 
   # make change elsewhere (i.e., not .inputObjects code) -- should NOT rerun .inputObjects
@@ -349,12 +352,12 @@ test_that("test .robustDigest for simLists", {
   try(clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   args$params <- list(test = list(.useCache = c(".inputObjects", "init")))
   bbb <- do.call(simInit, args)
-  opts <- options(spades.saveSimOnExit = FALSE)
+  opts <- withr::local_options(spades.saveSimOnExit = FALSE)
   expect_silent({
-    aaMess <- capture_messages(spades(bbb, debug = FALSE))
+    aaMess <- capture_messages(spades(bbb, debug = FALSE, .plotInitialTime = NA))
   })
   options(opts)
-  mess31 <- capture_messages(spades(bbb, debug = TRUE))
+  mess31 <- capture_messages(spades(bbb, debug = TRUE, .plotInitialTime = NA))
   expect_true(LoadedMgsCheck(mess31, "init"))
   # expect_true(sum(grepl("Loaded!|for init event", mess31)) == 2)
 
@@ -370,13 +373,13 @@ test_that("test .robustDigest for simLists", {
   expect_true(any(grepl(format(bbb@.xData$.mods$test$Init), pattern = newCode)))
 
   # should NOT use Cached copy, so no message
-  opts <- options(spades.saveSimOnExit = FALSE)
-  aaa <- capture_messages(spades(bbb, debug = TRUE))
-  expect_false(LoadedMgsCheck(aaa, "init"))
-  # aa <- sum(grepl("Loaded! Cached", aaa))
+  opts <- withr::local_options(spades.saveSimOnExit = FALSE)
+  bbbbb <- capture_messages(spades(bbb, debug = TRUE, .plotInitialTime = NA))
+  expect_false(LoadedMgsCheck(bbbbb, "init"))
+  # aa <- sum(grepl("Loaded! Cached", bbbbb))
   # expect_true(aa == 0) # seems to vary stochastically; either is OK
   options(opts)
-  mess111 <- capture_messages(spades(bbb, debug = TRUE))
+  mess111 <- capture_messages(spades(bbb, debug = TRUE, .plotInitialTime = NA))
   expect_true(LoadedMgsCheck(mess111, "init"))
   # expect_true(sum(grepl("Loaded! Cached|for init event", mess111)) == 2)
 })
@@ -477,7 +480,7 @@ test_that("Cache sim objs via .Cache attr", {
                    params = list(test = list(.useCache = "init")))
   mySim$co4 <- 5
   mySim$co5 <- 6
-  mySim2 <- spades(Copy(mySim))
+  mySim2 <- spades(Copy(mySim), .plotInitialTime = NA)
   expect_true(mySim2$co1 == 1)
   expect_true(mySim2$co2 == 1)
   expect_true(mySim2$co3 == 1)
@@ -485,7 +488,8 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim2$co5 == 6)
 
   # Test mod
-  expect_true(mySim2$.mods$test$.objects$hello == 2)
+  # expect_true(mySim2$.mods$test$.objects$hello == 2)
+  expect_true(mySim2[[dotObjs]]$test$hello == 2)
 
   mySim <- simInit(paths = list(modulePath = tmpdir), modules = as.list(m[1]),
                    objects = list(co4 = 3, co3 = 2, co1 = 4), params =
@@ -494,7 +498,7 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
   # expect_true(is.null(mySim$.mods$test$hi)) # hi was removed from module
-  mySim2 <- spades(Copy(mySim))
+  mySim2 <- spades(Copy(mySim), .plotInitialTime = NA)
   # expect_true(mySim2$.mods$test$hi == 1) # hi was removed from module
   expect_true(mySim2$co1 == 1) # was affected
   expect_true(mySim2$co2 == 1)# was affected
@@ -507,11 +511,12 @@ test_that("Cache sim objs via .Cache attr", {
   # expect_true(is.null(mySim$.mods$test$hi)) # is not in the
   # ._prepareOutput_5 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<-  1
   mess1 <- capture_messages({
-    mySim2 <- spades(Copy(mySim), debug = TRUE)
+    mySim2 <- spades(Copy(mySim), debug = TRUE, .plotInitialTime = NA)
   })
   # expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
   # Test mod
-  expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
+  expect_true(mySim2[[dotObjs]]$test$hello == 2) # recovered in Cache
+  # expect_true(mySim2$.mods$test$.objects$hello == 2) # recovered in Cache
 
   expect_true(LoadedMgsCheck(mess1, "init"))
 
@@ -599,10 +604,10 @@ test_that("test showSimilar", {
     outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
   )
 
-  out1 <- spades(Copy(mySim))#, showSimilar = TRUE)
+  out1 <- spades(Copy(mySim), .plotInitialTime = NA)#, showSimilar = TRUE)
   params(mySim)$randomLandscapes$nx <- 101
   mess <- capture_messages({
-    out2 <- spades(Copy(mySim))#, showSimilar = TRUE)
+    out2 <- spades(Copy(mySim), .plotInitialTime = NA)#, showSimilar = TRUE)
   })
   mySim$a <- 1
   mess <- capture_messages({
@@ -610,14 +615,16 @@ test_that("test showSimilar", {
   })
   expect_false(any(grepl("Cache of.*differs", mess))) ## Now it is function-specific -- no previous spades call
   mySim$a <- 2
-  mess <- capture_messages({
-    out4 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
-  })
-  expect_true(any(grepl("Cache of.*differs", mess)))
+  oo <- capture.output(
+    mess <- capture_messages({
+      out4 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
+    })
+  )
+  expect_true(any(grepl("Cache of.*differs|different elements", mess)))
   mess <- capture_messages({
     out5 <- Cache(spades, Copy(mySim), showSimilar = TRUE)
   })
-  expect_false(any(grepl("Cache of.*differs", mess)))
+  expect_false(any(grepl("Cache of.*differs|different elements", mess)))
 })
 
 test_that("test multipart cache file", {
@@ -645,11 +652,11 @@ test_that("test multipart cache file", {
   )
 
   expect_no_error({
-    out1 <- Cache(spades(Copy(mySim)))
+    out1 <- Cache(spades(Copy(mySim), .plotInitialTime = NA))
   })
   end(out1) <- 2
   expect_no_error({
-    out2 <- Cache(spades(Copy(out1)))
+    out2 <- Cache(spades(Copy(out1), .plotInitialTime = NA))
   })
 })
 
@@ -673,7 +680,7 @@ test_that("multifile cache saving", {
   }
   s <- simInit()
   s$ras <- randomPolyToDisk2(tmpfile)
-  s2 <- Cache(spades(s))
+  s2 <- Cache(spades(s, .plotInitialTime = NA))
   expect_true(identical(Filenames(s2), Filenames(s)))
 })
 
@@ -695,14 +702,9 @@ test_that("cache of terra objects in the depends", {
   }
 })
 
-
-
-
 test_that("caching simInitAndSpades specifically", {
   skip_on_cran() # too long
   testInit(sampleModReqdPkgs)
-
-  set.seed(42)
 
   times <- list(start = 0.0, end = 1, timeunit = "year")
   params <- list(
@@ -716,20 +718,24 @@ test_that("caching simInitAndSpades specifically", {
 
   fns <- c(simInitAndSpades, simInit)
   for (fn in fns) {
-    paths <- list(modulePath = getSampleModules(tmpdir))
+    paths <- list(modulePath = asPath(getSampleModules(tmpdir)))
     fileNames <- file.path(paths$modulePath, modules, paste0(modules, ".R"))
     mySimEvent <- list()
+    mess <- list()
     for (i in 1:3) {
       if (identical(i, 3L)) {
         cat(append = TRUE, sep = "\n", fill = FALSE, file = fileNames[1],
             "newFun <- function(sim) return(invisible(sim))")
       }
-      mySimEvent[[i]] <- fn(modules = modules, paths = paths, times = times) |>
-        reproducible::Cache()
+      set.seed(42)
+      mySimEvent[[i]] <- fn(modules = modules, paths = paths, times = times,
+                            .plotInitialTime = NA) |>
+        Cache(.cacheExtra = asPath(dir(paths$modulePath, recursive = TRUE, full.names = T)))
       if (identical(i, 2L))
         expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
-      if (identical(i, 3L))
+      if (identical(i, 3L)) {
         expect_false(identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[3]])))
+      }
     }
 
   }
@@ -745,8 +751,9 @@ test_that("caching simInitAndSpades specifically", {
         cat(append = TRUE, sep = "\n", fill = FALSE, file = fileNames[1],
             "newFun <- function(sim) return(invisible(sim))")
       }
-      mySimEvent[[i]] <- do.call(fn, list(l = list(modules = modules, paths = paths, times = times))) |>
-        reproducible::Cache()
+      mySimEvent[[i]] <- do.call(fn, list(l = list(modules = modules, paths = paths, times = times,
+                                                   .plotInitialTime = NA))) |>
+        Cache(.cacheExtra = asPath(dir(paths$modulePath, recursive = TRUE, full.names = T)))
       if (identical(i, 2L))
         expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
       if (identical(i, 3L))

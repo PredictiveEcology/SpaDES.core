@@ -15,13 +15,15 @@ test_that("local mod object", {
   mySim <- simInit(times = list(start = 0, end = 0),
                    paths = list(modulePath = tmpdir), modules = c("test", "test2"))
 
-  expect_true(mySim$.mods$test2$.objects$y == "This module")
+  expect_true(mySim[[dotObjs]]$test2$y == "This module")
+  # expect_true(mySim$.mods$test2$.objects$y == "This module")
   out2 <- spades(Copy(mySim))
   out3 <- Cache(spades, Copy(mySim)) ## TODO: failure due to NULL current module
   mess <- capture_messages({
     out4 <- Cache(spades, Copy(mySim)) # should get cached
   })
   out <- spades(mySim)
+
 
   ## Test the Par stuff
   expect_true(identical(out2$testPar1, params(out2)$test$testParA))
@@ -34,39 +36,39 @@ test_that("local mod object", {
   expect_true(identical(out4$testPar2, params(out4)$test2$testParB))
 
   ## Test the results
-  expect_true(out$.mods$test$.objects$a == 2) # object that results from addition
-  expect_true(out$.mods$test2$.objects$a == 1) # object that results from addition
-  expect_true(out$.mods$test2$.objects$b == 2) # object that results from addition -- didn't collide with sim$test$a
-  expect_true(out$.mods$test$.objects$x == "sdf") # correct module, i.e., x is in test, and is sdf
-  expect_true(is.null(out$.mods$test2$.objects$x)) # wrong module, i.e., x is in test
-  expect_true(!is.null(mySim$.mods$test$.objects$x)) # .inputObjects is run
-  expect_true(!is.null(mySim$.mods$test2$.objects$y)) # .inputObjects is run
-  expect_true(out$.mods$test2$.objects$y == "This module is test2") # paste0 from .inputObjects & event1 event
+  expect_true(out[[dotObjs]]$test$a == 2) # object that results from addition
+  expect_true(out[[dotObjs]]$test2$a == 1) # object that results from addition
+  expect_true(out[[dotObjs]]$test2$b == 2) # object that results from addition -- didn't collide with sim$test$a
+  expect_true(out[[dotObjs]]$test$x == "sdf") # correct module, i.e., x is in test, and is sdf
+  expect_true(is.null(out[[dotObjs]]$test2$x)) # wrong module, i.e., x is in test
+  expect_true(!is.null(mySim[[dotObjs]]$test$x)) # .inputObjects is run
+  expect_true(!is.null(mySim[[dotObjs]]$test2$y)) # .inputObjects is run
+  expect_true(out[[dotObjs]]$test2$y == "This module is test2") # paste0 from .inputObjects & event1 event
 
   ## Post Copy(mySim)
-  expect_true(out2$.mods$test$.objects$a == 2)
-  expect_true(out2$.mods$test2$.objects$a == 1)
-  expect_true(out2$.mods$test2$.objects$b == 2)
-  expect_true(is.null(out2$.mods$test2$.objects$x))
-  expect_true(!is.null(out2$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out2$.mods$test2$.objects$y == "This module is test2")
+  expect_true(out2[[dotObjs]]$test$a == 2)
+  expect_true(out2[[dotObjs]]$test2$a == 1)
+  expect_true(out2[[dotObjs]]$test2$b == 2)
+  expect_true(is.null(out2[[dotObjs]]$test2$x))
+  expect_true(!is.null(out2[[dotObjs]]$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out2[[dotObjs]]$test2$y == "This module is test2")
 
   ## Cache -- using the first time through
-  expect_true(out3$.mods$test$.objects$a == 2)
-  expect_true(out3$.mods$test2$.objects$a == 1)
-  expect_true(out3$.mods$test2$.objects$b == 2)
-  expect_true(is.null(out3$.mods$test2$.objects$x))
-  expect_true(!is.null(out3$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out3$.mods$test2$.objects$y == "This module is test2")
+  expect_true(out3[[dotObjs]]$test$a == 2)
+  expect_true(out3[[dotObjs]]$test2$a == 1)
+  expect_true(out3[[dotObjs]]$test2$b == 2)
+  expect_true(is.null(out3[[dotObjs]]$test2$x))
+  expect_true(!is.null(out3[[dotObjs]]$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out3[[dotObjs]]$test2$y == "This module is test2")
 
   ## Cached copy
   expect_true(any(grepl("Loaded! Cached", mess)))
-  expect_true(out4$.mods$test$.objects$a == 2) ## TODO: fails (gets NULL)
-  expect_true(out4$.mods$test2$.objects$a == 1) ## TODO: fails (gets NULL)
-  expect_true(out4$.mods$test2$.objects$b == 2) ## TODO: fails (gets NULL)
-  expect_true(is.null(out4$.mods$test2$.objects$x))
-  expect_true(!is.null(out4$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out4$.mods$test2$.objects$y == "This module is test2") ## TODO: fails (gets 'This module')
+  expect_true(out4[[dotObjs]]$test$a == 2) ## TODO: fails (gets NULL)
+  expect_true(out4[[dotObjs]]$test2$a == 1) ## TODO: fails (gets NULL)
+  expect_true(out4[[dotObjs]]$test2$b == 2) ## TODO: fails (gets NULL)
+  expect_true(is.null(out4[[dotObjs]]$test2$x))
+  expect_true(!is.null(out4[[dotObjs]]$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out4[[dotObjs]]$test2$y == "This module is test2") ## TODO: fails (gets 'This module')
 
   ## Test P replace method
   mySim3 <- simInit(times = list(start = 0, end = 0),
@@ -159,9 +161,8 @@ test_that("local mod object", {
 
 test_that("convertToPackage testing", {
   skip_on_cran()
-  skip_if_not_installed(c("ggplot2", "pkgload", "roxygen2"))
 
-  testInit(c("roxygen2", "ggplot2"), smcc = FALSE, debug = FALSE,
+  testInit(c("ggplot2", "pkgload", "roxygen2"), smcc = FALSE, debug = FALSE,
            opts = list(reproducible.useMemoise = FALSE,
                        spades.moduleDocument = TRUE))
 
