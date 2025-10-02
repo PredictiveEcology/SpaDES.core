@@ -600,7 +600,6 @@ setMethod(
   ".prepareOutput",
   signature = "simList",
   definition = function(object, cachePath, ...) {
-    # if ("Biomass_borealDataPrep" %in% currentModule(object)) browser()
     simFromCache <- object # rename for internal purposes
     hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
     if (hasDotObjs %in% FALSE) {

@@ -998,53 +998,39 @@ setMethod(
             sim <- memoryUseOnExit(sim, originalPlan)
           }, add = TRUE)
         } else {
-          stop(futureMessage)
+          stop(.message$futureMessage)
         }
       }
 
       # timeunits gets accessed every event -- this should only be needed once per simList
       sim@.xData$.timeunits <- timeunits(sim)
       on.exit({
-        # if (!.pkgEnv[["skipNamespacing"]])
-        #   .modifySearchPath(.pkgEnv$searchPath, removeOthers = TRUE)
         rm(".timeunits", envir = sim@.xData)
 
 
         ## RecoverMode Step 2 -- on exit
         if (isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
           sim <- saveSimOnExit(recoverMode, sim, rmo)
-          # if (!isTRUE(.pkgEnv$.cleanEnd)) {
-          #   if (recoverMode > 0) {
-          #     sim <- recoverModeOnExit(sim, rmo, recoverMode)
-          #   }
-          #   messageInterrupt1(recoverMode)
-          # } else {
-          #   message(cli::col_magenta("simList saved in"), "\n",
-          #           cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
-          #           cli::col_magenta("It will be deleted at next spades() call."))
-          # }
-          # svdSimEnv <- savedSimEnv() # can't assign to a function
-          # svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
-          # .pkgEnv$.cleanEnd <- NULL
         }
         ## RecoverMode Step 2 -- End
 
         # For restarting R -- a few extra pieces, including saving the simList as the last thing
-        if (!is.null(sim$._restartRList)) {
-          sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
-          sim$._restartRList$.spadesCall <- match.call()
-
-          restartFormals <- formals(restartR)
-          # can change end(sim) back to original now because we are already ending
-          end(sim) <- sim$._restartRList$endOrig
-          restartR(
-            sim = sim,
-            reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
-            .First = getOption("spades.restartR..First", restartFormals$.First),
-            .RDataFile = getOption("spades.restartR.filename", sim$._restartRList$simFilename),
-            restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
-          )
-        }
+        # if (!is.null(sim$._restartRList)) {
+        #   sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
+        #   sim$._restartRList$.spadesCall <- match.call()
+        #
+        #   restartFormals <- formals(restartR)
+        #   # can change end(sim) back to original now because we are already ending
+        #   end(sim) <- sim$._restartRList$endOrig
+        #   browser()
+        #   restartR(
+        #     sim = sim,
+        #     reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
+        #     .First = getOption("spades.restartR..First", restartFormals$.First),
+        #     .RDataFile = getOption("spades.restartR.filename", sim$._restartRList$simFilename),
+        #     restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
+        #   )
+        # }
 
         # seconds <- "secs"
         # sim$._totalElapsedTime <- difftime(Sys.time(), sim$._startClockTime, units = seconds)
@@ -1229,6 +1215,22 @@ setMethod(
 
       # For determining if clean ending to spades call
       .pkgEnv$.cleanEnd <- TRUE
+
+      if (!is.null(sim$._restartRList)) {
+        sim@simtimes[["current"]] <- sim@events[[1]]$eventTime
+        sim$._restartRList$.spadesCall <- match.call()
+
+        restartFormals <- formals(restartR)
+        # can change end(sim) back to original now because we are already ending
+        end(sim) <- sim$._restartRList$endOrig
+        restartR(
+          sim = sim,
+          reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
+          .First = getOption("spades.restartR..First", restartFormals$.First),
+          .RDataFile = getOption("spades.restartR.filename", sim$._restartRList$simFilename),
+          restartDir = getOption("spades.restartR.restartDir", restartFormals$restartDir)
+        )
+      }
       return(invisible(sim))
     },
     warning = function(w) {
@@ -2550,6 +2552,7 @@ saveSimOnExit <- function(recoverMode, sim, rmo) {
   svdSimEnv <- savedSimEnv() # can't assign to a function
   svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
   .pkgEnv$.cleanEnd <- NULL
+  sim
 }
 
 recoverModeTypo <- function() {
