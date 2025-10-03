@@ -5,13 +5,13 @@ utils::globalVariables(c(
 
 doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    if (is.null(P(sim, module = ".restartR")$.restartRInterval))
+    if (is.null(P(sim)$.restartRInterval))
       params(sim)$restartR$.restartRInterval <- getOption("spades.restartRInterval")
-    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim, module = ".restartR")$.restartRInterval,
+    sim <- scheduleEvent(sim, time(sim, timeunit(sim)) + P(sim)$.restartRInterval,
                          "restartR", "restartR", .last())
 
   } else if (eventType == "restartR") {
-    nextTime <- time(sim, timeunit(sim)) + P(sim, module = ".restartR")$.restartRInterval
+    nextTime <- time(sim, timeunit(sim)) + P(sim)$.restartRInterval
 
     # This next step of creating this list is critical -- it is the trigger for on.exit in spades
     sim$._restartRList <- list()
@@ -96,7 +96,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   if (is.null(sim)) {
     sim <- savedSimEnv()$.sim
     messageVerbose("sim not supplied, using \n",
-            "sim <- savedSimEnv()$.sim", verbose = verbose)
+                   "sim <- savedSimEnv()$.sim", verbose = verbose)
   }
   if (is.character(sim)) {
     sim <- SpaDES.core::loadSimList(sim)
@@ -198,8 +198,8 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       }
 
       message(cli::col_blue("Reversing event: ",
-                           paste(collapse = " ",
-                                 paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
+                            paste(collapse = " ",
+                                  paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
       invisible()
     })
 
@@ -396,7 +396,10 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   if (is.null(sim$._restartRList)) sim$._restartRList <- list()
   sim$._restartRList$envvars <- as.list(Sys.getenv())
 
-  sim$._restartRList$opts <- options()
+  o <- options()
+  rmBCFullEnvir <- grep("env", names(o))
+  o[rmBCFullEnvir] <- NULL
+  sim$._restartRList$opts <- o
   if ("raster" %in% attached) {
     invisible(capture.output({
       sim$._restartRList$optsRaster <- raster::rasterOptions()
@@ -405,12 +408,13 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     sim$._restartRList$optsRaster$depwarning <- NULL
   }
 
+  filename <- basename(tempfile())
   sim$._restartRList$simFilename <- file.path(.newDir, paste0(
-    basename(file), "_time",
+    filename, "_time",
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
 
   ## ensure correct file extension
-  sim$._restartRList$simFilename <- raster::extension(sim$._restartRList$simFilename, ".qs")
+  sim$._restartRList$simFilename <- paste0(sim$._restartRList$simFilename, ".qs")
 
   # sim$._restartRList$endOrig <- end(sim)
   sim$._restartRList$startOrig <- start(sim)
@@ -427,9 +431,9 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
   saveSimListFormals <- formals(saveSimList)
   saveSimList(
     sim,
-    filename = getOption("spades.saveSimList.filename", sim$._restartRList$simFilename),
-    fileBackend = getOption("spades.saveSimList.fileBackend", 0),
-    filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir)
+    filename = getOption("spades.saveSimList.filename", sim$._restartRList$simFilename)#,
+    # fileBackend = getOption("spades.saveSimList.fileBackend", 0),
+    # filebackedDir = getOption("spades.saveSimList.filebackedDir", saveSimListFormals$filebackedDir)
   )
 
   # from pryr::mem_used
@@ -460,9 +464,10 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     rm(list = ls(all.names = TRUE, envir = .GlobalEnv), envir = .GlobalEnv)
 
     # Need load to get custom .First fn
-    rstudioapi::restartSession(paste0("{load('", .RDataFile, "'); ",
+    rstudioapi::restartSession(paste0("{browser();
+                                      load('", .RDataFile, "'); ",
                                       "sim <- .First(); ",
-                                      "sim <- eval(.spadesCall)}"))
+                                      "sim <- eval(.spadesCall)}"), clean = TRUE)
   } else {
     #reg.finalizer(.GlobalEnv, function(e) system("R --no-save"), TRUE)
     # R cmd line loads .RData first, then .First, if there is one.
@@ -542,6 +547,7 @@ First <- function(...) {
   # From Rstudio, it gets all the correct, session-specific files.
   #   From R, it does not. Only has the commandArgs -- must rebuild objects
   fromRCmd <- FALSE
+  browser()
   if (!exists(".attachedPkgsFilename")) {
     fromRCmd <- TRUE
     .rndString <- list(...)$.rndString
@@ -549,7 +555,7 @@ First <- function(...) {
     load(file.path(.newDir, ".RData"))
   }
 
-  setwd(.oldWd)
+  # setwd(.oldWd)
 
   # attachedPkgsFilename <- file.path("~", paste0(".", .rndString), ".attachedPkgs.RData")
   load(.attachedPkgsFilename) # for "attached" object
@@ -596,11 +602,11 @@ First <- function(...) {
   if (!(Sys.getenv("RSTUDIO") == "1")) {
     sim <- eval(.spadesCall)
     message(cli::col_green("Because restartR was used, the simList is located in the location above.",
-                          " It should be assigned to an object immediately: e.g.,\n",
-                          "sim <- Copy(savedSimEnv()$.sim)"))
+                           " It should be assigned to an object immediately: e.g.,\n",
+                           "sim <- Copy(savedSimEnv()$.sim)"))
   } else {
     message(cli::col_green("Because restartR was used, the simList is now saved in the .GlobalEnv",
-                          " named 'sim' (which may not be the same as the original assignment)"))
+                           " named 'sim' (which may not be the same as the original assignment)"))
   }
   return(sim)
 }

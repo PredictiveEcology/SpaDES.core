@@ -46,6 +46,7 @@ setMethod("Copy",
           signature(object = "simList"),
           definition = function(object,
                                 objects, queues, modules, ...) {
+
             if (missing(objects)) objects <- TRUE
             if (missing(queues)) queues <- TRUE
             if (missing(modules)) modules <-  TRUE

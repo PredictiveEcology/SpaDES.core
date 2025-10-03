@@ -5,6 +5,11 @@ utils::globalVariables(c(
 ## non-exported imports from other packages -------------------------------------
 
 .message <- getFromNamespace(".message", "reproducible") ## envir for messages + message-funs
+.message$futureMessage <- paste0(
+  "To use 'spades.memoryUseInterval', packages 'future' and 'future.callr' must be installed:\n",
+  "  install.packages(c('future', 'future.callr'))"
+)
+
 .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
 
 ## TODO: why aren't these properly exported if intended for use?
