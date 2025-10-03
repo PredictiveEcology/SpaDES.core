@@ -33,6 +33,7 @@ test_that("downloadData downloads and unzips module data", {
       objectName = c("DEM", "habitatQuality"),
       objectClass = "RasterLayer",
       sourceURL = c(
+        ## TODO: these don't exist on main branch yet, so they will fail!
         "https://raw.githubusercontent.com/PredictiveEcology/SpaDES.core/main/inst/maps/DEM.tif",
         "https://raw.githubusercontent.com/PredictiveEcology/SpaDES.core/main/inst/maps/habitatQuality.tif"
       ),
