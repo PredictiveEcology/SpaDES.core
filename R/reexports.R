@@ -7,7 +7,7 @@ utils::globalVariables(c(".", "inequality", "keepBasedOnRedundantInequalities", 
   "To use 'spades.memoryUseInterval', packages 'future' and 'future.callr' must be installed:\n",
   "  install.packages(c('future', 'future.callr'))"
 )
-.quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot") ## TODO: remove
+.quickPlotEnv <- new.env(parent = emptyenv()) ## TODO: remove
 
 ## TODO: why aren't these properly exported if intended for use?
 ## see <https://github.com/PredictiveEcology/Require/issues/105>
