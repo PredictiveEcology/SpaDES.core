@@ -1,6 +1,4 @@
-utils::globalVariables(c(
-  ".", "inequality", "keepBasedOnRedundantInequalities", "verbose"
-))
+utils::globalVariables(c(".", "inequality", "keepBasedOnRedundantInequalities", "verbose"))
 
 ## non-exported imports from other packages -------------------------------------
 
@@ -9,6 +7,7 @@ utils::globalVariables(c(
   "To use 'spades.memoryUseInterval', packages 'future' and 'future.callr' must be installed:\n",
   "  install.packages(c('future', 'future.callr'))"
 )
+.quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot") ## TODO: remove
 
 ## TODO: why aren't these properly exported if intended for use?
 ## see <https://github.com/PredictiveEcology/Require/issues/105>
