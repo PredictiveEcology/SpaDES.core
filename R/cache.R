@@ -819,9 +819,13 @@ setMethod(
             object@depends@dependencies[[cmod]]@outputObjects$objectName
           })
           outputsFromTheseMods <- unlist(outputsFromTheseMods)
-          simPost@outputs <- rbindlist(list(
+
+          ooo <- rbindlist(list(
             simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
-            use.names = TRUE, fill = TRUE) |> unique()
+            use.names = TRUE, fill = TRUE)
+          allowedColumnsForUnique <- (sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE
+          simPost@outputs <- unique(ooo, by = names(ooo)[allowedColumnsForUnique])
+
         }
 
 
