@@ -614,7 +614,6 @@ setMethod(
   ".prepareOutput",
   signature = "simList",
   definition = function(object, cachePath, ...) {
-    # if ("Biomass_borealDataPrep" %in% currentModule(object)) browser()
     simFromCache <- object # rename for internal purposes
     hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
     if (hasDotObjs %in% FALSE) {
@@ -833,9 +832,13 @@ setMethod(
             object@depends@dependencies[[cmod]]@outputObjects$objectName
           })
           outputsFromTheseMods <- unlist(outputsFromTheseMods)
-          simPost@outputs <- rbindlist(list(
+
+          ooo <- rbindlist(list(
             simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
-            use.names = TRUE, fill = TRUE) |> unique()
+            use.names = TRUE, fill = TRUE)
+          allowedColumnsForUnique <- (sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE
+          simPost@outputs <- unique(ooo, by = names(ooo)[allowedColumnsForUnique])
+
         }
 
 
