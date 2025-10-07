@@ -257,8 +257,8 @@ Plots <- function(data, fn, filename,
         gg <- NULL
         if (is(data, "ggplot")) {
           gg <- data
-        } else if (needScreen) {
-          fn(data, ...) # This will plot to screen if it is base::plot or terra::plot
+        } else {
+          gg <- fn(data, ...) # This will plot to screen if it is base::plot or terra::plot
         }
       }
 
