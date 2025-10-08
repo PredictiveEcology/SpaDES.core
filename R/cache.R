@@ -151,7 +151,7 @@ setMethod(
     # don't cache contents of output because file may already exist
     if (NROW(object@outputs)) {
       object@outputs$file <- basename(object@outputs$file)
-      object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs or rds; doesn't matter for Cache
+      object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # qs2 or rds; doesn't matter for Cache
     }
 
     deps <- object@depends@dependencies

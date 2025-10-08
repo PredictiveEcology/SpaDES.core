@@ -276,7 +276,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 #' `saveState` is a wrapper around `restartSpades` and `saveSimList`. You can
 #' pass arguments to the `...` that will be passed to `saveSimList`, such as
 #' `modules`, `inputs`, `outputs`.
-saveState <- function(filename, ...){
+saveState <- function(filename, ...) {
   sim <- restartSpades(restart = FALSE)
   saveSimList(sim, filename, ...)
   message("Saved! ", filename)
@@ -320,8 +320,8 @@ saveState <- function(filename, ...){
 #'
 #' @note
 #' Because of the restarting, the object name of the original assignment of the
-#' `spades` call can not be preserved. The `spades` call will be
-#' assigned to `sim` in the `.GlobalEnv`.
+#' `spades` call can not be preserved.
+#' The `spades` call will be assigned to `sim` in the `.GlobalEnv`.
 #'
 #' Because this function is focused on restarting during a `spades` call,
 #' it will remove all objects in the `.GlobalEnv`, emulating `q("no")`.
@@ -332,22 +332,22 @@ saveState <- function(filename, ...){
 #' To keep the saved `simList`, use `options("spades.restartR.clearFiles" = TRUE)`.
 #' The default is to treat these files as temporary files and so will be removed.
 #'
-#' @param sim Required. A `simList` to be retained through the restart
+#' @param sim Required. A `simList` to be retained through the restart.
 #'
 #' @param reloadPkgs Logical. If `TRUE`, it will attempt to reload all the packages
 #'    as they were in previous session, in the same order. If `FALSE`, it will
-#'    load no packages beyond normal R startup. Default `TRUE`
+#'    load no packages beyond normal R startup. Default `TRUE`.
 #'
-#' @param .First A function to save to \file{~/.qs} which will
-#'    be loaded at restart from \file{~/.qs} and run. Default is `NULL`,
-#'    meaning it will use the non-exported `SpaDES.core:::First`. If a
-#'    user wants to make a custom `First` file, it should built off that one.
+#' @param .First A function to save to \file{~/.qs2} which will
+#'    be loaded at restart from \file{~/.qs2} and run.
+#'    Default is `NULL`, meaning it will use the non-exported `SpaDES.core:::First`.
+#'    If a user wants to make a custom `First` file, it should built off that one.
 #'
 #' @param .RDataFile A filename for saving the `simList`.
 #'     Defaults to `getOption("spades.restartR.filename")`, and the directory will
 #'     be in `restartDir`. The simulation time will be mid-pended to this
 #'     name, as in: `basename(file), "_time",`
-#'     `paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))`
+#'     `paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))`.
 #'
 #' @param restartDir A character string indicating root directory to
 #'     save `simList` and other ancillary files during restart.
@@ -414,7 +414,7 @@ restartR <- function(sim, reloadPkgs = TRUE, .First = NULL,
     paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))
 
   ## ensure correct file extension
-  sim$._restartRList$simFilename <- paste0(sim$._restartRList$simFilename, ".qs")
+  sim$._restartRList$simFilename <- paste0(sim$._restartRList$simFilename, ".qs2")
 
   # sim$._restartRList$endOrig <- end(sim)
   sim$._restartRList$startOrig <- start(sim)

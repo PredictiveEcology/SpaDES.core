@@ -1432,7 +1432,7 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
 #' of the files that are saved e.g., for [saveSimList()] so that all files can
 #' be added to the archive. In addition to setting `outputs` at the `simInit`
 #' stage, a module developer can also put this in a using any saving mechanism that
-#' is relevant (e.g., `qs::qsave`, `saveRDS` etc.). When a module event does this
+#' is relevant (e.g., `qs2::qs_save`, `saveRDS` etc.). When a module event does this
 #' it can be useful to register that saved file. `registerOutputs` offers an additional
 #' mechanism to do this. See examples.
 #'

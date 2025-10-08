@@ -216,9 +216,11 @@ saveFiles <- function(sim) {
 #' @rdname loadFiles
 .saveFileExtensions <- function() {
   ## TODO: try to guess other file types -- see .guessPkgFun
+  # fmt: skip
   .sFE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
     "rds", "saveRDS", "base",
     "qs", "qsave", "qs",
+    "qs2", "qs_save", "qs2",
     "txt", "write.table", "utils",
     "csv", "write.csv", "utils",
     "grd", "writeRaster", "raster",

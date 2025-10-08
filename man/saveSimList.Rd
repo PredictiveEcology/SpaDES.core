@@ -24,7 +24,7 @@ Using a character string will assign that object name to the saved
 \code{simList}, so when it is recovered it will be given that name.}
 
 \item{filename}{Character string with the path for saving \code{simList} to or
-reading the \code{simList} from. Currently, only \code{.rds} and \code{.qs} file types are supported.}
+reading the \code{simList} from. Currently, only \code{.rds} and \code{.qs2} file types are supported.}
 
 \item{projectPath}{Should be the "top level" or project path for the \code{simList}.
 Defaults to \code{getwd()}. All other paths will be made relative with respect to
@@ -54,12 +54,12 @@ saving of files specified in \code{inputs(sim)}, \code{outputs(sim)} or the cach
 \item{...}{Additional arguments. See Details.}
 }
 \value{
-Invoked for side effects of saving both a \code{.qs} (or \code{.rds}) file,
+Invoked for side effects of saving both a \code{.qs2} (or \code{.rds}) file,
 and a compressed archive (one of \code{.tar.gz} if using non-Windows OS or \code{.zip} on Windows).
 }
 \description{
 Saving a \code{simList} may not work using the standard approaches
-(e.g., \code{save}, \code{saveRDS}, and \code{qs::qsave}).
+(e.g., \code{save}, \code{saveRDS}, and \code{qs2::qs_save}).
 There are 2 primary reasons why this doesn't work as expected:
 the \code{activeBindings} that are in place within modules
 (these allow the \code{mod} and \code{Par} to exist), and file-backed objects,

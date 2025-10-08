@@ -82,7 +82,7 @@ test_that("Plots function 1", {
       expect_true(any(grepl("gg", files)))
     }
     if (any(grepl("raw", out))) {
-      expect_true(any(grepl("qs", files) & !grepl("gg", files)))
+      expect_true(any(grepl("qs2", files) & !grepl("gg", files)))
     }
     if (any(grepl("png", out))) {
       expect_true(any(grepl("png", files)))

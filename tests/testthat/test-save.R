@@ -159,9 +159,11 @@ test_that("saving csv files works correctly", {
 test_that("saveSimList works correctly", {
   skip_if_not_installed("archive")
 
-  testInit(sampleModReqdPkgs,
-           tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
-           opts = list(reproducible.verbose = 0))
+  testInit(
+    sampleModReqdPkgs,
+    tmpFileExt = c("grd", "qs2", "qs2", "tif", "", "", "grd", "rds"),
+    opts = list(reproducible.verbose = 0)
+  )
   unlink(tmpfile[5])
   unlink(tmpfile[6])
   mapPath <- getMapPath(tmpdir)
@@ -203,9 +205,8 @@ test_that("saveSimList works correctly", {
   mySim$landscape <- terra::writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
   mySim$habitatQuality <- terra::writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
-  ## test using qs
-  # keeps file-backings
-  saveSimList(mySim, filename = tmpfile[2])
+  ## test using qs2
+  saveSimList(mySim, filename = tmpfile[2]) ## keeps file-backings
 
   sim <- loadSimList(file = tmpfile[2], projectPath = tmpCache)
   expect_true(all(basename(Filenames(sim)) %in% basename(Filenames(mySim))))
@@ -279,8 +280,7 @@ test_that("saveSimList works correctly", {
 test_that("saveSimList with file backed objs", {
   skip_if_not_installed("archive")
 
-  testInit(sampleModReqdPkgs,
-           tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
+  testInit(sampleModReqdPkgs, tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs2"))
   mapPath <- getMapPath(tmpdir)
   modules <- getSampleModules(tmpdir)
 
@@ -551,8 +551,8 @@ test_that("registerOutputs", {
       sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
       },
       event1 = {
-      tf4 <- tempfile2(.rndstr(), fileext = ".qs")
-      sim <- qs::qsave(sim$age, file = tf4) |> registerOutputs()
+      tf4 <- tempfile2(.rndstr(), fileext = ".qs2")
+      sim <- qs2::qs_save(sim$age, file = tf4) |> registerOutputs()
 
       sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
       })

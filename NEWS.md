@@ -1,5 +1,6 @@
 # SpaDES.core (development version)
 
+* use `qs2` package instead of `qs` (deprecated) for improved object serialization (#291; #316);
 * `Plots` can now have a `quote(data)` argument, allowing the whole call to be `Cache`d more easily
 * the `mod` object has been moved within the `sim` to remove a memory leak. The `mod` object was previously placed in `sim@.xData[[moduleName]]$.objects`; even though it had `parent.env` that was `emptyenv()`, because it was attached to the environment `sim@.xData[[moduleName]]`, this meant that the objects in `mod` would become part of the environment where the functions were defined. This created a memory leak, resulting in inflated caches when events for that module were cached. It is now in `sim@.xData$.modObjs`, which appears to no longer suffer from the memory leak. This change in location required many changes throughout all exported `reproducible` functions that had `simList` methods, e.g., `.robustDigest`, etc.
 * two internal helpers, `dotObjs` and `dotMod` which create a canonical pointer in the `sim` to these two parts of module-specific objects or functions, respectively;
