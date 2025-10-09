@@ -1,5 +1,6 @@
 # SpaDES.core (development version)
 
+* use `qs2` package instead of `qs` (deprecated) for improved object serialization (#291; #316);
 * documentation improvements;
 
 # SpaDES.core 2.1.8

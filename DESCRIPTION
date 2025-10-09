@@ -14,8 +14,8 @@ Description: Provides the core framework for a discrete event system to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2025-09-17
-Version: 2.1.8.9000
+Date: 2025-10-08
+Version: 2.1.8.9001
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -39,7 +39,7 @@ Imports:
     igraph (>= 1.0.1),
     lobstr,
     methods,
-    qs (>= 0.21.1),
+    qs2,
     Require (>= 0.3.1),
     stats,
     terra (>= 1.7-46),

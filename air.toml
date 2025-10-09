@@ -6,4 +6,4 @@ line-ending = "auto"
 persistent-line-breaks = true
 exclude = []
 default-exclude = true
-skip = []
+skip = ["cat", "globalVariables", "Map", "mget", "on.exit"]

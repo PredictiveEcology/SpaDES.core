@@ -3,7 +3,7 @@ test_that("test checkpointing", {
 
   testInit(sampleModReqdPkgs, opts = list(spades.recoveryMode = FALSE))
 
-  file <- file.path("chkpnt.qs")
+  file <- file.path("chkpnt.qs2")
   ## save checkpoints; no load/restore
   set.seed(1234)
   times <- list(start = 0, end = 2, timeunit = "second")
@@ -14,10 +14,7 @@ test_that("test checkpointing", {
     caribouMovement = list(.plotInitialTime = NA, torus = TRUE)
   )
   modules <- list("randomLandscapes", "caribouMovement")
-  paths <- list(
-    modulePath = getSampleModules(tmpdir),
-    outputPath = tmpdir
-  )
+  paths <- list(modulePath = getSampleModules(tmpdir), outputPath = tmpdir)
   simA <- simInit(times = times, params = parameters, modules = modules, paths = paths)
   simA <- suppressWarnings(spades(simA))
 
@@ -49,7 +46,7 @@ test_that("test checkpointing with disk-backed raster", {
 
   testInit(c(sampleModReqdPkgs, "magrittr"), opts = list(spades.recoveryMode = FALSE))
 
-  file <- file.path("chkpnt.qs")
+  file <- file.path("chkpnt.qs2")
 
   ## save checkpoints; no load/restore
   set.seed(1234)
@@ -75,7 +72,9 @@ test_that("test checkpointing with disk-backed raster", {
     (function(x) file.path(inputPath(simA), x))() %T>%
     file.create() |>
     normPath()
-  if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
+  if (file.exists(tmpRasFilename)) {
+    unlink(tmpRasFilename)
+  }
   simA$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
   simA <- spades(simA)
 
@@ -94,7 +93,9 @@ test_that("test checkpointing with disk-backed raster", {
     normPath()
 
   # tmpRasFilename <- tempfile("tmpRas", fileext = ".grd")
-  if (file.exists(tmpRasFilename)) unlink(tmpRasFilename)
+  if (file.exists(tmpRasFilename)) {
+    unlink(tmpRasFilename)
+  }
   simA$ras[] <- simA$ras[]
   simB$ras <- writeRaster(simA$ras, filename = tmpRasFilename)
   end(simB) <- 1
