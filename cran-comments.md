@@ -13,7 +13,7 @@ one of CRAN's flavours.
 ### Current R versions
 * macOS 13.3.1            (mac-builder), R 4.5.1
 * macOS 14.7.6                 (GitHub), R 4.5.1
-* macOS 15.5                    (local), R 4.5.1
+* macOS 26.0.1                  (local), R 4.5.1
 * Ubuntu 24.04                 (GitHub), R 4.5.1
 * Ubuntu 24.04                  (local), R 4.5.1
 * Windows                      (GitHub), R 4.5.1
@@ -21,10 +21,10 @@ one of CRAN's flavours.
 * Windows                 (win-builder), R 4.5.1
 
 ### Development R version
-* Ubuntu 24.04                 (GitHub), R-devel (2025-09-16 r88844)
-* Ubuntu 24.04                  (local), R-devel (2025-09-16 r88844)
-* Windows                      (GitHub), R-devel (2025-09-16 r88844 ucrt)
-* Windows                 (win-builder), R-devel (2025-09-16 r88844 ucrt)
+* Ubuntu 24.04                 (GitHub), R-devel (2025-10-08 r88906)
+* Ubuntu 24.04                  (local), R-devel (2025-10-08 r88906)
+* Windows                      (GitHub), R-devel (2025-10-08 r88906 ucrt)
+* Windows                 (win-builder), R-devel (2025-10-08 r88906 ucrt)
 
 ## R CMD check results
 
