@@ -88,8 +88,9 @@ test_that("Plots function 1", {
       expect_true(any(grepl("png", files)))
       expect_true(sum(grepl(wdth, mess)) == 1)
     }
-    if (any(grepl("pdf", out)))
+    if (any(grepl("pdf", out))) {
       expect_true(any(grepl("pdf", files)))
+    }
 
     expect_true(NROW(outputs(simOut)) == length(out))
     unlink(files)

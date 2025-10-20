@@ -775,12 +775,14 @@ setMethod(
 }
 
 checkKnownExts <- function(exts, knownFileExts) {
-  if (missing(knownFileExts))
+  if (missing(knownFileExts)) {
     knownFileExts <- .saveFileExtensions()
+  }
   extsAvail <- na.omit(match(exts, knownFileExts[, "exts"]))
   extsMissing <- setdiff(exts, exts[extsAvail])
-  if (length(extsMissing) > 0)
+  if (length(extsMissing) > 0) {
     stop("No known save method is available for class ", extsMissing)
+  }
   extsAvail
 }
 

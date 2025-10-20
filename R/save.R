@@ -118,11 +118,10 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   file.remove(dir(outputPath, full.names = TRUE))
 #'
 #'   options(opts) # clean up
-#'
 #' }}
 saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
-  # extract the current module name that called this function
+  ## extract the current module name that called this function
   moduleName <- sim@current[["moduleName"]]
 
   if (length(moduleName) == 0) {
@@ -133,7 +132,7 @@ saveFiles <- function(sim) {
   }
 
   if (moduleName != "save") {
-    # i.e., a module driven save event
+    ## i.e., a module driven save event
     toSave <- lapply(params(sim), function(y) return(y$.saveObjects))[[moduleName]] |>
       unlist() |>
       (function(x) data.table(objectName = x, saveTime = curTime, file = x, stringsAsFactors = FALSE))() |>
@@ -141,7 +140,7 @@ saveFiles <- function(sim) {
     toSave <- .fillOutputRows(toSave)
     outputs(sim) <- rbind(outputs(sim), toSave)
 
-    # don't need to save exactly same thing more than once - use data.table here because distinct
+    ## don't need to save exactly same thing more than once - use data.table here because distinct
     outputs(sim) <- data.table(outputs(sim)) |>
       unique(by = c("objectName", "saveTime", "file", "fun", "package")) |>
       data.frame()
@@ -162,7 +161,7 @@ saveFiles <- function(sim) {
             isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
           }))])
 
-          # The actual save line
+          ## The actual save line
           do.call(outputs(sim)[["fun"]][i], args = args,
                   envir = getNamespace(outputs(sim)[["package"]][i]))
 
@@ -178,7 +177,7 @@ saveFiles <- function(sim) {
     }
   }
 
-  # Schedule an event for the next time in the saveTime column
+  ## Schedule an event for the next time in the saveTime column
   if (any(is.na(outputs(sim)[["saved"]][outputs(sim)$saveTime > curTime]))) {
     isNA <- is.na(outputs(sim)$saved)
     nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
@@ -186,8 +185,9 @@ saveFiles <- function(sim) {
     if ("eventPriority" %in% colnames(outputs(sim))) {
       nextPriority <- outputs(sim)[["eventPriority"]][isNA][nextTimeWh]
     }
-    if (!exists("nextPriority", inherits = FALSE))
+    if (!exists("nextPriority", inherits = FALSE)) {
       nextPriority <- .last()
+    }
 
     attributes(nextTime)$unit <- sim@simtimes[["timeunit"]]
     if (time(sim) == end(sim)) {
