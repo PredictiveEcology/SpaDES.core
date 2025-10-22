@@ -1327,8 +1327,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           # nextEvent <- NULL
           runFnCallAsExpr <- TRUE
+          verbose <- if (is.numeric(debug)) debug else !debug %in% FALSE
           if (allowSequentialCaching) {
-            sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debug)
+            sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = verbose)
             runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
           }
           if (runFnCallAsExpr) {
@@ -1343,13 +1344,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                              # .globals = globsWoKnowns,
                                              modules = mBase),
                          showSimilar = showSimilar,
-                         userTags = c(paste0("module:", mBase),
-                                      "eventType:.inputObjects"), verbose = debug)
+                         userTags = c(paste0("module:", mBase), "eventType:.inputObjects"),
+                         verbose = verbose)
           }
           if (allowSequentialCaching) {
             sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
           }
-
 
           # put back the current values of params that were not cached on
           if (sum(paramsDontCacheOnActual))
