@@ -11,6 +11,7 @@
 * new function `doCallSafe` that can be used for `doCallSafe(simInitAndSpades, out)`, and it does not suffer from the slow downs of `do.call`; 
 * many changes to accommodate updates to `reproducible` package, specifically the `Cache` function. These include
 * fix warning capture in `spades()` debug logging;
+* fix use of `debug` as `verbose` when caching (#322);
 * documentation improvements;
 
 # SpaDES.core 2.1.8

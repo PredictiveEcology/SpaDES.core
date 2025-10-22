@@ -1455,8 +1455,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           # nextEvent <- NULL
           runFnCallAsExpr <- TRUE
+          debugForCache <- debugToVerbose(debug)
           if (allowSequentialCaching) {
-            sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debug)
+            sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debugForCache)
             runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
           }
           if (runFnCallAsExpr) {
@@ -1464,7 +1465,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             pkgs <- c(pkgs, "stats")
             # if (getOption("spades.useBox", FALSE) && FALSE)
             #   do.call(box::use, lapply(pkgs, as.name))
-            debugForCache <- debugToVerbose(debug)
             if (any(mBase %in% getOption("spades.debugModule"))) {
               browser()
             }
