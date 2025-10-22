@@ -12,6 +12,7 @@
 * many changes to accommodate updates to `reproducible` package, specifically the `Cache` function. These include
 * fix warning capture in `spades()` debug logging;
 * fix use of `debug` as `verbose` when caching (#322);
+* improve startup message formatting;
 * documentation improvements;
 
 # SpaDES.core 2.1.8
