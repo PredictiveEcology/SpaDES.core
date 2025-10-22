@@ -78,22 +78,26 @@ Still VERY experimental. Use cautiously. \cr
 \tab The default local directory in which to look for simulation inputs.  \cr
 
 \code{spades.loadReqdPkgs}
-\tab Default is \code{TRUE} \tab Any \code{reqdPkgs} will be loaded via \code{Require}
-or \code{require}. If \code{FALSE}, no package loading will occur. This will mean that
+\tab Default is \code{TRUE}
+\tab Any \code{reqdPkgs} will be loaded via \code{Require} or \code{require}.
+If \code{FALSE}, no package loading will occur. This will mean that
 modules must prefix every function call from a package with that package name
-with double colon (::).  \cr
+with double colon (\code{::}).\cr
 
-\code{spades.lowMemory} \tab \code{FALSE}
+\code{spades.lowMemory}
+\tab \code{FALSE}
 \tab If true, some functions will use more memory
-efficient (but slower) algorithms. \cr
+efficient (but slower) algorithms.\cr
 
-\code{spades.memoryUseInterval} \tab \code{FALSE}
+\code{spades.memoryUseInterval}
+\tab \code{FALSE}
 \tab A numeric in seconds indicating how often sample the memory use. This will
 be run in a separate "future" process so it can monitor the main process.
 To access the resulting memory use table, use \code{memoryUse(sim)} after the simulation
 has terminated. \cr
 
-\code{spades.messagingNumCharsModule} \tab \code{21}
+\code{spades.messagingNumCharsModule}
+\tab \code{21}
 \tab The number of characters to use for the messaging preamble on each
 line of the messaging during spades calls.\cr
 
