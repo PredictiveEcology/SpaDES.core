@@ -67,22 +67,26 @@
 #'      \tab The default local directory in which to look for simulation inputs.  \cr
 #'
 #'   `spades.loadReqdPkgs`
-#'      \tab Default is `TRUE` meaning that any `reqdPkgs` will be loaded via `Require`
-#'      or `require`. If `FALSE`, no package loading will occur. This will mean that
+#'      \tab Default is `TRUE`
+#'      \tab If `TRUE`, any `reqdPkgs` will be loaded via `Require` or `require`.
+#'      If `FALSE`, no package loading will occur. This will mean that
 #'      modules must prefix every function call from a package with that package name
-#'      with double colon (::).  \cr
+#'      with double colon (`::`).\cr
 #'
-#'   `spades.lowMemory` \tab `FALSE`
+#'   `spades.lowMemory`
+#'     \tab `FALSE`
 #'     \tab If true, some functions will use more memory
-#'     efficient (but slower) algorithms. \cr
+#'     efficient (but slower) algorithms.\cr
 #'
-#'   `spades.memoryUseInterval` \tab `FALSE`
+#'   `spades.memoryUseInterval`
+#'     \tab `FALSE`
 #'     \tab A numeric in seconds indicating how often sample the memory use. This will
 #'     be run in a separate "future" process so it can monitor the main process.
 #'     To access the resulting memory use table, use `memoryUse(sim)` after the simulation
 #'     has terminated. \cr
 #'
-#'   `spades.messagingNumCharsModule` \tab `21`
+#'   `spades.messagingNumCharsModule`
+#'     \tab `21`
 #'     \tab The number of characters to use for the messaging preamble on each
 #'     line of the messaging during spades calls.\cr
 #'
