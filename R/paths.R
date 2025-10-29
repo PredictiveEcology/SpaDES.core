@@ -212,7 +212,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
         "    spades.modulePath = '", modPaths, "'\n", # normPath'ed above
         "    spades.scratchPath = '", normPath(scratchPath), "'\n",
         "  )\n",
-        "  terra::terraOptions(tempdir = '", normPath(terraPath), "'"
+        "  terra::terraOptions(tempdir = '", normPath(terraPath), "')"
       )
     }
   }

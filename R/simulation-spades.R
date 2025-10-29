@@ -840,32 +840,23 @@ setGeneric(
 setMethod(
   "spades",
   signature(sim = "simList", cache = "missing"),
-  definition = function(sim,
-                        debug,
-                        progress,
-                        cache,
-                        .plotInitialTime,
-                        .saveInitialTime,
-                        notOlderThan,
-                        events,
-                        .plots,
-                        ...) {
-
-    # set the options; then set them back on exit
+  definition = function(sim, debug, progress, cache, .plotInitialTime, .saveInitialTime,
+                        notOlderThan, events, .plots, ...) {
+    ## set the options; then set them back on exit
     optsFromDots <- dealWithOptions(sim = sim, dotNames = ...names())
     if (!is.null(optsFromDots$optsPrev)) {
-      # remove from `sim` as these should not be there
+      ## remove from `sim` as these should not be there
       rm(list = unique(names(optsFromDots$optionsAsProvided)), envir = envir(sim))
       on.exit({
-        # reset options in session
+        ## reset options in session
         options(optsFromDots$optsPrev)
-        # put them back in simList for reassessment during spades
+        ## put them back in simList for reassessment during spades
         if (exists("sim", inherits = FALSE))
           list2env(optsFromDots$optionsAsProvided, envir = envir(sim))
       }, add = TRUE)
     }
 
-    # loggingMessage helpers
+    ## loggingMessage helpers
     ._simNesting <- simNestingSetup(...)
     # sim[[._txtSimNesting]] <- ._simNesting
     sim[[._txtSimNesting]] <- ._simNesting
@@ -880,9 +871,10 @@ setMethod(
       modNam <- getOption("spades.covr")
       tf <- tempfile();
       on.exit(unlink(tf))
-      cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
+      cat(file = tf, paste("spades(sim, events = ", capture.output(dput(events)),
+                           ", .plotInitialTime = ", .plotInitialTime, ")", collapse = "\n"))
       sim[[dotMods]][[modNam]]$sim <- sim
-      opts <- options("spades.covr2" = FALSE) # turn off this chunk 2nd time through
+      opts <- options("spades.covr2" = FALSE) ## turn off this chunk 2nd time through
       on.exit(options(opts), add = TRUE)
       aa <- covr::environment_coverage(sim[[dotMods]][[modNam]], test_files = tf)
       rm(list = "sim", envir = sim[[dotMods]][[modNam]])
@@ -904,11 +896,10 @@ setMethod(
           all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
       } else {
         debug <- unlist(debug)
-
       }
     }
 
-    # need to recheck package loading because `simInit` may have been cached
+    ## need to recheck package loading because `simInit` may have been cached
     if (getOption("spades.loadReqdPkgs", TRUE)) {
       pkgs <- packages(sim)
       loadPkgs(pkgs)
@@ -971,7 +962,7 @@ setMethod(
         }
       }
 
-      # This sets up checking for memory leaks
+      ## This sets up checking for memory leaks
       if (is.null(sim@.xData[["._knownObjects"]])) {
         moduleNames <- unname(modules(sim))
         names(moduleNames) <- moduleNames
@@ -987,8 +978,8 @@ setMethod(
       # .pkgEnv[["skipNamespacing"]] <- !getOption("spades.switchPkgNamespaces")
       .pkgEnv[["spades.keepCompleted"]] <- getOption("spades.keepCompleted", TRUE)
 
-      # Memory Use
-      # memory estimation of each event/sim
+      ## Memory Use
+      ## memory estimation of each event/sim
       if (getOption("spades.memoryUseInterval", 0) > 0) {
         if (requireNamespace("future", quietly = TRUE) &&
             requireNamespace("future.callr", quietly = TRUE)) {
@@ -1002,7 +993,7 @@ setMethod(
         }
       }
 
-      # timeunits gets accessed every event -- this should only be needed once per simList
+      ## timeunits gets accessed every event -- this should only be needed once per simList
       sim@.xData$.timeunits <- timeunits(sim)
       on.exit({
         rm(".timeunits", envir = sim@.xData)
@@ -1100,10 +1091,10 @@ setMethod(
 
       sim@.xData[["._firstEventClockTime"]] <- Sys.time()
 
-      # This was introduced when sim@completed became an environment for speed purposes
-      # (list got slow as size increased)
-      # This is an attempt to deal with the expected behaviour of a list --
-      # i.e., delete it if this appears to be the original sim object again passed in
+      ## This was introduced when sim@completed became an environment for speed purposes
+      ## (list got slow as size increased)
+      ## This is an attempt to deal with the expected behaviour of a list --
+      ## i.e., delete it if this appears to be the original sim object again passed in
       if (length(sim@completed)) {
         existingCompleted <- sort(as.integer(ls(sim@completed, sorted = FALSE)))
         prevStart <- get(as.character(existingCompleted[1]), envir = sim@completed)
@@ -1126,7 +1117,7 @@ setMethod(
           if (length(toDel) > 0)
             unlink(toDel)
                  }, add = TRUE) # for file-backed files)
-        rmo <- NULL # The recovery mode object
+        rmo <- NULL ## the recovery mode object
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
       }
@@ -1145,8 +1136,8 @@ setMethod(
         sim$.simFuture <- list()
       }
 
-      # There are some edge cases where there is an event scheduled before current time,
-      #   even though current time is after end time
+      ## There are some edge cases where there is an event scheduled before current time,
+      ##   even though current time is after end time
       if (length(sim@events)) {
         specialStart <- sim@events[[1]][["eventTime"]] < sim@simtimes[["current"]] &&
           sim@simtimes[["current"]] > sim@simtimes[["end"]]
@@ -1171,7 +1162,7 @@ setMethod(
         if (recoverMode > 0) {
           rmo <- recoverModePost(sim, rmo, recoverMode)
         }
-        # Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
+        ## Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
         if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
           condEventsToOmit <- integer()
           for (condNum in seq(sim$._conditionalEvents)) {
@@ -1213,7 +1204,7 @@ setMethod(
       }
       sim@simtimes[["current"]] <- sim@simtimes[["end"]]
 
-      # For determining if clean ending to spades call
+      ## for determining if clean ending to spades call
       .pkgEnv$.cleanEnd <- TRUE
 
       if (!is.null(sim$._restartRList)) {
@@ -1235,11 +1226,12 @@ setMethod(
     },
     warning = function(w) {
       w$message <- gsub("^In modCall\\(sim = sim.+\"]]\\): ", "", w$message)
-      if (grepl("NAs introduced by coercion", w$message))
-      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
-        logging::logwarn(paste0(collapse = " ", c(names(w), w)))
+      if (any(grepl("NAs introduced by coercion", w$message))) {
+        if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
+          logging::logwarn(paste0(collapse = " ", c(names(w), w)))
+        }
       }
-      if (grepl("In .+:", w$message)) {
+      if (any(grepl("In .+:", w$message))) {
         warningSplitOnColon(w)
         invokeRestart("muffleWarning")
       } else if (isTRUE(any(grepl("'package:stats' may not be available when loading",
@@ -1249,16 +1241,17 @@ setMethod(
         warning(w)
         tryCatch(invokeRestart("muffleWarning"), error = function(e) NULL)
       }
-
     },
     error = function(e) {
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
-        if (debug > 0)
+        if (debug > 0) {
           logging::logerror(e)
+        }
       } else {
         fn <- get0("onError")
-        if (!is.null(fn))
+        if (!is.null(fn)) {
           fn(sim)
+        }
         stop(e)
       }
     },
