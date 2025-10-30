@@ -396,6 +396,11 @@ setMethod(
     #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
     # }
 
+    # rcae <- get(reproducible.CacheAddressEnv)
+    # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
+    # on.exit(rm(rcae))
+
+
     on.exit({
       options(opt)
       sim <- elapsedTimeInSimInit(get(._txtStartClockTime, inherits = FALSE), sim)
@@ -461,6 +466,7 @@ setMethod(
 
     # paths
     oldGetPaths <- .paths()
+
     do.call(setPaths, paths)
     on.exit({
       do.call(setPaths, append(list(silent = TRUE), oldGetPaths))
