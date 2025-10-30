@@ -862,9 +862,9 @@ setMethod(
     sim[[._txtSimNesting]] <- ._simNesting
 
     opt <- options("encoding" = "UTF-8")
-    if (isTRUE(getOption("spades.allowSequentialCaching"))) {
-      opt <- append(opt, options(reproducible.showSimilarDepth = 6))
-    }
+    # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
+    #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
+    # }
     on.exit(options(opt), add = TRUE)
 
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
@@ -1423,27 +1423,49 @@ setMethod(
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
     runFnCallAsExpr <- TRUE
-    allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
-    if (allowSequentialCaching) {
-      sim <- allowSequentialCaching1(sim, cacheIt, moduleCall, verbose)
-      runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
-    }
+    # allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
+    # if (allowSequentialCaching) {
+    #   sim <- allowSequentialCaching1(sim, cacheIt, moduleCall, verbose)
+    #   runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
+    # }
 
     rr <- .Random.seed
+
+    cacheChaining <- getOption("spades.cacheChaining", FALSE)
+    if (cacheChaining) {
+      prevCache <- attr(sim, "tags")
+      me <- reproducible:::memoiseEnv(cachePath(sim))
+      # dno <- CacheDigest()$outputHash
+      chaining <- cacheChainingSetup(cacheIt = cacheIt,
+                                             prevCache = prevCache,
+                                             me = me, # cachePath,
+                                             nonObjects = as.list(fnEnv, all.names = TRUE)[fns],
+                                             fnCallAsExpr = fnCallAsExpr,
+                                             module = cur[["moduleName"]],
+                                             event = cur[["eventType"]],
+                                             led = attr(sim, lastEventDetails))
+      fnCallAsExpr <- chaining$fnCallAsExpr
+    }
     if (runFnCallAsExpr) {
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
+      attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
     }
+    if (cacheChaining) {
+      sim <- cacheChainingPost(sim, cacheIt, postCacheId, prevCache,
+                                      chaining$cacheIdOfSkip, chaining$df, me)
+    }
+
     if (identical(rr, .Random.seed)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
     }
-    if (allowSequentialCaching) {
-        sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
-    }
+    # if (allowSequentialCaching) {
+    #     sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
+    # }
   }
 
-  if (allowSequentialCaching) {
-    sim <- allowSequentialCachingFinal(sim)
-  }
+  # if (allowSequentialCaching) {
+  #   sim <- allowSequentialCachingFinal(sim)
+  # }
 
   ## put back the current values of params that were not cached on
   if (exists("modParams", inherits = FALSE)) {
@@ -2604,3 +2626,56 @@ evalPostEvent <- function(envir = parent.frame()) {
     eval(getOption("spades.evalPostEvent"), envir = envir)
   }
 }
+
+cacheChainingSetup <- function(cacheIt, prevCache, me, nonObjects, fnCallAsExpr,
+                                        module, event, led) {
+  if (exists("aaaa", envir = .GlobalEnv)) browser()
+  df <- cacheIdOfSkip <- NULL
+  if (!is.null(prevCache) && isTRUE(cacheIt)) {
+    # me <- reproducible:::memoiseEnv(cachePath(sim))
+    digestNonObjects <- CacheDigest(nonObjects)$outputHash
+
+    df <- data.table(prevCache = prevCache, digestNonObjects = digestNonObjects,
+                     module = module, event = event)
+    set(df, NULL, lastEventDetails, led)
+    anyExisting <- me$eventCachingDF[df, on = colnames(df), nomatch = NULL]
+    if (exists("aaaa", envir = .GlobalEnv)) browser()
+    if (NROW(anyExisting)) {
+      #basically, can't be .inputObjects as previous event, if this event is not also .inputObjects
+      #   can't jump from simInit to spades because a user could have modified the simList
+      if (length(endsWith(anyExisting[[lastEventDetails]], ".inputObjects")) > 1)
+        browser()
+      if ( !(endsWith(anyExisting[[lastEventDetails]], ".inputObjects") &&
+             event != ".inputObjects") ) {
+        cacheIdOfSkip <- gsub("cacheId:", "", anyExisting$postCacheId)
+        fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
+      }
+    }
+  }
+  list(cacheIdOfSkip = cacheIdOfSkip, df = df, fnCallAsExpr = fnCallAsExpr)
+}
+
+
+cacheChainingPost <- function(sim, cacheIt, postCacheId, prevCache,
+                                       cacheIdOfSkip, df, me) {
+  if (exists("aaaa", envir = .GlobalEnv)) browser()
+  if (!isTRUE(cacheIt)) {
+    attr(sim, "tags") <- NULL
+  } else if (!is.null(prevCache)) {
+    if (is.null(cacheIdOfSkip)) {
+      # It can already be there, especially when it is .inputObjects to init transition
+      if (!(df$prevCache %in% me[["eventCachingDF"]]$prevCache &&
+            df$digestNonObjects %in% me[["eventCachingDF"]]$digestNonObjects)) {
+        postCacheId <- attr(sim, "tags")
+        df <- set(df, NULL, "postCacheId", postCacheId)
+        # if (any(duplicated(rbind(me[["eventCachingDF"]], df)))) browser()
+        me[["eventCachingDF"]] <- rbind(me[["eventCachingDF"]], df)
+      }
+
+    }
+  }
+  sim
+}
+
+
+lastEventDetails <- "lastEventDetails"
