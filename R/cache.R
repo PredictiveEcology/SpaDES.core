@@ -859,6 +859,7 @@ setMethod(
 
       # Need the .Cache attributes from the recovered simFromCache
       attr(simPost, ".Cache") <- attr(simFromCache, ".Cache")
+      attr(simPost, "tags") <- attr(simFromCache, "tags")
 
       attrsToGrab <- setdiff(names(attributes(simFromCache)), names(attributes(simPost)))
       for (atts in attrsToGrab) {
