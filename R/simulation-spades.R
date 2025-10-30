@@ -1352,10 +1352,14 @@ setMethod(
 
 #' @keywords internal
 #' @importFrom cli bg_yellow
-.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan, showSimilar, .pkgEnv) {
-  if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]])) { # allow for super simple simList without a slot outputObjects
+.runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                      showSimilar, .pkgEnv) {
+  cacheChaining <- getOption("spades.cacheChaining", FALSE)
+  # cacheIt <- cacheChaining || cacheIt
+  if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]]) || cacheChaining) { # allow for super simple simList without a slot outputObjects
     expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
     createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+
     if (cacheIt) { # means that a module or event is to be cached
 
       fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
@@ -1423,36 +1427,36 @@ setMethod(
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
   } else {
     runFnCallAsExpr <- TRUE
-    # allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
-    # if (allowSequentialCaching) {
-    #   sim <- allowSequentialCaching1(sim, cacheIt, moduleCall, verbose)
-    #   runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
-    # }
 
     rr <- .Random.seed
 
-    cacheChaining <- getOption("spades.cacheChaining", FALSE)
     if (cacheChaining) {
       prevCache <- attr(sim, "tags")
-      me <- reproducible:::memoiseEnv(cachePath(sim))
-      # dno <- CacheDigest()$outputHash
-      chaining <- cacheChainingSetup(cacheIt = cacheIt,
-                                             prevCache = prevCache,
-                                             me = me, # cachePath,
-                                             nonObjects = as.list(fnEnv, all.names = TRUE)[fns],
-                                             fnCallAsExpr = fnCallAsExpr,
-                                             module = cur[["moduleName"]],
-                                             event = cur[["eventType"]],
-                                             led = attr(sim, lastEventDetails))
+      ce <- chainingEnv(cachePath(sim))
+      chaining <- cacheChainingSetup(
+        cacheIt = cacheIt,
+        prevCache = prevCache,
+        chainingEnv = ce,
+        # The next line is not evaluated it `cacheIt` is FALSE (lazy evaluation);
+        #   so can't pre-calculate it
+        nonObjects = append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
+                            classOptions),
+        fnCallAsExpr = fnCallAsExpr,
+        module = cur[["moduleName"]],
+        event = cur[["eventType"]],
+        led = attr(sim, lastEventDetails),
+        verbose = verbose)
       fnCallAsExpr <- chaining$fnCallAsExpr
     }
     if (runFnCallAsExpr) {
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
-      attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
+      # attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
     }
     if (cacheChaining) {
-      sim <- cacheChainingPost(sim, cacheIt, postCacheId, prevCache,
-                                      chaining$cacheIdOfSkip, chaining$df, me)
+      sim <- cacheChainingPost(sim, cacheIt, prevCache,
+                               chaining$cacheIdOfSkip, chaining$df, ce,
+                               moduleName = cur[["moduleName"]],
+                               eventType = cur[["eventType"]])
     }
 
     if (identical(rr, .Random.seed)) {
@@ -2627,19 +2631,17 @@ evalPostEvent <- function(envir = parent.frame()) {
   }
 }
 
-cacheChainingSetup <- function(cacheIt, prevCache, me, nonObjects, fnCallAsExpr,
-                                        module, event, led) {
-  if (exists("aaaa", envir = .GlobalEnv)) browser()
+cacheChainingSetup <- function(cacheIt, prevCache, chainingEnv, nonObjects, fnCallAsExpr,
+                               module, event, led,
+                               verbose = getOption("reproducible.verbose")) {
   df <- cacheIdOfSkip <- NULL
   if (!is.null(prevCache) && isTRUE(cacheIt)) {
-    # me <- reproducible:::memoiseEnv(cachePath(sim))
-    digestNonObjects <- CacheDigest(nonObjects)$outputHash
+    digestNonObjects <- reproducible::CacheDigest(nonObjects)$outputHash
 
     df <- data.table(prevCache = prevCache, digestNonObjects = digestNonObjects,
                      module = module, event = event)
     set(df, NULL, lastEventDetails, led)
-    anyExisting <- me$eventCachingDF[df, on = colnames(df), nomatch = NULL]
-    if (exists("aaaa", envir = .GlobalEnv)) browser()
+    anyExisting <- chainingEnv$eventCachingDF[df, on = colnames(df), nomatch = NULL]
     if (NROW(anyExisting)) {
       #basically, can't be .inputObjects as previous event, if this event is not also .inputObjects
       #   can't jump from simInit to spades because a user could have modified the simList
@@ -2647,8 +2649,10 @@ cacheChainingSetup <- function(cacheIt, prevCache, me, nonObjects, fnCallAsExpr,
         browser()
       if ( !(endsWith(anyExisting[[lastEventDetails]], ".inputObjects") &&
              event != ".inputObjects") ) {
-        cacheIdOfSkip <- gsub("cacheId:", "", anyExisting$postCacheId)
+        cacheIdOfSkip <- anyExisting$postCacheId
         fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
+        messageCache("Using cacheChaining ... ", verbose = verbose)
+
       }
     }
   }
@@ -2656,20 +2660,19 @@ cacheChainingSetup <- function(cacheIt, prevCache, me, nonObjects, fnCallAsExpr,
 }
 
 
-cacheChainingPost <- function(sim, cacheIt, postCacheId, prevCache,
-                                       cacheIdOfSkip, df, me) {
-  if (exists("aaaa", envir = .GlobalEnv)) browser()
+cacheChainingPost <- function(sim, cacheIt, prevCache,
+                              cacheIdOfSkip, df, chainingEnv, moduleName, eventType) {
+  attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
   if (!isTRUE(cacheIt)) {
     attr(sim, "tags") <- NULL
   } else if (!is.null(prevCache)) {
     if (is.null(cacheIdOfSkip)) {
       # It can already be there, especially when it is .inputObjects to init transition
-      if (!(df$prevCache %in% me[["eventCachingDF"]]$prevCache &&
-            df$digestNonObjects %in% me[["eventCachingDF"]]$digestNonObjects)) {
-        postCacheId <- attr(sim, "tags")
+      if (!(df$prevCache %in% chainingEnv[["eventCachingDF"]]$prevCache &&
+            df$digestNonObjects %in% chainingEnv[["eventCachingDF"]]$digestNonObjects)) {
+        postCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
         df <- set(df, NULL, "postCacheId", postCacheId)
-        # if (any(duplicated(rbind(me[["eventCachingDF"]], df)))) browser()
-        me[["eventCachingDF"]] <- rbind(me[["eventCachingDF"]], df)
+        chainingEnv[["eventCachingDF"]] <- rbind(chainingEnv[["eventCachingDF"]], df)
       }
 
     }
@@ -2679,3 +2682,18 @@ cacheChainingPost <- function(sim, cacheIt, postCacheId, prevCache,
 
 
 lastEventDetails <- "lastEventDetails"
+
+chainingEnv <- function(cachePath, envir = .GlobalEnv) {
+  obj <- paste0(".spadesChainingEnv_", cachePath)
+  if (!exists(obj, envir = envir))
+    assign(obj, new.env(parent = emptyenv()), envir = envir)
+  theEnv <- get(obj, envir = envir, inherits = FALSE)
+  theEnv
+}
+
+
+extractFns <- function(moduleSpecificObjects) {
+  fns2 <- grep(":", moduleSpecificObjects, value = TRUE) |>
+    gsub(pattern = "^.+:", replacement = "")
+  fns2[nzchar(fns2)]
+}

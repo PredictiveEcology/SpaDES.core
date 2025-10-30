@@ -1,6 +1,8 @@
 test_that("simulation runs with new Cache chaining", {
   skip_on_cran() # too long
   testInit(sampleModReqdPkgs)
+  withr::local_options(reproducible.useMemoise = TRUE,
+                       spades.cacheChaining = TRUE)
 
   set.seed(42)
   times <- list(start = 0.0, end = 2, timeunit = "year")
@@ -18,10 +20,6 @@ test_that("simulation runs with new Cache chaining", {
 
 
   set.seed(123)
-  withr::local_options(reproducible.memoisePersist = TRUE,
-                       reproducible.useMemoise = TRUE,
-                       reproducible.verbose = TRUE,
-                       spades.debug = TRUE)
   #devtools::load_all("~/GitHub/reproducible")
   #devtools::load_all("~/GitHub/SpaDES.core")
 
@@ -32,13 +30,13 @@ test_that("simulation runs with new Cache chaining", {
     c(".inputObjects", "init",  "stats", "burn", "move")
   )
 
-  me <- reproducible:::memoiseEnv(getOption("reproducible.cachePath"))
+  me <- chainingEnv(getOption("reproducible.cachePath"))
   me$eventCachingDF <- NULL # make sure it is empty
 
 
   mess <- mySims <- test <- list()
   for (useCache in useCaches) {
-    for (i in 1:2) {
+    for (i in 1:2) { # need to run twice to set the Cache each time
       params$.globals = list(burnStats = "npixelsburned", stackName = "landscape",
                              .useCache = useCache)
       iter <- paste0(paste(useCache, collapse = "_"), "_", i)
@@ -458,9 +456,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
   #
   # summary(a2)[, "median"]/summary(a3)[, "median"]
   #
-  # ########################################
+  #
   # # With 2 modules, therefore sorting
-  # ########################################
+  #
   # modules <- list("test", "test2")
   # mySim <- simInit(times = times, params = parameters, modules = modules,
   #                  objects = objects, paths = paths)

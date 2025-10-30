@@ -87,10 +87,6 @@ setMethod(
     allObjsInSimList <- sortInner(allObjsInSimList)
     allEnvsInSimList <- sortInner(allEnvsInSimList)
 
-    # if ("fireSense_dataPrepFit" %in% curMod) {
-    #   # after .addChangedAttr --> .objects is a list with `moduleFunctions` and `moduleObjects` ... with `.robustDigest` alone, it doesn't
-    #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-    # }
     isObjectEmpty <- if (!missing(.objects)) {
       if (!is.null(.objects)) {
         FALSE

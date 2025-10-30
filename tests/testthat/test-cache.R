@@ -131,7 +131,6 @@ test_that("test event-level cache & memory leaks", {
   # sims[[dotObjs]]$caribouMovement$.objects$crazyFunction <- function() rnorm(1)
   # sim@.xData[[dotObjs]][[cur[["moduleName"]]]]
   end(sims) <- end(sims) + 0.1
-  # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
   mess <- capture.output({
     warnsFunction <- capture_warnings({
       simsOut <- spades(sims, debug = FALSE)
