@@ -28,7 +28,7 @@ The following options are likely of interest to most users
 \code{simInit} will evaluate the dependencies in the metadata objects and determine whether
 there are modules whose \code{init} events can be run safely prior to
 the \code{.inputObjects} of other modules, i.e., if a module's \code{expectsInput}
-is not being supplied by any other module's \code{createsOutput}. \cr
+is not being supplied by any other module's \code{createsOutput}.\cr
 
 \code{spades.browserOnError} \tab \code{FALSE} \tab If \code{TRUE}, the default, then any
 error rerun the same event with \code{debugonce} called on it to allow editing
@@ -40,7 +40,7 @@ For example, if the \code{simList} gets updated inside that event in an iterativ
 manner, then each run through the event will cause that iteration to occur.
 When this option is \code{TRUE}, then the event will be run at least 3 times: the
 first time makes the error, the second time has \code{debugonce} and the third time
-is after the error is addressed. \code{TRUE} is likely somewhat slower. \cr
+is after the error is addressed. \code{TRUE} is likely somewhat slower.\cr
 
 \code{reproducible.cachePath} \tab \code{getOption('reproducible.cachePath')}
 \tab The default local directory in which to cache simulation outputs.
@@ -54,7 +54,7 @@ if it is cached or not cached, so this will not mistakenly \code{cacheChain} whe
 it isn't appropriate.\cr
 
 \code{spades.debug} \tab \code{TRUE}
-\tab  The default debugging value \code{debug} argument in \code{spades()} \cr
+\tab  The default debugging value \code{debug} argument in \code{spades()}.\cr
 
 \code{spades.dotInputObjects} \tab \code{TRUE}
 \tab  This is used in \code{simInit}; if set to \code{TRUE} then the \code{.inputObjects}
@@ -62,7 +62,7 @@ function will be run; if \code{FALSE}, then it will be skipped.\cr
 
 \code{spades.DTthreads} \tab \code{1L}
 \tab  The default number of \pkg{data.table} threads to use.
-See also \code{?data.table::setDTthreads}. \cr
+See also \code{?data.table::setDTthreads}.\cr
 
 \code{spades.evalPostEvent} \tab \code{NULL}
 \tab  User can put any \code{quote}d code to evaluate after each event
@@ -74,7 +74,7 @@ user can monitor its changes.\cr
 \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
 whose outputs are not needed (by other events in the \code{simList}) into a future.
 In some cases, this will speed up simulations, by running some events in parallel.
-Still VERY experimental. Use cautiously. \cr
+Still VERY experimental. Use cautiously.\cr
 
 \code{spades.logPath}
 \tab Defaults to a subdirectory (\verb{logs/}) of the simulation output directory.
@@ -82,7 +82,7 @@ Still VERY experimental. Use cautiously. \cr
 
 \code{spades.inputPath}
 \tab Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/inputs})
-\tab The default local directory in which to look for simulation inputs.  \cr
+\tab The default local directory in which to look for simulation inputs.\cr
 
 \code{spades.loadReqdPkgs}
 \tab Default is \code{TRUE}
@@ -93,15 +93,14 @@ with double colon (\code{::}).\cr
 
 \code{spades.lowMemory}
 \tab \code{FALSE}
-\tab If true, some functions will use more memory
-efficient (but slower) algorithms.\cr
+\tab If true, some functions will use more memory efficient (but slower) algorithms.\cr
 
 \code{spades.memoryUseInterval}
 \tab \code{FALSE}
 \tab A numeric in seconds indicating how often sample the memory use. This will
-be run in a separate "future" process so it can monitor the main process.
+be run in a separate \code{future} process so it can monitor the main process.
 To access the resulting memory use table, use \code{memoryUse(sim)} after the simulation
-has terminated. \cr
+has terminated.\cr
 
 \code{spades.messagingNumCharsModule}
 \tab \code{21}
@@ -110,27 +109,27 @@ line of the messaging during spades calls.\cr
 
 \code{spades.moduleCodeChecks}
 \tab \code{list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)}
-\tab Should the various code checks be run
-during \code{simInit}. These are passed to \code{codetools::checkUsage()}.
-Default is given by the function, plus these: \cr
+\tab Should the various code checks be run during \code{simInit}.
+These are passed to \code{codetools::checkUsage()}.
+Default is given by the function, plus these:\cr
 
 \code{spades.moduleDocument} \tab  \code{TRUE}
 \tab  When a module is an R package e.g., via \code{convertToPackage},
 it will, by default, rebuild documentation and reparse during \code{simInit}.
 Since rebuilding documentation (from the \code{roxygen2} tags) can be time consuming,
-a user may wish to prevent this from happening each \code{simInit} call. If so,
-set this option to \code{FALSE} \cr
+a user may wish to prevent this from happening each \code{simInit} call.
+If so, set this option to \code{FALSE}.\cr
 
 \code{spades.modulePath} \tab \code{file.path(tempdir(), "SpaDES", "modules")})
 \tab The default local directory where modules and data will be downloaded and stored.
-Default is a temporary directory  \cr
+Default is a temporary directory.\cr
 
 \code{spades.moduleRepo} \tab  \code{"PredictiveEcology/SpaDES-modules"}
 \tab  The default GitHub repository to use when
-downloading modules via \code{downloadModule} \cr
+downloading modules via \code{downloadModule}.\cr
 
 \code{spades.nCompleted} \tab \code{1000L} \tab The maximum number of completed events to
-retain in the \code{completed} event queue. \cr
+retain in the \code{completed} event queue.\cr
 
 \code{spades.outputPath}
 \tab \code{file.path(tempdir(), "SpaDES", "outputs")}
@@ -140,7 +139,7 @@ retain in the \code{completed} event queue. \cr
 \tab The value of this will passed to \code{.plots} within every module; it will thus
 override all module parameter values for \code{.plots}. This can, e.g., be used
 to turn off all plotting.
-\tab The default is NULL, meaning accept the module-level parameter\cr
+\tab The default is \code{NULL}, meaning accept the module-level parameter.\cr
 
 \code{spades.recoveryMode} \tab \code{1L} \tab
 If this is a numeric greater than 0 or TRUE, then the
@@ -154,7 +153,7 @@ more than one event in the past, i.e., redo some of the "completed" events.
 Default is \code{TRUE}, i.e., it will keep the state of the \code{simList}
 at the start of the current event. This can be recovered with \code{restartSpades}
 and the differences can be seen in a hidden object in the stashed \code{simList}.
-There is a message which describes how to find that. \cr
+There is a message which describes how to find that.\cr
 
 \code{spades.reqdPkgsDontLoad} \tab \code{"box"} \tab Specify any packages that should not
 be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
@@ -172,8 +171,8 @@ Then specify e.g.,
 
 \code{spades.scratchPath} \tab \code{file.path(tempdir(), "SpaDES", "scratch")})
 \tab The default local directory where transient files from modules and data will written.
-This includes temporary \code{raster} and \code{terra} files, as well as SpaDES recovery mode files.
-Default is a temporary directory. \cr
+This includes temporary \code{raster} and \code{terra} files, as well as \code{SpaDES} recovery mode files.
+Default is a temporary directory.\cr
 
 \code{spades.sessionInfo} \tab \code{TRUE})
 \tab Assigns the \code{\link[utils:sessionInfo]{utils::sessionInfo()}} to the \code{simList} during \code{simInit} with
@@ -181,21 +180,21 @@ the name \code{sim$._sessionInfo}. This takes about 75 milliseconds, which may b
 undesirable for some situations where speed is critical. If \code{FALSE}, then
 this is not assigned to the \code{simList}.\cr
 
-\code{spades.switchPkgNamespaces} \tab Defunct. \tab Do not use \cr
+\code{spades.switchPkgNamespaces} \tab Defunct. \tab Do not use.\cr
 
 \code{spades.testMemoryLeaks} \tab \code{TRUE}.
-\tab  There is a very easy way to create a memory leak with R and SpaDES,
-by adding formulas or functions to \verb{sim$} when the enclosing environment
-of the formula or function contained a large object, most relevant here is
-the \code{sim} object. SpaDES.core now tests for likely culprits for this
-and suggests alternatives with a warning \cr
+\tab  There is a very easy way to create a memory leak with R and \code{SpaDES},
+by adding formulas or functions to \verb{sim$} when the enclosing environment of the
+formula or function contained a large object, most relevant here is the \code{sim} object.
+\code{SpaDES.core} now tests for likely culprits for this and suggests alternatives
+with a warning.\cr
 
 \code{spades.tolerance} \tab \code{.Machine$double.eps^0.5}.
 \tab  The default tolerance value used for floating
-point number comparisons. \cr
+point number comparisons.\cr
 
 \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
-\tab The default user agent to use for downloading modules from GitHub. \cr
+\tab The default user agent to use for downloading modules from GitHub.\cr
 
 \code{spades.useBox} \tab FALSE
 \tab Unimplemented while memory problems with \code{box} are resolved.
@@ -209,7 +208,7 @@ may have specified their own packages, which cover the needs of another
 package. \code{useBox = TRUE} will force modules to be accurate with their \code{reqdPkgs}.\cr
 
 \code{spades.useRequire} \tab \code{!tolower(Sys.getenv("SPADES_USE_REQUIRE")) \%in\% "false"}
-\tab : The default for that environment variable is unset, so this returns
+\tab The default for that environment variable is unset, so this returns
 \code{TRUE}. If this is \code{TRUE}, then during the \code{simInit} call, when packages are
 identified as being required, these will be installed if missing, only if
 \code{spades.useRequire} option is \code{TRUE}, otherwise, \code{simInit} will fail because
