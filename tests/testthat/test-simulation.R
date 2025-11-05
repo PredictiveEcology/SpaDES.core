@@ -1,3 +1,64 @@
+test_that("simulation runs with new Cache chaining", {
+  skip_on_cran() # too long
+  testInit(sampleModReqdPkgs)
+  withr::local_options(reproducible.useMemoise = TRUE,
+                       spades.cacheChaining = TRUE)
+
+  set.seed(42)
+  times <- list(start = 0.0, end = 2, timeunit = "year")
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape",
+                    .useCache = c(".inputObjects", "init", "move",
+                                  "burn", "stats")),
+    randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA, .seed = list("init" = 321)),
+    caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
+    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+  )
+  modules <- list("randomLandscapes", "caribouMovement",
+                  "fireSpread")
+  paths <- list(modulePath = getSampleModules(tmpdir))
+
+
+  set.seed(123)
+  #devtools::load_all("~/GitHub/reproducible")
+  #devtools::load_all("~/GitHub/SpaDES.core")
+
+  useCaches <- list(
+    c(".inputObjects", "init"),
+    c(".inputObjects", "init", "stats"),
+    c(".inputObjects", "init", "stats", "burn"),
+    c(".inputObjects", "init",  "stats", "burn", "move")
+  )
+
+  me <- chainingEnv(getOption("reproducible.cachePath"))
+  me$eventCachingDF <- NULL # make sure it is empty
+
+
+  mess <- mySims <- test <- list()
+  for (useCache in useCaches) {
+    for (i in 1:2) { # need to run twice to set the Cache each time
+      params$.globals = list(burnStats = "npixelsburned", stackName = "landscape",
+                             .useCache = useCache)
+      iter <- paste0(paste(useCache, collapse = "_"), "_", i)
+      mess[[iter]] <-
+        capture_messages(mySims[[iter]] <- simInit(times, params, modules,
+                                                   objects = list(), paths) |>
+                           spades(debug = TRUE, .plotInitialTime = NA))
+      test[[iter]] <- grep("cacheId passed to override", mess[[iter]])
+    }
+  }
+
+  expects <- c(.inputObjects_init_1 = 0L, .inputObjects_init_2 = 2L,
+               .inputObjects_init_stats_1 = 2L,
+               .inputObjects_init_stats_2 = 2L,
+               .inputObjects_init_stats_burn_1 = 2L,
+               .inputObjects_init_stats_burn_2 = 3L,
+               .inputObjects_init_stats_burn_move_1 = 3L,
+               .inputObjects_init_stats_burn_move_2 = 19L)
+  expect_identical(lengths(test), expects)
+
+})
+
 test_that("simulation runs with simInit and spades with set.seed; events arg", {
   skip_on_cran() # too long
   testInit(sampleModReqdPkgs)
@@ -395,9 +456,9 @@ test_that("simulation runs with simInit with duplicate modules named", {
   #
   # summary(a2)[, "median"]/summary(a3)[, "median"]
   #
-  # ########################################
+  #
   # # With 2 modules, therefore sorting
-  # ########################################
+  #
   # modules <- list("test", "test2")
   # mySim <- simInit(times = times, params = parameters, modules = modules,
   #                  objects = objects, paths = paths)
@@ -1112,3 +1173,4 @@ paste0("    reqdPkgs = list(\'", dontLoad, "\'),"),'
   unloadNamespace(dontLoad)
 
 })
+

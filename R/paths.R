@@ -169,6 +169,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
   options(
     rasterTmpDir = newPaths$rasterPath,
     reproducible.cachePath = cachePath,
+    reproducible.inputPath = inputPath,
     spades.inputPath = inputPath,
     spades.modulePath = unlist(modulePath),
     spades.outputPath = outputPath,

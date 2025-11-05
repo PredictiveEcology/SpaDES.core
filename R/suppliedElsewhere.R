@@ -214,7 +214,6 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
       # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
       #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
       #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
-      # if (exists("aaaa", envir = .GlobalEnv)) browser()
       out <- del[!(from %in% c("_INPUT_", curMod)), ][
         objName %in% objDeparsed]
       out <- out[, .(objName, noFeedback = all(from != to)), by = from][noFeedback %in% TRUE]

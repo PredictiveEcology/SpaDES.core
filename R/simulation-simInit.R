@@ -392,9 +392,14 @@ setMethod(
     sim[[._txtSimNesting]] <- ._simNestingLocal
 
     opt <- options("encoding" = "UTF-8")
-    if (isTRUE(getOption("spades.allowSequentialCaching"))) {
-      opt <- append(opt, options(reproducible.showSimilarDepth = 6))
-    }
+    # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
+    #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
+    # }
+
+    # rcae <- get(reproducible.CacheAddressEnv)
+    # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
+    # on.exit(rm(rcae))
+
 
     on.exit({
       options(opt)
@@ -461,6 +466,7 @@ setMethod(
 
     # paths
     oldGetPaths <- .paths()
+
     do.call(setPaths, paths)
     on.exit({
       do.call(setPaths, append(list(silent = TRUE), oldGetPaths))
@@ -1389,6 +1395,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       if  (is.call(debug))
         debug <- eval(debug)
 
+      verbose <- debugToVerbose(debug)
+
+
       cur <- sim@current
       curModNam <- cur$moduleName
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
@@ -1400,7 +1409,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       if (!(FALSE %in% debug || any(is.na(debug))))
         objsIsNullBefore <- objsAreNull(sim)
 
-      allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
+      # allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1455,11 +1464,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           # nextEvent <- NULL
           runFnCallAsExpr <- TRUE
-          debugForCache <- debugToVerbose(debug)
-          if (allowSequentialCaching) {
-            sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = debugForCache)
-            runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
-          }
+          # if (allowSequentialCaching) {
+          #   sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = verbose)
+          #   runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
+          # }
           if (runFnCallAsExpr) {
             pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
             pkgs <- c(pkgs, "stats")
@@ -1469,40 +1477,69 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               browser()
             }
 
-            # if (isTRUE("Biomass_borealDataPrep" %in% mBase)) {
-            #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-            # }
-            # aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-
             # Remove outputObjects from @depends, as it should not affect the .inputObjects
             dependsSlots <- metadataToDigest
             dependsSlots <- outputsRmDontNeedForCache(dependsSlots, "outputObjects")
             # dependsSlots <- setdiff(dependsSlots, "outputObjects")
 
-            sim <- .inputObjects(sim) |>
-              Cache(
-                .objects = objectsToEvaluateForCaching,
-                notOlderThan = notOlderThan,
-                outputObjects = moduleSpecificInputObjects,
-                quick = getOption("reproducible.quick", FALSE),
-                cachePath = sim@paths$cachePath,
-                classOptions = list(events = FALSE,
-                                    current = FALSE,
-                                    completed = FALSE,
-                                    simtimes = FALSE,
-                                    params = paramsWoKnowns,
-                                    depends = dependsSlots,
-                                    # .globals = globsWoKnowns,
-                                    modules = mBase),
-                showSimilar = showSimilar,
-                .functionName = paste0(".inputObjects_", mBase),
-                userTags = c(paste0("module:", mBase),
-                             "eventType:.inputObjects"),
-                verbose = debugForCache)
+            fnCallAsExpr <- expression(
+              .inputObjects(sim) |>
+                Cache(
+                  .objects = objectsToEvaluateForCaching,
+                  notOlderThan = notOlderThan,
+                  outputObjects = moduleSpecificInputObjects,
+                  quick = getOption("reproducible.quick", FALSE),
+                  cachePath = sim@paths$cachePath,
+                  classOptions = list(events = FALSE,
+                                      current = FALSE,
+                                      completed = FALSE,
+                                      simtimes = FALSE,
+                                      params = paramsWoKnowns,
+                                      depends = dependsSlots,
+                                      # .globals = globsWoKnowns,
+                                      modules = mBase),
+                  showSimilar = showSimilar,
+                  .functionName = paste0(".inputObjects_", mBase),
+                  userTags = c(paste0("module:", mBase),
+                               "eventType:.inputObjects"),
+                  verbose = verbose)
+
+            )
+
+            cacheChaining <- getOption("spades.cacheChaining", FALSE)
+            if (cacheChaining) {
+              fnEnv <- sim@.xData[[dotMods]][[mBase]]
+              prevCache <- attr(sim, "tags")
+              ce <- chainingEnv(cachePath(sim))
+              # take only functions; no objects; select because the functions have ":"
+              fns2 <- extractFns(objectsToEvaluateForCaching)
+              chaining <- cacheChainingSetup(cacheIt = cacheIt,
+                                             prevCache = prevCache,
+                                             chainingEnv = ce, # cachePath,
+                                             nonObjects = as.list(fnEnv, all.names = TRUE)[fns2],
+                                             fnCallAsExpr = fnCallAsExpr,
+                                             module = mBase,
+                                             event = ".inputObjects",
+                                             led = attr(sim, lastEventDetails),
+                                             verbose = verbose)
+              fnCallAsExpr <- chaining$fnCallAsExpr
+            }
+
+            sim <- eval(fnCallAsExpr)
+
+            if (cacheChaining) {
+              # attr(sim, lastEventDetails) <- paste(mBase, ".inputObjects", collapse = "_")
+              sim <- cacheChainingPost(sim, cacheIt, prevCache,
+                                       cacheIdOfSkip = chaining$cacheIdOfSkip,
+                                       df = chaining$df, ce,
+                                       moduleName = mBase,
+                                       eventType = ".inputObjects")
+            }
+
           }
-          if (allowSequentialCaching) {
-            sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
-          }
+          # if (allowSequentialCaching) {
+          #   sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
+          # }
 
 
           # put back the current values of params that were not cached on
@@ -1519,9 +1556,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           sim <- .inputObjects(sim)
         }
       }
-      if (allowSequentialCaching) {
-        sim <- allowSequentialCachingFinal(sim)
-      }
+      # if (allowSequentialCaching) {
+      #   sim <- allowSequentialCachingFinal(sim)
+      # }
 
       if (!(FALSE %in% debug || any(is.na(debug)))) {
         sim <- objectsCreatedPost(sim, objsIsNullBefore)

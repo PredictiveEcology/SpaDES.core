@@ -87,10 +87,6 @@ setMethod(
     allObjsInSimList <- sortInner(allObjsInSimList)
     allEnvsInSimList <- sortInner(allEnvsInSimList)
 
-    # if ("fireSense_dataPrepFit" %in% curMod) {
-    #   # after .addChangedAttr --> .objects is a list with `moduleFunctions` and `moduleObjects` ... with `.robustDigest` alone, it doesn't
-    #   aaaa <<- 1; on.exit(rm(aaaa, envir = .GlobalEnv))
-    # }
     isObjectEmpty <- if (!missing(.objects)) {
       if (!is.null(.objects)) {
         FALSE
@@ -859,6 +855,7 @@ setMethod(
 
       # Need the .Cache attributes from the recovered simFromCache
       attr(simPost, ".Cache") <- attr(simFromCache, ".Cache")
+      attr(simPost, "tags") <- attr(simFromCache, "tags")
 
       attrsToGrab <- setdiff(names(attributes(simFromCache)), names(attributes(simPost)))
       for (atts in attrsToGrab) {

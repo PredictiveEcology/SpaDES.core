@@ -41,6 +41,13 @@
 #'      \tab The default local directory in which to cache simulation outputs.
 #'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).\cr
 #'
+#'   `spades.cacheChaining` \tab `FALSE`
+#'      \tab If set to `TRUE`, then sequential events that are cached can re-use
+#'      their `digest` step. The second event will only digest the functions and
+#'      parameters, but not objects. Every event will add a tag or remove that tag
+#'      if it is cached or not cached, so this will not mistakenly cacheChain when
+#'      it isn't appropriate.\cr
+#'
 #'   `spades.debug` \tab `TRUE`
 #'     \tab  The default debugging value `debug` argument in `spades()` \cr
 #'
@@ -213,6 +220,7 @@ spadesOptions <- function() {
   list(
     spades.allowInitDuringSimInit = FALSE,
     spades.browserOnError = FALSE,
+    spades.cacheChaining = FALSE,
     spades.compressionLevel = 1L,
     # spades.cachePath = reproCachePath,
     spades.debug = 1, ## TODO: is this the best default? see discussion in #5

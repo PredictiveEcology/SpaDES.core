@@ -46,6 +46,13 @@ is after the error is addressed. \code{TRUE} is likely somewhat slower. \cr
 \tab The default local directory in which to cache simulation outputs.
 Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/cache}).\cr
 
+\code{spades.cacheChaining} \tab \code{FALSE}
+\tab If set to \code{TRUE}, then sequential events that are cached can re-use
+their \code{digest} step. The second event will only digest the functions and
+parameters, but not objects. Every event will add a tag or remove that tag
+if it is cached or not cached, so this will not mistakenly cacheChain when
+it isn't appropriate.\cr
+
 \code{spades.debug} \tab \code{TRUE}
 \tab  The default debugging value \code{debug} argument in \code{spades()} \cr
 
