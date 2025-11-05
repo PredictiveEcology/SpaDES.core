@@ -40,6 +40,7 @@ Imports:
     lobstr,
     methods,
     qs (>= 0.21.1),
+    qs2,
     Require (>= 1.0.1.9000),
     stats,
     terra (>= 1.7-46),

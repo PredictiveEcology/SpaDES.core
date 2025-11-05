@@ -81,7 +81,7 @@
 #'
 #'   `spades.loadReqdPkgs`
 #'      \tab Default is `TRUE`
-#'      \tab Any `reqdPkgs` will be loaded via `Require` or `require`.
+#'      \tab If `TRUE`, any `reqdPkgs` will be loaded via `Require` or `require`.
 #'      If `FALSE`, no package loading will occur. This will mean that
 #'      modules must prefix every function call from a package with that package name
 #'      with double colon (`::`).\cr

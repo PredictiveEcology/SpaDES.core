@@ -1541,7 +1541,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           #   sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
           # }
 
-
           # put back the current values of params that were not cached on
           if (sum(paramsDontCacheOnActual))
             sim@params[[mBase]][paramsDontCacheOnActual] <- modParams[paramsDontCacheOnActual]

@@ -99,7 +99,6 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
   file.remove(dir(outputPath, full.names = TRUE))
 
   options(opts) # clean up
-
 }}
 }
 \author{

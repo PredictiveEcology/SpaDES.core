@@ -86,7 +86,7 @@ Still VERY experimental. Use cautiously.\cr
 
 \code{spades.loadReqdPkgs}
 \tab Default is \code{TRUE}
-\tab Any \code{reqdPkgs} will be loaded via \code{Require} or \code{require}.
+\tab If \code{TRUE}, any \code{reqdPkgs} will be loaded via \code{Require} or \code{require}.
 If \code{FALSE}, no package loading will occur. This will mean that
 modules must prefix every function call from a package with that package name
 with double colon (\code{::}).\cr
