@@ -78,7 +78,6 @@ Still VERY experimental. Use cautiously. \cr
 
 \code{spades.logPath}
 \tab Defaults to a subdirectory (\verb{logs/}) of the simulation output directory.
-\tab The default local directory in which to look for simulation inputs.  \cr
 
 \code{spades.inputPath}
 \tab Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/inputs})
