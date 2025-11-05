@@ -210,12 +210,12 @@
 #' }
 #'
 spadesOptions <- function() {
-  list( # nolint
+  list(
     spades.allowInitDuringSimInit = FALSE,
     spades.browserOnError = FALSE,
     spades.compressionLevel = 1L,
-    #spades.cachePath = reproCachePath,
-    spades.debug = 1, # TODO: is this the best default? see discussion in #5
+    # spades.cachePath = reproCachePath,
+    spades.debug = 1, ## TODO: is this the best default? see discussion in #5
     spades.dotInputObjects = TRUE,
     spades.DTthreads = 1L,
     spades.futureEvents = FALSE,
@@ -245,13 +245,16 @@ spadesOptions <- function() {
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",
     spades.restartR.restartDir = file.path(.spadesTempDir(), "outputs"),
-    spades.saveFileExtensions = data.frame(exts = character(), fun = character(),
-                                           package = character()),
+    spades.saveFileExtensions = data.frame(
+      exts = character(),
+      fun = character(),
+      package = character()
+    ),
     spades.saveSimOnExit = TRUE,
     spades.scratchPath = file.path(.spadesTempDir(), "scratch"),
     spades.sessionInfo = TRUE,
     spades.testMemoryLeaks = TRUE,
-    spades.tolerance = .Machine$double.eps ^ 0.5,
+    spades.tolerance = .Machine$double.eps^0.5,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
     # spades.useBox = FALSE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",
