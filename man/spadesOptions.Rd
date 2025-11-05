@@ -68,7 +68,7 @@ See also \code{?data.table::setDTthreads}. \cr
 \tab  User can put any \code{quote}d code to evaluate after each event
 (\code{.inputObjects} included), e.g., \code{quote(print(.robustDigest(sim$rstLCC)))}
 will print the digest value of the \code{sim$rstLCC} after each event so a
-user can monitor its changes \cr
+user can monitor its changes.\cr
 
 \code{spades.futureEvents} \tab \code{FALSE}
 \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
@@ -78,6 +78,7 @@ Still VERY experimental. Use cautiously. \cr
 
 \code{spades.logPath}
 \tab Defaults to a subdirectory (\verb{logs/}) of the simulation output directory.
+\tab The default local directory to write simulation log files.\cr
 
 \code{spades.inputPath}
 \tab Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/inputs})
@@ -205,8 +206,7 @@ module is missing a \code{reqdPkgs}, then the module will fail to run, with
 an error saying the package/function doesn't exist. Without \code{box},
 modules may run, even though \code{reqdPkgs} is incorrect, because other modules
 may have specified their own packages, which cover the needs of another
-package. \code{useBox = TRUE} will force modules to be accurate with their
-\code{reqdPkgs} \cr
+package. \code{useBox = TRUE} will force modules to be accurate with their \code{reqdPkgs}.\cr
 
 \code{spades.useRequire} \tab \code{!tolower(Sys.getenv("SPADES_USE_REQUIRE")) \%in\% "false"}
 \tab : The default for that environment variable is unset, so this returns

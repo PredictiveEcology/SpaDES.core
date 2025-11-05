@@ -63,7 +63,7 @@
 #'     \tab  User can put any `quote`d code to evaluate after each event
 #'      (`.inputObjects` included), e.g., `quote(print(.robustDigest(sim$rstLCC)))`
 #'      will print the digest value of the `sim$rstLCC` after each event so a
-#'      user can monitor its changes \cr
+#'      user can monitor its changes.\cr
 #'
 #'   `spades.futureEvents` \tab `FALSE`
 #'     \tab  If set to `TRUE`, the event simulator will attempt to spawn events
@@ -73,6 +73,7 @@
 #'
 #'   `spades.logPath`
 #'      \tab Defaults to a subdirectory (`logs/`) of the simulation output directory.
+#'      \tab The default local directory to write simulation log files.\cr
 #'
 #'   `spades.inputPath`
 #'      \tab Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`)
@@ -203,8 +204,7 @@
 #'     an error saying the package/function doesn't exist. Without `box`,
 #'     modules may run, even though `reqdPkgs` is incorrect, because other modules
 #'     may have specified their own packages, which cover the needs of another
-#'     package. `useBox = TRUE` will force modules to be accurate with their
-#'     `reqdPkgs` \cr
+#'     package. `useBox = TRUE` will force modules to be accurate with their `reqdPkgs`.\cr
 #'
 #'   `spades.useRequire` \tab `!tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false"`
 #'     \tab : The default for that environment variable is unset, so this returns
