@@ -45,7 +45,7 @@
 #'      \tab If set to `TRUE`, then sequential events that are cached can re-use
 #'      their `digest` step. The second event will only digest the functions and
 #'      parameters, but not objects. Every event will add a tag or remove that tag
-#'      if it is cached or not cached, so this will not mistakenly cacheChain when
+#'      if it is cached or not cached, so this will not mistakenly `cacheChain` when
 #'      it isn't appropriate.\cr
 #'
 #'   `spades.debug` \tab `TRUE`

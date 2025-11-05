@@ -50,7 +50,7 @@ Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/cache}).\c
 \tab If set to \code{TRUE}, then sequential events that are cached can re-use
 their \code{digest} step. The second event will only digest the functions and
 parameters, but not objects. Every event will add a tag or remove that tag
-if it is cached or not cached, so this will not mistakenly cacheChain when
+if it is cached or not cached, so this will not mistakenly \code{cacheChain} when
 it isn't appropriate.\cr
 
 \code{spades.debug} \tab \code{TRUE}
