@@ -61,7 +61,7 @@
 #'
 #'   `spades.evalPostEvent` \tab `NULL`
 #'     \tab  User can put any `quote`d code to evaluate after each event
-#'      (.inputObjects included), e.g., `quote(print(.robustDigest(sim$rstLCC)))`
+#'      (`.inputObjects` included), e.g., `quote(print(.robustDigest(sim$rstLCC)))`
 #'      will print the digest value of the `sim$rstLCC` after each event so a
 #'      user can monitor its changes \cr
 #'

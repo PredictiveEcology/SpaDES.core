@@ -66,7 +66,7 @@ See also \code{?data.table::setDTthreads}. \cr
 
 \code{spades.evalPostEvent} \tab \code{NULL}
 \tab  User can put any \code{quote}d code to evaluate after each event
-(.inputObjects included), e.g., \code{quote(print(.robustDigest(sim$rstLCC)))}
+(\code{.inputObjects} included), e.g., \code{quote(print(.robustDigest(sim$rstLCC)))}
 will print the digest value of the \code{sim$rstLCC} after each event so a
 user can monitor its changes \cr
 
