@@ -246,6 +246,7 @@ spadesOptions <- function() {
     spades.nCompleted = 10000L,
     spades.outputPath = file.path(.spadesTempDir(), "outputs"),
     spades.plots = NULL,
+    spades.evalPostEvent = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
     spades.reqdPkgsDontLoad = "box",
