@@ -34,9 +34,12 @@ test_that("simulation runs with new Cache chaining", {
   me$eventCachingDF <- NULL # make sure it is empty
 
 
-  mess <- mySims <- test <- list()
+  mess <- mySims <- test <- testEvalPostEvent <- list()
   for (useCache in useCaches) {
     for (i in 1:2) { # need to run twice to set the Cache each time
+      options(
+        spades.evalPostEvent = quote(message(paste('ThisMess', .robustDigest(sim$landscape))))
+      )
       params$.globals = list(burnStats = "npixelsburned", stackName = "landscape",
                              .useCache = useCache)
       iter <- paste0(paste(useCache, collapse = "_"), "_", i)
@@ -45,6 +48,11 @@ test_that("simulation runs with new Cache chaining", {
                                                    objects = list(), paths) |>
                            spades(debug = TRUE, .plotInitialTime = NA))
       test[[iter]] <- grep("cacheId passed to override", mess[[iter]])
+      testEvalPostEvent[[iter]] <- length(grep("ThisMess", mess[[iter]])) ==
+        (NROW(completed(mySims[[iter]])) -
+           length(modules(mySims[[iter]])) +  # rm all 3 .inputObjects
+           1 - # just 1 .inputObjects
+           length(.coreModules()) + 1 ) # restartR is not used
     }
   }
 
@@ -56,6 +64,20 @@ test_that("simulation runs with new Cache chaining", {
                .inputObjects_init_stats_burn_move_1 = 3L,
                .inputObjects_init_stats_burn_move_2 = 19L)
   expect_identical(lengths(test), expects)
+  expect_true(all(unlist(testEvalPostEvent)))
+
+  env <- environment()
+  options(
+    spades.evalPostEvent = quote({a <- data.frame(b = 1:10, d = 1:10);
+                                 gg <- ggplot2::ggplot(a) + ggplot2::geom_point(aes(x = b, y = d))
+                                 assign("gg", gg, envir = SpaDES.core:::.pkgEnv)})
+  )
+  times <- list(start = 0.0, end = 0, timeunit = "year")
+  messy <- capture_messages(si <- simInit(times, params, modules,
+                                             objects = list(), paths) |>
+                     spades(debug = TRUE, .plotInitialTime = NA))
+  expect_true(is(.pkgEnv$gg, "gg"))
+  rm(list = "gg", envir = SpaDES.core:::.pkgEnv)
 
 })
 

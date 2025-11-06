@@ -2626,7 +2626,7 @@ dotRMOFilepath <- function(thisSpadesCallRandomStr, events) {
 
 evalPostEvent <- function(envir = parent.frame()) {
   if (!is.null(getOption("spades.evalPostEvent"))) {
-    print(getOption("spades.evalPostEvent"))
+    # print(getOption("spades.evalPostEvent"))
     eval(getOption("spades.evalPostEvent"), envir = envir)
   }
 }
