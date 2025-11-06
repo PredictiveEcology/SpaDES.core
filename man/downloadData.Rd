@@ -117,12 +117,12 @@ file if there is a \code{sourceURL} but no entry for that file.
 This is experimental and should be used with caution.
 }
 \examples{
-\donttest{
-# In metadata, each expectsInput has a sourceURL; downloadData will look for
-# that and download if it defined; however this sample module has all
-# NAs for sourceURL, so nothing to download
-modulePath <- getSampleModules(tempdir())
-downloadData("caribouMovement", path = modulePath)
+## In metadata, each expectsInput has a sourceURL;
+## downloadData will look for that and download if it defined;
+## however this sample module has all NAs for sourceURL, so nothing to download.
+if (FALSE) {
+  modulePath <- getSampleModules(tempdir())
+  downloadData("caribouMovement", path = modulePath)
 }
 
 }

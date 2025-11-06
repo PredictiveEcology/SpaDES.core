@@ -159,9 +159,11 @@ test_that("saving csv files works correctly", {
 test_that("saveSimList works correctly", {
   skip_if_not_installed("archive")
 
-  testInit(sampleModReqdPkgs,
-           tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
-           opts = list(reproducible.verbose = 0))
+  testInit(
+    sampleModReqdPkgs,
+    tmpFileExt = c("grd", "qs2", "qs2", "tif", "", "", "grd", "rds"),
+    opts = list(reproducible.verbose = 0)
+  )
   unlink(tmpfile[5])
   unlink(tmpfile[6])
   mapPath <- getMapPath(tmpdir)
@@ -203,9 +205,8 @@ test_that("saveSimList works correctly", {
   mySim$landscape <- terra::writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
   mySim$habitatQuality <- terra::writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
-  ## test using qs
-  # keeps file-backings
-  saveSimList(mySim, filename = tmpfile[2])
+  ## test using qs2
+  saveSimList(mySim, filename = tmpfile[2]) ## keeps file-backings
 
   sim <- loadSimList(file = tmpfile[2], projectPath = tmpCache)
   expect_true(all(basename(Filenames(sim)) %in% basename(Filenames(mySim))))
@@ -279,8 +280,7 @@ test_that("saveSimList works correctly", {
 test_that("saveSimList with file backed objs", {
   skip_if_not_installed("archive")
 
-  testInit(sampleModReqdPkgs,
-           tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
+  testInit(sampleModReqdPkgs, tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs2"))
   mapPath <- getMapPath(tmpdir)
   modules <- getSampleModules(tmpdir)
 
@@ -497,13 +497,11 @@ test_that("restart with logging", {
 test_that("registerOutputs", {
   testInit()
   sim <- simInit()
-  # This would normally be a save call, e.g., `writeRaster`
   tf <- reproducible::tempfile2(fileext = ".tif")
   tf2 <- reproducible::tempfile2(fileext = ".tif")
   sim <- registerOutputs(sim, filename = c(tf, tf2))
   odf <- outputs(sim)
   expect_true(all(odf$file %in% c(tf, tf2)))
-
 
   newModule("test", tmpdir, open = FALSE)
   cat(file = file.path(tmpdir, "test", "test.R"),'
@@ -538,21 +536,25 @@ test_that("registerOutputs", {
       eventType,
       init = {
 
-      tf <- tempfile2(.rndstr(), fileext = ".rds")
-      tf2 <- tempfile2(.rndstr(), fileext = ".rds")
-      tf3 <- tempfile2(.rndstr(), fileext = ".rds")
+      tf <- tempfile2(tempdir = outputPath(sim), fileext = ".rds")
+      tf2 <- tempfile2(tempdir = outputPath(sim), fileext = ".rds")
+      tf3 <- tempfile2(tempdir = outputPath(sim), fileext = ".rds")
 
       sim <- saveRDS(sim$age, file = tf) |> registerOutputs(filename = tf)
       sim <- registerOutputs(filename = saveRDS(sim$age, file = tf2))
       sim <- saveRDS(sim$age, file = tf3) |> registerOutputs()
 
-
-      #sim$dp <- dataPath(sim)
-      sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+      sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1")
       },
       event1 = {
-      tf4 <- tempfile2(.rndstr(), fileext = ".qs")
-      sim <- qs::qsave(sim$age, file = tf4) |> registerOutputs()
+      tf4 <- tempfile2(tempdir = outputPath(sim), fileext = ".qs2")
+      sim <- qs2::qs_save(sim$age, file = tf4) |> registerOutputs()
+
+      tf5 <- tempfile2(tempdir = outputPath(sim), fileext = ".png")
+      png(tf5)
+      plot(1:10, runif(10))
+      dev.off()
+      sim <- registerOutputs(tf5)
 
       sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
       })
@@ -561,17 +563,25 @@ test_that("registerOutputs", {
 
       .inputObjects <- function(sim) {
         if (suppliedElsewhere("ageMap", sim)) {
-                sim$worked <- TRUE
+          sim$worked <- TRUE
         }
         sim
       }
       ', fill = TRUE)
   modules <- "test"
-  sim <- simInit(times = list(start = 0, end = 1, timeunit = "year"),
+  sim <- simInit(times = list(start = 0, end = 2, timeunit = "year"),
                  modules = modules,
                  objects = list(age = 1, vegMap = 2, studyArea = 3),
+                 outputs = data.frame(
+                   objectName = "vegMap",
+                   saveTime = 2,
+                   fun = "saveRDS",
+                   package = "base",
+                   file = "vegMap.rds",
+                   stringsAsFactors = FALSE
+                  ),
                  paths = list(modulePath = tmpdir))
   sim <- spades(sim)
-  expect_equal(NROW(outputs(sim)$file), 4)
+  expect_equal(NROW(outputs(sim)$file), 8)
   expect_true(all(file.exists(outputs(sim)$file)))
 })

@@ -6,10 +6,6 @@ if (nzchar(Sys.getenv("NOT_CRAN")) && as.logical(Sys.getenv("NOT_CRAN"))) {
   withr::local_options(spades.useBox = FALSE)
   # Sys.setenv(R_REPRODUCIBLE_USE_DBI = "false")
   test_check("SpaDES.core")
-
-  # withr::local_options(spades.useBox = FALSE) # box is not appropriate if Caching is a thing
-  # test_check("SpaDES.core")
 } else {
   test_check("SpaDES.core")
 }
-

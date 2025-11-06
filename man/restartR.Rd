@@ -13,22 +13,22 @@ restartR(
 )
 }
 \arguments{
-\item{sim}{Required. A \code{simList} to be retained through the restart}
+\item{sim}{Required. A \code{simList} to be retained through the restart.}
 
 \item{reloadPkgs}{Logical. If \code{TRUE}, it will attempt to reload all the packages
 as they were in previous session, in the same order. If \code{FALSE}, it will
-load no packages beyond normal R startup. Default \code{TRUE}}
+load no packages beyond normal R startup. Default \code{TRUE}.}
 
-\item{.First}{A function to save to \file{~/.qs} which will
-be loaded at restart from \file{~/.qs} and run. Default is \code{NULL},
-meaning it will use the non-exported \code{SpaDES.core:::First}. If a
-user wants to make a custom \code{First} file, it should built off that one.}
+\item{.First}{A function to save to \file{~/.qs2} which will
+be loaded at restart from \file{~/.qs2} and run.
+Default is \code{NULL}, meaning it will use the non-exported \code{SpaDES.core:::First}.
+If a user wants to make a custom \code{First} file, it should built off that one.}
 
 \item{.RDataFile}{A filename for saving the \code{simList}.
 Defaults to \code{getOption("spades.restartR.filename")}, and the directory will
 be in \code{restartDir}. The simulation time will be mid-pended to this
 name, as in: \verb{basename(file), "_time",}
-\verb{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}}
+\verb{paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))}.}
 
 \item{restartDir}{A character string indicating root directory to
 save \code{simList} and other ancillary files during restart.
@@ -82,8 +82,8 @@ the file backends will still be intact after a restart, so no need to move them 
 }
 \note{
 Because of the restarting, the object name of the original assignment of the
-\code{spades} call can not be preserved. The \code{spades} call will be
-assigned to \code{sim} in the \code{.GlobalEnv}.
+\code{spades} call can not be preserved.
+The \code{spades} call will be assigned to \code{sim} in the \code{.GlobalEnv}.
 
 Because this function is focused on restarting during a \code{spades} call,
 it will remove all objects in the \code{.GlobalEnv}, emulating \code{q("no")}.

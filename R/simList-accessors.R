@@ -1415,14 +1415,16 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
     stop("args must a list (with same length as file) of lists (with named elements), ",
          ", wrapped with I(  )")
   }
-  if (length(args) < length(file))
+  if (length(args) < length(file)) {
     args <- I(rep(args, length(file)))
+  }
   df <- data.frame(file = file, saved = TRUE, objectName = objectName, fun = fun, args = args)
 
-
   outs <- .fillOutputRows(df, endTime = saveTime)
-  if (!is(outputs[["arguments"]], "AsIs")) # needed for rbindlist
+  if (!is(outputs[["arguments"]], "AsIs")) {
+    ## needed for rbindlist
     outputs[["arguments"]] <- I(outputs[["arguments"]])
+  }
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
 }
 
@@ -1432,7 +1434,7 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
 #' of the files that are saved e.g., for [saveSimList()] so that all files can
 #' be added to the archive. In addition to setting `outputs` at the `simInit`
 #' stage, a module developer can also put this in a using any saving mechanism that
-#' is relevant (e.g., `qs::qsave`, `saveRDS` etc.). When a module event does this
+#' is relevant (e.g., `qs2::qs_save`, `saveRDS` etc.). When a module event does this
 #' it can be useful to register that saved file. `registerOutputs` offers an additional
 #' mechanism to do this. See examples.
 #'
@@ -1479,16 +1481,18 @@ registerOutputs <- function(filename, sim, ...) {
   simIsIn <- NULL
   simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
 
-  if (missing(sim)) sim <- NULL
+  if (missing(sim)) {
+    sim <- NULL
+  }
   if (is.null(sim)) {
     if (!exists("sim", simIsIn, inherits = FALSE))
       simIsIn <- try(whereInStack("sim"), silent = TRUE)
   }
   sim <- get0("sim", simIsIn, inherits = FALSE)
 
-
-  if (is.name(fn))
+  if (is.name(fn)) {
     filename <- try(eval(fn, envir = simIsIn), silent = TRUE)
+  }
 
   if (!is.character(filename)) {
     fnNames <- names(fn)
@@ -1497,15 +1501,19 @@ registerOutputs <- function(filename, sim, ...) {
       fnNames <- names(fn) # redo
     }
     theFileArg <- NULL
-    if (!is.null(fnNames))
+    if (!is.null(fnNames)) {
       theFileArg <- grep("^file$|^filename$", names(fn), value = TRUE)
-    if (!is.null(theFileArg))
+    }
+    if (!is.null(theFileArg)) {
       filename <- try(eval(fn[[theFileArg]], envir = simIsIn), silent = TRUE)
+    }
   }
-  if (is(filename, "try-error"))
+  if (is(filename, "try-error")) {
     stop("Couldn't guess filename; please pass it explicitly")
+  }
 
   sim@outputs <- outputsAppend(sim@outputs, saveTime = time(sim), file = filename, ...)
+
   sim
 }
 

@@ -96,7 +96,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @export
 #' @include simList-accessors.R
 #' @importFrom grDevices dev.off dev.cur
-#' @importFrom qs qsave
+#' @importFrom qs2 qs_save
 #' @importFrom quickPlot clearPlot Plot whereInStack
 #' @importFrom terra writeRaster
 #' @importFrom tools file_path_sans_ext
@@ -376,13 +376,14 @@ Plots <- function(data, fn, filename,
           ...
         )
     } else {
-      rawFilename <- file.path(path, paste0(filename, "_data.qs"))
-      qs::qsave(data, rawFilename)
+      rawFilename <- file.path(path, paste0(filename, "_data.qs2"))
+      qs2::qs_save(data, rawFilename)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(
           outputs = sim@outputs, saveTime = time(sim),
           objectName = tools::file_path_sans_ext(basename(rawFilename)),
-          file = rawFilename, fun = "qs::qsave",
+          file = rawFilename,
+          fun = "qs2::qs_save",
           ...
         )
     }
@@ -435,18 +436,25 @@ Plots <- function(data, fn, filename,
     }
 
     if (any(grepl("object", types))) {
-      filename11 <- file.path(path, paste0(filename, "_gg.qs"))
-      qs::qsave(gg, file = filename11)
+      filename11 <- file.path(path, paste0(filename, "_gg.qs2"))
+      qs2::qs_save(gg, file = filename11)
 
-      if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = tools::file_path_sans_ext(basename(filename11)),
-                                     file = filename11, fun = "qs::qsave", ...)
+      if (exists("sim", inherits = FALSE)) {
+        sim@outputs <- outputsAppend(
+          outputs = sim@outputs,
+          saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(filename11)),
+          file = filename11,
+          fun = "qs2::qs_save",
+          ...
+        )
+      }
     }
   }
 
-  if (exists("sim", inherits = FALSE))
+  if (exists("sim", inherits = FALSE)) {
     assign("sim", sim, envir = simIsIn)
+  }
 
   if (exists("gg", inherits = FALSE))
     return(invisible(gg))
