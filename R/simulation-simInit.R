@@ -792,7 +792,8 @@ setMethod(
               objectsToUse <- objects
             }
 
-            objs(sim) <- objectsToUse
+            if (NROW(objectsToUse))
+              objs(sim) <- objectsToUse
           } else {
             stop(
               paste(
