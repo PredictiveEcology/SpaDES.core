@@ -89,8 +89,11 @@ that led to the error (although some objects, e.g., on disk, may have already be
 # options("spades.recoveryMode" = 1) # now the default
 s <- simInit()
 s <- spades(s) # if this is interrupted or fails
-# the following line will not work if the previous line didn't fail
-s <- restartSpades(s) # don't need to specify `sim` if previous line fails
-                     # will take from savedSimEnv()$.sim automatically
+## the following line will not work if the previous line didn't fail:
+
+## don't need to specify `sim` if previous line fails;
+## will take from savedSimEnv()$.sim automatically
+s <- restartSpades(s)
+
 }
 }

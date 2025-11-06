@@ -82,9 +82,12 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' # options("spades.recoveryMode" = 1) # now the default
 #' s <- simInit()
 #' s <- spades(s) # if this is interrupted or fails
-#' # the following line will not work if the previous line didn't fail
-#' s <- restartSpades(s) # don't need to specify `sim` if previous line fails
-#'                      # will take from savedSimEnv()$.sim automatically
+#' ## the following line will not work if the previous line didn't fail:
+#'
+#' ## don't need to specify `sim` if previous line fails;
+#' ## will take from savedSimEnv()$.sim automatically
+#' s <- restartSpades(s)
+#'
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE,
                           verbose = getOption("reproducible.verbose", 1L), ...) {
@@ -115,7 +118,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     etSecs <- sum(com[, et := difftime(get(._txtClockTime), get(._txtPrevEventTimeFinish), units = "secs"),
                       by = seq_len(NROW(com))]$et)
 
-    # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
+    ## remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
     # et <- difftime(tail(com$._clockTime, numMods - 1)[1], com$._clockTime[1])
     st <- Sys.time()
     sim[[._txtStartClockTime]] <- st - etSecs
@@ -144,7 +147,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     modules <- unique(modules)
     names(modules) <- modules
     modules <- modules[!modules %in% unlist(.coreModules())]
-    # move objects back in place
+    ## move objects back in place
     # browser(expr = exists("._restartSpades_2"))
     out <- lapply(eventIndices, function(event) {
       objNames <- names(sim$.recoverableObjs[[event]])
@@ -152,7 +155,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       names(notYetCreated) <- notYetCreated
       notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
 
-      # need to overwrite with NULL if the object was not yet created
+      ## need to overwrite with NULL if the object was not yet created
       sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
       # sim$.recoverableObjs[[event]]
       objsToCopy <- sim$.recoverableObjs[[event]]
@@ -160,7 +163,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       objNames <- names(objsToCopy)
       # objNames <- setdiff(objNames, notYetCreated)
       if (!is.null(objNames)) {
-        # only take objects that changed -- determine which ones are changed
+        ## only take objects that changed -- determine which ones are changed
         whNULLs <- sapply(objsToCopy, is.null)
         objsWONULLSs <- objsToCopy[!whNULLs]
         if (any(whNULLs)) {
@@ -178,9 +181,10 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
           stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
           fd1 <- fd1[!unlist(unname(fd1)) %in% unlist(unname(fd2))]
         }
-        # move the changed ones to the simList
-        if (NROW(fd1))
+        ## move the changed ones to the simList
+        if (NROW(fd1)) {
           list2env(objsToCopy[names(fd1)], envir = sim@.xData)
+        }
       }
 
       if (length(sim$.recoverableModObjs)) {
@@ -201,12 +205,12 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       invisible()
     })
 
-    # Once reversed, remove the .recoverableObjs
+    ## Once reversed, remove the .recoverableObjs
     sim$.recoverableObjs <- NULL
 
     # modules <- if (!is.list(module)) as.list(module) else module
 
-    # reset activeBinding mod
+    ## reset activeBinding mod
     out <- lapply(modules, function(mod) {
       makeModActiveBinding(sim = sim, mod = mod)
     })
@@ -214,7 +218,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       makeParActiveBinding(sim = sim, mod = mod)
     })
 
-    # Remove all added events that occurred during the events, i.e., via scheduleEvent
+    ## Remove all added events that occurred during the events, i.e., via scheduleEvent
     sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
     sim@current <- list()
     assign(".Random.seed", sim@.xData$._randomSeed[[numMods]], envir = .GlobalEnv)
@@ -223,7 +227,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   }
 
   opt <- options("spades.moduleCodeChecks" = FALSE)
-
 
   out <- lapply(modules, function(module) {
     pp <- list()
@@ -235,7 +238,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 
       doesntUseNamespacing <- !.isNamespaced(sim, module)
 
-      # evaluate the rest of the parsed file
+      ## evaluate the rest of the parsed file
       sim <- currentModuleTemporary(sim, module)
       pkgs = slot(slot(depends(sim), "dependencies")[[module]], "reqdPkgs")
       if (doesntUseNamespacing) {
@@ -246,15 +249,15 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       if (length(subFiles)) {
         pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
       }
-      #ee <- new.env()
-      #ee$sim <- sim
+      # ee <- new.env()
+      # ee$sim <- sim
       # sim@.xData[[module]]$sim <- sim
       lapply(pp, function(pp1)
         evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim, pkgs = pkgs))
       message(cli::col_blue("Reparsing ", module, " source code"))
     }
-    #rm(list = "sim", envir = ee)
-    #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
+    # rm(list = "sim", envir = ee)
+    # list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
     invisible()
   })
   options(opt)
