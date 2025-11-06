@@ -30,26 +30,24 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 
 #' Restart an interrupted simulation
 #'
-#' This is very experimental and has not been thoroughly tested. Use with caution.
-#' This function will re-parse a single module (currently) into the `simList`
-#' where its source code should reside, and then optionally restart a simulation
-#' that stopped on an error, presumably after the developer has modified the
-#' source code of the module that caused the break.
-#' This will restart the simulation at the next event in the event queue
-#' (i.e., returned by `events(sim)`). Because of this, this function will
-#' not do anything if the event queue is empty.
+#' **This is experimental and has not been thoroughly tested. Use with caution.**
+#' If there is an error during an event, this function will rewind the simulation to a state
+#' `numEvents` prior to the event that led to the error. The developer may then modify the
+#' source code of the module that caused the break and resume the simulation.
 #'
 #' @details
-#' This will only parse the source code from the named module. It will not affect any
-#' objects that are in the `mod` or `sim`.
+#' If `options('spades.recoveryMode')` is set to `TRUE` or a numeric (default 1), then
+#' there will be a list in the `simList` called `.recoverableObjs`.
+#' These record the elements of simList that have  changed over a number of events equal
+#' to the number chosen for `options('spades.recoveryMode')`.
+#' The `restartSpades` function then uses this list to rewind `numEvents` backwards from the
+#' first event in `events(sim)` (likely the one that caused the error).
 #'
 #' The random number seed will be reset to the state it was at the start of the
-#' earliest event recovered, thereby returning to the exact stochastic simulation
-#' trajectory.
+#' earliest event recovered, thereby returning to the exact stochastic simulation trajectory.
 #'
-#' @note This will only work reliably
-#' *if the `simList` was not modified yet during the event which caused the error*.
-#' The `simList` will be in the state it was at the time of the error.
+#' @note The `simList` will be in the state it was `numEvents` prior to the event
+#' that led to the error (although some objects, e.g., on disk, may have already been modified).
 #'
 #' @param sim A `simList` or a filename that will load a `simList`, e.g., from
 #'    `saveState` or `saveSimList`. If not supplied (the default),
@@ -63,11 +61,12 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
 #'   with the module code parsed into the `simList`
 #'
-#' @param numEvents Numeric. Default is Inf (i.e., all available). In the `simList`, if
-#'   `options('spades.recoveryMode')` is set to `TRUE` or a numeric, then
-#'   there will be a list in the `simList` called `.recoverableObjs`. These will be
-#'   replayed backwards in time to reproduce the initial state of the `simList` before
-#'   the event that is `numEvents` back from the first event in `events(sim)`.
+#' @param numEvents Numeric. Default is Inf (i.e., all available).
+#'   The number of events to be rewound.
+#'   In the `simList`, if `options('spades.recoveryMode')` is set to `TRUE` or a numeric,
+#'   then there will be a list in the `simList` called `.recoverableObjs`.
+#'   These will be replayed backwards in time to reproduce the initial state of the `simList`
+#'   before the event that is `numEvents` prior to the first event in `events(sim)`.
 #'
 #' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
 #'
@@ -83,14 +82,16 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' # options("spades.recoveryMode" = 1) # now the default
 #' s <- simInit()
 #' s <- spades(s) # if this is interrupted or fails
-#' # the following line will not work if the previous line didn't fail
-#' s <- restartSpades(s) # don't need to specify `sim` if previous line fails
-#'                      # will take from savedSimEnv()$.sim automatically
+#' ## the following line will not work if the previous line didn't fail:
+#'
+#' ## don't need to specify `sim` if previous line fails;
+#' ## will take from savedSimEnv()$.sim automatically
+#' s <- restartSpades(s)
+#'
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE,
                           verbose = getOption("reproducible.verbose", 1L), ...) {
-  message("Running restartSpades ... this is very experimental; ",
-          "this should be used with caution.")
+  message("This is experimental and should be used with caution.")
 
   # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
@@ -117,7 +118,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     etSecs <- sum(com[, et := difftime(get(._txtClockTime), get(._txtPrevEventTimeFinish), units = "secs"),
                       by = seq_len(NROW(com))]$et)
 
-    # remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
+    ## remove the times of the completed events - 1 because the restartSpaDES includes the incompleted event
     # et <- difftime(tail(com$._clockTime, numMods - 1)[1], com$._clockTime[1])
     st <- Sys.time()
     sim[[._txtStartClockTime]] <- st - etSecs
@@ -146,7 +147,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     modules <- unique(modules)
     names(modules) <- modules
     modules <- modules[!modules %in% unlist(.coreModules())]
-    # move objects back in place
+    ## move objects back in place
     # browser(expr = exists("._restartSpades_2"))
     out <- lapply(eventIndices, function(event) {
       objNames <- names(sim$.recoverableObjs[[event]])
@@ -154,7 +155,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       names(notYetCreated) <- notYetCreated
       notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
 
-      # need to overwrite with NULL if the object was not yet created
+      ## need to overwrite with NULL if the object was not yet created
       sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
       # sim$.recoverableObjs[[event]]
       objsToCopy <- sim$.recoverableObjs[[event]]
@@ -162,7 +163,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       objNames <- names(objsToCopy)
       # objNames <- setdiff(objNames, notYetCreated)
       if (!is.null(objNames)) {
-        # only take objects that changed -- determine which ones are changed
+        ## only take objects that changed -- determine which ones are changed
         whNULLs <- sapply(objsToCopy, is.null)
         objsWONULLSs <- objsToCopy[!whNULLs]
         if (any(whNULLs)) {
@@ -180,9 +181,10 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
           stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
           fd1 <- fd1[!unlist(unname(fd1)) %in% unlist(unname(fd2))]
         }
-        # move the changed ones to the simList
-        if (NROW(fd1))
+        ## move the changed ones to the simList
+        if (NROW(fd1)) {
           list2env(objsToCopy[names(fd1)], envir = sim@.xData)
+        }
       }
 
       if (length(sim$.recoverableModObjs)) {
@@ -203,12 +205,12 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       invisible()
     })
 
-    # Once reversed, remove the .recoverableObjs
+    ## Once reversed, remove the .recoverableObjs
     sim$.recoverableObjs <- NULL
 
     # modules <- if (!is.list(module)) as.list(module) else module
 
-    # reset activeBinding mod
+    ## reset activeBinding mod
     out <- lapply(modules, function(mod) {
       makeModActiveBinding(sim = sim, mod = mod)
     })
@@ -216,7 +218,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       makeParActiveBinding(sim = sim, mod = mod)
     })
 
-    # Remove all added events that occurred during the events, i.e., via scheduleEvent
+    ## Remove all added events that occurred during the events, i.e., via scheduleEvent
     sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
     sim@current <- list()
     assign(".Random.seed", sim@.xData$._randomSeed[[numMods]], envir = .GlobalEnv)
@@ -225,7 +227,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   }
 
   opt <- options("spades.moduleCodeChecks" = FALSE)
-
 
   out <- lapply(modules, function(module) {
     pp <- list()
@@ -237,7 +238,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 
       doesntUseNamespacing <- !.isNamespaced(sim, module)
 
-      # evaluate the rest of the parsed file
+      ## evaluate the rest of the parsed file
       sim <- currentModuleTemporary(sim, module)
       pkgs = slot(slot(depends(sim), "dependencies")[[module]], "reqdPkgs")
       if (doesntUseNamespacing) {
@@ -248,15 +249,15 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
       if (length(subFiles)) {
         pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
       }
-      #ee <- new.env()
-      #ee$sim <- sim
+      # ee <- new.env()
+      # ee$sim <- sim
       # sim@.xData[[module]]$sim <- sim
       lapply(pp, function(pp1)
         evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim, pkgs = pkgs))
       message(cli::col_blue("Reparsing ", module, " source code"))
     }
-    #rm(list = "sim", envir = ee)
-    #list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
+    # rm(list = "sim", envir = ee)
+    # list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
     invisible()
   })
   options(opt)
