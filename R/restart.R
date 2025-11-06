@@ -30,26 +30,24 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 
 #' Restart an interrupted simulation
 #'
-#' This is very experimental and has not been thoroughly tested. Use with caution.
-#' This function will re-parse a single module (currently) into the `simList`
-#' where its source code should reside, and then optionally restart a simulation
-#' that stopped on an error, presumably after the developer has modified the
-#' source code of the module that caused the break.
-#' This will restart the simulation at the next event in the event queue
-#' (i.e., returned by `events(sim)`). Because of this, this function will
-#' not do anything if the event queue is empty.
+#' **This is experimental and has not been thoroughly tested. Use with caution.**
+#' If there is an error during an event, this function will rewind the simulation to a state
+#' `numEvents` prior to the event that led to the error. The developer may then modify the
+#' source code of the module that caused the break and resume the simulation.
 #'
 #' @details
-#' This will only parse the source code from the named module. It will not affect any
-#' objects that are in the `mod` or `sim`.
+#' If `options('spades.recoveryMode')` is set to `TRUE` or a numeric (default 1), then
+#' there will be a list in the `simList` called `.recoverableObjs`.
+#' These record the elements of simList that have  changed over a number of events equal
+#' to the number chosen for `options('spades.recoveryMode')`.
+#' The `restartSpades` function then uses this list to rewind `numEvents` backwards from the
+#' first event in `events(sim)` (likely the one that caused the error).
 #'
 #' The random number seed will be reset to the state it was at the start of the
-#' earliest event recovered, thereby returning to the exact stochastic simulation
-#' trajectory.
+#' earliest event recovered, thereby returning to the exact stochastic simulation trajectory.
 #'
-#' @note This will only work reliably
-#' *if the `simList` was not modified yet during the event which caused the error*.
-#' The `simList` will be in the state it was at the time of the error.
+#' @note The `simList` will be in the state it was `numEvents` prior to the event
+#' that led to the error (although some objects, e.g., on disk, may have already been modified).
 #'
 #' @param sim A `simList` or a filename that will load a `simList`, e.g., from
 #'    `saveState` or `saveSimList`. If not supplied (the default),
@@ -63,11 +61,12 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
 #'   with the module code parsed into the `simList`
 #'
-#' @param numEvents Numeric. Default is Inf (i.e., all available). In the `simList`, if
-#'   `options('spades.recoveryMode')` is set to `TRUE` or a numeric, then
-#'   there will be a list in the `simList` called `.recoverableObjs`. These will be
-#'   replayed backwards in time to reproduce the initial state of the `simList` before
-#'   the event that is `numEvents` back from the first event in `events(sim)`.
+#' @param numEvents Numeric. Default is Inf (i.e., all available).
+#'   The number of events to be rewound.
+#'   In the `simList`, if `options('spades.recoveryMode')` is set to `TRUE` or a numeric,
+#'   then there will be a list in the `simList` called `.recoverableObjs`.
+#'   These will be replayed backwards in time to reproduce the initial state of the `simList`
+#'   before the event that is `numEvents` prior to the first event in `events(sim)`.
 #'
 #' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
 #'
@@ -89,8 +88,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE,
                           verbose = getOption("reproducible.verbose", 1L), ...) {
-  message("Running restartSpades ... this is very experimental; ",
-          "this should be used with caution.")
+  message("This is experimental and should be used with caution.")
 
   # browser(expr = exists("._restartSpades_1"))
   if (is.null(sim)) {
