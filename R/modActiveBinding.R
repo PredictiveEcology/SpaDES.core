@@ -54,7 +54,6 @@ activeModBindingFunction <- function(value) {
   return(ret)
 }
 
-#' @importFrom quickPlot whereInStack
 activeParBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {

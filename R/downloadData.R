@@ -24,7 +24,6 @@ setGeneric(
 
 #' @export
 #' @exportMethod extractURL
-#' @importFrom quickPlot whereInStack
 #' @rdname extractURL
 setMethod(
   "extractURL",
@@ -34,12 +33,18 @@ setMethod(
     lenSC <- length(sys.calls())
     # This will get the simList that is closest in the call stack, noting that
     #  in this first one (i.e., this function), sim will be missing
-    while (missing(sim) && i < lenSC) {
-      i <- i + 1
-      simEnv <- whereInStack("sim", -i)
+    simEnv <- whereInStack("sim", parent.frame()) # has to start "before" this function or it will find this function's missing "sim"
+    if (!is.null(simEnv)) {
       sim <- simEnv$sim
+      # while (missing(sim) && i < lenSC) {
+      #   i <- i + 1
+      #   simEnv <- whereInStack("sim", -i)
+      #   sim <- simEnv$sim
+      # }
+      extractURL(objectName = objectName, sim = sim, module = module)
+    } else {
+      NULL
     }
-    extractURL(objectName = objectName, sim = sim, module = module)
 })
 
 #' @export
