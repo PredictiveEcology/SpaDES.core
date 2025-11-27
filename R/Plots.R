@@ -97,7 +97,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @include simList-accessors.R
 #' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs qsave
-#' @importFrom quickPlot clearPlot Plot whereInStack
+#' @importFrom quickPlot clearPlot Plot
 #' @importFrom terra writeRaster
 #' @importFrom tools file_path_sans_ext
 #'
