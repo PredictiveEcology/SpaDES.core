@@ -18,7 +18,7 @@ simInitAndSpades(
   outputs,
   loadOrder,
   notOlderThan,
-  debug,
+  debug = getOption("spades.debug"),
   progress,
   cache,
   .plots,
