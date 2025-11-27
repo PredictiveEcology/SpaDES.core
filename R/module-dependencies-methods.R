@@ -46,8 +46,10 @@ setMethod(
     deps <- sim@depends
     DT <- .depsEdgeList(deps, plot, includeOutputs = includeOutputs)
     correctOrd <- unlist(sim@modules, use.names = FALSE)
-    DT[, fromOrd := factor(from, levels = correctOrd)]
-    DT[, toOrd := factor(to, levels = correctOrd)]
+    set(DT, NULL, "fromOrd", factor(DT[["from"]], levels = correctOrd))
+    # DT[, fromOrd := factor(from, levels = correctOrd)]
+    set(DT, NULL, "toOrd", factor(DT[["to"]], levels = correctOrd))
+    # DT[, toOrd := factor(to, levels = correctOrd)]
     DT <- setorderv(DT, c("fromOrd", "toOrd"))
     return(DT)
 })
@@ -61,30 +63,60 @@ setMethod("depsEdgeList",
 
 #' @importFrom data.table as.data.table data.table rbindlist setkeyv setorder
 .depsEdgeList <- function(deps, plot, includeOutputs = FALSE) {
-  sim.in <- sim.out <- data.table(objectName = character(0),
-                                  objectClass = character(0),
-                                  module = character(0))
+  if (FALSE) {
+    sim.in <- sim.out <- data.table(objectName = character(0),
+                                    objectClass = character(0),
+                                    module = character(0))
+  } else {
+    sim.in <- sim.out <- data.frame(objectName = character(0),
+                                    objectClass = character(0),
+                                    module = character(0))
+  }
   lapply(deps@dependencies, function(x) {
     if (!is.null(x)) {
-      z.in <- as.data.table(x@inputObjects)[, .(objectName, objectClass)]
-      if (NROW(z.in) == 0)
-        z.in <- as.data.table(list(objectName = ".dummyIn", objectClass = NA))
-      z.out <- as.data.table(x@outputObjects)[, .(objectName, objectClass)]
-      if (NROW(z.out) == 0)
-        z.in <- as.data.table(list(objectName = ".dummyOut", objectClass = NA))
-      z.in$module <- z.out$module <- x@name
-      if (!all(is.na(z.in[, objectName]), is.na(z.in[, objectClass]))) {
-        sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
-      }
-      if (!all(is.na(z.out[, 1:2]), is.na(z.out[, objectClass]))) {
-        sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
+      if (FALSE) {
+        z.in <- as.data.table(x@inputObjects)[, .(objectName, objectClass)]
+        if (NROW(z.in) == 0)
+          z.in <- as.data.table(list(objectName = ".dummyIn", objectClass = NA))
+        z.out <- as.data.table(x@outputObjects)[, .(objectName, objectClass)]
+        if (NROW(z.out) == 0)
+          z.in <- as.data.table(list(objectName = ".dummyOut", objectClass = NA))
+        z.in$module <- z.out$module <- x@name
+        if (!all(is.na(z.in[, objectName]), is.na(z.in[, objectClass]))) {
+          sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
+        }
+        if (!all(is.na(z.out[, 1:2]), is.na(z.out[, objectClass]))) {
+          sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
+        }
+      } else {
+        z.in <- x@inputObjects[, c("objectName", "objectClass")]
+        if (NROW(z.in) == 0)
+          z.in <- data.frame(objectName = ".dummyIn", objectClass = NA)
+        z.out <- x@outputObjects[, c("objectName", "objectClass")]
+        if (NROW(z.out) == 0)
+          z.out <- data.frame(objectName = ".dummyIn", objectClass = NA)
+        z.in$module <- z.out$module <- x@name
+        if (!all(is.na(z.in[, "objectName"]), is.na(z.in[, "objectClass"]))) {
+          # sim.in <<- rbind(sim.in, z.in)
+          sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
+        }
+        if (!all(is.na(z.out[, c("objectName")]), is.na(z.out[, "objectClass"]))) {
+          sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
+          # sim.out <<- rbind(sim.out, z.out)
+        }
+
       }
     }
     return(invisible(NULL)) # return from the lapply
   })
 
-  setkeyv(sim.in, "objectName")
-  setkeyv(sim.out, "objectName")
+  if (FALSE) {
+    setkeyv(sim.in, "objectName")
+    setkeyv(sim.out, "objectName")
+  } else {
+    setkeyv(setDT(sim.in), "objectName")
+    setkeyv(setDT(sim.out), "objectName")
+  }
 
   if ((nrow(sim.in)) && (nrow(sim.out))) {
     dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]

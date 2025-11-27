@@ -202,7 +202,8 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
     # }
       # test for circularity
       circular <- dd[, any(from %in% to) && any(to %in% from), by = objName]
-      rmObjs <- circular[V1 %in% TRUE]$objName
+      # rmObjs <- circular[V1 %in% TRUE]$objName
+      rmObjs <- circular$objName[circular$V1 %in% TRUE]
       if (length(rmObjs))
         dd <- dd[!objName %in% rmObjs]
 

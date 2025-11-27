@@ -2263,7 +2263,8 @@ end.simList <- function(x, unit, ...) {
         unit <- NA_character_
     }
     if (!is.na(unit)) {
-      if (is.na(pmatch("second", unit))) {
+      # if (is.na(pmatch("second", unit))) {
+      if (!startsWith(unit, "second")) {
         # i.e., if not in same units as simulation
         t <- convertTimeunit(x@simtimes$end, unit, x@.xData)
         return(t)
@@ -2316,7 +2317,9 @@ start.simList <- function(x, unit = NULL, ...) {
     }
 
     if (!is.na(unit)) {
-      if (is.na(pmatch("second", unit))) {
+      # if (is.na(pmatch("second", unit))) {
+      if (!startsWith(unit, "second")) {
+
         # i.e., if not in same units as simulation
         t <- convertTimeunit(x@simtimes$start, unit, x@.xData)
         return(t)
@@ -2542,7 +2545,8 @@ setMethod(
     if (length(unit) != 1) {
       stop("unit must be length 1")
     }
-    if (is.na(pmatch("second", unit)) && (length(sim@events) > 0)) {
+    # if (is.na(pmatch("second", unit)) && (length(sim@events) > 0)) {
+    if (!startsWith(unit, "second") && (length(sim@events) > 0)) {
       ## note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(obj$eventTime))) {
         if (!is.null(obj$eventTime)) {
@@ -2633,8 +2637,8 @@ setMethod(
         x
       })
       obj <- rbindlist(conds)
-      if (is.na(pmatch("second", unit)) &&
-          (length(conds) > 0)) {
+      # if (is.na(pmatch("second", unit)) && (length(conds) > 0)) {
+      if (!startsWith(unit, "second") && (length(conds) > 0)) {
         # note the above line captures empty eventTime, whereas is.na does not
         if (any(!is.na(obj$minEventTime)) && (any(!is.na(obj$maxEventTime)))) {
           if (!is.null(obj$minEventTime) && !is.null(obj$maxEventTime)) {
@@ -2680,7 +2684,8 @@ setMethod(
   "current",
   signature = c("simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) & (length(sim@current$eventTime))) {
+    # out <- if (is.na(pmatch("second", unit)) & (length(sim@current$eventTime))) {
+    out <- if (!startsWith(unit, "second") && (length(sim@current$eventTime))) {
       # note the above line captures empty eventTime, whereas `is.na` does not
       if (any(!is.na(sim@current$eventTime))) {
         if (!is.null(sim@current$eventTime)) {
@@ -2761,7 +2766,8 @@ setMethod(
       if (!isTRUE(times)) {
         set(obj, NULL, grep("^[.]_", names(obj)), NULL)
       }
-      if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+      # if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+      if (!startsWith(unit, "second") & (length(sim@completed))) {
         # note the above line captures empty eventTime, whereas `is.na` does not
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
