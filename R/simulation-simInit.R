@@ -1826,6 +1826,10 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       # This keeps the user passed params
       sim@params <- modifyList2(sim@params, params)
 
+      # keep the cache information for cacheChaining
+      attr(sim, "tags") <- attr(simAltOut, "tags")
+      attr(sim, lastEventDetails) <- attr(simAltOut, lastEventDetails)
+
       list2env(objs(simAltOut), envir(sim))
 
       dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)

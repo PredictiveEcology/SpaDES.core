@@ -35,6 +35,7 @@ layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
 # .txtNoPrefix <- getFromNamespace(".txtNoPrefix", "reproducible")
 cacheId <- getFromNamespace("cacheId", "reproducible")
 whereInStack <- getFromNamespace("whereInStack", "reproducible")
+showCacheFast <- getFromNamespace("showCacheFast", "reproducible")
 makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 
 ## re-exported functions --------------------------------------------------------

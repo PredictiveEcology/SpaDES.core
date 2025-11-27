@@ -2639,21 +2639,43 @@ cacheChainingSetup <- function(cacheIt, prevCache, chainingEnv, nonObjects, fnCa
   if (!is.null(prevCache) && isTRUE(cacheIt)) {
     digestNonObjects <- reproducible::CacheDigest(nonObjects)$outputHash
 
-    df <- data.table(prevCache = prevCache, digestNonObjects = digestNonObjects,
-                     module = module, event = event)
+    df <- setDT(list(prevCache = prevCache, digestNonObjects = digestNonObjects,
+                     module = module, event = event))
+    #df <- data.table(prevCache = prevCache, digestNonObjects = digestNonObjects,
+    #                 module = module, event = event)
     set(df, NULL, lastEventDetails, led)
-    anyExisting <- chainingEnv$eventCachingDF[df, on = colnames(df), nomatch = NULL]
-    if (NROW(anyExisting)) {
-      #basically, can't be .inputObjects as previous event, if this event is not also .inputObjects
-      #   can't jump from simInit to spades because a user could have modified the simList
-      if (length(endsWith(anyExisting[[lastEventDetails]], ".inputObjects")) > 1)
-        browser()
-      if ( !(endsWith(anyExisting[[lastEventDetails]], ".inputObjects") &&
-             event != ".inputObjects") ) {
+    anyExisting <- chainingEnv[[eventCachingDF]][df, on = colnames(df), nomatch = NULL]
+    cacheId <- gsub("cacheId:", "", prevCache)
+    sc <- showCacheFast(cacheId = cacheId)
+    ccVals <- sc[startsWith(sc$tagKey, "cacheChaining")]
+    if (NROW(ccVals)) {
+      spli <- strsplit(ccVals$tagKey, "_")
+      postCacheIds <- sapply(spli, function(x) x[[3]])
+      nams <- sapply(spli, function(x) x[[2]])
+      whPCI <- nams %in% "postCacheId"
+      vals <- ccVals$tagValue
+      prevDF <- setDT(as.data.frame(as.list(vals) |> setNames(nams)))
+
+      # THIS IS THE IMPORTANT LINE; JOIN on ALL COLUMNS especially digestNonObjects
+      anyExisting <- prevDF[df, on = colnames(df), nomatch = NULL]
+
+
+      # hasAPostCacheId <- unique(sc$tagValue[endsWith(sc$tagKey, "postCacheId")])
+
+      # if (length(hasAPostCacheId)) {
+      if (NROW(anyExisting)) {
+        #basically, can't be .inputObjects as previous event, if this event is not also .inputObjects
+        #   can't jump from simInit to spades because a user could have modified the simList
+        #if (length(endsWith(anyExisting[[lastEventDetails]], ".inputObjects")) > 1)
+        #  browser()
+        #if ( !(endsWith(anyExisting[[lastEventDetails]], ".inputObjects") &&
+        #       event != ".inputObjects") ) {
+        # cacheIdOfSkip <- hasAPostCacheId
         cacheIdOfSkip <- anyExisting$postCacheId
         fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
         messageCache("Using cacheChaining ... ", verbose = verbose)
 
+        #}
       }
     }
   }
@@ -2665,15 +2687,20 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
                               cacheIdOfSkip, df, chainingEnv, moduleName, eventType) {
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
   if (!isTRUE(cacheIt)) {
-    attr(sim, "tags") <- NULL
+    attr(sim, "tags") <- NULL # Remove the tag from Cache recovery
   } else if (!is.null(prevCache)) {
     if (is.null(cacheIdOfSkip)) {
       # It can already be there, especially when it is .inputObjects to init transition
-      if (!(df$prevCache %in% chainingEnv[["eventCachingDF"]]$prevCache &&
-            df$digestNonObjects %in% chainingEnv[["eventCachingDF"]]$digestNonObjects)) {
-        postCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
-        df <- set(df, NULL, "postCacheId", postCacheId)
-        chainingEnv[["eventCachingDF"]] <- rbind(chainingEnv[["eventCachingDF"]], df)
+      postCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
+      df <- set(df, NULL, "postCacheId", postCacheId)
+      # .addTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
+      #              tagKey = cacheChainingPostCacheId, postCacheId)
+
+      .addTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
+                   tagKey = paste0("cacheChaining_", colnames(df), "_", postCacheId), tagValue = unname(unlist(df)))
+      if (!(df$prevCache %in% chainingEnv[[eventCachingDF]]$prevCache &&
+            df$digestNonObjects %in% chainingEnv[[eventCachingDF]]$digestNonObjects)) {
+        chainingEnv[[eventCachingDF]] <- rbind(chainingEnv[[eventCachingDF]], df)
       }
 
     }
@@ -2683,6 +2710,8 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
 
 
 lastEventDetails <- "lastEventDetails"
+eventCachingDF <- "eventCachingDF"
+cacheChainingPostCacheId <- "cacheChaining_postCacheId"
 
 chainingEnv <- function(cachePath, envir = .GlobalEnv) {
   obj <- paste0(".spadesChainingEnv_", cachePath)
