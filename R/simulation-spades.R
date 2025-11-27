@@ -192,8 +192,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           !identical(debug, FALSE)
         }
       }
-      if (attr(sim, "needDebug")) {
-        debugMessage(debug, sim, cur, fnEnv, curModuleName)
+      if (attr(sim, "needDebug") + 1) {
+        debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
@@ -216,7 +216,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
               #.useCache is not TRUE
               if (cur[["eventType"]] %in% a) {
                 cacheIt <- TRUE
-              } else if (is(a, "POSIXt")) {
+              } else if (inherits(a, "POSIXt")) {
                 cacheIt <- TRUE
                 notOlderThan <- a
               }
@@ -1013,7 +1013,6 @@ setMethod(
         #   restartFormals <- formals(restartR)
         #   # can change end(sim) back to original now because we are already ending
         #   end(sim) <- sim$._restartRList$endOrig
-        #   browser()
         #   restartR(
         #     sim = sim,
         #     reloadPkgs = getOption("spades.restartR.reloadPkgs", restartFormals$reloadPkgs),
@@ -1459,7 +1458,7 @@ setMethod(
                                eventType = cur[["eventType"]])
     }
 
-    if (identical(rr, .Random.seed)) {
+    if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
     }
     # if (allowSequentialCaching) {
@@ -1479,7 +1478,7 @@ setMethod(
   }
 
   if (debugToVerbose(debug)) {
-    sim <- objectsCreatedPost(sim, objsIsNullBefore)
+    sim <- objectsCreatedPost(sim, objsIsNullBefore, verbose = verbose)
   }
   evalPostEvent() # this is getOption("spades.evalPostEvent")
 
@@ -1504,7 +1503,7 @@ setMethod(
   numTries <- 0
   while (canContinue) {
     out <- try(eval(fnCallAsExpr))
-    if (isTRUE(is(out, "try-error"))) {
+    if (isTRUE(inherits(out, "try-error"))) {
       numTries <- numTries + 1
       if (numTries > 1) {
         tmp <- .parseConditional(filename = sim@.xData[[dotMods]][[cur[["moduleName"]]]]$._sourceFilename)
@@ -1600,7 +1599,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
       } else {
         list()
       })
-      if (is(newList, "try-error"))
+      if (inherits(newList, "try-error"))
         stop(newList)
 
       names(newList) <- curMod
@@ -1776,7 +1775,7 @@ clearFileBackedObjs <- function(recoverableObjs, recoverMode) {
       toClear <- recoverableObjs[[as.numeric(recoverMode)]]
       if (length(toClear)) {
         out <- lapply(toClear, function(x) {
-          if (is(x, "Raster")) {
+          if (inherits(x, "Raster")) {
             Filenames(x)
           }
         })
@@ -1963,71 +1962,73 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 
 #' @importFrom cli col_green
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
-  if (!is(debug, "list") && !is.character(debug)) debug <- list(debug)
-  if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else isTRUE(x), FUN.VALUE = logical(1))))
-    debug <- append(list(1L), debug)
-  for (i in seq_along(debug)) {
-    if (isTRUE(debug[[i]]) || identical(debug[[i]], "current") || identical(debug[[i]], "step")) {
-      if (length(cur) > 0) {
-        if (debug[[i]] == "step") {
-          if (interactive())
-            readline("Press any key to continue...")
-        }
-        outMess <- debugMessTRUE(sim)
-      }
-    } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 1 else isTRUE(debug[[i]]))) {
-      totalDiff <- difftime(Sys.time(), sim@.xData$._startClockTime - sim$._simInitElapsedTime)
-
-      outMess <- paste0("total elpsd: ", format(totalDiff, digits = 2, unit = "auto"),
-                        " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
-    } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 2 else isTRUE(debug[[i]]))) {
-      compareTime <- if (is.null(attr(sim, "completedCounter")) ||
-                         attr(sim, "completedCounter") == 1) {
-        sim@.xData$._startClockTime
-      } else {
-        .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]][[._txtClockTime]])
-      }
-      outMess <- paste0("elpsd: ", format(Sys.time() - compareTime, digits = 2),
-                        " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
-    } else {
-      if (is.call(debug[[i]])) {# || is(debug[[i]], "if") || is(debug[[i]], "{")) {
-        outMess <- try(eval(debug[[i]]))
-      } else if (identical(debug[[i]], "simList")) {
-        outMess <- try(capture.output(sim))
-      } else if (isTRUE(grepl(debug[[i]], pattern = "\\(")) && !cli::ansi_has_any(debug[i])) {
-        outMess <- try(eval(parse(text = debug[[i]])))
-      } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
-        outMess <- NULL
-        if (is.environment(fnEnv)) {
-          if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
-            debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
-            on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+  if (!inherits(debug, "list") && !is.character(debug)) debug <- list(debug)
+  if ( !(isFALSE(debug) || debug == 0)) {
+    if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else isTRUE(x), FUN.VALUE = logical(1))))
+      debug <- append(list(1L), debug)
+    for (i in seq_along(debug)) {
+      if (isTRUE(debug[[i]]) || identical(debug[[i]], "current") || identical(debug[[i]], "step")) {
+        if (length(cur) > 0) {
+          if (debug[[i]] == "step") {
+            if (interactive())
+              readline("Press any key to continue...")
           }
+          outMess <- debugMessTRUE(sim)
         }
-      } else if (!any(debug[[i]] %in% c("browser"))) { # any other
-        if (!is.function(debug[[i]])) {
-          outMess <- tryCatch(do.call(debug[[i]], list(sim)), silent = TRUE,
-                              error = function(e) NULL)
-        } else  {
-          outMess <- try(debug[[i]](sim))
+      } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 1 else isTRUE(debug[[i]]))) {
+        totalDiff <- difftime(Sys.time(), sim@.xData$._startClockTime - sim$._simInitElapsedTime)
+
+        outMess <- paste0("total elpsd: ", format(totalDiff, digits = 2, unit = "auto"),
+                          " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
+      } else if (isTRUE(if (is.numeric(debug[[i]])) debug[[i]] %in% 2 else isTRUE(debug[[i]]))) {
+        compareTime <- if (is.null(attr(sim, "completedCounter")) ||
+                           attr(sim, "completedCounter") == 1) {
+          sim@.xData$._startClockTime
+        } else {
+          .POSIXct(sim@completed[[as.character(attr(sim, "completedCounter") - 1)]][[._txtClockTime]])
         }
+        outMess <- paste0("elpsd: ", format(Sys.time() - compareTime, digits = 2),
+                          " | ", paste(format(unname(current(sim)), digits = 4), collapse = " "))
       } else {
-        outMess <- NULL
+        if (is.call(debug[[i]])) {# || is(debug[[i]], "if") || is(debug[[i]], "{")) {
+          outMess <- try(eval(debug[[i]]))
+        } else if (identical(debug[[i]], "simList")) {
+          outMess <- try(capture.output(sim))
+        } else if (isTRUE(grepl(debug[[i]], pattern = "\\(")) && !cli::ansi_has_any(debug[i])) {
+          outMess <- try(eval(parse(text = debug[[i]])))
+        } else if (isTRUE(any(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")])))) {
+          outMess <- NULL
+          if (is.environment(fnEnv)) {
+            if (all(debug[[i]] %in% unlist(cur[c("moduleName", "eventType")]))) {
+              debugonce(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+              on.exit(get(paste0("doEvent.", curModuleName), envir = fnEnv))
+            }
+          }
+        } else if (!any(debug[[i]] %in% c("browser"))) { # any other
+          if (!is.function(debug[[i]])) {
+            outMess <- tryCatch(do.call(debug[[i]], list(sim)), silent = TRUE,
+                                error = function(e) NULL)
+          } else  {
+            outMess <- try(debug[[i]](sim))
+          }
+        } else {
+          outMess <- NULL
+        }
       }
-    }
-    if (is.data.frame(outMess)) {
-      reproducible::messageDF(outMess, colour = "green", colnames = FALSE)
-    } else {
-      w <- getOption("width")
-      suppress <- lapply(outMess, function(x)
-        message(cli::col_green(substring(x, first = 1, last = w - 30))))
+      if (is.data.frame(outMess)) {
+        reproducible::messageDF(outMess, colour = "green", colnames = FALSE)
+      } else {
+        w <- getOption("width")
+        suppress <- lapply(outMess, function(x)
+          message(cli::col_green(substring(x, first = 1, last = w - 30))))
+      }
     }
   }
 }
 
 updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
                                         needClass, needValuesMess) {
-  if (!is(newParamValues, needClass) && !is.na(newParamValues)) {
+  if (!inherits(newParamValues, needClass) && !is.na(newParamValues)) {
     if (missing(needValuesMess))
       needValuesMess <- ""
     stop(newParamValues, " must be class '", needClass, "'. It must be ", needValuesMess)
@@ -2053,16 +2054,16 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     noNew <- FALSE
     if (numCharsMax > 0) {
       sim2 <- list() # don't put a `sim` here because whereInStack will find this one
-      while (!is(sim2, "simList")) {
-        simEnv <- try(whereInStack("sim"), silent = TRUE)
-        if (is(simEnv, "try-error"))
+      while (!inherits(sim2, "simList")) {
+        simEnv <- whereInStack("sim")
+        if (is.null(simEnv))
           break
         sim <- get0("sim", envir = simEnv, inherits = FALSE)
-        if (is(sim, "simList"))
+        if (inherits(sim, "simList"))
           sim2 <- sim
       }
 
-      if (!is(sim, "try-error") && !is.null(sim)) {
+      if (!inherits(sim, "try-error") && !is.null(sim)) {
         # If this is a nested spades call, will have time already at start
         if (startsWith(mess, strftime(st, format = "%h%d"))) {
           noNew <- TRUE
@@ -2359,7 +2360,7 @@ allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
       if (isTRUE(noChange)) {
         isMemoised <- reproducible::.isMemoised(cacheId = nextEvent, cachePath = cachePath(sim))
         simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
-        if (!is(simSkip, "try-error")) {
+        if (!inherits(simSkip, "try-error")) {
           if (all(current(simSkip) == current(sim))) {
             attr(sim, "runFnCallAsExpr") <- FALSE # the trigger to NOT pull the next event
             sim <- .prepareOutput(simSkip, cachePath(sim), sim)
@@ -2626,7 +2627,7 @@ dotRMOFilepath <- function(thisSpadesCallRandomStr, events) {
 
 evalPostEvent <- function(envir = parent.frame()) {
   if (!is.null(getOption("spades.evalPostEvent"))) {
-    print(getOption("spades.evalPostEvent"))
+    # print(getOption("spades.evalPostEvent"))
     eval(getOption("spades.evalPostEvent"), envir = envir)
   }
 }

@@ -50,6 +50,11 @@ setMethod(
   signature(sim = "simList", object = "ANY"),
   definition = function(sim, object, layer, ...) {
     ret <- TRUE # set default
+    debug <- getDebug() # from options first, then override if in a simInitAndSpades
+    if  (is.call(debug))
+      debug <- eval(debug)
+    verbose <- debugToVerbose(debug)
+
     # if (exists(deparse(substitute(object)), envir = sim@.xData)) { # can't use sim@.xData because it has parent of emptyenv
     obj <- tryCatch(
       eval(parse(text = deparse(substitute(object))),
@@ -58,15 +63,15 @@ setMethod(
     if (!isFALSE(obj) && !is.null(obj)) {
       if (!missing(layer)) {
         if (is.na(match(layer, names(object)))) {
-          message(paste(deparse(substitute(object, env = sim@.xData)),
-                        "exists, but", layer, "is not a layer"))
+          messageVerbose(paste(deparse(substitute(object, env = sim@.xData)),
+                        "exists, but", layer, "is not a layer"), verbose = verbose)
           ret <- FALSE
         }
       }
 
     } else {
-      message(paste(deparse(substitute(object, env = sim@.xData)),
-                    "does not exist."))
+      messageVerbose(paste(deparse(substitute(object, env = sim@.xData)),
+                    "does not exist."), verbose = verbose)
       ret <- FALSE
     }
     return(invisible(ret))
@@ -129,6 +134,11 @@ setMethod(
     globalParams <- sim@params$.globals
     allFound <- TRUE
 
+    debug <- getDebug() # from options first, then override if in a simInitAndSpades
+    if  (is.call(debug))
+      debug <- eval(debug)
+    verbose <- debugToVerbose(debug)
+
     if (length(userModules)) {
       ### check whether each param in simInit occurs in a module's .R file
       globalsFound <- list()
@@ -172,7 +182,7 @@ setMethod(
         if (any(!isInCode)) {
           allFound <- FALSE
           lapply(names(userParams)[!isInCode], function(uP) {
-            message(paste("Parameter", uP, "is not used in module", uM))
+            messageVerbose(paste("Parameter", uP, "is not used in module", uM), verbose = verbose)
           })
         }
       }
@@ -181,8 +191,8 @@ setMethod(
       notFound <- setdiff(names(globalParams), globalsFound)
       if (length(notFound) > 0) {
         allFound <- FALSE
-        message("Global parameter(s) not used in any module: ",
-                paste(notFound, collapse = ", "), ".")
+        messageVerbose("Global parameter(s) not used in any module: ",
+                paste(notFound, collapse = ", "), ".", verbose = verbose)
       }
 
       ### check whether each param in a module's .R file occurs in simInit
@@ -232,8 +242,8 @@ setMethod(
               mP <- moduleParams[i]
               if (!(mP %in% userParams)) {
                 allFound <- FALSE
-                message(paste("Parameter", mP, "is not supplied to module",
-                              uM, "during simInit"))
+                messageVerbose(paste("Parameter", mP, "is not supplied to module",
+                              uM, "during simInit"), verbose = verbose)
               }
             }
           }
@@ -243,10 +253,10 @@ setMethod(
         notFound <- setdiff(globalsFound, names(globalParams))
         if (length(notFound) > 0) {
           allFound <- FALSE
-          message(paste(
+          messageVerbose(paste(
             "The following global parameters are used in module", uM,
             "but not supplied to simInit in .globals:", unlist(notFound)
-          ))
+          ), verbose = verbose)
         }
       }
     } else {

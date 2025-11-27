@@ -604,6 +604,11 @@ setMethod(
       clearCache(x = cachePath, cacheId = cacheId(object), ask = FALSE)
       return(invisible(reproducible:::.returnNothing))
     }
+    debug <- getDebug() # from options first, then override if in a simInitAndSpades
+    if  (is.call(debug))
+      debug <- eval(debug)
+
+    verbose <- debugToVerbose(debug)
 
     simPre <- list(...)
     simPre <- .findSimList(simPre)
@@ -666,7 +671,7 @@ setMethod(
           anyNewGlobals <- setdiffNamed(simFromCache@params$.globals, simPost@params$.globals)
           if (length(anyNewGlobals)) {
             suppressMessages(
-              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params)
+              simPost@params <- updateParamsSlotFromGlobals(simPost@params, simFromCache@params, verbose = verbose)
             )
           }
         }

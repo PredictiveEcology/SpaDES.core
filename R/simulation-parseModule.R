@@ -208,6 +208,10 @@ setMethod(
     if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
     # sim@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
     # sim@.xData$.objects <- new.env(parent = emptyenv())
+    debug <- getDebug() # from options first, then override if in a simInitAndSpades
+    if  (is.call(debug))
+      debug <- eval(debug)
+    verbose <- debugToVerbose(debug)
 
     for (j in .unparsed(modules)) {
       m <- names(modules)[[j]][1]
@@ -368,11 +372,21 @@ setMethod(
           warning("It looks like there may be an extra argument, i.e., a trailing comma, in `defineModule`")
           pf[[1]] <- pf[[1]][1:numExptedArgs]
         }
-        out <- tryCatch(eval(pf, envir = env), silent = TRUE,
-                                   error = function(e) {
-                                     # convert errors to warnings # so can capture them outside
-                                     warning(e$message)
-                                   })
+        messHere <- c()
+        withCallingHandlers(
+          out <- tryCatch(eval(pf, envir = env), silent = TRUE,
+                          error = function(e) {
+                            # convert errors to warnings # so can capture them outside
+                            warning(e$message)
+                          })
+          , message = function(m) {
+            messHere <<- c(messHere, m$message)
+            invokeRestart("muffleMessage")
+          })
+        if (length(messHere) && verbose > 0) {
+          messageColoured("While parsing: ", mBase, ":", colour = "green")
+          messageColoured(messHere)
+        }
           # out <- try(eval(pf, envir = env))
         #}, type = "message")
           mess <- NULL
