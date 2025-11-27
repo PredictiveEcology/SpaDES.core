@@ -796,7 +796,8 @@ setMethod(
               objectsToUse <- objects
             }
 
-            objs(sim) <- objectsToUse
+            if (NROW(objectsToUse))
+              objs(sim) <- objectsToUse
           } else {
             stop(
               paste(
@@ -1543,7 +1544,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           # if (allowSequentialCaching) {
           #   sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
           # }
-
 
           # put back the current values of params that were not cached on
           if (sum(paramsDontCacheOnActual))

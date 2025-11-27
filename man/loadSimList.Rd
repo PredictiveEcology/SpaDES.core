@@ -18,7 +18,7 @@ unzipSimList(zipfile, load = TRUE, paths = getPaths(), ...)
 }
 \arguments{
 \item{filename}{Character giving the name of a saved simulation file.
-Currently, only file types \code{.qs} or \code{.rds} are supported.}
+Currently, only file types \code{.qs2} or \code{.rds} are supported.}
 
 \item{projectPath}{An optional path for the project within which the \code{simList}
 exists. This is used to identify relative paths for saving and loading the \code{simList}.}

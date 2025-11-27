@@ -56,7 +56,7 @@ If a module saves a file to disk during events, it can be useful to keep track
 of the files that are saved e.g., for \code{\link[=saveSimList]{saveSimList()}} so that all files can
 be added to the archive. In addition to setting \code{outputs} at the \code{simInit}
 stage, a module developer can also put this in a using any saving mechanism that
-is relevant (e.g., \code{qs::qsave}, \code{saveRDS} etc.). When a module event does this
+is relevant (e.g., \code{qs2::qs_save}, \code{saveRDS} etc.). When a module event does this
 it can be useful to register that saved file. \code{registerOutputs} offers an additional
 mechanism to do this. See examples.
 }

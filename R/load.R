@@ -9,11 +9,13 @@ utils::globalVariables(c("fun", "loadTime", "package"))
 #' @export
 #' @rdname loadFiles
 .fileExtensions <- function() {
+  # fmt: skip
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
     "asc", "rast", "terra",
     "csv", "read.csv", "utils",
     "png", "rast", "terra",
     "qs", "qread", "qs",
+    "qs2", "qs_read", "qs2",
     "Rdata", "load", "base",
     "rdata", "load", "base",
     "RData", "load", "base",
@@ -22,7 +24,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "shp", "terra", "vect",
     "tif", "rast", "terra",
     "txt", "read.table", "utils"
-    )),
+  )),
     stringsAsFactors = FALSE)
   colnames(.fE) <- c("exts", "fun", "package")
   return(.fE)
