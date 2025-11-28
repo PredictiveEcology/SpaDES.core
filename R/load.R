@@ -181,7 +181,7 @@ setMethod(
                 objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]])) # nolint
               }
             } else {
-              objListEnv <- whereInStack(filelist$objectName[y])
+              objListEnv <- .whereInStack(filelist$objectName[y])
               objList <- list(get(filelist$objectName[y], objListEnv))
             }
             names(objList) <- filelist$objectName[y]

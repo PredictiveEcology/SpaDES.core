@@ -2053,9 +2053,9 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     middleFix <- ""
     noNew <- FALSE
     if (numCharsMax > 0) {
-      sim2 <- list() # don't put a `sim` here because whereInStack will find this one
+      sim2 <- list() # don't put a `sim` here because .whereInStack will find this one
       while (!inherits(sim2, "simList")) {
-        simEnv <- whereInStack("sim")
+        simEnv <- .whereInStack("sim")
         if (is.null(simEnv))
           break
         sim <- get0("sim", envir = simEnv, inherits = FALSE)

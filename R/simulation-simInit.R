@@ -1987,8 +1987,8 @@ stopMessForRequireFail <- function(pkg) {
 }
 
 getDebug <- function() {
-  hasDebug <- whereInStack("debug")
-  # hasDebug <- tryCatch(whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+  hasDebug <- .whereInStack("debug")
+  # hasDebug <- tryCatch(.whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
   debug <- getOption("spades.debug")
   if (!is.null(hasDebug)) {
     # if (!isFALSE(hasDebug)) {
@@ -2113,7 +2113,7 @@ prefixSimInit <- " simInit:"
 spaceDashDashSpace <- " -- "
 
 simNestingSetup <- function(...) {
-  prevSimEnv <- tryCatch(whereInStack(._txtSimNesting), error = function(x) character())
+  prevSimEnv <- tryCatch(.whereInStack(._txtSimNesting), error = function(x) character())
   if (is.environment(prevSimEnv)) {
     prevSimEnv <- get0(._txtSimNesting, envir = prevSimEnv, inherits = FALSE)
   }

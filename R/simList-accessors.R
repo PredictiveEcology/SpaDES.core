@@ -1479,14 +1479,14 @@ registerOutputs <- function(filename, sim, ...) {
   fn <- substitute(filename)
 
   simIsIn <- NULL
-  simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
+  simIsIn <- parent.frame() # try for simplicity sake... though the .whereInStack would get this too
 
   if (missing(sim)) {
     sim <- NULL
   }
   if (is.null(sim)) {
     if (!exists("sim", simIsIn, inherits = FALSE))
-      simIsIn <- try(whereInStack("sim"), silent = TRUE)
+      simIsIn <- try(.whereInStack("sim"), silent = TRUE)
   }
   sim <- get0("sim", simIsIn, inherits = FALSE)
 
@@ -3401,17 +3401,14 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 #'
 #' @export
 #' @importFrom data.table set rbindlist setcolorder
+#' @importFrom reproducible .whereInStack
 #' @rdname objects
 moduleObjects <- function(sim, module, path) {
-  simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check
+  simTry <- NULL # can't set `sim = NULL` because `.whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      for (i in seq_along(sys.frames())[-1]) { # don't start in this environment; not here
-        simTry <- suppressWarnings(try(get("sim", whereInStack("sim", whFrame = -i)), silent = TRUE))
-        if (!is(simTry, "try-error")) {
-          break
-        }
-      }
+      browser()
+      simTry <- suppressWarnings(try(get("sim", .whereInStack("sim")), silent = TRUE))
     }
     sim <- simTry
   }
