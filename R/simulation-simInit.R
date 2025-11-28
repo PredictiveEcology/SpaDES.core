@@ -699,7 +699,7 @@ setMethod(
       # browser(expr = exists("._simInit_4"))
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
         # .pkgEnv[[".spadesDebugFirst"]] <- TRUE
-        sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
+        sim[["._spadesDebugWidth"]] <- spadesDebugWidthDefault
       }
 
       for (m in loadOrder) {
@@ -2165,3 +2165,5 @@ objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
   }
   objectsToUse
 }
+
+spadesDebugWidthDefault <- c(9, 10, 9, 13)

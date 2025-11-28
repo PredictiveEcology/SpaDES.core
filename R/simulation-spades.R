@@ -2254,6 +2254,9 @@ debugMessTRUE <- function(sim, events) {
     events <- current(sim)
   evnts1 <- data.frame(events)
   widths <- unname(unlist(lapply(format(evnts1), nchar)))
+  if (is.null(sim[["._spadesDebugWidth"]]))
+    sim[["._spadesDebugWidth"]] <- spadesDebugWidthDefault
+
   sim[["._spadesDebugWidth"]] <- pmax(widths, sim[["._spadesDebugWidth"]], na.rm = TRUE)
   evnts1[1L, ] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]],"s"), evnts1)
   evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
