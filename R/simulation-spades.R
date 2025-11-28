@@ -2083,6 +2083,8 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
       if (len > 1) {
         mess <- strsplit(mess, "\n")[[1]]
         mess[-len] <- paste0(mess[-len], "\n")
+        len2 <- length(mess)
+        mess[len2] <- gsub(pattern = "\\n$", replacement = "", mess[len2])
       }
     }
 
