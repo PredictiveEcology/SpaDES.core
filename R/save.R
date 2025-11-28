@@ -170,10 +170,14 @@ saveFiles <- function(sim) {
         } else {
           saveSimList(sim, filename = outputs(sim)[["file"]][i])
         }
-        outputs(sim)[["saved"]][i] <- TRUE
+        # the next line, if using the accessor outputs(sim) <-,  modifies any filenames that don't have names;
+        #   the i indexing doesn't work here as expected; use direct
+        sim@outputs[["saved"]][i] <- TRUE
+        # outputs(sim)[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)[["objectName"]][i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[["saved"]][i] <- FALSE
+        sim@outputs[["saved"]][i] <- TRUE # see a few lines above for comment about this
+        # outputs(sim)[["saved"]][i] <- FALSE
       }
     }
   }
