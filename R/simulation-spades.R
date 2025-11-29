@@ -861,6 +861,15 @@ setMethod(
     # sim[[._txtSimNesting]] <- ._simNesting
     sim[[._txtSimNesting]] <- ._simNesting
 
+    # cacheChaining -- remove Cache tag if it isn't inside a simInitAndSpades call
+    cacheChaining <- getOption("spades.cacheChaining", FALSE)
+    if (isTRUE(cacheChaining)) {
+      inSIAS <- .whereInStack("simInitAndSpades")
+      if (is.null(inSIAS)) {
+        attr(sim, "tags") <- NULL # a bit draconian; remove the cacheId... when the goal is just to say, "don't do cacheChaining"
+      }
+    }
+
     opt <- options("encoding" = "UTF-8")
     # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
     #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
