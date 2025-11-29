@@ -445,7 +445,18 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
-  expect_true(sum(grepl(oa, mess)) == 2) # continues from .inputObjects to init
+  expect_true(sum(grepl(oa, mess)) == 2) # does not continue from .inputObjects to init
+
+  mess2 <- capture_messages(
+    mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
+                              debug = 1, .plotInitialTime = NA)
+  )
+  mess3 <- capture_messages(
+    mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
+                              debug = 1, .plotInitialTime = NA)
+  )
+  expect_true(sum(grepl(oa, mess3)) == 3) # continues from .inputObjects to init for simInitAndSpades
+
 
   ## If they are not sequential, shouldn't do it
   params <- list(
