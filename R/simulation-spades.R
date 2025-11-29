@@ -1252,7 +1252,7 @@ setMethod(
     },
     error = function(e) {
       if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
-        if (debug > 0) {
+        if (any(debug > 0)) {
           logging::logerror(e)
         }
       } else {
