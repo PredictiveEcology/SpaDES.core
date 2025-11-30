@@ -898,16 +898,19 @@ setMethod(
     on.exit({
       setwd(oldWd)
     }, add = TRUE)
-    useNormalMessaging <- TRUE
-    newDebugging <- is.list(debug)
-    if (newDebugging) {
+    # useNormalMessaging <- TRUE
+    useLoggingPkg <- is.list(debug)
+    if (useLoggingPkg) {
       if (requireNamespace("logging", quietly = TRUE)) {
         debug <- setupDebugger(debug)
-        useNormalMessaging <- !newDebugging ||
-          all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
-      } else {
-        debug <- unlist(debug)
+        useLoggingPkg <- !(# !useLoggingPkg ||
+          all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]]))))
+      }  else {
+        useLoggingPkg <- FALSE
       }
+      if (!useLoggingPkg)
+        debug <- unlist(debug)
+      # }
     }
 
     ## need to recheck package loading because `simInit` may have been cached
@@ -1237,7 +1240,7 @@ setMethod(
     warning = function(w) {
       w$message <- gsub("^In modCall\\(sim = sim.+\"]]\\): ", "", w$message)
       if (any(grepl("NAs introduced by coercion", w$message))) {
-        if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
+        if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
           logging::logwarn(paste0(collapse = " ", c(names(w), w)))
         }
       }
@@ -1253,8 +1256,8 @@ setMethod(
       }
     },
     error = function(e) {
-      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
-        if (any(debug > 0)) {
+      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
+        if (isTRUE(any(debug > 0))) {
           logging::logerror(e)
         }
       } else {
@@ -1266,17 +1269,13 @@ setMethod(
       }
     },
     message = function(m) {
-      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
+      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
-      }
-
-      if (useNormalMessaging) {
+      } else {
         if (isTRUE(any(grepl("\b", m$message)))) {
           m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
-          # message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
-        } # else {
+        }
         message(loggingMessage(m$message))
-        # }
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
