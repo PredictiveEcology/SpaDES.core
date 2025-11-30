@@ -31,7 +31,7 @@ Authors@R: c(
 Depends:
     R (>= 4.3),
     quickPlot (>= 1.0.2),
-    reproducible (>= 2.1.2.9091)
+    reproducible (>= 2.1.2.9999)
 Imports:
     cli,
     data.table (>= 1.11.0),
