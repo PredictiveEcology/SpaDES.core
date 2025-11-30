@@ -153,7 +153,7 @@ test_that("newModule with events and functions", {
 })
 
 test_that("newModule without path specified as arg", {
-  testInit("ggplot2")
+  testInit("ggplot2", opts = list(spades.debug = 0))
   nm <- "test"
   setPaths(modulePath = file.path(Require::tempdir2(), "lolololo"))
   unlink(dir(getPaths()$modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
