@@ -195,7 +195,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         }
       }
       if (attr(sim, "needDebug") + 1) {
-        debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
+        debugHere <- if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug)
+        # debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
+        debugMessage(debugHere, sim, cur, fnEnv, curModuleName)
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
@@ -1973,7 +1975,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 #' @importFrom cli col_green
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!inherits(debug, "list") && !is.character(debug)) debug <- list(debug)
-  if ( !(isFALSE(debug) || debug == 0)) {
+  if ( !(any(debug %in% FALSE) || any(debug %in% 0))) {
     if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else isTRUE(x), FUN.VALUE = logical(1))))
       debug <- append(list(1L), debug)
     for (i in seq_along(debug)) {
