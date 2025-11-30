@@ -69,7 +69,7 @@ setMethod(
     if (length(filename) > 1) {
       fileExists <- any(file.exists(filename))
       if (fileExists) {
-        filename <- filename[file.exists(filename)]
+        filename <- filename[file.exists(filename)][1]
       } else {
         #the file doesn't exist anywhere so choose the first NA to avoid downstream error
         filename <- filename[1]
