@@ -35,9 +35,12 @@ test_that("simulation runs with new Cache chaining", {
 
 
   mess <- mySims <- test <- testEvalPostEvent <- list()
+  opts11 <- list()
+  op1 <- getOption("spades.evalPostEvent")
+  on.exit(options(spades.evalPostEvent = op1))
   for (useCache in useCaches) {
     for (i in 1:2) { # need to run twice to set the Cache each time
-      options(
+      opts11[[i]] <- options(
         spades.evalPostEvent = quote(message(paste('ThisMess', .robustDigest(sim$landscape))))
       )
       params$.globals = list(burnStats = "npixelsburned", stackName = "landscape",
@@ -67,9 +70,9 @@ test_that("simulation runs with new Cache chaining", {
   expect_true(all(unlist(testEvalPostEvent)))
 
   env <- environment()
-  options(
+  opts111 <- options(
     spades.evalPostEvent = quote({a <- data.frame(b = 1:10, d = 1:10);
-                                 gg <- ggplot2::ggplot(a) + ggplot2::geom_point(aes(x = b, y = d))
+                                 gg <- ggplot2::ggplot(a) + ggplot2::geom_point(ggplot2::aes(x = b, y = d))
                                  assign("gg", gg, envir = SpaDES.core:::.pkgEnv)})
   )
   times <- list(start = 0.0, end = 0, timeunit = "year")
@@ -316,7 +319,7 @@ test_that("simInit with R subfolder scripts", {
 })
 
 test_that("simulation runs with simInit with duplicate modules named", {
-  testInit(sampleModReqdPkgs)
+  testInit(sampleModReqdPkgs, opts = list(spades.debug = 1))
 
   set.seed(42)
 
@@ -498,7 +501,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
 })
 
 test_that("conflicting function types", {
-  testInit(sampleModReqdPkgs, smcc = TRUE)
+  testInit(sampleModReqdPkgs, smcc = TRUE, opts = list(spades.debug = 1))
 
   m <- "child4"
   newModule(m, tmpdir, open = FALSE)
@@ -782,7 +785,7 @@ test_that("scheduleEvent with NA logical in a non-standard parameter", {
 })
 
 test_that("messaging with multiple modules", {
-  testInit("ggplot2", smcc = TRUE)
+  testInit("ggplot2", smcc = TRUE, opts = list(spades.debug = TRUE))
 
   m1 <- "test"
   m2 <- "test2"
