@@ -384,8 +384,8 @@ setMethod(
             invokeRestart("muffleMessage")
           })
         if (length(messHere) && verbose > 0) {
-          messageColoured("While parsing: ", mBase, ":", colour = "green")
-          messageColoured(messHere)
+          messageColoured("While parsing: ", mBase, ":", colour = "green", verbose = verbose)
+          messageColoured(messHere, verbose = verbose)
         }
           # out <- try(eval(pf, envir = env))
         #}, type = "message")
