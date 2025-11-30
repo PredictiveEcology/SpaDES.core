@@ -329,12 +329,6 @@ all.equal.simList <- function(target, current, ...) {
   })
   rm(list = objNamesTarget, envir = envir(target))
   rm(list = objNamesCurrent, envir = envir(current))
-  # suppressWarnings(rm("._startClockTime", envir = envir(target)))
-  # suppressWarnings(rm("._startClockTime", envir = envir(current)))
-  # suppressWarnings(rm("._firstEventClockTime", envir = envir(target)))
-  # suppressWarnings(rm("._firstEventClockTime", envir = envir(current)))
-  # suppressWarnings(rm(".timestamp", envir = envir(target)))
-  # suppressWarnings(rm(".timestamp", envir = envir(current)))
 
   target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
   current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
@@ -407,3 +401,9 @@ noEventWarning <- function(sim) {
     sep = ""
   )
 }
+
+
+._txtClockTime <- "._clockTime"
+._txtStartClockTime <- "._startClockTime"
+._txtPrevEventTimeFinish <- "._prevEventTimeFinish"
+._txtSimNesting <- "._simNesting"

@@ -253,7 +253,7 @@ test_that("Plots function 3 - use as Plot", {
 test_that("Plots test .guessPkgFun", {
   testInit("raster")
 
-  pkgFun <- sapply(baseClassesCanHandle, SpaDES.core:::.guessPkgFun)
+  pkgFun <- sapply(baseClassesCanHandle, .guessPkgFun)
   test <- sapply(pkgFun, function(x) {
     exists(sub(".*:", "", x), where = paste0("package:", sub(":.*", "", x)), mode = "function")
   })

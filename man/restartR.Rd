@@ -38,7 +38,7 @@ If \code{NULL}, then it will try, in order, \code{outputPath(sim)},
 taking the first one that is not inside the \code{tempdir()}, which will
 disappear during restart of R.
 The actual directory for a given \code{spades} call that is restarting will be:
-\code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}.
+\code{file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))}.
 The random string is to prevent parallel processes that started at the same clock
 time from colliding.}
 }
@@ -72,7 +72,7 @@ the default behaviour should suffice. These are of 3 types: \code{restartRInterv
 the arguments to \code{restartR} and the arguments to \code{saveSimList}, these latter two
 using a dot to separate the function name and its argument. The defaults for
 two key options are: \verb{options("spades.restartR.restartDir" = NULL}, meaning
-use \code{file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))}
+use \code{file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))}
 and \code{options("spades.saveSimList.fileBackend" = 0)}, which means don't do anything
 with raster-backed files.
 See specific functions for defaults and argument meanings.

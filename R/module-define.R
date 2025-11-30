@@ -441,29 +441,47 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
       paramDesc = character(0), stringsAsFactors = FALSE))
   if (is.character(name) && is.character(class) && missing(min) && missing(max)) {
     NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
-    if (class %in% NAtypes) {
+    if (any(class %in% NAtypes)) {
+
+      NAtypeToUse <- vapply(class, function(cla) is(default, cla), FUN.VALUE = logical(1))
+      NAtypeToUse <- if (any(NAtypeToUse))
+        names(NAtypeToUse)[NAtypeToUse]
+      else
+        class[1]
       # coerce `min` and `max` to same type as `default`
-      min <- as(NA, class)
-      max <- as(NA, class)
+      min <- as(NA, NAtypeToUse) # if a vector of possible classes, take first
+      max <- as(NA, NAtypeToUse) # if a vector of possible classes, take first
     } else {
       min <- NA
       max <- NA
     }
   }
 
-  anyNAs <- suppressWarnings(c(is.na(default), is.na(min), is.na(max)))
+  anyNAs <- suppressWarnings(
+    if (is.list(default)) {
+      c(list(any(is.na(default))), as.list(is.na(min)), as.list(is.na(max))) |> unlist()
+    } else {
+      c(is.na(default), is.na(min), is.na(max))
+    })
+  # anyNAs <- suppressWarnings(testForNA)
   if (!all(anyNAs)) {
     # if some or all are NA -- need to check
-    wrongClass <- lapply(class, function(cla)
+    wrongClass <- lapply(class, function(cla) {
       # Note c() doesn't always produce a vector -- e.g., functions, calls -- need lapply
-      lapply(c(default, min, max)[!anyNAs], function(val) {
+      test <- if (is.list(default)) {
+        list(list(default), min = as.list(min), max = as.list(max))
+      } else {
+        list(default, min, max) # Using `c` strips class Path ... need list here
+      }
+      lapply(test[!anyNAs], function(val) {
         a <- is(val, cla)
         if (isFALSE(a))
           if (is(val, "call"))
             a <- NA
         a
         })
-      )
+    }
+    )
     classWrong <- na.omit(all(!unlist(wrongClass)))
     if (isTRUE(classWrong)) {
       # any messages here are captured if this is run from .parseModule

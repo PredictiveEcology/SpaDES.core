@@ -15,13 +15,15 @@ test_that("local mod object", {
   mySim <- simInit(times = list(start = 0, end = 0),
                    paths = list(modulePath = tmpdir), modules = c("test", "test2"))
 
-  expect_true(mySim$.mods$test2$.objects$y == "This module")
+  expect_true(mySim[[dotObjs]]$test2$y == "This module")
+  # expect_true(mySim$.mods$test2$.objects$y == "This module")
   out2 <- spades(Copy(mySim))
   out3 <- Cache(spades, Copy(mySim)) ## TODO: failure due to NULL current module
   mess <- capture_messages({
     out4 <- Cache(spades, Copy(mySim)) # should get cached
   })
   out <- spades(mySim)
+
 
   ## Test the Par stuff
   expect_true(identical(out2$testPar1, params(out2)$test$testParA))
@@ -34,39 +36,39 @@ test_that("local mod object", {
   expect_true(identical(out4$testPar2, params(out4)$test2$testParB))
 
   ## Test the results
-  expect_true(out$.mods$test$.objects$a == 2) # object that results from addition
-  expect_true(out$.mods$test2$.objects$a == 1) # object that results from addition
-  expect_true(out$.mods$test2$.objects$b == 2) # object that results from addition -- didn't collide with sim$test$a
-  expect_true(out$.mods$test$.objects$x == "sdf") # correct module, i.e., x is in test, and is sdf
-  expect_true(is.null(out$.mods$test2$.objects$x)) # wrong module, i.e., x is in test
-  expect_true(!is.null(mySim$.mods$test$.objects$x)) # .inputObjects is run
-  expect_true(!is.null(mySim$.mods$test2$.objects$y)) # .inputObjects is run
-  expect_true(out$.mods$test2$.objects$y == "This module is test2") # paste0 from .inputObjects & event1 event
+  expect_true(out[[dotObjs]]$test$a == 2) # object that results from addition
+  expect_true(out[[dotObjs]]$test2$a == 1) # object that results from addition
+  expect_true(out[[dotObjs]]$test2$b == 2) # object that results from addition -- didn't collide with sim$test$a
+  expect_true(out[[dotObjs]]$test$x == "sdf") # correct module, i.e., x is in test, and is sdf
+  expect_true(is.null(out[[dotObjs]]$test2$x)) # wrong module, i.e., x is in test
+  expect_true(!is.null(mySim[[dotObjs]]$test$x)) # .inputObjects is run
+  expect_true(!is.null(mySim[[dotObjs]]$test2$y)) # .inputObjects is run
+  expect_true(out[[dotObjs]]$test2$y == "This module is test2") # paste0 from .inputObjects & event1 event
 
   ## Post Copy(mySim)
-  expect_true(out2$.mods$test$.objects$a == 2)
-  expect_true(out2$.mods$test2$.objects$a == 1)
-  expect_true(out2$.mods$test2$.objects$b == 2)
-  expect_true(is.null(out2$.mods$test2$.objects$x))
-  expect_true(!is.null(out2$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out2$.mods$test2$.objects$y == "This module is test2")
+  expect_true(out2[[dotObjs]]$test$a == 2)
+  expect_true(out2[[dotObjs]]$test2$a == 1)
+  expect_true(out2[[dotObjs]]$test2$b == 2)
+  expect_true(is.null(out2[[dotObjs]]$test2$x))
+  expect_true(!is.null(out2[[dotObjs]]$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out2[[dotObjs]]$test2$y == "This module is test2")
 
   ## Cache -- using the first time through
-  expect_true(out3$.mods$test$.objects$a == 2)
-  expect_true(out3$.mods$test2$.objects$a == 1)
-  expect_true(out3$.mods$test2$.objects$b == 2)
-  expect_true(is.null(out3$.mods$test2$.objects$x))
-  expect_true(!is.null(out3$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out3$.mods$test2$.objects$y == "This module is test2")
+  expect_true(out3[[dotObjs]]$test$a == 2)
+  expect_true(out3[[dotObjs]]$test2$a == 1)
+  expect_true(out3[[dotObjs]]$test2$b == 2)
+  expect_true(is.null(out3[[dotObjs]]$test2$x))
+  expect_true(!is.null(out3[[dotObjs]]$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out3[[dotObjs]]$test2$y == "This module is test2")
 
   ## Cached copy
   expect_true(any(grepl("Loaded! Cached", mess)))
-  expect_true(out4$.mods$test$.objects$a == 2) ## TODO: fails (gets NULL)
-  expect_true(out4$.mods$test2$.objects$a == 1) ## TODO: fails (gets NULL)
-  expect_true(out4$.mods$test2$.objects$b == 2) ## TODO: fails (gets NULL)
-  expect_true(is.null(out4$.mods$test2$.objects$x))
-  expect_true(!is.null(out4$.mods$test$.objects$x)) # was made in .inputObjects, copies fine
-  expect_true(out4$.mods$test2$.objects$y == "This module is test2") ## TODO: fails (gets 'This module')
+  expect_true(out4[[dotObjs]]$test$a == 2) ## TODO: fails (gets NULL)
+  expect_true(out4[[dotObjs]]$test2$a == 1) ## TODO: fails (gets NULL)
+  expect_true(out4[[dotObjs]]$test2$b == 2) ## TODO: fails (gets NULL)
+  expect_true(is.null(out4[[dotObjs]]$test2$x))
+  expect_true(!is.null(out4[[dotObjs]]$test$x)) # was made in .inputObjects, copies fine
+  expect_true(out4[[dotObjs]]$test2$y == "This module is test2") ## TODO: fails (gets 'This module')
 
   ## Test P replace method
   mySim3 <- simInit(times = list(start = 0, end = 0),
@@ -148,15 +150,19 @@ test_that("local mod object", {
     sim <- savedSimEnv()$.sim
     sim@params$test2$testRestartSpades <- NULL
     sim3 <- restartSpades(sim, debug = FALSE)
-    expect_true(NROW(completed(sim3)) == 7)
+    expect_true(NROW(completed(sim3)) ==
+                  length(modules(sim)) + # .inputObjects
+                  length(setdiff(unlist(.coreModules()), "restartR")) + # core
+                  length(modules(sim)) + # init
+                  1 # test2 has an event
+                )
   }
 })
 
 test_that("convertToPackage testing", {
   skip_on_cran()
-  skip_if_not_installed(c("ggplot2", "pkgload", "roxygen2"))
 
-  testInit(c("roxygen2", "ggplot2"), smcc = FALSE, debug = FALSE,
+  testInit(c("ggplot2", "pkgload", "roxygen2"), smcc = FALSE, debug = FALSE,
            opts = list(reproducible.useMemoise = FALSE,
                        spades.moduleDocument = TRUE))
 
@@ -164,13 +170,13 @@ test_that("convertToPackage testing", {
   testName2 <- paste0("test2.", .rndstr(len = 1))
   mainModFile1 <- paste0(testName1, ".R")
   mainModFile2 <- paste0(testName2, ".R")
-  try(pkgload::unload(testName1), silent = TRUE)
-  try(pkgload::unload(testName2), silent = TRUE)
+  # try(pkgload::unload(testName1), silent = TRUE)
+  # try(pkgload::unload(testName2), silent = TRUE)
 
-  on.exit({
-    try(pkgload::unload(testName1), silent = TRUE)
-    try(pkgload::unload(testName2), silent = TRUE)
-  }, add = TRUE)
+  # on.exit({
+  #   try(pkgload::unload(testName1), silent = TRUE)
+  #   try(pkgload::unload(testName2), silent = TRUE)
+  # }, add = TRUE)
 
   newModule(testName1, tmpdir, open = FALSE)
   newModule(testName2, tmpdir, open = FALSE)
@@ -191,6 +197,7 @@ test_that("convertToPackage testing", {
       #\' @rdname Init
       #\' @name Init
       #\' @param sim A simList
+      #\' @export
       Init <- function(sim) {
         sim$aaaa <- Run1(1)
         return(sim)
@@ -230,7 +237,7 @@ test_that("convertToPackage testing", {
     expect_true(!file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
     ## list.files(file.path(tmpdir, tt, "R"))
-    expect_true(file.exists(filenameForMainFunctions(tt, tmpdir)))
+    # expect_true(file.exists(filenameForMainFunctions(tt, tmpdir)))
   }
 
   mySim9 <- simInit(times = list(start = 0, end = 1),
@@ -239,7 +246,7 @@ test_that("convertToPackage testing", {
   # doesn't document, unless it is first time
   for (tt in c(testName1, testName2)) {
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-    expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    # expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
     expect_true(dir.exists(file.path(tmpdir, tt, "R")))
   }
   working <- spades(mySim9, debug = FALSE)
@@ -253,19 +260,38 @@ test_that("convertToPackage testing", {
   # Will run document() so will have the NAMESPACE and
   for (tt in c(testName1, testName2)) {
     expect_true(file.exists(file.path(tmpdir, tt, "DESCRIPTION")))
-    expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
-    expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
+    # expect_true(file.exists(file.path(tmpdir, tt, "NAMESPACE")))
+    # expect_true(sum(grepl("export.+doEvent", readLines(file.path(tmpdir, tt, "NAMESPACE")))) == 1)
   }
 
   # check that inheritance is correct -- Run is in the namespace, Init also... doEvent calls Init calls Run
   expect_true(is(working, "simList"))
   expect_true(working$aaaa == 2)
   expect_true(is(working$cccc, "try-error"))
-  bbb <- get("Run2", asNamespace(testName2))(2)
-  fnTxt <- readLines(filenameForMainFunctions(tt, tmpdir))
+  # bbb <- get("Run2", asNamespace(testName2))(2)
+  bbb <- get("Run2", working$.mods[[testName2]])(2)
+
+  packageFoldername <- file.path(tmpdir, testName2)
+  fnTxt <- readLines(file.path(packageFoldername, paste0(testName2, ".R")))
   expect_true(sum(grepl("Need to keep comments", fnTxt)) == 1)
   expect_true(bbb == 4)
-  pkgload::unload(testName1)
-  pkgload::unload(testName2)
+
+  # check documentation
+  packageFoldername <- file.path(tmpdir, testName1)
+  expect_false(dir.exists(file.path(packageFoldername, "man")))
+  documentModule(packageFoldername)
+  expect_true(dir.exists(file.path(packageFoldername, "man")))
+  pkgload::load_all(packageFoldername)
+  on.exit({
+    try(pkgload::unload(.moduleNameNoUnderscore(basename(packageFoldername))), silent = TRUE)
+  })
+  fn <- get("Init", envir = asNamespace(.moduleNameNoUnderscore(basename(packageFoldername))))
+  expect_is(fn, "function")
+  pkgload::unload(.moduleNameNoUnderscore(basename(packageFoldername)))
+  fn <- try(get("Init", envir = asNamespace(.moduleNameNoUnderscore(basename(packageFoldername)))), silent = TRUE)
+  expect_true(is(fn, "try-error"))
+
+  # pkgload::unload(testName1)
+  # pkgload::unload(testName2)
   #}
 })

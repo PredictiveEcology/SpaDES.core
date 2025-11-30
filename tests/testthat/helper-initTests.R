@@ -107,9 +107,9 @@ testCode <- '
       mod$a <- 2 # should have mod$x here
       sim$testPar1 <- Par$testParA
 
-      if (tryCatch(exists("Init", envir = asNamespace("test"), inherits = FALSE), error = function(x) FALSE)) {
+      # if (tryCatch(exists("Init", envir = asNamespace("test"), inherits = FALSE), error = function(x) FALSE)) {
         sim <- Init(sim)
-      }
+      # }
 
       sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       },
@@ -117,6 +117,9 @@ testCode <- '
       sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
       })
       return(invisible(sim))
+      }
+      Init <- function(sim) {
+        return(invisible(sim))
       }
 
       .inputObjects <- function(sim) {
@@ -161,9 +164,9 @@ test2Code <- '
       switch(
       eventType,
       init = {
-      if (tryCatch(exists("Init", envir = asNamespace("test2"), inherits = FALSE), error = function(x) FALSE)) {
+      # if (tryCatch(exists("Init", envir = asNamespace("test2"), inherits = FALSE), error = function(x) FALSE)) {
         sim <- Init(sim)
-      }
+      # }
 
       if (isTRUE(P(sim)$testParB >= 1100)) {
          P(sim, "testParB") <-  P(sim)$testParB + 756
@@ -197,6 +200,10 @@ test2Code <- '
       })
       return(invisible(sim))
       }
+      Init <- function(sim) {
+        return(invisible(sim))
+      }
+
       .inputObjects <- function(sim) {
       if (isTRUE(P(sim)$testParB >= 543)) {
          P(sim, "testParB") <-  P(sim)$testParB + 654
@@ -254,4 +261,9 @@ runTestsWithTimings <- function(pkgPath = ".",
 
 LoadedMgsCheck <- function(msg, event) {
   sum(grepl(paste0("Loaded! Cached|for ", event," event"), msg)) == 2
+}
+
+
+grepDotInputObjectsModule <- function(m) {
+  paste0(".inputObjects.+", m, ".+.inputObjects")
 }

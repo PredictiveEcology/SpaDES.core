@@ -1,4 +1,4 @@
-utils::globalVariables(c("objName", "V1"))
+utils::globalVariables(c("objName", "V1", "noFeedback"))
 
 
 #' Assess whether an object has or will be supplied from elsewhere
@@ -69,9 +69,9 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
                      # on my windows system -- shows something similar to sys.calls()
   forms <- formals()
   forms[names(mc)] <- mc
-  partialMatching <- c("s", "i", "u")
+  partialMatching <- c("s", "i", "u", "c")
   forms$where <- partialMatching[which(!is.na(pmatch(partialMatching, forms$where)))]
-  if (length(forms$where) == 0) stop("where must be either sim, user or initEvent")
+  if (length(forms$where) == 0) stop("where must be either sim, user, initEvent, or cyclic")
   objDeparsed <- substitute(object)
   if (missing(sim)) {
     theCall <- as.call(parse(text = deparse(objDeparsed)))
@@ -95,13 +95,26 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   objDeparsed <- as.character(objDeparsed)
 
+  namesInList <- names(sim@.xData)
+  if (!is.null(sim[[objSynName]])) {
+    namesInListHasOS <- lapply(sim[[objSynName]], function(os) {
+      osInNamesInList <- os %in% namesInList
+      if (any(osInNamesInList)) {
+        os
+      } else {
+        os <- NULL
+      }
+    })
+    if (length(unlist(namesInListHasOS)))
+      namesInList <- unique(c(namesInList, unlist(namesInListHasOS)))
+  }
   # Equivalent to !is.null(sim$xxx)
   inPrevDotInputObjects <- if ("s" %in% forms$where) {
-    out <- match(objDeparsed, names(sim@.xData), nomatch = 0L) > 0L
+    out <- match(objDeparsed, namesInList, nomatch = 0L) > 0L
     # check not in because it is just declared as a objectSynonym
     if (isTRUE(out)) {
-      if (!is.null(sim$objectSynonyms)) {
-        if (is.null(sim[[objDeparsed]]) && (objDeparsed %in% unlist(sim$objectSynonyms)))
+      if (!is.null(sim[[objSynName]])) {
+        if (is.null(sim[[objDeparsed]]) && (objDeparsed %in% unlist(sim[[objSynName]])))
           out <- FALSE
       }
     }
@@ -113,17 +126,105 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   inUserSupplied <- if ("u" %in% forms$where) {
     objDeparsed %in% sim$.userSuppliedObjNames
   } else {
-    FALSE
+    rep(FALSE, length(objDeparsed))
   }
 
   # If one of the modules that has already been loaded has this object as an output,
   #   then don't create this
-  inFutureInit <- if ("i" %in% forms$where) {
-    # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
-    #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
-    #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
-    isTRUE(depsEdgeList(sim, plot = FALSE)[!(from %in% c("_INPUT_", currentModule(sim))), ][
-      objName == objDeparsed][, all(from != to), by = from][V1 == TRUE]$V1)
+  curMod <- currentModule(sim)
+
+  inFutureInit <- if (any(c("i", "c") %in% forms$where)) {
+
+    # The includeOutputs = TRUE is because depsEdgeList removes objects
+    #   that are not used by another module, so it will miss objects
+    #   that are part of objectSynonyms. With includeOutputs, it puts _OUTPUTS_
+    #   analogous to _INPUTS_, so even dangling outputs will be kept, so they can
+    #   be checked against objectSynonyms
+    del <- depsEdgeList(sim, plot = FALSE, includeOutputs = TRUE)
+
+    # Need to deal with objectSynonyms
+    if (!is.null(sim[[objSynName]])) {
+      objsInOS <- sim[[objSynName]]
+      ddel1 <- list()
+      iter <- 0
+      for (OS in objsInOS) {
+        if (any(objDeparsed %in% OS)) {
+          iter <- iter + 1
+          ddel1[[iter]] <- list()
+          for (OSitem in OS) {
+            ddel1[[iter]][[OSitem]] <- del[objName %in% OSitem]
+            ddel1[[iter]][[OSitem]] <- ddel1[[iter]][[OSitem]][rep(seq_len(NROW(ddel1[[iter]][[OSitem]])), length(OS) - 1)]
+            ddel1[[iter]][[OSitem]][, objName := setdiff(OS, OSitem)]
+          }
+        }
+      }
+      del <- rbindlist(list(del, rbindlist(unlist(ddel1, recursive = FALSE))))
+    }
+    if (NROW(del)) {
+    # if ("c" %in% forms$where) {
+
+    # THIS IS THE PREVIOUS APPROACH THAT MISSED SEVERAL CASES ESPECIALLY WITH loadOrder
+    # outPrev <- isTRUE(depsEdgeList(sim, plot = FALSE)[!(from %in% c("_INPUT_", curMod)), ][
+    #   objName %in% objDeparsed][, all(from != to), by = from][V1 == TRUE]$V1)
+
+    # This next line:
+    #  1. only evaluate the objects that are named in `object`
+    #  2. Remove within-module circular references (from != to)
+    #  3. Remove cases where it is coming from INPUT data
+      dd <- del[objName %in% objDeparsed][from != to][!(from %in% c("_INPUT_")), ]
+      d <- depends(sim)
+      allModsDeps <- d@dependencies
+      otherModsDeps <- allModsDeps[which(!names(d@dependencies) %in% curMod)]
+
+      for (mod in allModsDeps) {
+        lo <- mod@loadOrder
+        modNam <- mod@name
+        #if (any(curMod %in% modNam)) { # if this module is named
+          if (any(dd[["from"]] %in% lo[["after"]])) {
+            toRm <- dd[, to %in% modNam & from %in% lo$after]
+            if (any(toRm))
+              dd <- dd[which(toRm)]
+          }
+
+          if (any(dd[["to"]] %in% lo[["before"]])) {
+            toRm <- dd[, from %in% modNam & to %in% lo$before]
+            if (any(toRm))
+              dd <- dd[which(toRm)]
+          }
+
+        #}
+        # curcularity dd[, any(from %in% to) && any(to %in% from), by = objName]
+        #if (!is.null(lo$after) && curMod == modNam)
+        #  dd <- dd[from %in% lo$after]
+        # else
+        #   del <- dd
+      }
+    # }
+      # test for circularity
+      circular <- dd[, any(from %in% to) && any(to %in% from), by = objName]
+      # rmObjs <- circular[V1 %in% TRUE]$objName
+      rmObjs <- circular$objName[circular$V1 %in% TRUE]
+      if (length(rmObjs))
+        dd <- dd[!objName %in% rmObjs]
+
+      rmSelf <- which(dd[["from"]] == curMod)
+      if (length(rmSelf))
+        dd <- dd[-rmSelf]
+      del <- dd
+    # if (any(c("i", "c") %in% forms$where)) {
+      # The next line is subtle -- it must be provided by another module, previously loaded (thus in the depsEdgeList),
+      #   but that does not need it itself. If it needed it itself, then it would have loaded it already in the simList
+      #   which is checked in a different test of suppliedElsewhere -- i.e., "sim"
+      out <- del[!(from %in% c("_INPUT_", curMod)), ][
+        objName %in% objDeparsed]
+      out <- out[, .(objName, noFeedback = all(from != to)), by = from][noFeedback %in% TRUE]
+      objDeparsed %in% out$objName
+    # } else {
+    #   FALSE
+    # }
+    } else {
+      FALSE
+    }
   } else {
     FALSE
   }

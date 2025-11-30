@@ -97,5 +97,5 @@ The default is to overwrite any existing files in the case of a conflict.
 \code{\link[=zipModule]{zipModule()}} for creating module .zip folders.
 }
 \author{
-Alex Chubaty
+Alex Chubaty and Eliot McIntire
 }

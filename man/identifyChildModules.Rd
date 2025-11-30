@@ -4,7 +4,11 @@
 \alias{.identifyChildModules}
 \title{Identify child modules from a recursive list}
 \usage{
-.identifyChildModules(sim, modules)
+.identifyChildModules(
+  sim,
+  modules,
+  verbose = getOption("reproducible.verbose")
+)
 }
 \arguments{
 \item{sim}{a \code{simList} object}

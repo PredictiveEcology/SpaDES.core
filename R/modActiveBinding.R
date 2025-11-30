@@ -8,7 +8,7 @@ makeSimListActiveBindings <- function(sim) {
 }
 
 makeModActiveBinding <- function(sim, mod) {
-  if (.isPackage(fullModulePath = mod, sim = sim)) {
+  if (all(.isPackage(fullModulePath = mod, sim = sim))) {
     env <- asNamespace(.moduleNameNoUnderscore(mod))
   } else {
     env <- sim@.xData$.mods[[mod]]
@@ -37,13 +37,15 @@ makeParActiveBinding <- function(sim, mod) {
 activeModBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {
-    simEnv <- try(whereInStack("sim"), silent = TRUE)
+    simEnv <- try(.whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
         mod <- currentModule(sim)
-        if (length(mod) && !is.null(sim@.xData$.mods[[mod]]))
-          ret <- get(".objects", envir = sim@.xData$.mods[[mod]], inherits = FALSE)
+        if (length(mod) && !is.null(sim@.xData[[dotObjs]][[mod]])) {
+          ret <- get(mod, envir = sim@.xData[[dotObjs]], inherits = FALSE)
+          # ret <- get(".objects", envir = sim@.xData[[dotObjs]][[mod]], inherits = FALSE)
+        }
       }
     }
   } else {
@@ -52,11 +54,10 @@ activeModBindingFunction <- function(value) {
   return(ret)
 }
 
-#' @importFrom quickPlot whereInStack
 activeParBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {
-    simEnv <- try(whereInStack("sim"), silent = TRUE)
+    simEnv <- try(.whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {

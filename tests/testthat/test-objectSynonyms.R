@@ -40,11 +40,11 @@ test_that("test objectSynonyms", {
               c("systime", "systime2"),
               c("vegMap", "veg"))
   sim <- objectSynonyms(sim, os)
-  expect_true(length(sim$objectSynonyms) == length(os))
+  expect_true(length(sim[[objSynName]]) == length(os))
   sim <- objectSynonyms(sim, os2)
 
-  expect_true(length(sim$objectSynonyms) == 4)
-  expect_true(identical(sim$objectSynonyms[[2]], unique(c(os[[1]], os2[[1]]))))
+  expect_true(length(sim[[objSynName]]) == 4)
+  expect_true(identical(sim[[objSynName]][[2]], unique(c(os[[1]], os2[[1]]))))
 
   e <- new.env(parent = emptyenv())
   e <- objectSynonyms(e, list(c("age", "ageMap")))
@@ -112,8 +112,8 @@ test_that("test objectSynonyms", {
   expect_true(isTRUE(sim$worked))
 
   sim <- Cache(simInit, times, params, modules = modules,
-                 objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
-                 paths = list(modulePath = tmpdir))
+               objects = list(age = 1, vegMap = 2, studyArea = 3, objectSynonyms = os),
+               paths = list(modulePath = tmpdir))
   expect_equal(sim$age, sim$ageMap)
   expect_equal(sim$veg, sim$vegMap)
   expect_equal(sim$studyArea, sim$studyArea2)

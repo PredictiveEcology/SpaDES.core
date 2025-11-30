@@ -1,6 +1,6 @@
 utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 
-# Just checks for paths, creates them if they do not exist
+## Just checks for paths, creates them if they do not exist
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (NROW(outputs(sim)) > 0) {
@@ -9,11 +9,12 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
       if ("eventPriority" %in% colnames(outputs(sim))) {
         firstPriority <- outputs(sim)[["eventPriority"]][firstSaveWh]
       }
-      if (!exists("firstPriority", inherits = FALSE))
+      if (!exists("firstPriority", inherits = FALSE)) {
         firstPriority <- .last()
+      }
       attributes(firstSave)$unit <- sim@simtimes[["timeunit"]]
       sim <- scheduleEvent(sim, firstSave, "save", "spades", firstPriority)
-      #sim <- scheduleEvent(sim, end(sim, sim@simtimes[["timeunit"]]), "save", "end", .last())
+      # sim <- scheduleEvent(sim, end(sim, sim@simtimes[["timeunit"]]), "save", "end", .last())
     }
     checkPath(sim@paths$outputPath, create = TRUE)
   } else if (eventType == "spades") {
@@ -169,10 +170,14 @@ saveFiles <- function(sim) {
         } else {
           saveSimList(sim, filename = outputs(sim)[["file"]][i])
         }
-        outputs(sim)[["saved"]][i] <- TRUE
+        # the next line, if using the accessor outputs(sim) <-,  modifies any filenames that don't have names;
+        #   the i indexing doesn't work here as expected; use direct
+        sim@outputs[["saved"]][i] <- TRUE
+        # outputs(sim)[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)[["objectName"]][i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[["saved"]][i] <- FALSE
+        sim@outputs[["saved"]][i] <- TRUE # see a few lines above for comment about this
+        # outputs(sim)[["saved"]][i] <- FALSE
       }
     }
   }
@@ -235,10 +240,10 @@ saveFiles <- function(sim) {
            paste(colnames(.sFE), collapse = ", "), "; they are currently ",
            paste(collapse = ", ", colnames(getOption("spades.saveFileExtensions"))))
     }
-    # remove initial dot
+    ## remove initial dot
     .sFE <- rbind(getOption("spades.saveFileExtensions"), .sFE)
     .sFE[["exts"]] <- gsub("^\\.", "", .sFE[["exts"]])
-    # remove if there are 2 extensions for same fun and package
+    ## remove if there are 2 extensions for same fun and package
     dups <- duplicated(.sFE[, c("fun", "package")])
     .sFE <- .sFE[!dups, ]
   }
@@ -259,10 +264,9 @@ saveFiles <- function(sim) {
 #' @export
 #' @importFrom reproducible normPath
 simFile <- function(name, path, time = NULL, ext = "rds") {
-  if (is.null(time))
+  if (is.null(time)) {
     file.path(normPath(path), paste0(name, ".", ext))
-  else {
+  } else {
     file.path(normPath(path), paste0(name, "_", paddedFloatToChar(time, padL = 4), ".", ext))
   }
 }
-

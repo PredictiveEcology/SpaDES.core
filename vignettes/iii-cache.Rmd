@@ -11,7 +11,7 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
-  %\VignetteDepends{raster, RColorBrewer, reproducible, SpaDES.core, SpaDES.tools}
+  %\VignetteDepends{knitr, NLMR, RColorBrewer, reproducible, SpaDES.core, SpaDES.tools, terra}
   %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -20,15 +20,17 @@ editor_options:
 ---
 
 ```{r setup, include = FALSE}
-SuggestedPkgsNeeded <- c("NLMR", "RColorBrewer", "SpaDES.tools", "knitr")
+SuggestedPkgsNeeded <- c("knitr", "NLMR", "RColorBrewer", "SpaDES.tools")
 hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
 useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
 
 knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
 
-options("spades.moduleCodeChecks" = FALSE,
-        "spades.useRequire" = FALSE,
-        "spades.loadReqdPkgs" = FALSE)
+options(
+  spades.loadReqdPkgs = FALSE,
+  spades.moduleCodeChecks = FALSE,
+  spades.useRequire = FALSE
+)
 ```
 
 As part of a reproducible work flow, caching of various function calls are a critical component.
@@ -96,7 +98,7 @@ all.equal(outSim, outSimCached)
 
 ## Module-level caching
 
-If the parameter `.useCache` in the module's metadata is set to `TRUE`, then *every* event in the module will be cached. 
+If the parameter `.useCache` in the module's metadata is set to `TRUE`, then *every* event in the module will be cached.
 That means that every time that module is called from within a `spades()` call, `Cache` will be called. 
 Only the objects inside the `simList` that correspond to the `inputObjects` or the `outputObjects` from the module metadata will be assessed for caching. 
 For general use, module-level caching would be mostly useful for modules that have no stochasticity, such as data-preparation modules, GIS modules etc.

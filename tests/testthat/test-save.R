@@ -202,8 +202,8 @@ test_that("saveSimList works correctly", {
   ) |>
     spades()
   mySim$landscape[] <- round(mySim$landscape[], 3) # after saving, these come back different, unless rounded
-  mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
-  mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
+  mySim$landscape <- terra::writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
+  mySim$habitatQuality <- terra::writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
   ## test using qs2
   saveSimList(mySim, filename = tmpfile[2]) ## keeps file-backings
@@ -230,8 +230,8 @@ test_that("saveSimList works correctly", {
   # sim$habitatQuality[] <- sim$habitatQuality[]
   unlink(c(tmpfile[1], paste0(tools::file_path_sans_ext(tmpfile[1]), ".gri"))) ## needed because of hardlink shenanigans
   unlink(c(tmpfile[7], paste0(tools::file_path_sans_ext(tmpfile[7]), ".gri"))) ## needed because of hardlink shenanigans
-  sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1])
-  sim$habitatQuality <- writeRaster(sim$habitatQuality, filename = tmpfile[7])
+  sim$landscape <- terra::writeRaster(sim$landscape, filename = tmpfile[1])
+  sim$habitatQuality <- terra::writeRaster(sim$habitatQuality, filename = tmpfile[7])
   ## grd format doesn't get minmax right especially with terra -- can't fix it with terra
 
   ## The terra pointers with grd files make comparisons wrong
@@ -252,11 +252,10 @@ test_that("saveSimList works correctly", {
   expect_equivalent(
     gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(simLoaded$landscape, allowMultiple = FALSE))),
     tmpfile[1])
-  expect_true(bindingIsActive("mod", simLoaded@.xData$.mods$caribouMovement)) ## TODO: fails?
+  expect_true(bindingIsActive("mod", simLoaded@.xData[[dotMods]]$caribouMovement)) ## TODO: fails?
 
   mySim <- simLoaded
   # Now keep as file-backed, but change name
-  # aaaa <<- 1
   saveSimList(mySim, filename = tmpfile[3])
 
   sim <- loadSimList(file = tmpfile[3])
@@ -270,10 +269,10 @@ test_that("saveSimList works correctly", {
   file.remove(dir(dirname(tmpfile[c(1)]), pattern = ".gr.$", full.names = TRUE))
   # rm(mySim)
 
-  assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$.objects)
-  assign("a", 2, envir = sim@.xData$.mods$caribouMovement$.objects)
+  assign("a", 1, envir = mySim@.xData[[dotObjs]]$caribouMovement)
+  assign("a", 2, envir = sim@.xData[[dotObjs]]$caribouMovement)
 
-  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement)) ## TODO: fails?
+  expect_true(bindingIsActive("mod", sim@.xData[[dotMods]]$caribouMovement)) ## TODO: fails?
   # test file-backed raster is gone
   expect_error(mySim$landscape$DEM[])
 })
@@ -332,7 +331,7 @@ test_that("saveSimList with file backed objs", {
 
   Map(nam = names(mySim$landscape), i = seq(nlyr(mySim$landscape)), function(nam, i) {
     coltab(mySim$landscape[[nam]]) <- NULL ## can't use colour table with FLT4S (#261)
-    mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
+    mySim$landscape[[nam]] <- terra::writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
   })
 
   ## with file backed
@@ -364,6 +363,7 @@ test_that("saveSimList with file backed objs", {
 
 test_that("restart does not work correctly", {
   skip("restartR not possible in automated tests")
+  # Run this on its own, without testthat
   skip_if_not_installed("NLMR")
 
   # Must be run manually
@@ -434,15 +434,16 @@ test_that("restart does not work correctly", {
       outputPath = tmpdir
     )
 
-    options("spades.restartRInterval" = interval)
+    options("spades.restartRInterval" = interval,
+            spades.restartR.restartDir = paths$inputPath)
     times <- list(start = 0, end = 3)
     mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                      outputs = data.frame(objectName = "landscape", saveTime = times$end))
-    mySim$tesRas <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+    mySim$tesRas <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1, res = 1)
     tmpFilename <- "~/tmpRas.tif"
-    mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
+    mySim$tesRas <- terra::writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
     mySim <- spades(mySim, debug = 1)
-    sim$tesRas + 1
+    mySim$tesRas + 1
     file.exists(tmpFilename)
   }
 
@@ -482,9 +483,9 @@ test_that("restart with logging", {
   times <- list(start = 0, end = 3)
   mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                    outputs = data.frame(objectName = "landscape", saveTime = times$end))
-  mySim$tesRas <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+  mySim$tesRas <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1, res = 1)
   tmpFilename <- "~/tmpRas.tif"
-  mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
+  mySim$tesRas <- terra::writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
   mySim <- spades(mySim, debug = list("file" = list("file" = "log.txt")))
   sim$tesRas + 1
   file.exists(tmpFilename)
