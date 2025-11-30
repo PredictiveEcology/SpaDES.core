@@ -104,4 +104,8 @@ test_that("simulation runs with simInit and spades", {
 
   # Test for integer values in scheduleEvent
   expect_true(completed(mySim)[moduleName == "test" & eventType == 'event1', eventTime == 2])
+
+  #confirm moduleVersion works with two paths
+  expect_true(moduleVersion("randomLandscapes", modulePath(mySim)) > '0.0.1')
+
 })
