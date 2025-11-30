@@ -97,12 +97,12 @@ setMethod("depsEdgeList",
           z.out <- data.frame(objectName = ".dummyIn", objectClass = NA)
         z.in$module <- z.out$module <- x@name
         if (!all(is.na(z.in[, "objectName"]), is.na(z.in[, "objectClass"]))) {
-          # sim.in <<- rbind(sim.in, z.in)
-          sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
+          sim.in <<- rbind(sim.in, z.in)
+          # sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
         }
         if (!all(is.na(z.out[, c("objectName")]), is.na(z.out[, "objectClass"]))) {
-          sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
-          # sim.out <<- rbind(sim.out, z.out)
+          # sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
+          sim.out <<- rbind(sim.out, z.out)
         }
 
       }
@@ -110,13 +110,8 @@ setMethod("depsEdgeList",
     return(invisible(NULL)) # return from the lapply
   })
 
-  if (FALSE) {
-    setkeyv(sim.in, "objectName")
-    setkeyv(sim.out, "objectName")
-  } else {
-    setkeyv(setDT(sim.in), "objectName")
-    setkeyv(setDT(sim.out), "objectName")
-  }
+  setkeyv(setDT(sim.in), "objectName")
+  setkeyv(setDT(sim.out), "objectName")
 
   if ((nrow(sim.in)) && (nrow(sim.out))) {
     dx <- sim.out[sim.in, nomatch = NA_character_, allow.cartesian = TRUE]

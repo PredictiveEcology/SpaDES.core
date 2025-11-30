@@ -96,7 +96,6 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @export
 #' @include simList-accessors.R
 #' @importFrom grDevices dev.off dev.cur
-#' @importFrom qs qsave
 #' @importFrom qs2 qs_save
 #' @importFrom quickPlot clearPlot Plot
 #' @importFrom terra writeRaster
@@ -162,9 +161,9 @@ Plots <- function(data, fn, filename,
                   ...) {
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
-    simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
+    simIsIn <- parent.frame() # try for simplicity sake... though the .whereInStack would get this too
     if (!exists("sim", simIsIn, inherits = FALSE)) {
-      simIsIn <- try(whereInStack("sim"), silent = TRUE)
+      simIsIn <- try(.whereInStack("sim"), silent = TRUE)
       if (is(simIsIn, "try-error"))
         simIsIn <- NULL
     }

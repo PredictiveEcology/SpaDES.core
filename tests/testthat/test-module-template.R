@@ -153,7 +153,7 @@ test_that("newModule with events and functions", {
 })
 
 test_that("newModule without path specified as arg", {
-  testInit("ggplot2")
+  testInit("ggplot2", opts = list(spades.debug = 0))
   nm <- "test"
   setPaths(modulePath = file.path(Require::tempdir2(), "lolololo"))
   unlink(dir(getPaths()$modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
@@ -179,7 +179,7 @@ test_that("newModule without path specified as arg", {
   )
   expect_is(out, "simList")
   expect_identical(out$dd, "no way")
-  expect_true(sum(grepl("init", mess)) == 1)
+  expect_true(sum(grepl("init", mess)) == length(modules(out, hidden = TRUE)))
 
   unlink(dir(getPaths()$modulePath, pattern = nm, full.names = TRUE), recursive = TRUE)
   expect_false(file.exists(file.path(getPaths()$modulePath, nm, paste0(nm, ".R"))))

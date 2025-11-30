@@ -399,6 +399,9 @@ setMethod(
     # rcae <- get(reproducible.CacheAddressEnv)
     # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
     # on.exit(rm(rcae))
+    debug <- list(...)$debug
+    if (is.null(debug))
+      rm(debug, inherits = FALSE)
     debug <- getDebug() # from options first, then override if in a simInitAndSpades
     if  (is.call(debug))
       debug <- eval(debug)
@@ -699,7 +702,7 @@ setMethod(
       # browser(expr = exists("._simInit_4"))
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
         # .pkgEnv[[".spadesDebugFirst"]] <- TRUE
-        sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
+        sim[["._spadesDebugWidth"]] <- spadesDebugWidthDefault
       }
 
       for (m in loadOrder) {
@@ -1347,6 +1350,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   # If they are all supplied, then skip the .inputObjects code
   cacheIt <- FALSE
 
+  set_console_width(update = TRUE) # sets options(width = XXX) to correct width
+
   mnames <- vapply(seq_along(sim@depends@dependencies), function(k) {
     sim@depends@dependencies[[k]]@name
   }, character(1))
@@ -1987,8 +1992,8 @@ stopMessForRequireFail <- function(pkg) {
 }
 
 getDebug <- function() {
-  hasDebug <- whereInStack("debug")
-  # hasDebug <- tryCatch(whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+  hasDebug <- .whereInStack("debug")
+  # hasDebug <- tryCatch(.whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
   debug <- getOption("spades.debug")
   if (!is.null(hasDebug)) {
     # if (!isFALSE(hasDebug)) {
@@ -2113,7 +2118,7 @@ prefixSimInit <- " simInit:"
 spaceDashDashSpace <- " -- "
 
 simNestingSetup <- function(...) {
-  prevSimEnv <- tryCatch(whereInStack(._txtSimNesting), error = function(x) character())
+  prevSimEnv <- tryCatch(.whereInStack(._txtSimNesting), error = function(x) character())
   if (is.environment(prevSimEnv)) {
     prevSimEnv <- get0(._txtSimNesting, envir = prevSimEnv, inherits = FALSE)
   }
@@ -2165,3 +2170,5 @@ objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
   }
   objectsToUse
 }
+
+spadesDebugWidthDefault <- c(9, 10, 9, 13)

@@ -58,6 +58,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     stop("doEvent can only accept a simList object")
   }
 
+  set_console_width(update = TRUE) # sets options(width = XXX) to correct width
+
   # core modules
   core <- .pkgEnv$.coreModules
 
@@ -193,7 +195,9 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         }
       }
       if (attr(sim, "needDebug") + 1) {
-        debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
+        debugHere <- if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug)
+        # debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
+        debugMessage(debugHere, sim, cur, fnEnv, curModuleName)
       }
 
       # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
@@ -861,6 +865,15 @@ setMethod(
     # sim[[._txtSimNesting]] <- ._simNesting
     sim[[._txtSimNesting]] <- ._simNesting
 
+    # cacheChaining -- remove Cache tag if it isn't inside a simInitAndSpades call
+    cacheChaining <- getOption("spades.cacheChaining", FALSE)
+    if (isTRUE(cacheChaining)) {
+      inSIAS <- .grepSysCalls(sys.calls(), "simInitAndSpades|simInitAndExperiment")
+      if (length(inSIAS) == 0) {
+        attr(sim, "tags") <- NULL # a bit draconian; remove the cacheId... when the goal is just to say, "don't do cacheChaining"
+      }
+    }
+
     opt <- options("encoding" = "UTF-8")
     # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
     #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
@@ -887,16 +900,19 @@ setMethod(
     on.exit({
       setwd(oldWd)
     }, add = TRUE)
-    useNormalMessaging <- TRUE
-    newDebugging <- is.list(debug)
-    if (newDebugging) {
+    # useNormalMessaging <- TRUE
+    useLoggingPkg <- is.list(debug)
+    if (useLoggingPkg) {
       if (requireNamespace("logging", quietly = TRUE)) {
         debug <- setupDebugger(debug)
-        useNormalMessaging <- !newDebugging ||
-          all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]])))
-      } else {
-        debug <- unlist(debug)
+        useLoggingPkg <- !(# !useLoggingPkg ||
+          all(!grepl("writeToConsole", names(logging::getLogger()[["handlers"]]))))
+      }  else {
+        useLoggingPkg <- FALSE
       }
+      if (!useLoggingPkg)
+        debug <- unlist(debug)
+      # }
     }
 
     ## need to recheck package loading because `simInit` may have been cached
@@ -1226,7 +1242,7 @@ setMethod(
     warning = function(w) {
       w$message <- gsub("^In modCall\\(sim = sim.+\"]]\\): ", "", w$message)
       if (any(grepl("NAs introduced by coercion", w$message))) {
-        if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
+        if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
           logging::logwarn(paste0(collapse = " ", c(names(w), w)))
         }
       }
@@ -1242,8 +1258,8 @@ setMethod(
       }
     },
     error = function(e) {
-      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
-        if (debug > 0) {
+      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
+        if (isTRUE(any(debug > 0))) {
           logging::logerror(e)
         }
       } else {
@@ -1255,17 +1271,13 @@ setMethod(
       }
     },
     message = function(m) {
-      if (newDebugging && requireNamespace("logging", quietly = TRUE)) {
+      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(m$message)
-      }
-
-      if (useNormalMessaging) {
+      } else {
         if (isTRUE(any(grepl("\b", m$message)))) {
           m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
-          # message(paste0("\b", gsub("\b *", " ", m$message), "\b"))
-        } # else {
+        }
         message(loggingMessage(m$message))
-        # }
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -1963,7 +1975,7 @@ isListedEvent <- function(eventQueue, eventsToDo) {
 #' @importFrom cli col_green
 debugMessage <- function(debug, sim, cur, fnEnv, curModuleName) {
   if (!inherits(debug, "list") && !is.character(debug)) debug <- list(debug)
-  if ( !(isFALSE(debug) || debug == 0)) {
+  if ( !(any(debug %in% FALSE) || any(debug %in% 0))) {
     if (!any(vapply(debug, function(x) if (is.numeric(x)) x %in% 1:2 else isTRUE(x), FUN.VALUE = logical(1))))
       debug <- append(list(1L), debug)
     for (i in seq_along(debug)) {
@@ -2053,9 +2065,9 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     middleFix <- ""
     noNew <- FALSE
     if (numCharsMax > 0) {
-      sim2 <- list() # don't put a `sim` here because whereInStack will find this one
+      sim2 <- list() # don't put a `sim` here because .whereInStack will find this one
       while (!inherits(sim2, "simList")) {
-        simEnv <- whereInStack("sim")
+        simEnv <- .whereInStack("sim")
         if (is.null(simEnv))
           break
         sim <- get0("sim", envir = simEnv, inherits = FALSE)
@@ -2254,6 +2266,9 @@ debugMessTRUE <- function(sim, events) {
     events <- current(sim)
   evnts1 <- data.frame(events)
   widths <- unname(unlist(lapply(format(evnts1), nchar)))
+  if (is.null(sim[["._spadesDebugWidth"]]))
+    sim[["._spadesDebugWidth"]] <- spadesDebugWidthDefault
+
   sim[["._spadesDebugWidth"]] <- pmax(widths, sim[["._spadesDebugWidth"]], na.rm = TRUE)
   evnts1[1L, ] <- sprintf(paste0("%-", sim[["._spadesDebugWidth"]],"s"), evnts1)
   evnts1[1L, 1L] <- sprintf(paste0("%.4", "g"), as.numeric(evnts1[1L, 1L]))
@@ -2728,4 +2743,40 @@ extractFns <- function(moduleSpecificObjects) {
   fns2 <- grep(":", moduleSpecificObjects, value = TRUE) |>
     gsub(pattern = "^.+:", replacement = "")
   fns2[nzchar(fns2)]
+}
+
+
+set_console_width <- function(update = TRUE, min_width = 120, check_interval = 20) {
+  if (!requireNamespace("cli", quietly = TRUE)) {
+    stop("Package 'cli' is required. Install it with install.packages('cli').")
+  }
+
+  # Current time
+  now <- Sys.time()
+
+  # Check if we have cached width and timestamp
+  if (exists("last_width", envir = .pkgEnv) && exists("last_time", envir = .pkgEnv)) {
+    elapsed <- as.numeric(difftime(now, .pkgEnv$last_time, units = "secs"))
+    if (elapsed < check_interval) {
+      # Use cached value
+      cols <- .pkgEnv$last_width
+      if (update) options(width = cols)
+      return(cols)
+    }
+  }
+
+  # Detect width using cli
+  cols <- cli::console_width()
+
+  # Enforce minimum width
+  if (cols < min_width) cols <- min_width
+
+  # Cache result
+  .pkgEnv$last_width <- cols
+  .pkgEnv$last_time <- now
+
+  # Update options if requested
+  if (update) options(width = cols)
+
+  return(cols)
 }

@@ -208,6 +208,9 @@ setMethod(
     if (!is.null(dots[["objects"]])) objs <- dots[["objects"]]
     # sim@.xData$.mods <- new.env(parent = asNamespace("SpaDES.core"))
     # sim@.xData$.objects <- new.env(parent = emptyenv())
+    debug <- list(...)$debug
+    if (is.null(debug))
+      rm(debug, inherits = FALSE)
     debug <- getDebug() # from options first, then override if in a simInitAndSpades
     if  (is.call(debug))
       debug <- eval(debug)
@@ -384,8 +387,8 @@ setMethod(
             invokeRestart("muffleMessage")
           })
         if (length(messHere) && verbose > 0) {
-          messageColoured("While parsing: ", mBase, ":", colour = "green")
-          messageColoured(messHere)
+          messageColoured("While parsing: ", mBase, ":", colour = "green", verbose = verbose)
+          messageColoured(messHere, verbose = verbose)
         }
           # out <- try(eval(pf, envir = env))
         #}, type = "message")

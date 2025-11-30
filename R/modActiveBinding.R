@@ -37,7 +37,7 @@ makeParActiveBinding <- function(sim, mod) {
 activeModBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {
-    simEnv <- try(whereInStack("sim"), silent = TRUE)
+    simEnv <- try(.whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
@@ -57,7 +57,7 @@ activeModBindingFunction <- function(value) {
 activeParBindingFunction <- function(value) {
   ret <- NULL
   if (missing(value)) {
-    simEnv <- try(whereInStack("sim"), silent = TRUE)
+    simEnv <- try(.whereInStack("sim"), silent = TRUE)
     if (!is(simEnv, "try-error")) {
       sim <- try(get("sim", simEnv, inherits = FALSE), silent = TRUE)
       if (!is(sim, "try-error")) {
