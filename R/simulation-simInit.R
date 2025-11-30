@@ -1350,6 +1350,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   # If they are all supplied, then skip the .inputObjects code
   cacheIt <- FALSE
 
+  set_console_width(update = TRUE) # sets options(width = XXX) to correct width
+
   mnames <- vapply(seq_along(sim@depends@dependencies), function(k) {
     sim@depends@dependencies[[k]]@name
   }, character(1))

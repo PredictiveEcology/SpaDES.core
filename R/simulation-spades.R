@@ -58,6 +58,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
     stop("doEvent can only accept a simList object")
   }
 
+  set_console_width(update = TRUE) # sets options(width = XXX) to correct width
+
   # core modules
   core <- .pkgEnv$.coreModules
 
@@ -2740,4 +2742,40 @@ extractFns <- function(moduleSpecificObjects) {
   fns2 <- grep(":", moduleSpecificObjects, value = TRUE) |>
     gsub(pattern = "^.+:", replacement = "")
   fns2[nzchar(fns2)]
+}
+
+
+set_console_width <- function(update = TRUE, min_width = 120, check_interval = 20) {
+  if (!requireNamespace("cli", quietly = TRUE)) {
+    stop("Package 'cli' is required. Install it with install.packages('cli').")
+  }
+
+  # Current time
+  now <- Sys.time()
+
+  # Check if we have cached width and timestamp
+  if (exists("last_width", envir = .pkgEnv) && exists("last_time", envir = .pkgEnv)) {
+    elapsed <- as.numeric(difftime(now, .pkgEnv$last_time, units = "secs"))
+    if (elapsed < check_interval) {
+      # Use cached value
+      cols <- .pkgEnv$last_width
+      if (update) options(width = cols)
+      return(cols)
+    }
+  }
+
+  # Detect width using cli
+  cols <- cli::console_width()
+
+  # Enforce minimum width
+  if (cols < min_width) cols <- min_width
+
+  # Cache result
+  .pkgEnv$last_width <- cols
+  .pkgEnv$last_time <- now
+
+  # Update options if requested
+  if (update) options(width = cols)
+
+  return(cols)
 }
