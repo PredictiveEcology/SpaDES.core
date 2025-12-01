@@ -370,27 +370,24 @@ setMethod("rasterToMemory", signature = c(x = "character"), definition = functio
 })
 
 #' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "ANY"),
-          definition = function(x, ...) {
-            if (isRaster(x)) {
-              if (any(nchar(Filenames(x)) > 0)) {
-                r <- rasterCreate(x, ...)
-                r[] <- terra::values(r)
-                if (is(x, "RasterStack") && !is(r, "RasterStack")) {
-                  r <- raster::stack(r, ...)
-                }
-                x <- r
-              }
-
-            } else if (.isSpat(x)) {
-              if (any(nchar(Filenames(x)) > 0)) {
-                r <- rasterCreate(x, ...)
-                r[] <- terra::values(x)
-                x <- r
-              }
-            }
-            x
+setMethod("rasterToMemory", signature = c(x = "ANY"), definition = function(x, ...) {
+  if (isRaster(x)) {
+    if (any(nchar(Filenames(x)) > 0)) {
+      r <- rasterCreate(x, ...)
+      r[] <- terra::values(r)
+      if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+        r <- raster::stack(r, ...)
+      }
+      x <- r
+    }
+  } else if (.isSpat(x)) {
+    if (any(nchar(Filenames(x)) > 0)) {
+      r <- rasterCreate(x, ...)
+      r[] <- terra::values(x)
+      x <- r
+    }
+  }
+  x
 })
 
 #' @rdname rasterToMemory
