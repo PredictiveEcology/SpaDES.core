@@ -383,7 +383,7 @@ setMethod("rasterToMemory",
                 x <- r
               }
 
-            } else if (isSpat(x)) {
+            } else if (.isSpat(x)) {
               if (any(nchar(Filenames(x)) > 0)) {
                 r <- rasterCreate(x, ...)
                 r[] <- terra::values(x)
