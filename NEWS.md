@@ -18,6 +18,7 @@
 * several corrections to messaging when there are nested `simList` objects, i.e., when `simInit` is called within a module; 
 * fix warning capture in `spades()` debug logging;
 * fix use of `debug` as `verbose` when caching (#322);
+* small changes to caching of simList during event caching; missing ability to pass explicit classOptions for params
 
 ## Enhancements
 
