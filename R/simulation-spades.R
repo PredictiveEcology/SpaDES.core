@@ -211,7 +211,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         # for future caching of modules
         cacheIt <- FALSE
         eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-        a <- sim@params[[curModuleName]][[".useCache"]]
+        a <- sim@params[[curModuleName]][[._txtDotUseCache]]
         if (!is.null(a)) {
           #.useCache is a parameter
           if (!identical(FALSE, a)) {
@@ -1366,6 +1366,7 @@ setMethod(
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                       showSimilar, .pkgEnv) {
   cacheChaining <- getOption("spades.cacheChaining", FALSE)
+  classOptions <- moduleSpecificObjects <- NULL # set defaults
   # cacheIt <- cacheChaining || cacheIt
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]]) || cacheChaining) { # allow for super simple simList without a slot outputObjects
     expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
@@ -1387,17 +1388,19 @@ setMethod(
                                        paste0(dotObjs, "$", cur[["moduleName"]]),
                                        objSynName
                                        )
-      # globalParams <- sim@params[[".globals"]]
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
       paramsDontCacheOnActual <- names(modParamsFull) %in% paramsDontCacheOn
-      simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
+      # simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
       modParams <- modParamsFull[!paramsDontCacheOnActual]
 
-      classOptions <- list(events = cur[["eventType"]], current = FALSE, completed = FALSE, simtimes = FALSE,
-                           paths = FALSE, outputs = FALSE,
-                           params = modParams,
-                           # .globals = globalParams,
-                           modules = cur[["moduleName"]])
+      classOptions <- classOptionsForCache(events = cur[["eventType"]],
+                                           paramsWoKnowns = modParams, dependsSlots = metadataToDigest,
+                                           mBase = cur[["moduleName"]])
+
+      # classOptions <- list(events = cur[["eventType"]], current = FALSE, completed = FALSE, simtimes = FALSE,
+      #                      paths = FALSE, outputs = FALSE,
+      #                      params = modParams,
+      #                      modules = cur[["moduleName"]])
     }
   }
   verbose <- debugToVerbose(debug)
@@ -1442,6 +1445,11 @@ setMethod(
     rr <- .Random.seed
 
     if (cacheChaining) {
+
+      nonObjects <- nonObjectsForCacheChaining(moduleSpecificObjects, fnEnv, classOptions)
+      # append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
+      #        classOptions)
+
       prevCache <- attr(sim, "tags")
       ce <- chainingEnv(cachePath(sim))
       chaining <- cacheChainingSetup(
@@ -1450,8 +1458,8 @@ setMethod(
         chainingEnv = ce,
         # The next line is not evaluated it `cacheIt` is FALSE (lazy evaluation);
         #   so can't pre-calculate it
-        nonObjects = append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
-                            classOptions),
+        nonObjects = nonObjects, # append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
+                            # classOptions),
         fnCallAsExpr = fnCallAsExpr,
         module = cur[["moduleName"]],
         event = cur[["eventType"]],
@@ -2319,7 +2327,7 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 ## don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
-paramsDontCacheOn <- .knownDotParams
+paramsDontCacheOn <- grep(c("useCache"), .knownDotParams, value = TRUE)
 
 #' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache
 #' @importFrom reproducible messageCache showCache
@@ -2780,3 +2788,4 @@ set_console_width <- function(update = TRUE, min_width = 120, check_interval = 2
 
   return(cols)
 }
+

@@ -109,7 +109,8 @@ setMethod(
                          out <- Map(obj = objs, moduleNam = names(objs), function(obj, moduleNam) {
                            if (!is.null(.objects[[xDataDotModDotObj]][[moduleNam]]) && length(obj)) {
                              digestEnviros(obj, .objects[[xDataDotModDotObj]][[moduleNam]],
-                                           allEnvsInSimList[[xDataDotModDotObj]][[moduleNam]], algo, quick, length, classOptions)
+                                           allEnvsInSimList[[xDataDotModDotObj]][[moduleNam]],
+                                           algo, quick, length, classOptions)
                            }
                          })
 
@@ -164,9 +165,9 @@ setMethod(
       }
     }
 
-    if (!is.null(classOptions$.globals)) {
-      newGlobals <- object@params$.globals
-    }
+    # if (!is.null(classOptions$.globals)) {
+    #   newGlobals <- object@params$.globals
+    # }
 
     if (!is.null(classOptions$modules)) {
       if (length(classOptions$modules)) {
@@ -187,20 +188,26 @@ setMethod(
       }
     }
 
-    # Params
+    # params @params $params
     # if this call is within a single module, only keep module-specific params
     if (length(curMod) > 0) {
-      omitParams <- c(".showSimilar", ".useCache")
-      object@params <- object@params[curMod]
-      object@params[[curMod]] <- object@params[[curMod]][
-        !names(object@params[[curMod]]) %in% omitParams
-      ]
+      if (!is.null(classOptions["params"])) {
+        object@params <- classOptions["params"] |> setNames(curMod)
+      } else {
+        omitParams <- c(".showSimilar", ".useCache")
+        object@params <- object@params[curMod]
+        object@params[[curMod]] <- object@params[[curMod]][
+          !names(object@params[[curMod]]) %in% omitParams
+        ]
+      }
+
     }
     object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
     object@params <- .sortDotsUnderscoreFirst(object@params)
 
     # globals
     if (!is.null(classOptions$.globals)) {
+      newGlobals <- object@params$.globals
       object@params <- append(list(.globals = newGlobals), object@params)
     }
 

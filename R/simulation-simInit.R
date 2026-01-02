@@ -1392,7 +1392,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         }
         list2env(objectsToUse, envir = sim@.xData)
       }
-      a <- P(sim, ".useCache", mBase)
+      a <- P(sim, ._txtDotUseCache, mBase)
       if (!is.null(a)) {
         if (!identical(FALSE, a)) {
           if (isTRUE(a)) {
@@ -1487,10 +1487,19 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             }
 
             # Remove outputObjects from @depends, as it should not affect the .inputObjects
-            dependsSlots <- metadataToDigest
-            dependsSlots <- outputsRmDontNeedForCache(dependsSlots, "outputObjects")
+            # dependsSlots <- metadataToDigest
+            dependsSlots <- outputsRmDontNeedForCache(metadataToDigest, "outputObjects")
             # dependsSlots <- setdiff(dependsSlots, "outputObjects")
 
+            classOptions <- classOptionsForCache(events = FALSE, paramsWoKnowns, dependsSlots, mBase)
+            # classOptions <- list(events = FALSE,
+            #                      current = FALSE,
+            #                      completed = FALSE,
+            #                      simtimes = FALSE,
+            #                      params = paramsWoKnowns,
+            #                      depends = dependsSlots,
+            #                      # .globals = globsWoKnowns,
+            #                     modules = mBase)
             fnCallAsExpr <- expression(
               .inputObjects(sim) |>
                 Cache(
@@ -1499,14 +1508,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                   outputObjects = moduleSpecificInputObjects,
                   quick = getOption("reproducible.quick", FALSE),
                   cachePath = sim@paths$cachePath,
-                  classOptions = list(events = FALSE,
-                                      current = FALSE,
-                                      completed = FALSE,
-                                      simtimes = FALSE,
-                                      params = paramsWoKnowns,
-                                      depends = dependsSlots,
-                                      # .globals = globsWoKnowns,
-                                      modules = mBase),
+                  classOptions = classOptions,
                   showSimilar = showSimilar,
                   .functionName = paste0(".inputObjects_", mBase),
                   userTags = c(paste0("module:", mBase),
@@ -1520,12 +1522,16 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               fnEnv <- sim@.xData[[dotMods]][[mBase]]
               prevCache <- attr(sim, "tags")
               ce <- chainingEnv(cachePath(sim))
-              # take only functions; no objects; select because the functions have ":"
-              fns2 <- extractFns(objectsToEvaluateForCaching)
+              # # take only functions; no objects; select because the functions have ":"
+              nonObjects <- nonObjectsForCacheChaining(objectsToEvaluateForCaching, fnEnv, classOptions)
+
+              # fns2 <- extractFns(objectsToEvaluateForCaching)
+              # nonObjects <- append(classOptions,
+              #                      as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
               chaining <- cacheChainingSetup(cacheIt = cacheIt,
                                              prevCache = prevCache,
                                              chainingEnv = ce, # cachePath,
-                                             nonObjects = as.list(fnEnv, all.names = TRUE)[fns2],
+                                             nonObjects = nonObjects,
                                              fnCallAsExpr = fnCallAsExpr,
                                              module = mBase,
                                              event = ".inputObjects",
@@ -2172,3 +2178,20 @@ objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
 }
 
 spadesDebugWidthDefault <- c(9, 10, 9, 13)
+
+nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions) {
+  fns2 <- extractFns(objectsToEvaluateForCaching)
+  nonObjects <- append(classOptions,
+                       as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
+}
+
+classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, mBase) {
+  list(events = events,
+       current = FALSE,
+       completed = FALSE,
+       simtimes = FALSE,
+       params = paramsWoKnowns,
+       depends = dependsSlots,
+       # .globals = globsWoKnowns,
+       modules = mBase)
+}
