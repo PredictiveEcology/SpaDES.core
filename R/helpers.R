@@ -18,23 +18,6 @@
   )
 }
 
-#' Reserved module parameter names
-#'
-#' These are common parameter names that are reserved for specific use within modules.
-#'
-#' - `.plotInitialTime`: the initial time for plotting;
-#' - `.plotInterval`: the interval between plots;
-#' - `.plots`: the types of plots to create (see `types` argument in [Plots()]);
-#' - `.saveInitialTime`: the initial time for saving;
-#' - `.saveInterval`: the interval between saves;
-#' - `.useCache`: whether to use caching, or which events to cache;
-#' - `.useParallel`: whether to use parallel processing, or the number of parallel cores to use;
-#'
-#' @keywords internal
-#' @rdname dot-params
-.knownDotParams <- c(".plotInitialTime", ".plotInterval", ".plots",
-                     ".saveInitialTime", ".saveInterval",
-                     ".useCache", ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
 
 #' @keywords internal
 #' @include environment.R
@@ -407,3 +390,24 @@ noEventWarning <- function(sim) {
 ._txtStartClockTime <- "._startClockTime"
 ._txtPrevEventTimeFinish <- "._prevEventTimeFinish"
 ._txtSimNesting <- "._simNesting"
+._txtDotUseCache <- ".useCache"
+
+#' Reserved module parameter names
+#'
+#' These are common parameter names that are reserved for specific use within modules.
+#'
+#' - `.plotInitialTime`: the initial time for plotting;
+#' - `.plotInterval`: the interval between plots;
+#' - `.plots`: the types of plots to create (see `types` argument in [Plots()]);
+#' - `.saveInitialTime`: the initial time for saving;
+#' - `.saveInterval`: the interval between saves;
+#' - `.useCache`: whether to use caching, or which events to cache;
+#' - `.useParallel`: whether to use parallel processing, or the number of parallel cores to use;
+#'
+#' @keywords internal
+#' @rdname dot-params
+.knownDotParams <- c(".plotInitialTime", ".plotInterval",
+                     ".plots",
+                     ".saveInitialTime", ".saveInterval",
+                     ._txtDotUseCache, ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
+
