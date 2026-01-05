@@ -40,7 +40,7 @@ Imports:
     lobstr,
     methods,
     qs2,
-    Require (>= 1.0.1.9000),
+    Require (>= 1.0.1),
     stats,
     terra (>= 1.7-46),
     tools,
@@ -82,8 +82,7 @@ Suggests:
     withr
 Remotes:
     ropensci/NLMR,
-    PredictiveEcology/reproducible@development,
-    PredictiveEcology/Require@development
+    PredictiveEcology/reproducible@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
