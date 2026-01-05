@@ -16,6 +16,7 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'              Only `master`/`main` branches can be used at this point.
 #' @param moduleFiles Optional. List of files of the `name` and `repo`. If not
 #'   supplied, this function will get that information by using `checkModule`.
+#' @inheritParams reproducible::Cache
 #'
 #' @return `numeric_version`
 #'
@@ -35,7 +36,8 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
-setGeneric("getModuleVersion", function(name, repo, token, moduleFiles = NULL) {
+setGeneric("getModuleVersion", function(name, repo, token, moduleFiles = NULL,
+                                        verbose = getOption("reproducible.verbose")) {
   standardGeneric("getModuleVersion")
 })
 
@@ -43,13 +45,14 @@ setGeneric("getModuleVersion", function(name, repo, token, moduleFiles = NULL) {
 setMethod(
   "getModuleVersion",
   signature = c(name = "character", repo = "character", token = "ANY"),
-  definition = function(name, repo, token, moduleFiles = NULL) {
+  definition = function(name, repo, token, moduleFiles = NULL,
+                        verbose = getOption("reproducible.verbose")) {
     if (length(name) > 1) {
       warning("name contains more than one module. Only the first will be used.")
       name <- name[1]
     }
     if (is.null(moduleFiles))
-      moduleFiles <- checkModule(name, repo, token = token)
+      moduleFiles <- checkModule(name, repo, token = token, verbose = verbose)
     zipFiles <- grep(paste0(name, "_+.+.zip"), moduleFiles, value = TRUE) # moduleName_....zip only
     zipFiles <- grep(file.path(name, "data"), zipFiles, invert = TRUE, value = TRUE) # remove any zip in data folder
     # all zip files is not correct behaviour, only
@@ -67,10 +70,11 @@ setMethod(
 #' @rdname getModuleVersion
 setMethod("getModuleVersion",
           signature = c(name = "character", repo = "missing", token = "ANY"),
-          definition = function(name, token, moduleFiles = NULL) {
+          definition = function(name, token, moduleFiles = NULL,
+                                verbose = getOption("reproducible.verbose")) {
             v <- getModuleVersion(name, token = token,
                                   getOption("spades.moduleRepo", defaultGitRepoToSpaDESModules),
-                                  moduleFiles = moduleFiles)
+                                  moduleFiles = moduleFiles, verbose = verbose)
             return(v)
 })
 
@@ -90,10 +94,11 @@ setMethod("getModuleVersion",
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
+#' @inheritParams paramCheckOtherMods
 #' @importFrom cli col_magenta
 #' @importFrom utils packageVersion
 #' @rdname checkModule
-setGeneric("checkModule", function(name, repo, token) {
+setGeneric("checkModule", function(name, repo, token, verbose) {
   standardGeneric("checkModule")
 })
 
@@ -101,7 +106,7 @@ setGeneric("checkModule", function(name, repo, token) {
 setMethod(
   "checkModule",
   signature = c(name = "character", repo = "character", token = "ANY"),
-  definition = function(name, repo, token) {
+  definition = function(name, repo, token, verbose = getOption("reproducible.verbose")) {
     goAhead <- FALSE
     if (requireNamespace("httr", quietly = TRUE)) {
       if (packageVersion("httr") >= "1.2.1") {
@@ -154,9 +159,10 @@ setMethod(
 #' @rdname checkModule
 setMethod("checkModule",
           signature = c(name = "character", repo = "missing", token = "ANY"),
-          definition = function(name, token) {
+          definition = function(name, token, verbose = getOption("reproducible.verbose")) {
             v <- checkModule(name, getOption("spades.moduleRepo",
-                                             defaultGitRepoToSpaDESModules))
+                                             defaultGitRepoToSpaDESModules),
+                             verbose = verbose)
             return(v)
 })
 
@@ -287,7 +293,8 @@ setMethod(
 #' @export
 #' @rdname downloadModule
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
-                                      quickCheck = FALSE, overwrite = FALSE) {
+                                      quickCheck = FALSE, overwrite = FALSE,
+                                      verbose = getOption("reproducible.verbose")) {
   standardGeneric("downloadModule")
 })
 
@@ -301,7 +308,7 @@ setMethod(
                 repo = "character", data = "logical", quiet = "logical",
                 quickCheck = "ANY", overwrite = "logical"),
   definition = function(name, path, version, repo, data, quiet, quickCheck,
-                        overwrite) {
+                        overwrite, verbose = getOption("reproducible.verbose")) {
     if (requireNamespace("httr", quietly = TRUE)) {
       path <- checkPath(path, create = TRUE)
       checkPath(file.path(path, name), create = TRUE)
@@ -318,8 +325,10 @@ setMethod(
           token <- getGitCredsToken()
         }
 
-        moduleFiles <- checkModule(name, repo, token = token)
-        if (is.na(version)) version <- getModuleVersion(name, repo, token = token, moduleFiles = moduleFiles)
+        moduleFiles <- checkModule(name, repo, token = token, verbose = verbose)
+        if (is.na(version))
+          version <- getModuleVersion(name, repo, token = token, moduleFiles = moduleFiles,
+                                      verbose = verbose)
 
         innerPaths <- c(paste0("/master/modules/", name, "/"), "/master/")
         for (tries in 1:2) {
