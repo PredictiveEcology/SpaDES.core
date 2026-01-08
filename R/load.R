@@ -9,11 +9,13 @@ utils::globalVariables(c("fun", "loadTime", "package"))
 #' @export
 #' @rdname loadFiles
 .fileExtensions <- function() {
+  # fmt: skip
   .fE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
     "asc", "rast", "terra",
     "csv", "read.csv", "utils",
     "png", "rast", "terra",
     "qs", "qread", "qs",
+    "qs2", "qs_read", "qs2",
     "Rdata", "load", "base",
     "rdata", "load", "base",
     "RData", "load", "base",
@@ -22,7 +24,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "shp", "terra", "vect",
     "tif", "rast", "terra",
     "txt", "read.table", "utils"
-    )),
+  )),
     stringsAsFactors = FALSE)
   colnames(.fE) <- c("exts", "fun", "package")
   return(.fE)
@@ -112,7 +114,7 @@ doEvent.load <- function(sim, eventTime, eventType, debug = FALSE) { # nolint
 #' end(sim2) <- 20
 #' sim2 <- spades(sim2) # loads the percentPine map 2 more times, once at 10, once at 20
 #' }
-setGeneric("loadFiles", function(sim, filelist, ...)  {
+setGeneric("loadFiles", function(sim, filelist, ...) {
   standardGeneric("loadFiles")
 })
 
@@ -127,13 +129,15 @@ setMethod(
     if (NROW(inputs(sim)) != 0) {
       inputs(sim) <- .fillInputRows(inputs(sim), start(sim))
       filelist <- inputs(sim) # does not create a copy - because data.table ... this is a pointer
-      nonNAFileList <- filelist[!is.na(filelist$file),]
+      nonNAFileList <- filelist[!is.na(filelist$file), ]
       if (NROW(nonNAFileList)) {
         doFilesExist <- file.exists(nonNAFileList$file)
         if (any(!doFilesExist)) {
-          stop("These files in 'inputs' don't exist; please put them in the right place, ",
-             "or change `inputs`:\n    ",
-             paste0(nonNAFileList$file[!doFilesExist], collapse = "\n    "))
+          stop(
+            "These files in 'inputs' don't exist; please put them in the right place, ",
+            "or change `inputs`:\n    ",
+            paste0(nonNAFileList$file[!doFilesExist], collapse = "\n    ")
+          )
         }
       }
 
@@ -142,11 +146,12 @@ setMethod(
       # Check if arguments is a named list; the name may be concatenated
       # with the "arguments", separated by a ".". This will extract that.
       if ((length(arguments) > 0) & !is.null(names(arguments))) {
-        if (grepl(".", fixed = TRUE, names(filelist)[pmatch("arguments", names(filelist))]))
-          names(arguments) <- sapply(strsplit(
-            names(filelist)[pmatch("arguments", names(filelist))], ".", fixed = TRUE),
+        if (grepl(".", fixed = TRUE, names(filelist)[pmatch("arguments", names(filelist))])) {
+          names(arguments) <- sapply(
+            strsplit(names(filelist)[pmatch("arguments", names(filelist))], ".", fixed = TRUE),
             function(x) x[-1]
           )
+        }
       }
 
       # check if arguments should be, i.e,. recycled
@@ -172,14 +177,19 @@ setMethod(
                 if (exists(loadFun[y])) {
                   objList <- list(do.call(get(loadFun[y]), arguments[[y]]))
                 } else {
-                  stop("'inputs' often requires (like now) that package be specified",
-                       " explicitly in the 'fun' column, e.g., base::load")
+                  stop(
+                    "'inputs' often requires (like now) that package be specified",
+                    " explicitly in the 'fun' column, e.g., base::load"
+                  )
                 }
               } else {
-                objList <- list(do.call(getFromNamespace(loadFun[y], loadPackage[y]), arguments[[y]])) # nolint
+                objList <- list(do.call(
+                  getFromNamespace(loadFun[y], loadPackage[y]),
+                  arguments[[y]]
+                )) # nolint
               }
             } else {
-              objListEnv <- quickPlot::whereInStack(filelist$objectName[y])
+              objListEnv <- .whereInStack(filelist$objectName[y])
               objList <- list(get(filelist$objectName[y], objListEnv))
             }
             names(objList) <- filelist$objectName[y]
@@ -188,16 +198,22 @@ setMethod(
               filelist[y, "loaded"] <- TRUE
               message(filelist[y, "objectName"], " loaded into simList")
             } else {
-              message("Can't find object '", filelist$objectName[y], "'. ",
-                      "To correctly transfer it to the simList, it should be ",
-                      "in the search path.")
+              message(
+                "Can't find object '",
+                filelist$objectName[y],
+                "'. ",
+                "To correctly transfer it to the simList, it should be ",
+                "in the search path."
+              )
             }
           } else {
             # for files
             if (is.na(loadPackage[y])) {
               if (!exists(loadFun[y])) {
-                stop("'inputs' often requires (like now) that package be specified",
-                     " explicitly in the 'fun' column, e.g., base::load")
+                stop(
+                  "'inputs' often requires (like now) that package be specified",
+                  " explicitly in the 'fun' column, e.g., base::load"
+                )
               }
             }
             if (!is.null(nam)) {
@@ -207,7 +223,6 @@ setMethod(
               } else {
                 names(argument) <- c(nam, names(formals(getFromNamespace(loadFun[y], loadPackage[y])))[1])
               }
-
             } else {
               argument <- list(filelist[y, "file"])
               if (is.na(loadPackage[y])) {
@@ -219,35 +234,50 @@ setMethod(
 
             # The actual load call
             if (identical(loadFun[y], "load")) {
-              do.call(getFromNamespace(loadFun[y], loadPackage[y]),
-                      args = argument, envir = sim@.xData)
+              do.call(
+                getFromNamespace(loadFun[y], loadPackage[y]),
+                args = argument,
+                envir = sim@.xData
+              )
             } else {
-              sim[[filelist[y, "objectName"]]] <-
-                if (is.na(loadPackage[y])) {
-                  do.call(get(loadFun[y]), args = argument)
-                } else {
-                  do.call(getFromNamespace(loadFun[y], loadPackage[y]),
-                          args = argument)
-                }
+              sim[[filelist[y, "objectName"]]] <- if (is.na(loadPackage[y])) {
+                do.call(get(loadFun[y]), args = argument)
+              } else {
+                do.call(getFromNamespace(loadFun[y], loadPackage[y]), args = argument)
+              }
             }
             filelist[y, "loaded"] <- TRUE
 
-            mess <- paste0(filelist[y, "objectName"], " read from ", filelist[y, "file"], " using ", loadFun[y])
+            mess <- paste0(
+              filelist[y, "objectName"],
+              " read from ",
+              filelist[y, "file"],
+              " using ",
+              loadFun[y]
+            )
             if (loadFun[y] %in% c("raster", "rast")) {
-                mess <- paste0(mess, "(inMemory=", inMemory(sim[[filelist[y, "objectName"]]]), ")")
+              mess <- paste0(mess, "(inMemory=", inMemory(sim[[filelist[y, "objectName"]]]), ")")
             }
-            mess <- paste0(mess, paste0(ifelse(filelist[y, "loadTime"] != sim@simtimes[["start"]],
-                                               paste("\n   at time", filelist[y, "loadTime"]), "")))
+            mess <- paste0(
+              mess,
+              paste0(ifelse(
+                filelist[y, "loadTime"] != sim@simtimes[["start"]],
+                paste("\n   at time", filelist[y, "loadTime"]),
+                ""
+              ))
+            )
             message(mess)
           }
         } # end y
         # add new rows of files to load based on filelistDT$Interval
         if (!is.na(match("intervals", names(filelist)))) {
           if (any(!is.na(filelist[filelist$loaded, "intervals"]))) {
-
             newFilelist <- filelist[(filelist$loaded & !is.na(filelist$intervals)), ]
-            newFilelist[, c("loadTime", "loaded", "intervals")] <-
-              data.frame(curTime + newFilelist$intervals, NA, NA_real_)
+            newFilelist[, c("loadTime", "loaded", "intervals")] <- data.frame(
+              curTime + newFilelist$intervals,
+              NA,
+              NA_real_
+            )
             filelist <- rbind(filelist, newFilelist)
           }
         }
@@ -262,25 +292,33 @@ setMethod(
       }
     }
     return(invisible(sim))
-})
+  }
+)
 
 #' @rdname loadFiles
-setMethod("loadFiles",
-          signature(sim = "missing", filelist = "ANY"),
-          definition = function(filelist, ...) {
-            sim <- simInit(times = list(start = 0.0, end = 1),
-                           params = list(),
-                           inputs = filelist,
-                           modules = list(), ...)
-            return(invisible(sim))
-})
+setMethod(
+  "loadFiles",
+  signature(sim = "missing", filelist = "ANY"),
+  definition = function(filelist, ...) {
+    sim <- simInit(
+      times = list(start = 0.0, end = 1),
+      params = list(),
+      inputs = filelist,
+      modules = list(),
+      ...
+    )
+    return(invisible(sim))
+  }
+)
 
 #' @rdname loadFiles
-setMethod("loadFiles",
-          signature(sim = "missing", filelist = "missing"),
-          definition = function(...) {
-            message("no files loaded because sim and filelist are empty")
-})
+setMethod(
+  "loadFiles",
+  signature(sim = "missing", filelist = "missing"),
+  definition = function(...) {
+    message("no files loaded because sim and filelist are empty")
+  }
+)
 
 #######################################################
 #' Read raster to memory
@@ -322,50 +360,41 @@ setGeneric("rasterToMemory", function(x, ...) {
 # })
 
 #' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "list"),
-          definition = function(x, ...) {
-            lapply(x, rasterToMemory, ...)
+setMethod("rasterToMemory", signature = c(x = "list"), definition = function(x, ...) {
+  lapply(x, rasterToMemory, ...)
 })
 
 #' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "character"),
-          definition = function(x, ...) {
-            rasterToMemory(terra::rast(x, ...))
+setMethod("rasterToMemory", signature = c(x = "character"), definition = function(x, ...) {
+  rasterToMemory(terra::rast(x, ...))
 })
 
 #' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "ANY"),
-          definition = function(x, ...) {
-            if (isRaster(x)) {
-              if (any(nchar(Filenames(x)) > 0)) {
-                r <- rasterCreate(x, ...)
-                r[] <- terra::values(r)
-                if (is(x, "RasterStack") && !is(r, "RasterStack")) {
-                  r <- raster::stack(r, ...)
-                }
-                x <- r
-              }
-
-            } else if (isSpat(x)) {
-              if (any(nchar(Filenames(x)) > 0)) {
-                r <- rasterCreate(x, ...)
-                r[] <- terra::values(x)
-                x <- r
-              }
-            }
-            x
+setMethod("rasterToMemory", signature = c(x = "ANY"), definition = function(x, ...) {
+  if (isRaster(x)) {
+    if (any(nchar(Filenames(x)) > 0)) {
+      r <- rasterCreate(x, ...)
+      r[] <- terra::values(r)
+      if (is(x, "RasterStack") && !is(r, "RasterStack")) {
+        r <- raster::stack(r, ...)
+      }
+      x <- r
+    }
+  } else if (.isSpat(x)) {
+    if (any(nchar(Filenames(x)) > 0)) {
+      r <- rasterCreate(x, ...)
+      r[] <- terra::values(x)
+      x <- r
+    }
+  }
+  x
 })
 
 #' @rdname rasterToMemory
-setMethod("rasterToMemory",
-          signature = c(x = "simList"),
-          definition = function(x, ...) {
-            obj <- lapply(as.list(x), rasterToMemory, ...) # explicitly don't do hidden "." objects
-            list2env(obj, envir = envir(x))
-            return(x)
+setMethod("rasterToMemory", signature = c(x = "simList"), definition = function(x, ...) {
+  obj <- lapply(as.list(x), rasterToMemory, ...) # explicitly don't do hidden "." objects
+  list2env(obj, envir = envir(x))
+  return(x)
 })
 
 #' Simple wrapper to load any `Raster*` object
@@ -391,7 +420,9 @@ rasterCreate <- function(x, ...) {
 #' @export
 rasterCreate.default <- function(x, ...) {
   if (inherits(x, "Raster")) {
-    if (!requireNamespace("raster")) stop("Please install.packages('raster')")
+    if (!requireNamespace("raster")) {
+      stop("Please install.packages('raster')")
+    }
     if (inherits(x, "RasterStack")) {
       x <- raster::stack(x, ...)
     } else if (inherits(x, "RasterBrick")) {
@@ -404,4 +435,3 @@ rasterCreate.default <- function(x, ...) {
   }
   x
 }
-

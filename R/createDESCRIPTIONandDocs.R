@@ -1,32 +1,13 @@
 #' Convert standard module code into an R package
 #'
-#' *EXPERIMENTAL -- USE WITH CAUTION*. This function attempts to convert a
-#' SpaDES module to the closest rendition of the same functionality, but in an
-#' R package. The main change is that instead of `SpaDES.core` parsing the functions
-#' using custom parsing tools, it will use `pkgload::load_all` on the package functions.
-#' These
-#'
-#' `convertToPackage` will:
-#' \enumerate{
-#'   \item move any functions that were defined within the main module file
-#'   (`moduleName.R`) into the R folder, with the same name, but ending with `Fns.R`;
-#'   \item keep the `defineModule(...)` function call with all the metadata in
-#'         the same file, `moduleName.R`, but with all other content removed,
-#'         i.e., only the `defineModule(...)` will be here.
-#'   \item build documentation from all the \pkg{roxygen2} tags
-#'   \item places one \pkg{roxygen2} tag, `@export` in front of the `doEvent.moduleName`
-#'         function, so that the function can be found by `SpaDES.core`
-#'   \item All other functions will be kept "private", i.e., not exported, unless
-#'         the user manually adds `@export`, as per a normal package
-#'   \item will make a `DESCRIPTION` file from the SpaDES module metadata
-#'   \item will make a `NAMESPACE` file from the \pkg{roxygen2} tags (e.g., `@export`)
-#' }
-#'
-#' A user can continue to use the module code as before, i.e., by editing it and
-#' putting `browser()` etc. It will be parsed during `simInit`. Because the functions
-#' are "in a package", they are automatically namespaced with each other, so that
-#' when you want to use a function from that package, there is no need to put a
-#' prefix with the package name.
+#' *EXPERIMENTAL -- USE WITH CAUTION*. This function will create a `DESCRIPTION`
+#' file if one does not exist, based on the module metadata. If one exists, it will
+#' update it with any additional information: **it will not remove packages that are
+#' removed from the metadata**. It will create, if one does not
+#' exist, or update a `.Rbuildignore` file. If `importAll = TRUE` It will create a file named `R/imports.R`,
+#' which will import all functions.  This function will make no changes to
+#' any existing source file of a SpaDES.module. If `buildDocumentation = TRUE`,
+#' it will build documentation `.Rd` files from `roxygen2` tags.
 #'
 #' This function does not install anything (e.g., `devtools::install`). After
 #' running this function, `simInit` will automatically detect that this is now
@@ -122,19 +103,26 @@
 #'
 #' @param buildDocuments A logical. If `TRUE`, the default, then the documentation
 #'   will be built, if any exists, using `roxygen2::roxygenise`.
+#' @param importAll A logical. If `TRUE`, then every package named in `reqdPkgs` will
+#' have an `@importFrom <pkgName>`, meaning **every** function from every package will
+#' be imported. If `FALSE`, then only functions explicitly imported using
+#' `@importFrom <pkgName> <functionName>` will be imported.
+#' @inheritParams reproducible::Cache
 #'
-#' @return invoked for the side effect of converting a module to a package
+#' @return invoked for the side effect of creating DESCRIPTION file, a `.Rbuildingore`
+#' file and possibly building documentation from roxygen2 tags.
 #'
 #' @export
 #' @examples
 #' if (requireNamespace("ggplot2") && requireNamespace("pkgload") ) {
 #'   tmpdir <- tempdir2()
 #'   newModule("test", tmpdir, open = FALSE)
-#'   convertToPackage("test", path = tmpdir)
+#'   createDESCRIPTIONandDocs("test", path = tmpdir)
 #' }
-#'
-convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
-                             buildDocuments = TRUE) {
+createDESCRIPTIONandDocs <- function(module = NULL, path = getOption("spades.modulePath"),
+                                     importAll = TRUE,
+                                     buildDocuments = TRUE,
+                                     verbose = getOption("Require.verbose")) {
   stopifnot(
     requireNamespace("pkgload", quietly = TRUE),
     requireNamespace("roxygen2", quietly = TRUE)
@@ -143,15 +131,15 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
   packageFolderName <- dirname(mainModuleFile)
   aa <- parse(mainModuleFile, keep.source = TRUE)
-  gpd <- getParseData(aa)
-
   rlaa <- readLines(mainModuleFile)
+  gpd <- getParseData(aa)
 
   defModule <- grepl("^defineModule", aa)
   whDefModule <- which(defModule)
   whNotDefModule <- which(!defModule)
 
-  linesWithDefModule <- gpd[grep("defineModule", gpd$text) - 1, ][, c("line1", "line2")]
+  defModLine <- which(grepl("defineModule", gpd$text) & gpd$token == "SYMBOL_FUNCTION_CALL")
+  linesWithDefModule <- gpd[defModLine - 1, ][, c("line1", "line2")]
 
   doEvent <- grepl(paste0("^doEvent.", module), aa)
   whDoEvent <- which(doEvent)
@@ -169,65 +157,30 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   linesWithRoxygen <- parseWithRoxygen[, "line1"]
   nextElement <- c(whNotDefModule[-1], Inf)
 
-  # fileNames <- Map(element = whDefModule, nextElement = whNotDefModule[1],
-  #                  function(element, nextElement) {
-  #                    i <- 0
-  #                    fn <- filePath <- fnCh <- parseWithFn <- lineWithFn <- list()
-  #                    for (elem in c(element, nextElement)) {
-  #                      i <- i + 1
-  #                      if (is.infinite(elem)) {
-  #                        lineWithFn[[i]] <- length(rlaa) + 1
-  #                        break
-  #                      }
-  #                      fn[[i]] <- aa[[elem]][[2]]
-  #                      filePath[[i]] <- filenameFromFunction(packageFolderName, fn[[i]], "R")
-  #                      fnCh[[i]] <- as.character(fn[[i]])
-  #                      gpdLines <- which(gpd$text == fnCh[[i]] & gpd$token == "SYMBOL")
-  #                      if (length(gpdLines) > 1)
-  #                        for (gl in gpdLines) {
-  #                          line1 <- gpd[gl, "line1"]
-  #                          isTop <- any(gpd[gpd[, "line1"] == line1, "parent"] == 0)
-  #                          if (isTRUE(isTop)) {
-  #                            gpdLines <- gl
-  #                            break
-  #                          }
-  #                        }
-  #                      parseWithFn[[i]] <- gpd[gpdLines, ]
-  #                      lineWithFn[[i]] <- parseWithFn[[i]][, "line1"]
-  #                      if (length(lineWithFn[[i]]) > 1) {
-  #                        if (i == 1) {
-  #                          lineWithFn[[1]] <- lineWithFn[[1]][1]
-  #                        } else {
-  #                          whAfterLine1 <- which(lineWithFn[[2]] > lineWithFn[[1]])
-  #                          if (length(whAfterLine1))
-  #                            lineWithFn[[2]] <- lineWithFn[[2]][whAfterLine1[1]]
-  #                        }
-  #                      }
-  #                    }
-  #                    fn <- filenameForMainFunctions(module, path)
-  #                    cat("#' @export", file = fn, sep = "\n", append = FALSE)
-  #                    cat(rlaa[lineWithFn[[2]]:length(rlaa)],
-  #                        file = fn, sep = "\n", append = TRUE)
-  #                    cat(rlaa[1:(lineWithFn[[2]] - 1)], file = mainModuleFile,
-  #                        sep = "\n", append = FALSE)
-  #                  })
 
   filePathImportSpadesCore <- filenameFromFunction(packageFolderName, "imports", "R")# file.path(dirname(mainModuleFile), "R", "imports.R")
 
   md <- aa[[whDefModule]][[3]]
   deps <- unlist(eval(md$reqdPkgs))
 
-  dFile <- DESCRIPTIONfileFromModule(
-    module, md, deps, hasNamespaceFile, NAMESPACEFile,
-    filePathImportSpadesCore, packageFolderName)
+  dFile <- DESCRIPTIONfileFromModule(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
+                                     packageFolderName, verbose = verbose)
 
   if (isTRUE(buildDocuments)) {
-    documentModule(packageFolderName, gpd, linesWithDefModule)
+    message("Building documentation")
+    m <- packageFolderName
+    tmpSrcForDoc <- "R/tmp.R"
+    theDir <- dirname(tmpSrcForDoc)
+    checkPath(theDir, create = TRUE)
+    on.exit(unlink(theDir, recursive = TRUE), add = TRUE)
+    cat(rlaa[-(linesWithDefModule[[1]]:linesWithDefModule[[2]])], sep = "\n", file = tmpSrcForDoc)
+    on.exit(unlink(tmpSrcForDoc), add = TRUE)
+    roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
+    pkgload::dev_topic_index_reset(m)
+    pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
   }
 
   RBuildIgnoreFile <- filenameFromFunction(packageFolderName, "", fileExt = ".Rbuildignore")
-
-  startCat <- if (file.exists(RBuildIgnoreFile)) readLines(RBuildIgnoreFile) else character()
 
   rbi <- paste("^.*\\.Rproj$
 ^\\.Rproj\\.user$
@@ -257,7 +210,12 @@ vignettes/.*\\.log$
 
   modFiles <- c(paste0(module, ".*"), ".*zip")
 
-  rbi <- unique(c(startCat, rbi, modFiles))
+  if (file.exists(RBuildIgnoreFile)) {
+    startCat <- readLines(RBuildIgnoreFile)
+    rbi <- unique(c(startCat, rbi))
+  }
+
+  rbi <- unique(c(rbi, modFiles))
   cat(rbi, file = RBuildIgnoreFile, fill = TRUE, sep = "\n")
 
   return(invisible())
@@ -274,7 +232,7 @@ filenameForMainFunctions <- function(module, modulePath = ".")
 
 
 DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
-                                      packageFolderName) {
+                                      packageFolderName, verbose = getOption("Require.verbose")) {
   d <- list()
   d$Package <- .moduleNameNoUnderscore(module)
   d$Type <- "Package"
@@ -320,7 +278,7 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
 
   dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
-  origDESCtxt <- read.dcf(dFile)
+  origDESCtxt <- if (file.exists(dFile)) read.dcf(dFile) else character()
 
   cat(paste("Package:", d$Package), file = dFile, sep = "\n")
   cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
@@ -330,12 +288,15 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
   cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
 
-  mergeField(origDESCtxt = origDESCtxt, field = d$Imports, fieldName = "Imports", dFile)
+  if (length(d$Imports) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = d$Imports, fieldName = "Imports", dFile)
 
   suggs <- c('knitr', 'rmarkdown', 'testthat', 'withr', 'roxygen2')
-  mergeField(origDESCtxt = origDESCtxt, field = suggs, fieldName = "Suggests", dFile)
+  if (length(suggs) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = suggs, fieldName = "Suggests", dFile)
 
-  mergeField(origDESCtxt = origDESCtxt, field = d$Remotes, fieldName = "Remotes", dFile)
+  if (length(d$Remotes) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = d$Remotes, fieldName = "Remotes", dFile)
 
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
   cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
@@ -345,7 +306,7 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   cat(paste0("RoxygenNote: ", as.character(packageVersion("roxygen2"))), sep = "\n", file = dFile, append = TRUE)
 
 
-  message("New/updated DESCRIPTION file is: ", dFile)
+  messageVerbose("New/updated DESCRIPTION file is: ", dFile, verbose = verbose)
   return(dFile)
 }
 
@@ -355,38 +316,8 @@ mergeField <- function(origDESCtxt, field, dFile, fieldName = "Imports") {
     fieldVals <- strsplit(origDESCtxt[, fieldName], split = ",+\n")[[1]]
   if (length(field)) {
     field <- trimRedundancies(unique(c(field, fieldVals)))
+    cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
+        sep = "\n", file = dFile, append = file.exists(dFile))
   }
-  cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
-      sep = "\n", file = dFile, append = TRUE)
-}
-
-
-
-documentModule <- function(packageFolderName, gpd, linesWithDefModule) {
-  message("Building documentation")
-  m <- packageFolderName
-  tmpSrcForDoc <- file.path(m, "R/READONLYFromMainModuleFile.R")
-  mainModuleFile <- file.path(m, paste0(basename(m), ".R"))
-  # if (missing(rlaa)) {
-  rlaa <- readLines(mainModuleFile)
-  # }
-
-  if (missing(linesWithDefModule)) {
-    if (missing(gpd)) {
-      aa <- parse(mainModuleFile, keep.source = TRUE)
-      gpd <- getParseData(aa)
-    }
-    linesWithDefModule <- gpd[grep("defineModule", gpd$text) - 1, ][, c("line1", "line2")]
-  }
-  if (!dir.exists(file.path(m, "R")))
-    dir.create(file.path(m, "R"))
-  cat(paste0("#% Generated by SpaDES.core: do not edit by hand
-#% Please edit documentation in\n#%", mainModuleFile),
-      file = tmpSrcForDoc)
-  cat(rlaa[-(linesWithDefModule[[1]]:linesWithDefModule[[2]])], sep = "\n",
-      file = tmpSrcForDoc, append = TRUE)
-  # on.exit(unlink(tmpSrcForDoc))
-  roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...
-  pkgload::dev_topic_index_reset(m)
-  pkgload::unload(.moduleNameNoUnderscore(basename2(m))) # so, unload here before reloading without exporting
+  field
 }

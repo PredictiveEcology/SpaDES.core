@@ -6,11 +6,11 @@
 \alias{checkModule,character,missing-method}
 \title{Check for the existence of a remote module}
 \usage{
-checkModule(name, repo)
+checkModule(name, repo, token, verbose)
 
-\S4method{checkModule}{character,character}(name, repo)
+\S4method{checkModule}{character,character}(name, repo, token, verbose = getOption("reproducible.verbose"))
 
-\S4method{checkModule}{character,missing}(name)
+\S4method{checkModule}{character,missing}(name, token, verbose = getOption("reproducible.verbose"))
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -18,6 +18,10 @@ checkModule(name, repo)
 \item{repo}{GitHub repository name.
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.}
+
+\item{token}{A github repository token as from \code{gitcreds::gitcreds_get()}}
+
+\item{verbose}{Logical or Numeric, follows \code{reproducible.verbose} value by default.}
 }
 \value{
 a character vector of module file paths (invisibly).

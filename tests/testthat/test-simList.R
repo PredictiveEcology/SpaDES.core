@@ -182,7 +182,7 @@ test_that("simList object initializes correctly (1)", {
   }) |>
     unlist() |>
     sort() |>
-    SpaDES.core:::.cleanPkgs() |>
+    .cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
@@ -192,7 +192,7 @@ test_that("simList object initializes correctly (1)", {
   reqdPkgs <- lapply(modules, function(m) packages(module = m)) |>
     unlist() |>
     sort() |>
-    SpaDES.core:::.cleanPkgs() |>
+    .cleanPkgs() |>
     unique()
   expect_equal(sort(reqdPkgs), sort(pkgs))
 
@@ -407,8 +407,10 @@ test_that("inputObjects on module arg not sim", {
 })
 
 test_that("test sped-up Caching of sequentially cached events", {
-  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE))
+  testInit(sampleModReqdPkgs, opts = list())#spades.allowSequentialCaching = TRUE))
   withr::local_options(list(reproducible.cachePath = tmpdir))
+  withr::local_options(reproducible.useMemoise = TRUE,
+                       spades.cacheChaining = TRUE)
 
   defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
@@ -427,14 +429,34 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
-  expect_false(any(grepl("Skipped digest", mess)))
+  et <- elapsedTime(mySimOut)
+  mins <- "mins"
+  et2 <- elapsedTime(mySimOut, units = mins)
+  expect_is(et, "data.table")
+  expect_identical(units(et2$elapsedTime), mins)
+  expect_identical(colnames(et), c("moduleName", "eventType", "elapsedTime"))
+  oa <- "override automatic"
+  expect_false(any(grepl(oa, mess)))
 
   ## Rerun with Cached copies being recovered
-  mySim <- simInit(times, params, modules, objects = list(), paths)
+  mess1 <- capture_messages(
+    mySim <- simInit(times, params, modules, objects = list(), paths)
+  )
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
-  expect_true(sum(grepl("Skipped digest", mess)) == 2)
+  expect_true(sum(grepl(oa, mess)) == 2) # does not continue from .inputObjects to init
+
+  mess2 <- capture_messages(
+    mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
+                              debug = 1, .plotInitialTime = NA)
+  )
+  mess3 <- capture_messages(
+    mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
+                              debug = 1, .plotInitialTime = NA)
+  )
+  expect_true(sum(grepl(oa, mess3)) == 3) # continues from .inputObjects to init for simInitAndSpades
+
 
   ## If they are not sequential, shouldn't do it
   params <- list(
@@ -446,13 +468,13 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
-  expect_false(any(grepl("Skipped digest", mess)))
+  expect_false(any(grepl(oa, mess)))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
-  expect_false(any(grepl("Skipped digest", mess)))
+  expect_true(sum(grepl(oa, mess)) == 0) # because .inputObjects of caribou leads to init of randomLandscapes
 
   ## If they are different sequential, should do it
   params <- list(
@@ -465,18 +487,21 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
-  expect_false(sum(grepl("Skipped digest", mess)) == 1)
+  expect_false(sum(grepl(oa, mess)) == 1)
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
   })
-  expect_true(sum(grepl("Skipped digest", mess)) == 1)
+  expect_true(sum(grepl(oa, mess)) == 1)
 })
 
-test_that("test sped-up Caching of sequentially cached events", {
-  testInit(sampleModReqdPkgs, opts = list(spades.allowSequentialCaching = TRUE))
+test_that("test sped-up Caching of sequentially cached events 2", {
+  testInit(sampleModReqdPkgs, opts = list())#spades.allowSequentialCaching = FALSE))
   withr::local_options(list(reproducible.cachePath = tmpdir))
+
+  withr::local_options(reproducible.useMemoise = TRUE,
+                       spades.cacheChaining = TRUE)
 
   defaults <- .coreModules() |> unname()
   times <- list(start = 1.0, end = 10)
@@ -497,7 +522,7 @@ test_that("test sped-up Caching of sequentially cached events", {
               ".inputObjects <- function(sim) {",
               "  a = asPath(file.path(inputPath(sim), \"test\")) ",
               paste0("  if (!suppliedElsewhere(", params$.globals$stackName, "))"),
-              paste0("  sim[[", params$.globals$stackName, "]] <- sim[[", params$.globals$stackName, "]]"),
+              paste0("  sim[['", params$.globals$stackName, "']] <- sim[['", params$.globals$stackName, "']]"),
               "sim",
               "}")
 
@@ -505,19 +530,26 @@ test_that("test sped-up Caching of sequentially cached events", {
   }
 
   ## Run first time to create the caches
-  for (i in 1:2) {
+  for (i in 1:3) {
     mess1 <- capture_messages({
       mySim <- simInit(times, params, modules, objects = list(), paths, debug = 1)
     })
     mess <- capture_messages({
       mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
     })
+    oa <- "override automatic"
     if (i == 1) {
-      expect_equal(sum(grepl("Skipped digest", mess)), 0)
-      expect_equal(sum(grepl("Skipped digest", mess1)), 0)
-    } else {
-      expect_equal(sum(grepl("Skipped digest", mess)), 3)
-      expect_equal(sum(grepl("Skipped digest", mess1)), 1) # there is no .inputObjects for randomLandscapes
+      expect_equal(sum(grepl(oa, mess)), 0)
+      expect_equal(sum(grepl(oa, mess1)), 0)
+    } else if (i == 2) {
+      expect_equal(sum(grepl(oa, mess)), 2)
+      expect_equal(sum(grepl(oa, mess1)), 2)
+    }
+    if (i == 2) {
+      params$fireSpread$.useCache <- NULL # remove the "middle" one, so that it should do none
+    }
+    if (i == 3) {
+      expect_equal(sum(grepl(oa, mess1)), 0)
     }
   }
 })

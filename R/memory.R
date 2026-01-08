@@ -141,12 +141,11 @@ memoryUse <- function(sim, max = TRUE) {
     message("There are no data in the sim@.xData$.memoryUse$obj ... try running spades again?")
   } else {
     # make sure same tz
-    if (any(grepl("^time$", names(mem)))) {
-      setnames(mem, old = "time", new = "clockTime")
-    }
-    mem[, clockTime := as.POSIXct(as.character(clockTime))] # In case these two objects are in different tz
-    compl[, clockTime := as.POSIXct(as.character(clockTime))]
-    a <- mem[compl, on = c("clockTime"), roll = TRUE, allow.cartesian = TRUE]
+    if (any(grepl("^time$", names(mem))))
+      setnames(mem, old = "time", new = ._txtClockTime)
+    mem[, eval(._txtClockTime) := as.POSIXct(as.character(get(._txtClockTime)))] # In case these two objects are in different tz
+    compl[, eval(._txtClockTime) := as.POSIXct(as.character(get(._txtClockTime)))]
+    a <- mem[compl, on = c(._txtClockTime), roll = TRUE, allow.cartesian = TRUE]
     if (isTRUE(max)) {
       a <- a[, list(maxMemory = max(memory, na.rm = TRUE)), by = c("moduleName", "eventType")]
     } else {
@@ -168,7 +167,6 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       requireNamespace("future.callr", quietly = TRUE)
   ) {
     thePlan <- getOption("spades.futurePlan", NULL)
-    # originalFuturePlan <- future::plan()
     if (!is(originalFuturePlan, "sequential")) {
       theActualPlan <- originalFuturePlan
       message(
@@ -213,7 +211,7 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
     }
 
     counterForMax <- 0
-    maxCounterForMax <- 30
+    maxCounterForMax <- 40
     while (!file.exists(sim@.xData$.memoryUse$filename) && counterForMax < maxCounterForMax) {
       Sys.sleep(0.5)
       counterForMax <- counterForMax + 1
@@ -227,7 +225,7 @@ memoryUseSetup <- function(sim, originalFuturePlan) {
       message("\bDone!")
     }
   } else {
-    stop(futureMessage)
+    stop(.message$futureMessage)
   }
 
   return(sim)
@@ -256,7 +254,7 @@ memoryUseOnExit <- function(sim, originalFuturePlan) {
       message("Memory use saved in simList; see memoryUse(sim); removing memoryUse txt file")
     }
   } else {
-    stop(futureMessage)
+    stop(.message$futureMessage)
   }
   return(sim)
 }
@@ -269,7 +267,3 @@ outputFilename <- function(thisPid) {
   reproducible::tempfile2("memoryUse", fileext = paste0("..memAvail", "_", thisPid, ".txt"))
 }
 
-futureMessage <- paste0(
-  "To use 'spades.memoryUseInterval', packages 'future' and 'future.callr' must be installed:\n",
-  "  install.packages(c('future', 'future.callr'))"
-)

@@ -39,7 +39,6 @@ jobs:
           extra-packages: |
             any::cffr
             any::V8
-            PredictiveEcology/reproducible@development
             NLMR=?ignore
 
       - name: Install additional package dependencies

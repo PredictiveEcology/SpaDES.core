@@ -2,62 +2,98 @@
 % Please edit documentation in R/restart.R
 \name{restartSpades}
 \alias{restartSpades}
+\alias{saveState}
+\alias{restartOrSimInitAndSpades}
 \title{Restart an interrupted simulation}
 \usage{
-restartSpades(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE, ...)
+restartSpades(
+  sim = NULL,
+  module = NULL,
+  numEvents = Inf,
+  restart = TRUE,
+  verbose = getOption("reproducible.verbose", 1L),
+  ...
+)
+
+saveState(filename, ...)
+
+restartOrSimInitAndSpades(ll, file, reset = getOption("spades.resetRestart"))
 }
 \arguments{
-\item{sim}{A \code{simList.} If not supplied (the default), this will take the \code{sim} from
+\item{sim}{A \code{simList} or a filename that will load a \code{simList}, e.g., from
+\code{saveState} or \code{saveSimList}. If not supplied (the default),
+this will take the \code{sim} from
 \code{savedSimEnv()$.sim}, i.e., the one that was interrupted}
 
 \item{module}{A character string length one naming the module that caused the error and
 whose source code was fixed. This module will be re-parsed and placed into the \code{simList}}
 
-\item{numEvents}{Numeric. Default is Inf (i.e., all available). In the \code{simList}, if
-\code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric, then
-there will be a list in the \code{simList} called \code{.recoverableObjs}. These will be
-replayed backwards in time to reproduce the initial state of the \code{simList} before
-the event that is \code{numEvents} back from the first event in \code{events(sim)}.}
+\item{numEvents}{Numeric. Default is Inf (i.e., all available).
+The number of events to be rewound.
+In the \code{simList}, if \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric,
+then there will be a list in the \code{simList} called \code{.recoverableObjs}.
+These will be replayed backwards in time to reproduce the initial state of the \code{simList}
+before the event that is \code{numEvents} prior to the first event in \code{events(sim)}.}
 
 \item{restart}{Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
 restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
 with the module code parsed into the \code{simList}}
 
+\item{verbose}{Logical or Numeric, follows \code{reproducible.verbose} value by default.}
+
 \item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
+
+\item{filename}{The filename to save the sim state.
+
+\code{saveState} is a wrapper around \code{restartSpades} and \code{saveSimList}. You can
+pass arguments to the \code{...} that will be passed to \code{saveSimList}, such as
+\code{modules}, \code{inputs}, \code{outputs}.}
+
+\item{ll}{A list of elements that would be passed to \code{simInit}, such as \code{modules}.}
+
+\item{file}{An optional file that has a saved \code{simList}, e.g., from \code{saveSimList}
+or \code{saveState}.}
+
+\item{reset}{Logical. If \code{TRUE}, then it will force \code{simInitAndSpades} to be called
+even if there is saved \code{sim} available.}
 }
 \value{
 A \code{simList} as if \code{spades} had been called on a \code{simList}.
+
+A \code{simList}, that has been "executed" until \code{end(sim)}, if it does not
+hit an error.
 }
 \description{
-This is very experimental and has not been thoroughly tested. Use with caution.
-This function will re-parse a single module (currently) into the \code{simList}
-where its source code should reside, and then optionally restart a simulation
-that stopped on an error, presumably after the developer has modified the
-source code of the module that caused the break.
-This will restart the simulation at the next event in the event queue
-(i.e., returned by \code{events(sim)}). Because of this, this function will
-not do anything if the event queue is empty.
+\strong{This is experimental and has not been thoroughly tested. Use with caution.}
+If there is an error during an event, this function will rewind the simulation to a state
+\code{numEvents} prior to the event that led to the error. The developer may then modify the
+source code of the module that caused the break and resume the simulation.
 }
 \details{
-This will only parse the source code from the named module. It will not affect any
-objects that are in the \code{mod} or \code{sim}.
+If \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric (default 1), then
+there will be a list in the \code{simList} called \code{.recoverableObjs}.
+These record the elements of simList that have  changed over a number of events equal
+to the number chosen for \code{options('spades.recoveryMode')}.
+The \code{restartSpades} function then uses this list to rewind \code{numEvents} backwards from the
+first event in \code{events(sim)} (likely the one that caused the error).
 
 The random number seed will be reset to the state it was at the start of the
-earliest event recovered, thereby returning to the exact stochastic simulation
-trajectory.
+earliest event recovered, thereby returning to the exact stochastic simulation trajectory.
 }
 \note{
-This will only work reliably
-\emph{if the \code{simList} was not modified yet during the event which caused the error}.
-The \code{simList} will be in the state it was at the time of the error.
+The \code{simList} will be in the state it was \code{numEvents} prior to the event
+that led to the error (although some objects, e.g., on disk, may have already been modified).
 }
 \examples{
 \donttest{
 # options("spades.recoveryMode" = 1) # now the default
 s <- simInit()
 s <- spades(s) # if this is interrupted or fails
-# the following line will not work if the previous line didn't fail
-s <- restartSpades(s) # don't need to specify `sim` if previous line fails
-                     # will take from savedSimEnv()$.sim automatically
+## the following line will not work if the previous line didn't fail:
+
+## don't need to specify `sim` if previous line fails;
+## will take from savedSimEnv()$.sim automatically
+s <- restartSpades(s)
+
 }
 }

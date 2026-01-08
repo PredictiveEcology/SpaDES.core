@@ -159,9 +159,11 @@ test_that("saving csv files works correctly", {
 test_that("saveSimList works correctly", {
   skip_if_not_installed("archive")
 
-  testInit(sampleModReqdPkgs,
-           tmpFileExt = c("grd", "qs", "qs", "tif", "", "", "grd", "rds"),
-           opts = list(reproducible.verbose = 0))
+  testInit(
+    sampleModReqdPkgs,
+    tmpFileExt = c("grd", "qs2", "qs2", "tif", "", "", "grd", "rds"),
+    opts = list(reproducible.verbose = 0)
+  )
   unlink(tmpfile[5])
   unlink(tmpfile[6])
   mapPath <- getMapPath(tmpdir)
@@ -200,12 +202,11 @@ test_that("saveSimList works correctly", {
   ) |>
     spades()
   mySim$landscape[] <- round(mySim$landscape[], 3) # after saving, these come back different, unless rounded
-  mySim$landscape <- writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
-  mySim$habitatQuality <- writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
+  mySim$landscape <- terra::writeRaster(mySim$landscape, filename = tmpfile[1], overwrite = TRUE, datatype = "FLT4S")
+  mySim$habitatQuality <- terra::writeRaster(mySim$landscape, filename = tmpfile[7], overwrite = TRUE)
 
-  ## test using qs
-  # keeps file-backings
-  saveSimList(mySim, filename = tmpfile[2])
+  ## test using qs2
+  saveSimList(mySim, filename = tmpfile[2]) ## keeps file-backings
 
   sim <- loadSimList(file = tmpfile[2], projectPath = tmpCache)
   expect_true(all(basename(Filenames(sim)) %in% basename(Filenames(mySim))))
@@ -229,8 +230,8 @@ test_that("saveSimList works correctly", {
   # sim$habitatQuality[] <- sim$habitatQuality[]
   unlink(c(tmpfile[1], paste0(tools::file_path_sans_ext(tmpfile[1]), ".gri"))) ## needed because of hardlink shenanigans
   unlink(c(tmpfile[7], paste0(tools::file_path_sans_ext(tmpfile[7]), ".gri"))) ## needed because of hardlink shenanigans
-  sim$landscape <- writeRaster(sim$landscape, filename = tmpfile[1])
-  sim$habitatQuality <- writeRaster(sim$habitatQuality, filename = tmpfile[7])
+  sim$landscape <- terra::writeRaster(sim$landscape, filename = tmpfile[1])
+  sim$habitatQuality <- terra::writeRaster(sim$habitatQuality, filename = tmpfile[7])
   ## grd format doesn't get minmax right especially with terra -- can't fix it with terra
 
   ## The terra pointers with grd files make comparisons wrong
@@ -251,11 +252,10 @@ test_that("saveSimList works correctly", {
   expect_equivalent(
     gsub("\\_[[:digit:]]{1,2}$", "", checkPath(Filenames(simLoaded$landscape, allowMultiple = FALSE))),
     tmpfile[1])
-  expect_true(bindingIsActive("mod", simLoaded@.xData$.mods$caribouMovement)) ## TODO: fails?
+  expect_true(bindingIsActive("mod", simLoaded@.xData[[dotMods]]$caribouMovement)) ## TODO: fails?
 
   mySim <- simLoaded
   # Now keep as file-backed, but change name
-  # aaaa <<- 1
   saveSimList(mySim, filename = tmpfile[3])
 
   sim <- loadSimList(file = tmpfile[3])
@@ -269,10 +269,10 @@ test_that("saveSimList works correctly", {
   file.remove(dir(dirname(tmpfile[c(1)]), pattern = ".gr.$", full.names = TRUE))
   # rm(mySim)
 
-  assign("a", 1, envir = mySim@.xData$.mods$caribouMovement$.objects)
-  assign("a", 2, envir = sim@.xData$.mods$caribouMovement$.objects)
+  assign("a", 1, envir = mySim@.xData[[dotObjs]]$caribouMovement)
+  assign("a", 2, envir = sim@.xData[[dotObjs]]$caribouMovement)
 
-  expect_true(bindingIsActive("mod", sim@.xData$.mods$caribouMovement)) ## TODO: fails?
+  expect_true(bindingIsActive("mod", sim@.xData[[dotMods]]$caribouMovement)) ## TODO: fails?
   # test file-backed raster is gone
   expect_error(mySim$landscape$DEM[])
 })
@@ -280,8 +280,7 @@ test_that("saveSimList works correctly", {
 test_that("saveSimList with file backed objs", {
   skip_if_not_installed("archive")
 
-  testInit(sampleModReqdPkgs,
-           tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs"))
+  testInit(sampleModReqdPkgs, tmpFileExt = c("zip", "grd", "tif", "tif", "tif", "grd", "qs2"))
   mapPath <- getMapPath(tmpdir)
   modules <- getSampleModules(tmpdir)
 
@@ -332,7 +331,7 @@ test_that("saveSimList with file backed objs", {
 
   Map(nam = names(mySim$landscape), i = seq(nlyr(mySim$landscape)), function(nam, i) {
     coltab(mySim$landscape[[nam]]) <- NULL ## can't use colour table with FLT4S (#261)
-    mySim$landscape[[nam]] <- writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
+    mySim$landscape[[nam]] <- terra::writeRaster(mySim$landscape[[nam]], tmpfile[i + 1], datatype = "FLT4S")
   })
 
   ## with file backed
@@ -364,6 +363,7 @@ test_that("saveSimList with file backed objs", {
 
 test_that("restart does not work correctly", {
   skip("restartR not possible in automated tests")
+  # Run this on its own, without testthat
   skip_if_not_installed("NLMR")
 
   # Must be run manually
@@ -434,15 +434,16 @@ test_that("restart does not work correctly", {
       outputPath = tmpdir
     )
 
-    options("spades.restartRInterval" = interval)
+    options("spades.restartRInterval" = interval,
+            spades.restartR.restartDir = paths$inputPath)
     times <- list(start = 0, end = 3)
     mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                      outputs = data.frame(objectName = "landscape", saveTime = times$end))
-    mySim$tesRas <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+    mySim$tesRas <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1, res = 1)
     tmpFilename <- "~/tmpRas.tif"
-    mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
+    mySim$tesRas <- terra::writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
     mySim <- spades(mySim, debug = 1)
-    sim$tesRas + 1
+    mySim$tesRas + 1
     file.exists(tmpFilename)
   }
 
@@ -482,9 +483,9 @@ test_that("restart with logging", {
   times <- list(start = 0, end = 3)
   mySim <- simInit(times = times, params = parameters, modules = modules, paths = paths,
                    outputs = data.frame(objectName = "landscape", saveTime = times$end))
-  mySim$tesRas <- raster(extent(0, 10, 0, 10), vals = 1, res = 1)
+  mySim$tesRas <- terra::rast(terra::ext(0, 10, 0, 10), vals = 1, res = 1)
   tmpFilename <- "~/tmpRas.tif"
-  mySim$tesRas <- writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
+  mySim$tesRas <- terra::writeRaster(mySim$tesRas, tmpFilename, overwrite = TRUE)
   mySim <- spades(mySim, debug = list("file" = list("file" = "log.txt")))
   sim$tesRas + 1
   file.exists(tmpFilename)
@@ -496,13 +497,11 @@ test_that("restart with logging", {
 test_that("registerOutputs", {
   testInit()
   sim <- simInit()
-  # This would normally be a save call, e.g., `writeRaster`
   tf <- reproducible::tempfile2(fileext = ".tif")
   tf2 <- reproducible::tempfile2(fileext = ".tif")
   sim <- registerOutputs(sim, filename = c(tf, tf2))
   odf <- outputs(sim)
   expect_true(all(odf$file %in% c(tf, tf2)))
-
 
   newModule("test", tmpdir, open = FALSE)
   cat(file = file.path(tmpdir, "test", "test.R"),'
@@ -537,21 +536,25 @@ test_that("registerOutputs", {
       eventType,
       init = {
 
-      tf <- tempfile2(.rndstr(), fileext = ".rds")
-      tf2 <- tempfile2(.rndstr(), fileext = ".rds")
-      tf3 <- tempfile2(.rndstr(), fileext = ".rds")
+      tf <- tempfile2(tempdir = outputPath(sim), fileext = ".rds")
+      tf2 <- tempfile2(tempdir = outputPath(sim), fileext = ".rds")
+      tf3 <- tempfile2(tempdir = outputPath(sim), fileext = ".rds")
 
       sim <- saveRDS(sim$age, file = tf) |> registerOutputs(filename = tf)
       sim <- registerOutputs(filename = saveRDS(sim$age, file = tf2))
       sim <- saveRDS(sim$age, file = tf3) |> registerOutputs()
 
-
-      #sim$dp <- dataPath(sim)
-      sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
+      sim <- scheduleEvent(sim, time(sim) + 1, "test", "event1")
       },
       event1 = {
-      tf4 <- tempfile2(.rndstr(), fileext = ".qs")
-      sim <- qs::qsave(sim$age, file = tf4) |> registerOutputs()
+      tf4 <- tempfile2(tempdir = outputPath(sim), fileext = ".qs2")
+      sim <- qs2::qs_save(sim$age, file = tf4) |> registerOutputs()
+
+      tf5 <- tempfile2(tempdir = outputPath(sim), fileext = ".png")
+      png(tf5)
+      plot(1:10, runif(10))
+      dev.off()
+      sim <- registerOutputs(tf5)
 
       sim <- scheduleEvent(sim, time(sim)+1, "test", "event1")
       })
@@ -560,17 +563,25 @@ test_that("registerOutputs", {
 
       .inputObjects <- function(sim) {
         if (suppliedElsewhere("ageMap", sim)) {
-                sim$worked <- TRUE
+          sim$worked <- TRUE
         }
         sim
       }
       ', fill = TRUE)
   modules <- "test"
-  sim <- simInit(times = list(start = 0, end = 1, timeunit = "year"),
+  sim <- simInit(times = list(start = 0, end = 2, timeunit = "year"),
                  modules = modules,
                  objects = list(age = 1, vegMap = 2, studyArea = 3),
+                 outputs = data.frame(
+                   objectName = "vegMap",
+                   saveTime = 2,
+                   fun = "saveRDS",
+                   package = "base",
+                   file = "vegMap.rds",
+                   stringsAsFactors = FALSE
+                  ),
                  paths = list(modulePath = tmpdir))
   sim <- spades(sim)
-  expect_equal(NROW(outputs(sim)$file), 4)
+  expect_equal(NROW(outputs(sim)$file), 8)
   expect_true(all(file.exists(outputs(sim)$file)))
 })

@@ -1,6 +1,6 @@
 utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 
-# Just checks for paths, creates them if they do not exist
+## Just checks for paths, creates them if they do not exist
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     if (NROW(outputs(sim)) > 0) {
@@ -9,11 +9,12 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
       if ("eventPriority" %in% colnames(outputs(sim))) {
         firstPriority <- outputs(sim)[["eventPriority"]][firstSaveWh]
       }
-      if (!exists("firstPriority", inherits = FALSE))
+      if (!exists("firstPriority", inherits = FALSE)) {
         firstPriority <- .last()
+      }
       attributes(firstSave)$unit <- sim@simtimes[["timeunit"]]
       sim <- scheduleEvent(sim, firstSave, "save", "spades", firstPriority)
-      #sim <- scheduleEvent(sim, end(sim, sim@simtimes[["timeunit"]]), "save", "end", .last())
+      # sim <- scheduleEvent(sim, end(sim, sim@simtimes[["timeunit"]]), "save", "end", .last())
     }
     checkPath(sim@paths$outputPath, create = TRUE)
   } else if (eventType == "spades") {
@@ -118,11 +119,10 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   file.remove(dir(outputPath, full.names = TRUE))
 #'
 #'   options(opts) # clean up
-#'
 #' }}
 saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
-  # extract the current module name that called this function
+  ## extract the current module name that called this function
   moduleName <- sim@current[["moduleName"]]
 
   if (length(moduleName) == 0) {
@@ -133,7 +133,7 @@ saveFiles <- function(sim) {
   }
 
   if (moduleName != "save") {
-    # i.e., a module driven save event
+    ## i.e., a module driven save event
     toSave <- lapply(params(sim), function(y) return(y$.saveObjects))[[moduleName]] |>
       unlist() |>
       (function(x) data.table(objectName = x, saveTime = curTime, file = x, stringsAsFactors = FALSE))() |>
@@ -141,7 +141,7 @@ saveFiles <- function(sim) {
     toSave <- .fillOutputRows(toSave)
     outputs(sim) <- rbind(outputs(sim), toSave)
 
-    # don't need to save exactly same thing more than once - use data.table here because distinct
+    ## don't need to save exactly same thing more than once - use data.table here because distinct
     outputs(sim) <- data.table(outputs(sim)) |>
       unique(by = c("objectName", "saveTime", "file", "fun", "package")) |>
       data.frame()
@@ -162,7 +162,7 @@ saveFiles <- function(sim) {
             isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
           }))])
 
-          # The actual save line
+          ## The actual save line
           do.call(outputs(sim)[["fun"]][i], args = args,
                   envir = getNamespace(outputs(sim)[["package"]][i]))
 
@@ -170,15 +170,19 @@ saveFiles <- function(sim) {
         } else {
           saveSimList(sim, filename = outputs(sim)[["file"]][i])
         }
-        outputs(sim)[["saved"]][i] <- TRUE
+        # the next line, if using the accessor outputs(sim) <-,  modifies any filenames that don't have names;
+        #   the i indexing doesn't work here as expected; use direct
+        sim@outputs[["saved"]][i] <- TRUE
+        # outputs(sim)[["saved"]][i] <- TRUE
       } else {
         warning(paste(outputs(sim)[["objectName"]][i], "is not an object in the simList. Cannot save."))
-        outputs(sim)[["saved"]][i] <- FALSE
+        sim@outputs[["saved"]][i] <- TRUE # see a few lines above for comment about this
+        # outputs(sim)[["saved"]][i] <- FALSE
       }
     }
   }
 
-  # Schedule an event for the next time in the saveTime column
+  ## Schedule an event for the next time in the saveTime column
   if (any(is.na(outputs(sim)[["saved"]][outputs(sim)$saveTime > curTime]))) {
     isNA <- is.na(outputs(sim)$saved)
     nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
@@ -186,8 +190,9 @@ saveFiles <- function(sim) {
     if ("eventPriority" %in% colnames(outputs(sim))) {
       nextPriority <- outputs(sim)[["eventPriority"]][isNA][nextTimeWh]
     }
-    if (!exists("nextPriority", inherits = FALSE))
+    if (!exists("nextPriority", inherits = FALSE)) {
       nextPriority <- .last()
+    }
 
     attributes(nextTime)$unit <- sim@simtimes[["timeunit"]]
     if (time(sim) == end(sim)) {
@@ -216,9 +221,11 @@ saveFiles <- function(sim) {
 #' @rdname loadFiles
 .saveFileExtensions <- function() {
   ## TODO: try to guess other file types -- see .guessPkgFun
+  # fmt: skip
   .sFE <- data.frame(matrix(ncol = 3, byrow = TRUE, c(
     "rds", "saveRDS", "base",
     "qs", "qsave", "qs",
+    "qs2", "qs_save", "qs2",
     "txt", "write.table", "utils",
     "csv", "write.csv", "utils",
     "grd", "writeRaster", "raster",
@@ -233,10 +240,10 @@ saveFiles <- function(sim) {
            paste(colnames(.sFE), collapse = ", "), "; they are currently ",
            paste(collapse = ", ", colnames(getOption("spades.saveFileExtensions"))))
     }
-    # remove initial dot
+    ## remove initial dot
     .sFE <- rbind(getOption("spades.saveFileExtensions"), .sFE)
     .sFE[["exts"]] <- gsub("^\\.", "", .sFE[["exts"]])
-    # remove if there are 2 extensions for same fun and package
+    ## remove if there are 2 extensions for same fun and package
     dups <- duplicated(.sFE[, c("fun", "package")])
     .sFE <- .sFE[!dups, ]
   }
@@ -257,10 +264,9 @@ saveFiles <- function(sim) {
 #' @export
 #' @importFrom reproducible normPath
 simFile <- function(name, path, time = NULL, ext = "rds") {
-  if (is.null(time))
+  if (is.null(time)) {
     file.path(normPath(path), paste0(name, ".", ext))
-  else {
+  } else {
     file.path(normPath(path), paste0(name, "_", paddedFloatToChar(time, padL = 4), ".", ext))
   }
 }
-

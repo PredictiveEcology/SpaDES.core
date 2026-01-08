@@ -44,7 +44,7 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
   ### determine checkpoint file location, for use in events below
   if (useChkpnt) {
     if (is.null(checkpointFile(sim))) {
-      checkpointFile <- "checkpoint.qs"
+      checkpointFile <- "checkpoint.qs2"
     } else {
       checkpointFile <- checkpointFile(sim)
     }
@@ -87,7 +87,7 @@ doEvent.checkpoint <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @importFrom tools file_ext
 #' @rdname checkpoint
 checkpointLoad <- function(file) {
-  stopifnot(tools::file_ext(file) == "qs")
+  stopifnot(tools::file_ext(file) == "qs2")
 
   ## check for previous checkpoint files
   file <- checkArchiveAlternative(file)

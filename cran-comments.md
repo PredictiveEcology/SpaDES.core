@@ -1,30 +1,30 @@
 ## Release information
 
-This is a minor release to address an intermittent package failure on 
-one of CRAN's flavours.
+This is a major release update to address changes in the package dependency, reproducible.
+
+This also has many enhancemenets and addresses many minor bugfixes.
 
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 24.04                 (GitHub), R 4.3.3, 4.4.3
-* Windows                      (GitHub), R 4.3.3, 4.4.3
+* Ubuntu 24.04                 (GitHub), R 4.4.3
+* Windows                      (GitHub), R 4.4.3
 * Windows                 (win-builder), R 4.4.3
 
 ### Current R versions
-* macOS 13.3.1            (mac-builder), R 4.5.1
-* macOS 14.7.6                 (GitHub), R 4.5.1
-* macOS 15.5                    (local), R 4.5.1
-* Ubuntu 24.04                 (GitHub), R 4.5.1
-* Ubuntu 24.04                  (local), R 4.5.1
-* Windows                      (GitHub), R 4.5.1
-* Windows                       (local), R 4.5.1
-* Windows                 (win-builder), R 4.5.1
+* macOS 13.3.1            (mac-builder), R 4.5.2
+* macOS 14.7.6                 (GitHub), R 4.5.2
+* Ubuntu 24.04                 (GitHub), R 4.5.2
+* Ubuntu 24.04                  (local), R 4.5.2
+* Windows                      (GitHub), R 4.5.2
+* Windows                       (local), R 4.5.2
+* Windows                 (win-builder), R 4.5.2
 
 ### Development R version
-* Ubuntu 24.04                 (GitHub), R-devel (2025-09-16 r88844)
-* Ubuntu 24.04                  (local), R-devel (2025-09-16 r88844)
-* Windows                      (GitHub), R-devel (2025-09-16 r88844 ucrt)
-* Windows                 (win-builder), R-devel (2025-09-16 r88844 ucrt)
+* Ubuntu 24.04                 (GitHub), R-devel (2026-01-07 r89288)
+* Ubuntu 24.04                  (local), R-devel (2026-01-07 r89288)
+* Windows                      (GitHub), R-devel (2026-01-07 r89288 ucrt)
+* Windows                 (win-builder), R-devel (2026-01-07 r89288 ucrt)
 
 ## R CMD check results
 
@@ -45,7 +45,8 @@ There is one NOTE:
 
 ## Downstream dependencies
 
-We checked 1 reverse dependency (`SpaDES`) from CRAN, comparing R CMD check results across CRAN and dev versions of this package.
+We checked 1 reverse dependency (`SpaDES`) from CRAN, comparing R CMD check results 
+across CRAN and dev versions of this package.
 
  * We saw 0 new problems
  * We failed to check 0 packages

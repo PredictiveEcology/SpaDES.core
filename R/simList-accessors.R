@@ -1415,14 +1415,16 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
     stop("args must a list (with same length as file) of lists (with named elements), ",
          ", wrapped with I(  )")
   }
-  if (length(args) < length(file))
+  if (length(args) < length(file)) {
     args <- I(rep(args, length(file)))
+  }
   df <- data.frame(file = file, saved = TRUE, objectName = objectName, fun = fun, args = args)
 
-
   outs <- .fillOutputRows(df, endTime = saveTime)
-  if (!is(outputs[["arguments"]], "AsIs")) # needed for rbindlist
+  if (!is(outputs[["arguments"]], "AsIs")) {
+    ## needed for rbindlist
     outputs[["arguments"]] <- I(outputs[["arguments"]])
+  }
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
 }
 
@@ -1432,7 +1434,7 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
 #' of the files that are saved e.g., for [saveSimList()] so that all files can
 #' be added to the archive. In addition to setting `outputs` at the `simInit`
 #' stage, a module developer can also put this in a using any saving mechanism that
-#' is relevant (e.g., `qs::qsave`, `saveRDS` etc.). When a module event does this
+#' is relevant (e.g., `qs2::qs_save`, `saveRDS` etc.). When a module event does this
 #' it can be useful to register that saved file. `registerOutputs` offers an additional
 #' mechanism to do this. See examples.
 #'
@@ -1477,18 +1479,20 @@ registerOutputs <- function(filename, sim, ...) {
   fn <- substitute(filename)
 
   simIsIn <- NULL
-  simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
+  simIsIn <- parent.frame() # try for simplicity sake... though the .whereInStack would get this too
 
-  if (missing(sim)) sim <- NULL
+  if (missing(sim)) {
+    sim <- NULL
+  }
   if (is.null(sim)) {
     if (!exists("sim", simIsIn, inherits = FALSE))
-      simIsIn <- try(whereInStack("sim"), silent = TRUE)
+      simIsIn <- try(.whereInStack("sim"), silent = TRUE)
   }
   sim <- get0("sim", simIsIn, inherits = FALSE)
 
-
-  if (is.name(fn))
+  if (is.name(fn)) {
     filename <- try(eval(fn, envir = simIsIn), silent = TRUE)
+  }
 
   if (!is.character(filename)) {
     fnNames <- names(fn)
@@ -1497,15 +1501,19 @@ registerOutputs <- function(filename, sim, ...) {
       fnNames <- names(fn) # redo
     }
     theFileArg <- NULL
-    if (!is.null(fnNames))
+    if (!is.null(fnNames)) {
       theFileArg <- grep("^file$|^filename$", names(fn), value = TRUE)
-    if (!is.null(theFileArg))
+    }
+    if (!is.null(theFileArg)) {
       filename <- try(eval(fn[[theFileArg]], envir = simIsIn), silent = TRUE)
+    }
   }
-  if (is(filename, "try-error"))
+  if (is(filename, "try-error")) {
     stop("Couldn't guess filename; please pass it explicitly")
+  }
 
   sim@outputs <- outputsAppend(sim@outputs, saveTime = time(sim), file = filename, ...)
+
   sim
 }
 
@@ -2263,7 +2271,8 @@ end.simList <- function(x, unit, ...) {
         unit <- NA_character_
     }
     if (!is.na(unit)) {
-      if (is.na(pmatch("second", unit))) {
+      # if (is.na(pmatch("second", unit))) {
+      if (!startsWith(unit, "second")) {
         # i.e., if not in same units as simulation
         t <- convertTimeunit(x@simtimes$end, unit, x@.xData)
         return(t)
@@ -2316,7 +2325,9 @@ start.simList <- function(x, unit = NULL, ...) {
     }
 
     if (!is.na(unit)) {
-      if (is.na(pmatch("second", unit))) {
+      # if (is.na(pmatch("second", unit))) {
+      if (!startsWith(unit, "second")) {
+
         # i.e., if not in same units as simulation
         t <- convertTimeunit(x@simtimes$start, unit, x@.xData)
         return(t)
@@ -2539,15 +2550,23 @@ setMethod(
   signature = c("simList", "character"),
   definition = function(sim, unit) {
     obj <- rbindlist(sim@events)
-    if (length(unit) != 1) stop("unit must be length 1")
-    if (is.na(pmatch("second", unit)) && (length(sim@events) > 0)) {
-      # note the above line captures empty eventTime, whereas is.na does not
+    if (length(unit) != 1) {
+      stop("unit must be length 1")
+    }
+    # if (is.na(pmatch("second", unit)) && (length(sim@events) > 0)) {
+    if (!startsWith(unit, "second") && (length(sim@events) > 0)) {
+      ## note the above line captures empty eventTime, whereas is.na does not
       if (any(!is.na(obj$eventTime))) {
         if (!is.null(obj$eventTime)) {
           obj[, eventTime := convertTimeunit(eventTime, unit, sim@.xData)]
           obj[]
         }
        } #else {
+    }
+
+    ## catch NULL/empty data.table and use empty event list
+    if (NROW(obj) == 0 && NCOL(obj) == 0) {
+      obj <- .emptyEventListDT
     }
     return(obj)
 })
@@ -2626,8 +2645,8 @@ setMethod(
         x
       })
       obj <- rbindlist(conds)
-      if (is.na(pmatch("second", unit)) &&
-          (length(conds) > 0)) {
+      # if (is.na(pmatch("second", unit)) && (length(conds) > 0)) {
+      if (!startsWith(unit, "second") && (length(conds) > 0)) {
         # note the above line captures empty eventTime, whereas is.na does not
         if (any(!is.na(obj$minEventTime)) && (any(!is.na(obj$maxEventTime)))) {
           if (!is.null(obj$minEventTime) && !is.null(obj$maxEventTime)) {
@@ -2673,7 +2692,8 @@ setMethod(
   "current",
   signature = c("simList", "character"),
   definition = function(sim, unit) {
-    out <- if (is.na(pmatch("second", unit)) & (length(sim@current$eventTime))) {
+    # out <- if (is.na(pmatch("second", unit)) & (length(sim@current$eventTime))) {
+    out <- if (!startsWith(unit, "second") && (length(sim@current$eventTime))) {
       # note the above line captures empty eventTime, whereas `is.na` does not
       if (any(!is.na(sim@current$eventTime))) {
         if (!is.null(sim@current$eventTime)) {
@@ -2754,14 +2774,16 @@ setMethod(
       if (!isTRUE(times)) {
         set(obj, NULL, grep("^[.]_", names(obj)), NULL)
       }
-      if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+      # if (is.na(pmatch("second", unit)) & (length(sim@completed))) {
+      if (!startsWith(unit, "second") & (length(sim@completed))) {
         # note the above line captures empty eventTime, whereas `is.na` does not
         if (any(!is.na(obj$eventTime))) {
           if (!is.null(obj$eventTime)) {
-            if (!is.null(obj$._clockTime))
-              obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData),
-                         clockTime = obj$._clockTime,
-                         ._clockTime = NULL)]
+            if (!is.null(obj[[._txtClockTime]])) {
+              obj[, `:=`(eventTime = convertTimeunit(eventTime, unit, sim@.xData))]
+                         #clockTime = obj[[._txtClockTime]],
+                         #._clockTime = NULL)]
+            }
           }
         }
       }
@@ -3338,7 +3360,7 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
   if (!is.null(comp)) {
     comp <- comp[, list(moduleName, eventType,
-                          diffTime = diff(c(x@.xData[["._firstEventClockTime"]], clockTime)))]
+                          diffTime = diff(c(x@.xData[["._firstEventClockTime"]], get(._txtClockTime))))]
     theBy <- if (isTRUE(byEvent)) {
       c("moduleName", "eventType")
     } else {
@@ -3379,17 +3401,14 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 #'
 #' @export
 #' @importFrom data.table set rbindlist setcolorder
+#' @importFrom reproducible .whereInStack
 #' @rdname objects
 moduleObjects <- function(sim, module, path) {
-  simTry <- NULL # can't set `sim = NULL` because `whereInStack`; also next line check
+  simTry <- NULL # can't set `sim = NULL` because `.whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      for (i in seq_along(sys.frames())[-1]) { # don't start in this environment; not here
-        simTry <- suppressWarnings(try(get("sim", whereInStack("sim", whFrame = -i)), silent = TRUE))
-        if (!is(simTry, "try-error")) {
-          break
-        }
-      }
+      browser()
+      simTry <- suppressWarnings(try(get("sim", .whereInStack("sim")), silent = TRUE))
     }
     sim <- simTry
   }

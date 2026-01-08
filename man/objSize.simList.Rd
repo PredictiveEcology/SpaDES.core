@@ -4,13 +4,16 @@
 \alias{objSize.simList}
 \title{Object size for \code{simList}}
 \usage{
-\method{objSize}{simList}(x, quick = TRUE, ...)
+\method{objSize}{simList}(x, quick = FALSE, recursive = FALSE, ...)
 }
 \arguments{
 \item{x}{An object}
 
 \item{quick}{Logical. If \code{FALSE}, then an attribute, "objSize" will be added to
 the returned value, with each of the elements' object size returned also.}
+
+\item{recursive}{Logical. If \code{TRUE}, then, in addition to evaluating the whole object,
+it will also return the recursive sizes of the elements of a list or environment.}
 
 \item{...}{Additional arguments (currently unused), enables backwards compatible use.}
 }

@@ -16,15 +16,12 @@ utils::globalVariables(c("expectedFile", "result"))
 #' @export
 #' @exportMethod extractURL
 #' @rdname extractURL
-setGeneric(
-  "extractURL",
-  function(objectName, sim, module) {
-    standardGeneric("extractURL")
+setGeneric("extractURL", function(objectName, sim, module) {
+  standardGeneric("extractURL")
 })
 
 #' @export
 #' @exportMethod extractURL
-#' @importFrom quickPlot whereInStack
 #' @rdname extractURL
 setMethod(
   "extractURL",
@@ -34,12 +31,18 @@ setMethod(
     lenSC <- length(sys.calls())
     # This will get the simList that is closest in the call stack, noting that
     #  in this first one (i.e., this function), sim will be missing
-    while (missing(sim) && i < lenSC) {
-      i <- i + 1
-      simEnv <- whereInStack("sim", -i)
+    simEnv <- .whereInStack("sim", parent.frame()) # has to start "before" this function or it will find this function's missing "sim"
+    if (!is.null(simEnv)) {
       sim <- simEnv$sim
+      # while (missing(sim) && i < lenSC) {
+      #   i <- i + 1
+      #   simEnv <- .whereInStack("sim", -i)
+      #   sim <- simEnv$sim
+      # }
+      extractURL(objectName = objectName, sim = sim, module = module)
+    } else {
+      NULL
     }
-    extractURL(objectName = objectName, sim = sim, module = module)
 })
 
 #' @export
@@ -52,10 +55,11 @@ setMethod(
       module <- currentModule(sim)
     }
 
-    io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects" )
+    io <- .parseModulePartial(sim, modules = list(module), defineModuleElement = "inputObjects")
     wh <- io[[module]][["objectName"]] == objectName
     io[[module]][wh, ]$sourceURL
-})
+  }
+)
 
 #' Calculate checksum for a module's data files
 #'
@@ -201,34 +205,66 @@ remoteFileSize <- function(url) {
 #' @importFrom utils download.file
 #' @rdname downloadData
 #' @examples
-#' \donttest{
-#' # In metadata, each expectsInput has a sourceURL; downloadData will look for
-#' # that and download if it defined; however this sample module has all
-#' # NAs for sourceURL, so nothing to download
-#' modulePath <- getSampleModules(tempdir())
-#' downloadData("caribouMovement", path = modulePath)
+#' ## In metadata, each expectsInput has a sourceURL;
+#' ## downloadData will look for that and download if it defined;
+#' ## however this sample module has all NAs for sourceURL, so nothing to download.
+#' if (FALSE) {
+#'   modulePath <- getSampleModules(tempdir())
+#'   downloadData("caribouMovement", path = modulePath)
 #' }
 #'
-setGeneric("downloadData", function(module, path, quiet, quickCheck = FALSE,
-                                    overwrite = FALSE, files = NULL, checked = NULL,
-                                    urls = NULL, children = NULL, ...) {
-  standardGeneric("downloadData")
-})
+setGeneric(
+  "downloadData",
+  function(
+    module,
+    path,
+    quiet,
+    quickCheck = FALSE,
+    overwrite = FALSE,
+    files = NULL,
+    checked = NULL,
+    urls = NULL,
+    children = NULL,
+    ...
+  ) {
+    standardGeneric("downloadData")
+  }
+)
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "character", quiet = "logical",
-                quickCheck = "ANY", overwrite = "ANY", files = "ANY", checked = "ANY",
-                urls = "ANY", children = "ANY"),
-  definition = function(module, path, quiet, quickCheck, overwrite, files, checked,
-                        urls, children, ...) {
+  signature = c(
+    module = "character",
+    path = "character",
+    quiet = "logical",
+    quickCheck = "ANY",
+    overwrite = "ANY",
+    files = "ANY",
+    checked = "ANY",
+    urls = "ANY",
+    children = "ANY"
+  ),
+  definition = function(
+    module,
+    path,
+    quiet,
+    quickCheck,
+    overwrite,
+    files,
+    checked,
+    urls,
+    children,
+    ...
+  ) {
     cwd <- getwd()
     path <- checkPath(path, create = FALSE)
 
     if (is.null(urls)) {
-      inputs <- .parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
-                                    defineModuleElement = "inputObjects")
+      inputs <- .parseModulePartial(
+        filename = file.path(path, module, paste0(module, ".R")),
+        defineModuleElement = "inputObjects"
+      )
       urls <- inputs$sourceURL
     }
 
@@ -252,17 +288,19 @@ setMethod(
     dPath <- file.path(path, module, "data")
     if (any(notNAs)) {
       # This requires googledrive in reproducible 1.2.16; even if not a googledrive url
-      res <- Map(reproducible::preProcess,
-                 targetFile = targetFiles[notNAs],
-                 url = urls[notNAs],
-                 MoreArgs = append(
-                   list(
-                     quick = quickCheck,
-                     overwrite = overwrite,
-                     destinationPath = dPath
-                   ),
-                   list(...)
-                 )
+      res <- Map(
+        reproducible::preProcess,
+        targetFile = targetFiles[notNAs],
+        url = urls[notNAs],
+        MoreArgs = append(
+          list(
+            quick = quickCheck,
+            overwrite = overwrite,
+            destinationPath = dPath,
+            verbose = !quiet
+          ),
+          list(...)
+        )
       )
       chksums <- rbindlist(lapply(res, function(x) x$checkSums))
       chksums <- chksums[order(-result)]
@@ -270,8 +308,9 @@ setMethod(
     } else {
       unlinkAfter <- !dir.exists(dPath) # next line will make the folder and put nothing in it
       chksums <- Checksums(dPath, write = TRUE)
-      if (isTRUE(unlinkAfter))
+      if (isTRUE(unlinkAfter)) {
         unlink(dPath, recursive = TRUE)
+      }
     }
 
     # after download, check for childModules that also require downloading
@@ -279,45 +318,105 @@ setMethod(
     if (!is.null(children)) {
       if (length(children)) {
         if (all(nzchar(children) & !is.na(children))) {
-          chksums2 <- bindrows(lapply(children, downloadData, path = path, quiet = quiet,
-                             quickCheck = quickCheck))
+          chksums2 <- bindrows(lapply(
+            children,
+            downloadData,
+            path = path,
+            quiet = quiet,
+            quickCheck = quickCheck
+          ))
           chksums <- bindrows(chksums, chksums2)
         }
       }
     }
 
     return(chksums)
-})
+  }
+)
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "missing", quickCheck = "ANY",
-                overwrite = "ANY", files = "ANY", checked = "ANY", urls = "ANY", children = "ANY"),
+  signature = c(
+    module = "character",
+    path = "missing",
+    quiet = "missing",
+    quickCheck = "ANY",
+    overwrite = "ANY",
+    files = "ANY",
+    checked = "ANY",
+    urls = "ANY",
+    children = "ANY"
+  ),
   definition = function(module, quickCheck, overwrite, files, checked, urls, children) {
-    downloadData(module = module, path = getOption("spades.modulePath"), quiet = FALSE,
-                 quickCheck = quickCheck, overwrite = overwrite, files = files,
-                 checked = checked, urls = urls, children = children)
-})
+    downloadData(
+      module = module,
+      path = getOption("spades.modulePath"),
+      quiet = FALSE,
+      quickCheck = quickCheck,
+      overwrite = overwrite,
+      files = files,
+      checked = checked,
+      urls = urls,
+      children = children
+    )
+  }
+)
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "missing", quiet = "logical", quickCheck = "ANY",
-                overwrite = "ANY", files = "ANY", checked = "ANY", urls = "ANY", children = "ANY"),
+  signature = c(
+    module = "character",
+    path = "missing",
+    quiet = "logical",
+    quickCheck = "ANY",
+    overwrite = "ANY",
+    files = "ANY",
+    checked = "ANY",
+    urls = "ANY",
+    children = "ANY"
+  ),
   definition = function(module, quiet, quickCheck, overwrite, files, checked, urls, children) {
-    downloadData(module = module, path = getOption("spades.modulePath"), quiet = quiet,
-                 quickCheck = quickCheck, overwrite = overwrite, files = files,
-                 checked = checked, urls = urls, children = children)
-})
+    downloadData(
+      module = module,
+      path = getOption("spades.modulePath"),
+      quiet = quiet,
+      quickCheck = quickCheck,
+      overwrite = overwrite,
+      files = files,
+      checked = checked,
+      urls = urls,
+      children = children
+    )
+  }
+)
 
 #' @rdname downloadData
 setMethod(
   "downloadData",
-  signature = c(module = "character", path = "character", quiet = "missing", quickCheck = "ANY",
-                overwrite = "ANY", files = "ANY", checked = "ANY", urls = "ANY", children = "ANY"),
+  signature = c(
+    module = "character",
+    path = "character",
+    quiet = "missing",
+    quickCheck = "ANY",
+    overwrite = "ANY",
+    files = "ANY",
+    checked = "ANY",
+    urls = "ANY",
+    children = "ANY"
+  ),
   definition = function(module, path, quickCheck, overwrite, files, checked, urls, children) {
-    downloadData(module = module, path = path, quiet = FALSE,
-                 quickCheck = quickCheck, overwrite = overwrite, files = files,
-                 checked = checked, urls = urls, children = children)
-})
+    downloadData(
+      module = module,
+      path = path,
+      quiet = FALSE,
+      quickCheck = quickCheck,
+      overwrite = overwrite,
+      files = files,
+      checked = checked,
+      urls = urls,
+      children = children
+    )
+  }
+)

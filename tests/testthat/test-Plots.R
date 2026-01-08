@@ -82,14 +82,15 @@ test_that("Plots function 1", {
       expect_true(any(grepl("gg", files)))
     }
     if (any(grepl("raw", out))) {
-      expect_true(any(grepl("qs", files) & !grepl("gg", files)))
+      expect_true(any(grepl("qs2", files) & !grepl("gg", files)))
     }
     if (any(grepl("png", out))) {
       expect_true(any(grepl("png", files)))
       expect_true(sum(grepl(wdth, mess)) == 1)
     }
-    if (any(grepl("pdf", out)))
+    if (any(grepl("pdf", out))) {
       expect_true(any(grepl("pdf", files)))
+    }
 
     expect_true(NROW(outputs(simOut)) == length(out))
     unlink(files)
@@ -252,7 +253,7 @@ test_that("Plots function 3 - use as Plot", {
 test_that("Plots test .guessPkgFun", {
   testInit("raster")
 
-  pkgFun <- sapply(baseClassesCanHandle, SpaDES.core:::.guessPkgFun)
+  pkgFun <- sapply(baseClassesCanHandle, .guessPkgFun)
   test <- sapply(pkgFun, function(x) {
     exists(sub(".*:", "", x), where = paste0("package:", sub(":.*", "", x)), mode = "function")
   })

@@ -251,7 +251,8 @@ test_that("timeunits with child and parent modules work correctly", {
   })
   mm1 <- cleanMessage(mm1)
   fullMessage <- c(
-    "Running .inputObjects for child6",
+    grepDotInputObjectsModule("child6"),
+    # "Running .inputObjects for child6",
     "child6: module code: b is declared in metadata inputObjects, but is not used in the module",
     paste(
       "child6: outputObjects: dp, cm are assigned to sim inside doEventchild6,",
@@ -285,5 +286,6 @@ test_that("timeunits with child and parent modules work correctly", {
   })
   mm1 <- cleanMessage(mm1)
   expect_true(all(unlist(lapply(fullMessage, function(x) any(grepl(mm1, pattern = x))))))
-  expect_true(any(grepl("Running .inputObjects", mm1)))
+  expect_true(any(grepl(grepDotInputObjectsModule("child6"), mm1)))
+  # expect_true(any(grepl("Running .inputObjects", mm1)))
 })

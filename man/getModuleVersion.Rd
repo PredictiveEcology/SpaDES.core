@@ -6,11 +6,28 @@
 \alias{getModuleVersion,character,missing-method}
 \title{Find the latest module version from a SpaDES module repository}
 \usage{
-getModuleVersion(name, repo)
+getModuleVersion(
+  name,
+  repo,
+  token,
+  moduleFiles = NULL,
+  verbose = getOption("reproducible.verbose")
+)
 
-\S4method{getModuleVersion}{character,character}(name, repo)
+\S4method{getModuleVersion}{character,character}(
+  name,
+  repo,
+  token,
+  moduleFiles = NULL,
+  verbose = getOption("reproducible.verbose")
+)
 
-\S4method{getModuleVersion}{character,missing}(name)
+\S4method{getModuleVersion}{character,missing}(
+  name,
+  token,
+  moduleFiles = NULL,
+  verbose = getOption("reproducible.verbose")
+)
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -19,6 +36,17 @@ getModuleVersion(name, repo)
 Default is \code{"PredictiveEcology/SpaDES-modules"}, which is
 specified by the global option \code{spades.moduleRepo}.
 Only \code{master}/\code{main} branches can be used at this point.}
+
+\item{token}{A github repository token as from \code{gitcreds::gitcreds_get()}}
+
+\item{moduleFiles}{Optional. List of files of the \code{name} and \code{repo}. If not
+supplied, this function will get that information by using \code{checkModule}.}
+
+\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 }
 \value{
 \code{numeric_version}

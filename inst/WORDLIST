@@ -48,6 +48,7 @@ checkpointing
 checksum
 checksums
 choosealicense
+classOptions
 codecov
 crw
 customizations
@@ -60,11 +61,14 @@ errored
 et
 feedbacks
 franca
+github
 globals
 googledrive
 gowlland
 https
 ing
+inputObjects
+isn
 julia
 lingua
 login
@@ -90,6 +94,7 @@ pre
 recache
 reparse
 reproducibly
+roxygen2
 scalable
 se
 sim
@@ -109,6 +114,7 @@ v1
 v2
 versa
 versioning
+wasn
 workflow
 workflows
 www

@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       USING_COVR: true
 
     steps:
@@ -34,7 +35,6 @@ jobs:
           extra-packages: |
             any::covr
             NLMR=?ignore
-            PredictiveEcology/reproducible@development
 
       - name: Install additional package dependencies
         run: |

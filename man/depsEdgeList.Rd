@@ -6,9 +6,9 @@
 \alias{depsEdgeList,simList,missing-method}
 \title{Build edge list for module dependency graph}
 \usage{
-depsEdgeList(sim, plot)
+depsEdgeList(sim, plot, includeOutputs = FALSE)
 
-\S4method{depsEdgeList}{simList,logical}(sim, plot)
+\S4method{depsEdgeList}{simList,logical}(sim, plot, includeOutputs = FALSE)
 
 \S4method{depsEdgeList}{simList,missing}(sim, plot)
 }
@@ -20,6 +20,12 @@ will be used for plotting. If \code{TRUE}, duplicated rows
 (i.e., multiple object dependencies between modules) are removed
 so that only a single arrow is drawn connecting the modules.
 Default is \code{FALSE}.}
+
+\item{includeOutputs}{Logical indicating whether objects that are only "outputs"
+will be kept and labelled as \emph{OUTPUTS} analogous to \emph{INPUTS}. This is relevant
+in the case of \code{objectSynonyms}. If an object is not used by another module
+then it will be removed from this \code{depsEdgeList} return; this keeps these
+so can be determined if they are e.g., \code{suppliedElsewhere}.}
 }
 \value{
 A \code{data.table} whose first two columns give a list of edges

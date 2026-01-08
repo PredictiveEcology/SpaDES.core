@@ -67,6 +67,9 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @param usePlot Logical. If `TRUE`, the default, then the plot will occur
 #'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
 #'
+#' @param envir The environment where the `data` argument should be evaluated if it is
+#'   a `call`. Normally, this should be left at its default, `parent.frame()`.
+#'
 #' @param ... Anything needed by `fn`, all named.
 #'
 #' @return Called for its side effect of plot creation.
@@ -93,8 +96,8 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @export
 #' @include simList-accessors.R
 #' @importFrom grDevices dev.off dev.cur
-#' @importFrom qs qsave
-#' @importFrom quickPlot clearPlot Plot whereInStack
+#' @importFrom qs2 qs_save
+#' @importFrom quickPlot clearPlot Plot
 #' @importFrom terra writeRaster
 #' @importFrom tools file_path_sans_ext
 #'
@@ -147,19 +150,20 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'             .plotInitialTime = 1)
 #'     }
 #'   } # end ggplot
+#'   unlink("figures") # clean up
 #' } # end of dontrun
 Plots <- function(data, fn, filename,
                   types = quote(params(sim)[[currentModule(sim)]]$.plots),
                   path = quote(figurePath(sim)),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
-                  deviceArgs = list(),
+                  deviceArgs = list(), envir = parent.frame(),
                   ...) {
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
-    simIsIn <- parent.frame() # try for simplicity sake... though the whereInStack would get this too
+    simIsIn <- parent.frame() # try for simplicity sake... though the .whereInStack would get this too
     if (!exists("sim", simIsIn, inherits = FALSE)) {
-      simIsIn <- try(whereInStack("sim"), silent = TRUE)
+      simIsIn <- try(.whereInStack("sim"), silent = TRUE)
       if (is(simIsIn, "try-error"))
         simIsIn <- NULL
     }
@@ -186,6 +190,7 @@ Plots <- function(data, fn, filename,
     if (is(simIsIn, "try-error")) {
       .plotInitialTime <- 0L
     } else {
+      envir <- simIsIn
       sim <- get("sim", envir = simIsIn)
       ## only look in the metadata -- not the simList (which will have a default of NA)
       isPlotITinSim <- ".plotInitialTime" %in% moduleMetadata(sim, currentModule(sim))$parameters$paramName
@@ -207,6 +212,13 @@ Plots <- function(data, fn, filename,
 
   ## has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
+
+  if (missing(data)) {
+    data <- NULL
+  } else {
+    if (is.call(data))
+      data <- eval(data, envir)
+  }
   if (missing(fn)) {
     if (isTRUE(usePlot)) {
       fn <- Plot
@@ -239,10 +251,17 @@ Plots <- function(data, fn, filename,
     }
   } else {
     if ( (needScreen || needSave) ) {
-      if (missing(data)) {
+      if (is.null(data)) {
         gg <- fn(...)
       } else {
-        gg <- fn(data, ...)
+        gg <- NULL
+        if (is(data, "ggplot")) {
+          gg <- data
+        } else {
+          # don't plot or terra::plot if needScreen is FALSE
+          if ( (!(identical(plot, fn) || identical(terra::plot, fn)) ) || needScreen)
+            gg <- fn(data, ...) # This will plot to screen if it is base::plot or terra::plot
+        }
       }
 
       if (!is(gg, ".quickPlot")) {
@@ -309,7 +328,8 @@ Plots <- function(data, fn, filename,
         names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
         Plot(ggListToScreen, addTo = gg$labels$title)
       } else {
-        if (!(identical(fn, plot) || identical(fn, terra::plot)))
+        if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
+            !is(gg, ".quickPlot"))
           print(gg)
       }
     }
@@ -317,10 +337,22 @@ Plots <- function(data, fn, filename,
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
     if (missing(filename)) {
-      filename <- tempfile(fileext = "") ## TODO: can we use e.g. the object name + sim time??
+      dataObjName <- deparse(substitute(data))
+      filename <- paste0(dataObjName, "_", basename(gsub("file", "", tempfile(fileext = "")))) ## TODO: can we use e.g. the object name + sim time??
+      if (exists("sim", inherits = FALSE)) {
+        simTime <- round(as.numeric(time(sim)), 3)
+        filename <- paste0("sim", "_", filename)
+      }
     } else {
-      filename <- basename(filename) |> tools::file_path_sans_ext()
+      filename <- filename |> tools::file_path_sans_ext()
     }
+
+    if (isAbsolutePath(filename)) {
+      path <- dirname(filename)
+    }
+
+    filename <- basename(filename)
+
     isDefaultPath <- identical(eval(formals(Plots)$path), path)
     if (!is.null(simIsIn)) {
       if (is(path, "call"))
@@ -333,7 +365,7 @@ Plots <- function(data, fn, filename,
   }
 
   if (needSaveRaw) {
-    if (is(data, "Raster")) {
+    if (is(data, "Raster") || is(data, "SpatRaster")) {
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
       writeRaster(data, filename = rasterFilename, overwrite = TRUE)
       if (exists("sim", inherits = FALSE))
@@ -344,18 +376,18 @@ Plots <- function(data, fn, filename,
           ...
         )
     } else {
-      rawFilename <- file.path(path, paste0(filename, "_data.qs"))
-      qs::qsave(data, rawFilename)
+      rawFilename <- file.path(path, paste0(filename, "_data.qs2"))
+      qs2::qs_save(data, rawFilename)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(
           outputs = sim@outputs, saveTime = time(sim),
           objectName = tools::file_path_sans_ext(basename(rawFilename)),
-          file = rawFilename, fun = "qs::qsave",
+          file = rawFilename,
+          fun = "qs2::qs_save",
           ...
         )
     }
   }
-
   if (needSave) {
     if (is.null(simIsIn)) {
       if (is.call(path))
@@ -363,7 +395,7 @@ Plots <- function(data, fn, filename,
       if (is.call(path))
         path <- "."
     }
-    if (fnIsPlot || is.null(gg)) {
+    if (fnIsPlot || !is(gg, "gg") ) {
       baseSaveFormats <- intersect(baseClassesCanHandle, types)
       for (bsf in baseSaveFormats) {
         type <- get(bsf)
@@ -404,20 +436,30 @@ Plots <- function(data, fn, filename,
     }
 
     if (any(grepl("object", types))) {
-      filename11 <- file.path(path, paste0(filename, "_gg.qs"))
-      qs::qsave(gg, file = filename11)
+      filename11 <- file.path(path, paste0(filename, "_gg.qs2"))
+      qs2::qs_save(gg, file = filename11)
 
-      if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                     objectName = tools::file_path_sans_ext(basename(filename11)),
-                                     file = filename11, fun = "qs::qsave", ...)
+      if (exists("sim", inherits = FALSE)) {
+        sim@outputs <- outputsAppend(
+          outputs = sim@outputs,
+          saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(filename11)),
+          file = filename11,
+          fun = "qs2::qs_save",
+          ...
+        )
+      }
     }
   }
 
-  if (exists("sim", inherits = FALSE))
+  if (exists("sim", inherits = FALSE)) {
     assign("sim", sim, envir = simIsIn)
+  }
 
-  return(invisible(NULL))
+  if (exists("gg", inherits = FALSE))
+    return(invisible(gg))
+  else
+    return(invisible(NULL))
 }
 
 #' Test whether there should be any plotting from `.plots` module parameter

@@ -51,18 +51,21 @@
   invisible()
 }
 
+#' @importFrom cli format_message
 #' @importFrom utils packageVersion
 .onAttach <- function(libname, pkgname) {
   if (interactive()) {
-    packageStartupMessage("Using SpaDES.core version ", utils::packageVersion("SpaDES.core"), ".")
+    packageStartupMessage(
+      cli::format_message("Using {.pkg SpaDES.core} version {utils::packageVersion('SpaDES.core')}")
+    )
     a <- capture.output(setPaths(), type = "message")
     a <- paste(a, collapse = "\n")
     packageStartupMessage(a)
     packageStartupMessage(
-      "To change these, use setPaths(...); see ?setPaths"
+      cli::format_message("To change these, use {.help [{.fun setPaths}](SpaDES.core::setPaths)}.")
     )
     packageStartupMessage(
-      "See ?spadesOptions for advanced features"
+      cli::format_message("See {.help [{.fun ?spadesOptions}](SpaDES.core::spadesOptions)} for advanced features.")
     )
   }
 

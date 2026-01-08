@@ -4,7 +4,7 @@
 \alias{.prepareOutput,simList-method}
 \title{\code{.prepareOutput} for \code{simList} objects}
 \usage{
-\S4method{.prepareOutput}{simList}(object, cachePath, ...)
+\S4method{.prepareOutput}{simList}(object, cachePath = getOption("reproducible.cachePath"), ...)
 }
 \arguments{
 \item{object}{Any R object returned from a function}

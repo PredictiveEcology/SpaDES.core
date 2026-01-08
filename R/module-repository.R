@@ -14,6 +14,9 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
 #'              Only `master`/`main` branches can be used at this point.
+#' @param moduleFiles Optional. List of files of the `name` and `repo`. If not
+#'   supplied, this function will get that information by using `checkModule`.
+#' @inheritParams reproducible::Cache
 #'
 #' @return `numeric_version`
 #'
@@ -29,23 +32,27 @@ defaultGitRepoToSpaDESModules <- "PredictiveEcology/SpaDES-modules"
 #'
 #' @author Alex Chubaty
 #' @export
+#' @inheritParams checkModule
 #' @rdname getModuleVersion
 #' @seealso [zipModule()] for creating module \file{.zip} folders.
 #'
-setGeneric("getModuleVersion", function(name, repo) {
+setGeneric("getModuleVersion", function(name, repo, token, moduleFiles = NULL,
+                                        verbose = getOption("reproducible.verbose")) {
   standardGeneric("getModuleVersion")
 })
 
 #' @rdname getModuleVersion
 setMethod(
   "getModuleVersion",
-  signature = c(name = "character", repo = "character"),
-  definition = function(name, repo) {
+  signature = c(name = "character", repo = "character", token = "ANY"),
+  definition = function(name, repo, token, moduleFiles = NULL,
+                        verbose = getOption("reproducible.verbose")) {
     if (length(name) > 1) {
       warning("name contains more than one module. Only the first will be used.")
       name <- name[1]
     }
-    moduleFiles <- checkModule(name, repo)
+    if (is.null(moduleFiles))
+      moduleFiles <- checkModule(name, repo, token = token, verbose = verbose)
     zipFiles <- grep(paste0(name, "_+.+.zip"), moduleFiles, value = TRUE) # moduleName_....zip only
     zipFiles <- grep(file.path(name, "data"), zipFiles, invert = TRUE, value = TRUE) # remove any zip in data folder
     # all zip files is not correct behaviour, only
@@ -62,10 +69,12 @@ setMethod(
 
 #' @rdname getModuleVersion
 setMethod("getModuleVersion",
-          signature = c(name = "character", repo = "missing"),
-          definition = function(name) {
-            v <- getModuleVersion(name, getOption("spades.moduleRepo",
-                                                  defaultGitRepoToSpaDESModules))
+          signature = c(name = "character", repo = "missing", token = "ANY"),
+          definition = function(name, token, moduleFiles = NULL,
+                                verbose = getOption("reproducible.verbose")) {
+            v <- getModuleVersion(name, token = token,
+                                  getOption("spades.moduleRepo", defaultGitRepoToSpaDESModules),
+                                  moduleFiles = moduleFiles, verbose = verbose)
             return(v)
 })
 
@@ -79,22 +88,25 @@ setMethod("getModuleVersion",
 #'              Default is `"PredictiveEcology/SpaDES-modules"`, which is
 #'              specified by the global option `spades.moduleRepo`.
 #'
+#' @param token A github repository token as from `gitcreds::gitcreds_get()`
+#'
 #' @return a character vector of module file paths (invisibly).
 #'
 #' @author Eliot McIntire and Alex Chubaty
 #' @export
+#' @inheritParams paramCheckOtherMods
 #' @importFrom cli col_magenta
 #' @importFrom utils packageVersion
 #' @rdname checkModule
-setGeneric("checkModule", function(name, repo) {
+setGeneric("checkModule", function(name, repo, token, verbose) {
   standardGeneric("checkModule")
 })
 
 #' @rdname checkModule
 setMethod(
   "checkModule",
-  signature = c(name = "character", repo = "character"),
-  definition = function(name, repo) {
+  signature = c(name = "character", repo = "character", token = "ANY"),
+  definition = function(name, repo, token, verbose = getOption("reproducible.verbose")) {
     goAhead <- FALSE
     if (requireNamespace("httr", quietly = TRUE)) {
       if (packageVersion("httr") >= "1.2.1") {
@@ -107,14 +119,19 @@ setMethod(
         name <- name[1]
       }
       apiurl <- paste0("https://api.github.com/repos/", repo, "/git/trees/master?recursive=1") # nolint
+
       ua <- httr::user_agent(getOption("spades.useragent"))
-      pat <- Sys.getenv("GITHUB_PAT")
-      request <- if (identical(pat, "")) {
-        httr::GET(apiurl, ua)
+      if (missing(token))
+        token <- getGitCredsToken()
+      request <- if (!is.null(token)) {
+        GETWauthThenNonAuth(apiurl, token = token, verbose = verbose)
+        # httr::GET(apiurl, ua)
       } else {
+        pat <- Sys.getenv("GITHUB_PAT")
         message(cli::col_magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
         httr::GET(apiurl, ua, config = list(httr::config(token = pat)))
       }
+
       httr::stop_for_status(request)
       allFiles <- unlist(lapply(httr::content(request)$tree, "[", "path"), use.names = FALSE)
       moduleFiles <- grep(paste0("^modules/", name), allFiles, value = TRUE)
@@ -141,10 +158,11 @@ setMethod(
 
 #' @rdname checkModule
 setMethod("checkModule",
-          signature = c(name = "character", repo = "missing"),
-          definition = function(name) {
+          signature = c(name = "character", repo = "missing", token = "ANY"),
+          definition = function(name, token, verbose = getOption("reproducible.verbose")) {
             v <- checkModule(name, getOption("spades.moduleRepo",
-                                             defaultGitRepoToSpaDESModules))
+                                             defaultGitRepoToSpaDESModules),
+                             verbose = verbose)
             return(v)
 })
 
@@ -271,11 +289,12 @@ setMethod(
 #'    including whether it was downloaded or not, and whether it was renamed
 #'    (because there was a local copy that had the wrong file name).
 #'
-#' @author Alex Chubaty
+#' @author Alex Chubaty and Eliot McIntire
 #' @export
 #' @rdname downloadModule
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
-                                      quickCheck = FALSE, overwrite = FALSE) {
+                                      quickCheck = FALSE, overwrite = FALSE,
+                                      verbose = getOption("reproducible.verbose")) {
   standardGeneric("downloadModule")
 })
 
@@ -289,96 +308,113 @@ setMethod(
                 repo = "character", data = "logical", quiet = "logical",
                 quickCheck = "ANY", overwrite = "logical"),
   definition = function(name, path, version, repo, data, quiet, quickCheck,
-                        overwrite) {
+                        overwrite, verbose = getOption("reproducible.verbose")) {
     if (requireNamespace("httr", quietly = TRUE)) {
-    path <- checkPath(path, create = TRUE)
-    checkPath(file.path(path, name), create = TRUE)
+      path <- checkPath(path, create = TRUE)
+      checkPath(file.path(path, name), create = TRUE)
 
-    # check locally for module. only download if doesn't exist locally,
-    # or if overwrite is wanted
-    if (!checkModuleLocal(name, path, version) | overwrite) {
-      # check remotely for module
-      checkModule(name, repo)
-      if (is.na(version)) version <- getModuleVersion(name, repo)
-
-      innerPaths <- c(paste0("/master/modules/", name, "/"), "/master/")
-      for (tries in 1:2) {
-        innerPath <- innerPaths[tries]
-
-        zip <- paste0("https://raw.githubusercontent.com/", repo,
-                      innerPath, name, "_", version, ".zip") # nolint
-        localzip <- file.path(path, basename(zip))
-
-        ua <- httr::user_agent(getOption("spades.useragent"))
-        pat <- Sys.getenv("GITHUB_PAT")
-        request <- if (identical(pat, "")) {
-          httr::GET(zip, ua, httr::write_disk(localzip, overwrite = overwrite))
-        } else {
-          message(cli::col_magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
-          httr::GET(zip, ua, config = list(httr::config(token = pat)),
-                    httr::write_disk(localzip, overwrite = overwrite))
+      # check locally for module. only download if doesn't exist locally,
+      # or if overwrite is wanted
+      if (!checkModuleLocal(name, path, version) | overwrite) {
+        # check remotely for module
+        # Authentication
+        token <- NULL
+        usesGitCreds <- requireNamespace("gitcreds", quietly = TRUE) &&
+          requireNamespace("httr", quietly = TRUE)
+        if (usesGitCreds) {
+          token <- getGitCredsToken()
         }
-        status1 <- try(httr::stop_for_status(request), silent = TRUE)
-        if (!is(status1, "try-error")) break
-        if (is(status1, "try-error") && tries == 2) stop(status1)
-      }
 
-      files <- unzip(localzip, exdir = file.path(path), overwrite = TRUE)
-    } else {
-      files <- list.files(file.path(path, name))
-    }
+        moduleFiles <- checkModule(name, repo, token = token, verbose = verbose)
+        if (is.na(version))
+          version <- getModuleVersion(name, repo, token = token, moduleFiles = moduleFiles,
+                                      verbose = verbose)
 
-    # after download, check for childModules that also require downloading
-    files2 <- list()
-    children <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
-                                    defineModuleElement = "childModules")
-    childVersions <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
-                                         defineModuleElement = "version")
+        innerPaths <- c(paste0("/master/modules/", name, "/"), "/master/")
+        for (tries in 1:2) {
+          innerPath <- innerPaths[tries]
 
-    dataList2 <- data.frame(result = character(0), expectedFile = character(0),
-                            actualFile = character(0), checksum.x = character(0),
-                            checksum.y = character(0), algorithm.x = character(0),
-                            algorithm.y = character(0),
-                            stringsAsFactors = FALSE)
-    dataList3 <- dataList2
-    if (!is.null(children)) {
-      if (all(nzchar(children) & !is.na(children)) && length(children)) {
-        tmp <- lapply(children, function(x) {
-          f <- if (!is.null(childVersions[[x]])) {
-            downloadModule(x, path = path, repo = repo, data = data, version = childVersions[[x]],
-                           quickCheck = quickCheck, overwrite = overwrite)
+          zip <- paste0("https://raw.githubusercontent.com/", repo,
+                        innerPath, name, "_", version, ".zip") # nolint
+          localzip <- file.path(path, basename(zip))
+
+          ua <- httr::user_agent(getOption("spades.useragent"))
+          request <- if (!is.null(token)) {
+            message(cli::col_magenta("Using GitHub token stored with gitcreds", sep = ""))
+            GETWauthThenNonAuth(zip, # ua, httr::write_disk(localzip, overwrite = overwrite),
+                                          token = token)
           } else {
-            downloadModule(x, path = path,  repo = repo, data = data, quickCheck = quickCheck,
-                           overwrite = overwrite)
+            pat <- Sys.getenv("GITHUB_PAT")
+            message(cli::col_magenta("Using GitHub PAT from envvar GITHUB_PAT", sep = ""))
+            httr::GET(zip, ua, config = list(httr::config(token = pat)),
+                      httr::write_disk(localzip, overwrite = overwrite))
           }
-          files2 <<- append(files2, f[[1]])
-          dataList2 <<- setDF(rbindlist(list(dataList2, f[[2]]), use.names = TRUE, fill = TRUE))
-        })
-      }
-    }
+          status1 <- try(httr::stop_for_status(request), silent = TRUE)
+          if (!is(status1, "try-error")) break
+          if (is(status1, "try-error") && tries == 2) stop(status1)
+        }
 
-    if (data) {
-      moduleFilename <- file.path(path, name, paste0(name, ".R"))
-      inputs <- .parseModulePartial(filename = moduleFilename,
-                                    defineModuleElement = "inputObjects")
-      urls <- inputs$sourceURL
-      objNames <- if (is.call(inputs$objectName)) {
-        unlist(lapply(tail(parse(text = inputs$objectName), length(urls)), function(x) deparse(x)))
+        dataFromGET <- httr::content(request, "raw")
+        zipfile <- tempfile(fileext = ".zip")
+        writeBin(dataFromGET, zipfile)
+        on.exit(unlink(zipfile))
+        linkOrCopy(zipfile, localzip, symlink = FALSE, overwrite = overwrite)
+        files <- unzip(localzip, exdir = file.path(path), overwrite = overwrite)
       } else {
-        inputs$objectName
+        files <- list.files(file.path(path, name))
       }
-      names(urls) <- objNames
 
-      children <- .parseModulePartial(filename = moduleFilename,
+      # after download, check for childModules that also require downloading
+      files2 <- list()
+      children <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
                                       defineModuleElement = "childModules")
+      childVersions <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
+                                           defineModuleElement = "version")
 
-      dataList <- downloadData(module = name, path = path, quiet = quiet,
-                               quickCheck = quickCheck, urls = urls, children = children)
-    } else {
-      dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
-    }
-    message(cli::col_magenta("Download complete for module ", name,
-                            " (v", version, " at '", path,"').", sep = ""))
+      dataList2 <- data.frame(result = character(0), expectedFile = character(0),
+                              actualFile = character(0), checksum.x = character(0),
+                              checksum.y = character(0), algorithm.x = character(0),
+                              algorithm.y = character(0),
+                              stringsAsFactors = FALSE)
+      dataList3 <- dataList2
+      if (!is.null(children)) {
+        if (all(nzchar(children) & !is.na(children)) && length(children)) {
+          tmp <- lapply(children, function(x) {
+            f <- if (!is.null(childVersions[[x]])) {
+              downloadModule(x, path = path, repo = repo, data = data, version = childVersions[[x]],
+                             quickCheck = quickCheck, overwrite = overwrite)
+            } else {
+              downloadModule(x, path = path,  repo = repo, data = data, quickCheck = quickCheck,
+                             overwrite = overwrite)
+            }
+            files2 <<- append(files2, f[[1]])
+            dataList2 <<- setDF(rbindlist(list(dataList2, f[[2]]), use.names = TRUE, fill = TRUE))
+          })
+        }
+      }
+
+      if (data) {
+        moduleFilename <- file.path(path, name, paste0(name, ".R"))
+        inputs <- .parseModulePartial(filename = moduleFilename,
+                                      defineModuleElement = "inputObjects")
+        urls <- inputs$sourceURL
+        objNames <- if (is.call(inputs$objectName)) {
+          unlist(lapply(tail(parse(text = inputs$objectName), length(urls)), function(x) deparse(x)))
+        } else {
+          inputs$objectName
+        }
+        names(urls) <- objNames
+
+        children <- .parseModulePartial(filename = moduleFilename,
+                                        defineModuleElement = "childModules")
+
+        dataList <- downloadData(module = name, path = path, quiet = quiet,
+                                 quickCheck = quickCheck, urls = urls, children = children)
+      } else {
+        dataList <- checksums(module = name, path = path, quickCheck = quickCheck)
+      }
+      message(cli::col_magenta("Download complete for module ", name,
+                               " (v", version, " at '", path,"').", sep = ""))
     } else{
       stop("downloadModule does not work without httr package: ",
            "install.package('httr')")
@@ -386,7 +422,7 @@ setMethod(
 
     return(list(c(files, files2),
                 setDF(rbindlist(list(dataList, dataList2), use.names = TRUE, fill = TRUE))))
-})
+  })
 
 #' @rdname downloadModule
 setMethod(
@@ -396,7 +432,6 @@ setMethod(
                 quickCheck = "ANY", overwrite = "ANY"),
   definition = function(name, quickCheck, overwrite) {
     path <- checkModulePath()
-
     files <- downloadModule(name, path = path,
                             version = NA_character_,
                             repo = getOption("spades.moduleRepo",
@@ -404,7 +439,7 @@ setMethod(
                             data = FALSE, quiet = FALSE,
                             quickCheck = quickCheck, overwrite = overwrite)
     return(invisible(files))
-})
+  })
 
 #' @rdname downloadModule
 setMethod(
@@ -426,3 +461,4 @@ setMethod(
     files <- downloadModule(name, path, version, repo, data, quiet, quickCheck, overwrite)
     return(invisible(files))
 })
+

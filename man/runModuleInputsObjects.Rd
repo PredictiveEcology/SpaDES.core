@@ -4,7 +4,13 @@
 \alias{.runModuleInputObjects}
 \title{Run module's \code{.inputObjects}}
 \usage{
-.runModuleInputObjects(sim, m, objects, notOlderThan)
+.runModuleInputObjects(
+  sim,
+  m,
+  objects,
+  notOlderThan,
+  debug = getOption("spades.debug")
+)
 }
 \description{
 Run \code{.inputObjects()} from each module file from each module, one at a time,

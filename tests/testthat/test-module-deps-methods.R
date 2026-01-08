@@ -118,7 +118,7 @@ test_that("depsEdgeList and depsGraph work", {
   testInit(sampleModReqdPkgs)
 
   origRepos <- getOption("repos")
-  print(origRepos)
+  # print(origRepos)
   if (any(unname(origRepos) == "@CRAN@")) {
     suppressMessages(utils::chooseCRANmirror(ind = 1))
     on.exit({
@@ -141,16 +141,16 @@ test_that("depsEdgeList and depsGraph work", {
 
   # depsEdgeList
   el <- depsEdgeList(mySim)
-  el_from <- c("randomLandscapes", "randomLandscapes",
+  el_from <- c("_INPUT_", "randomLandscapes", "randomLandscapes",
                "fireSpread", "fireSpread", "fireSpread",
                "caribouMovement")
-  el_to <- c("fireSpread", "caribouMovement",
+  el_to <- c("randomLandscapes", "fireSpread", "caribouMovement",
              "fireSpread", "fireSpread", "caribouMovement",
              "caribouMovement")
-  el_objName <- c("landscape", "landscape", "landscape",
+  el_objName <- c("inRAM", "landscape", "landscape", "landscape",
                   npb, "landscape",
                   "caribou")
-  el_objClass <- c("SpatRaster", "SpatRaster",
+  el_objClass <- c("logical", "SpatRaster", "SpatRaster",
                    "SpatRaster", "numeric", "SpatRaster",
                    "SpatVector")
 
@@ -163,16 +163,16 @@ test_that("depsEdgeList and depsGraph work", {
 
   # .depsPruneEdges
   p <- .depsPruneEdges(el)
-  p_from <- c("randomLandscapes", "randomLandscapes", "fireSpread")
-  p_to <- c("fireSpread", "caribouMovement", "caribouMovement")
-  p_objName <- c("landscape", "landscape", "landscape")
-  p_objClass <- c("SpatRaster", "SpatRaster", "SpatRaster")
+  p_from <- c("_INPUT_", "randomLandscapes", "randomLandscapes", "fireSpread")
+  p_to <- c("randomLandscapes", "fireSpread", "caribouMovement", "caribouMovement")
+  p_objName <- c("inRAM", "landscape", "landscape", "landscape")
+  p_objClass <- c("logical", "SpatRaster", "SpatRaster", "SpatRaster")
   fromOrd <- p_from
   toOrd <- p_to
   p_ <- data.table::data.table(
     from = p_from, to = p_to,
     objName = p_objName, objClass = p_objClass,
-    fromOrd = p_from, toOrd = p_to
+    fromOrd = replace(p_from, p_from == "_INPUT_", NA), toOrd = p_to
   )
 
   expect_is(p, "data.table")

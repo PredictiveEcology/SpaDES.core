@@ -31,7 +31,7 @@ defineModule(sim, list(
   reqdPkgs = list("ropensci/NLMR (>= 1.1.1)", "terra", "RColorBrewer", "reproducible (>= 2.0.2)",
                   "SpaDES.tools (>= 2.0.0)"),
   parameters = rbind(
-    defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
+    # defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
     defineParameter("nx", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the x dimension"),
     defineParameter("ny", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the y dimension"),
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
@@ -50,8 +50,8 @@ defineModule(sim, list(
                     "or a vector of events to cache.")
   ),
   inputObjects = bindrows(
-    expectsInput(objectName = NA_character_, objectClass = NA_character_,
-                 sourceURL = NA_character_, desc = NA_character_)
+    expectsInput(objectName = "inRAM", "logical",
+                 sourceURL = NA_character_, desc = "should the raster be stored in memory?")
   ),
   outputObjects = bindrows(
     createsOutput(objectName = SpaDES.core::P(sim, module = "randomLandscapes")$stackName,
@@ -95,10 +95,10 @@ doEvent.randomLandscapes <- function(sim, eventTime, eventType, debug = FALSE) {
 
 ## event functions
 Init <- function(sim) {
-  if (is.null(Par$inRAM)) {
+  if (is.null(sim$inRAM)) {
     inMemory <- FALSE
   } else {
-    inMemory <- Par$inRAM
+    inMemory <- sim$inRAM
   }
 
   ## Give dimensions of dummy raster
@@ -156,4 +156,12 @@ Init <- function(sim) {
 
   sim[[Par$stackName]] <- mapStack
   return(invisible(sim))
+}
+
+.inputObjects <- function(sim) {
+  if (!suppliedElsewhere("inRAM", sim)) {
+    sim$inRAM <- TRUE
+  }
+  sim
+
 }

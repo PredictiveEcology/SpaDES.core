@@ -15,7 +15,8 @@ downloadModule(
   data,
   quiet,
   quickCheck = FALSE,
-  overwrite = FALSE
+  overwrite = FALSE,
+  verbose = getOption("reproducible.verbose")
 )
 
 \S4method{downloadModule}{character,character,character,character,logical,logical,ANY,logical}(
@@ -26,21 +27,13 @@ downloadModule(
   data,
   quiet,
   quickCheck = FALSE,
-  overwrite = FALSE
+  overwrite = FALSE,
+  verbose = getOption("reproducible.verbose")
 )
 
 \S4method{downloadModule}{character,missing,missing,missing,missing,missing,ANY,ANY}(name, quickCheck, overwrite)
 
-\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(
-  name,
-  path,
-  version,
-  repo,
-  data,
-  quiet,
-  quickCheck = FALSE,
-  overwrite = FALSE
-)
+\S4method{downloadModule}{character,ANY,ANY,ANY,ANY,ANY,ANY,ANY}(name, path, version, repo, data, quiet, quickCheck, overwrite)
 }
 \arguments{
 \item{name}{Character string giving the module name.}
@@ -67,6 +60,12 @@ This is faster, but potentially much less robust.}
 
 \item{overwrite}{Logical. Should local module files be overwritten in case they exist?
 Default \code{FALSE}.}
+
+\item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 }
 \value{
 A list of length 2. The first element is a character vector containing
@@ -97,5 +96,5 @@ The default is to overwrite any existing files in the case of a conflict.
 \code{\link[=zipModule]{zipModule()}} for creating module .zip folders.
 }
 \author{
-Alex Chubaty
+Alex Chubaty and Eliot McIntire
 }

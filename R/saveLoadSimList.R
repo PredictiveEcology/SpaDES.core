@@ -1,7 +1,7 @@
 #' Save a whole `simList` object to disk
 #'
 #' Saving a `simList` may not work using the standard approaches
-#' (e.g., `save`, `saveRDS`, and `qs::qsave`).
+#' (e.g., `save`, `saveRDS`, and `qs2::qs_save`).
 #' There are 2 primary reasons why this doesn't work as expected:
 #' the `activeBindings` that are in place within modules
 #' (these allow the `mod` and `Par` to exist), and file-backed objects,
@@ -38,7 +38,7 @@
 #'        It is the environment where the object named `sim` can be found.
 #'
 #' @param filename Character string with the path for saving `simList` to or
-#'   reading the `simList` from. Currently, only `.rds` and `.qs` file types are supported.
+#'   reading the `simList` from. Currently, only `.rds` and `.qs2` file types are supported.
 #'
 #' @param outputs Logical. If `TRUE`, all files identified in
 #'    `outputs(sim)` will be included in the zip.
@@ -54,17 +54,23 @@
 #' @param projectPath Should be the "top level" or project path for the `simList`.
 #'    Defaults to `getwd()`. All other paths will be made relative with respect to
 #'    this if nested within this.
+#' @param files Logical. Should all the files in the optional `outputs`, `inputs`,
+#'   `cache` be saved. If this is `TRUE`, then the resulting `filename` will be
+#'   silently converted to an archive file with the appropriate extension e.g.,
+#'   `.zip` or `.tar.gz`. This will automatically be `TRUE` if any of the `outputs`,
+#'   `inputs` or `cache` are `TRUE`. Setting this to `FALSE` will turn off the
+#'   saving of files specified in `inputs(sim)`, `outputs(sim)` or the cache.
 #'
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
-#' Invoked for side effects of saving both a `.qs` (or `.rds`) file,
+#' Invoked for side effects of saving both a `.qs2` (or `.rds`) file,
 #' and a compressed archive (one of `.tar.gz` if using non-Windows OS or `.zip` on Windows).
 #'
 #' @aliases saveSim
 #' @export
 #' @importFrom fs path_common
-#' @importFrom qs qsave
+#' @importFrom qs2 qs_save
 #' @importFrom stats runif
 #' @importFrom reproducible makeRelative .wrap
 #' @importFrom Require messageVerbose
@@ -73,13 +79,14 @@
 #' @rdname saveSimList
 #' @seealso [loadSimList()]
 saveSimList <- function(sim, filename, projectPath = getwd(),
-                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir, ...) {
+                        outputs = TRUE, inputs = TRUE, cache = FALSE, envir,
+                        files = TRUE, ...) {
   checkSimListExts(filename)
 
   dots <- list(...)
 
   ## user can explicitly override archiving files if FALSE
-  if (isFALSE(dots$files)) {
+  if (isFALSE(files)) {
     files <- cache <- inputs <- outputs <- FALSE
   } else {
     files <- TRUE
@@ -149,9 +156,9 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     }
   }
 
-  ## This forces it to be qs  (if not rds) instead of zip or tar.gz
+  ## This forces it to be qs2 (if not rds) instead of zip or tar.gz
   if (tools::file_ext(filename) != "rds") {
-    filename <- archiveConvertFileExt(filename, "qs")
+    filename <- archiveConvertFileExt(filename, "qs2")
   }
 
   origPaths <- paths(sim)
@@ -166,12 +173,12 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       as.list()
   }
 
-  # filename <- gsub(tools::file_ext(filename), "qs", filename)
+  # filename <- gsub(tools::file_ext(filename), "qs2", filename)
   if (tolower(tools::file_ext(filename)) == "rds") {
     saveRDS(sim, file = filename)
-  } else if (tolower(tools::file_ext(filename)) == "qs") {
-    filename <- gsub(tools::file_ext(filename), "qs", filename)
-    qs::qsave(sim, file = filename, nthreads = getOption("spades.qsThreads", 1))
+  } else if (tolower(tools::file_ext(filename)) == "qs2") {
+    filename <- gsub(tools::file_ext(filename), "qs2", filename)
+    qs2::qs_save(sim, file = filename, nthreads = getOption("spades.qsThreads", 1))
   }
 
   if (isTRUE(files)) {
@@ -206,7 +213,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       if (isTRUE(inputs)) {
         ins <- inputs(sim)
         if (NROW(ins)) {
-          ins[ins$loaded %in% TRUE]$file
+          inputFNs <- ins[ins$loaded %in% TRUE, ]$file
           otherFns <- c(otherFns, inputFNs)
         }
       }
@@ -217,6 +224,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
           allFns <- gsub(origPaths[[p]], symlinks[[p]], allFns)
         }
       }
+      allFns <- na.omit(allFns)
 
       relFns <- makeRelative(c(fileToDelete, allFns), projectPath) |> unname()
 
@@ -252,7 +260,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' objects that must be rebuilt. See description in [saveSimList()] for details.
 #'
 #' @param filename Character giving the name of a saved simulation file.
-#'   Currently, only file types `.qs` or `.rds` are supported.
+#'   Currently, only file types `.qs2` or `.rds` are supported.
 #' @param projectPath An optional path for the project within which the `simList`
 #'   exists. This is used to identify relative paths for saving and loading the `simList`.
 #' @param paths A list of character vectors for all the `simList` paths. When
@@ -274,7 +282,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @export
 #' @rdname loadSimList
 #' @seealso [saveSimList()], [zipSimList()]
-#' @importFrom qs qread
+#' @importFrom qs2 qs_read
 #' @importFrom reproducible linkOrCopy remapFilenames updateFilenameSlots .unwrap
 #' @importFrom tools file_ext
 loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
@@ -300,8 +308,8 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
     tmpsim <- readRDS(filename[1])
-  } else if (tolower(tools::file_ext(filename[1])) == "qs") {
-    tmpsim <- qs::qread(filename[1], nthreads = getOption("spades.qsThreads", 1))
+  } else if (tolower(tools::file_ext(filename[1])) == "qs2") {
+    tmpsim <- qs2::qs_read(filename[1], nthreads = getOption("spades.qsThreads", 1))
   }
   if (!is.null(paths)) {
     paths <- lapply(paths, normPath)
@@ -338,14 +346,35 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
       newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
 
-      tmpsim[[nam]][] <- newFiles$newName[]
+      if (is(tmpsim[[nam]], "list")) {
+        # lists are weird; historicalClimateLayers was length 2 list; had 4 filenames, 2 repeated twice
+        #   need to fix this
+        newNames <- unique(newFiles$newName)
+        for (elem in names(tmpsim[[nam]])) {
+          fileHere <- tmpsim[[nam]][[elem]] # should only have 1 element's file(s)
+          dirToFileHere <- dirname(fileHere)
+          nParents <- attr(fileHere, "nParentDirs")
+          1
+          #if (nParents > 0) {
+          for (nPar in rev(seq(nParents + 1))) {
+            dirToFileHere <- dirname(dirToFileHere)
+          }
+          newNames1 <- fs::path_rel(newNames, dirToFileHere)
+          thisFile <- fs::path_rel(fileHere, dirToFileHere)
+          newNames1 <- newNames1[newNames1 %in% thisFile]
+          newNamesHere <- file.path(dirToFileHere, newNames1)
+          tmpsim[[nam]][[elem]][] <- unique(newNamesHere)
+        }
+      } else {
+        tmpsim[[nam]][] <- newFiles$newName[]
+      }
     }
   }
 
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
 
   ## Work around for bug in qs that recovers data.tables as lists
-  tmpsim <- recoverDataTableFromQs(tmpsim)
+  # tmpsim <- recoverDataTableFromQs(tmpsim)
 
   ## Deal with all the RasterBacked Files that will be wrong
   if (any(nchar(otherFiles) > 0)) {
@@ -394,6 +423,7 @@ checkArchiveAlternative <- function(filename) {
 
 archiveExts <- "(tar$|tar\\.gz$|zip$|gz$)"
 
+## TODO: is this still needed when using qs2??
 #' @importFrom data.table as.data.table data.table rbindlist
 recoverDataTableFromQs <- function(sim) {
   objectName <- ls(sim)
@@ -488,20 +518,23 @@ recoverDataTableFromQs <- function(sim) {
 }
 
 checkSimListExts <- function(filename) {
-  stopifnot(grepl(paste0("(qs$|rds$)|", archiveExts), tolower(tools::file_ext(filename))))
+  stopifnot(grepl(paste0("(qs2$|rds$)|", archiveExts), tolower(tools::file_ext(filename))))
 }
 
 warnDeprecFileBacked <- function(arg) {
-  switch(tolower(arg),
-         filebackeddir =
-           paste0("filebackedDir is deprecated; use projectPath and optionally ",
-                  "set individual path arguments, such as modulePath."),
-         filebackend =
-           paste0("fileBackend argument is deprecated; file-backed objects are ",
-                  "now maintained; for memory only objects, convert them to RAM objects ",
-                  "prior to saveSimList"),
-         stop("No deprecation warning with that arg: ", arg)
-         )
+  switch(
+    tolower(arg),
+    filebackeddir = paste0(
+      "filebackedDir is deprecated; use projectPath and optionally ",
+      "set individual path arguments, such as modulePath."
+    ),
+    filebackend = paste0(
+      "fileBackend argument is deprecated; file-backed objects are ",
+      "now maintained; for memory only objects, convert them to RAM objects ",
+      "prior to saveSimList"
+    ),
+    stop("No deprecation warning with that arg: ", arg)
+  )
 }
 
 archiveExtract <- function(archiveName, exdir) {
@@ -530,7 +563,7 @@ archiveWrite <- function(archiveName, relFns, verbose) {
   } else {
     archiveName <- archiveConvertFileExt(archiveName, "zip")
     # archiveName <- gsub(tools::file_ext(archiveName), "zip", archiveName)
-    # the qs file doesn't deflate at all
+    ## the qs2 file doesn't deflate at all
     extras <- list("--compression-method store", NULL)
     if (verbose <= 0) {
       extras <- lapply(extras, function(ex) c(ex, "--quiet"))
