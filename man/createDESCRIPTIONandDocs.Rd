@@ -47,7 +47,7 @@ will be read in during the \code{simInit} call, as is the practice when a module
 is not a package.
 
 invoked for the side effect of creating DESCRIPTION file, a \code{.Rbuildingore}
-file and possibly building documentatation from roxygen tags.
+file and possibly building documentation from roxygen2 tags.
 }
 \description{
 \emph{EXPERIMENTAL -- USE WITH CAUTION}. This function will create a \code{DESCRIPTION}

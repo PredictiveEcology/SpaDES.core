@@ -110,7 +110,7 @@
 #' @inheritParams reproducible::Cache
 #'
 #' @return invoked for the side effect of creating DESCRIPTION file, a `.Rbuildingore`
-#' file and possibly building documentatation from roxygen tags.
+#' file and possibly building documentation from roxygen2 tags.
 #'
 #' @export
 #' @examples
