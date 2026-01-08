@@ -11,13 +11,13 @@
 \usage{
 \method{.wrap}{simList}(
   obj,
-  cachePath,
+  cachePath = getOption("reproducible.cachePath"),
   preDigest,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
   verbose = getOption("reproducible.verbose"),
   outputObjects = NULL,
-  cacheId,
+  cacheId = NULL,
   ...
 )
 
@@ -31,8 +31,8 @@
 
 \method{.unwrap}{simList}(
   obj,
-  cachePath,
-  cacheId,
+  cachePath = getOption("reproducible.cachePath"),
+  cacheId = NULL,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
   ...

@@ -1071,10 +1071,11 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.wrap.simList <- function(obj, cachePath, preDigest, drv = getOption("reproducible.drv", NULL),
+.wrap.simList <- function(obj, cachePath = getOption("reproducible.cachePath"),
+                          preDigest, drv = getOption("reproducible.drv", NULL),
                           conn = getOption("reproducible.conn", NULL),
                           verbose = getOption("reproducible.verbose"),
-                          outputObjects = NULL, cacheId,
+                          outputObjects = NULL, cacheId = NULL,
                           ...) {
 
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
@@ -1176,8 +1177,8 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #' @rdname dealWithClass
 .unwrap.simList <- function(
   obj,
-  cachePath,
-  cacheId,
+  cachePath = getOption("reproducible.cachePath"),
+  cacheId = NULL,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
   ...
