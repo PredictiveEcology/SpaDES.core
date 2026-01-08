@@ -1,8 +1,9 @@
-# SpaDES.core (development version)
+# SpaDES.core 3.0.0
 
 ## Dependency changes
 
-* use `qs2` package instead of `qs` (deprecated) for improved object serialization (#291; #316);
+* use `qs2` package instead of `qs` (being removed from CRAN) for improved object serialization (#291; #316);
+  This may cause `qs` based event caching to fail and will have to be re-run/re-cached;
 
 ## Bug fixes
 
@@ -18,17 +19,24 @@
 * several corrections to messaging when there are nested `simList` objects, i.e., when `simInit` is called within a module; 
 * fix warning capture in `spades()` debug logging;
 * fix use of `debug` as `verbose` when caching (#322);
+* several small bugfixes, including in `.robustDigest.simList`, `Plots`, 
+  `allowInitDuringSimInit`, `.prepareOutput`, `defineParameter`;
+* fix for `moduleVersion` when there are many paths
 * small changes to caching of simList during event caching; missing ability to pass explicit classOptions for params
 
 ## Enhancements
 
-* many changes to accommodate updates to `reproducible` package, specifically the `Cache` function;
-* `cacheChaining`: a new feature that will reduce time spent on digesting objects when
+* This is primarily a large update to address changes in `reproducible::Cache` and its many
+  exported methods;
+* `cacheChaining`: a new experimental feature that will reduce time spent on digesting objects when
   there is an unbroken sequence of cached events. Event level caching will assess whether
   the most recent event was Cached. If it was, then the current cache will skip digesting
   and use only the functions (and parameters) and the previous event's `cacheId` 
   to assess whether the `sim` can recover the current event from the cache repository.
-* `clearCacheEventsOnly` is a convenience wrapper that will remove all event-level cached objects in the cache repository;
+  Turned on via `options(spades.cacheChaining = TRUE)`
+* many changes to accommodate updates to `reproducible` package, specifically the `Cache` function;
+* `clearCacheEventsOnly` is a convenience wrapper that will remove all event-level cached 
+  objects in the cache repository;
 * two internal helpers, `dotObjs` and `dotMod` which create a canonical pointer in the `simList`
   to these two parts of module-specific objects or functions, respectively;
 * messaging updates when Caching events and `.inputObjects`;
