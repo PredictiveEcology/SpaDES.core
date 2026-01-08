@@ -1352,7 +1352,12 @@ setReplaceMethod(
          paste0(sim@outputs$objectName[is.na(sim@outputs$file)])
        ## If a filename is provided, determine if it is absolute path, if so,
        ## use that, if not, then append it to outputPath(sim)
-       alreadyWithOutputPath <- grepl(pattern = paste0("^", outputPath(sim)), sim@outputs$file)
+
+       normedOP <- normalizePath(outputPath(sim), winslash = "/", mustWork = FALSE)
+       alreadyWithOutputPath <- grepl(pattern = paste0("^", normedOP), sim@outputs$file)
+
+       # alreadyWithOutputPath <- grepl(pattern = paste0("^", normPath(outputPath(sim))), sim@outputs$file)
+       # alreadyWithOutputPath <- grepl(pattern = paste0("^", outputPath(sim)), sim@outputs$file)
        if (any(!alreadyWithOutputPath)) {
          isAP <- isAbsolutePath(as.character(sim@outputs$file))
 
