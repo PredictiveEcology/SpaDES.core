@@ -24,14 +24,14 @@ editor_options:
 vignette_pkgs <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
 
 # Check availability without attaching
-has_pkgs <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
+hasSuggests <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
 
 # CRAN sets NOT_CRAN = "false"; devtools sets it to "true" locally
 not_cran <- identical(Sys.getenv("NOT_CRAN"), "true")
 
 # Evaluate chunks only if NOT_CRAN and all vignette packages are available
 knitr::opts_chunk$set(
-  eval = not_cran && has_pkgs(vignette_pkgs),
+  eval = not_cran && hasSuggests(vignette_pkgs),
   message = FALSE,
   warning = FALSE
 )
