@@ -185,7 +185,7 @@ A module's metadata defines default values for module-specific parameters, and t
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
 
 ```{r passing-params, echo=TRUE}
-  library(SpaDES.core)
+library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 5.0)
@@ -271,7 +271,6 @@ Each module appears in a colour-coded row, within which each event for that modu
 Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module's event corresponds to the module's timestep unit, not the event's "duration".
 
 ```{r sim-eventDiagram, eval=evalTRUE, echo=FALSE, message=FALSE, warning=FALSE}
-library(SpaDES.core)
 
 parameters <- list(
   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
@@ -300,7 +299,7 @@ dev.off()
 unlink(normalizePath(ftmp))
 ```
   
-```{r eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7}
+```{r eventDiagram, echo=FALSE, fig.height=10, fig.width=7}
 # overview of the events in the simulation
 # Needs DiagrammeR package
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
