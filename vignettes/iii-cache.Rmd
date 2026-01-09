@@ -11,27 +11,36 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{03 Caching `SpaDES` simulations}
-  %\VignetteDepends{knitr, NLMR, RColorBrewer, reproducible, SpaDES.core, SpaDES.tools, terra}
-  %\VignetteKeyword{cache}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 editor_options: 
   chunk_output_type: console
 ---
 
-```{r setup, include = FALSE}
-SuggestedPkgsNeeded <- c("knitr", "NLMR", "RColorBrewer", "SpaDES.tools")
-hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
-useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
+```{r setup, include=FALSE}
+# Packages used in this vignette
+vignette_pkgs <- c("knitr", "NLMR", "RColorBrewer", "SpaDES.tools")
 
-knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
+# Check availability without attaching
+has_pkgs <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
+
+# CRAN sets NOT_CRAN = "false"; devtools sets it to "true" locally
+not_cran <- identical(Sys.getenv("NOT_CRAN"), "true")
+
+# Evaluate chunks only if NOT_CRAN and all vignette packages are available
+knitr::opts_chunk$set(
+  eval = not_cran && has_pkgs(vignette_pkgs),
+  message = FALSE,
+  warning = FALSE
+)
 
 options(
-  spades.loadReqdPkgs = FALSE,
   spades.moduleCodeChecks = FALSE,
   spades.useRequire = FALSE
 )
+
 ```
+
 
 As part of a reproducible work flow, caching of various function calls are a critical component.
 Down the road, it is likely that an entire work flow from raw data to publication, decision support, report writing, presentation building etc., could be built and be reproducible anywhere, on demand.
@@ -165,23 +174,25 @@ to
 `Cache(projectRaster, raster, crs = crs(newRaster))`.
 
 ```{r function-level, echo=TRUE}
-ras <- terra::rast(terra::ext(0, 1e3, 0, 1e3), res = 1, vals = 1)
-system.time({
-  map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
-               cachePath = cachePath(mySim),
-               userTags = "neutralLandscapeMap",
-               notOlderThan = Sys.time())
-})
-
-# faster the second time
-system.time({
-  mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
-                     cachePath = cachePath(mySim),
-                     userTags = "neutralLandscapeMap")
-})
-
-## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()
-all.equal(map[], mapCached[]) 
+if (requireNamespace("SpaDES.tools")) {
+  ras <- terra::rast(terra::ext(0, 1e3, 0, 1e3), res = 1, vals = 1)
+  system.time({
+    map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
+                 cachePath = cachePath(mySim),
+                 userTags = "neutralLandscapeMap",
+                 notOlderThan = Sys.time())
+  })
+  
+  # faster the second time
+  system.time({
+    mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
+                       cachePath = cachePath(mySim),
+                       userTags = "neutralLandscapeMap")
+  })
+  
+  ## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()
+  all.equal(map[], mapCached[]) 
+}
 ```
 
 ## Working with the Cache manually

@@ -35,6 +35,7 @@ simulation. Offers a less detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link[=objectDiagram]{objectDiagram()}}.
 }
 \examples{
+\dontshow{if (requireNamespace("NLMR", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 \donttest{
 if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
     requireNamespace("NLMR", quietly = TRUE)) {
@@ -74,7 +75,7 @@ ig <- graph_from_data_frame(edgeList[, list(from, to)])
 plot(ig)
 }
 }
-
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \link[igraph:aaa-igraph-package]{igraph::igraph}, \code{\link[=moduleGraph]{moduleGraph()}} for a version that accounts for

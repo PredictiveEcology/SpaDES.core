@@ -293,7 +293,7 @@ setMethod(
 #' @rdname moduleDiagram
 #'
 #' @author Alex Chubaty
-#' @examples
+#' @examplesIf requireNamespace("NLMR", quietly = TRUE)
 #' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
 #'     requireNamespace("NLMR", quietly = TRUE)) {
