@@ -811,8 +811,7 @@ scheduleConditionalEvent <- function(sim,
 #'
 #' @examples
 #' \donttest{
-#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
-#'     requireNamespace("NLMR", quietly = TRUE)) {
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
 #'   # some options are not necessary when not interactive
 #'   opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
 #'   if (!interactive()) opts <- append(opts, options("spades.plots" = NA))

@@ -72,8 +72,7 @@ params(s)$tmp <- list(a = 1)
 # P(s, "a") # get "a" parameter inside the current module
 # Par$a     # same. Get "a" parameter inside the current module
 
-if (requireNamespace("NLMR", quietly = TRUE) &&
-    requireNamespace("SpaDES.tools", quietly = TRUE)) {
+if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
   opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
   modules <- list("randomLandscapes")
   paths <- list(modulePath = getSampleModules(tempdir()))

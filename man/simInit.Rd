@@ -289,8 +289,7 @@ Please see the vignette dedicated to this topic.
 
 \examples{
 \donttest{ # Tests take several seconds
-if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
-requireNamespace("NLMR", quietly = TRUE)) {
+if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
 opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
 if (!interactive()) opts <- append(opts, options("spades.plots" = NA,
                                                  "spades.debug" = FALSE))

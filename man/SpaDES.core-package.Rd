@@ -252,7 +252,7 @@ Several \code{SpaDES.tools} functions assist with these:
 \tabular{ll}{
 \code{\link[SpaDES.tools:adj]{SpaDES.tools::adj()}} \tab An optimized (i.e., faster) version of \code{\link[terra:adjacent]{terra::adjacent()}}\cr
 \code{\link[SpaDES.tools:cir]{SpaDES.tools::cir()}} \tab Identify pixels in a circle around a \code{\link[sp:SpatialPoints-class]{SpatialPoints*()}} object\cr
-\code{\link[SpaDES.tools:directionFromEachPoint]{SpaDES.tools::directionFromEachPoint()}} \tab Fast calculation of direction and distance surfaces\cr
+\code{\link[SpaDES.tools:directions]{SpaDES.tools::directionFromEachPoint()}} \tab Fast calculation of direction and distance surfaces\cr
 \code{\link[SpaDES.tools:distanceFromEachPoint]{SpaDES.tools::distanceFromEachPoint()}} \tab Fast calculation of distance surfaces\cr
 \code{\link[SpaDES.tools:rings]{SpaDES.tools::rings()}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
 \code{\link[SpaDES.tools:spokes]{SpaDES.tools::spokes()}} \tab Identify outward radiating spokes from initial points\cr
@@ -269,8 +269,8 @@ Agents have several methods and functions specific to them:
 \code{\link[SpaDES.tools:crw]{SpaDES.tools::crw()}} \tab Simple correlated random walk function\cr
 \code{\link[SpaDES.tools:heading]{SpaDES.tools::heading()}} \tab Determines the heading between \verb{SpatialPoints*}\cr
 \code{\link[quickPlot:makeLines]{quickPlot::makeLines()}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
-\code{\link[SpaDES.tools:move]{SpaDES.tools::move()}} \tab A meta function that can currently only take "crw"\cr
-\code{\link[SpaDES.tools:specificNumPerPatch]{SpaDES.tools::specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
+\code{\link[SpaDES.tools:crw]{SpaDES.tools::move()}} \tab A meta function that can currently only take "crw"\cr
+\code{\link[SpaDES.tools:specnumperpatch-probs]{SpaDES.tools::specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
 }
 }
 
@@ -331,11 +331,11 @@ They are intended to make translations from SELES (https://www.gowlland.ca/).
 You must know how to use SELES for these to be useful:
 
 \tabular{ll}{
-\code{\link[SpaDES.tools:agentLocation]{SpaDES.tools::agentLocation()}} \tab Agent location\cr
+\code{\link[SpaDES.tools:SELESagentLocation]{SpaDES.tools::agentLocation()}} \tab Agent location\cr
 \code{\link[SpaDES.tools:initiateAgents]{SpaDES.tools::initiateAgents()}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
-\code{\link[SpaDES.tools:numAgents]{SpaDES.tools::numAgents()}} \tab Number of agents\cr
-\code{\link[SpaDES.tools:probInit]{SpaDES.tools::probInit()}} \tab Probability of initiating an agent or event\cr
-\code{\link[SpaDES.tools:transitions]{SpaDES.tools::transitions()}} \tab Transition probability\cr
+\code{\link[SpaDES.tools:SELESnumAgents]{SpaDES.tools::numAgents()}} \tab Number of agents\cr
+\code{\link[SpaDES.tools:SELESprobInit]{SpaDES.tools::probInit()}} \tab Probability of initiating an agent or event\cr
+\code{\link[SpaDES.tools:SELEStransitions]{SpaDES.tools::transitions()}} \tab Transition probability\cr
 }
 }
 

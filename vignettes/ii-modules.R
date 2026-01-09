@@ -1,12 +1,24 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
-hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
-useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
+# Packages used in this vignette
+vignette_pkgs <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
 
-knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
+# Check availability without attaching
+hasSuggests <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
 
-options("spades.moduleCodeChecks" = FALSE,
-        "spades.useRequire" = FALSE)
+# CRAN sets NOT_CRAN = "false"; devtools sets it to "true" locally
+not_cran <- identical(Sys.getenv("NOT_CRAN"), "true")
+evalTRUE <- not_cran && hasSuggests(vignette_pkgs)
+# Evaluate chunks only if NOT_CRAN and all vignette packages are available
+knitr::opts_chunk$set(
+  eval = evalTRUE,
+  message = FALSE,
+  warning = FALSE
+)
+
+options(
+  spades.moduleCodeChecks = FALSE,
+  spades.useRequire = FALSE
+)
 
 
 ## ----module-metadata, echo=FALSE, results="asis"------------------------------
@@ -17,8 +29,8 @@ cat(c(
   "```"
   ), sep = "\n")
 
-## ----passing-params, echo=TRUE------------------------------------------------
-  library(SpaDES.core)
+## ----passing-params, echo=TRUE----------------------------------------------------------------------------------------
+library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 5.0)
@@ -44,7 +56,7 @@ paths <- list(modulePath = getSampleModules(tempdir()),
 mySim <- simInit(times = times, params = parameters, modules = modules,
                  objects = objects, paths = paths)
 
-## ----accessing-params, eval=FALSE, echo=TRUE----------------------------------
+## ----accessing-params, eval=FALSE, echo=TRUE--------------------------------------------------------------------------
 # ## Access parameters
 # P(mySim)                    # shows all parameters
 # P(mySim, module = "caribouMovement") # only parameters in caribouMovement module
@@ -56,7 +68,7 @@ mySim <- simInit(times = times, params = parameters, modules = modules,
 # ## in a module
 # P(mySim)$N  # Only one parameter if used within a module
 
-## ----event-types, echo=FALSE, results="asis"----------------------------------
+## ----event-types, echo=FALSE, results="asis"--------------------------------------------------------------------------
 cat(c(
   "```",
   "## sample event type definitions for the default `caribouMovement` module",
@@ -64,7 +76,7 @@ cat(c(
   "```"
   ), sep = "\n")
 
-## ----event-functions, echo=FALSE, results="asis"------------------------------
+## ----event-functions, echo=FALSE, results="asis"----------------------------------------------------------------------
 cat(c(
   "```",
   "## sample Init event function from the default `caribouMovement` module",
@@ -72,8 +84,7 @@ cat(c(
   "```"
   ), sep = "\n")
 
-## ----sim-eventDiagram, eval=hasSuggests, echo=FALSE, message=FALSE, warning=FALSE----
-library(SpaDES.core)
+## ----sim-eventDiagram, eval=evalTRUE, echo=FALSE, message=FALSE, warning=FALSE----------------------------------------
 
 parameters <- list(
   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
@@ -101,12 +112,12 @@ mySim <- simInitAndSpades(
 dev.off()
 unlink(normalizePath(ftmp))
 
-## ----eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7----
+## ----eventDiagram, echo=FALSE, fig.height=10, fig.width=7-------------------------------------------------------------
 # overview of the events in the simulation
 # Needs DiagrammeR package
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 
-## ----checksums, eval=FALSE----------------------------------------------------
+## ----checksums, eval=FALSE--------------------------------------------------------------------------------------------
 # ## 1. specify your module here
 # moduleName <- "my_module"
 # 
@@ -127,7 +138,7 @@ eventDiagram(mySim, "0000-06-01", n = 200, width = 720)
 #           to = file.path('path/to/my/moduleDir', moduleName, 'data', 'CHECKSUMS.txt'),
 #           overwrite = TRUE)
 
-## ----module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7------------
+## ----module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7----------------------------------------------------
 ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
 #install.packages("SpaDES.taols")
 #install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
@@ -154,7 +165,7 @@ moduleDiagram(mySim, showParents = TRUE) # similar, but showing parent module gr
 # detailed visual representation of objects
 objectDiagram(mySim, width = 720)
 
-## ----checkpoints, echo=TRUE, message=FALSE------------------------------------
+## ----checkpoints, echo=TRUE, message=FALSE----------------------------------------------------------------------------
 # initialize a new simulation, setting the checkpoint interval and filename.
 times <- list(start = 0, end = 5)
 parameters <- list(
@@ -172,7 +183,7 @@ mySim <- simInit(times = times, params = parameters, modules = modules, paths = 
 checkpointFile(mySim)
 checkpointInterval(mySim)
 
-## ----progress, echo=TRUE, message=FALSE---------------------------------------
+## ----progress, echo=TRUE, message=FALSE-------------------------------------------------------------------------------
 # initialize a new simulation, setting the progress parameters
 mySim <- simInit(times = list(start = 0.0, end = 10.0),
                  params = list(.globals = list(stackName = "landscape"),
@@ -184,7 +195,7 @@ mySim <- simInit(times = list(start = 0.0, end = 10.0),
 progressType(mySim)
 progressInterval(mySim)
 
-## ----load-save, echo=TRUE, message=FALSE--------------------------------------
+## ----load-save, echo=TRUE, message=FALSE------------------------------------------------------------------------------
 # initialize a new simulation, setting the load and save parameters
 outputDir <- file.path(tempdir(), "simOutputs")
 mySim <- simInit(times = list(start = 0, end = 5),
@@ -224,14 +235,14 @@ mySim2 <- spades(mySim)
 dev.off()
 unlink(normalizePath(ftmp))
 
-## ----save-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
+## ----save-events, echo=TRUE, eval=FALSE, message=FALSE----------------------------------------------------------------
 # ### WITHIN A MODULE:
 # 
 # # schedule a recurring save event
 # nextSave <- time(mySim) + params(mySim)$randomLandscapes$.saveInterval
 # sim <- scheduleEvent(mySim, nextSave, "randomLandscapes", "save")
 
-## ----plotting, echo=TRUE, eval=FALSE, message=FALSE---------------------------
+## ----plotting, echo=TRUE, eval=FALSE, message=FALSE-------------------------------------------------------------------
 # # initialize a new simulation, setting the load and save parameters
 # mySim <- simInit(times = list(start = 0, end = 5),
 #                  params = list(
@@ -246,25 +257,25 @@ unlink(normalizePath(ftmp))
 # params(mySim)$randomLandscapes$.plotInitialTime
 # params(mySim)$randomLandscapes$.plotInterval
 
-## ----plot-events, echo=TRUE, eval=FALSE, message=FALSE------------------------
+## ----plot-events, echo=TRUE, eval=FALSE, message=FALSE----------------------------------------------------------------
 # ### WITHIN A MODULE:
 # 
 # # schedule a recurring plot event
 # nextPlot <- time(mySim) + params(mySim)$randomLandscapes$.plotInterval
 # mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "save")
 
-## ----caribouMovement, echo=TRUE, eval=FALSE-----------------------------------
+## ----caribouMovement, echo=TRUE, eval=FALSE---------------------------------------------------------------------------
 # openModules(getSampleModules(tempdir()), "moduleName")
 
-## ----download-module, echo=TRUE, eval=FALSE-----------------------------------
+## ----download-module, echo=TRUE, eval=FALSE---------------------------------------------------------------------------
 # downloadModule("moduleName")
 
-## ----create-new-module, eval=FALSE, echo=TRUE, message=FALSE------------------
+## ----create-new-module, eval=FALSE, echo=TRUE, message=FALSE----------------------------------------------------------
 # # create a new module called "randomLandscape" in the "custom-modules" subdirectory
 # # and open the resulting file immediately for editing.
 # newModule(name = "randomLandscapes", path = "custom-modules", open = TRUE)
 
-## ----module-group-init, eval=FALSE--------------------------------------------
+## ----module-group-init, eval=FALSE------------------------------------------------------------------------------------
 # library(DiagrammeR)
 # library(SpaDES.core)
 # 
@@ -296,9 +307,9 @@ unlink(normalizePath(ftmp))
 # 
 # modules(mySim) # note the child modules are initialized
 
-## ----module-group-dl, eval=FALSE----------------------------------------------
+## ----module-group-dl, eval=FALSE--------------------------------------------------------------------------------------
 # downloadModule("SpaDES_sampleModules")
 
-## ----cleanup, echo=FALSE------------------------------------------------------
+## ----cleanup, echo=FALSE----------------------------------------------------------------------------------------------
 unlink(outputDir, recursive = TRUE)
 

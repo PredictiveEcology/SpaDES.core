@@ -293,10 +293,9 @@ setMethod(
 #' @rdname moduleDiagram
 #'
 #' @author Alex Chubaty
-#' @examplesIf requireNamespace("NLMR", quietly = TRUE)
+#' @examples
 #' \donttest{
-#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
-#'     requireNamespace("NLMR", quietly = TRUE)) {
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
 #' library(igraph)
 #' times <- list(start = 0, end = 6, "month")
 #' parameters <- list(
