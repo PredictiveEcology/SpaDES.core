@@ -30,7 +30,7 @@
 * several small bugfixes, including in `.robustDigest.simList`, `Plots`, 
   `allowInitDuringSimInit`, `.prepareOutput`, `defineParameter`;
 * fix for `moduleVersion` when there are many paths
-* small changes to caching of simList during event caching; missing ability to pass explicit classOptions for params
+* small changes to caching of `simList` during event caching; missing ability to pass explicit classOptions for params
 
 ## Enhancements
 
