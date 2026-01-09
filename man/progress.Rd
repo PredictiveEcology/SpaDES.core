@@ -51,7 +51,8 @@ See examples.
 }
 \examples{
 \donttest{
-if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+      packageVersion("SpaDES.tools") > "3.0.0") {
 opts <- options("spades.moduleCodeChecks" = FALSE) # not necessary for example
 mySim <- simInit(
   times = list(start=0.0, end=100.0),

@@ -84,9 +84,10 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @importFrom data.table data.table
 #' @rdname saveFiles
 #'
-#' @examplesIf requireNamespace("NLMR", quietly = TRUE)
+#' @examples
 #' \donttest{
-#' if (requireNamespace("SpaDES.tools", quietly = TRUE)) {
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#'       packageVersion("SpaDES.tools") > "3.0.0") {
 #' ## This will save the "caribou" object at the save interval of 1 unit of time
 #' ## in the outputPath location
 #'   outputPath <- file.path(tempdir(), "test_save")
