@@ -28,10 +28,10 @@ hasSuggests <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE,
 
 # CRAN sets NOT_CRAN = "false"; devtools sets it to "true" locally
 not_cran <- identical(Sys.getenv("NOT_CRAN"), "true")
-
+evalTRUE <- not_cran && hasSuggests(vignette_pkgs)
 # Evaluate chunks only if NOT_CRAN and all vignette packages are available
 knitr::opts_chunk$set(
-  eval = not_cran && hasSuggests(vignette_pkgs),
+  eval = evalTRUE,
   message = FALSE,
   warning = FALSE
 )
@@ -270,7 +270,7 @@ Simulation time is presented on the x-axis, starting at date `startDate`.
 Each module appears in a colour-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module.
 Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module's event corresponds to the module's timestep unit, not the event's "duration".
 
-```{r sim-eventDiagram, eval=hasSuggests, echo=FALSE, message=FALSE, warning=FALSE}
+```{r sim-eventDiagram, eval=evalTRUE, echo=FALSE, message=FALSE, warning=FALSE}
 library(SpaDES.core)
 
 parameters <- list(
