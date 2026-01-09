@@ -66,6 +66,7 @@ Suggests:
     lme4,
     logging,
     magrittr,
+    NLMR (>= 1.1.1),
     pkgload,
     png,
     RColorBrewer (>= 1.1-2),
