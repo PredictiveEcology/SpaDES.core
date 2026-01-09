@@ -7,12 +7,11 @@ This also has many enhancemenets and addresses many minor bugfixes.
 ## Test environments
 
 ### Previous R versions
-* Ubuntu 24.04                 (GitHub), R 4.4.3
-* Windows                      (GitHub), R 4.4.3
+* Ubuntu 24.04                 (GitHub), R 4.3.3, 4.4.3
+* Windows                      (GitHub), R 4.3.3, 4.4.3
 * Windows                 (win-builder), R 4.4.3
 
 ### Current R versions
-* macOS 13.3.1            (mac-builder), R 4.5.2
 * macOS 14.7.6                 (GitHub), R 4.5.2
 * Ubuntu 24.04                 (GitHub), R 4.5.2
 * Ubuntu 24.04                  (local), R 4.5.2

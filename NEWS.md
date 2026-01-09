@@ -1,3 +1,7 @@
+# SpaDES.core 3.0.3
+
+* minor changes for CRAN submission
+
 # SpaDES.core 3.0.0
 
 ## Dependency changes
