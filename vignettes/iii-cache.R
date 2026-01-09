@@ -1,17 +1,27 @@
-## ----setup, include = FALSE---------------------------------------------------
-SuggestedPkgsNeeded <- c("knitr", "NLMR", "RColorBrewer", "SpaDES.tools")
-hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
-useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
+## ----setup, include=FALSE---------------------------------------------------------------------------------------------
+# Packages used in this vignette
+vignette_pkgs <- c("knitr", "NLMR", "RColorBrewer", "SpaDES.tools")
 
-knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
+# Check availability without attaching
+has_pkgs <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
+
+# CRAN sets NOT_CRAN = "false"; devtools sets it to "true" locally
+not_cran <- identical(Sys.getenv("NOT_CRAN"), "true")
+
+# Evaluate chunks only if NOT_CRAN and all vignette packages are available
+knitr::opts_chunk$set(
+  eval = not_cran && has_pkgs(vignette_pkgs),
+  message = FALSE,
+  warning = FALSE
+)
 
 options(
-  spades.loadReqdPkgs = FALSE,
   spades.moduleCodeChecks = FALSE,
   spades.useRequire = FALSE
 )
 
-## ----examples, echo=TRUE, message=FALSE---------------------------------------
+
+## ----examples, echo=TRUE, message=FALSE-------------------------------------------------------------------------------
 library(terra)
 library(reproducible)
 library(SpaDES.core)
@@ -27,20 +37,20 @@ mySim <- simInit(
   paths = list(modulePath = getSampleModules(tempdir()))
 )
 
-## ----spades-------------------------------------------------------------------
+## ----spades-----------------------------------------------------------------------------------------------------------
 # compare caching ... run once to create cache
 system.time({
   outSim <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time())
 })
 
-## ----spades-cached------------------------------------------------------------
+## ----spades-cached----------------------------------------------------------------------------------------------------
 # faster 2nd time
 system.time({
   outSimCached <- spades(Copy(mySim), cache = TRUE)
 })
 all.equal(outSim, outSimCached)
 
-## ----module-level, echo=TRUE--------------------------------------------------
+## ----module-level, echo=TRUE------------------------------------------------------------------------------------------
 # Module-level
 params(mySim)$randomLandscapes$.useCache <- TRUE
 system.time({
@@ -53,7 +63,7 @@ system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
 
-## ----test-module-level--------------------------------------------------------
+## ----test-module-level------------------------------------------------------------------------------------------------
 layers <- list("DEM", "forestAge", "habitatQuality", "percentPine", "Fires")
 same <- lapply(layers, function(l) {
   identical(randomSim$landscape[[l]], randomSimCached$landscape[[l]])
@@ -61,7 +71,7 @@ same <- lapply(layers, function(l) {
 names(same) <- layers
 print(same) # Fires is not same because all non-init events in fireSpread are not cached
 
-## ----event-level, echo=TRUE---------------------------------------------------
+## ----event-level, echo=TRUE-------------------------------------------------------------------------------------------
 params(mySim)$fireSpread$.useCache <- "init"
 system.time({
   randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
@@ -73,26 +83,28 @@ system.time({
   randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
 })
 
-## ----function-level, echo=TRUE------------------------------------------------
-ras <- terra::rast(terra::ext(0, 1e3, 0, 1e3), res = 1, vals = 1)
-system.time({
-  map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
-               cachePath = cachePath(mySim),
-               userTags = "neutralLandscapeMap",
-               notOlderThan = Sys.time())
-})
+## ----function-level, echo=TRUE----------------------------------------------------------------------------------------
+if (requireNamespace("SpaDES.tools")) {
+  ras <- terra::rast(terra::ext(0, 1e3, 0, 1e3), res = 1, vals = 1)
+  system.time({
+    map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
+                 cachePath = cachePath(mySim),
+                 userTags = "neutralLandscapeMap",
+                 notOlderThan = Sys.time())
+  })
+  
+  # faster the second time
+  system.time({
+    mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
+                       cachePath = cachePath(mySim),
+                       userTags = "neutralLandscapeMap")
+  })
+  
+  ## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()
+  all.equal(map[], mapCached[]) 
+}
 
-# faster the second time
-system.time({
-  mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
-                     cachePath = cachePath(mySim),
-                     userTags = "neutralLandscapeMap")
-})
-
-## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()
-all.equal(map[], mapCached[]) 
-
-## ----manual-cache-------------------------------------------------------------
+## ----manual-cache-----------------------------------------------------------------------------------------------------
 cacheDB <- showCache(mySim, userTags = "neutralLandscapeMap")
 
 ## get the RasterLayer that was produced with neutralLandscapeMap()
@@ -101,12 +113,12 @@ map <- loadFromCache(cacheId = cacheDB$cacheId, cachePath = cachePath(mySim))
 clearPlot()
 Plot(map)
 
-## ----eval=FALSE, echo=TRUE----------------------------------------------------
+## ----eval=FALSE, echo=TRUE--------------------------------------------------------------------------------------------
 # simInit() --> many .inputObjects calls
 # 
 # spades() call --> many module calls --> many event calls --> many function calls
 
-## ----eval=FALSE, echo=TRUE----------------------------------------------------
+## ----eval=FALSE, echo=TRUE--------------------------------------------------------------------------------------------
 # parameters = list(
 #   FireModule = list(.useCache = TRUE)
 # )

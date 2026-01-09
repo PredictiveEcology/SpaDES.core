@@ -296,7 +296,7 @@ setMethod(
 #' @examples
 #' \donttest{
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
-#'     requireNamespace("NLMR", quietly = TRUE)) {
+#'       packageVersion("SpaDES.tools") > "3.0.0") {
 #' library(igraph)
 #' times <- list(start = 0, end = 6, "month")
 #' parameters <- list(
