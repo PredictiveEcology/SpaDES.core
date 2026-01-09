@@ -10,7 +10,6 @@ output:
     toc: yes
 vignette: >
   %\VignetteIndexEntry{02 Building `SpaDES` modules}
-  %\VignetteDepends{data.table, DiagrammeR, igraph, magrittr, terra, RColorBrewer, SpaDES.core, SpaDES.tools, CircStats}
   %\VignetteKeyword{module development}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,15 +17,29 @@ editor_options:
   chunk_output_type: console
 ---
 
+
+
 ```{r setup, include=FALSE}
-SuggestedPkgsNeeded <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
-hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
-useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
+# Packages used in this vignette
+vignette_pkgs <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
 
-knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
+# Check availability without attaching
+hasSuggests <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
 
-options("spades.moduleCodeChecks" = FALSE,
-        "spades.useRequire" = FALSE)
+# CRAN sets NOT_CRAN = "false"; devtools sets it to "true" locally
+not_cran <- identical(Sys.getenv("NOT_CRAN"), "true")
+evalTRUE <- not_cran && hasSuggests(vignette_pkgs)
+# Evaluate chunks only if NOT_CRAN and all vignette packages are available
+knitr::opts_chunk$set(
+  eval = evalTRUE,
+  message = FALSE,
+  warning = FALSE
+)
+
+options(
+  spades.moduleCodeChecks = FALSE,
+  spades.useRequire = FALSE
+)
 
 ```
 
@@ -172,7 +185,7 @@ A module's metadata defines default values for module-specific parameters, and t
 Default parameter values can overridden by passing values in the parameter list to `simInit`.
 
 ```{r passing-params, echo=TRUE}
-  library(SpaDES.core)
+library(SpaDES.core)
 
 outputDir <- file.path(tempdir(), "simOutputs")
 times <- list(start = 0.0, end = 5.0)
@@ -257,8 +270,7 @@ Simulation time is presented on the x-axis, starting at date `startDate`.
 Each module appears in a colour-coded row, within which each event for that module is displayed corresponding to the sequence of events for that module.
 Note that only the start time of the event is meaningful is these figures: the width of the bar associated with a particular module's event corresponds to the module's timestep unit, not the event's "duration".
 
-```{r sim-eventDiagram, eval=hasSuggests, echo=FALSE, message=FALSE, warning=FALSE}
-library(SpaDES.core)
+```{r sim-eventDiagram, eval=evalTRUE, echo=FALSE, message=FALSE, warning=FALSE}
 
 parameters <- list(
   .globals = list(stackName = "landscape", burnStats = "nPixelsBurned"),
@@ -287,7 +299,7 @@ dev.off()
 unlink(normalizePath(ftmp))
 ```
   
-```{r eventDiagram, echo=FALSE, eval=hasSuggests, fig.height=10, fig.width=7}
+```{r eventDiagram, echo=FALSE, fig.height=10, fig.width=7}
 # overview of the events in the simulation
 # Needs DiagrammeR package
 eventDiagram(mySim, "0000-06-01", n = 200, width = 720)

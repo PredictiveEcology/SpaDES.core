@@ -225,7 +225,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @examples
 #' \donttest{ # Tests take several seconds
 #' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
-#' requireNamespace("NLMR", quietly = TRUE)) {
+#'       packageVersion("SpaDES.tools") > "3.0.0") {
 #' opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
 #' if (!interactive()) opts <- append(opts, options("spades.plots" = NA,
 #'                                                  "spades.debug" = FALSE))

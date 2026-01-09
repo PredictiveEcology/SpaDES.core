@@ -1,12 +1,25 @@
 ## ----setup, include=FALSE-----------------------------------------------------
-SuggestedPkgsNeeded <- c("knitr", "NLMR", "SpaDES.tools")
-hasSuggests <- all(sapply(SuggestedPkgsNeeded, require, character.only = TRUE, quietly = TRUE))
-useSuggests <- !(tolower(Sys.getenv("_R_CHECK_DEPENDS_ONLY_")) == "true")
+# List the vignette-only packages this file *uses*:
+vignette_pkgs <- c("SpaDES.tools", "NLMR")
 
-knitr::opts_chunk$set(eval = hasSuggests && useSuggests)
+# Helper that checks availability without attaching:
+has_pkgs <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
 
-options(spades.moduleCodeChecks = FALSE,
-        spades.useRequire = FALSE)
+# CRAN sets NOT_CRAN = "false"; locally it's usually "true" via devtools::check().
+not_cran <- identical(Sys.getenv("NOT_CRAN"), "true")
+
+# Evaluate code chunks only if:
+#  (a) we're NOT on CRAN, and
+#  (b) all vignette packages are available
+knitr::opts_chunk$set(
+  eval = not_cran && has_pkgs(vignette_pkgs),
+  message = FALSE,
+  warning = FALSE
+)
+
+options(
+  spades.moduleCodeChecks = FALSE,
+  spades.useRequire = FALSE)
 
 ## ----SpaDES-demo, eval=FALSE, echo=TRUE---------------------------------------
 # ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
