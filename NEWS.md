@@ -1,3 +1,7 @@
+# SpaDES.core (development version)
+
+* update `reproducible` dependency version to 3.0.0;
+
 # SpaDES.core 3.0.3
 
 * minor changes for CRAN submission
