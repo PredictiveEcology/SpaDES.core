@@ -787,7 +787,8 @@ setMethod(
           if (length(objNames) == length(objects)) {
             # don't override all objects with user supplied objects if the init events have
             #   been run
-            if (isTRUE(getOption("spades.allowInitDuringSimInit"))) {
+            if (isTRUE(getOption("spades.allowInitDuringSimInit") &&
+                       getOption("spades.dotInputObjects", TRUE))) {
               inputObjectsAllMods <- inputObjects(sim)
               if (is(inputObjectsAllMods, "list"))
                 inputObjectsAllMods <- inputObjectsAllMods |> rbindlist() #@depends@dependencies[names()]@inputObjects[["objectName"]]
@@ -1387,7 +1388,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         # If the init events have gone already, then the "objects" shouldn't override
         #   the outputs of those modules
         objectsToUse <- objects[inputObjectsThisModule[allObjsProvided]]
-        if (isTRUE(getOption("spades.allowInitDuringSimInit"))) {
+        if (isTRUE(getOption("spades.allowInitDuringSimInit") &&
+                   getOption("spades.dotInputObjects", TRUE))) {
           objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
         }
         list2env(objectsToUse, envir = sim@.xData)
@@ -1783,7 +1785,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   depsGrDF <- (depsEdgeList(sim, FALSE) |> .depsPruneEdges())
   #depsGrDF1 <- depsEdgeList(sim, FALSE)
   #depsGrDF <- depsGrDF1[from != to]
-  if (getOption("spades.allowInitDuringSimInit", TRUE)) {
+  if (getOption("spades.allowInitDuringSimInit", TRUE) &&
+      getOption("spades.dotInputObjects", TRUE)) {
     cannotSafelyRunInit <- unique(depsGrDF[from != "_INPUT_"]$to)
     hasUnresolvedInputs <- unique(depsGrDF[from == "_INPUT_"]$to)
     canSafelyRunInit <- setdiff(hasUnresolvedInputs, cannotSafelyRunInit)
@@ -1793,7 +1796,8 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
   loadOrder <- .depsLoadOrder(sim, depsGr) # brings up the loadOrder metadata -- so can add modules that aren't being used
   sim@modules <- sim@modules[na.omit(match(loadOrder, sim@modules))] # na.omit is for loadOrder metadata ones
 
-  if (getOption("spades.allowInitDuringSimInit", TRUE)) {
+  if (getOption("spades.allowInitDuringSimInit", TRUE) &&
+      getOption("spades.dotInputObjects", TRUE)) {
     if (length(canSafelyRunInit) && isTRUE(shouldRunAltSimInit)) {
       # verbose <- getOption("reproducible.verbose")
       messageVerbose(cli::col_yellow("These modules will be run prior to all other modules' .inputObjects"), verbose = verbose)
@@ -1820,7 +1824,9 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
                                        end = as.numeric(end(sim)), timeunit = timeunit(sim)),
                           ._startClockTime = sim[[._txtStartClockTime]])
         simAlt@.xData$._ranInitDuringSimInit <- completed(simAlt)$moduleName
-        messageVerbose(cli::col_yellow("**** Running spades call for:", safeToRunModules, "****"), verbose = verbose)
+        messageVerbose(
+          cli::col_yellow("**** Running init events (spades(events = 'init')) call for:",
+                          safeToRunModules, "****"), verbose = verbose)
         simAltOut <- spades(simAlt, events = "init", debug = debug)
       })
 
