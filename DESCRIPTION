@@ -105,7 +105,6 @@ Collate:
     'code-checking.R'
     'convertToPackage.R'
     'copy.R'
-    'createDESCRIPTIONandDocs.R'
     'debugging.R'
     'downloadData.R'
     'simulation-parseModule.R'

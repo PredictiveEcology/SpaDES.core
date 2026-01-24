@@ -271,10 +271,8 @@ filenameForMainFunctions <- function(module, modulePath = ".")
   normPath(file.path(modulePath, unlist(module), "R", paste0(unlist(basename(module)), "Fns.R")))
 
 
-
-
 DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
-                                      packageFolderName) {
+                                      packageFolderName, verbose = getOption("Require.verbose")) {
   d <- list()
   d$Package <- .moduleNameNoUnderscore(module)
   d$Type <- "Package"
@@ -320,7 +318,7 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
 
   dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
-  origDESCtxt <- read.dcf(dFile)
+  origDESCtxt <- if (file.exists(dFile)) read.dcf(dFile) else character()
 
   cat(paste("Package:", d$Package), file = dFile, sep = "\n")
   cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
@@ -330,12 +328,15 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
   cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
 
-  mergeField(origDESCtxt = origDESCtxt, field = d$Imports, fieldName = "Imports", dFile)
+  if (length(d$Imports) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = d$Imports, fieldName = "Imports", dFile)
 
   suggs <- c('knitr', 'rmarkdown', 'testthat', 'withr', 'roxygen2')
-  mergeField(origDESCtxt = origDESCtxt, field = suggs, fieldName = "Suggests", dFile)
+  if (length(suggs) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = suggs, fieldName = "Suggests", dFile)
 
-  mergeField(origDESCtxt = origDESCtxt, field = d$Remotes, fieldName = "Remotes", dFile)
+  if (length(d$Remotes) || length(origDESCtxt))
+    mergeField(origDESCtxt = origDESCtxt, field = d$Remotes, fieldName = "Remotes", dFile)
 
   cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
   cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
@@ -345,9 +346,11 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
   cat(paste0("RoxygenNote: ", as.character(packageVersion("roxygen2"))), sep = "\n", file = dFile, append = TRUE)
 
 
-  message("New/updated DESCRIPTION file is: ", dFile)
+  messageVerbose("New/updated DESCRIPTION file is: ", dFile, verbose = verbose)
   return(dFile)
 }
+
+
 
 mergeField <- function(origDESCtxt, field, dFile, fieldName = "Imports") {
   fieldVals <- character()
@@ -355,12 +358,11 @@ mergeField <- function(origDESCtxt, field, dFile, fieldName = "Imports") {
     fieldVals <- strsplit(origDESCtxt[, fieldName], split = ",+\n")[[1]]
   if (length(field)) {
     field <- trimRedundancies(unique(c(field, fieldVals)))
+    cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
+        sep = "\n", file = dFile, append = file.exists(dFile))
   }
-  cat(c(paste0(fieldName, ":"), paste("   ", sort(field$packageFullName), collapse = ",\n")),
-      sep = "\n", file = dFile, append = TRUE)
+  field
 }
-
-
 
 documentModule <- function(packageFolderName, gpd, linesWithDefModule) {
   message("Building documentation")
