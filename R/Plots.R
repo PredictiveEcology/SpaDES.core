@@ -87,6 +87,9 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'     }
 #' }
 #'
+#' In the case of `"raw"` or `"object"`, the function will use either `qs2::qs_save` or
+#' `base::saveRDS`, depending on the value of `getOption('reproducible.cacheSaveFormat')`
+#'
 #' @section Recording of files saved:
 #' In cases where files are saved, and where `Plots` is used within a SpaDES module,
 #' the file(s) that is/are saved will be appended to the `outputs` slot of the
@@ -364,6 +367,10 @@ Plots <- function(data, fn, filename,
     }
   }
 
+  useRDS <- getOption("reproducible.cacheSaveFormat") %in% "rds"
+  saveFnChar <- if (useRDS) "base::saveRDS" else "qs2::qs_save"
+  saveFn <- eval(parse(text = saveFnChar))
+
   if (needSaveRaw) {
     if (is(data, "Raster") || is(data, "SpatRaster")) {
       rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
@@ -377,13 +384,14 @@ Plots <- function(data, fn, filename,
         )
     } else {
       rawFilename <- file.path(path, paste0(filename, "_data.qs2"))
-      qs2::qs_save(data, rawFilename)
+      if (useRDS) rawFilename <- swapToRDS(rawFilename)
+      saveFn(data, rawFilename)
       if (exists("sim", inherits = FALSE))
         sim@outputs <- outputsAppend(
           outputs = sim@outputs, saveTime = time(sim),
           objectName = tools::file_path_sans_ext(basename(rawFilename)),
           file = rawFilename,
-          fun = "qs2::qs_save",
+          fun = saveFnChar,
           ...
         )
     }
@@ -437,7 +445,8 @@ Plots <- function(data, fn, filename,
 
     if (any(grepl("object", types))) {
       filename11 <- file.path(path, paste0(filename, "_gg.qs2"))
-      qs2::qs_save(gg, file = filename11)
+      if (useRDS) filename11 <- swapToRDS(filename11)
+      saveFn(gg, file = filename11)
 
       if (exists("sim", inherits = FALSE)) {
         sim@outputs <- outputsAppend(
@@ -445,7 +454,7 @@ Plots <- function(data, fn, filename,
           saveTime = time(sim),
           objectName = tools::file_path_sans_ext(basename(filename11)),
           file = filename11,
-          fun = "qs2::qs_save",
+          fun = saveFnChar,
           ...
         )
       }
@@ -513,4 +522,8 @@ evalAttempt <- function(subs, envir) {
       subs <- subsOrig
   }
   subs
+}
+
+swapToRDS <- function(rawFilename) {
+  gsub("qs2$", "rds", rawFilename)
 }
