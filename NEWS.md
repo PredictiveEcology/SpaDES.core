@@ -3,6 +3,7 @@
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 
   if `options(spades.allowInitDuringSimInit = TRUE)`; previously, this was not respected.
 * update `reproducible` dependency version to 3.0.0;
+* Issue #311: remove duplication that was due to failed merge
 
 # SpaDES.core 3.0.3
 
