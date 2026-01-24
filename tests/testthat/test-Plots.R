@@ -14,6 +14,7 @@ test_that("Plots function 1", {
                NULL)
   .plotInitialTimes <- c(NA_integer_, NA_integer_, 1L, 1L, NA_integer_)
   iii <- 0
+  withr::local_options(reproducible.cacheSaveFormat = "qs2")
   for (out in outs) {
     iii <- iii + 1
     .plotInitialTime <- .plotInitialTimes[iii]
