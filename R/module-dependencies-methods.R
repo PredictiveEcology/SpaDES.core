@@ -63,52 +63,122 @@ setMethod("depsEdgeList",
 
 #' @importFrom data.table as.data.table data.table rbindlist setkeyv setorder
 .depsEdgeList <- function(deps, plot, includeOutputs = FALSE) {
-  if (FALSE) {
-    sim.in <- sim.out <- data.table(objectName = character(0),
-                                    objectClass = character(0),
-                                    module = character(0))
-  } else {
-    sim.in <- sim.out <- data.frame(objectName = character(0),
-                                    objectClass = character(0),
-                                    module = character(0))
-  }
-  lapply(deps@dependencies, function(x) {
-    if (!is.null(x)) {
-      if (FALSE) {
-        z.in <- as.data.table(x@inputObjects)[, .(objectName, objectClass)]
-        if (NROW(z.in) == 0)
-          z.in <- as.data.table(list(objectName = ".dummyIn", objectClass = NA))
-        z.out <- as.data.table(x@outputObjects)[, .(objectName, objectClass)]
-        if (NROW(z.out) == 0)
-          z.in <- as.data.table(list(objectName = ".dummyOut", objectClass = NA))
-        z.in$module <- z.out$module <- x@name
-        if (!all(is.na(z.in[, objectName]), is.na(z.in[, objectClass]))) {
-          sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
-        }
-        if (!all(is.na(z.out[, 1:2]), is.na(z.out[, objectClass]))) {
-          sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
-        }
-      } else {
-        z.in <- x@inputObjects[, c("objectName", "objectClass")]
-        if (NROW(z.in) == 0)
-          z.in <- data.frame(objectName = ".dummyIn", objectClass = NA)
-        z.out <- x@outputObjects[, c("objectName", "objectClass")]
-        if (NROW(z.out) == 0)
-          z.out <- data.frame(objectName = ".dummyIn", objectClass = NA)
-        z.in$module <- z.out$module <- x@name
-        if (!all(is.na(z.in[, "objectName"]), is.na(z.in[, "objectClass"]))) {
-          sim.in <<- rbind(sim.in, z.in)
-          # sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
-        }
-        if (!all(is.na(z.out[, c("objectName")]), is.na(z.out[, "objectClass"]))) {
-          # sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
-          sim.out <<- rbind(sim.out, z.out)
-        }
+  # THIS PREVIOUS APPROACH LED TO ABUNDANT GARBAGE COLLECTION, RESULTING IN 1-2 seconds extra per module;
+  #  rewrite with out "growing objects"
+  # if (FALSE) {
+  #   sim.in <- sim.out <- data.table(objectName = character(0),
+  #                                   objectClass = character(0),
+  #                                   module = character(0))
+  # } else {
+  #   sim.in <- sim.out <- data.frame(objectName = character(0),
+  #                                   objectClass = character(0),
+  #                                   module = character(0))
+  # }
+  # lapply(deps@dependencies, function(x) {
+  #   if (!is.null(x)) {
+  #     if (FALSE) {
+  #       z.in <- as.data.table(x@inputObjects)[, .(objectName, objectClass)]
+  #       if (NROW(z.in) == 0)
+  #         z.in <- as.data.table(list(objectName = ".dummyIn", objectClass = NA))
+  #       z.out <- as.data.table(x@outputObjects)[, .(objectName, objectClass)]
+  #       if (NROW(z.out) == 0)
+  #         z.in <- as.data.table(list(objectName = ".dummyOut", objectClass = NA))
+  #       z.in$module <- z.out$module <- x@name
+  #       if (!all(is.na(z.in[, objectName]), is.na(z.in[, objectClass]))) {
+  #         sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
+  #       }
+  #       if (!all(is.na(z.out[, 1:2]), is.na(z.out[, objectClass]))) {
+  #         sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
+  #       }
+  #     } else {
+  #       z.in <- x@inputObjects[, c("objectName", "objectClass")]
+  #       if (NROW(z.in) == 0 || all(is.na(z.in$objectName))) {
+  #         z.in <- data.frame(objectName = ".dummyIn", objectClass = ".dummyIn")
+  #       }
+  #       z.out <- x@outputObjects[, c("objectName", "objectClass")]
+  #       if (NROW(z.out) == 0 || all(is.na(z.out$objectName))) {
+  #         browser()
+  #         z.out <- data.frame(objectName = ".dummyOut", objectClass = ".dummyOut")
+  #       }
+  #       z.in$module <- z.out$module <- x@name
+  #       if (!all(is.na(z.in[, "objectName"]), is.na(z.in[, "objectClass"]))) {
+  #         sim.in <<- rbind(sim.in, z.in)
+  #         # sim.in <<- rbindlist(list(sim.in, z.in), use.names = TRUE)
+  #       }
+  #       if (!all(is.na(z.out[, c("objectName")]), is.na(z.out[, "objectClass"]))) {
+  #         # sim.out <<- rbindlist(list(sim.out, z.out), use.names = TRUE)
+  #         sim.out <<- rbind(sim.out, z.out)
+  #       }
+  #
+  #     }
+  #   }
+  #   return(invisible(NULL)) # return from the lapply
+  # })
+  #
+  # setDT(sim.in)
+  # setDT(sim.out)
 
-      }
+  .dummyIn  <- data.frame(objectName = ".dummyIn",  objectClass = ".dummyIn",  stringsAsFactors = FALSE)
+  .dummyOut <- data.frame(objectName = ".dummyOut", objectClass = ".dummyOut", stringsAsFactors = FALSE)
+
+  # This is attempt #1; subsequently rewritten next with simpler code; even fewer copies/gc
+  # outHere <- lapply(deps@dependencies, function(x) {
+  #   ret <- NULL
+  #   if (!is.null(x)) {
+  #     z.in <- x@inputObjects[, c("objectName", "objectClass")]
+  #     if (NROW(z.in) == 0 || all(is.na(z.in$objectName))) {
+  #       z.in <- .dummyIn
+  #     }
+  #     z.out <- x@outputObjects[, c("objectName", "objectClass")]
+  #     if (NROW(z.out) == 0 || all(is.na(z.out$objectName))) {
+  #       z.out <- .dummyOut
+  #     }
+  #     z.in$module <- z.out$module <- x@name
+  #     ret <- list(inputs = NULL, outputs = NULL)
+  #     if (!all(is.na(z.in[, "objectName"]), is.na(z.in[, "objectClass"]))) {
+  #       ret[["inputs"]] <- z.in
+  #     }
+  #     if (!all(is.na(z.out[, c("objectName")]), is.na(z.out[, "objectClass"]))) {
+  #       ret[["outputs"]] <- z.out
+  #     }
+  #   }
+  #   return(invisible(ret)) # return from the lapply
+  # })
+
+  # This new approach is simpler and doesn't trigger copious gc() because of the ever growing sim.in/sim.out
+  outHere <- lapply(deps@dependencies, function(x) {
+    if (is.null(x)) return(NULL)
+
+    io_in  <- x@inputObjects
+    io_out <- x@outputObjects
+
+    if (NROW(io_in) == 0 || all(is.na(io_in$objectName))) {
+      io_in <- .dummyIn
     }
-    return(invisible(NULL)) # return from the lapply
+
+    if (NROW(io_out) == 0 || all(is.na(io_out$objectName))) {
+      io_out <- .dummyOut
+    }
+
+    list(
+      inputs  = if (NROW(io_in))  io_in  else NULL,   # no subsetting/copy
+      outputs = if (NROW(io_out)) io_out else NULL
+    )
   })
+
+  colsToUse <- c("objectName", "objectClass", "module")
+  if (is.null(outHere[[1]])) {
+    sim.in <- list(character(), character(), character()) |> setNames(colsToUse) |> setDT()
+    sim.out <- list(character(), character(), character()) |> setNames(colsToUse) |> setDT()
+  } else {
+    outThere <- Require::invertList(outHere)
+    sim.in <- rbindlist(outThere$inputs, idcol = "module", fill = TRUE)[, ..colsToUse]
+    sim.out <- rbindlist(outThere$outputs, idcol = "module", fill = TRUE)[, ..colsToUse]
+  }
+
+  # This was to assert that the old way and new way were identical
+  # if (!isTRUE(all.equal(sim.in, sim.in2))) browser()
+  # if (!isTRUE(all.equal(sim.out, sim.out2))) browser()
 
   setkeyv(setDT(sim.in), "objectName")
   setkeyv(setDT(sim.out), "objectName")
