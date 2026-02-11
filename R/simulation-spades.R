@@ -913,7 +913,12 @@ setMethod(
       if (!useLoggingPkg)
         debug <- unlist(debug)
       # }
+    } 
+    if (!identical(debug, getOption("spades.debug"))) {
+      opts <- options("spades.debug" = debug)
+      on.exit(options(opts), add = TRUE)
     }
+    
 
     ## need to recheck package loading because `simInit` may have been cached
     if (getOption("spades.loadReqdPkgs", TRUE)) {

@@ -399,10 +399,18 @@ setMethod(
     # rcae <- get(reproducible.CacheAddressEnv)
     # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
     # on.exit(rm(rcae))
-    debug <- list(...)$debug
-    if (is.null(debug))
-      rm(debug, inherits = FALSE)
-    debug <- getDebug() # from options first, then override if in a simInitAndSpades
+    debug <- list(...)$debug # it is not an arg for `simInit`--> it is only in `spades`; but if `simInitAndSpades`
+    #  and really, it should be in `simInit`
+    if (is.null(debug)) 
+      debug <- getOption("spades.debug")
+      # rm(debug, inherits = FALSE)
+    
+    if (!identical(debug, getOption("spades.debug"))) {
+      opts <- options("spades.debug" = debug)
+      on.exit(options(opts), add = TRUE)
+    }
+    
+    debug <- getDebug(debug = debug) # from options first, then override if in a simInitAndSpades
     if  (is.call(debug))
       debug <- eval(debug)
     verbose <- debugToVerbose(debug)
@@ -1236,6 +1244,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   passedArgsNames <- setdiff(names(passedArgs), formsOnlySpades)
   namesMatchCall <- names(match.call())
   defaultArgs <- .fillInSimInit(list(), namesMatchCall)
+  
+  if (!identical(debug, getOption("spades.debug"))) {
+    opts <- options("spades.debug" = debug)
+    on.exit(options(opts), add = TRUE)
+  }
+  
   simInitCall <- as.call(x = append(list(simInit), append(passedArgs[passedArgsNames], defaultArgs)))
   sim <- eval(simInitCall, envir = parent.frame())
 
@@ -2003,18 +2017,21 @@ stopMessForRequireFail <- function(pkg) {
   })
 }
 
-getDebug <- function() {
-  hasDebug <- .whereInStack("debug")
-  # hasDebug <- tryCatch(.whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
-  debug <- getOption("spades.debug")
-  if (!is.null(hasDebug)) {
-    # if (!isFALSE(hasDebug)) {
-    newDebug <- get0("debug", hasDebug, inherits = FALSE)#, silent = TRUE)
-    # newDebug <- try(get("debug", hasDebug), silent = TRUE)
-    if (!is.null(newDebug))
-      # if (!is(newDebug, "try-error"))
-      debug <- newDebug
-  }
+getDebug <- function(debug = NULL, envir = parent.frame()) {
+  if (is.function(debug))
+    debug <- NULL
+  if (is.null(debug))
+    # hasDebug <- tryCatch(.whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+    debug <- getOption("spades.debug")
+  # if (!is.null(hasDebug)) {
+  #   hasDebug <- .whereInStack("debug", startingEnv = envir)
+  #   # if (!isFALSE(hasDebug)) {
+  #   newDebug <- get0("debug", hasDebug, inherits = FALSE)#, silent = TRUE)
+  #   # newDebug <- try(get("debug", hasDebug), silent = TRUE)
+  #   if (!is.null(newDebug))
+  #     # if (!is(newDebug, "try-error"))
+  #     debug <- newDebug
+  # }
   debug
 }
 
