@@ -808,6 +808,12 @@ setMethod(
               objectsToUse <- objects
             }
 
+            if (length(objectsToUse) && verbose) {
+              messageNewObjects(
+                objectsToUse[order(names(objectsToUse))], verbose = verbose,
+                prefix = "User-supplied objects passed into sim for spades call:")
+            }
+
             if (NROW(objectsToUse))
               objs(sim) <- objectsToUse
           } else {
@@ -1406,6 +1412,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                    getOption("spades.dotInputObjects", TRUE))) {
           objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
         }
+        if (length(objectsToUse) && verbose) {
+          messageNewObjects(
+            objectsToUse[order(names(objectsToUse))], verbose = verbose,
+            prefix = "User-supplied objects passed into sim for .inputObjects:")
+        }
         list2env(objectsToUse, envir = sim@.xData)
       }
       a <- P(sim, ._txtDotUseCache, mBase)
@@ -1421,8 +1432,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         }
       }
 
-      # message(cli::col_green("Running .inputObjects for ", mBase, sep = ""))
-
       cur <- sim@current
       curModNam <- cur$moduleName
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
@@ -1431,8 +1440,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       }
       debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam)
 
-      if (!(FALSE %in% debug || any(is.na(debug))))
+      if (verbose) {
         objsIsNullBefore <- objsAreNull(sim)
+      }
 
       # allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
       if (isTRUE(cacheIt)) {
@@ -1590,7 +1600,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       #   sim <- allowSequentialCachingFinal(sim)
       # }
 
-      if (!(FALSE %in% debug || any(is.na(debug)))) {
+      if (verbose) {
         sim <- objectsCreatedPost(sim, objsIsNullBefore, verbose = verbose)
       }
       evalPostEvent() # this is getOption("spades.debugPrint")
@@ -1932,11 +1942,12 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates,
 objectsCreatedPost <- function(sim, objsIsNullBefore, verbose = getOption("reproducible.verbose")) {
   objsIsNullAfter <- objsAreNull(sim)
   newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
-  if (length(newObjs)) {
-    df <- data.frame(newObjects = names(newObjs))
-    messageColoured("New objects created:", colour = "yellow", verbose = verbose)
-    messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
-    setDT(df)
+  # browser()
+  if (length(newObjs[unname(newObjs)])) {
+    df <- messageNewObjects(newObjs, verbose = verbose)
+    # df <- data.frame(newObjects = names(newObjs))
+    # messageColoured("New objects created:", colour = "yellow", verbose = verbose)
+    # messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
     sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit = sim@simtimes$timeunit, sim@.xData)
     set(df, NULL, names(sim@current), sim@current)
     if (is.null(sim$._objectsCreated))
@@ -1946,10 +1957,21 @@ objectsCreatedPost <- function(sim, objsIsNullBefore, verbose = getOption("repro
   sim
 }
 
+
+messageNewObjects <- function(newObjs, prefix = "New objects created:", verbose = getOption("reproducible.verbose")) {
+  df <- data.frame(newObjects = names(newObjs))
+  messageColoured(prefix, colour = "yellow", verbose = verbose)
+  messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
+  setDT(df)
+}
+
 objsAreNull <- function(sim) {
-  mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
+  areNULL <- mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
                          ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
                     envir = envir(sim)), function(obj) is.null(obj))
+  # browser()
+  # areAbsent <- inputObjects(sim, currentModule(sim))$objectName
+  areNULL
 }
 
 adjustModuleNameSpacing <- function(modNames) {
@@ -2218,3 +2240,4 @@ classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, m
        # .globals = globsWoKnowns,
        modules = mBase)
 }
+
