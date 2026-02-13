@@ -653,7 +653,7 @@ evalAttempt <- function(subs, envir) {
 }
 
 
-strip_ggplot_metadata <- function(p) {
+strip_ggplot_metadataOld <- function(p) {
   # 1. Main Data
   p$data <- p$data[0, , drop = FALSE]
 
@@ -755,3 +755,155 @@ rmDups <- function(sim) {
   }
   sim
 }
+
+# Canonical digestable representation of a ggplot object
+# Returns a base R list with deterministic ordering & values.
+# You can serialize with jsonlite::toJSON(auto_unbox=TRUE, null="null", digits=15)
+# and hash with digest::digest(., algo = "sha256")
+
+# Canonical digestable representation of a ggplot object
+# Adds data-dependent fingerprints from ggplot_build().
+# Output is a base R list; serialize (e.g., jsonlite::toJSON) then hash.
+
+# Canonical digestable representation of a ggplot object
+# Adds data-dependent fingerprints from ggplot_build().
+# Output is a base R list; serialize (e.g., jsonlite::toJSON) then hash.
+
+strip_ggplot_metadata <- canonicalize_ggplot <- function(
+    p,
+    numeric_digits = 15#,
+    #hash_fun = function(x) digest::digest(x, algo = "xxhash64")
+) {
+  stopifnot(inherits(p, "ggplot"))
+  
+  `%||%` <- function(x, y) if (is.null(x)) y else x
+  
+  as_label_safe <- function(x) {
+    if (is.null(x)) return(NULL)
+    tryCatch(rlang::as_label(x), error = function(e) NULL)
+  }
+  
+  map_labels <- function(m) {
+    if (is.null(m)) return(NULL)
+    out <- lapply(m, as_label_safe)
+    out[order(names(out))]
+  }
+  
+  drop_nulls <- function(x) if (is.null(x)) NULL else x[!vapply(x, is.null, logical(1))]
+  sort_list_recursive <- function(x) {
+    if (is.list(x) && !is.null(names(x))) x <- x[order(names(x))]
+    lapply(x, function(v) if (is.list(v)) sort_list_recursive(v) else v)
+  }
+  
+  keep_simple_fields <- function(x) {
+    if (is.null(x)) return(NULL)
+    y <- list()
+    nms <- names(x)
+    for (nm in nms) {
+      v <- x[[nm]]
+      if (is.atomic(v) && !is.object(v)) {
+        y[[nm]] <- v
+      } else if (is.list(v) && all(vapply(v, function(i) is.atomic(i) && !is.object(i), logical(1)))) {
+        y[[nm]] <- v
+      }
+    }
+    drop_nulls(y)
+  }
+  
+  # --- RAW DATA DIGEST -------------------------------------------------------
+  raw_plot_data_digest <- if (is.data.frame(p$data)) .robustDigest(p$data) else NULL
+  
+  raw_layer_data <- lapply(p$layers, function(l) {
+    if (is.null(l$data)) {
+      list(source = "plot", digest = raw_plot_data_digest)
+    } else if (is.data.frame(l$data)) {
+      list(source = "layer", digest = .robustDigest(l$data))
+    } else {
+      # data as function or other object -> hash its deparsed form
+      list(source = "other", digest = .robustDigest(utils::capture.output(str(l$data))))
+    }
+  })
+  
+  # --- SPEC PART (same as before) --------------------------------------------
+  plot_data_cols <- if (is.data.frame(p$data)) sort(names(p$data)) else NULL
+  plot_mapping   <- map_labels(p$mapping)
+  
+  layers_spec <- lapply(seq_along(p$layers), function(i) {
+    l <- p$layers[[i]]
+    list(
+      geom_class     = class(l$geom)[1],
+      stat_class     = class(l$stat)[1],
+      position_class = class(l$position)[1],
+      inherit_aes    = isTRUE(l$inherit.aes),
+      mapping        = map_labels(l$mapping),
+      aes_params     = keep_simple_fields(l$aes_params),
+      geom_params    = keep_simple_fields(l$geom_params),
+      stat_params    = keep_simple_fields(l$stat_params),
+      show_legend    = if (is.null(l$show.legend)) NULL else as.character(l$show.legend),
+      data_digest    = raw_layer_data[[i]]   # <-- added here
+    )
+  })
+  
+  facet <- NULL
+  if (!is.null(p$facet$params)) {
+    fp <- p$facet$params
+    facet <- list(
+      facet_class = class(p$facet)[1],
+      vars        = if (!is.null(fp$facets)) sort(names(fp$facets)) else NULL,
+      nrow        = fp$nrow %||% NULL,
+      ncol        = fp$ncol %||% NULL,
+      free        = fp$free   %||% NULL,
+      strip_pos   = fp$strip.position %||% NULL
+    )
+  }
+  
+  scales <- lapply(p$scales$scales, function(s) {
+    list(
+      scale_class = class(s)[1],
+      aesthetics  = sort(unique(s$aesthetics %||% character(0))),
+      limits      = s$limits,
+      trans       = tryCatch(s$trans$name, error = function(e) NULL),
+      position    = s$position %||% NULL,
+      guide       = if (!is.null(s$guide) && !is.logical(s$guide)) as.character(s$guide) else s$guide
+    )
+  })
+  
+  coords <- list(
+    coord_class = class(p$coordinates)[1],
+    params      = keep_simple_fields(p$coordinates)
+  )
+  
+  theme_elems <- NULL
+  if (length(p$theme)) {
+    theme_elems <- lapply(as.list(p$theme), keep_simple_fields)
+    theme_elems <- drop_nulls(theme_elems)
+    if (length(theme_elems)) theme_elems <- theme_elems[order(names(theme_elems))]
+  }
+  
+  labels <- NULL
+  if (!is.null(p$labels) && length(p$labels)) {
+    labels <- lapply(p$labels, function(v) {
+      if (is.symbol(v) || rlang::is_quosure(v)) as_label_safe(v) else as.character(v)
+    })
+    labels <- labels[order(names(labels))]
+  }
+  
+  out <- list(
+    spec_version = "ggplot-dna/3",
+    data_cols    = plot_data_cols,
+    data_digest  = raw_plot_data_digest,   # <-- also top-level digest
+    mapping      = plot_mapping,
+    layers       = layers_spec,
+    scales       = scales,
+    coordinates  = coords,
+    facet        = facet,
+    labels       = labels,
+    theme        = theme_elems
+  )
+  
+  out <- drop_nulls(out)
+  out <- sort_list_recursive(out)
+  out
+}
+      
+`%||%` <- function(x, y) if (is.null(x)) y else x
