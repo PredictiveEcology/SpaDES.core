@@ -1942,8 +1942,7 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates,
 objectsCreatedPost <- function(sim, objsIsNullBefore, verbose = getOption("reproducible.verbose")) {
   objsIsNullAfter <- objsAreNull(sim)
   newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
-  # browser()
-  if (length(newObjs[unname(newObjs)])) {
+  if (length(newObjs[!unname(newObjs)])) {
     df <- messageNewObjects(newObjs, verbose = verbose)
     # df <- data.frame(newObjects = names(newObjs))
     # messageColoured("New objects created:", colour = "yellow", verbose = verbose)
