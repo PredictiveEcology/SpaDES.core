@@ -1435,7 +1435,7 @@ setMethod(
     expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
-  if (debugToVerbose(debug)) {
+  if (verbose) {
     objsIsNullBefore <- objsAreNull(sim)
   }
 
@@ -1502,7 +1502,7 @@ setMethod(
     }
   }
 
-  if (debugToVerbose(debug)) {
+  if (verbose) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore, verbose = verbose)
   }
   evalPostEvent() # this is getOption("spades.evalPostEvent")
