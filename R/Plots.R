@@ -346,7 +346,7 @@ Plots <- function(data, fn, filename,
       }
     } else {
       if ( (needScreen || needSave) ) {
-        if (is.null(data)) {
+        if (missing(data) || is.null(data)) {
           gg <- fn(...)
         } else {
           gg <- NULL
@@ -506,7 +506,11 @@ Plots <- function(data, fn, filename,
         # the plot saving ###
         do.call(type, modifyList2(list(theFilename), deviceArgs))
         if (isTRUE(fnIsPlot)) clearPlot()
-        plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
+        if (missing(data) || is.null(data)) {
+          plotted <- fn(...)
+        } else {
+          plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
+        }
         dev.off()
         # end plot saving ###
 
@@ -581,8 +585,10 @@ Plots <- function(data, fn, filename,
   }
 
   if (!useCache %in% FALSE) {
+    typesNoScreen <- setdiff(types, "screen")
     for (i in seq(filenamesForSave)) {
-      type <- types[i]
+      if (exists("aaaa", envir = .GlobalEnv)) browser()
+      type <- typesNoScreen[i]
       filenameSaved <- .robustDigest(asPath(filenamesForSave[i]))[[1]]
       if (needNewPlot)
         .addTagsRepo(cacheId, cachePath = cachePath(sim), tagKey = tagKeySavedFile, tagValue = paste0(type, ":", filenameSaved))
