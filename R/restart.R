@@ -89,7 +89,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- restartSpades(s)
 #'
 #' }
-restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE,
+restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = TRUE,
                           verbose = getOption("reproducible.verbose", 1L), ...) {
   message("This is experimental and should be used with caution.")
 
