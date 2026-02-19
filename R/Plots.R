@@ -599,6 +599,7 @@ Plots <- function(data, fn, filename,
     assign("sim", sim, envir = simIsIn)
   }
 
+  on.exit() # clear the clearCache if it gets to here
   if (exists("gg", inherits = FALSE))
     return(invisible(gg))
   else
@@ -729,6 +730,11 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame()) {
     allArgs[["data"]] <- .robustDigest(metadata)
   }
   cached <- list(allArgs) |> Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
+  on.exit2({
+    clearCache(cacheId = cacheId(cached), ask = FALSE, verbose = FALSE)
+    message("Plots did not complete; clearing the cached record")
+    })
+  
   ret <- attr(cached, ".Cache")$newCache %in% TRUE
   attributes(ret) <- attributes(cached)
   if (ret %in% FALSE) { # means it doesn't need a new plotting
