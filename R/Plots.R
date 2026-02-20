@@ -729,7 +729,8 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame()) {
     metadata <- strip_ggplot_metadata(allArgs$data)
     allArgs[["data"]] <- .robustDigest(metadata)
   }
-  cached <- list(allArgs) |> Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
+  cached <- list(allArgs) |>
+    Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
   on.exit2({
     clearCache(cacheId = cacheId(cached), ask = FALSE, verbose = FALSE)
     message("Plots did not complete; clearing the cached record")
