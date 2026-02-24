@@ -15,6 +15,7 @@ utils::globalVariables(c(
 ## TODO: why aren't these properly exported if intended for use?
 ## see <https://github.com/PredictiveEcology/Require/issues/105>
 ## and <https://github.com/PredictiveEcology/reproducible/issues/389>
+on.exit2 <- getFromNamespace("on.exit2", "reproducible")
 compareVersion2 <- getFromNamespace("compareVersion2", "Require")
 extractInequality <- getFromNamespace("extractInequality", "Require")
 GETWauthThenNonAuth <- getFromNamespace("GETWauthThenNonAuth", "Require")
