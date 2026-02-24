@@ -318,8 +318,12 @@ Plots <- function(data, fn, filename,
   if (exists("aaaa", envir = .GlobalEnv)) browser()
 
   needNewPlot <- TRUE
-  if (length(intersect(useCache, types)) > 0 || !useCache %in% FALSE) {
-    useCacheNNP <- useCacheNeedNewPlot(filenamesForSave) # creates a TRUE if it needs new plot
+  
+  useCache <- (length(setdiff(types, "screen")) > 0 && 
+                 (!useCache %in% FALSE || 
+                    length(intersect(types, useCache))))
+  if (useCache) {
+    useCacheNNP <- useCacheNeedNewPlot(filenamesForSave, ...) # creates a TRUE if it needs new plot
     cacheId <- cacheId(useCacheNNP)
     needNewPlot <- useCacheNNP
   }
@@ -584,7 +588,7 @@ Plots <- function(data, fn, filename,
     }
   }
 
-  if (!useCache %in% FALSE) {
+  if (useCache) {
     typesNoScreen <- setdiff(types, "screen")
     for (i in seq(filenamesForSave)) {
       if (exists("aaaa", envir = .GlobalEnv)) browser()
@@ -715,12 +719,13 @@ strip_ggplot_metadataOld <- function(p) {
 }
 
 
-useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame()) {
+useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
   allArgs <- mget(formalArgs(Plots), envir = envir)
   # check dots
-  allNamed <- names(allArgs) %in% formalArgs(Plots)
+  mc <- match.call(Plots, sys.call(-1), expand.dots = TRUE)[-1]
+  allNamed <- names(mc) %in% formalArgs(Plots)
   if (any(allNamed %in% FALSE)) {
-    dotArgs <- mget(names(allArgs)[!allNamed], envir = envir)
+    dotArgs <- list(...)
     allArgs <- append(allArgs, dotArgs)
   }
   allArgs$envir <- NULL
@@ -729,9 +734,8 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame()) {
     metadata <- strip_ggplot_metadata(allArgs$data)
     allArgs[["data"]] <- .robustDigest(metadata)
   }
-  cached <- list(allArgs) |>
-    Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
-  on.exit2({
+  cached <- list(allArgs) |> Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
+  reproducible:::on.exit2({
     clearCache(cacheId = cacheId(cached), ask = FALSE, verbose = FALSE)
     message("Plots did not complete; clearing the cached record")
     })
