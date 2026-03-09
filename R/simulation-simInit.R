@@ -670,7 +670,7 @@ setMethod(
         # This is the call to Init with allowInitDuringSimInit
         sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs, verbose = verbose)
         if (length(sim@completed))
-          sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$module, .coreModules())
+          sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$moduleName, .coreModules())
         loadOrderPoss <- unlist(unname(sim@modules))
         if (length(missingInLoadOrder)) {
           if (any(match(loadOrder, loadOrderPoss) != seq_along(loadOrder))) {
