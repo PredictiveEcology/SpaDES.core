@@ -122,6 +122,14 @@ setMethod(
 
     envirHash <- rmLength0Recursive(envirHash)
     envirHash <- upgradeModsToXdata(envirHash, upgradeModsToXdata, moduleFunctionEnvir)
+    
+    # special objects -- like .objectSynonyms
+    specialObjNames <- c(".objectSynonyms")
+    specialObjNames <- intersect(names(object), specialObjNames)
+    if (length(specialObjNames)) {
+      specialObjHash <- .robustDigest(mget(specialObjNames, envir = envir(object)))
+      envirHash$.xData <- append(envirHash$.xData, specialObjHash)
+    }
 
     if (FALSE) {
       eh <- envirHash[names(envirHash)[names(envirHash) %in% names(moduleFunctionEnvir)]]
