@@ -15,6 +15,7 @@ Plots(
   usePlot = getOption("spades.PlotsUsePlot", FALSE),
   deviceArgs = list(),
   envir = parent.frame(),
+  useCache = FALSE,
   ...
 )
 }

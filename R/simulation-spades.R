@@ -913,7 +913,12 @@ setMethod(
       if (!useLoggingPkg)
         debug <- unlist(debug)
       # }
+    } 
+    if (!identical(debug, getOption("spades.debug"))) {
+      opts <- options("spades.debug" = debug)
+      on.exit(options(opts), add = TRUE)
     }
+    
 
     ## need to recheck package loading because `simInit` may have been cached
     if (getOption("spades.loadReqdPkgs", TRUE)) {
@@ -1430,7 +1435,7 @@ setMethod(
     expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
-  if (debugToVerbose(debug)) {
+  if (verbose) {
     objsIsNullBefore <- objsAreNull(sim)
   }
 
@@ -1497,7 +1502,7 @@ setMethod(
     }
   }
 
-  if (debugToVerbose(debug)) {
+  if (verbose) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore, verbose = verbose)
   }
   evalPostEvent() # this is getOption("spades.evalPostEvent")
@@ -1583,7 +1588,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
     allObjNames <- outputObjectNames(sim)
   }
 
-  if (is.null(rmo))
+  if (is.null(rmo)) {
     rmo <- list(
       recoverModeTiming = 0,
       recoverableObjs = list(),
@@ -1591,6 +1596,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
       addedEvents = list(list()),
       randomSeed = list(list())
     )
+  }
 
   # Remove the tail entry in each of the lists
   if (length(rmo$addedEvents) > (recoverMode - 1))
@@ -1608,7 +1614,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
 
   if (length(sim@events) > 0) {
     curMod <- sim@events[[1]][["moduleName"]]
-    objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod  ]]
+    objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
 
     mess <- capture.output(type = "message", {
@@ -1627,22 +1633,24 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
     })
 
     if (exists(curMod, envir = sim[[dotObjs]])) {
-      if (!is.null(sim[[dotObjs]][[curMod]])) {
-        # if (exists(".objects", sim[[dotObjs]][[curMod]])) {
+      newList <- if (!is.null(sim[[dotObjs]][[curMod]])) {
           modObjEnv <- sim[[dotObjs]][[curMod]]# $.objects
-          objsInModObjects <- ls(modObjEnv)
-          mess2 <- capture.output(type = "message",
-                                  rmo$recoverableModObjs <- append(list(if (length(objsInModObjects)) {
-                                    Copy(mget(objsInModObjects, envir = modObjEnv),
-                                         # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
-                                         filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
-
-                                  } else {
-                                    list()
-                                  }), rmo$recoverableModObjs)
-          )
-        # }
+          objsInModObjects <- ls(modObjEnv, all.names = TRUE)
+          list(
+            if (length(objsInModObjects)) {
+              Copy(mget(objsInModObjects, envir = modObjEnv),
+                   # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                   filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
+            } else {
+              list()
+            })
+      } else {
+        list()
       }
+      names(newList) <- curMod
+      mess2 <- capture.output(type = "message",
+                              rmo$recoverableModObjs <- append(newList, rmo$recoverableModObjs)
+      )
     }
 
     mess <- grep("Hardlinked version", mess, invert = TRUE)

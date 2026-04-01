@@ -399,10 +399,18 @@ setMethod(
     # rcae <- get(reproducible.CacheAddressEnv)
     # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
     # on.exit(rm(rcae))
-    debug <- list(...)$debug
-    if (is.null(debug))
-      rm(debug, inherits = FALSE)
-    debug <- getDebug() # from options first, then override if in a simInitAndSpades
+    debug <- list(...)$debug # it is not an arg for `simInit`--> it is only in `spades`; but if `simInitAndSpades`
+    #  and really, it should be in `simInit`
+    if (is.null(debug)) 
+      debug <- getOption("spades.debug")
+      # rm(debug, inherits = FALSE)
+    
+    if (!identical(debug, getOption("spades.debug"))) {
+      opts <- options("spades.debug" = debug)
+      on.exit(options(opts), add = TRUE)
+    }
+    
+    debug <- getDebug(debug = debug) # from options first, then override if in a simInitAndSpades
     if  (is.call(debug))
       debug <- eval(debug)
     verbose <- debugToVerbose(debug)
@@ -662,7 +670,7 @@ setMethod(
         # This is the call to Init with allowInitDuringSimInit
         sim <- resolveDepsRunInitIfPoss(sim, modules, paths, params, objects, inputs, outputs, verbose = verbose)
         if (length(sim@completed))
-          sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$module, .coreModules())
+          sim@.xData$._ranInitDuringSimInit <- setdiff(completed(sim)$moduleName, .coreModules())
         loadOrderPoss <- unlist(unname(sim@modules))
         if (length(missingInLoadOrder)) {
           if (any(match(loadOrder, loadOrderPoss) != seq_along(loadOrder))) {
@@ -798,6 +806,12 @@ setMethod(
               objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
             } else {
               objectsToUse <- objects
+            }
+
+            if (length(objectsToUse) && verbose) {
+              messageNewObjects(
+                objectsToUse[order(names(objectsToUse))], verbose = verbose,
+                prefix = "User-supplied objects passed into sim for spades call:")
             }
 
             if (NROW(objectsToUse))
@@ -1236,6 +1250,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   passedArgsNames <- setdiff(names(passedArgs), formsOnlySpades)
   namesMatchCall <- names(match.call())
   defaultArgs <- .fillInSimInit(list(), namesMatchCall)
+  
+  if (!identical(debug, getOption("spades.debug"))) {
+    opts <- options("spades.debug" = debug)
+    on.exit(options(opts), add = TRUE)
+  }
+  
   simInitCall <- as.call(x = append(list(simInit), append(passedArgs[passedArgsNames], defaultArgs)))
   sim <- eval(simInitCall, envir = parent.frame())
 
@@ -1392,6 +1412,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                    getOption("spades.dotInputObjects", TRUE))) {
           objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
         }
+        if (length(objectsToUse) && verbose) {
+          messageNewObjects(
+            objectsToUse[order(names(objectsToUse))], verbose = verbose,
+            prefix = "User-supplied objects passed into sim for .inputObjects:")
+        }
         list2env(objectsToUse, envir = sim@.xData)
       }
       a <- P(sim, ._txtDotUseCache, mBase)
@@ -1407,8 +1432,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         }
       }
 
-      # message(cli::col_green("Running .inputObjects for ", mBase, sep = ""))
-
       cur <- sim@current
       curModNam <- cur$moduleName
       if (!(all(unlist(lapply(debug, identical, FALSE))))) {
@@ -1417,8 +1440,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       }
       debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam)
 
-      if (!(FALSE %in% debug || any(is.na(debug))))
+      if (verbose) {
         objsIsNullBefore <- objsAreNull(sim)
+      }
 
       # allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
       if (isTRUE(cacheIt)) {
@@ -1576,7 +1600,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       #   sim <- allowSequentialCachingFinal(sim)
       # }
 
-      if (!(FALSE %in% debug || any(is.na(debug)))) {
+      if (verbose) {
         sim <- objectsCreatedPost(sim, objsIsNullBefore, verbose = verbose)
       }
       evalPostEvent() # this is getOption("spades.debugPrint")
@@ -1918,11 +1942,11 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates,
 objectsCreatedPost <- function(sim, objsIsNullBefore, verbose = getOption("reproducible.verbose")) {
   objsIsNullAfter <- objsAreNull(sim)
   newObjs <- setdiffNamed(objsIsNullAfter, objsIsNullBefore)
-  if (length(newObjs)) {
-    df <- data.frame(newObjects = names(newObjs))
-    messageColoured("New objects created:", colour = "yellow", verbose = verbose)
-    messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
-    setDT(df)
+  if (length(newObjs[!unname(newObjs)])) {
+    df <- messageNewObjects(newObjs, verbose = verbose)
+    # df <- data.frame(newObjects = names(newObjs))
+    # messageColoured("New objects created:", colour = "yellow", verbose = verbose)
+    # messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
     sim@current$eventTime <- convertTimeunit(sim@current$eventTime, unit = sim@simtimes$timeunit, sim@.xData)
     set(df, NULL, names(sim@current), sim@current)
     if (is.null(sim$._objectsCreated))
@@ -1932,10 +1956,21 @@ objectsCreatedPost <- function(sim, objsIsNullBefore, verbose = getOption("repro
   sim
 }
 
+
+messageNewObjects <- function(newObjs, prefix = "New objects created:", verbose = getOption("reproducible.verbose")) {
+  df <- data.frame(newObjects = names(newObjs))
+  messageColoured(prefix, colour = "yellow", verbose = verbose)
+  messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
+  setDT(df)
+}
+
 objsAreNull <- function(sim) {
-  mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
+  areNULL <- mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
                          ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
                     envir = envir(sim)), function(obj) is.null(obj))
+  # browser()
+  # areAbsent <- inputObjects(sim, currentModule(sim))$objectName
+  areNULL
 }
 
 adjustModuleNameSpacing <- function(modNames) {
@@ -2003,18 +2038,21 @@ stopMessForRequireFail <- function(pkg) {
   })
 }
 
-getDebug <- function() {
-  hasDebug <- .whereInStack("debug")
-  # hasDebug <- tryCatch(.whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
-  debug <- getOption("spades.debug")
-  if (!is.null(hasDebug)) {
-    # if (!isFALSE(hasDebug)) {
-    newDebug <- get0("debug", hasDebug, inherits = FALSE)#, silent = TRUE)
-    # newDebug <- try(get("debug", hasDebug), silent = TRUE)
-    if (!is.null(newDebug))
-      # if (!is(newDebug, "try-error"))
-      debug <- newDebug
-  }
+getDebug <- function(debug = NULL, envir = parent.frame()) {
+  if (is.function(debug))
+    debug <- NULL
+  if (is.null(debug))
+    # hasDebug <- tryCatch(.whereInStack("debug"), silent = TRUE, error = function(e) FALSE)
+    debug <- getOption("spades.debug")
+  # if (!is.null(hasDebug)) {
+  #   hasDebug <- .whereInStack("debug", startingEnv = envir)
+  #   # if (!isFALSE(hasDebug)) {
+  #   newDebug <- get0("debug", hasDebug, inherits = FALSE)#, silent = TRUE)
+  #   # newDebug <- try(get("debug", hasDebug), silent = TRUE)
+  #   if (!is.null(newDebug))
+  #     # if (!is(newDebug, "try-error"))
+  #     debug <- newDebug
+  # }
   debug
 }
 
@@ -2201,3 +2239,4 @@ classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, m
        # .globals = globsWoKnowns,
        modules = mBase)
 }
+

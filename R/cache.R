@@ -122,6 +122,14 @@ setMethod(
 
     envirHash <- rmLength0Recursive(envirHash)
     envirHash <- upgradeModsToXdata(envirHash, upgradeModsToXdata, moduleFunctionEnvir)
+    
+    # special objects -- like .objectSynonyms
+    specialObjNames <- c(".objectSynonyms")
+    specialObjNames <- intersect(names(object), specialObjNames)
+    if (length(specialObjNames)) {
+      specialObjHash <- .robustDigest(mget(specialObjNames, envir = envir(object)))
+      envirHash$.xData <- append(envirHash$.xData, specialObjHash)
+    }
 
     if (FALSE) {
       eh <- envirHash[names(envirHash)[names(envirHash) %in% names(moduleFunctionEnvir)]]
@@ -177,15 +185,25 @@ setMethod(
     }
 
     # Inputs
-    if (NROW(object@inputs)) {
+    # if (curMod %in% "fireSense_dataPrepPredict") browser()
+    if (NROW(object@inputs)) { # this is the argument for simInit --> this shouldn't matter/ should be ignored
+      #  Essentially, if an object is relevant, it will be directly digested; it shouldn't matter whether it
+      #  comes from simInit(inputs = ...), which is also the dots simInit(...) or whether it comes from another
+      #  source. Example, I (Eliot) moved a sppEquiv creation from the setupProject to a module. It is exactly
+      #  the same sppEquiv, but because it is no longer passed at simInit(...) this treats it as a change
+      #  so must recalculate
+      object@inputs <- data.frame()
+
+
+      # Eliot omitted the next chunk Jan 26, 2026
       # Only include objects that are in the `inputs` slot that this module uses
-      if (length(curMod)) { # If it is a simInitAndSpades call, it doesn't have a curMod
-        expectsInputs <- deps[[curMod]]@inputObjects$objectName
-        object@inputs <- object@inputs[object@inputs$objectName %in% expectsInputs,]
-      }
-      if (NROW(object@inputs)) { # previous line may have removed row(s) from object@inputs, leaving potentially zero
-        object@inputs$file <- unlist(.robustDigest(object@inputs$file, algo = algo, quick = quick, length = length)) #nolint
-      }
+      # if (length(curMod)) { # If it is a simInitAndSpades call, it doesn't have a curMod
+      #   expectsInputs <- deps[[curMod]]@inputObjects$objectName
+      #   object@inputs <- object@inputs[object@inputs$objectName %in% expectsInputs,]
+      # }
+      # if (NROW(object@inputs)) { # previous line may have removed row(s) from object@inputs, leaving potentially zero
+      #   object@inputs$file <- unlist(.robustDigest(object@inputs$file, algo = algo, quick = quick, length = length)) #nolint
+      # }
     }
 
     # params @params $params
@@ -243,8 +261,11 @@ setMethod(
 
     # outputs -- we only care if it was an output from this module
     if (length(curMod) > 0) {
-      outputsFromThisMod <- object@depends@dependencies[[curMod]]$outputObjects$objectName
-      object@outputs <- object@outputs[object@outputs$objectName %in% outputsFromThisMod,]
+      # See note above about object@inputs
+      # object@outputs <- object@outputs[0]
+      object@outputs <- object@outputs[0, c("objectName", "saveTime", "file", "arguments")]
+      # outputsFromThisMod <- object@depends@dependencies[[curMod]]$outputObjects$objectName
+      # object@outputs <- object@outputs[object@outputs$objectName %in% outputsFromThisMod,]
     }
 
     otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
@@ -1184,11 +1205,14 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
   ...
 ) {
   ## the as.list doesn't get everything. But with a simList, this is OK; rest will stay
-  obj[[dotMods]] <- .unwrap(obj[[dotMods]], cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
-  obj[[dotObjs]] <- .unwrap(obj[[dotObjs]], cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
+  obj[[dotMods]] <- .unwrap(obj[[dotMods]], cachePath = cachePath, cacheId = cacheId,
+                            drv = drv, conn = conn, ...)
+  obj[[dotObjs]] <- .unwrap(obj[[dotObjs]], cachePath = cachePath, cacheId = cacheId,
+                            drv = drv, conn = conn, ...)
   objList <- as.list(obj, all.names = TRUE) # don't overwrite everything, just the ones in the list part
 
-  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId, drv = drv, conn = conn, ...)
+  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
+                     drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
 
   # .unwrap the metadata ... i.e,. @depends

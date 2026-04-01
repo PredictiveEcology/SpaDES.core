@@ -1,5 +1,7 @@
 # SpaDES.core (development version)
 
+* `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
+* `restartSpades` now has default `numEvents = 1L` instead of `Inf`
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 
   if `options(spades.allowInitDuringSimInit = TRUE)`; previously, this was not respected.
 * update `reproducible` dependency version to 3.0.0;
