@@ -41,6 +41,7 @@ Imports:
     methods,
     qs2,
     Require (>= 1.0.1),
+    rlang,
     stats,
     terra (>= 1.7-46),
     tools,
