@@ -159,8 +159,6 @@ Plots <- function(data, fn, filename,
                   ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
                   deviceArgs = list(), envir = parent.frame(), useCache = FALSE,
                   ...) {
-  if (exists("aaaa", envir = .GlobalEnv)) browser()
-
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the .whereInStack would get this too
@@ -311,11 +309,9 @@ Plots <- function(data, fn, filename,
     if (any(grepl(objChar, types))) {
       filename11 <- file.path(path, paste0(filename, "_gg.qs2"))
       filenamesForSave[[objChar]] <- filename11
-      funsUsed[[objChar]] <- funUsed
+      funsUsed[[objChar]] <- "qs2::qs_save"
     }
   }
-
-  if (exists("aaaa", envir = .GlobalEnv)) browser()
 
   needNewPlot <- TRUE
   
@@ -435,36 +431,7 @@ Plots <- function(data, fn, filename,
       }
     }
   }
-  # needSaveRaw <- any(grepl("raw", types))
-  # if (needSave || needSaveRaw) {
-  #   if (missing(filename)) {
-  #     dataObjName <- deparse(substitute(data))
-  #     filename <- paste0(dataObjName, "_", basename(gsub("file", "", tempfile(fileext = "")))) ## TODO: can we use e.g. the object name + sim time??
-  #     if (exists("sim", inherits = FALSE)) {
-  #       simTime <- round(as.numeric(time(sim)), 3)
-  #       filename <- paste0("sim", "_", filename)
-  #     }
-  #   } else {
-  #     filename <- filename |> tools::file_path_sans_ext()
-  #   }
-  #
-  #   if (isAbsolutePath(filename)) {
-  #     path <- dirname(filename)
-  #   }
-  #
-  #   filename <- basename(filename)
-  #
-  #   isDefaultPath <- identical(eval(formals(Plots)$path), path)
-  #   if (!is.null(simIsIn)) {
-  #     if (is(path, "call"))
-  #       path <- eval(path, envir = simIsIn)
-  #   }
-  #
-  #   if (is(path, "character")) {
-  #     checkPath(path, create = TRUE)
-  #   }
-  # }
-
+  
   if (!is(data, "ggplot2")) {
     if (needSaveRaw) {
       if (is(data, "Raster") || is(data, "SpatRaster")) {
@@ -562,12 +529,12 @@ Plots <- function(data, fn, filename,
     if (any(grepl(objChar, types))) {
       # filename11 <- file.path(path, paste0(filename, "_gg.qs2"))
       filename11 <- filenamesForSave[[objChar]]
-      browser()# this next line needs to use eval(parse(text = funsUsed[[objChar]]))
+      # funsUsed[[objChar]] == "qs2::qs_save"
       qs2::qs_save(gg, file = filename11)
     }
   }
 
-  if (needSave) {
+  if (needSave || needSaveRaw) {
     if (exists("sim", inherits = FALSE)) {
       for (i in seq(filenamesForSave)) {
 
@@ -591,7 +558,6 @@ Plots <- function(data, fn, filename,
   if (useCache) {
     typesNoScreen <- setdiff(types, "screen")
     for (i in seq(filenamesForSave)) {
-      if (exists("aaaa", envir = .GlobalEnv)) browser()
       type <- typesNoScreen[i]
       filenameSaved <- .robustDigest(asPath(filenamesForSave[i]))[[1]]
       if (needNewPlot)
