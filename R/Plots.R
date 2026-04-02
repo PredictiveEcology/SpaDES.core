@@ -1,3 +1,5 @@
+utils::globalVariables("str")
+
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 
