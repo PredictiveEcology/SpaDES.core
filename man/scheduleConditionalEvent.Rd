@@ -43,17 +43,17 @@ even if the condition is met. Defaults to \code{start(sim)}}
 even if the condition is met. Defaults to \code{end(sim)}}
 }
 \value{
-Returns the modified \code{simList} object, i.e., \code{sim$._conditionalEvents}.
+Returns the modified \code{simList} object, i.e., \code{sim$._conditional}.
 }
 \description{
 Adds a new event to the simulation's conditional event queue,
 updating the simulation object by creating or appending to
-\code{sim$._conditionalEvents}.
+\code{sim$._conditional}.
 \emph{This is very experimental. Use with caution.}
 }
 \details{
 This conditional event queue will be assessed at every single event in the normal event
-queue. If there are no conditional events, then \code{spades} will proceed as normal.
+queue. If there are no conditional , then \code{spades} will proceed as normal.
 As conditional event conditions are found to be true, then it will trigger a call to
 \code{scheduleEvent(...)} with the current time passed to \code{eventTime} \emph{and}
 it will remove the conditional event from the conditional queue.
@@ -67,7 +67,7 @@ to very low or even negative to ensure it gets inserted at the top of the event 
   condition <- quote(sim$age > 1) # provide as a call
   condition <- expression(sim$age > 1) # provide as an expression
   sim <- scheduleConditionalEvent(sim, condition, "firemodule", "burn")
-  conditionalEvents(sim)
+  conditional(sim)
   sim <- spades(sim) # no changes to sim$age, i.e., it is absent
   events(sim) # nothing scheduled
   sim$age <- 2 # change the value
@@ -81,7 +81,7 @@ San Francisco, CA: No Starch Press, Inc..
 Retrieved from \url{https://nostarch.com/artofr.htm}
 }
 \seealso{
-\code{\link[=scheduleEvent]{scheduleEvent()}}, \code{\link[=conditionalEvents]{conditionalEvents()}}
+\code{\link[=scheduleEvent]{scheduleEvent()}}, \code{\link[=conditional]{conditional()}}
 }
 \author{
 Eliot McIntire
