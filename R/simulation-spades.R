@@ -412,7 +412,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
-#'  events(sim) # shows all scheduled events, with eventTime and priority
+#'  (sim) # shows all scheduled , with eventTime and priority
 scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
@@ -444,7 +444,7 @@ scheduleEvent <- function(sim,
 
   }
   if (length(eventTime)) {
-    sim <- appendEvents(sim, eventTime, eventType, moduleName, eventPriority)
+    sim <- append(sim, eventTime, eventType, moduleName, eventPriority)
   } else {
     warning(
       paste(
@@ -462,11 +462,11 @@ scheduleEvent <- function(sim,
 #'
 #' Adds a new event to the simulation's conditional event queue,
 #' updating the simulation object by creating or appending to
-#' `sim$._conditionalEvents`.
+#' `sim$._conditional`.
 #' *This is very experimental. Use with caution.*
 #'
 #' This conditional event queue will be assessed at every single event in the normal event
-#' queue. If there are no conditional events, then `spades` will proceed as normal.
+#' queue. If there are no conditional , then `spades` will proceed as normal.
 #' As conditional event conditions are found to be true, then it will trigger a call to
 #' `scheduleEvent(...)` with the current time passed to `eventTime` *and*
 #' it will remove the conditional event from the conditional queue.
@@ -487,13 +487,13 @@ scheduleEvent <- function(sim,
 #'      It can access objects in the `simList` by using functions of `sim`,
 #'      e.g., `"sim$age > 1"`
 #'
-#' @return Returns the modified `simList` object, i.e., `sim$._conditionalEvents`.
+#' @return Returns the modified `simList` object, i.e., `sim$._conditional`.
 #'
 #'
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
-#' @seealso [scheduleEvent()], [conditionalEvents()]
+#' @seealso [scheduleEvent()], [conditional()]
 #'
 #' @author Eliot McIntire
 #'
@@ -507,7 +507,7 @@ scheduleEvent <- function(sim,
 #'   condition <- quote(sim$age > 1) # provide as a call
 #'   condition <- expression(sim$age > 1) # provide as an expression
 #'   sim <- scheduleConditionalEvent(sim, condition, "firemodule", "burn")
-#'   conditionalEvents(sim)
+#'   conditional(sim)
 #'   sim <- spades(sim) # no changes to sim$age, i.e., it is absent
 #'   events(sim) # nothing scheduled
 #'   sim$age <- 2 # change the value
@@ -666,7 +666,9 @@ scheduleConditionalEvent <- function(sim,
 #'   must correspond to the modules and the character vectors can be specific events within
 #'   each of the named modules. With the `list` form, all unspecified modules
 #'   will run *all* their events, including internal spades modules, e.g., `save`,
-#'   that get invoked with the `outputs` argument in  `simInit`. See example.
+#'   that get invoked with the `outputs` argument in  `simInit`. However, if NOT a named list
+#'   internal spades modules' events will not run, if not listed in the character vector.
+#'   See example.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
 #'            This will be included in the `Cache` call, so will be unique
@@ -827,6 +829,16 @@ scheduleConditionalEvent <- function(sim,
 #'    paths = list(modulePath = getSampleModules(tempdir()))
 #'   )
 #'   spades(mySim)
+#'                                   
+#' # Example of `events` misuse: only the .inputObjects runs because "init" (an internal event) was not listed,
+#' # does not run and, therefore, does not schedule other events
+#' spades(mySim, events = c(".inputObjects", "burn", "move", "stats"))
+#' completed(mySim)
+#' 
+#' # Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module, 
+#' ##without affecting the events of other modules or internal events
+#' spades(mySim, events = list(caribouMovement = c(".inputObjects", "init", "move")))
+#' completed(mySim)
 #'
 #'   options(opts) # reset options
 #' }
