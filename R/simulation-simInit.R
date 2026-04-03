@@ -158,10 +158,10 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' `interval` (numeric), `loadTime` (numeric).
 #' See [inputs()] and vignette("ii-modules") section about inputs.
 #'
-#' @param outputs A `data.frame`. Can specify from 1 to 5
+#' @param outputs A `data.frame`. Can specify from 1 to 7
 #' columns with following column names: `objectName` (character, required),
 #' `file` (character), `fun` (character), `package` (character),
-#' `saveTime` (numeric) and `eventPriority` (numeric). If
+#' `saveTime` (numeric), `arguments` (list) and `eventPriority` (numeric). If
 #' `eventPriority` is not set, it defaults to `.last()`. If `eventPriority`
 #' is set to a low value, e.g., 0, 1, 2 and `saveTime` is `start(sim)`,
 #' it should give "initial conditions".
@@ -401,15 +401,15 @@ setMethod(
     # on.exit(rm(rcae))
     debug <- list(...)$debug # it is not an arg for `simInit`--> it is only in `spades`; but if `simInitAndSpades`
     #  and really, it should be in `simInit`
-    if (is.null(debug)) 
+    if (is.null(debug))
       debug <- getOption("spades.debug")
       # rm(debug, inherits = FALSE)
-    
+
     if (!identical(debug, getOption("spades.debug"))) {
       opts <- options("spades.debug" = debug)
       on.exit(options(opts), add = TRUE)
     }
-    
+
     debug <- getDebug(debug = debug) # from options first, then override if in a simInitAndSpades
     if  (is.call(debug))
       debug <- eval(debug)
@@ -1250,12 +1250,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   passedArgsNames <- setdiff(names(passedArgs), formsOnlySpades)
   namesMatchCall <- names(match.call())
   defaultArgs <- .fillInSimInit(list(), namesMatchCall)
-  
+
   if (!identical(debug, getOption("spades.debug"))) {
     opts <- options("spades.debug" = debug)
     on.exit(options(opts), add = TRUE)
   }
-  
+
   simInitCall <- as.call(x = append(list(simInit), append(passedArgs[passedArgsNames], defaultArgs)))
   sim <- eval(simInitCall, envir = parent.frame())
 
