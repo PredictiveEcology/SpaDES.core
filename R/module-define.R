@@ -243,6 +243,8 @@ setMethod(
           ext(x$spatialExtent)
         }
       }
+    } else {
+      x$spatialExtent
     }
 
     x$timeframe <- if (is.null(x$timeframe) || any(is.na(x$timeframe))) {
