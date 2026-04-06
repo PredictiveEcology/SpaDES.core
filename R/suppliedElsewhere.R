@@ -95,7 +95,16 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
 
   objDeparsed <- as.character(objDeparsed)
 
-  namesInList <- names(sim@.xData)
+  # there can be 2 types of NULL --> existing NULL, i.e., a user assigned NULL, and a non-existent NULL, i.e., list(a = 1)$b
+  # names(...) will include the assigned NULL values. In the case here, we should be
+  # indicating that assigned NULL is same as nonexistent NULL
+  namesInList <- names(sim@.xData) #  previous prior to April 6, 2026
+  if (length(namesInList)) {
+    notNULL <- lapply(mget(names(namesInList), envir = namesInList), function(x) !is.null(x)) |> unlist()
+    namesInList <- names(notNULL)[unlist(notNULL)]
+  }
+
+
   if (!is.null(sim[[objSynName]])) {
     namesInListHasOS <- lapply(sim[[objSynName]], function(os) {
       osInNamesInList <- os %in% namesInList

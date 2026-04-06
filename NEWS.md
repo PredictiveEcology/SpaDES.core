@@ -1,5 +1,6 @@
 # SpaDES.core (development version)
 
+* `suppliedElsewhere` now treats both types of NULL as equal: list(a = 1)$b and list(a = NULL)$a were seen as different; now they are the same
 * `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 
