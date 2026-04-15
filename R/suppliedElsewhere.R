@@ -100,7 +100,7 @@ suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent")
   # indicating that assigned NULL is same as nonexistent NULL
   namesInList <- names(sim@.xData) #  previous prior to April 6, 2026
   if (length(namesInList)) {
-    notNULL <- lapply(mget(names(namesInList), envir = namesInList), function(x) !is.null(x)) |> unlist()
+    notNULL <- lapply(mget(namesInList, envir = sim@.xData), function(x) !is.null(x)) |> unlist()
     namesInList <- names(notNULL)[unlist(notNULL)]
   }
 
