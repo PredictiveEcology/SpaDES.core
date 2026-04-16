@@ -263,7 +263,7 @@ setMethod(
     if (length(curMod) > 0) {
       # See note above about object@inputs
       # object@outputs <- object@outputs[0]
-      object@outputs <- object@outputs[0, c("objectName", "saveTime", "file", "arguments")]
+      object@outputs <- object@outputs[0, c("objectName", "saveTime", "file", .txtArguments)]
       # outputsFromThisMod <- object@depends@dependencies[[curMod]]$outputObjects$objectName
       # object@outputs <- object@outputs[object@outputs$objectName %in% outputsFromThisMod,]
     }
@@ -279,7 +279,7 @@ setMethod(
     obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
     # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
-    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")],
+    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", .txtArguments)],
                                     quick = TRUE, algo = algo)
     if (!is.null(classOptions$depends)) { # this is used for Cache(.inputObjects(...))
       keep <- intersect(names(obj$depends[[curMod]]), classOptions$depends)

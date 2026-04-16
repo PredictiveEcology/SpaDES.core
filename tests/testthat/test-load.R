@@ -145,8 +145,10 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
       intervals = c(NA, 1, 2, NA),
       stringsAsFactors = FALSE
     )
+    inputs <- match_colnames(inputs, inputTableColNames)
+
     if (length(args[[i]])) {
-      inputs$args <- args[[i]]
+      inputs[[.txtArguments]] <- args[[i]]
     }
 
     times <- list(start = 0, end = 1, timeunit = "seconds")
@@ -156,7 +158,7 @@ test_that("passing arguments to filelist in simInit does not work correctly", {
 
     # Test that arguments got passed in correctly
     if (length(args[[i]]))
-      expect_equal(inputs(sim2)$arguments, I(rep(list(native = TRUE), 4)))
+      expect_equal(inputs(sim2)[[.txtArguments]], I(rep(list(native = TRUE), 4)))
     expect_true(!any(c("forestCover", "forestAge", "habitatQuality") %in% ls(sim2)))
 
     sim2 <- spades(sim2)
@@ -346,7 +348,8 @@ test_that("more tests", {
        arguments = arguments,
        loadTime = 0,
        intervals = c(rep(NA, length(files) - 1), 10)
-    )
+    ) 
+    filelist <- match_colnames(filelist, inputTableColNames)
     expect_message({
       sim2 <- loadFiles(filelist = filelist)
     }, "DEM read from")
@@ -498,3 +501,5 @@ test_that("loadSimList handles nested lists (i.e. scfm poly lists) sensibly", {
 
   withr::deferred_run()
 })
+
+

@@ -146,9 +146,9 @@ setMethod(
       # Check if arguments is a named list; the name may be concatenated
       # with the "arguments", separated by a ".". This will extract that.
       if ((length(arguments) > 0) & !is.null(names(arguments))) {
-        if (grepl(".", fixed = TRUE, names(filelist)[pmatch("arguments", names(filelist))])) {
+        if (grepl(".", fixed = TRUE, names(filelist)[pmatch(.txtArguments, names(filelist))])) {
           names(arguments) <- sapply(
-            strsplit(names(filelist)[pmatch("arguments", names(filelist))], ".", fixed = TRUE),
+            strsplit(names(filelist)[pmatch(.txtArguments, names(filelist))], ".", fixed = TRUE),
             function(x) x[-1]
           )
         }

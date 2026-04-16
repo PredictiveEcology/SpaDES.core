@@ -1426,9 +1426,9 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
   df <- data.frame(file = file, saved = TRUE, objectName = objectName, fun = fun, args = args)
 
   outs <- .fillOutputRows(df, endTime = saveTime)
-  if (!is(outputs[["arguments"]], "AsIs")) {
+  if (!is(outputs[[.txtArguments]], "AsIs")) {
     ## needed for rbindlist
-    outputs[["arguments"]] <- I(outputs[["arguments"]])
+    outputs[[.txtArguments]] <- I(outputs[[.txtArguments]])
   }
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
 }
@@ -1560,9 +1560,9 @@ setReplaceMethod(
   signature = "simList",
   function(sim, value) {
    if (is.list(value) & !is.data.frame(value)) {
-     sim@inputs$args <- value
+     sim@inputs[[.txtArguments]] <- value
    } else if (is.null(value)) {
-     sim@inputs$args <- rep(list(NULL), NROW(inputs(sim)))
+     sim@inputs[[.txtArguments]] <- rep(list(NULL), NROW(inputs(sim)))
    } else {
      stop("value passed to inputArgs() must be a list of named elements")
    }
@@ -3510,3 +3510,4 @@ setMethod(
     x2
   }
 )
+
