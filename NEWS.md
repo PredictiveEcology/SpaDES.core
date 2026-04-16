@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+* cli progress bars from any package (e.g., `archive::archive_extract`) no longer flood
+  the console during `simInit`/`spades`. Progress output is throttled to one line per
+  `getOption("spades.progressInterval", 2)` seconds. Set
+  `options(spades.progressInterval = N)` to change the interval.
 * `suppliedElsewhere` now treats both types of NULL as equal: list(a = 1)$b and list(a = NULL)$a were seen as different; now they are the same
 * `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`

@@ -484,6 +484,12 @@
 #'     there should be no name conflicts among package objects,
 #'     but it is much slower, especially if the events are themselves fast.
 #'
+#'   \item `spades.progressInterval`: Minimum number of seconds between successive
+#'     cli progress-bar lines emitted to the console during `simInit` and `spades`.
+#'     cli progress output (e.g., from `archive::archive_extract` or any other package
+#'     that uses cli internally) is throttled to one timestamped line per interval so
+#'     that fast-updating progress bars do not flood the console. Default `2`.
+#'
 #'   \item `spades.tolerance`: The default tolerance value used for floating
 #'     point number comparisons. Default `.Machine$double.eps^0.5`.
 #'

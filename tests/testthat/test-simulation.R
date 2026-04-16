@@ -1199,3 +1199,57 @@ paste0("    reqdPkgs = list(\'", dontLoad, "\'),"),'
 
 })
 
+test_that("cli progress bars are throttled and not flooded during spades()", {
+  skip_if_not_installed("cli")
+  testInit()
+
+  modName <- "cliProgressTest"
+  newModule(modName, path = tmpdir, open = FALSE)
+
+  # Module emits 50 cli progress ticks as fast as possible (all complete << 2 s).
+  # With throttling, only the first tick gets through; without it, all 50 would.
+  cat(file = file.path(tmpdir, modName, paste0(modName, ".R")),
+'defineModule(sim, list(
+  name = "cliProgressTest",
+  description = "test cli progress throttling",
+  keywords = character(0),
+  authors = person("Test", "User"),
+  childModules = character(0),
+  version = list(cliProgressTest = "0.0.1"),
+  timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year",
+  citation = list(),
+  documentation = list(),
+  reqdPkgs = list("cli"),
+  parameters = rbind(),
+  inputObjects = bindrows(),
+  outputObjects = bindrows()
+))
+
+doEvent.cliProgressTest <- function(sim, eventTime, eventType) {
+  switch(
+    eventType,
+    init = {
+      pb <- cli::cli_progress_bar(total = 50, .envir = environment())
+      for (i in seq_len(50))
+        cli::cli_progress_update(id = pb, .envir = environment())
+      cli::cli_progress_done(id = pb, .envir = environment())
+    }
+  )
+  return(invisible(sim))
+}
+', fill = TRUE)
+
+  sim <- simInit(times = list(start = 0, end = 1), modules = list(modName),
+                 paths = list(modulePath = tmpdir))
+
+  msgs <- capture_messages(spades(sim))
+
+  # Strip ANSI and find lines that look like progress output (contain digits and
+  # common progress-bar tokens).  With throttling all 50 ticks complete in << 2 s
+  # so at most 1 progress line should appear; without throttling all 50 would.
+  clean_msgs <- cli::ansi_strip(msgs)
+  progress_msgs <- grep("[0-9]+/[0-9]+|[0-9]+%|\\[=", clean_msgs, value = TRUE)
+  expect_lte(length(progress_msgs), 2)
+})
+
