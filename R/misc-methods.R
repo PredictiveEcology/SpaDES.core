@@ -383,7 +383,7 @@ setMethod(
       objectName = character(0), saveTime = numeric(0), saved = logical(0),
       arguments = I(list()), stringsAsFactors = FALSE
     ) 
-    filelist <- match_colnames(filelist, outputTableColNames) # use the programmatic ones
+    ft <- match_colnames(ft, outputTableColNames) # use the programmatic ones
 
     return(ft)
 })
