@@ -852,7 +852,14 @@ setMethod(
             simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
             use.names = TRUE, fill = TRUE)
           allowedColumnsForUnique <- (sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE
-          simPost@outputs <- unique(ooo, by = names(ooo)[allowedColumnsForUnique])
+          
+          # the file column must be changed to be the local one: there could be a different outputPath
+          #   so the file names will be slightly different if they include the outputPath
+          #   if they were being run in a different outputPath, but shared cachePath
+          allowedColumnsForUnique <- setdiff(names(ooo)[allowedColumnsForUnique], "file")
+          # because they were rbindlisted in order of simPost, then simCache (i.e., object), it will
+          #   keep the simPost, which is the local path
+          simPost@outputs <- unique(ooo, by = allowedColumnsForUnique)
 
         }
 
