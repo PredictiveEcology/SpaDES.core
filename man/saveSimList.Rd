@@ -78,6 +78,10 @@ There is a family of 2 functions that are mutually useful for saving and
 loading \code{simList} objects and their associated files (e.g., file-backed
 \verb{Raster*}, \code{inputs}, \code{outputs}, \code{cache}) \code{\link[=saveSimList]{saveSimList()}}, \code{\link[=loadSimList]{loadSimList()}}.
 
+The \code{sim@.xData$._sim} slot (a circular reference used internally during a
+running simulation) is removed before saving to avoid redundant data.
+It is not needed for a saved/restored \code{simList}.
+
 Additional arguments may be passed via \code{...}, including:
 \itemize{
 \item \code{files}: logical indicating whether files should be included in the archive.

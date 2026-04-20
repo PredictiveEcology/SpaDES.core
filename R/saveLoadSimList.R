@@ -20,6 +20,10 @@
 #' loading `simList` objects and their associated files (e.g., file-backed
 #' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()].
 #'
+#' The `sim@.xData$._sim` slot (a circular reference used internally during a
+#' running simulation) is removed before saving to avoid redundant data.
+#' It is not needed for a saved/restored `simList`.
+#'
 #' Additional arguments may be passed via `...`, including:
 #' - `files`: logical indicating whether files should be included in the archive.
 #'            if `FALSE`, will override `cache`, `inputs`, `outputs`, setting them to `FALSE`.
@@ -146,6 +150,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   }
 
   sim <- .wrap(sim, cachePath = NULL, paths = paths(sim)) # makes a copy of filebacked object files
+  sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
   if (isTRUE(files)) {

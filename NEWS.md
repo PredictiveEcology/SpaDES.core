@@ -1,5 +1,6 @@
 # SpaDES.core (development version)
 
+* `saveSimList`: remove `sim@.xData$._sim` (circular reference) before saving to avoid redundant data in the saved file.
 * .prepareOutput -- if outputPath was different, but cachePath is same between 2 simInit/spades calls, then outputs will get a file that is not available because it was in the outputPath of the first one; fixed
 * cli progress bars from any package (e.g., `archive::archive_extract`) no longer flood
   the console during `simInit`/`spades`. Progress output is throttled to one line per
