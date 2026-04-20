@@ -501,12 +501,15 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
         .ext <- ext
         .projectPath <- projectPath
         .simPaths    <- simPaths
-        delayedAssign(.nm, {
+        delayedAssign(.nm, tryCatch({
           obj <- if (.ext == "rds") readRDS(.f)
                  else qs2::qs_read(.f, nthreads = getOption("spades.qsThreads", 1))
           obj <- .remapFileBackedObj(obj, .projectPath, .simPaths)
           .unwrap(obj, cachePath = NULL, paths = .simPaths)
-        }, eval.env = environment(), assign.env = envir(tmpsim))
+        }, error = function(e) {
+          warning("Could not load lazy object '", .nm, "': ", conditionMessage(e), call. = FALSE)
+          NULL
+        }), eval.env = environment(), assign.env = envir(tmpsim))
       })
     }
   }

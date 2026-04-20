@@ -11,6 +11,7 @@ utils::globalVariables(c(
 #'
 #' @author Alex Chubaty
 #' @export
+#' @importFrom rlang env_binding_are_lazy
 #' @importFrom stats na.omit
 #' @importFrom utils capture.output ls.str
 #' @include simList-class.R
@@ -54,7 +55,14 @@ setMethod(
 
     ### list stored objects
     out[[14]] <- capture.output(cat(">> Objects stored:\n"))
-    out[[15]] <- capture.output(print(ls.str(envir(object))))
+    env <- envir(object)
+    nms <- ls(env)
+    lazyNms  <- if (length(nms)) nms[rlang::env_binding_are_lazy(env, nms)] else character(0)
+    eagerNms <- setdiff(nms, lazyNms)
+    out[[15]] <- capture.output({
+      if (length(eagerNms)) print(ls.str(env, name = eagerNms))
+      if (length(lazyNms))  cat("Lazy (not yet loaded):", paste(sort(lazyNms), collapse = ", "), "\n")
+    })
     out[[16]] <- capture.output(cat("\n"))
 
     ### params
