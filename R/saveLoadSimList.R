@@ -475,7 +475,15 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     }
   }
 
-  tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
+  tmpsim <- tryCatch( # convert e.g., PackedSpatRaster; resilient to missing backing files
+    .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)),
+    error = function(e) {
+      warning("loadSimList: could not fully unwrap simList (some file-backed objects may be ",
+              "missing or inaccessible); continuing with partially-unwrapped sim.\n",
+              "  Error: ", conditionMessage(e), call. = FALSE)
+      tmpsim
+    }
+  )
 
   ## Work around for bug in qs that recovers data.tables as lists
   # tmpsim <- recoverDataTableFromQs(tmpsim)
