@@ -14,7 +14,8 @@ saveSimList(
   cache = FALSE,
   envir,
   files = TRUE,
-  ...
+  ...,
+  lazy = FALSE
 )
 }
 \arguments{
@@ -52,6 +53,12 @@ silently converted to an archive file with the appropriate extension e.g.,
 saving of files specified in \code{inputs(sim)}, \code{outputs(sim)} or the cache.}
 
 \item{...}{Additional arguments. See Details.}
+
+\item{lazy}{Logical. If \code{TRUE}, each user object in \code{sim@.xData} is saved
+individually into a \verb{<filename>_xData/} directory alongside the shell
+\code{simList} file, rather than monolithically. \code{\link[=loadSimList]{loadSimList()}} detects this
+layout automatically and loads each object lazily via \code{\link[=delayedAssign]{delayedAssign()}},
+materializing it only on first access. Defaults to \code{FALSE}.}
 }
 \value{
 Invoked for side effects of saving both a \code{.qs2} (or \code{.rds}) file,

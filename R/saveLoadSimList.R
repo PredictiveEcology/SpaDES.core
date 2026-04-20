@@ -65,6 +65,11 @@
 #'   `inputs` or `cache` are `TRUE`. Setting this to `FALSE` will turn off the
 #'   saving of files specified in `inputs(sim)`, `outputs(sim)` or the cache.
 #'
+#' @param lazy Logical. If `TRUE`, each user object in `sim@.xData` is saved
+#'   individually into a `<filename>_xData/` directory alongside the shell
+#'   `simList` file, rather than monolithically. [loadSimList()] detects this
+#'   layout automatically and loads each object lazily via [delayedAssign()],
+#'   materializing it only on first access. Defaults to `FALSE`.
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
@@ -84,7 +89,7 @@
 #' @seealso [loadSimList()]
 saveSimList <- function(sim, filename, projectPath = getwd(),
                         outputs = TRUE, inputs = TRUE, cache = FALSE, envir,
-                        files = TRUE, ...) {
+                        files = TRUE, ..., lazy = FALSE) {
   checkSimListExts(filename)
 
   dots <- list(...)
@@ -176,6 +181,87 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       modifyList(symlinks) |>
       relativizePaths(projectPath) |>
       as.list()
+  }
+
+  if (isTRUE(lazy)) {
+    ext <- tools::file_ext(filename)
+    xDir <- paste0(tools::file_path_sans_ext(filename), "_xData")
+    dir.create(xDir, showWarnings = FALSE, recursive = TRUE)
+
+    userObjNames <- ls(sim@.xData, all.names = FALSE)
+    manifest <- data.frame(name = userObjNames,
+                           file = paste0(userObjNames, ".", ext),
+                           stringsAsFactors = FALSE)
+
+    for (nm in userObjNames) {
+      objFile <- file.path(xDir, paste0(nm, ".", ext))
+      if (ext == "rds") {
+        saveRDS(sim@.xData[[nm]], file = objFile)
+      } else {
+        qs2::qs_save(sim@.xData[[nm]], file = objFile,
+                     nthreads = getOption("spades.qsThreads", 1))
+      }
+      rm(list = nm, envir = sim@.xData)
+    }
+
+    manifestFile <- file.path(xDir, paste0("_manifest.", ext))
+    if (ext == "rds") {
+      saveRDS(manifest, file = manifestFile)
+    } else {
+      qs2::qs_save(manifest, file = manifestFile,
+                   nthreads = getOption("spades.qsThreads", 1))
+    }
+
+    if (ext == "rds") {
+      saveRDS(sim, file = filename)
+    } else {
+      qs2::qs_save(sim, file = filename, nthreads = getOption("spades.qsThreads", 1))
+    }
+
+    if (isTRUE(files) && length(fns)) {
+      fileToDelete <- filename
+      otherFns <- c()
+      if (isTRUE(outputs)) {
+        os <- outputs(sim)
+        if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE]$file)
+      }
+      if (isTRUE(inputs)) {
+        ins <- inputs(sim)
+        if (NROW(ins)) otherFns <- c(otherFns, ins[ins$loaded %in% TRUE, ]$file)
+      }
+
+      srcFiles <- mapply(mod = modules(sim), mp = modulePath(sim),
+                         function(mod, mp) {
+                           fls <- dir(file.path(mp, mod), recursive = TRUE, full.names = TRUE)
+                           grep("^\\<data\\>", invert = TRUE, value = TRUE, fls)
+                         })
+      srcFilesRel <- makeRelative(srcFiles, projectPath)
+      if (any(isAbsolutePath(srcFilesRel))) {
+        guessProjPath <- fs::path_common(origPaths["modulePath"]) |> unique() |> dirname()
+        srcFilesRel <- makeRelative(srcFiles, guessProjPath)
+        tmpSrcFiles <- file.path(projectPath, srcFilesRel)
+        linkOrCopy(srcFiles, tmpSrcFiles, verbose = verbose - 1)
+        on.exit(unlink(tmpSrcFiles))
+        srcFiles <- tmpSrcFiles
+      }
+
+      xDirFiles <- dir(xDir, full.names = TRUE, recursive = TRUE)
+      allFns <- c(fns, otherFns, srcFilesRel)
+      if (!is.null(symlinks)) {
+        for (p in names(symlinks)) {
+          allFns <- gsub(origPaths[[p]], symlinks[[p]], allFns)
+        }
+      }
+      allFns <- na.omit(allFns)
+
+      relFns <- makeRelative(c(fileToDelete, xDirFiles, allFns), projectPath) |> unname()
+      archiveWrite(filename, relFns, verbose)
+      unlink(fileToDelete)
+      unlink(xDir, recursive = TRUE)
+    }
+
+    messageVerbose("    ... saved!", verbose = verbose)
+    return(invisible())
   }
 
   # filename <- gsub(tools::file_ext(filename), "qs2", filename)
@@ -301,14 +387,27 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     td <- tempdir2(sub = .rndstr())
     filename <- archiveExtract(filename, exdir = td)
     on.exit(unlink(td, recursive = TRUE), add = TRUE)
-    filenameRel <- gsub(paste0(td, "/"), "", filename[-1])  ## TODO: WRONG!
 
+    baseNameNoExt <- tools::file_path_sans_ext(basename(filename[1]))
+    xDirBasename <- paste0(baseNameNoExt, "_xData")
+    isXData <- grepl(xDirBasename, filename[-1], fixed = TRUE)
+
+    filenameRel <- gsub(paste0(td, "/"), "", filename[-1][!isXData])  ## TODO: WRONG!
     ## This will put the files to relative path of projectPath
     newFns <- file.path(projectPath, filenameRel)
-    linkOrCopy(filename[-1], newFns, verbose = verbose - 1)
+    linkOrCopy(filename[-1][!isXData], newFns, verbose = verbose - 1)
+
+    ## Persist _xData/ beyond tempdir cleanup so lazy promises can resolve
+    xDir <- file.path(tempPath, xDirBasename)
+    xDirInTd <- file.path(td, xDirBasename)
+    if (dir.exists(xDirInTd)) {
+      if (dir.exists(xDir)) unlink(xDir, recursive = TRUE)
+      file.copy(xDirInTd, tempPath, recursive = TRUE)
+    }
   } else {
     # filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
     filenameRel <- getRelative(filename, projectPath)
+    xDir <- paste0(tools::file_path_sans_ext(filename[1]), "_xData")
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
@@ -386,6 +485,31 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     .dealWithRasterBackends(tmpsim) # no need to assign to sim b/c uses list2env
   }
   makeSimListActiveBindings(tmpsim)
+
+  ## Lazy loading: if a _xData/ directory with a manifest exists, set up
+  ## delayedAssign promises for each user object — materialised on first access.
+  ext <- tools::file_ext(filename[1])
+  manifestFile <- file.path(xDir, paste0("_manifest.", ext))
+  if (file.exists(manifestFile)) {
+    manifest <- if (ext == "rds") readRDS(manifestFile)
+                else qs2::qs_read(manifestFile, nthreads = getOption("spades.qsThreads", 1))
+    simPaths <- paths(tmpsim)
+    for (nm in manifest$name) {
+      local({
+        .nm <- nm
+        .f  <- file.path(xDir, manifest$file[manifest$name == .nm])
+        .ext <- ext
+        .projectPath <- projectPath
+        .simPaths    <- simPaths
+        delayedAssign(.nm, {
+          obj <- if (.ext == "rds") readRDS(.f)
+                 else qs2::qs_read(.f, nthreads = getOption("spades.qsThreads", 1))
+          obj <- .remapFileBackedObj(obj, .projectPath, .simPaths)
+          .unwrap(obj, cachePath = NULL, paths = .simPaths)
+        }, eval.env = environment(), assign.env = envir(tmpsim))
+      })
+    }
+  }
 
   return(tmpsim)
 }
@@ -520,6 +644,34 @@ recoverDataTableFromQs <- function(sim) {
   })
 
   list2env(reworkedRas, envir = envir(sim))
+}
+
+## Remap file paths in a single wrapped object (mirrors the per-object logic in
+## loadSimList's remap loop, extracted so lazy promises can reuse it).
+.remapFileBackedObj <- function(obj, projectPath, simPaths) {
+  tags <- attr(obj, "tags")
+  if (is.null(tags)) return(obj)
+  pths <- if (identical(projectPath, getwd())) simPaths else list(projectPath = projectPath)
+  newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
+  if (is(obj, "list")) {
+    newNames <- unique(newFiles$newName)
+    for (elem in names(obj)) {
+      fileHere      <- obj[[elem]]
+      dirToFileHere <- dirname(fileHere)
+      nParents      <- attr(fileHere, "nParentDirs")
+      for (nPar in rev(seq(nParents + 1))) {
+        dirToFileHere <- dirname(dirToFileHere)
+      }
+      newNames1    <- fs::path_rel(newNames, dirToFileHere)
+      thisFile     <- fs::path_rel(fileHere, dirToFileHere)
+      newNames1    <- newNames1[newNames1 %in% thisFile]
+      newNamesHere <- file.path(dirToFileHere, newNames1)
+      obj[[elem]][] <- unique(newNamesHere)
+    }
+  } else {
+    obj[] <- newFiles$newName[]
+  }
+  obj
 }
 
 checkSimListExts <- function(filename) {
