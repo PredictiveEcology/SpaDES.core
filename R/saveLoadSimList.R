@@ -651,6 +651,10 @@ recoverDataTableFromQs <- function(sim) {
 .remapFileBackedObj <- function(obj, projectPath, simPaths) {
   tags <- attr(obj, "tags")
   if (is.null(tags)) return(obj)
+  ## Only remap objects that are truly file-backed (mirrors the Filenames filter in
+  ## the non-lazy remap loop — wrapped non-file objects have tags but no filenames).
+  fns <- tryCatch(Filenames(obj), error = function(e) character(0))
+  if (!length(fns) || all(nchar(fns) == 0L)) return(obj)
   pths <- if (identical(projectPath, getwd())) simPaths else list(projectPath = projectPath)
   newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
   if (is(obj, "list")) {
