@@ -475,15 +475,25 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     }
   }
 
-  tmpsim <- tryCatch( # convert e.g., PackedSpatRaster; resilient to missing backing files
-    .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)),
-    error = function(e) {
-      warning("loadSimList: could not fully unwrap simList (some file-backed objects may be ",
-              "missing or inaccessible); continuing with partially-unwrapped sim.\n",
-              "  Error: ", conditionMessage(e), call. = FALSE)
-      tmpsim
+  ## Detect lazy load before .unwrap so we can clear .modObjs (which holds per-module
+  ## copies of file-backed objects) from the shell simList. Those objects were NOT saved
+  ## as part of the shell — their backing files may not exist — and .unwrap would fail on
+  ## them. They are rebuilt by spades() on the next run, so it is safe to clear them here.
+  ext <- tools::file_ext(filename[1])
+  manifestFile <- file.path(xDir, paste0("_manifest.", ext))
+  isLazyLoad <- file.exists(manifestFile)
+
+  if (isLazyLoad) {
+    modObjsEnv <- tmpsim@.xData[[".modObjs"]]
+    if (is.environment(modObjsEnv)) {
+      nms <- ls(modObjsEnv, all.names = TRUE)
+      if (length(nms)) rm(list = nms, envir = modObjsEnv)
+    } else if (!is.null(modObjsEnv)) {
+      tmpsim@.xData[[".modObjs"]] <- NULL
     }
-  )
+  }
+
+  tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim))
 
   ## Work around for bug in qs that recovers data.tables as lists
   # tmpsim <- recoverDataTableFromQs(tmpsim)
@@ -496,9 +506,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
 
   ## Lazy loading: if a _xData/ directory with a manifest exists, set up
   ## delayedAssign promises for each user object — materialised on first access.
-  ext <- tools::file_ext(filename[1])
-  manifestFile <- file.path(xDir, paste0("_manifest.", ext))
-  if (file.exists(manifestFile)) {
+  if (isLazyLoad) {
     manifest <- if (ext == "rds") readRDS(manifestFile)
                 else qs2::qs_read(manifestFile, nthreads = getOption("spades.qsThreads", 1))
     simPaths <- paths(tmpsim)
