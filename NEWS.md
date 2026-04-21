@@ -1,5 +1,6 @@
 # SpaDES.core (development version)
 
+* `saveSimList`: resilient to individual file-backed objects whose backing files are inaccessible at save time; such objects are saved as `NULL` with a warning rather than aborting the entire save.
 * `saveSimList`: new `lazy = TRUE` option saves each user object individually into a `<filename>_xData/` directory; `loadSimList` auto-detects this layout and loads objects lazily via `delayedAssign`, materialising each only on first access. During lazy load, `.modObjs` (per-module object copies held in the shell simList) is cleared before `.unwrap()` so that missing backing files do not cause a load failure; `.modObjs` is rebuilt by `spades()` on the next run.
 * `saveSimList`: remove `sim@.xData$._sim` (circular reference) before saving to avoid redundant data in the saved file.
 * .prepareOutput -- if outputPath was different, but cachePath is same between 2 simInit/spades calls, then outputs will get a file that is not available because it was in the outputPath of the first one; fixed

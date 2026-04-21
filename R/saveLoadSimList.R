@@ -154,7 +154,10 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     sim <- get(simName, envir = tmpEnv)
   }
 
-  sim <- .wrap(sim, cachePath = NULL, paths = paths(sim)) # makes a copy of filebacked object files
+  ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
+  ## does not abort the entire save; failed objects are saved as NULL with a warning.
+  sim <- .wrapResiliently(sim)
+  sim <- .wrap(sim, cachePath = NULL, paths = paths(sim)) # wrap remaining / non-file-backed
   sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
@@ -663,6 +666,31 @@ recoverDataTableFromQs <- function(sim) {
   })
 
   list2env(reworkedRas, envir = envir(sim))
+}
+
+## Pre-wrap each file-backed object in sim@.xData individually so that one
+## inaccessible backing file does not abort saveSimList. Failed objects are
+## replaced with NULL and a warning is issued; the subsequent monolithic
+## .wrap(sim, ...) then succeeds on the remaining objects.
+.wrapResiliently <- function(sim) {
+  nms <- ls(sim@.xData, all.names = FALSE)
+  simPaths <- paths(sim)
+  for (nm in nms) {
+    obj <- sim@.xData[[nm]]
+    fns <- tryCatch(Filenames(obj), error = function(e) character(0))
+    if (length(fns) && any(nchar(fns) > 0L)) {
+      sim@.xData[[nm]] <- tryCatch(
+        .wrap(obj, cachePath = NULL, paths = simPaths),
+        error = function(e) {
+          warning("saveSimList: could not wrap '", nm,
+                  "' (backing file inaccessible); saving as NULL.\n",
+                  "  Error: ", conditionMessage(e), call. = FALSE)
+          NULL
+        }
+      )
+    }
+  }
+  sim
 }
 
 ## Remap file paths in a single wrapped object (mirrors the per-object logic in
