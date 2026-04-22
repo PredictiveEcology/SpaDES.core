@@ -304,8 +304,14 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
   ## Once reversed, remove the .recoverableObjs
   sim$.recoverableObjs <- NULL
 
-  if (restart)
+  if (restart) {
+    # All packages are guaranteed already loaded in this session; skip the
+    # Require() call in loadPkgs which can hang non-interruptibly (dyn.load on
+    # an NFS-backed .so) when packages are touched again unnecessarily.
+    opts <- options(spades.loadReqdPkgs = FALSE)
+    on.exit(options(opts), add = TRUE)
     sim <- spades(sim, ...)
+  }
   # } else {
   #   message("There was no interrupted spades call; returning sim as is")
   # }
