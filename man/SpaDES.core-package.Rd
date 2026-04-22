@@ -502,6 +502,12 @@ Default \code{FALSE} to keep computational overhead down. If \code{TRUE},
 there should be no name conflicts among package objects,
 but it is much slower, especially if the events are themselves fast.
 
+\item \code{spades.progressInterval}: Minimum number of seconds between successive
+cli progress-bar lines emitted to the console during \code{simInit} and \code{spades}.
+cli progress output (e.g., from \code{archive::archive_extract} or any other package
+that uses cli internally) is throttled to one timestamped line per interval so
+that fast-updating progress bars do not flood the console. Default \code{2}.
+
 \item \code{spades.tolerance}: The default tolerance value used for floating
 point number comparisons. Default \code{.Machine$double.eps^0.5}.
 
