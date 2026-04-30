@@ -459,6 +459,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
         newNames <- unique(newFiles$newName)
         for (elem in names(tmpsim[[nam]])) {
           fileHere <- tmpsim[[nam]][[elem]] # should only have 1 element's file(s)
+          if (!is.character(fileHere) || !length(fileHere)) next # NULL'd by .wrapResiliently
           dirToFileHere <- dirname(fileHere)
           nParents <- attr(fileHere, "nParentDirs")
           1
@@ -737,6 +738,7 @@ recoverDataTableFromQs <- function(sim) {
     newNames <- unique(newFiles$newName)
     for (elem in names(obj)) {
       fileHere      <- obj[[elem]]
+      if (!is.character(fileHere) || !length(fileHere)) next # NULL'd by .wrapResiliently
       dirToFileHere <- dirname(fileHere)
       nParents      <- attr(fileHere, "nParentDirs")
       for (nPar in rev(seq(nParents + 1))) {

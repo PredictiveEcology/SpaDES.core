@@ -2,6 +2,7 @@
 
 * `saveSimList`: resilient to individual file-backed objects whose backing files are inaccessible at save time; such objects are saved as `NULL` with a warning rather than aborting the entire save.
 * `loadSimList`: mirror-image resilience on the load side via `.unwrapResiliently()` — file-backed objects that cannot be `.unwrap()`ped (e.g. backing files missing on this machine) are loaded as `NULL` with a warning instead of aborting the load.
+* `loadSimList`: path-remap loops now skip non-character / `NULL` list elements (left behind by `.wrapResiliently` having nulled an object at save time), preventing `dirname(fileHere)` from aborting with "a character vector argument expected".
 * `saveSimList`: new `lazy = TRUE` option saves each user object individually into a `<filename>_xData/` directory; `loadSimList` auto-detects this layout and loads objects lazily via `delayedAssign`, materialising each only on first access. During lazy load, `.modObjs` (per-module object copies held in the shell simList) is cleared before `.unwrap()` so that missing backing files do not cause a load failure; `.modObjs` is rebuilt by `spades()` on the next run.
 * `saveSimList`: remove `sim@.xData$._sim` (circular reference) before saving to avoid redundant data in the saved file.
 * .prepareOutput -- if outputPath was different, but cachePath is same between 2 simInit/spades calls, then outputs will get a file that is not available because it was in the outputPath of the first one; fixed
