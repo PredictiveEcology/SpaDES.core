@@ -496,6 +496,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     }
   }
 
+  tmpsim <- .unwrapResiliently(tmpsim, paths(tmpsim))
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim))
 
   ## Work around for bug in qs that recovers data.tables as lists
@@ -684,6 +685,34 @@ recoverDataTableFromQs <- function(sim) {
         error = function(e) {
           warning("saveSimList: could not wrap '", nm,
                   "' (backing file inaccessible); saving as NULL.\n",
+                  "  Error: ", conditionMessage(e), call. = FALSE)
+          NULL
+        }
+      )
+    }
+  }
+  sim
+}
+
+## Pre-unwrap each file-backed object in sim@.xData individually so that one
+## inaccessible backing file does not abort loadSimList. Failed objects are
+## replaced with NULL and a warning is issued; the subsequent monolithic
+## .unwrap(sim, ...) then succeeds on the remaining objects. Mirror image of
+## .wrapResiliently — load-time failures are independent of save-time
+## failures (e.g. backing files may have been present at save time but
+## missing on the machine doing the load).
+.unwrapResiliently <- function(sim, simPaths) {
+  nms <- ls(sim@.xData, all.names = FALSE)
+  for (nm in nms) {
+    obj <- sim@.xData[[nm]]
+    if (is.null(attr(obj, "tags"))) next  # not wrapped
+    fns <- tryCatch(Filenames(obj), error = function(e) character(0))
+    if (length(fns) && any(nchar(fns) > 0L)) {
+      sim@.xData[[nm]] <- tryCatch(
+        .unwrap(obj, cachePath = NULL, paths = simPaths),
+        error = function(e) {
+          warning("loadSimList: could not unwrap '", nm,
+                  "' (backing file inaccessible); loading as NULL.\n",
                   "  Error: ", conditionMessage(e), call. = FALSE)
           NULL
         }
