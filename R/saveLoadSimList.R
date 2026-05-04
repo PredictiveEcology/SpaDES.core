@@ -209,7 +209,14 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     if (length(userObjNames)) {
       ## makeLazyLoadDB is internal to tools but stable; use getFromNamespace
       ## to avoid the R CMD check NOTE for ::: usage.
-      utils::getFromNamespace("makeLazyLoadDB", "tools")(sim@.xData, lazyBase)
+      ## Restrict to user objects: dot-prefixed internals (.mods, .modObjs, ...)
+      ## stay in @.xData and ride along in saveRDS(). Without `variables`,
+      ## makeLazyLoadDB defaults to all.names = TRUE and bundles each nested
+      ## env's bindings into a single serialized blob via its envhook --
+      ## .mods alone can exceed the 2 GB single-value lazyLoadDB limit.
+      utils::getFromNamespace("makeLazyLoadDB", "tools")(
+        sim@.xData, lazyBase, variables = userObjNames
+      )
       rm(list = userObjNames, envir = sim@.xData)
     }
 
