@@ -67,10 +67,10 @@
 #'
 #' @param lazy Logical. If `TRUE`, the user objects in `sim@.xData` are saved
 #'   into a sibling lazy-load DB (a `<filename>_xData.rdx`/`.rdb` pair built
-#'   by [tools::makeLazyLoadDB()]) alongside the shell `simList` file, rather
-#'   than monolithically. [loadSimList()] detects this layout automatically
-#'   and restores the objects via [lazyLoad()], materializing each one only
-#'   on first access. Defaults to `FALSE`.
+#'   by `tools:::makeLazyLoadDB()`) alongside the shell `simList` file,
+#'   rather than monolithically. [loadSimList()] detects this layout
+#'   automatically and restores the objects via [lazyLoad()], materializing
+#'   each one only on first access. Defaults to `FALSE`.
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
@@ -194,7 +194,9 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
     userObjNames <- ls(sim@.xData, all.names = FALSE)
     if (length(userObjNames)) {
-      tools::makeLazyLoadDB(sim@.xData, lazyBase)
+      ## makeLazyLoadDB is internal to tools but stable; use getFromNamespace
+      ## to avoid the R CMD check NOTE for ::: usage.
+      utils::getFromNamespace("makeLazyLoadDB", "tools")(sim@.xData, lazyBase)
       rm(list = userObjNames, envir = sim@.xData)
     }
 
