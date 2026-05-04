@@ -65,11 +65,12 @@
 #'   `inputs` or `cache` are `TRUE`. Setting this to `FALSE` will turn off the
 #'   saving of files specified in `inputs(sim)`, `outputs(sim)` or the cache.
 #'
-#' @param lazy Logical. If `TRUE`, each user object in `sim@.xData` is saved
-#'   individually into a `<filename>_xData/` directory alongside the shell
-#'   `simList` file, rather than monolithically. [loadSimList()] detects this
-#'   layout automatically and loads each object lazily via [delayedAssign()],
-#'   materializing it only on first access. Defaults to `FALSE`.
+#' @param lazy Logical. If `TRUE`, the user objects in `sim@.xData` are saved
+#'   into a sibling lazy-load DB (a `<filename>_xData.rdx`/`.rdb` pair built
+#'   by [tools::makeLazyLoadDB()]) alongside the shell `simList` file, rather
+#'   than monolithically. [loadSimList()] detects this layout automatically
+#'   and restores the objects via [lazyLoad()], materializing each one only
+#'   on first access. Defaults to `FALSE`.
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
@@ -188,31 +189,13 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
   if (isTRUE(lazy)) {
     ext <- tools::file_ext(filename)
-    xDir <- paste0(tools::file_path_sans_ext(filename), "_xData")
-    dir.create(xDir, showWarnings = FALSE, recursive = TRUE)
+    lazyBase <- paste0(tools::file_path_sans_ext(filename), "_xData")
+    lazyDbFiles <- paste0(lazyBase, c(".rdx", ".rdb"))
 
     userObjNames <- ls(sim@.xData, all.names = FALSE)
-    manifest <- data.frame(name = userObjNames,
-                           file = paste0(userObjNames, ".", ext),
-                           stringsAsFactors = FALSE)
-
-    for (nm in userObjNames) {
-      objFile <- file.path(xDir, paste0(nm, ".", ext))
-      if (ext == "rds") {
-        saveRDS(sim@.xData[[nm]], file = objFile)
-      } else {
-        qs2::qs_save(sim@.xData[[nm]], file = objFile,
-                     nthreads = getOption("spades.qsThreads", 1))
-      }
-      rm(list = nm, envir = sim@.xData)
-    }
-
-    manifestFile <- file.path(xDir, paste0("_manifest.", ext))
-    if (ext == "rds") {
-      saveRDS(manifest, file = manifestFile)
-    } else {
-      qs2::qs_save(manifest, file = manifestFile,
-                   nthreads = getOption("spades.qsThreads", 1))
+    if (length(userObjNames)) {
+      tools::makeLazyLoadDB(sim@.xData, lazyBase)
+      rm(list = userObjNames, envir = sim@.xData)
     }
 
     if (ext == "rds") {
@@ -248,7 +231,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
         srcFiles <- tmpSrcFiles
       }
 
-      xDirFiles <- dir(xDir, full.names = TRUE, recursive = TRUE)
+      lazyDbExisting <- lazyDbFiles[file.exists(lazyDbFiles)]
       allFns <- c(fns, otherFns, srcFilesRel)
       if (!is.null(symlinks)) {
         for (p in names(symlinks)) {
@@ -257,10 +240,10 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       }
       allFns <- na.omit(allFns)
 
-      relFns <- makeRelative(c(fileToDelete, xDirFiles, allFns), projectPath) |> unname()
+      relFns <- makeRelative(c(fileToDelete, lazyDbExisting, allFns), projectPath) |> unname()
       archiveWrite(filename, relFns, verbose)
       unlink(fileToDelete)
-      unlink(xDir, recursive = TRUE)
+      unlink(lazyDbExisting)
     }
 
     messageVerbose("    ... saved!", verbose = verbose)
@@ -392,25 +375,29 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     on.exit(unlink(td, recursive = TRUE), add = TRUE)
 
     baseNameNoExt <- tools::file_path_sans_ext(basename(filename[1]))
-    xDirBasename <- paste0(baseNameNoExt, "_xData")
-    isXData <- grepl(xDirBasename, filename[-1], fixed = TRUE)
+    lazyBaseName <- paste0(baseNameNoExt, "_xData")
+    lazyDbBasenames <- paste0(lazyBaseName, c(".rdx", ".rdb"))
+    isLazyDb <- basename(filename[-1]) %in% lazyDbBasenames
 
-    filenameRel <- gsub(paste0(td, "/"), "", filename[-1][!isXData])  ## TODO: WRONG!
+    filenameRel <- gsub(paste0(td, "/"), "", filename[-1][!isLazyDb])  ## TODO: WRONG!
     ## This will put the files to relative path of projectPath
     newFns <- file.path(projectPath, filenameRel)
-    linkOrCopy(filename[-1][!isXData], newFns, verbose = verbose - 1)
+    linkOrCopy(filename[-1][!isLazyDb], newFns, verbose = verbose - 1)
 
-    ## Persist _xData/ beyond tempdir cleanup so lazy promises can resolve
-    xDir <- file.path(tempPath, xDirBasename)
-    xDirInTd <- file.path(td, xDirBasename)
-    if (dir.exists(xDirInTd)) {
-      if (dir.exists(xDir)) unlink(xDir, recursive = TRUE)
-      file.copy(xDirInTd, tempPath, recursive = TRUE)
+    ## Persist .rdb/.rdx beyond tempdir cleanup so lazy promises can resolve
+    lazyBase <- file.path(tempPath, lazyBaseName)
+    for (ex in c(".rdx", ".rdb")) {
+      srcs <- filename[-1][isLazyDb & basename(filename[-1]) == paste0(lazyBaseName, ex)]
+      if (length(srcs)) {
+        dst <- paste0(lazyBase, ex)
+        if (file.exists(dst)) unlink(dst)
+        file.copy(srcs[[1L]], dst)
+      }
     }
   } else {
     # filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
     filenameRel <- getRelative(filename, projectPath)
-    xDir <- paste0(tools::file_path_sans_ext(filename[1]), "_xData")
+    lazyBase <- paste0(tools::file_path_sans_ext(filename[1]), "_xData")
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
@@ -483,9 +470,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   ## copies of file-backed objects) from the shell simList. Those objects were NOT saved
   ## as part of the shell — their backing files may not exist — and .unwrap would fail on
   ## them. They are rebuilt by spades() on the next run, so it is safe to clear them here.
-  ext <- tools::file_ext(filename[1])
-  manifestFile <- file.path(xDir, paste0("_manifest.", ext))
-  isLazyLoad <- file.exists(manifestFile)
+  isLazyLoad <- file.exists(paste0(lazyBase, ".rdx"))
 
   if (isLazyLoad) {
     modObjsEnv <- tmpsim@.xData[[".modObjs"]]
@@ -509,22 +494,24 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
   makeSimListActiveBindings(tmpsim)
 
-  ## Lazy loading: if a _xData/ directory with a manifest exists, set up
-  ## delayedAssign promises for each user object — materialised on first access.
+  ## Lazy loading: if a sibling .rdx/.rdb pair exists, restore the user objects
+  ## via lazyLoad() into a holding env, then bind delayedAssign wrappers on the
+  ## simList so each access triggers the underlying lazy promise plus our
+  ## remap/unwrap pass.
   if (isLazyLoad) {
-    manifest <- if (ext == "rds") readRDS(manifestFile)
-                else qs2::qs_read(manifestFile, nthreads = getOption("spades.qsThreads", 1))
+    lazyEnv <- new.env(parent = emptyenv())
+    tryCatch(lazyLoad(lazyBase, envir = lazyEnv),
+             error = function(e) warning("Could not attach lazy DB '", lazyBase,
+                                         "': ", conditionMessage(e), call. = FALSE))
     simPaths <- paths(tmpsim)
-    for (nm in manifest$name) {
+    for (nm in ls(lazyEnv, all.names = TRUE)) {
       local({
         .nm <- nm
-        .f  <- file.path(xDir, manifest$file[manifest$name == .nm])
-        .ext <- ext
+        .lazyEnv     <- lazyEnv
         .projectPath <- projectPath
         .simPaths    <- simPaths
         delayedAssign(.nm, tryCatch({
-          obj <- if (.ext == "rds") readRDS(.f)
-                 else qs2::qs_read(.f, nthreads = getOption("spades.qsThreads", 1))
+          obj <- get(.nm, envir = .lazyEnv)
           obj <- .remapFileBackedObj(obj, .projectPath, .simPaths)
           .unwrap(obj, cachePath = NULL, paths = .simPaths)
         }, error = function(e) {
