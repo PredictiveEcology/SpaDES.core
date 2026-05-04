@@ -143,6 +143,18 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     sim <- get(simName, envir = envir)
   }
 
+  ## Shallow-clone @.xData so subsequent rebindings (._randomSeed/._rng.kind
+  ## hidden vars, .wrapResiliently's per-object Path wrapping, the lazy
+  ## rm()) don't bleed back into the caller's sim — environments are passed
+  ## by reference. We deliberately avoid reproducible::Copy(sim) here because
+  ## that would deep-copy file-backed objects to new paths. The shallow clone
+  ## is enough: .wrapResiliently rebinds names to brand-new Path objects, so
+  ## the caller's environment keeps its original SpatRaster bindings.
+  .xDataClone <- new.env(parent = emptyenv())
+  list2env(as.list(sim@.xData, all.names = TRUE), envir = .xDataClone)
+  attributes(.xDataClone) <- attributes(sim@.xData)
+  sim@.xData <- .xDataClone
+
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   sim@.xData$._rng.kind <- RNGkind()
