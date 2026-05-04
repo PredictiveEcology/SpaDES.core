@@ -202,8 +202,7 @@ test_that("Plots function 2", {
 })
 
 test_that("Plots function 3 - use as Plot", {
-  skip_if_not(interactive())
-  # if (interactive()) {
+  testthat::skip_on_ci()
     testInit("terra", opts = list(spades.PlotsUsePlot = TRUE))
     packages <- c("raster", "terra")
     functions <- cbind(c("raster", "extent", "stack", "nlayers"),
