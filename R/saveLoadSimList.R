@@ -143,17 +143,18 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     sim <- get(simName, envir = envir)
   }
 
-  ## Shallow-clone @.xData so subsequent rebindings (._randomSeed/._rng.kind
-  ## hidden vars, .wrapResiliently's per-object Path wrapping, the lazy
-  ## rm()) don't bleed back into the caller's sim — environments are passed
-  ## by reference. We deliberately avoid reproducible::Copy(sim) here because
-  ## that would deep-copy file-backed objects to new paths. The shallow clone
-  ## is enough: .wrapResiliently rebinds names to brand-new Path objects, so
-  ## the caller's environment keeps its original SpatRaster bindings.
-  .xDataClone <- new.env(parent = emptyenv())
-  list2env(as.list(sim@.xData, all.names = TRUE), envir = .xDataClone)
-  attributes(.xDataClone) <- attributes(sim@.xData)
-  sim@.xData <- .xDataClone
+  ## Break every pass-by-reference link into the caller's sim. simList
+  ## state lives almost entirely in environments (@.xData and the nested
+  ## .mods / .modObjs / .objects envs), and the subsequent rebindings
+  ## (._randomSeed/._rng.kind, .wrapResiliently's per-object Path wrapping,
+  ## paths() rewrite, lazy rm) would otherwise mutate the caller's state.
+  ## We avoid reproducible::Copy(sim) here because its SpatRaster path
+  ## eagerly duplicates backing files (filebackedDir = NULL is documented
+  ## but not honored by the ANY method). .cloneSimEnvs recursively clones
+  ## every environment but leaves leaf values (SpatRasters, data.tables,
+  ## etc.) alone — saveSimList rebinds names, not nested object internals,
+  ## so leaf-pointer sharing is harmless.
+  sim <- .cloneSimEnvs(sim)
 
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
@@ -669,6 +670,45 @@ recoverDataTableFromQs <- function(sim) {
   })
 
   list2env(reworkedRas, envir = envir(sim))
+}
+
+## Recursively clone every environment reachable from a simList so that
+## subsequent rebindings inside saveSimList don't mutate the caller's state.
+## Leaf values (SpatRasters, data.tables, lists, etc.) are kept by reference
+## — saveSimList rebinds names in the cloned envs rather than mutating the
+## internals of those leaves, and avoiding leaf duplication is the whole
+## point of doing this instead of reproducible::Copy(sim) (which eagerly
+## duplicates SpatRaster backing files).
+.cloneSimEnvs <- function(sim) {
+  sim@.xData    <- .cloneEnvDeep(sim@.xData)
+  sim@.envir    <- sim@.xData
+  sim@completed <- .cloneEnvDeep(sim@completed)
+  sim
+}
+
+## Recursive environment cloner. For each binding: if it's an environment,
+## recurse; otherwise pass it through. Preserves attributes.
+.cloneEnvDeep <- function(env, .seen = NULL) {
+  if (!is.environment(env)) return(env)
+  if (is.null(.seen)) .seen <- new.env(parent = emptyenv())
+  key <- format(env)
+  if (exists(key, envir = .seen, inherits = FALSE)) {
+    return(get(key, envir = .seen, inherits = FALSE))
+  }
+  out <- new.env(parent = parent.env(env))
+  assign(key, out, envir = .seen)  # cycle guard before recursing
+  for (nm in ls(env, all.names = TRUE)) {
+    if (bindingIsActive(nm, env)) {
+      ## Re-attach the same active binding (its backing function is what
+      ## defines its behavior; copying the function is enough).
+      makeActiveBinding(nm, activeBindingFunction(nm, env), out)
+    } else {
+      val <- get(nm, envir = env, inherits = FALSE)
+      assign(nm, .cloneEnvDeep(val, .seen = .seen), envir = out)
+    }
+  }
+  attributes(out) <- attributes(env)
+  out
 }
 
 ## Pre-wrap each file-backed object in sim@.xData individually so that one

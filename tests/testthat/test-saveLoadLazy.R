@@ -78,6 +78,37 @@ test_that("lazy round-trip materializes a file-backed terra SpatRaster on access
   expect_true(rlang::env_binding_are_lazy(loaded@.xData, "plain"))
 })
 
+test_that("saveSimList does not mutate the caller's simList (Path-wrap leak)", {
+  ## Regression: .wrapResiliently used to rebind sim@.xData[[nm]] to Path
+  ## objects in place. .xData is an environment, so the caller's live sim
+  ## ended up with Path-wrapped rasters after every saveSimList call —
+  ## visibly broke the checkpoint module (which calls saveSimList mid-run)
+  ## and any code that touched the sim afterwards.
+  skip_if_not_installed("terra")
+
+  td <- normPath(withr::local_tempdir())
+  simPaths <- list(cachePath = td, inputPath = td, outputPath = td,
+                   modulePath = td, scratchPath = td, terraPath = td)
+
+  rastFile <- file.path(td, "tiny.tif")
+  terra::writeRaster(terra::rast(matrix(1:9, 3)), rastFile, overwrite = TRUE)
+
+  sim <- new("simList")
+  paths(sim) <- simPaths
+  sim@.xData[["r"]] <- terra::rast(rastFile)
+  sim@.xData[["x"]] <- 42L
+  sim@.xData[["nested"]] <- new.env(parent = emptyenv())
+  sim@.xData[["nested"]]$inner <- "untouched"
+
+  saveSimList(sim, filename = file.path(td, "sim.rds"),
+              files = FALSE, projectPath = td)
+
+  expect_s4_class(sim$r, "SpatRaster")
+  expect_false(inherits(sim$r, "Path"))
+  expect_identical(sim$x, 42L)
+  expect_identical(sim$nested$inner, "untouched")
+})
+
 test_that("lazy saveSimList omits the .rdx/.rdb when there are no user objects", {
   td <- normPath(withr::local_tempdir())
   simPaths <- list(cachePath = td, inputPath = td, outputPath = td,
