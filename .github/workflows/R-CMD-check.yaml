@@ -102,6 +102,13 @@ jobs:
           # Pin pak to its stable channel; the action defaults to devel which
           # occasionally regresses on Windows.
           pak-version: stable
+          # Bump when the stock-Noble libgdal/proj soversion changes (or
+          # when a stale binary cache otherwise refuses to load). Previous
+          # cache had `terra` binaries built against libgdal.so.37 from the
+          # old ubuntugis-unstable PPA; runners now ship libgdal.so.34 from
+          # stock Noble, so the cache must be invalidated to force a fresh
+          # source build (notably for ubuntu oldrel-1).
+          cache-version: 2
           extra-packages: |
             any::rcmdcheck
             NLMR=?ignore

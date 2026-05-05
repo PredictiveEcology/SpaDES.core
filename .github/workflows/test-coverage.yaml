@@ -43,6 +43,13 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           pak-version: stable
+          # Bump when the stock-Noble libgdal/proj soversion changes (or when
+          # a stale binary cache otherwise refuses to load). Previous cache
+          # (cache-version: 1) had a `terra` binary built against
+          # libgdal.so.37 from the old ubuntugis-unstable PPA; runners now
+          # ship libgdal.so.34 from stock Noble, so the cache must be
+          # invalidated to force a fresh source build.
+          cache-version: 2
           extra-packages: |
             any::covr
             NLMR=?ignore
