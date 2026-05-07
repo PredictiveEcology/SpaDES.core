@@ -41,7 +41,7 @@ This is stated in a message.'><!-- mathjax --><script src="https://cdnjs.cloudfl
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -90,7 +90,7 @@ This is stated in a message.'><!-- mathjax --><script src="https://cdnjs.cloudfl
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Restart R programmatically</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.8/R/restart.R" class="external-link"><code>R/restart.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/restart.R" class="external-link"><code>R/restart.R</code></a></small>
     <div class="hidden name"><code>restartR.Rd</code></div>
     </div>
 
@@ -131,20 +131,20 @@ This is stated in a message.</p>
 
 
 <dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
-<dd><p>Required. A <code>simList</code> to be retained through the restart</p></dd>
+<dd><p>Required. A <code>simList</code> to be retained through the restart.</p></dd>
 
 
 <dt id="arg-reloadpkgs">reloadPkgs<a class="anchor" aria-label="anchor" href="#arg-reloadpkgs"></a></dt>
 <dd><p>Logical. If <code>TRUE</code>, it will attempt to reload all the packages
 as they were in previous session, in the same order. If <code>FALSE</code>, it will
-load no packages beyond normal R startup. Default <code>TRUE</code></p></dd>
+load no packages beyond normal R startup. Default <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg--first">.First<a class="anchor" aria-label="anchor" href="#arg--first"></a></dt>
-<dd><p>A function to save to <code class="file">~/.qs</code> which will
-be loaded at restart from <code class="file">~/.qs</code> and run. Default is <code>NULL</code>,
-meaning it will use the non-exported <code>SpaDES.core:::First</code>. If a
-user wants to make a custom <code>First</code> file, it should built off that one.</p></dd>
+<dd><p>A function to save to <code class="file">~/.qs2</code> which will
+be loaded at restart from <code class="file">~/.qs2</code> and run.
+Default is <code>NULL</code>, meaning it will use the non-exported <code>SpaDES.core:::First</code>.
+If a user wants to make a custom <code>First</code> file, it should built off that one.</p></dd>
 
 
 <dt id="arg--rdatafile">.RDataFile<a class="anchor" aria-label="anchor" href="#arg--rdatafile"></a></dt>
@@ -152,7 +152,7 @@ user wants to make a custom <code>First</code> file, it should built off that on
 Defaults to <code>getOption("spades.restartR.filename")</code>, and the directory will
 be in <code>restartDir</code>. The simulation time will be mid-pended to this
 name, as in: <code>basename(file), "_time",</code>
-<code>paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))</code></p></dd>
+<code>paddedFloatToChar(time(sim), padL = nchar(as.character(end(sim))))))</code>.</p></dd>
 
 
 <dt id="arg-restartdir">restartDir<a class="anchor" aria-label="anchor" href="#arg-restartdir"></a></dt>
@@ -164,7 +164,7 @@ If <code>NULL</code>, then it will try, in order, <code>outputPath(sim)</code>,
 taking the first one that is not inside the <code><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir()</a></code>, which will
 disappear during restart of R.
 The actual directory for a given <code>spades</code> call that is restarting will be:
-<code>file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))</code>.
+<code>file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))</code>.
 The random string is to prevent parallel processes that started at the same clock
 time from colliding.</p></dd>
 
@@ -180,7 +180,7 @@ the default behaviour should suffice. These are of 3 types: <code>restartRInterv
 the arguments to <code>restartR</code> and the arguments to <code>saveSimList</code>, these latter two
 using a dot to separate the function name and its argument. The defaults for
 two key options are: <code>options("spades.restartR.restartDir" = NULL</code>, meaning
-use <code>file.path(restartDir, "restartR", paste0(sim$._startClockTime, "_", .rndString))</code>
+use <code>file.path(restartDir, "restartR", paste0(sim[[._txtStartClockTime]], "_", .rndString))</code>
 and <code>options("spades.saveSimList.fileBackend" = 0)</code>, which means don't do anything
 with raster-backed files.
 See specific functions for defaults and argument meanings.
@@ -191,8 +191,8 @@ the file backends will still be intact after a restart, so no need to move them 
     <div id="note">
     <h2>Note</h2>
     <p>Because of the restarting, the object name of the original assignment of the
-<code>spades</code> call can not be preserved. The <code>spades</code> call will be
-assigned to <code>sim</code> in the <code>.GlobalEnv</code>.</p>
+<code>spades</code> call can not be preserved.
+The <code>spades</code> call will be assigned to <code>sim</code> in the <code>.GlobalEnv</code>.</p>
 <p>Because this function is focused on restarting during a <code>spades</code> call,
 it will remove all objects in the <code>.GlobalEnv</code>, emulating <code>q("no")</code>.
 If the user wants to keep those objects, then they should be saved to disk
@@ -214,7 +214,7 @@ The default is to treat these files as temporary files and so will be removed.</
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

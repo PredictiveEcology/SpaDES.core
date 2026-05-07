@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -72,7 +72,7 @@
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Find the latest module version from a SpaDES module repository</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.8/R/module-repository.R" class="external-link"><code>R/module-repository.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/module-repository.R" class="external-link"><code>R/module-repository.R</code></a></small>
     <div class="hidden name"><code>getModuleVersion.Rd</code></div>
     </div>
 
@@ -81,13 +81,30 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getModuleVersion</span><span class="op">(</span><span class="va">name</span>, <span class="va">repo</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getModuleVersion</span><span class="op">(</span></span>
+<span>  <span class="va">name</span>,</span>
+<span>  <span class="va">repo</span>,</span>
+<span>  <span class="va">token</span>,</span>
+<span>  moduleFiles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.verbose"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'character,character'</span></span>
-<span><span class="fu">getModuleVersion</span><span class="op">(</span><span class="va">name</span>, <span class="va">repo</span><span class="op">)</span></span>
+<span><span class="fu">getModuleVersion</span><span class="op">(</span></span>
+<span>  <span class="va">name</span>,</span>
+<span>  <span class="va">repo</span>,</span>
+<span>  <span class="va">token</span>,</span>
+<span>  moduleFiles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.verbose"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># S4 method for class 'character,missing'</span></span>
-<span><span class="fu">getModuleVersion</span><span class="op">(</span><span class="va">name</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">getModuleVersion</span><span class="op">(</span></span>
+<span>  <span class="va">name</span>,</span>
+<span>  <span class="va">token</span>,</span>
+<span>  moduleFiles <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  verbose <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"reproducible.verbose"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -103,6 +120,23 @@
 Default is <code>"PredictiveEcology/SpaDES-modules"</code>, which is
 specified by the global option <code>spades.moduleRepo</code>.
 Only <code>master</code>/<code>main</code> branches can be used at this point.</p></dd>
+
+
+<dt id="arg-token">token<a class="anchor" aria-label="anchor" href="#arg-token"></a></dt>
+<dd><p>A github repository token as from <code><a href="https://gitcreds.r-lib.org/reference/gitcreds_get.html" class="external-link">gitcreds::gitcreds_get()</a></code></p></dd>
+
+
+<dt id="arg-modulefiles">moduleFiles<a class="anchor" aria-label="anchor" href="#arg-modulefiles"></a></dt>
+<dd><p>Optional. List of files of the <code>name</code> and <code>repo</code>. If not
+supplied, this function will get that information by using <code>checkModule</code>.</p></dd>
+
+
+<dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
+<dd><p>Numeric, -1 silent (where possible), 0 being very quiet,
+1 showing more messaging, 2 being more messaging, etc.
+Default is 1. Above 3 will output much more information about the internals of
+Caching, which may help diagnose Caching challenges. Can set globally with an
+option, e.g., <code>options('reproducible.verbose' = 0) to reduce to minimal</code></p></dd>
 
 </dl></div>
     <div id="value">
@@ -140,7 +174,7 @@ and see our SpaDES-modules repo for details of module repository structure
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

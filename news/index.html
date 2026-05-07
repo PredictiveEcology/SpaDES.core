@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -72,9 +72,50 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.8/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0.3" id="spadescore-303">SpaDES.core 3.0.3<a class="anchor" aria-label="anchor" href="#spadescore-303"></a></h2>
+<ul><li>minor changes for CRAN submission</li>
+</ul></div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.0.0" id="spadescore-300">SpaDES.core 3.0.0<a class="anchor" aria-label="anchor" href="#spadescore-300"></a></h2>
+<div class="section level3">
+<h3 id="dependency-changes-3-0-0">Dependency changes<a class="anchor" aria-label="anchor" href="#dependency-changes-3-0-0"></a></h3>
+<ul><li>use <code>qs2</code> package instead of <code>qs</code> (being removed from CRAN) for improved object serialization (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/291" class="external-link">#291</a>; <a href="https://github.com/PredictiveEcology/SpaDES.core/issues/316" class="external-link">#316</a>); This may cause <code>qs</code> based event caching to fail and will have to be re-run/re-cached;</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-3-0-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-0-0"></a></h3>
+<ul><li>fix a memory leak associated with <code>simList</code>’s <code>mod</code> object: The <code>mod</code> object was previously placed in <code>sim@.xData[[moduleName]]$.objects</code>; even though it had <code>parent.env</code> that was <code><a href="https://rdrr.io/r/base/environment.html" class="external-link">emptyenv()</a></code>, because it was attached to the environment <code>sim@.xData[[moduleName]]</code>, this meant that the objects in <code>mod</code> would become part of the environment where the functions were defined. This created a memory leak, resulting in inflated caches when events for that module were cached. It is now in <code>sim@.xData$.modObjs</code>, which appears to no longer suffer from the memory leak. This change in location required many changes throughout all exported <code>reproducible</code> functions that had <code>simList</code> methods, e.g., <code>.robustDigest</code>, etc.</li>
+<li>several corrections to messaging when there are nested <code>simList</code> objects, i.e., when <code>simInit</code> is called within a module;</li>
+<li>fix warning capture in <code><a href="../reference/spades.html">spades()</a></code> debug logging;</li>
+<li>fix use of <code>debug</code> as <code>verbose</code> when caching (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/322" class="external-link">#322</a>);</li>
+<li>several small bugfixes, including in <code>.robustDigest.simList</code>, <code>Plots</code>, <code>allowInitDuringSimInit</code>, <code>.prepareOutput</code>, <code>defineParameter</code>;</li>
+<li>fix for <code>moduleVersion</code> when there are many paths</li>
+<li>small changes to caching of simList during event caching; missing ability to pass explicit classOptions for params</li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-3-0-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-3-0-0"></a></h3>
+<ul><li>This is primarily a large update to address changes in <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> and its many exported methods;</li>
+<li>
+<code>cacheChaining</code>: a new experimental feature that will reduce time spent on digesting objects when there is an unbroken sequence of cached events. Event level caching will assess whether the most recent event was Cached. If it was, then the current cache will skip digesting and use only the functions (and parameters) and the previous event’s <code>cacheId</code> to assess whether the <code>sim</code> can recover the current event from the cache repository. Turned on via <code>options(spades.cacheChaining = TRUE)</code>
+</li>
+<li>many changes to accommodate updates to <code>reproducible</code> package, specifically the <code>Cache</code> function;</li>
+<li>
+<code>clearCacheEventsOnly</code> is a convenience wrapper that will remove all event-level cached objects in the cache repository;</li>
+<li>two internal helpers, <code>dotObjs</code> and <code>dotMod</code> which create a canonical pointer in the <code>simList</code> to these two parts of module-specific objects or functions, respectively;</li>
+<li>messaging updates when Caching events and <code>.inputObjects</code>;</li>
+<li>
+<code>Plots</code> can now have a <code>quote(data)</code> argument, allowing the whole call to be <code>Cache</code>d more easily;</li>
+<li>new function <code>doCallSafe</code> that can be used for <code>doCallSafe(simInitAndSpades, out)</code>, and it does not suffer from the slow downs of <code>do.call</code>;</li>
+<li>
+<code>.depsEdgeList</code> gains a new argument, <code>outputObjects</code>, which will return “hanging” outputs as <code>_OUTPUTS_</code>, analogous to the hanging inputs as <code>_INPUTS_</code>. This is needed to address a new case of <code>suppliedElsewhere</code> where the object is contained within an <code>objectSynonym</code>, and has not yet been made, but is only listed as an <code>outputObject</code> in a module;</li>
+<li>
+<code>evalPostEvent</code> and <code>options(spades.evalPostEvent)</code>, where a user can pass <code>quote</code>d code that will be evaluated at the end of each event and <code>.inputObject</code> call;</li>
+<li>documentation improvements;</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1.8" id="spadescore-218">SpaDES.core 2.1.8<small>2025-09-18</small><a class="anchor" aria-label="anchor" href="#spadescore-218"></a></h2>
 <ul><li>changes to a sporadically failing test;</li>
@@ -82,10 +123,12 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1.6" id="spadescore-216">SpaDES.core 2.1.6<small>2025-09-02</small><a class="anchor" aria-label="anchor" href="#spadescore-216"></a></h2>
 <ul><li>drop support for R 4.2;</li>
-<li>fixed issue with <code><a href="../reference/Plots.html">Plots()</a></code> where plots were discarded if no filename was specified;</li>
+<li>fix edge case with caching of events; <code>outputs</code> would create false positives (i.e., a change, when there wasn’t one); this meant that caching would only be successful after the 2nd time running the event, if another module had put objects in the <code>outputs</code> list, especially by using <code>Plots</code>.</li>
+<li>fix issue with <code><a href="../reference/Plots.html">Plots()</a></code> where plots were discarded if no filename was specified;</li>
 <li>fixed timeunit test failures (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/297" class="external-link">#297</a>);</li>
 <li>add package anchors to Rd links (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/300" class="external-link">#300</a>);</li>
 <li>minor documentation improvements;</li>
+<li>new option: <code>spades.reqdPkgsDontLoad</code>, a character vector. If anything is specified, then it will not be loaded with <code>require</code> or <code>library</code>, but it will be installed, if needed, and if <code>spades.useRequire = TRUE</code>, which is the default. Default for this new option is “box”, which is one of potentially many in the R universe that throws an error if it is loaded.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="2.1.5" id="spadescore-215">SpaDES.core 2.1.5<a class="anchor" aria-label="anchor" href="#spadescore-215"></a></h2>
@@ -553,7 +596,7 @@
 <li>better assertions inside list elements of <code>simInit</code>, e.g., <code>simInit(times = list(start = "test"))</code> now fails because times must be a list of 2 <code>numeric</code> objects</li>
 <li>messaging is now all with <code>message</code> instead of a mixture of <code>message</code>, <code>cat</code> and <code>print</code>. This allows for easier suppressing of messaging, e.g., via <code>suppressMessages</code>. This was requested in a downstream package, <code>SpaDES.experiment</code> that was submitted to CRAN but rejected due to the now former inability to suppress messages.</li>
 <li>
-<code>restartR</code> saves simulation objects using <code><a href="https://rdrr.io/pkg/qs/man/qsave.html" class="external-link">qs::qsave()</a></code> which is faster and creates smaller file sizes.</li>
+<code>restartR</code> saves simulation objects using <code>qs::qsave()</code> which is faster and creates smaller file sizes.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="dependency-changes-1-0-0">Dependency Changes<a class="anchor" aria-label="anchor" href="#dependency-changes-1-0-0"></a></h3>
@@ -686,7 +729,7 @@
 <li><p><code>simInit</code> and <code>spades</code> now call <code>setPaths(paths)</code> or <code>setPaths(sim$paths)</code>, unsetting them <code>on.exit</code> internally to make the paths used for functions e.g., <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> to use the correct path</p></li>
 <li><p>under-the-hood speed improvements for the DES (about 20% faster) – 38 microseconds per event under ideal conditions</p></li>
 <li><p>improved default path settings in <code>.inputObjects</code> (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/83" class="external-link">#83</a>)</p></li>
-<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on <code>simList</code> objects)</p></li>
+<li><p>following <code>reproducible</code> package updates, now uses <code><a href="https://rdrr.io/pkg/data.table/man/setattr.html" class="external-link">data.table::setattr</a></code> internally to avoid copying of objects (this may have very little/no effect on <code>simList</code> objects)</p></li>
 <li><p><code>suppliedElsewhere</code> has a new argument, <code>returnWhere</code>, a logical which will cause a logical of length 3 to be returned, indicating in which of the 3 other places the object may have been supplied, instead of length 1, still the default.</p></li>
 </ul></div>
 <div class="section level3">
@@ -882,7 +925,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>

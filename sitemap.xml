@@ -35,9 +35,11 @@
 <url><loc>https://spades-core.predictiveecology.org/reference/citation.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/classFilter.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/clearCache.html</loc></url>
+<url><loc>https://spades-core.predictiveecology.org/reference/clearCacheEventsOnly.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/convertToPackage.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/copyModule.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/coreModules.html</loc></url>
+<url><loc>https://spades-core.predictiveecology.org/reference/createDESCRIPTIONandDocs.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/createsOutput.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/dealWithClass.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/defineEvent.html</loc></url>
@@ -48,6 +50,7 @@
 <url><loc>https://spades-core.predictiveecology.org/reference/depsGraph.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/depsLoadOrder.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/depsPruneEdges.html</loc></url>
+<url><loc>https://spades-core.predictiveecology.org/reference/do.call.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/doEvent.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/dot-cleanPkgs.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/dot-findObjects.html</loc></url>

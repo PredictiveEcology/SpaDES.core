@@ -24,7 +24,7 @@ a simList would look like once it is converted to a repeatably digestible object
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">2.1.8</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
       </span>
     </div>
 
@@ -73,7 +73,7 @@ a simList would look like once it is converted to a repeatably digestible object
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1><code>.robustDigest</code> for <code>simList</code> objects</h1>
-    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/v2.1.8/R/cache.R" class="external-link"><code>R/cache.R</code></a></small>
+    <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/R/cache.R" class="external-link"><code>R/cache.R</code></a></small>
     <div class="hidden name"><code>robustDigest.Rd</code></div>
     </div>
 
@@ -84,7 +84,7 @@ a <code>simList</code> would look like once it is converted to a repeatably dige
 
     <div id="ref-usage">
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S4 method for class 'simList'</span></span>
-<span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/robustDigest.html" class="external-link">.robustDigest</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">.objects</span>, <span class="va">length</span>, <span class="va">algo</span>, <span class="va">quick</span>, <span class="va">classOptions</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/robustDigest.html" class="external-link">.robustDigest</a></span><span class="op">(</span><span class="va">object</span>, <span class="va">.objects</span>, <span class="va">length</span>, algo <span class="op">=</span> <span class="st">"xxhash64"</span>, <span class="va">quick</span>, <span class="va">classOptions</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -108,17 +108,13 @@ objects, this will only be applied outermost first.</p></dd>
 <dd><p>Numeric. If the element passed to Cache is a <code>Path</code> class
 object (from e.g., <code>asPath(filename)</code>) or it is a <code>Raster</code> with
 file-backing, then this will be
-passed to <code><a href="https://rdrr.io/pkg/digest/man/digest.html" class="external-link">digest::digest</a></code>, essentially limiting the number of bytes
+passed to <code><a href="https://eddelbuettel.github.io/digest/man/digest.html" class="external-link">digest::digest</a></code>, essentially limiting the number of bytes
 to digest (for speed). This will only be used if <code>quick = FALSE</code>.
 Default is <code>getOption("reproducible.length")</code>, which is set to <code>Inf</code>.</p></dd>
 
 
 <dt id="arg-algo">algo<a class="anchor" aria-label="anchor" href="#arg-algo"></a></dt>
-<dd><p>The algorithms to be used; currently available choices are
-    <code>md5</code>, which is also the default, <code>sha1</code>, <code>crc32</code>,
-    <code>sha256</code>, <code>sha512</code>, <code>xxhash32</code>, <code>xxhash64</code>,
-    <code>murmur32</code>, <code>spookyhash</code>, <code>blake3</code>, <code>crc32c</code>,
-    <code>xxh3_64</code>, and <code>xxh3_128</code>.</p></dd>
+<dd><p>The digest algorithm to use. Default <code>xxhash64</code> (see <code><a href="https://eddelbuettel.github.io/digest/man/digest.html" class="external-link">digest::digest()</a></code> for others).</p></dd>
 
 
 <dt id="arg-quick">quick<a class="anchor" aria-label="anchor" href="#arg-quick"></a></dt>
@@ -161,7 +157,7 @@ This will likely still not allow identical digest results across R versions.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
