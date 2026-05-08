@@ -1414,22 +1414,27 @@ setMethod(
     modCall <- get(moduleCall, envir = fnEnv)
     # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
 
-    expression(Cache(FUN =
-                       modCall(
-                         sim = sim,
-                         eventTime = cur[["eventTime"]], eventType = cur[["eventType"]]),
-                     # debugCache = "quick",
-                     .objects = moduleSpecificObjects,
-                     notOlderThan = notOlderThan,
-                     outputObjects = moduleSpecificOutputObjects,
-                     classOptions = classOptions,
-                     showSimilar = showSimilar,
-                     cachePath = sim@paths[["cachePath"]],
-                     .functionName = paste0(moduleCall, "::", cur[["eventType"]]),
-                     verbose = verbose,
-                     userTags = c(paste0("module:", cur[["moduleName"]]),
-                                  paste0("eventType:", cur[["eventType"]]),
-                                  paste0("eventTime:", time(sim)))))
+    extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
+    if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+
+    defaultCacheArgs <- list(
+      FUN = quote(modCall(sim = sim,
+                          eventTime = cur[["eventTime"]],
+                          eventType = cur[["eventType"]])),
+      .objects = quote(moduleSpecificObjects),
+      notOlderThan = quote(notOlderThan),
+      outputObjects = quote(moduleSpecificOutputObjects),
+      classOptions = quote(classOptions),
+      showSimilar = quote(showSimilar),
+      cachePath = quote(sim@paths[["cachePath"]]),
+      .functionName = quote(paste0(moduleCall, "::", cur[["eventType"]])),
+      verbose = quote(verbose),
+      userTags = quote(c(paste0("module:", cur[["moduleName"]]),
+                         paste0("eventType:", cur[["eventType"]]),
+                         paste0("eventTime:", time(sim))))
+    )
+    as.expression(as.call(c(list(quote(Cache)),
+                            modifyList(defaultCacheArgs, extraCacheArgs))))
   } else {
     ## Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))

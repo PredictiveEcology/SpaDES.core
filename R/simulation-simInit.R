@@ -1526,22 +1526,25 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             #                      depends = dependsSlots,
             #                      # .globals = globsWoKnowns,
             #                     modules = mBase)
-            fnCallAsExpr <- expression(
-              .inputObjects(sim) |>
-                Cache(
-                  .objects = objectsToEvaluateForCaching,
-                  notOlderThan = notOlderThan,
-                  outputObjects = moduleSpecificInputObjects,
-                  quick = getOption("reproducible.quick", FALSE),
-                  cachePath = sim@paths$cachePath,
-                  classOptions = classOptions,
-                  showSimilar = showSimilar,
-                  .functionName = paste0(".inputObjects_", mBase),
-                  userTags = c(paste0("module:", mBase),
-                               "eventType:.inputObjects"),
-                  verbose = verbose)
+            extraCacheArgs <- sim@params[[mBase]][[._txtDotUseCacheArgs]][[".inputObjects"]]
+            if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
 
+            defaultCacheArgs <- list(
+              FUN = quote(.inputObjects(sim)),
+              .objects = quote(objectsToEvaluateForCaching),
+              notOlderThan = quote(notOlderThan),
+              outputObjects = quote(moduleSpecificInputObjects),
+              quick = quote(getOption("reproducible.quick", FALSE)),
+              cachePath = quote(sim@paths$cachePath),
+              classOptions = quote(classOptions),
+              showSimilar = quote(showSimilar),
+              .functionName = quote(paste0(".inputObjects_", mBase)),
+              userTags = quote(c(paste0("module:", mBase),
+                                 "eventType:.inputObjects")),
+              verbose = quote(verbose)
             )
+            fnCallAsExpr <- as.expression(as.call(c(list(quote(Cache)),
+                                                    modifyList(defaultCacheArgs, extraCacheArgs))))
 
             cacheChaining <- getOption("spades.cacheChaining", FALSE)
             if (cacheChaining) {
