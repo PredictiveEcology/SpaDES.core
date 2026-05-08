@@ -1445,7 +1445,10 @@ setMethod(
 
     extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
     if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
-
+    isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
+    if (isTRUE(any(isCalls))) 
+      extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())
+    
     defaultCacheArgs <- list(
       FUN = quote(modCall(sim = sim,
                           eventTime = cur[["eventTime"]],
