@@ -112,6 +112,42 @@ test_that(".useCacheArgs splices arbitrary Cache args (userTags) per event", {
               info = "Caller-supplied userTags should override the default per-event userTags")
 })
 
+test_that(".useCacheArgs evaluates quoted entries at the splice site", {
+  skip_on_cran()
+
+  ## A `quote(...)` value in .useCacheArgs is evaluated in the local frame of
+  ## .runEvent at splice time, so module authors can write e.g.
+  ## `.cacheExtra = quote(sim$.someState)` and have it resolved per-event.
+  testInit(opts = list(reproducible.useMemoise = FALSE,
+                       reproducible.verbose     = 0,
+                       spades.saveSimOnExit     = FALSE))
+
+  modName <- "testUseCacheArgsQuoted"
+  suppressMessages(newModule(modName, path = tmpdir, open = FALSE))
+
+  args <- list(
+    modules = list(modName),
+    paths   = list(modulePath = tmpdir, cachePath = tmpCache),
+    params  = stats::setNames(
+      list(list(
+        .useCache     = "init",
+        ## Quoted call: should be evaluated at splice time and resolve to the
+        ## literal string before being passed to Cache().
+        .useCacheArgs = list(init = list(cacheId = quote(paste0("quoted_", "v1"))))
+      )),
+      modName
+    )
+  )
+
+  try(reproducible::clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
+  mySim <- suppressMessages(do.call(simInit, args))
+  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plotInitialTime = NA))
+
+  cache <- reproducible::showCache(tmpCache, cacheId = "quoted_v1", verbose = -1)
+  expect_true(NROW(cache) > 0,
+              info = "Quoted cacheId in .useCacheArgs should be eval'd to a string before reaching Cache()")
+})
+
 test_that(".useCacheArgs is excluded from the per-module cache digest", {
   ## The grep("useCache", .knownDotParams) at simulation-spades.R:2367 should
   ## auto-include .useCacheArgs in paramsDontCacheOn now that .useCacheArgs is
