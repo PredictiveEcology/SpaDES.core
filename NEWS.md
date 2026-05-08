@@ -1,5 +1,6 @@
 # SpaDES.core (development version)
 
+* New module parameter `.useCacheArgs`: optional named list (keyed by event name) of extra arguments spliced into the per-event `reproducible::Cache()` call. Lets a developer pin a fixed `cacheId` so a pre-seeded cloud folder (`useCloud = TRUE`, `cloudFolderID = ...`) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The `newModule()` template emits a commented-out opt-in example.
 * `saveSimList`: resilient to individual file-backed objects whose backing files are inaccessible at save time; such objects are saved as `NULL` with a warning rather than aborting the entire save.
 * `loadSimList`: mirror-image resilience on the load side via `.unwrapResiliently()` — file-backed objects that cannot be `.unwrap()`ped (e.g. backing files missing on this machine) are loaded as `NULL` with a warning instead of aborting the load.
 * `loadSimList`: path-remap loops now skip non-character / `NULL` list elements (left behind by `.wrapResiliently` having nulled an object at save time), preventing `dirname(fileHere)` from aborting with "a character vector argument expected".
