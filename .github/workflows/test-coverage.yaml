@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      GOOGLEDRIVE_AUTH: ${{ secrets.GOOGLEDRIVE_AUTH }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
       USING_COVR: true
       NOT_CRAN: true
