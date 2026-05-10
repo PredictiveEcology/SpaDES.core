@@ -1,5 +1,24 @@
 # SpaDES.core (development version)
 
+* Documentation: rewrite of the categorized package overview (`?SpaDES.core`).
+  Restructured into 14 sections with simpler language; every user-facing export
+  is now linked. The inlined options table is replaced with a pointer to
+  [`spadesOptions()`] (the single source of truth). New sections cover code
+  checking, persistence/recovery, and memory monitoring.
+* Documentation: vignette accuracy pass. Fixed: typo `SpaDES.taols` →
+  `SpaDES.tools` (in `i-introduction` and `ii-modules`); wrong option name
+  `spades.modulesPath` → `spades.modulePath` (three places); broken sentence
+  about the `simList`'s environment; stale `raster::Extent` reference in the
+  module-metadata table → `terra::SpatExtent` (with `Extent` kept for
+  back-compat); stale `sim$myFunction()` call style — modules now use
+  namespaced calls; wrong event name `"save"` in a plot `scheduleEvent()`
+  example → `"plot"`; stale `getOption("spades.cachePath")` →
+  `reproducible.cachePath`; stale `SpaDES::setPaths()` →
+  `SpaDES.core::setPaths()`; Ubuntu 18.04 in `v-automated-testing` → 24.04.
+  Modernized `SpatialPoints*` / `Raster*` mentions to `SpatVector` / `sf` /
+  `SpatRaster` (older `sp`/`raster` classes still work). The Advanced
+  vignette is rewritten and gains a section documenting the static code
+  checker.
 * `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 

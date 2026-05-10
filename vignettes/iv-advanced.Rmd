@@ -19,33 +19,97 @@ bibliography: bibliography.bib
 
 # Advanced `SpaDES` use
 
-_This vignette is still a work in progress._
+This vignette covers tools that become useful once you are building or
+maintaining a substantial `SpaDES` workflow: monitoring memory use across
+events, and statically checking that a module's code agrees with its
+declared metadata.
 
 ## Memory monitoring
 
-While `profvis::profvis` is an essential tool for memory monitoring using deep R internals, it is often not sufficient for a discrete event situation.
-For example, it may be useful to know the *peak memory use* of an event, as this may be the limiting step for setting up many parallel instances. 
-There is an experimental tool that gets triggered with `options("spades.memoryUseInterval" = xxx)` where `xxx` is a `numeric` in seconds, e.g., `0.2`. If this is set, and `future` and `future.callr` are installed, then whenever a `spades` call is made, the memory use will be assessed at that regular interval.
-The procedure is:
-1. spawn a future session (i.e., a parallel session) that runs `system('ps')` which lists all processes. It only keeps the process that represents the process ID of the main R session;
-2. that `ps` call writes to a text file every `getOption('spades.memoryUseInterval')`;
-3. if you ran this with a `spades` call, setting `options("spades.memoryUseInterval" = 0.5)` or some other interval (in seconds), it will read that text file into the `simList` at the end (`on.exit`) of the `spades` call (_doing this triggers a file deletion of the text file_);
-4. the object is then in `sim$.memoryUse$obj`.
+`profvis::profvis` is great for digging into R internals, but it doesn't fit
+the discrete-event pattern very well. Often the question is simpler: which
+event uses the most memory, and how much? That number sets how many parallel
+runs you can fit on a machine.
 
-At that point, the function `memoryUse` can be called on the `simList` and it will do a join on the `sim$.memoryUse$obj` with the `completed(sim)` _by_ time stamp, so each event shows its memory use.
+`SpaDES.core` ships a small background sampler. Turn it on by setting the
+option `spades.memoryUseInterval` to a sampling interval in seconds (e.g.,
+`0.2`). If `future` and `future.callr` are installed, each `spades()` call
+will then:
+
+1. spawn a `future` (parallel) R session that runs `system('ps')` once per
+   interval, keeping only the row for the main R process;
+2. write that to a text file;
+3. when `spades()` returns, read the file into `sim@.xData$.memoryUse$obj`
+   and delete the file;
+4. [memoryUse()] joins that table to [completed()] by timestamp, so each
+   event is annotated with its memory use.
 
 ```{r memoryUse, eval=FALSE, echo=TRUE}
 if (requireNamespace("future", quietly = TRUE) &&
-  requireNamespace("future.callr", quietly = TRUE)) {
-  options("spades.memoryUseInterval" = 0.5)
-  
-  # run your simInit and spades calls here
-  # sim <- simInit()
-  # sim <- spades(sim)  
-  
-  memoryUse(sim, max = TRUE) # this should show peak memory use by eventType -- i.e., summarizes if multiple times
-  memoryUse(sim, max = FALSE) # this should show peak memory use by event
+    requireNamespace("future.callr", quietly = TRUE)) {
+  options(spades.memoryUseInterval = 0.5)
+
+  # sim <- simInit(...)
+  # sim <- spades(sim)
+
+  memoryUse(sim, max = TRUE)  # peak memory by event type (summarised across times)
+  memoryUse(sim, max = FALSE) # peak memory for every individual event
 }
 ```
+
+[memoryUseThisSession()] returns the memory currently used by the running R
+session; useful as a quick sanity check between events.
+
+## Static code checking
+
+`simInit()` parses your module's source and statically checks that the code
+agrees with the metadata: every read of `sim$x` should have `x` listed in
+`expectsInput()` or `createsOutput()`, every parameter access (`Par$y`,
+`P(sim)$y`, `params(sim)$mod$y`) should match a `defineParameter()` entry,
+every `doEvent.*` function should return `sim`, and so on. Mismatches are
+reported as a structured table with file/line/column locations.
+
+The checks are controlled by two options:
+
+```{r codecheck-options, eval=FALSE}
+options(spades.moduleCodeChecks = TRUE)    # turn checking on/off
+options(spades.codeCheckEngine = "v2")     # "v1" (legacy) or "v2" (new, structured)
+```
+
+You can also run the checks on a module on disk, without going through
+`simInit()`. This is handy while authoring or refactoring a module:
+
+```{r codecheck-standalone, eval=FALSE}
+# returns a data.frame of findings; also prints a grouped report
+findings <- codeCheckModule("path/to/myModule")
+
+# subset by severity or rule id
+findings[findings$severity == "warning", ]
+findings[findings$id == "param_used_undeclared", ]
+```
+
+A finding has columns `id`, `severity`, `module`, `where`, `name`, `fn`,
+`file`, `line`, `col`, `message`, `suggestion`. The suggestion is a
+plain-language fix (e.g., "add `defineParameter('coverThresh', ...)` to
+parameters"). When `simInit()` runs the checks, the same data.frame is
+stashed at `sim@.xData$.codeCheck[[moduleName]]`.
+
+Typical findings the checker flags:
+
+| id | what it catches |
+|---|---|
+| `out_declared_unused` | output declared in metadata, never assigned in code |
+| `out_used_undeclared` | `sim$x <- ...` for `x` not in `createsOutput()` |
+| `in_declared_unused` | input declared, never read |
+| `in_used_undeclared` | `sim$x` read for `x` not in `expectsInput()` |
+| `param_declared_unused` | `defineParameter("x", ...)` but no `Par$x` in the code |
+| `param_used_undeclared` | `Par$x` / `P(sim)$x` for `x` not declared |
+| `unresolved_accessor` | `sim[[expr]]` or `get(var, envir=envir(sim))` — can't be checked statically |
+| `must_return_sim` | `doEvent.*` not ending with `return(invisible(sim))` |
+| `must_assign_to_sim` | `scheduleEvent(...)` or `saveFiles(...)` not assigned back to `sim` |
+| `module_named_object` | `sim$<moduleName> <- ...` (forbidden) |
+| `conflicting_fn_unqualified` | bare `levels`/`scale`/`which.max` (ambiguous with `raster::`) |
+
+See [codeCheckModule()] for details.
 
 # References
