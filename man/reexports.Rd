@@ -11,6 +11,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{reproducible}{\code{\link[reproducible]{paddedFloatToChar}}}
+  \item{reproducible}{\code{\link[reproducible:paddedFloatToChar]{paddedFloatToChar()}}}
 }}
 

@@ -29,8 +29,8 @@ NULL (invisibly). Invoked for its side effect of creating new module test files.
 Create template testing structures for new modules
 }
 \seealso{
-Other module creation helpers: 
-\code{\link{newModule}()}
+Other module creation helpers:
+\code{\link[=newModule]{newModule()}}
 }
 \author{
 Eliot McIntire and Alex Chubaty
