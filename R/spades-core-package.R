@@ -9,19 +9,14 @@
 #' \if{latex}{\figure{SpaDES.png}{options: width=0.5in}}
 #'
 #' @description
-#' This package allows implementation a variety of simulation-type models,
-#' with a focus on spatially explicit models.
-#' The core simulation components are built upon a discrete event simulation
-#' framework that facilitates modularity, and easily enables the user to
-#' include additional functionality by running user-built simulation modules.
-#' Included are numerous tools to visualize various spatial data formats,
-#' as well as non-spatial data. Much work has been done to speed up the core
-#' of the DES, with current benchmarking as low as 56 microseconds overhead for
-#' each event (including scheduling, sorting event queue, spawning event etc.) or
-#' 38 microseconds if there is no sorting (i.e., no sorting occurs under simple conditions).
-#' Under most event conditions, therefore, the DES itself will contribute
-#' very minimally compared to the content of the events, which may often be
-#' milliseconds to many seconds each event.
+#' `SpaDES.core` is a framework for building spatial discrete-event simulations
+#' from re-usable modules. A simulation is held in a single `simList` object,
+#' modules schedule events that change the `simList`, and the events run in
+#' time order until the simulation ends.
+#'
+#' Below is a categorized list of the functions you will use most often.
+#' Each entry is a short, plain-language description; click through for full
+#' details.
 #'
 #' Bug reports: <https://github.com/PredictiveEcology/SpaDES.core/issues>
 #'
@@ -29,473 +24,276 @@
 #'
 #' Wiki: <https://github.com/PredictiveEcology/SpaDES/wiki>
 #'
-#' @section 1 Spatial discrete event simulation (`SpaDES`):
-#'
-#' A collection of top-level functions for doing spatial discrete event simulation.
-#'
-#' \subsection{1.1 Simulations}{
-#'   There are two workhorse functions that initialize and run a simulation, and
-#'   third function for doing multiple spades runs:
-#'
-#'   \tabular{ll}{
-#'     [simInit()] \tab Initialize a new simulation\cr
-#'     [spades()] \tab Run a discrete event simulation\cr
-#'     `experiment` \tab In `SpaDES.experiment` package.
-#'                                   Run multiple [spades()] calls\cr
-#'     `experiment2` \tab In `SpaDES.experiment` package.
-#'                                   Run multiple [spades()] calls\cr
-#'   }
-#' }
-#'
-#' \subsection{1.2 Events}{
-#'   Within a module, important simulation functions include:
-#'
-#'   \tabular{ll}{
-#'     [scheduleEvent()] \tab Schedule a simulation event\cr
-#'     [scheduleConditionalEvent()] \tab Schedule a conditional simulation event\cr
-#'     `removeEvent` \tab Remove an event from the simulation queue (not yet implemented)\cr
-#'   }
-#' }
-#'
-#' @section 2 The `simList` object class:
-#'
-#' The principle exported object class is the `simList`.
-#' All `SpaDES` simulations operate on this object class.
+#' @section 1 Initialize and run a simulation:
 #'
 #' \tabular{ll}{
-#'   [simList()] \tab The `simList` class\cr
+#'   [simInit()] \tab Set up a new simulation.\cr
+#'   [spades()] \tab Run the simulation that `simInit()` set up.\cr
+#'   [simInitAndSpades()] \tab Convenience: `simInit()` then `spades()` in one call.\cr
+#'   [restartSpades()] \tab Resume a simulation after an error or interruption.\cr
+#'   [restartOrSimInitAndSpades()] \tab Try to restart from a saved state; otherwise start fresh.\cr
 #' }
 #'
-#' @section 3 `simList` methods:
+#' @section 2 Events:
 #'
-#' Collections of commonly used functions to retrieve or set slots (and their elements)
-#' of a [simList()] object are summarized further below.
-#'
-#' \subsection{3.1 Simulation parameters}{
-#'   \tabular{ll}{
-#'      [globals()] \tab List of global simulation parameters.\cr
-#'      [params()] \tab Nested list of all simulation parameter.\cr
-#'      [P()] \tab Namespaced version of [params()]
-#'                         (i.e., do not have to specify module name).\cr
-#'   }
-#' }
-#'
-#' \subsection{3.2 loading from disk, saving to disk}{
-#'   \tabular{ll}{
-#'      [inputs()] \tab List of loaded objects used in simulation. (advanced)\cr
-#'      [outputs()] \tab List of objects to save during simulation. (advanced)\cr
-#'   }
-#' }
-#'
-#' \subsection{3.3 objects in the `simList`}{
-#'   \tabular{ll}{
-#'      [ls()], [objects()] \tab Names of objects referenced by the simulation environment.\cr
-#'      [ls.str()] \tab List the structure of the `simList` objects.\cr
-#'      [objs()] \tab List of objects referenced by the simulation environment.\cr
-#'   }
-#' }
-#'
-#' \subsection{3.4 Simulation paths}{
-#'   Accessor functions for the `paths` slot and its elements.
-#'   \tabular{ll}{
-#'      [cachePath()] \tab Global simulation cache path.\cr
-#'      [modulePath()] \tab Global simulation module path.\cr
-#'      [inputPath()] \tab Global simulation input path.\cr
-#'      [outputPath()] \tab Global simulation output path.\cr
-#'      [rasterPath()] \tab Global simulation temporary raster path.\cr
-#'      [paths()] \tab Global simulation paths (cache, modules, inputs, outputs, rasters).\cr
-#'   }
-#' }
-#'
-#' \subsection{3.5 Simulation times}{
-#'   Accessor functions for the `simtimes` slot and its elements.
-#'
-#'   \tabular{ll}{
-#'      [time()] \tab Current simulation time, in units of longest module.\cr
-#'      [start()] \tab Simulation start time, in units of longest module.\cr
-#'      [end()] \tab Simulation end time, in units of longest module.\cr
-#'      [times()] \tab List of all simulation times (current, start, end), in units of longest module..\cr
-#'   }
-#' }
-#'
-#' \subsection{3.6 Simulation event queues}{
-#'   Accessor functions for the `events` and `completed` slots.
-#'   By default, the event lists are shown when the `simList` object is printed,
-#'   thus most users will not require direct use of these methods.
-#'
-#'   \tabular{ll}{
-#'      [events()] \tab Scheduled simulation events (the event queue). (advanced)\cr
-#'      [current()] \tab Currently executing event. (advanced)\cr
-#'      [completed()] \tab Completed simulation events. (advanced)\cr
-#'      [elapsedTime()] \tab The amount of clock time that modules & events use\cr
-#'   }
-#' }
-#'
-#' \subsection{3.7 Modules, dependencies, packages}{
-#'   Accessor functions for the `depends`, `modules`, and `.loadOrder` slots.
-#'   These are included for advanced users.
-#'
-#'   \tabular{ll}{
-#'      [depends()] \tab List of simulation module dependencies. (advanced)\cr
-#'      [modules()] \tab List of simulation modules to be loaded. (advanced)\cr
-#'      [packages()] \tab Vector of required R libraries of all modules. (advanced)\cr
-#'   }
-#' }
-#'
-#' \subsection{3.8 `simList` environment}{
-#'   The [simList()] has a slot called `.xData` which is an environment.
-#'   All objects in the `simList` are actually in this environment,
-#'   i.e., the `simList` is not a `list`.
-#'   In R, environments use pass-by-reference semantics, which means that copying
-#'   a `simList` object using normal R assignment operation (e.g., `sim2 <- sim1`),
-#'   will not copy the objects contained within the `.xData` slot.
-#'   The two objects (`sim1` and `sim2`) will share identical objects
-#'   within that slot. Sometimes, this not desired, and a true copy is required.
-#'
-#'   \tabular{ll}{
-#'      [envir()] \tab Access the environment of the `simList` directly (advanced)\cr
-#'      \code{\link[SpaDES.core:Copy]{Copy()}} \tab Deep copy of a `simList`. (advanced)\cr
-#'   }
-#' }
-#'
-#' \subsection{3.9 Checkpointing}{
-#'   \tabular{lll}{
-#'      Accessor method \tab Module \tab Description\cr
-#'      [checkpointFile()] \tab `checkpoint` \tab Name of the checkpoint file. (advanced)\cr
-#'      [checkpointInterval()] \tab `checkpoint` \tab The simulation checkpoint interval. (advanced)\cr
-#'    }
-#'  }
-#'
-#' \subsection{3.10 Progress Bar}{
-#'   \tabular{lll}{
-#'      [progressType()] \tab `.progress` \tab Type of graphical progress bar used. (advanced)\cr
-#'      [progressInterval()] \tab `.progress` \tab Interval for the progress bar. (advanced)\cr
-#'   }
-#' }
-#'
-#' @section 4 Module operations:
-#'
-#' \subsection{4.1 Creating, distributing, and downloading modules}{
-#'   Modules are the basic unit of `SpaDES`.
-#'   These are generally created and stored locally, or are downloaded from remote
-#'   repositories, including our
-#'   [SpaDES-modules](https://github.com/PredictiveEcology/SpaDES-modules)
-#'   repository on GitHub.
-#'
-#'   \tabular{ll}{
-#'     [checksums()] \tab Verify (and optionally write) checksums for a module's data files.\cr
-#'     [downloadModule()] \tab Open all modules nested within a base directory.\cr
-#'     [getModuleVersion()] \tab Get the latest module version # from module repository.\cr
-#'     [newModule()] \tab Create new module from template.\cr
-#'     [newModuleDocumentation()] \tab Create empty documentation for a new module.\cr
-#'     [openModules()] \tab Open all modules nested within a base directory.\cr
-#'     [moduleMetadata()] \tab Shows the module metadata.\cr
-#'     [zipModule()] \tab Zip a module and its associated files.\cr
-#'   }
-#' }
-#'
-#' \subsection{4.2 Module metadata}{
-#'   Each module requires several items to be defined.
-#'   These comprise the metadata for that module (including default parameter
-#'   specifications, inputs and outputs), and are currently written at the top of
-#'   the module's `.R` file.
-#'
-#'   \tabular{ll}{
-#'     [defineModule()] \tab Define the module metadata\cr
-#'     [defineParameter()] \tab Specify a parameter's name, value and set a default\cr
-#'     [expectsInput()] \tab Specify an input object's name, class, description, `sourceURL` and other specifications\cr
-#'     [createsOutput()] \tab Specify an output object's name, class, description and other specifications\cr
-#'   }
-#'
-#'   There are also accessors for many of the metadata entries:
-#'   \tabular{ll}{
-#'     [timeunit()] \tab Accesses metadata of same name\cr
-#'     [citation()] \tab Accesses metadata of same name\cr
-#'     [documentation()] \tab Accesses metadata of same name\cr
-#'     [reqdPkgs()] \tab Accesses metadata of same name\cr
-#'     [inputObjects()] \tab Accesses metadata of same name\cr
-#'     [outputObjects()] \tab Accesses metadata of same name\cr
-#'   }
-#' }
-#'
-#' \subsection{4.3 Module dependencies}{
-#'   Once a set of modules have been chosen, the dependency information is automatically
-#'   calculated once `simInit` is run. There are several functions to assist with dependency
-#'   information:
-#'
-#'   \tabular{ll}{
-#'     [depsEdgeList()] \tab Build edge list for module dependency graph\cr
-#'     [depsGraph()] \tab Build a module dependency graph using `igraph`\cr
-#'   }
-#' }
-#'
-#' @section 5 Module functions:
-#'
-#' *A collection of functions that help with making modules can be found in
-#' the suggested `SpaDES.tools` package, and are summarized below.*
-#'
-#' \subsection{5.1 Spatial spreading/distances methods}{
-#'   Spatial contagion is a key phenomenon for spatially explicit simulation models.
-#'   Contagion can be modelled using discrete approaches or continuous approaches.
-#'   Several `SpaDES.tools` functions assist with these:
-#'
-#'   \tabular{ll}{
-#'     [SpaDES.tools::adj()] \tab An optimized (i.e., faster) version of [terra::adjacent()]\cr
-#'     [SpaDES.tools::cir()] \tab Identify pixels in a circle around a [`SpatialPoints*()`][sp::SpatialPoints-class] object\cr
-#'     [SpaDES.tools::directionFromEachPoint()] \tab Fast calculation of direction and distance surfaces\cr
-#'     [SpaDES.tools::distanceFromEachPoint()] \tab Fast calculation of distance surfaces\cr
-#'     [SpaDES.tools::rings()] \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
-#'     [SpaDES.tools::spokes()] \tab Identify outward radiating spokes from initial points\cr
-#'     [SpaDES.tools::spread()] \tab Contagious cellular automata\cr
-#'     [SpaDES.tools::spread2()] \tab Contagious cellular automata, different algorithm, more robust\cr
-#'     [SpaDES.tools::wrap()] \tab Create a torus from a grid\cr
-#'   }
-#' }
-#'
-#' \subsection{5.2 Spatial agent methods}{
-#'   Agents have several methods and functions specific to them:
-#'
-#'   \tabular{ll}{
-#'     [SpaDES.tools::crw()] \tab Simple correlated random walk function\cr
-#'     [SpaDES.tools::heading()] \tab Determines the heading between `SpatialPoints*`\cr
-#'     [quickPlot::makeLines()] \tab Makes `SpatialLines` object for, e.g., drawing arrows\cr
-#'     [SpaDES.tools::move()] \tab A meta function that can currently only take "crw"\cr
-#'     [SpaDES.tools::specificNumPerPatch()] \tab Initiate a specific number of agents per patch\cr
-#'   }
-#' }
-#'
-#' \subsection{5.3 GIS operations}{
-#'   In addition to the vast amount of GIS operations available in R (mostly from
-#'   contributed packages such as `sf`, `terra`, (also `sp`, `raster`), `maps`, `maptools`
-#'   and many others), we provide the following GIS-related functions:
-#'
-#'   \tabular{ll}{
-#'     [quickPlot::equalExtent()] \tab Assess whether a list of extents are all equal\cr
-#'   }
-#' }
-#'
-#' \subsection{5.4 'Map-reduce'--type operations}{
-#'   These functions convert between reduced and mapped representations of the same data.
-#'   This allows compact representation of, e.g., rasters that have many individual pixels
-#'   that share identical information.
-#'
-#'   \tabular{ll}{
-#'     [SpaDES.tools::rasterizeReduced()] \tab Convert reduced representation to full raster.\cr
-#'   }
-#' }
-#'
-#' \subsection{5.5 Colours in `Raster*` objects}{
-#'   We likely will not want the default colours for every map.
-#'   Here are several helper functions to add to, set and get colours of `Raster*` objects:
-#'
-#'   \tabular{ll}{
-#'     [quickPlot::setColors()] \tab Set colours for plotting `Raster*` objects\cr
-#'     [quickPlot::getColors()] \tab Get colours in a `Raster*` objects\cr
-#'     [quickPlot::divergentColors()] \tab Create a colour palette with diverging colours around a middle\cr
-#'   }
-#' }
-#'
-#' \subsection{5.6 Random Map Generation}{
-#'   It is often useful to build dummy maps with which to build simulation models before all data are available.
-#'   These dummy maps can later be replaced with actual data maps.
-#'
-#'   \tabular{ll}{
-#'     [SpaDES.tools::neutralLandscapeMap()] \tab Creates a random map using Gaussian random fields\cr
-#'     [SpaDES.tools::randomPolygons()] \tab Creates a random polygon with specified number of classes\cr
-#'   }
-#' }
-#'
-#' \subsection{5.7 Checking for the existence of objects}{
-#'   `SpaDES` modules will often require the existence of objects in the `simList`.
-#'   These are helpers for assessing this:
-#'
-#'   \tabular{ll}{
-#'     [SpaDES.core::checkObject()] \tab Check for a existence of an object within a `simList` \cr
-#'     [reproducible::checkPath()] \tab Checks the specified filepath for formatting consistencies\cr
-#'   }
-#' }
-#'
-#' \subsection{5.8 SELES-type approach to simulation}{
-#'   These functions are essentially skeletons and are not fully implemented.
-#'   They are intended to make translations from SELES (https://www.gowlland.ca/).
-#'   You must know how to use SELES for these to be useful:
-#'
-#'   \tabular{ll}{
-#'     [SpaDES.tools::agentLocation()] \tab Agent location\cr
-#'     [SpaDES.tools::initiateAgents()] \tab Initiate agents into a `SpatialPointsDataFrame`\cr
-#'     [SpaDES.tools::numAgents()] \tab Number of agents\cr
-#'     [SpaDES.tools::probInit()] \tab Probability of initiating an agent or event\cr
-#'     [SpaDES.tools::transitions()] \tab Transition probability\cr
-#'   }
-#' }
-#'
-#' \subsection{5.9 Miscellaneous}{
-#'   Functions that may be useful within a `SpaDES` context:
-#'
-#'   \tabular{ll}{
-#'     [SpaDES.tools::inRange()] \tab Test whether a number lies within range `[a,b]`\cr
-#'     [quickPlot::layerNames()] \tab Get layer names for numerous object classes\cr
-#'     [quickPlot::numLayers()] \tab Return number of layers\cr
-#'     [reproducible::paddedFloatToChar()] \tab Wrapper for padding (e.g., zeros) floating numbers to character\cr
-#'   }
-#' }
-#'
-#' @section 6 Caching simulations and simulation components:
-#'
-#' *Simulation caching uses the `reproducible` package.*
-#'
-#' Caching can be done in a variety of ways, most of which are up to the module developer.
-#' However, the one most common usage would be to cache a simulation run.
-#' This might be useful if a simulation is very long, has been run once, and the
-#' goal is just to retrieve final results.
-#' This would be an alternative to manually saving the outputs.
-#'
-#' See example in [spades()], achieved by using `cache = TRUE` argument.
+#' Events are the building blocks of a simulation. Modules schedule events
+#' that run at a given time and may schedule further events.
 #'
 #' \tabular{ll}{
-#'   [reproducible::Cache()] \tab Caches a function, but often accessed as argument in [spades()]\cr
-#'   [reproducible::showCache()] \tab Shows information about the objects in the cache\cr
-#'   [reproducible::clearCache()] \tab Removes objects from the cache\cr
-#'   [reproducible::keepCache()] \tab Keeps only the objects described\cr
+#'   [scheduleEvent()] \tab Schedule an event to run at a given simulation time.\cr
+#'   [scheduleConditionalEvent()] \tab Schedule an event that runs when a condition becomes `TRUE`.\cr
+#'   [conditionalEvents()] \tab List the conditional events currently waiting.\cr
+#'   [doEvent()] \tab Internal dispatcher; usually not called directly.\cr
+#'   [defineEvent()] \tab Define a new event type inside a module.\cr
 #' }
 #'
-#' A module developer can build caching into their module by creating cached versions of their
-#' functions.
+#' @section 3 The `simList` object:
 #'
-#' @section 7 Plotting:
-#'
-#' **Much of the underlying plotting functionality is provided by \pkg{quickPlot}.**
-#'
-#' There are several user-accessible plotting functions that are optimized for modularity
-#' and speed of plotting:
-#'
-#' Commonly used:
-#' \tabular{ll}{
-#'   [quickPlot::Plot()] \tab The workhorse plotting function\cr
-#' }
-#'
-#' Simulation diagrams:
-#' \tabular{ll}{
-#'   [SpaDES.core::eventDiagram()] \tab Gantt chart representing the events in a completed simulation.\cr
-#'   [SpaDES.core::moduleDiagram()] \tab Network diagram of simplified module (object) dependencies.\cr
-#'   [SpaDES.core::objectDiagram()] \tab Sequence diagram of detailed object dependencies.\cr
-#' }
-#'
-#' Other useful plotting functions:
-#' \tabular{ll}{
-#'   [quickPlot::clearPlot()] \tab Helpful for resolving many errors\cr
-#'   [quickPlot::clickValues()] \tab Extract values from a raster object at the mouse click location(s)\cr
-#'   [quickPlot::clickExtent()] \tab Zoom into a raster or polygon map that was plotted with [quickPlot::Plot()]\cr
-#'   [quickPlot::clickCoordinates()] \tab Get the coordinates, in map units, under mouse click\cr
-#'   [quickPlot::dev()] \tab Specify which device to plot on, making a non-RStudio one as default\cr
-#'   [quickPlot::newPlot()] \tab Open a new default plotting device\cr
-#'   [quickPlot::rePlot()] \tab Re-plots all elements of device for refreshing or moving plot\cr
-#' }
-#'
-#' @section 8 File operations:
-#'
-#' In addition to R's file operations, we have added several here to aid in bulk
-#' loading and saving of files for simulation purposes:
+#' The `simList` holds everything about a simulation: parameters, modules,
+#' the event queue, the simulation times, and all the data objects modules
+#' read and write. Its objects live in an environment, so updates happen
+#' in place rather than by copying.
 #'
 #' \tabular{ll}{
-#'   [loadFiles()] \tab Load simulation objects according to a file list\cr
-#'   [rasterToMemory()] \tab Read a raster from file to RAM\cr
-#'   [saveFiles()] \tab Save simulation objects according to outputs and parameters\cr
+#'   \link{simList-class} \tab The `simList` class definition.\cr
+#'   [envir()] \tab The environment that holds the simulation's objects.\cr
+#'   \code{\link[SpaDES.core:Copy]{Copy()}} \tab Make a true (deep) copy of a `simList`.\cr
 #' }
 #'
-#' @section 9 Sample modules included in package:
+#' @section 4 `simList` accessors:
 #'
-#' Several dummy modules are included for testing of functionality.
-#' These can be found with `file.path(find.package("SpaDES.core"), "sampleModules")`.
+#' Functions to read and write the various parts of a `simList`. All getters
+#' have matching setters (e.g., `params(sim) <- ...`).
+#'
+#' \subsection{4.1 Parameters}{
+#'   \tabular{ll}{
+#'      [params()] \tab All simulation parameters, as a nested list.\cr
+#'      [P()] \tab Get a parameter for the current module without naming it.\cr
+#'      [globals()] \tab Simulation-wide (global) parameters.\cr
+#'      [paramCheckOtherMods()] \tab Compare a parameter's value across modules.\cr
+#'   }
+#' }
+#'
+#' \subsection{4.2 Paths}{
+#'   Where files are read from and written to.
+#'
+#'   \tabular{ll}{
+#'      [paths()] \tab All paths used by the simulation.\cr
+#'      [getPaths()], [setPaths()] \tab Get or set all paths in one call.\cr
+#'      [cachePath()] \tab Where cached results are stored.\cr
+#'      [modulePath()] \tab Where modules are loaded from.\cr
+#'      [inputPath()] \tab Where input files are read from.\cr
+#'      [outputPath()] \tab Where output files are written.\cr
+#'      [dataPath()] \tab Where a module finds its `data/` folder.\cr
+#'      [figurePath()] \tab Where figures are saved.\cr
+#'      [logPath()] \tab Where simulation logs are written.\cr
+#'      [scratchPath()] \tab Disposable working directory.\cr
+#'      [rasterPath()], [terraPath()] \tab Temporary raster directories.\cr
+#'   }
+#' }
+#'
+#' \subsection{4.3 Simulation times}{
+#'   \tabular{ll}{
+#'      [time()] \tab The current simulation time.\cr
+#'      [start()], [end()] \tab Start and end times.\cr
+#'      [times()] \tab All times (current, start, end) at once.\cr
+#'      [timeunit()] \tab The time unit of the simulation (or of a module).\cr
+#'      [timeunits()] \tab The time units of all modules in the simulation.\cr
+#'      [minTimeunit()], [maxTimeunit()] \tab The shortest and longest time unit in use.\cr
+#'      [convertTimeunit()] \tab Convert a number between time units.\cr
+#'      [elapsedTime()] \tab How much real time each module and event used.\cr
+#'   }
+#'
+#'   Helpers for writing durations: [dsecond()], [dmin()], [dhour()], [dday()],
+#'   [dweek()], [dmonth()], [dyear()].
+#' }
+#'
+#' \subsection{4.4 Event queues}{
+#'   \tabular{ll}{
+#'      [events()] \tab The queue of scheduled events.\cr
+#'      [current()] \tab The event being run right now.\cr
+#'      [completed()] \tab Events that have already run.\cr
+#'   }
+#' }
+#'
+#' \subsection{4.5 Objects in the simulation}{
+#'   \tabular{ll}{
+#'      [objs()] \tab All data objects in the simulation environment.\cr
+#'      [ls()], [objects()] \tab Names of those objects (base R methods).\cr
+#'      [ls.str()] \tab Names plus a short summary of each object's structure.\cr
+#'   }
+#' }
+#'
+#' \subsection{4.6 Modules in the simulation}{
+#'   \tabular{ll}{
+#'      [modules()] \tab The modules loaded in this simulation.\cr
+#'      [depends()] \tab Each module's declared dependencies.\cr
+#'      [packages()] \tab R packages required by the modules.\cr
+#'   }
+#' }
+#'
+#' @section 5 Building a module:
+#'
+#' \subsection{5.1 Module metadata}{
+#'   Every module declares its name, parameters, inputs and outputs using
+#'   these constructors, called inside [defineModule()].
+#'
+#'   \tabular{ll}{
+#'      [defineModule()] \tab Top-level metadata constructor.\cr
+#'      [defineParameter()] \tab Declare one parameter with a default.\cr
+#'      [expectsInput()] \tab Declare one input the module reads from `sim`.\cr
+#'      [createsOutput()] \tab Declare one output the module writes to `sim`.\cr
+#'      [bindrows()] \tab Combine the rows above into the metadata table.\cr
+#'   }
+#' }
+#'
+#' \subsection{5.2 Reading module metadata back}{
+#'   \tabular{ll}{
+#'      [moduleMetadata()] \tab The whole metadata block.\cr
+#'      [moduleParams()], [moduleInputs()], [moduleOutputs()] \tab Just one slice.\cr
+#'      [moduleObjects()] \tab All objects a module reads or writes.\cr
+#'      [moduleVersion()] \tab The declared version.\cr
+#'      [moduleDefaults] \tab Default values used when metadata is missing.\cr
+#'      [parameters()], [inputObjects()], [outputObjects()] \tab Read these on a `simList`.\cr
+#'      [citation()], [documentation()], [reqdPkgs()] \tab Other metadata accessors.\cr
+#'   }
+#' }
+#'
+#' \subsection{5.3 Helpers inside event functions}{
+#'   \tabular{ll}{
+#'      [currentModule()] \tab The name of the running module.\cr
+#'      [suppliedElsewhere()] \tab `TRUE` if another module already provides an object.\cr
+#'      [checkObject()] \tab Confirm a required object exists in `sim`.\cr
+#'      [findObjects()] \tab Look up objects across modules.\cr
+#'   }
+#' }
+#'
+#' \subsection{5.4 Authoring and packaging modules}{
+#'   \tabular{ll}{
+#'      [newModule()] \tab Create a new module from a template.\cr
+#'      [newModuleCode()], [newModuleDocumentation()], [newModuleTests()] \tab
+#'         Generate individual parts of a module.\cr
+#'      [copyModule()] \tab Copy a module to a new location and (optionally) rename it.\cr
+#'      [openModules()] \tab Open one or more module files in the editor.\cr
+#'      [zipModule()] \tab Zip up a module for distribution.\cr
+#'      [convertToPackage()] \tab Turn a module into an installable R package.\cr
+#'      [newProject()] \tab Create a new project that contains modules.\cr
+#'   }
+#' }
+#'
+#' @section 6 Module dependencies and diagrams:
+#'
+#' `simInit()` works out which modules depend on which. These functions
+#' inspect that graph.
 #'
 #' \tabular{ll}{
-#'   `randomLandscapes` \tab Imports, updates, and plots several raster map layers\cr
-#'   `caribouMovement` \tab A simple agent-based (a.k.a., individual-based) model\cr
-#'   `fireSpread` \tab A simple model of a spatial spread process\cr
+#'   [depsEdgeList()] \tab Edge list of object dependencies between modules.\cr
+#'   [depsGraph()] \tab The same, as an `igraph`.\cr
+#'   [moduleDiagram()] \tab A simplified picture of which module feeds which.\cr
+#'   [objectDiagram()] \tab A detailed picture, by individual object.\cr
+#'   [eventDiagram()] \tab Gantt chart of events that ran in a completed simulation.\cr
 #' }
 #'
-#' @section 10 Package options:
+#' @section 7 Caching:
 #'
-#' `SpaDES` packages use the following [options()] to configure behaviour:
+#' Caching makes a workflow reproducible and skips re-running steps that
+#' have not changed. Caching uses the `reproducible` package; SpaDES adds
+#' shortcuts for caching at the `spades`, module, event, and function level.
 #'
-#' \itemize{
-#'   \item `spades.browserOnError`: If `TRUE`, the default, then any
-#'   error rerun the same event with `debugonce` called on it to allow editing
-#'   to be done. When that browser is continued (e.g., with 'c'), then it will save it
-#'   reparse it into the `simList` and rerun the edited version. This may allow a spades
-#'   call to be recovered on error, though in many cases that may not be the correct
-#'   behaviour. For example, if the `simList` gets updated inside that event in an iterative
-#'   manner, then each run through the event will cause that iteration to occur.
-#'   When this option is `TRUE`, then the event will be run at least 3 times: the
-#'   first time makes the error, the second time has `debugonce` and the third time
-#'   is after the error is addressed. `TRUE` is likely somewhat slower.
-#'
-#'   \item `reproducible.cachePath`: The default local directory in which to
-#'   cache simulation outputs.
-#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).
-#'
-#'   \item `spades.inputPath`: The default local directory in which to
-#'   look for simulation inputs.
-#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`).
-#'
-#'   \item `spades.debug`: The default debugging value `debug`
-#'   argument in `spades()`. Default is `TRUE`.
-#'
-#'   \item `spades.lowMemory`: If true, some functions will use more memory
-#'     efficient (but slower) algorithms. Default `FALSE`.
-#'
-#'   \item `spades.moduleCodeChecks`: Should the various code checks be run
-#'   during `simInit`. These are passed to `codetools::checkUsage()`.
-#'   Default is given by the function, plus these :`list(suppressParamUnused = FALSE,
-#'   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
-#'   skipWith = TRUE)`.
-#'
-#'   \item `spades.modulePath`: The default local directory where modules
-#'     and data will be downloaded and stored.
-#'     Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/modules`).
-#'
-#'   \item `spades.moduleRepo`: The default GitHub repository to use when
-#'     downloading modules via `downloadModule`.
-#'     Default `"PredictiveEcology/SpaDES-modules"`.
-#'
-#'   \item `spades.nCompleted`: The maximum number of completed events to
-#'     retain in the `completed` event queue. Default `1000L`.
-#'
-#'   \item `spades.outputPath`: The default local directory in which to
-#'   save simulation outputs.
-#'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/outputs`).
-#'
-#'   \item `spades.recoveryMode`: If this a numeric greater than 0 or TRUE, then the
-#'   discrete event simulator will take a snapshot of the objects in the `simList`
-#'   that might change (based on metadata `outputObjects` for that module), prior to
-#'   initiating every event. This will allow the
-#'   user to be able to recover in case of an error or manual interruption (e.g., `Esc`).
-#'   If this is numeric, a copy of that number of "most recent events" will be
-#'   maintained so that the user can recover and restart more than one event in the past,
-#'   i.e., redo some of the "completed" events.
-#'   Default is `TRUE`, i.e., it will keep the state of the `simList`
-#'   at the start of the current event. This can be recovered with `restartSpades`
-#'   and the differences can be seen in a hidden object in the stashed `simList.`
-#'   There is a message which describes how to find that.
-#'
-#'   \item `spades.switchPkgNamespaces`: Should the search path be modified
-#'     to ensure a module's required packages are listed first?
-#'     Default `FALSE` to keep computational overhead down. If `TRUE`,
-#'     there should be no name conflicts among package objects,
-#'     but it is much slower, especially if the events are themselves fast.
-#'
-#'   \item `spades.progressInterval`: Minimum number of seconds between successive
-#'     cli progress-bar lines emitted to the console during `simInit` and `spades`.
-#'     cli progress output (e.g., from `archive::archive_extract` or any other package
-#'     that uses cli internally) is throttled to one timestamped line per interval so
-#'     that fast-updating progress bars do not flood the console. Default `2`.
-#'
-#'   \item `spades.tolerance`: The default tolerance value used for floating
-#'     point number comparisons. Default `.Machine$double.eps^0.5`.
-#'
-#'   \item `spades.useragent`: The default user agent to use for downloading
-#'     modules from GitHub.com. Default `"https://github.com/PredictiveEcology/SpaDES"`.
+#' \tabular{ll}{
+#'   [reproducible::Cache()] \tab Cache any function call.\cr
+#'   [reproducible::showCache()] \tab Inspect what is in the cache.\cr
+#'   [reproducible::clearCache()] \tab Remove cached entries.\cr
+#'   [reproducible::keepCache()] \tab Keep only the entries you name.\cr
 #' }
+#'
+#' Inside a module's metadata you can set the parameter `.useCache` to `TRUE`
+#' (cache the whole module), a character vector (cache only those events),
+#' or use `.useCacheArgs` to pin per-event arguments to [reproducible::Cache()].
+#' See the caching vignette: `vignette("iii-cache", package = "SpaDES.core")`.
+#'
+#' @section 8 Plotting:
+#'
+#' Plotting goes through `quickPlot::Plot()`, which is optimised for fast
+#' redraws within a simulation. SpaDES.core adds the [Plots()] wrapper that
+#' lets a module choose at runtime whether to render to screen, a PNG file,
+#' or no output at all.
+#'
+#' \tabular{ll}{
+#'   [Plots()] \tab Module-friendly wrapper for any plotting function.\cr
+#'   [quickPlot::Plot()] \tab The workhorse plotter.\cr
+#'   [quickPlot::clearPlot()] \tab Reset the plotting device.\cr
+#'   [quickPlot::rePlot()] \tab Re-render all elements on the device.\cr
+#'   [anyPlotting()] \tab `TRUE` if the current `.plots` setting will produce any output.\cr
+#' }
+#'
+#' @section 9 Code checking:
+#'
+#' When `simInit()` runs, it can statically check each module's code against
+#' the metadata: every `sim$x` and parameter access is checked to be sure it
+#' matches the declared inputs, outputs, and parameters.
+#'
+#' \tabular{ll}{
+#'   [codeCheckModule()] \tab Run the checks on a module on disk (no `simInit()` needed).\cr
+#' }
+#'
+#' Controlled by these options:
+#' \tabular{ll}{
+#'   `spades.moduleCodeChecks` \tab Turn the in-`simInit()` checks on (`TRUE`) or off (`FALSE`).\cr
+#'   `spades.codeCheckEngine` \tab `"v1"` (default) or `"v2"` (new, structured output).\cr
+#' }
+#'
+#' @section 10 Persistence and recovery:
+#'
+#' \tabular{ll}{
+#'   [saveSimList()] \tab Save a `simList` to disk.\cr
+#'   [loadSimList()] \tab Load one back.\cr
+#'   [zipSimList()], [unzipSimList()] \tab Save/load a `simList` together with its files.\cr
+#'   [saveState()] \tab Snapshot the state during a run.\cr
+#'   [restartR()] \tab Restart R (for example, to free memory) and continue.\cr
+#'   [saveFiles()], [loadFiles()] \tab Save or load files described by `outputs()` / `inputs()`.\cr
+#'   [checksums()] \tab Verify (or write) checksums for a module's data files.\cr
+#' }
+#'
+#' @section 11 Memory monitoring:
+#'
+#' \tabular{ll}{
+#'   [memoryUse()] \tab Memory used by each event in a finished simulation.\cr
+#'   [memoryUseThisSession()] \tab Memory used by the current R session.\cr
+#' }
+#'
+#' See `vignette("iv-advanced", package = "SpaDES.core")` for how to enable
+#' the background sampler with `options(spades.memoryUseInterval = ...)`.
+#'
+#' @section 12 Module repository and downloads:
+#'
+#' \tabular{ll}{
+#'   [downloadModule()] \tab Download a module from the repository.\cr
+#'   [downloadData()] \tab Download just the data for a module.\cr
+#'   [getModuleVersion()] \tab Get the latest version number on the repository.\cr
+#'   [getSampleModules()] \tab Copy the bundled sample modules somewhere usable.\cr
+#' }
+#'
+#' @section 13 Sample modules included with the package:
+#'
+#' Three small modules in `inst/sampleModules/`, plus a module group that
+#' loads all three:
+#'
+#' \tabular{ll}{
+#'   `randomLandscapes` \tab Generates a `SpatRaster` stack of random landscape layers.\cr
+#'   `fireSpread` \tab Simulates fire ignition and spread on those layers.\cr
+#'   `caribouMovement` \tab Agent-based caribou movement (correlated random walk).\cr
+#'   `SpaDES_sampleModules` \tab Module group that loads all three.\cr
+#' }
+#'
+#' Get a copy with `getSampleModules(tempdir())`.
+#'
+#' @section 14 Package options:
+#'
+#' Many behaviours are configurable through R options (e.g., default paths,
+#' how much output to print, code-checking, parallelism). See [spadesOptions()]
+#' for the full list with defaults and descriptions; the defaults are also
+#' returned as a named list by calling `spadesOptions()`.
 #'
 #' @seealso [spadesOptions()]
 #'

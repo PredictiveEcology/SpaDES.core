@@ -1,5 +1,22 @@
 # SpaDES.core (development version)
 
+* Documentation: rewrite of the categorized package overview (`?SpaDES.core`).
+  Restructured into 14 sections, simpler language, every user-facing export
+  is now linked, and the inlined options table is replaced with a pointer to
+  [spadesOptions()] (which is the single source of truth). New sections cover
+  code checking, persistence/recovery, memory monitoring, and conditional
+  events.
+* Documentation: vignette accuracy pass. Fixed: typo `SpaDES.taols`,
+  wrong option name `spades.modulesPath` → `spades.modulePath`,
+  broken sentence about `simList`'s environment slot,
+  stale `raster::Extent` reference in module-metadata table,
+  stale `sim$myFunction()` call style (modules now use namespaced calls),
+  wrong event name `"save"` in a `scheduleEvent()` plot example,
+  stale `getOption("spades.cachePath")` → `reproducible.cachePath`,
+  stale `SpaDES::setPaths()` → `SpaDES.core::setPaths()`,
+  stale Ubuntu 18.04 example → 24.04. `sp` references kept with a note that
+  modern `terra`/`sf` classes are preferred but `sp` still works. The
+  Advanced vignette gains a section on the static code checker.
 * New code-checking engine v2 (opt-in; `options(spades.codeCheckEngine = "v2")`),
   built on `xmlparsedata` + `xml2`. Adds: parameter-use checks (`Par$x`,
   `P(sim)$x`, `P(sim, module = "other")$x`, `params(sim)$mod$x`,
