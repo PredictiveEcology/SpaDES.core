@@ -1,7 +1,10 @@
 ## Helper: capture messages from a quiet spades() run, then filter out known
 ## baseline channels that are not gated by `debug` (Require/pak chatter, the
 ## simInit setDTthreads notice, and the spades saveSimOnExit notice). Anything
-## remaining is a real surprise.
+## remaining is a real surprise. The actual unknown content is embedded in
+## the failure info so a CI or interactive run shows exactly what leaked
+## through (different installs of reproducible, cli, etc. can occasionally
+## emit a baseline message we hadn't anticipated).
 .expectNoUnknownMessages <- function(expr) {
   knownPatterns <- c(
     "skipping new package dependency",
@@ -9,12 +12,24 @@
     "Using setDTthreads",
     "simList saved in",
     "savedSimEnv\\(\\)\\$\\.sim",
-    "deleted at next spades"
+    "deleted at next spades",
+    ## reproducible / cli baseline noise sometimes seen in interactive
+    ## sessions when `reproducible.verbose = 0` does not gate every line:
+    "Cache cleared",
+    "Cleared cache",
+    "Caching",
+    "Loading cached",
+    "Setting cache path",
+    "memoised copy",
+    "cached copy"
   )
   mess <- testthat::capture_messages(utils::capture.output(force(expr)))
   unknown <- mess[!Reduce("|", lapply(knownPatterns, function(p) grepl(p, mess)))]
-  testthat::expect_equal(unknown, character(0),
-                         info = "spades(debug=FALSE) emitted unexpected messages")
+  testthat::expect_equal(
+    unknown, character(0),
+    info = paste0("spades(debug=FALSE) emitted unexpected messages:\n",
+                  paste0("  ", trimws(unknown), collapse = "\n"))
+  )
 }
 
 test_that(".useCacheArgs splices a fixed cacheId into the per-event Cache call", {
