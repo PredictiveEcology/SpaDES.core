@@ -43,7 +43,7 @@
 
   for (g in unique(findings$group)) {
     sub <- findings[findings$group == g, , drop = FALSE]
-    cli::cli_text(cli::col_yellow(paste0("• ", g)))
+    cli::cli_text(cli::col_yellow(paste0("\u2022 ", g)))
     for (i in seq_len(nrow(sub))) {
       r <- sub[i, ]
       sevTag <- switch(r$severity,
@@ -57,7 +57,7 @@
       } else ""
       cli::cli_text("  {sevTag} {r$message}{loc}")
       if (!is.na(r$suggestion)) {
-        cli::cli_text(cli::col_silver("        ↪  {r$suggestion}"))
+        cli::cli_text(cli::col_silver("        \u21aa  {r$suggestion}"))
       }
     }
   }

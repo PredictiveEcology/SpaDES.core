@@ -245,7 +245,7 @@
     lines <- paste(g$line, collapse = ", ")
     u <- g[1, ]
     .cc_findingFromUse("unresolved_accessor", "info", meta$module, u,
-                       message = sprintf("%d unresolved %s accessor(s) in %s (lines %s) — skipped",
+                       message = sprintf("%d unresolved %s accessor(s) in %s (lines %s) \u2014 skipped",
                                          nrow(g), u$kind, u$fn, lines),
                        suggestion = "if these objects should be checked, declare them explicitly in inputObjects/outputObjects")
   }))
