@@ -574,6 +574,12 @@ setMethod(
   }
 
   if (needParse) {
+    ## Run modular malformed-metadata detectors at the start of the parse
+    ## sequence -- gives a clear error for common authoring mistakes
+    ## (missing comma between metadata rows, trailing comma in defineModule,
+    ## unquoted parameter name, etc.) instead of the cryptic downstream
+    ## failure. See R/module-malformed.R.
+    .checkMalformedMetadata(filename)
     tmp[["parsedFile"]] <- parse(filename)#, keep.source = getOption("spades.moduleCodeChecks"))
     opt <- getOption("spades.moduleCodeChecks")
     if (isTRUE(opt) || length(names(opt)) > 1) {
