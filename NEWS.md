@@ -1,5 +1,16 @@
 # SpaDES.core (development version)
 
+* New code-checking engine v2 (opt-in; `options(spades.codeCheckEngine = "v2")`),
+  built on `xmlparsedata` + `xml2`. Adds: parameter-use checks (`Par$x`,
+  `P(sim)$x`, `P(sim, module = "other")$x`, `params(sim)$mod$x`,
+  `params(sim)[["m"]][["x"]]`), broader `sim` accessor coverage
+  (`get`/`assign`/`exists`/`mget` against `envir(sim)`), accurate
+  source-position reporting (`file:line:col`), structured `data.frame` of
+  findings (stashed on `sim@.xData$.codeCheck`), one suggestion per finding,
+  and grouped `cli` table output. v1 (`code-checking.R`) remains the default
+  and is selectable via `options(spades.codeCheckEngine = "v1")`. New
+  standalone API `codeCheckModule(path)` runs the checks against a module
+  directory without requiring `simInit()`.
 * New module parameter `.useCacheArgs`: optional named list (keyed by event name) of extra arguments spliced into the per-event `reproducible::Cache()` call. Lets a developer pin a fixed `cacheId` so a pre-seeded cloud folder (`useCloud = TRUE`, `cloudFolderID = ...`) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The `newModule()` template emits a commented-out opt-in example.
 * `saveSimList`: resilient to individual file-backed objects whose backing files are inaccessible at save time; such objects are saved as `NULL` with a warning rather than aborting the entire save.
 * `loadSimList`: mirror-image resilience on the load side via `.unwrapResiliently()` — file-backed objects that cannot be `.unwrap()`ped (e.g. backing files missing on this machine) are loaded as `NULL` with a warning instead of aborting the load.

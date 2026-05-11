@@ -489,16 +489,29 @@ setMethod(
         ## SECTION ON CODE SCANNING FOR POTENTIAL PROBLEMS
         opt <- getOption("spades.moduleCodeChecks")
         if (isTRUE(opt) || length(names(opt)) > 1) {
-          # the code will always have magenta colour, which has an mBase
-          codeCheckMsgsThisMod <- any(grepl(paste0("m", mBase, ":"), codeCheckMsgs))
-          mess <- capture.output(type = "message", .runCodeChecks(sim, mBase, k, codeCheckMsgsThisMod))
-          if (length(mess) | length(codeCheckMsgsThisMod) == 0) {
-            mess <- c(capture.output(type = "message",
-                                     message(grep(paste0(mBase, ".R"),
-                                                  ls(sim@.xData$.parsedFiles), value = TRUE))),
-                      mess)
+          engine <- getOption("spades.codeCheckEngine", "v1")
+          if (identical(engine, "v2")) {
+            mess <- capture.output(type = "message",
+                                   .runCodeChecks2(sim, mBase, k))
+            if (length(mess)) {
+              mess <- c(capture.output(type = "message",
+                                       message(grep(paste0(mBase, ".R"),
+                                                    ls(sim@.xData$.parsedFiles), value = TRUE))),
+                        mess)
+            }
+            codeCheckMsgs <- c(codeCheckMsgs, mess)
+          } else {
+            # the code will always have magenta colour, which has an mBase
+            codeCheckMsgsThisMod <- any(grepl(paste0("m", mBase, ":"), codeCheckMsgs))
+            mess <- capture.output(type = "message", .runCodeChecks(sim, mBase, k, codeCheckMsgsThisMod))
+            if (length(mess) | length(codeCheckMsgsThisMod) == 0) {
+              mess <- c(capture.output(type = "message",
+                                       message(grep(paste0(mBase, ".R"),
+                                                    ls(sim@.xData$.parsedFiles), value = TRUE))),
+                        mess)
+            }
+            codeCheckMsgs <- c(codeCheckMsgs, mess)
           }
-          codeCheckMsgs <- c(codeCheckMsgs, mess)
         } ## End of code checking
 
         # lockBinding(mBase, sim@.xData$.mods)
