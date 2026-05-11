@@ -252,7 +252,7 @@ Several \code{SpaDES.tools} functions assist with these:
 \tabular{ll}{
 \code{\link[SpaDES.tools:adj]{SpaDES.tools::adj()}} \tab An optimized (i.e., faster) version of \code{\link[terra:adjacent]{terra::adjacent()}}\cr
 \code{\link[SpaDES.tools:cir]{SpaDES.tools::cir()}} \tab Identify pixels in a circle around a \code{\link[sp:SpatialPoints-class]{SpatialPoints*()}} object\cr
-\code{\link[SpaDES.tools:directions]{SpaDES.tools::directionFromEachPoint()}} \tab Fast calculation of direction and distance surfaces\cr
+\code{\link[SpaDES.tools:directionFromEachPoint]{SpaDES.tools::directionFromEachPoint()}} \tab Fast calculation of direction and distance surfaces\cr
 \code{\link[SpaDES.tools:distanceFromEachPoint]{SpaDES.tools::distanceFromEachPoint()}} \tab Fast calculation of distance surfaces\cr
 \code{\link[SpaDES.tools:rings]{SpaDES.tools::rings()}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
 \code{\link[SpaDES.tools:spokes]{SpaDES.tools::spokes()}} \tab Identify outward radiating spokes from initial points\cr
@@ -269,8 +269,8 @@ Agents have several methods and functions specific to them:
 \code{\link[SpaDES.tools:crw]{SpaDES.tools::crw()}} \tab Simple correlated random walk function\cr
 \code{\link[SpaDES.tools:heading]{SpaDES.tools::heading()}} \tab Determines the heading between \verb{SpatialPoints*}\cr
 \code{\link[quickPlot:makeLines]{quickPlot::makeLines()}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
-\code{\link[SpaDES.tools:crw]{SpaDES.tools::move()}} \tab A meta function that can currently only take "crw"\cr
-\code{\link[SpaDES.tools:specnumperpatch-probs]{SpaDES.tools::specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
+\code{\link[SpaDES.tools:move]{SpaDES.tools::move()}} \tab A meta function that can currently only take "crw"\cr
+\code{\link[SpaDES.tools:specificNumPerPatch]{SpaDES.tools::specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
 }
 }
 
@@ -299,8 +299,8 @@ We likely will not want the default colours for every map.
 Here are several helper functions to add to, set and get colours of \verb{Raster*} objects:
 
 \tabular{ll}{
-\code{\link[quickPlot:getSetColors]{quickPlot::setColors()}} \tab Set colours for plotting \verb{Raster*} objects\cr
-\code{\link[quickPlot:getSetColors]{quickPlot::getColors()}} \tab Get colours in a \verb{Raster*} objects\cr
+\code{\link[quickPlot:setColors]{quickPlot::setColors()}} \tab Set colours for plotting \verb{Raster*} objects\cr
+\code{\link[quickPlot:getColors]{quickPlot::getColors()}} \tab Get colours in a \verb{Raster*} objects\cr
 \code{\link[quickPlot:divergentColors]{quickPlot::divergentColors()}} \tab Create a colour palette with diverging colours around a middle\cr
 }
 }
@@ -331,11 +331,11 @@ They are intended to make translations from SELES (https://www.gowlland.ca/).
 You must know how to use SELES for these to be useful:
 
 \tabular{ll}{
-\code{\link[SpaDES.tools:SELESagentLocation]{SpaDES.tools::agentLocation()}} \tab Agent location\cr
+\code{\link[SpaDES.tools:agentLocation]{SpaDES.tools::agentLocation()}} \tab Agent location\cr
 \code{\link[SpaDES.tools:initiateAgents]{SpaDES.tools::initiateAgents()}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
-\code{\link[SpaDES.tools:SELESnumAgents]{SpaDES.tools::numAgents()}} \tab Number of agents\cr
-\code{\link[SpaDES.tools:SELESprobInit]{SpaDES.tools::probInit()}} \tab Probability of initiating an agent or event\cr
-\code{\link[SpaDES.tools:SELEStransitions]{SpaDES.tools::transitions()}} \tab Transition probability\cr
+\code{\link[SpaDES.tools:numAgents]{SpaDES.tools::numAgents()}} \tab Number of agents\cr
+\code{\link[SpaDES.tools:probInit]{SpaDES.tools::probInit()}} \tab Probability of initiating an agent or event\cr
+\code{\link[SpaDES.tools:transitions]{SpaDES.tools::transitions()}} \tab Transition probability\cr
 }
 }
 
@@ -366,9 +366,9 @@ See example in \code{\link[=spades]{spades()}}, achieved by using \code{cache = 
 
 \tabular{ll}{
 \code{\link[reproducible:Cache]{reproducible::Cache()}} \tab Caches a function, but often accessed as argument in \code{\link[=spades]{spades()}}\cr
-\code{\link[reproducible:viewCache]{reproducible::showCache()}} \tab Shows information about the objects in the cache\cr
-\code{\link[reproducible:viewCache]{reproducible::clearCache()}} \tab Removes objects from the cache\cr
-\code{\link[reproducible:viewCache]{reproducible::keepCache()}} \tab Keeps only the objects described\cr
+\code{\link[reproducible:showCache]{reproducible::showCache()}} \tab Shows information about the objects in the cache\cr
+\code{\link[reproducible:clearCache]{reproducible::clearCache()}} \tab Removes objects from the cache\cr
+\code{\link[reproducible:keepCache]{reproducible::keepCache()}} \tab Keeps only the objects described\cr
 }
 
 A module developer can build caching into their module by creating cached versions of their
@@ -398,12 +398,12 @@ Simulation diagrams:
 Other useful plotting functions:
 \tabular{ll}{
 \code{\link[quickPlot:clearPlot]{quickPlot::clearPlot()}} \tab Helpful for resolving many errors\cr
-\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickValues()}} \tab Extract values from a raster object at the mouse click location(s)\cr
-\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickExtent()}} \tab Zoom into a raster or polygon map that was plotted with \code{\link[quickPlot:Plot]{quickPlot::Plot()}}\cr
-\code{\link[quickPlot:quickPlotMouseClicks]{quickPlot::clickCoordinates()}} \tab Get the coordinates, in map units, under mouse click\cr
+\code{\link[quickPlot:clickValues]{quickPlot::clickValues()}} \tab Extract values from a raster object at the mouse click location(s)\cr
+\code{\link[quickPlot:clickExtent]{quickPlot::clickExtent()}} \tab Zoom into a raster or polygon map that was plotted with \code{\link[quickPlot:Plot]{quickPlot::Plot()}}\cr
+\code{\link[quickPlot:clickCoordinates]{quickPlot::clickCoordinates()}} \tab Get the coordinates, in map units, under mouse click\cr
 \code{\link[quickPlot:dev]{quickPlot::dev()}} \tab Specify which device to plot on, making a non-RStudio one as default\cr
 \code{\link[quickPlot:newPlot]{quickPlot::newPlot()}} \tab Open a new default plotting device\cr
-\code{\link[quickPlot:Plot]{quickPlot::rePlot()}} \tab Re-plots all elements of device for refreshing or moving plot\cr
+\code{\link[quickPlot:rePlot]{quickPlot::rePlot()}} \tab Re-plots all elements of device for refreshing or moving plot\cr
 }
 }
 
@@ -518,6 +518,7 @@ modules from GitHub.com. Default \code{"https://github.com/PredictiveEcology/Spa
 
 Authors:
 \itemize{
+  \item Eliot J B McIntire \email{eliot.mcintire@canada.ca} (\href{https://orcid.org/0000-0002-6914-8316}{ORCID})
   \item Alex M Chubaty \email{achubaty@for-cast.ca} (\href{https://orcid.org/0000-0001-7146-8135}{ORCID})
 }
 
