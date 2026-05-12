@@ -1,5 +1,26 @@
 # SpaDES.core (development version)
 
+## Breaking changes
+
+* **Per-event cache keys change.** `.robustDigest()` for `simList` no longer
+  contributes the `@inputs` and module-scoped `@outputs` data.frames to the
+  cache digest. The rationale: if an object affects the event, it is already
+  digested directly via the module's expected inputs; whether it arrived
+  through `simInit(inputs = ...)` should not change the cache key. The visible
+  effect is that **cached events written by SpaDES.core < 3.0.4.9020 will not
+  be found** by ≥ 3.0.4.9020 — the digest changed, so the next call to
+  `spades()` recomputes (and re-caches) those events. Cloud caches keyed on
+  the old digest are similarly invisible to the new code. No data is lost;
+  the cache simply rebuilds.
+* `restartSpades()` now defaults to `numEvents = 1L` (previously `Inf`).
+  Callers that relied on the old default to replay every saved event must
+  pass `numEvents = Inf` explicitly.
+* Requires `reproducible` ≥ 3.0.0, which itself contains breaking changes in
+  the cache layer (option renames, sidecar format, `qs2` instead of `qs`).
+  See the `reproducible` NEWS for migration notes.
+
+## Enhancements and fixes
+
 * Documentation: rewrite of the categorized package overview (`?SpaDES.core`).
   Restructured into 14 sections, simpler language, every user-facing export
   is now linked, and the inlined options table is replaced with a pointer to
