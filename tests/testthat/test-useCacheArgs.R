@@ -21,7 +21,11 @@
     "Loading cached",
     "Setting cache path",
     "memoised copy",
-    "cached copy"
+    "cached copy",
+    ## reproducible::useDBI() emits this at verboseLevel=0 (i.e., even when
+    ## reproducible.verbose=0) when DBI/RSQLite isn't available or disabled.
+    "Using DBI backend",
+    "Using non-DBI backend"
   )
   mess <- testthat::capture_messages(utils::capture.output(force(expr)))
   unknown <- mess[!Reduce("|", lapply(knownPatterns, function(p) grepl(p, mess)))]

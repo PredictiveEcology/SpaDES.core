@@ -928,8 +928,16 @@ test_that("messaging with multiple modules", {
   withr::local_options(spades.allowInitDuringSimInit = FALSE)
   mm1 <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
   mm1 <- cleanMessage(mm1)
-  expect_true(all(unlist(lapply(fullMessage,
-                                function(x) any(grepl(mm1, pattern = x))))))
+  matched <- vapply(fullMessage, function(x) any(grepl(x, mm1)), logical(1))
+  expect_true(
+    all(matched),
+    info = paste0(
+      "Missing expected message pattern(s):\n",
+      paste0("  ", fullMessage[!matched], collapse = "\n"),
+      "\n--- captured messages (", length(mm1), ") ---\n",
+      paste0("  [", seq_along(mm1), "] ", trimws(mm1), collapse = "\n")
+    )
+  )
   mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = as.list(m)))
   mm <- cleanMessage(mm)
 })
