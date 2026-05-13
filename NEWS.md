@@ -62,6 +62,18 @@
   `getOption("spades.progressInterval", 2)` seconds. Set
   `options(spades.progressInterval = N)` to change the interval.
 * `suppliedElsewhere` now treats both types of NULL as equal: list(a = 1)$b and list(a = NULL)$a were seen as different; now they are the same
+* New: detection of malformed module metadata at the start of the parsing
+  sequence (`R/module-malformed.R`). A small registry of detectors
+  (`.CC_MALFORMED_CHECKS`) catches common authoring mistakes and emits a
+  clear, actionable error message instead of R's cryptic parse-error or
+  the deep failures that used to surface only inside `defineModule()`.
+  Initial detectors: trailing comma in `defineModule(sim, list(...))`,
+  missing comma between metadata rows inside `rbind()`/`bindrows()`,
+  unquoted parameter name in `defineParameter()`, and unquoted
+  `objectName` in `expectsInput()`/`createsOutput()`. New exported
+  function `checkModuleMetadata()` runs the checks on a module file
+  on disk (no `simInit()` needed). Adding a new check is one entry
+  in the registry — no surgery elsewhere. Closes #325.
 * `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 

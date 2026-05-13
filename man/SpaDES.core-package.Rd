@@ -199,16 +199,28 @@ Generate individual parts of a module.\cr
 inspect that graph.
 
 \tabular{ll}{
-\code{\link[=depsEdgeList]{depsEdgeList()}} \tab Edge list of object dependencies between modules.\cr
-\code{\link[=depsGraph]{depsGraph()}} \tab The same, as an \code{igraph}.\cr
-\code{\link[=moduleDiagram]{moduleDiagram()}} \tab A simplified picture of which module feeds which.\cr
-\code{\link[=objectDiagram]{objectDiagram()}} \tab A detailed picture, by individual object.\cr
-\code{\link[=eventDiagram]{eventDiagram()}} \tab Gantt chart of events that ran in a completed simulation.\cr
+\code{\link[SpaDES.tools:adj]{SpaDES.tools::adj()}} \tab An optimized (i.e., faster) version of \code{\link[terra:adjacent]{terra::adjacent()}}\cr
+\code{\link[SpaDES.tools:cir]{SpaDES.tools::cir()}} \tab Identify pixels in a circle around a \code{\link[sp:SpatialPoints-class]{SpatialPoints*()}} object\cr
+\code{\link[SpaDES.tools:directionFromEachPoint]{SpaDES.tools::directionFromEachPoint()}} \tab Fast calculation of direction and distance surfaces\cr
+\code{\link[SpaDES.tools:distanceFromEachPoint]{SpaDES.tools::distanceFromEachPoint()}} \tab Fast calculation of distance surfaces\cr
+\code{\link[SpaDES.tools:rings]{SpaDES.tools::rings()}} \tab Identify rings around focal cells (e.g., buffers and donuts)\cr
+\code{\link[SpaDES.tools:spokes]{SpaDES.tools::spokes()}} \tab Identify outward radiating spokes from initial points\cr
+\code{\link[SpaDES.tools:spread]{SpaDES.tools::spread()}} \tab Contagious cellular automata\cr
+\code{\link[SpaDES.tools:spread2]{SpaDES.tools::spread2()}} \tab Contagious cellular automata, different algorithm, more robust\cr
+\code{\link[SpaDES.tools:wrap]{SpaDES.tools::wrap()}} \tab Create a torus from a grid\cr
 }
 }
 
 \section{7 Caching}{
 
+\tabular{ll}{
+\code{\link[SpaDES.tools:crw]{SpaDES.tools::crw()}} \tab Simple correlated random walk function\cr
+\code{\link[SpaDES.tools:heading]{SpaDES.tools::heading()}} \tab Determines the heading between \verb{SpatialPoints*}\cr
+\code{\link[quickPlot:makeLines]{quickPlot::makeLines()}} \tab Makes \code{SpatialLines} object for, e.g., drawing arrows\cr
+\code{\link[SpaDES.tools:move]{SpaDES.tools::move()}} \tab A meta function that can currently only take "crw"\cr
+\code{\link[SpaDES.tools:specificNumPerPatch]{SpaDES.tools::specificNumPerPatch()}} \tab Initiate a specific number of agents per patch\cr
+}
+}
 
 Caching makes a workflow reproducible and skips re-running steps that
 have not changed. Caching uses the \code{reproducible} package; SpaDES adds
@@ -229,6 +241,12 @@ See the caching vignette: \code{vignette("iii-cache", package = "SpaDES.core")}.
 
 \section{8 Plotting}{
 
+\tabular{ll}{
+\code{\link[quickPlot:setColors]{quickPlot::setColors()}} \tab Set colours for plotting \verb{Raster*} objects\cr
+\code{\link[quickPlot:getColors]{quickPlot::getColors()}} \tab Get colours in a \verb{Raster*} objects\cr
+\code{\link[quickPlot:divergentColors]{quickPlot::divergentColors()}} \tab Create a colour palette with diverging colours around a middle\cr
+}
+}
 
 Plotting goes through \code{quickPlot::Plot()}, which is optimised for fast
 redraws within a simulation. SpaDES.core adds the \code{\link[=Plots]{Plots()}} wrapper that
@@ -252,7 +270,11 @@ the metadata: every \code{sim$x} and parameter access is checked to be sure it
 matches the declared inputs, outputs, and parameters.
 
 \tabular{ll}{
-\code{\link[=codeCheckModule]{codeCheckModule()}} \tab Run the checks on a module on disk (no \code{simInit()} needed).\cr
+\code{\link[SpaDES.tools:agentLocation]{SpaDES.tools::agentLocation()}} \tab Agent location\cr
+\code{\link[SpaDES.tools:initiateAgents]{SpaDES.tools::initiateAgents()}} \tab Initiate agents into a \code{SpatialPointsDataFrame}\cr
+\code{\link[SpaDES.tools:numAgents]{SpaDES.tools::numAgents()}} \tab Number of agents\cr
+\code{\link[SpaDES.tools:probInit]{SpaDES.tools::probInit()}} \tab Probability of initiating an agent or event\cr
+\code{\link[SpaDES.tools:transitions]{SpaDES.tools::transitions()}} \tab Transition probability\cr
 }
 
 Controlled by these options:
@@ -266,13 +288,10 @@ Controlled by these options:
 
 
 \tabular{ll}{
-\code{\link[=saveSimList]{saveSimList()}} \tab Save a \code{simList} to disk.\cr
-\code{\link[=loadSimList]{loadSimList()}} \tab Load one back.\cr
-\code{\link[=zipSimList]{zipSimList()}}, \code{\link[=unzipSimList]{unzipSimList()}} \tab Save/load a \code{simList} together with its files.\cr
-\code{\link[=saveState]{saveState()}} \tab Snapshot the state during a run.\cr
-\code{\link[=restartR]{restartR()}} \tab Restart R (for example, to free memory) and continue.\cr
-\code{\link[=saveFiles]{saveFiles()}}, \code{\link[=loadFiles]{loadFiles()}} \tab Save or load files described by \code{outputs()} / \code{inputs()}.\cr
-\code{\link[=checksums]{checksums()}} \tab Verify (or write) checksums for a module's data files.\cr
+\code{\link[reproducible:Cache]{reproducible::Cache()}} \tab Caches a function, but often accessed as argument in \code{\link[=spades]{spades()}}\cr
+\code{\link[reproducible:showCache]{reproducible::showCache()}} \tab Shows information about the objects in the cache\cr
+\code{\link[reproducible:clearCache]{reproducible::clearCache()}} \tab Removes objects from the cache\cr
+\code{\link[reproducible:keepCache]{reproducible::keepCache()}} \tab Keeps only the objects described\cr
 }
 }
 
@@ -288,7 +307,17 @@ See \code{vignette("iv-advanced", package = "SpaDES.core")} for how to enable
 the background sampler with \code{options(spades.memoryUseInterval = ...)}.
 }
 
-\section{12 Module repository and downloads}{
+Other useful plotting functions:
+\tabular{ll}{
+\code{\link[quickPlot:clearPlot]{quickPlot::clearPlot()}} \tab Helpful for resolving many errors\cr
+\code{\link[quickPlot:clickValues]{quickPlot::clickValues()}} \tab Extract values from a raster object at the mouse click location(s)\cr
+\code{\link[quickPlot:clickExtent]{quickPlot::clickExtent()}} \tab Zoom into a raster or polygon map that was plotted with \code{\link[quickPlot:Plot]{quickPlot::Plot()}}\cr
+\code{\link[quickPlot:clickCoordinates]{quickPlot::clickCoordinates()}} \tab Get the coordinates, in map units, under mouse click\cr
+\code{\link[quickPlot:dev]{quickPlot::dev()}} \tab Specify which device to plot on, making a non-RStudio one as default\cr
+\code{\link[quickPlot:newPlot]{quickPlot::newPlot()}} \tab Open a new default plotting device\cr
+\code{\link[quickPlot:rePlot]{quickPlot::rePlot()}} \tab Re-plots all elements of device for refreshing or moving plot\cr
+}
+}
 
 
 \tabular{ll}{
