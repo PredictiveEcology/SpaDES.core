@@ -56,12 +56,6 @@ jobs:
           cache-version: 2
           extra-packages: |
             any::covr
-            NLMR=?ignore
-
-      - name: Install additional package dependencies
-        run: |
-          pak::pkg_install("ropensci/NLMR")
-        shell: Rscript {0}
 
       - id: covr
         name: Test coverage

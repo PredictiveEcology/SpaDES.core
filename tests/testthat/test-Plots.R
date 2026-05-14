@@ -208,3 +208,166 @@ test_that("Plots test .guessPkgFun", {
   })
   expect_true(all(test))
 })
+
+test_that("Plots - base R fn (non-gg result)", {
+  skip_on_cran()
+  testInit()
+  newModule("test", tmpdir, open = FALSE)
+  withr::local_options(reproducible.cacheSaveFormat = "qs2")
+
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+      name = "test", description = NA, keywords = NA,
+      authors = person("A", "B"), childModules = character(0),
+      version = list(test = "0.0.1"),
+      timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year",
+      citation = list(), documentation = list(), reqdPkgs = list(),
+      parameters = rbind(), inputObjects = bindrows(), outputObjects = bindrows()
+    ))
+    doEvent.test <- function(sim, eventTime, eventType, debug = FALSE) {
+      switch(eventType,
+        init = {
+          sim$df <- data.frame(a = rnorm(50))
+          Plots(data = sim$df, fn = fnHist, filename = "hist_test",
+                types = c("png", "raw"), .plotInitialTime = NA)
+        }
+      )
+      return(invisible(sim))
+    }
+    fnHist <- function(d, ...) hist(d$a, main = "test", ...)
+  ', fill = TRUE)
+
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1, timeunit = "year"))
+  suppressMessages(simOut <- spades(sim, debug = FALSE))
+  files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
+  expect_true(any(grepl("hist_test", files) & endsWith(files, ".png")))
+  expect_true(any(grepl("hist_test", files) & grepl("_data\\.qs2$", files)))
+  expect_equal(NROW(outputs(simOut)), 2L)
+})
+
+test_that("Plots - terra SpatRaster and SpatVector", {
+  skip_on_cran()
+  skip_if_not_installed("terra")
+  testInit()
+  newModule("test", tmpdir, open = FALSE)
+  withr::local_options(reproducible.cacheSaveFormat = "qs2")
+
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+      name = "test", description = NA, keywords = NA,
+      authors = person("A", "B"), childModules = character(0),
+      version = list(test = "0.0.1"),
+      timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year",
+      citation = list(), documentation = list(), reqdPkgs = list("terra"),
+      parameters = rbind(), inputObjects = bindrows(), outputObjects = bindrows()
+    ))
+    doEvent.test <- function(sim, eventTime, eventType, debug = FALSE) {
+      switch(eventType,
+        init = {
+          # SpatRaster: raw saves as .tif
+          sim$ras <- terra::rast(terra::ext(0, 10, 0, 10), vals = runif(100), res = 1)
+          Plots(data = sim$ras, filename = "ras_test",
+                types = c("png", "raw"), .plotInitialTime = NA)
+          # SpatVector: raw saves as .qs2 (not Raster/SpatRaster)
+          sim$vect <- terra::vect(cbind(1:5, 1:5))
+          Plots(data = sim$vect, filename = "vect_test",
+                types = c("png", "raw"), .plotInitialTime = NA)
+        }
+      )
+      return(invisible(sim))
+    }
+  ', fill = TRUE)
+
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1, timeunit = "year"))
+  suppressMessages(simOut <- spades(sim, debug = FALSE))
+  files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
+
+  expect_true(any(grepl("ras_test", files) & endsWith(files, ".png")))
+  expect_true(any(grepl("ras_test", files) & endsWith(files, ".tif")))   # raw SpatRaster -> .tif
+
+  expect_true(any(grepl("vect_test", files) & endsWith(files, ".png")))
+  expect_true(any(grepl("vect_test", files) & grepl("_data\\.qs2$", files))) # raw SpatVector -> .qs2
+
+  expect_equal(NROW(outputs(simOut)), 4L)  # 2 per Plots call
+})
+
+test_that("Plots - named ... args without data argument", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+  testInit()
+  newModule("test", tmpdir, open = FALSE)
+  withr::local_options(reproducible.cacheSaveFormat = "qs2")
+
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+      name = "test", description = NA, keywords = NA,
+      authors = person("A", "B"), childModules = character(0),
+      version = list(test = "0.0.1"),
+      timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year",
+      citation = list(), documentation = list(), reqdPkgs = list("ggplot2"),
+      parameters = rbind(), inputObjects = bindrows(), outputObjects = bindrows()
+    ))
+    doEvent.test <- function(sim, eventTime, eventType, debug = FALSE) {
+      switch(eventType,
+        init = {
+          sim$df <- data.frame(a = rnorm(20))
+          # data omitted -- sim$df passed via named arg d1 in ...
+          Plots(d1 = sim$df, fn = fnDots, filename = "dots_test",
+                types = "png", .plotInitialTime = NA)
+        }
+      )
+      return(invisible(sim))
+    }
+    fnDots <- function(d1, ...) {
+      ggplot2::ggplot(d1, ggplot2::aes(a)) + ggplot2::geom_histogram(bins = 5)
+    }
+  ', fill = TRUE)
+
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1, timeunit = "year"))
+  suppressMessages(simOut <- spades(sim, debug = FALSE))
+  files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
+  expect_true(any(grepl("dots_test", files) & endsWith(files, ".png")))
+  expect_equal(NROW(outputs(simOut)), 1L)
+})
+
+test_that("Plots - ggplot object passed directly as data", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+  testInit()
+  newModule("test", tmpdir, open = FALSE)
+  withr::local_options(reproducible.cacheSaveFormat = "qs2")
+
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+      name = "test", description = NA, keywords = NA,
+      authors = person("A", "B"), childModules = character(0),
+      version = list(test = "0.0.1"),
+      timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year",
+      citation = list(), documentation = list(), reqdPkgs = list("ggplot2"),
+      parameters = rbind(), inputObjects = bindrows(), outputObjects = bindrows()
+    ))
+    doEvent.test <- function(sim, eventTime, eventType, debug = FALSE) {
+      switch(eventType,
+        init = {
+          sim$gg_obj <- ggplot2::ggplot(data.frame(a = rnorm(20)), ggplot2::aes(a)) +
+            ggplot2::geom_histogram(bins = 5)
+          # ggplot object passed directly -- fn not needed, ggsave path is used
+          Plots(data = sim$gg_obj, filename = "ggobj_test",
+                types = c("png", "object"), .plotInitialTime = NA)
+        }
+      )
+      return(invisible(sim))
+    }
+  ', fill = TRUE)
+
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1, timeunit = "year"))
+  suppressMessages(simOut <- spades(sim, debug = FALSE))
+  files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
+  expect_true(any(grepl("ggobj_test", files) & endsWith(files, ".png")))
+  expect_true(any(grepl("ggobj_test", files) & grepl("_gg\\.qs2$", files)))
+  expect_equal(NROW(outputs(simOut)), 2L)
+})

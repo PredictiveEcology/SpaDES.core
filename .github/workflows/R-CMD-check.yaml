@@ -124,7 +124,6 @@ jobs:
           cache-version: 2
           extra-packages: |
             any::rcmdcheck
-            NLMR=?ignore
           needs: check
 
       # Fallback: when setup-r-dependencies fails (most often a transient
@@ -148,11 +147,6 @@ jobs:
             install.packages("pak", repos = "https://r-lib.github.io/p/pak/stable/")
             pak::local_install_dev_deps(ask = FALSE, dependencies = TRUE)
             pak::pkg_install(c("any::rcmdcheck"), ask = FALSE)
-
-      - name: Install additional package dependencies
-        run: |
-          pak::pkg_install("ropensci/NLMR")
-        shell: Rscript {0}
 
       - uses: r-lib/actions/check-r-package@v2
         with:

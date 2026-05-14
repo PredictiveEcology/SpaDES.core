@@ -21,7 +21,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 # Packages used in this vignette
-vignette_pkgs <- c("DiagrammeR", "NLMR", "SpaDES.tools", "knitr", "CircStats")
+vignette_pkgs <- c("DiagrammeR", "SpaDES.tools", "knitr", "CircStats")
 
 # Check availability without attaching
 hasSuggests <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
@@ -397,9 +397,8 @@ Note that modules need not be inter-dependent on one another: module B may depen
 To view the dependencies for a simulation:
 
 ```{r module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7}
-## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
+## NOTE: Suggested package SpaDES.tools must be installed
 #install.packages("SpaDES.tools")
-#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
 
 library(SpaDES.core)
 
