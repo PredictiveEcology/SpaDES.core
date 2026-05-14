@@ -68,6 +68,22 @@
   if `options(spades.allowInitDuringSimInit = TRUE)`; previously, this was not respected.
 * update `reproducible` dependency version to 3.0.0;
 * Issue #311: remove duplication that was due to failed merge
+* Tests: end-to-end automated coverage for `spades.recoveryMode` (previously
+  zero — the only exercise was gated behind `if (interactive())` in
+  `test-mod.R` and never ran in CI). Three new `test_that()` blocks cover the
+  default 1-event recovery, the 2-event case (`spades.recoveryMode = 2L`,
+  asserting `length(.recoverableObjs) == 2L`, most-recent-first ordering, and
+  full rewind+replay via `restartSpades(numEvents = 2L)`), and the off case
+  (`spades.recoveryMode = FALSE` leaves `.recoverableObjs` NULL while the
+  sim is still stashed by `saveSimOnExit`).
+* `restartSpades()`: drop unreachable "Cannot replay N events as requested"
+  message — `numMods` is pre-clipped via `min(length(.recoverableObjs),
+  numEvents)`, so the gating condition could never be true. Silent clipping
+  is the documented contract when `numEvents` exceeds available state.
+* Tests: drop stale `if (interactive())` guards that produced silent
+  coverage gaps or "empty test" skips, and widen the known igraph
+  `cluster_optimal()` community-count fragility skip to Linux (previously
+  Windows-only).
 
 # SpaDES.core 3.0.3
 

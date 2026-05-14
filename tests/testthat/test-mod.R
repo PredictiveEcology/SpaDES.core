@@ -126,37 +126,139 @@ test_that("local mod object", {
     expect_true(sum(grepl("There was an error", mess)) == len)
   })
 
-  ## Test restartSpades # The removal of the completed ... it shouldn't, but it did previously
-  if (interactive()) {
-    withr::local_options(spades.recoveryMode = TRUE)
+})
 
-    mySim8 <- simInit(times = list(start = 0, end = 0),
-                      paths = list(modulePath = tmpdir), modules = c("test", "test2"),
-                      params = list(test2 = list(testRestartSpades = 1)))
-    ss <- try(spades(mySim8, debug = FALSE), silent = TRUE)
+test_that("spades.recoveryMode + restartSpades round-trip", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE)
 
-    sim <- savedSimEnv()$.sim ## TODO: retrieves NULL
-    expect_true(is(sim, "simList"))
+  newModule("test", tmpdir, open = FALSE)
+  newModule("test2", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "test", "test.R"), testCode, fill = TRUE)
+  cat(file = file.path(tmpdir, "test2", "test2.R"), test2Code, fill = TRUE)
 
-    err <- capture_error({
-      sim2 <- restartSpades(sim, debug = FALSE)
-    }) # is missing completed events
+  ## test2's init throws stop("testing restartSpades") when testRestartSpades is set
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = c("test", "test2"),
+                   params = list(test2 = list(testRestartSpades = 1)))
 
-    sim <- savedSimEnv()$.sim
-    err <- capture_error({
-      sim3 <- restartSpades(sim, debug = FALSE)
-    }) # is missing completed events
+  preCompleted <- NROW(completed(mySim))
 
-    sim <- savedSimEnv()$.sim
-    sim@params$test2$testRestartSpades <- NULL
-    sim3 <- restartSpades(sim, debug = FALSE)
-    expect_true(NROW(completed(sim3)) ==
-                  length(modules(sim)) + # .inputObjects
-                  length(setdiff(unlist(.coreModules()), "restartR")) + # core
-                  length(modules(sim)) + # init
-                  1 # test2 has an event
-                )
-  }
+  ## spades() must fail on test2's init event
+  err <- try(spades(mySim, debug = FALSE), silent = TRUE)
+  expect_s3_class(err, "try-error")
+  expect_match(attr(err, "condition")$message, "testing restartSpades")
+
+  ## After the failure, recoveryMode must have stashed the sim in savedSimEnv()
+  saved <- savedSimEnv()$.sim
+  expect_s4_class(saved, "simList")
+  expect_true(!is.null(saved$.recoverableObjs))
+  ## spades.recoveryMode = TRUE retains exactly one event of state
+  expect_equal(length(saved$.recoverableObjs), 1L)
+  ## test2's init never finished, so the failing event must still be in queue
+  expect_true(any(events(saved)$moduleName == "test2"))
+  ## ... and it must not be in completed
+  expect_false(any(completed(saved)$moduleName == "test2" &
+                     completed(saved)$eventType == "init"))
+
+  ## restartSpades against a saved sim whose offending parameter is still set
+  ## should re-throw the same module-level error
+  err2 <- try(restartSpades(saved, debug = FALSE), silent = TRUE)
+  expect_s3_class(err2, "try-error")
+  expect_match(attr(err2, "condition")$message, "testing restartSpades")
+
+  ## clear the offending param; restartSpades must now succeed and resume the queue
+  fixed <- savedSimEnv()$.sim
+  fixed@params$test2$testRestartSpades <- NULL
+  resumed <- restartSpades(fixed, debug = FALSE)
+  expect_s4_class(resumed, "simList")
+  ## After resume, completed should include the .inputObjects rows, all core
+  ## module init events except restartR, both module init events, plus
+  ## test2's event1 (scheduled by test2's init at start time).
+  expect_equal(NROW(completed(resumed)),
+               length(modules(resumed)) +                                # .inputObjects
+                 length(setdiff(unlist(.coreModules()), "restartR")) +   # core init
+                 length(modules(resumed)) +                              # module init
+                 1L)                                                     # test2's event1
+})
+
+test_that("spades.recoveryMode = 2L retains two events of state", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = 2L,
+                       spades.saveSimOnExit = TRUE)
+
+  newModule("test", tmpdir, open = FALSE)
+  newModule("test2", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "test", "test.R"), testCode, fill = TRUE)
+  cat(file = file.path(tmpdir, "test2", "test2.R"), test2Code, fill = TRUE)
+
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = c("test", "test2"),
+                   params = list(test2 = list(testRestartSpades = 1)))
+
+  err <- try(spades(mySim, debug = FALSE), silent = TRUE)
+  expect_s3_class(err, "try-error")
+
+  saved <- savedSimEnv()$.sim
+  expect_s4_class(saved, "simList")
+  ## with recoverMode = 2L, exactly two events of state must be retained
+  expect_equal(length(saved$.recoverableObjs), 2L)
+  ## entries are ordered most-recent-first: test2 (failing init), then test (prior init)
+  expect_equal(names(saved$.recoverableObjs), c("test2", "test"))
+  ## each entry is a list (per-event captured object snapshot)
+  expect_true(all(vapply(saved$.recoverableObjs, is.list, logical(1))))
+
+  ## restartSpades must mention "the last 2 events" in its diagnostic message,
+  ## confirming the recoveryMode value flowed through to the recovery infrastructure
+  fixed <- savedSimEnv()$.sim
+  fixed@params$test2$testRestartSpades <- NULL
+  mess <- capture_messages({
+    resumed <- restartSpades(fixed, numEvents = 2L, debug = FALSE)
+  })
+  expect_s4_class(resumed, "simList")
+  expect_true(any(grepl("Reversing event.*test2", mess)))
+  expect_true(any(grepl("Reversing event.*test\\b", mess)))  # the prior init also rewound
+  ## After a full 2-event rewind+replay, both module inits run exactly once again,
+  ## producing the same total-completed count as the 1-event case:
+  ## 2 inputObjects + 4 core inits + 2 module inits + test2's event1 = 9
+  expect_equal(NROW(completed(resumed)),
+               length(modules(resumed)) +
+                 length(setdiff(unlist(.coreModules()), "restartR")) +
+                 length(modules(resumed)) +
+                 1L)
+})
+
+test_that("spades.recoveryMode = FALSE does not populate .recoverableObjs", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = FALSE,
+                       spades.saveSimOnExit = TRUE)
+
+  newModule("test", tmpdir, open = FALSE)
+  newModule("test2", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "test", "test.R"), testCode, fill = TRUE)
+  cat(file = file.path(tmpdir, "test2", "test2.R"), test2Code, fill = TRUE)
+
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = c("test", "test2"),
+                   params = list(test2 = list(testRestartSpades = 1)))
+
+  err <- try(spades(mySim, debug = FALSE), silent = TRUE)
+  expect_s3_class(err, "try-error")
+
+  ## With recoveryMode off, no recoverable state should have been captured
+  saved <- savedSimEnv()$.sim
+  expect_s4_class(saved, "simList")  # still stashed by saveSimOnExit
+  expect_null(saved$.recoverableObjs)
 })
 
 test_that("convertToPackage testing", {

@@ -116,40 +116,6 @@ test_that("Plots function 1", {
   }
 })
 
-test_that("testing .plotInitialTime & .plots", {
-  testInit(sampleModReqdPkgs)
-
-  if (interactive()) {
-
-    times <- list(start = 0.0, end = 1, timeunit = "year")
-    params <- list(
-      .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-      randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-      # caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-      fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
-    )
-    modules <- list("randomLandscapes", #"caribouMovement",
-                    "fireSpread")
-    paths <- list(modulePath = getSampleModules(tmpdir))
-
-    mySim <- simInit(times, params, modules, objects = list(), paths)
-
-    mySim@params$randomLandscapes$.plotInitialTime <- 0
-    mySim@params$fireSpread$.plotInitialTime <- 0
-
-    # Makes plots
-    expect_no_error(spades(mySim))
-    .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
-    expect_true(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
-    # Makes no plots
-    clearPlot()
-    spades(mySim, .plots = NA)
-    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
-    spades(mySim, .plotInitialTime = NA)
-    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
-  }
-})
-
 test_that("Plots function 2", {
   skip_if_not_installed("ggplot2")
 

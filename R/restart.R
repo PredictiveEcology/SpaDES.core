@@ -145,9 +145,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     sim@completed[[last]][[._txtClockTime]] <- st
 
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
-    if (numMods > length(sim$.recoverableObjs))
-      message("Cannot replay ", numMods, " events as requested by numMods; ",
-              "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
     if (numMods < length(sim$.recoverableObjs))
       sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
     eventIndices <- seq_len(NROW(eventsToReplayDT))
