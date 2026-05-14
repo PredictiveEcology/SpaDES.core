@@ -2,6 +2,8 @@ utils::globalVariables(c(
   "newQuantity", "quantityAdj", "quantityAdj2"
 ))
 
+.txtArguments <- "arguments"
+
 #' A slightly modified version of `getOption()`
 #'
 #' This can take `x` as a character string or as a function that returns a character string.
@@ -315,6 +317,16 @@ setMethod(
     return(classFilter(x, include, exclude = NA_character_, envir = sys.frame(-1)))
 })
 
+# use with e.g., setNames to a canonical set of names
+match_colnames <- function(x, correct_names) {
+  matched <- sapply(names(x), function(nm) {
+    hits <- which(startsWith(correct_names, nm) | startsWith(nm, correct_names))
+    if (length(hits) >= 1) hits[1] else NA_integer_
+  })
+  names(x) <- ifelse(is.na(matched), names(x), correct_names[matched])
+  x
+}
+
 # fileTable -----------------------------------------------------------------------------------
 
 #' Create empty `fileTable` for inputs and outputs
@@ -342,9 +354,13 @@ setMethod(
       file = character(0), fun = character(0), package = character(0),
       objectName = character(0), loadTime = numeric(0), loaded = logical(0),
       arguments = I(list()), intervals = numeric(0), stringsAsFactors = FALSE
-    )
+    ) 
+    ft <- match_colnames(ft, inputTableColNames)
     return(ft)
   })
+
+inputTableColNames <- c("file", "fun", "package", "objectName", "loadTime", "loaded", 
+                        .txtArguments, "intervals")
 
 #' @rdname fileTable
 .fileTableInCols <- colnames(.fileTableIn())
@@ -366,9 +382,13 @@ setMethod(
       file = character(0), fun = character(0), package = character(0),
       objectName = character(0), saveTime = numeric(0), saved = logical(0),
       arguments = I(list()), stringsAsFactors = FALSE
-    )
+    ) 
+    ft <- match_colnames(ft, outputTableColNames) # use the programmatic ones
+
     return(ft)
 })
+
+outputTableColNames <- c("file", "fun", "package", "objectName", "saveTime", "saved", .txtArguments)
 
 #' @rdname fileTable
 .fileTableOutCols <- colnames(.fileTableOut())
@@ -430,3 +450,5 @@ FilterRecursive <- function(f, x) {
     }) |>
     Filter(f, x = _)
 }
+
+

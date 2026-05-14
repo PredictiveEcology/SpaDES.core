@@ -1,5 +1,5 @@
 utils::globalVariables(c(
-  ".", "from", "fromOrd", "i.module", "i.objectClass", "module", "module.x", "module.y",
+  ".", "..colsToUse", "from", "fromOrd", "i.module", "i.objectClass", "module", "module.x", "module.y",
   "name", "objectClass", "objectName", "other", "sourceURL", "to", "toOrd"
 ))
 

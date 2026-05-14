@@ -17,6 +17,10 @@ These are common parameter names that are reserved for specific use within modul
 \item \code{.saveInitialTime}: the initial time for saving;
 \item \code{.saveInterval}: the interval between saves;
 \item \code{.useCache}: whether to use caching, or which events to cache;
+\item \code{.useCacheArgs}: optional named list (keyed by event name) of extra arguments
+passed to \code{\link[reproducible:Cache]{reproducible::Cache()}} for that event (e.g. \code{cacheId},
+\code{useCloud}, \code{cloudFolderID}); enables a developer to pin a fixed cloud
+cache key for a deterministic event;
 \item \code{.useParallel}: whether to use parallel processing, or the number of parallel cores to use;
 }
 }

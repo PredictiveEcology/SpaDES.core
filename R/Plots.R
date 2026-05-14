@@ -1,3 +1,5 @@
+utils::globalVariables("str")
+
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 
@@ -67,6 +69,10 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @param usePlot Logical. If `TRUE`, the default, then the plot will occur
 #'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
 #'
+#' @param useCache Logical or character vector. If `TRUE`, caching is enabled for
+#'   all non-screen output types. If a character vector, caching is enabled only
+#'   for the matching `types`. Default is `FALSE`.
+#'
 #' @param envir The environment where the `data` argument should be evaluated if it is
 #'   a `call`. Normally, this should be left at its default, `parent.frame()`.
 #'
@@ -98,6 +104,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs2 qs_save
 #' @importFrom quickPlot clearPlot Plot
+#' @importFrom rlang as_label is_quosure
 #' @importFrom terra writeRaster
 #' @importFrom tools file_path_sans_ext
 #'
@@ -709,7 +716,7 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
   ret <- attr(cached, ".Cache")$newCache %in% TRUE
   attributes(ret) <- attributes(cached)
   if (ret %in% FALSE) { # means it doesn't need a new plotting
-    sc <- showCacheFast(cacheId = cacheId(cached), verbose = FALSE)
+    sc <- showCacheFast(cacheId = cacheId(cached))
     files <- sc[tagKey %in% tagKeySavedFile]$tagValue
     digs <- .robustDigest(asPath(filenamesForSave))
     digsToCompare <- paste0(names(digs), ":", unname(digs))

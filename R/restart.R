@@ -113,6 +113,17 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
+  
+  if (numMods == 0) {
+    message("There no saved state prior to any changes that happened in ",
+            module, ". Would you like to proceed from the last state of the ",
+            "simList anyway? i.e., any changes that had already happened ",
+            "inside the module: ", module, " before the fail will be kept...")
+    continue <- readline("Would you like to restart anyway? (y or n) ")
+    continue <- tolower(substr(continue, start = 1, stop = 1))
+    if (continue %in% "y")
+      numMods <- 1
+  }
   if (numMods > 0) {
     com <- completed(sim)
     etSecs <- sum(com[, et := difftime(get(._txtClockTime), get(._txtPrevEventTimeFinish), units = "secs"),
@@ -134,9 +145,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     sim@completed[[last]][[._txtClockTime]] <- st
 
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
-    if (numMods > length(sim$.recoverableObjs))
-      message("Cannot replay ", numMods, " events as requested by numMods; ",
-              "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
     if (numMods < length(sim$.recoverableObjs))
       sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
     eventIndices <- seq_len(NROW(eventsToReplayDT))
@@ -198,7 +206,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
           message(cli::col_blue("Setting all changed objects to their values at the start of ", modules[event]))
           list2env(Copy(objsToCopy), envir = sim@.xData)
         } else {
-          message(cli::col_blue("no objects to reset/recover it ", modules[event], ":",
+          message(cli::col_blue("no objects to reset/recover in ", modules[event], ":",
                                 rev(tail(completed(sim), max(eventIndices))$eventType)[event]))
         }
 
@@ -293,8 +301,14 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
   ## Once reversed, remove the .recoverableObjs
   sim$.recoverableObjs <- NULL
 
-  if (restart)
+  if (restart) {
+    # All packages are guaranteed already loaded in this session; skip the
+    # Require() call in loadPkgs which can hang non-interruptibly (dyn.load on
+    # an NFS-backed .so) when packages are touched again unnecessarily.
+    opts <- options(spades.loadReqdPkgs = FALSE)
+    on.exit(options(opts), add = TRUE)
     sim <- spades(sim, ...)
+  }
   # } else {
   #   message("There was no interrupted spades call; returning sim as is")
   # }

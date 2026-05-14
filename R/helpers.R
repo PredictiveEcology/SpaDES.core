@@ -391,6 +391,7 @@ noEventWarning <- function(sim) {
 ._txtPrevEventTimeFinish <- "._prevEventTimeFinish"
 ._txtSimNesting <- "._simNesting"
 ._txtDotUseCache <- ".useCache"
+._txtDotUseCacheArgs <- ".useCacheArgs"
 
 #' Reserved module parameter names
 #'
@@ -402,6 +403,10 @@ noEventWarning <- function(sim) {
 #' - `.saveInitialTime`: the initial time for saving;
 #' - `.saveInterval`: the interval between saves;
 #' - `.useCache`: whether to use caching, or which events to cache;
+#' - `.useCacheArgs`: optional named list (keyed by event name) of extra arguments
+#'   passed to [reproducible::Cache()] for that event (e.g. `cacheId`,
+#'   `useCloud`, `cloudFolderID`); enables a developer to pin a fixed cloud
+#'   cache key for a deterministic event;
 #' - `.useParallel`: whether to use parallel processing, or the number of parallel cores to use;
 #'
 #' @keywords internal
@@ -409,5 +414,6 @@ noEventWarning <- function(sim) {
 .knownDotParams <- c(".plotInitialTime", ".plotInterval",
                      ".plots",
                      ".saveInitialTime", ".saveInterval",
-                     ._txtDotUseCache, ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
+                     ._txtDotUseCache, ._txtDotUseCacheArgs,
+                     ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
 
