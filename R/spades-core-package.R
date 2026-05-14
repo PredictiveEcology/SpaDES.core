@@ -9,7 +9,7 @@
 #' \if{latex}{\figure{SpaDES.png}{options: width=0.5in}}
 #'
 #' @description
-#' `SpaDES.core` is a framework for building spatial discrete-event simulations
+#' `SpaDES.core` is a framework for building spatial discrete-event systems
 #' from re-usable modules. A simulation is held in a single `simList` object,
 #' modules schedule events that change the `simList`, and the events run in
 #' time order until the simulation ends.
