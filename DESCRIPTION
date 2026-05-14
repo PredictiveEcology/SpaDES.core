@@ -79,13 +79,14 @@ Suggests:
     RSQLite,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 2.0.0),
+    SpaDES.tools (>= 2.1.1.9001),
     tcltk,
     testthat (>= 1.0.2),
     withr
 Remotes:
     ropensci/NLMR,
-    PredictiveEcology/reproducible@development
+    PredictiveEcology/reproducible@development,
+    PredictiveEcology/SpaDES.tools@spreadSpeed
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
