@@ -22,7 +22,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 # List the vignette-only packages this file *uses*:
-vignette_pkgs <- c("SpaDES.tools", "NLMR")
+vignette_pkgs <- c("SpaDES.tools")
 
 # Helper that checks availability without attaching:
 has_pkgs <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
@@ -149,11 +149,10 @@ This demo loads three sample modules provided with the packages: 1) `randomLands
 These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.
 
 ```{r SpaDES-demo, eval=FALSE, echo=TRUE}
-## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
+## NOTE: Suggested package SpaDES.tools must be installed
 #install.packages("SpaDES.tools")
-#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
 
-knitr::opts_chunk$set(eval = requireNamespace("SpaDES.tools") && !requireNamespace("NLMR"))
+knitr::opts_chunk$set(eval = requireNamespace("SpaDES.tools"))
 
 library(SpaDES.core)
 

@@ -19,7 +19,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 # Packages used in this vignette
-vignette_pkgs <- c("knitr", "NLMR", "RColorBrewer", "SpaDES.tools")
+vignette_pkgs <- c("knitr", "RColorBrewer", "SpaDES.tools")
 
 # Check availability without attaching
 has_pkgs <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))

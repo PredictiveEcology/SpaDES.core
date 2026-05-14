@@ -114,18 +114,8 @@ test_that("defineModule correctly handles different inputs", {
 })
 
 test_that("depsEdgeList and depsGraph work", {
-  skip_on_cran() # requires installation of NLMR, from a Git Repo
   testInit(sampleModReqdPkgs)
 
-  origRepos <- getOption("repos")
-  # print(origRepos)
-  if (any(unname(origRepos) == "@CRAN@")) {
-    suppressMessages(utils::chooseCRANmirror(ind = 1))
-    on.exit({
-      options(repos = origRepos)
-      print(getOption("repos"))
-    } , add = TRUE)
-  }
   times <- list(start = 0.0, end = 10)
   npb <- "nPixelsBurned"
   params <- list(
