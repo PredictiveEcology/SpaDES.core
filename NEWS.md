@@ -81,7 +81,33 @@
   removed from `reqdPkgs`; bumped `SpaDES.tools` requirement to `>= 2.1.1.9001`.
   Step toward closing #334.
 * New module parameter `.useCacheArgs`: optional named list (keyed by event name) of extra arguments spliced into the per-event `reproducible::Cache()` call. Lets a developer pin a fixed `cacheId` so a pre-seeded cloud folder (`useCloud = TRUE`, `cloudFolderID = ...`) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The `newModule()` template emits a commented-out opt-in example.
-* `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
+* `Plots`: refactor for stability, robustness, and expanded coverage.
+  - **Stable filenames**: saved files now use `<dataObjName>_time<simTime>.<ext>`
+    (e.g. `myStack_time1.tif`) rather than a `tempfile()`-based suffix, so
+    repeated runs at the same sim time produce the same filename — making
+    outputs deterministic and easier to diff/version.
+  - **Base-R save errors surface**: if a base-R device save (`png`, `pdf`,
+    `tiff`, ...) fails inside `fn(data, ...)`, the device is still closed,
+    a warning is emitted, and the offending file is recorded in a local
+    `failedFiles` set so it is skipped when appending to `sim@outputs`.
+    Previously, failures could leave an `outputs` row pointing at a missing
+    file.
+  - **New `useCache` argument**: `TRUE` (or a character vector of `types`)
+    enables `reproducible::Cache()`-style memoization of the file-producing
+    branch; the cached `needNewPlot` flag controls whether the plot is
+    regenerated. Only relevant for non-screen `types`.
+  - **`data` may now be a `ggplot` object directly** (in addition to a
+    `quote()`d expression or a raw value); detection moved to a single
+    `is(data, "gg")` check, so passing `Plots(data = myGgplot, ...)` works.
+  - **Internal refactor**: filenames and save-function names are computed
+    once up front into `filenamesForSave` / `funsUsed` (keyed by type),
+    and a single `isBaseFormat` flag selects the base-R vs `ggplot2::ggsave`
+    path — replacing two parallel, partly-overlapping code paths.
+  - **Tests** (`tests/testthat/test-Plots.R`) grow from 5 to 8 `test_that`
+    blocks (PASS 37 → 51): base-R plotting function (`hist`) saving png +
+    raw `qs2`, `terra::SpatRaster` saving `tif` raw, `terra::SpatVector`
+    saving `qs2` raw, named `...` args without `data =`, and ggplot passed
+    directly as `data`.
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 
   if `options(spades.allowInitDuringSimInit = TRUE)`; previously, this was not respected.
