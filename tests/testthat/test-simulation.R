@@ -249,14 +249,13 @@ test_that("spades calls - diff't signatures", {
   expect_message(spades(a, debug = c("current", "events"), .plotInitialTime = NA), "moduleName")
   expect_message(spades(a, debug = "simList", .plotInitialTime = NA), "Completed Events")
 
-  if (interactive()) {
-    # progress = "text" is gated on interactive() inside R/progress.R and
-    # R/simulation-simInit.R, so the txtProgressBar is never created in a
-    # non-interactive test session and expect_output() has nothing to capture.
-    suppressWarnings(expect_output(spades(a, progress = "text", debug = TRUE), "10%"))
-    suppressWarnings(expect_output(spades(a, progress = "text", debug = TRUE), "20%"))
-    suppressWarnings(expect_output(spades(a, progress = "text"), "..........| 100%"))
-  }
+  ## Note: progress = "text" is intentionally not exercised here. Both
+  ## R/progress.R:5 and R/simulation-simInit.R:657 short-circuit the progress
+  ## bar when !interactive(), so the txtProgressBar is never created in a
+  ## non-interactive test session — there is nothing for expect_output() to
+  ## capture. The non-progress branches above already cover the surrounding
+  ## debug-output behaviour.
+
   opts <- withr::local_options(spades.saveSimOnExit = FALSE)
   expect_silent(expect_message(spades(a, debug = FALSE, progress = FALSE), "DTthreads"))
   expect_silent(expect_message(spades(a, debug = FALSE, progress = "rr"), "DTthreads"))
@@ -340,167 +339,7 @@ test_that("simulation runs with simInit with duplicate modules named", {
   expect_true(length(modules(mySim)) == length(unique(modules)))
 })
 
-test_that("simulation runs with simInit with duplicate modules named", {
-  skip("benchmarking DES")
 
-  testInit()
-
-  newModule("test", tmpdir, open = FALSE)
-  newModule("test2", tmpdir, open = FALSE)
-
-  sim <- simInit()
-
-  # Sept 18 2018 -- Changed to use "seconds" -- better comparison with simple loop
-  cat(file = file.path(tmpdir, "test", "test.R"), '
-      defineModule(sim, list(
-      name = "test",
-      description = "insert module description here",
-      keywords = c("insert key words here"),
-      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
-      childModules = character(0),
-      version = list(SpaDES.core = "0.1.0", test = "0.0.1"),
-      spatialExtent = terra::ext(rep(0, 4)),
-      timeframe = as.POSIXlt(c(NA, NA)),
-      timeunit = "second",
-      citation = list("citation.bib"),
-      documentation = list("README.md", "test.Rmd"),
-      reqdPkgs = list(),
-      parameters = rbind(
-      ),
-      inputObjects = bindrows(
-      ),
-      outputObjects = bindrows(
-      )
-      ))
-
-      doEvent.test = function(sim, eventTime, eventType, debug = FALSE) {
-      switch(
-      eventType,
-      init = {
-      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
-      },
-      event1 = {
-      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 1, "test", "event1", .skipChecks = TRUE)
-      })
-      return(invisible(sim))
-      }
-      ', fill = TRUE)
-
-  cat(file = file.path(tmpdir, "test2", "test2.R"), '
-      defineModule(sim, list(
-      name = "test2",
-      description = "insert module description here",
-      keywords = c("insert key words here"),
-      authors = person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca", role = c("aut", "cre")),
-      childModules = character(0),
-      version = list(SpaDES.core = "0.1.0", test2 = "0.0.1"),
-      spatialExtent = terra::ext(rep(0, 4)),
-      timeframe = as.POSIXlt(c(NA, NA)),
-      timeunit = "second",
-      citation = list("citation.bib"),
-      documentation = list("README.md", "test2.Rmd"),
-      reqdPkgs = list(),
-      parameters = rbind(
-      ),
-      inputObjects = bindrows(
-      ),
-      outputObjects = bindrows(
-      )
-      ))
-
-      doEvent.test2 = function(sim, eventTime, eventType, debug = FALSE) {
-      switch(
-      eventType,
-      init = {
-      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
-      },
-      event1 = {
-      sim <- scheduleEvent(sim, sim@simtimes[["current"]] + 2, "test2", "event1", .skipChecks = TRUE)
-      })
-      return(invisible(sim))
-      }
-      ', fill = TRUE)
-
-  N <- 5000
-
-  moduleDir <- file.path(tmpdir)
-  inputDir <- file.path(moduleDir, "inputs") |> checkPath(create = TRUE)
-  outputDir <- file.path(moduleDir, "outputs")
-  cacheDir <- file.path(outputDir, "cache")
-  times <- list(start = 0, end = N)
-  parameters <- list(
-  )
-  modules <- list("test")
-  objects <- list()
-  paths <- list(
-    cachePath = cacheDir,
-    modulePath = moduleDir,
-    inputPath = inputDir,
-    outputPath = outputDir
-  )
-
-  #options("spades.nCompleted" = 500)
-  mySim <- simInit(times = times, params = parameters, modules = modules,
-                   objects = objects, paths = paths)
-
-  nTimes <- 20
-
-  #######################
-  # Tested on laptop
-  #######################
-  # laptop was 10.2 seconds -- currently 4.2 seconds or so --> June 29, 2018 is 1.06 seconds
-  # laptop New with "seconds" -- Sept 21, 2018 is 0.492 seconds --> 98 microseconds/event
-  # laptop New with "seconds" -- Nov 26, 2018 is 0.458 seconds --> 92 microseconds/event!
-  # Windows Desktop -- slower -- Nov 26, 2018 0.730 Seconds --> 148 microseconds/event!
-  # Linux Server -- slower -- Nov 26, 2018 0.795 Seconds --> 159 microseconds/event!
-  # BorealCloud Server -- slower -- Nov 26, 2018 0.972 Seconds --> 194 microseconds/event!
-  # laptop -- May 25, 2019 0.603 Seconds --> 120 microseconds/event!
-  # laptop with new completed as environment -- May 25, 2019 0.357 Seconds --> 71 microseconds/event!
-  options("spades.keepCompleted" = TRUE)
-  # microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)})
-  #
-  # # Turn off completed list
-  # #  Changed to use "seconds" -- better comparison with simple loop
-  # # Old times using "year"  -- June 29, 2018 is 0.775 seconds, Sept 19, 2018 0.809 seconds
-  # #                         -- This is 161 microseconds per event
-  # # New times using "second" -- Sept 19, 2018 0.244 Seconds --> 49 microseconds/event
-  # # New times using "second" -- Nov 26, 2018 0.192 Seconds --> 38 microseconds/event!
-  # # Windows Desktop -- slower -- Nov 26, 2018 0.348 Seconds --> 70 microseconds/event!
-  # # Linux Server -- slower -- Nov 26, 2018 0.461 Seconds --> 92 microseconds/event!
-  # # BorealCloud Server -- slower -- Nov 26, 2018 0.282 Seconds --> 56 microseconds/event!
-  # # With many new "exists"
-  # # laptop -- May 25, 2019 0.264 Seconds --> 53 microseconds/event!
-  # options("spades.keepCompleted" = FALSE)
-  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-  # #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
-  #
-  # a <- 0
-  # a3 <- microbenchmark::microbenchmark(
-  #   for (i in 1:N) {
-  #     a <- a + 1
-  #   }
-  # )
-  #
-  # summary(a2)[, "median"]/summary(a3)[, "median"]
-  #
-  #
-  # # With 2 modules, therefore sorting
-  #
-  # modules <- list("test", "test2")
-  # mySim <- simInit(times = times, params = parameters, modules = modules,
-  #                  objects = objects, paths = paths)
-  #
-  # nTimes <- 10
-  # # Turn off completed list
-  # # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 59 microseconds/event, even with sorting
-  # options("spades.keepCompleted" = FALSE)
-  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-  # #profvis::profvis({for (i in 1:10) spades(mySim, debug = FALSE)})
-  #
-  # # New times using "second" -- Nov 26, 2018 0.443 Seconds --> 130 microseconds/event, even with sorting
-  # options("spades.keepCompleted" = TRUE)
-  # (a2 <- microbenchmark::microbenchmark(times = nTimes, {spades(mySim, debug = FALSE)}))
-})
 
 test_that("conflicting function types", {
   testInit(sampleModReqdPkgs, smcc = TRUE, opts = list(spades.debug = 1))

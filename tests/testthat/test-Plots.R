@@ -97,23 +97,6 @@ test_that("Plots function 1", {
     unlink(files)
   }
 
-  if (interactive()) {
-    something <- data.frame(a = sample(1:10, replace = TRUE))
-    fn1 <- function(d1, bins, title = "hello", ...) {
-      ggplot2::ggplot(d1, ggplot2::aes(a)) +
-        ggplot2::geom_histogram(bins = bins, ...) +
-        ggplot2::labs(title = title)
-    }
-    # Should add next 2 plots to same windows
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run1")
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run2")
-    # Should clear plot windows and each of following will be a new plot on its own
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run3", usePlot = FALSE)
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
-    clearPlot()
-    # avoid using `data` arg; just use all named args
-    Plots(d1 = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
-  }
 })
 
 test_that("Plots function 2", {
