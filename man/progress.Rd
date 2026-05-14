@@ -81,18 +81,18 @@ options(opts) # reset
 }}
 }
 \seealso{
-Other functions to access elements of a 'simList' object: 
-\code{\link{.addDepends}()},
-\code{\link{checkpointFile}()},
-\code{\link{envir}()},
-\code{\link{events}()},
-\code{\link{globals}()},
-\code{\link{inputs}()},
-\code{\link{modules}()},
-\code{\link{objs}()},
-\code{\link{packages}()},
-\code{\link{params}()},
-\code{\link{paths}()},
-\code{\link{times}()}
+Other functions to access elements of a 'simList' object:
+\code{\link[=.addDepends]{.addDepends()}},
+\code{\link[=checkpointFile]{checkpointFile()}},
+\code{\link[=envir]{envir()}},
+\code{\link[=events]{events()}},
+\code{\link[=globals]{globals()}},
+\code{\link[=inputs]{inputs()}},
+\code{\link[=modules]{modules()}},
+\code{\link[=objs]{objs()}},
+\code{\link[=packages]{packages()}},
+\code{\link[=params]{params()}},
+\code{\link[=paths]{paths()}},
+\code{\link[=times]{times()}}
 }
 \concept{functions to access elements of a 'simList' object}

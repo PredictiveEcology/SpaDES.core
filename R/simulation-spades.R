@@ -802,7 +802,7 @@ scheduleConditionalEvent <- function(sim,
 #' See <https://github.com/PredictiveEcology/SpaDES/wiki/Debugging> for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @importFrom cli col_blue col_magenta
+#' @importFrom cli ansi_strip col_blue col_magenta start_app
 #' @importFrom data.table setDTthreads
 #' @seealso vignettes
 #' @export
@@ -939,6 +939,9 @@ setMethod(
     }
 
     sim <- withCallingHandlers({
+      cli::start_app(output = "message", .auto_close = TRUE, .envir = environment())
+      .pkgEnv$.inProgressBar <- FALSE
+      .pkgEnv$.progressLastShown <- NULL
 
       ## RecoverMode Step 1 -- set up
       recoverModeTypo()
@@ -1288,13 +1291,39 @@ setMethod(
       }
     },
     message = function(m) {
-      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
-        logging::loginfo(m$message)
-      } else {
-        if (isTRUE(any(grepl("\b", m$message)))) {
-          m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
+      msg <- m$message
+      # Detect cli progress ticks routed through message() by start_app(output="message").
+      # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
+      # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
+      # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
+      # are intentionally excluded so colored regular messages are not mistaken for ticks.
+      if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
+        clean <- trimws(cli::ansi_strip(msg))
+        if (nchar(clean) == 0L) {
+          tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+          return()
         }
-        message(loggingMessage(m$message))
+        now <- Sys.time()
+        if (!isTRUE(.pkgEnv$.inProgressBar)) {
+          .pkgEnv$.inProgressBar <- TRUE
+          .pkgEnv$.progressLastShown <- now
+          message(loggingMessage(clean))
+        } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
+                   getOption("spades.progressInterval", 2)) {
+          message(loggingMessage(clean))
+          .pkgEnv$.progressLastShown <- now
+        }
+        tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+        return()
+      }
+      .pkgEnv$.inProgressBar <- FALSE
+      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
+        logging::loginfo(msg)
+      } else {
+        if (isTRUE(any(grepl("\b", msg)))) {
+          msg <- paste0("\b", gsub("\b *", " ", msg), "\b")
+        }
+        message(loggingMessage(msg))
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -1426,22 +1455,30 @@ setMethod(
     modCall <- get(moduleCall, envir = fnEnv)
     # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
 
-    expression(Cache(FUN =
-                       modCall(
-                         sim = sim,
-                         eventTime = cur[["eventTime"]], eventType = cur[["eventType"]]),
-                     # debugCache = "quick",
-                     .objects = moduleSpecificObjects,
-                     notOlderThan = notOlderThan,
-                     outputObjects = moduleSpecificOutputObjects,
-                     classOptions = classOptions,
-                     showSimilar = showSimilar,
-                     cachePath = sim@paths[["cachePath"]],
-                     .functionName = paste0(moduleCall, "::", cur[["eventType"]]),
-                     verbose = verbose,
-                     userTags = c(paste0("module:", cur[["moduleName"]]),
-                                  paste0("eventType:", cur[["eventType"]]),
-                                  paste0("eventTime:", time(sim)))))
+    extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
+    if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+    isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
+    if (isTRUE(any(isCalls))) 
+      extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())
+    
+    defaultCacheArgs <- list(
+      FUN = quote(modCall(sim = sim,
+                          eventTime = cur[["eventTime"]],
+                          eventType = cur[["eventType"]])),
+      .objects = quote(moduleSpecificObjects),
+      notOlderThan = quote(notOlderThan),
+      outputObjects = quote(moduleSpecificOutputObjects),
+      classOptions = quote(classOptions),
+      showSimilar = quote(showSimilar),
+      cachePath = quote(sim@paths[["cachePath"]]),
+      .functionName = quote(paste0(moduleCall, "::", cur[["eventType"]])),
+      verbose = quote(verbose),
+      userTags = quote(c(paste0("module:", cur[["moduleName"]]),
+                         paste0("eventType:", cur[["eventType"]]),
+                         paste0("eventTime:", time(sim))))
+    )
+    as.expression(as.call(c(list(quote(Cache)),
+                            modifyList(defaultCacheArgs, extraCacheArgs))))
   } else {
     ## Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))

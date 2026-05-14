@@ -22,14 +22,14 @@ defineModule(sim, list(
     person(c("Eliot", "J", "B"), "McIntire", email = "eliot.mcintire@nrcan-rncan.gc.ca",
            role = c("aut", "cre"))
   ),
-  version = list(randomLandscapes = "1.7.0"),
+  version = list(randomLandscapes = "1.7.1"),
   spatialExtent = terra::ext(rep(0, 4)),
   timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("ropensci/NLMR (>= 1.1.1)", "terra", "RColorBrewer", "reproducible (>= 2.0.2)",
-                  "SpaDES.tools (>= 2.0.0)"),
+  reqdPkgs = list("terra", "RColorBrewer", "reproducible (>= 2.0.2)",
+                  "SpaDES.tools (>= 2.1.1.9001)"),
   parameters = rbind(
     # defineParameter("inRAM", "logical", FALSE, TRUE, FALSE, "should the raster be stored in memory?"),
     defineParameter("nx", "numeric", 100L, 10L, 500L, "size of map (number of pixels) in the x dimension"),
@@ -106,31 +106,18 @@ Init <- function(sim) {
   ny <- Par$ny
   template <- rast(nrows = ny, ncols = nx, xmin = -nx / 2, xmax = nx / 2, ymin = -ny / 2, ymax = ny / 2)
 
-  ## Make dummy maps for testing of models
-  DEM <- SpaDES.tools::neutralLandscapeMap(template,
-                                           roughness = 0.3,
-                                           rand_dev = 10,
-                                           rescale = TRUE,
-                                           verbose = FALSE)
-
+  ## Make dummy maps for testing of models.
+  ## Uses the built-in 'gaussian' generator in SpaDES.tools::neutralLandscapeMap.
+  ## `smooth` controls spatial autocorrelation: larger = smoother.
+  DEM <- SpaDES.tools::neutralLandscapeMap(template, smooth = 5L)
   DEM[] <- round(values(DEM), 1) * 300
   # terra::plot(DEM)
 
-  forestAge <- SpaDES.tools::neutralLandscapeMap(template,
-                                                 roughness = 0.7,
-                                                 rand_dev = 10,
-                                                 rescale = FALSE,
-                                                 verbose = FALSE)
-
+  forestAge <- SpaDES.tools::neutralLandscapeMap(template, smooth = 2L)
   forestAge[] <- round(values(forestAge), 1) * 10
   # terra::plot(forestAge)
 
-  percentPine <- SpaDES.tools::neutralLandscapeMap(template,
-                                                   roughness = 0.5,
-                                                   rand_dev = 10,
-                                                   rescale = TRUE,
-                                                   verbose = FALSE)
-
+  percentPine <- SpaDES.tools::neutralLandscapeMap(template, smooth = 3L)
   percentPine[] <- round(values(percentPine), 1)
   # terra::plot(percentPine)
 

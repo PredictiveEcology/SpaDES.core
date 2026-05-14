@@ -1,11 +1,142 @@
 # SpaDES.core (development version)
 
-* `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
+## Breaking changes
+
+* **Per-event cache keys change.** `.robustDigest()` for `simList` no longer
+  contributes the `@inputs` and module-scoped `@outputs` data.frames to the
+  cache digest. The rationale: if an object affects the event, it is already
+  digested directly via the module's expected inputs; whether it arrived
+  through `simInit(inputs = ...)` should not change the cache key. The visible
+  effect is that **cached events written by SpaDES.core < 3.0.4.9020 will not
+  be found** by ≥ 3.0.4.9020 — the digest changed, so the next call to
+  `spades()` recomputes (and re-caches) those events. Cloud caches keyed on
+  the old digest are similarly invisible to the new code. No data is lost;
+  the cache simply rebuilds.
+* `restartSpades()` now defaults to `numEvents = 1L` (previously `Inf`).
+  Callers that relied on the old default to replay every saved event must
+  pass `numEvents = Inf` explicitly.
+* Requires `reproducible` ≥ 3.0.0.
+  See the `reproducible` NEWS for migration notes.
+
+## Enhancements and fixes
+
+* Documentation: rewrite of the categorized package overview (`?SpaDES.core`).
+  Restructured into 14 sections, simpler language, every user-facing export
+  is now linked, and the inlined options table is replaced with a pointer to
+  [spadesOptions()] (which is the single source of truth). New sections cover
+  code checking, persistence/recovery, memory monitoring, and conditional
+  events.
+* Documentation: vignette accuracy pass. Fixed: typo `SpaDES.taols`,
+  wrong option name `spades.modulesPath` → `spades.modulePath`,
+  broken sentence about `simList`'s environment slot,
+  stale `raster::Extent` reference in module-metadata table,
+  stale `sim$myFunction()` call style (modules now use namespaced calls),
+  wrong event name `"save"` in a `scheduleEvent()` plot example,
+  stale `getOption("spades.cachePath")` → `reproducible.cachePath`,
+  stale `SpaDES::setPaths()` → `SpaDES.core::setPaths()`,
+  stale Ubuntu 18.04 example → 24.04. `sp` references kept with a note that
+  modern `terra`/`sf` classes are preferred but `sp` still works. The
+  Advanced vignette gains a section on the static code checker.
+* New code-checking engine v2 (opt-in; `options(spades.codeCheckEngine = "v2")`),
+  built on `xmlparsedata` + `xml2`. Adds: parameter-use checks (`Par$x`,
+  `P(sim)$x`, `P(sim, module = "other")$x`, `params(sim)$mod$x`,
+  `params(sim)[["m"]][["x"]]`), broader `sim` accessor coverage
+  (`get`/`assign`/`exists`/`mget` against `envir(sim)`), accurate
+  source-position reporting (`file:line:col`), structured `data.frame` of
+  findings (stashed on `sim@.xData$.codeCheck`), one suggestion per finding,
+  and grouped `cli` table output. v1 (`code-checking.R`) remains the default
+  and is selectable via `options(spades.codeCheckEngine = "v1")`. New
+  standalone API `codeCheckModule(path)` runs the checks against a module
+  directory without requiring `simInit()`.
+* New module parameter `.useCacheArgs`: optional named list (keyed by event name) of extra arguments spliced into the per-event `reproducible::Cache()` call. Lets a developer pin a fixed `cacheId` so a pre-seeded cloud folder (`useCloud = TRUE`, `cloudFolderID = ...`) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The `newModule()` template emits a commented-out opt-in example.
+* `saveSimList`: resilient to individual file-backed objects whose backing files are inaccessible at save time; such objects are saved as `NULL` with a warning rather than aborting the entire save.
+* `loadSimList`: mirror-image resilience on the load side via `.unwrapResiliently()` — file-backed objects that cannot be `.unwrap()`ped (e.g. backing files missing on this machine) are loaded as `NULL` with a warning instead of aborting the load.
+* `loadSimList`: path-remap loops now skip non-character / `NULL` list elements (left behind by `.wrapResiliently` having nulled an object at save time), preventing `dirname(fileHere)` from aborting with "a character vector argument expected".
+* `saveSimList`: new `lazy = TRUE` option saves each user object individually into a `<filename>_xData/` directory; `loadSimList` auto-detects this layout and loads objects lazily via `delayedAssign`, materialising each only on first access. During lazy load, `.modObjs` (per-module object copies held in the shell simList) is cleared before `.unwrap()` so that missing backing files do not cause a load failure; `.modObjs` is rebuilt by `spades()` on the next run.
+* `saveSimList(lazy = TRUE)`: restrict `tools::makeLazyLoadDB` to user objects (`variables = userObjNames`) so dot-prefixed internals (`.mods`, `.modObjs`, ...) are not bundled into the lazy DB. Without this, `makeLazyLoadDB`'s `envhook` collapses each nested env's bindings into a single serialized blob, and `.mods` alone can blow R's 2 GB single-value lazyLoadDB limit (`Error in lazyLoadDBinsertValue ... long vectors not supported yet: connections.c:6552`).
+* `saveSimList`: remove `sim@.xData$._sim` (circular reference) before saving to avoid redundant data in the saved file.
+* .prepareOutput -- if outputPath was different, but cachePath is same between 2 simInit/spades calls, then outputs will get a file that is not available because it was in the outputPath of the first one; fixed
+* cli progress bars from any package (e.g., `archive::archive_extract`) no longer flood
+  the console during `simInit`/`spades`. Progress output is throttled to one line per
+  `getOption("spades.progressInterval", 2)` seconds. Set
+  `options(spades.progressInterval = N)` to change the interval.
+* `suppliedElsewhere` now treats both types of NULL as equal: list(a = 1)$b and list(a = NULL)$a were seen as different; now they are the same
+* New: detection of malformed module metadata at the start of the parsing
+  sequence (`R/module-malformed.R`). A small registry of detectors
+  (`.CC_MALFORMED_CHECKS`) catches common authoring mistakes and emits a
+  clear, actionable error message instead of R's cryptic parse-error or
+  the deep failures that used to surface only inside `defineModule()`.
+  Initial detectors: trailing comma in `defineModule(sim, list(...))`,
+  missing comma between metadata rows inside `rbind()`/`bindrows()`,
+  unquoted parameter name in `defineParameter()`, and unquoted
+  `objectName` in `expectsInput()`/`createsOutput()`. New exported
+  function `checkModuleMetadata()` runs the checks on a module file
+  on disk (no `simInit()` needed). Adding a new check is one entry
+  in the registry — no surgery elsewhere. Closes #325.
+* Sample module `randomLandscapes` (`inst/sampleModules/randomLandscapes`) no
+  longer requires `NLMR`. It now uses the new `type = "gaussian"` default of
+  `SpaDES.tools::neutralLandscapeMap()` (built-in, dependency-free) with a
+  per-layer `smooth` argument to control autocorrelation length. `NLMR`
+  removed from `reqdPkgs`; bumped `SpaDES.tools` requirement to `>= 2.1.1.9001`.
+  Step toward closing #334.
+* `NLMR` dependency fully removed from the package: dropped from `Suggests`
+  and `Remotes` in `DESCRIPTION`, removed from vignettes
+  (`i-introduction.Rmd`, `ii-modules.Rmd`, `iii-cache.Rmd`) and their
+  `vignette_pkgs` lists, removed from test helpers (`helper-initTests.R`'s
+  `sampleModReqdPkgs`) and from the `skip_if_not_installed("NLMR")` /
+  `skip_on_cran()` guards in `test-simulation.R` and
+  `test-module-deps-methods.R`. Mentions in `README.md` and `cran-comments.md`
+  removed. All neutral-landscape generation is now via
+  `SpaDES.tools::neutralLandscapeMap()`. Closes #334.
+* New module parameter `.useCacheArgs`: optional named list (keyed by event name) of extra arguments spliced into the per-event `reproducible::Cache()` call. Lets a developer pin a fixed `cacheId` so a pre-seeded cloud folder (`useCloud = TRUE`, `cloudFolderID = ...`) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The `newModule()` template emits a commented-out opt-in example.
+* `Plots`: refactor for stability, robustness, and expanded coverage.
+  - **Stable filenames**: saved files now use `<dataObjName>_time<simTime>.<ext>`
+    (e.g. `myStack_time1.tif`) rather than a `tempfile()`-based suffix, so
+    repeated runs at the same sim time produce the same filename — making
+    outputs deterministic and easier to diff/version.
+  - **Base-R save errors surface**: if a base-R device save (`png`, `pdf`,
+    `tiff`, ...) fails inside `fn(data, ...)`, the device is still closed,
+    a warning is emitted, and the offending file is recorded in a local
+    `failedFiles` set so it is skipped when appending to `sim@outputs`.
+    Previously, failures could leave an `outputs` row pointing at a missing
+    file.
+  - **New `useCache` argument**: `TRUE` (or a character vector of `types`)
+    enables `reproducible::Cache()`-style memoization of the file-producing
+    branch; the cached `needNewPlot` flag controls whether the plot is
+    regenerated. Only relevant for non-screen `types`.
+  - **`data` may now be a `ggplot` object directly** (in addition to a
+    `quote()`d expression or a raw value); detection moved to a single
+    `is(data, "gg")` check, so passing `Plots(data = myGgplot, ...)` works.
+  - **Internal refactor**: filenames and save-function names are computed
+    once up front into `filenamesForSave` / `funsUsed` (keyed by type),
+    and a single `isBaseFormat` flag selects the base-R vs `ggplot2::ggsave`
+    path — replacing two parallel, partly-overlapping code paths.
+  - **Tests** (`tests/testthat/test-Plots.R`) grow from 5 to 8 `test_that`
+    blocks (PASS 37 → 51): base-R plotting function (`hist`) saving png +
+    raw `qs2`, `terra::SpatRaster` saving `tif` raw, `terra::SpatVector`
+    saving `qs2` raw, named `...` args without `data =`, and ggplot passed
+    directly as `data`.
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 
   if `options(spades.allowInitDuringSimInit = TRUE)`; previously, this was not respected.
 * update `reproducible` dependency version to 3.0.0;
 * Issue #311: remove duplication that was due to failed merge
+* Tests: end-to-end automated coverage for `spades.recoveryMode` (previously
+  zero — the only exercise was gated behind `if (interactive())` in
+  `test-mod.R` and never ran in CI). Three new `test_that()` blocks cover the
+  default 1-event recovery, the 2-event case (`spades.recoveryMode = 2L`,
+  asserting `length(.recoverableObjs) == 2L`, most-recent-first ordering, and
+  full rewind+replay via `restartSpades(numEvents = 2L)`), and the off case
+  (`spades.recoveryMode = FALSE` leaves `.recoverableObjs` NULL while the
+  sim is still stashed by `saveSimOnExit`).
+* `restartSpades()`: drop unreachable "Cannot replay N events as requested"
+  message — `numMods` is pre-clipped via `min(length(.recoverableObjs),
+  numEvents)`, so the gating condition could never be true. Silent clipping
+  is the documented contract when `numEvents` exceeds available state.
+* Tests: drop stale `if (interactive())` guards that produced silent
+  coverage gaps or "empty test" skips, and widen the known igraph
+  `cluster_optimal()` community-count fragility skip to Linux (previously
+  Windows-only).
 
 # SpaDES.core 3.0.3
 

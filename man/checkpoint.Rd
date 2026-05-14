@@ -71,19 +71,19 @@ and \url{https://stackoverflow.com/q/13997444/1380598}
 \seealso{
 \link{.Random.seed}.
 
-Other functions to access elements of a 'simList' object: 
-\code{\link{.addDepends}()},
-\code{\link{envir}()},
-\code{\link{events}()},
-\code{\link{globals}()},
-\code{\link{inputs}()},
-\code{\link{modules}()},
-\code{\link{objs}()},
-\code{\link{packages}()},
-\code{\link{params}()},
-\code{\link{paths}()},
-\code{\link{progressInterval}()},
-\code{\link{times}()}
+Other functions to access elements of a 'simList' object:
+\code{\link[=.addDepends]{.addDepends()}},
+\code{\link[=envir]{envir()}},
+\code{\link[=events]{events()}},
+\code{\link[=globals]{globals()}},
+\code{\link[=inputs]{inputs()}},
+\code{\link[=modules]{modules()}},
+\code{\link[=objs]{objs()}},
+\code{\link[=packages]{packages()}},
+\code{\link[=params]{params()}},
+\code{\link[=paths]{paths()}},
+\code{\link[=progressInterval]{progressInterval()}},
+\code{\link[=times]{times()}}
 }
 \author{
 Alex Chubaty

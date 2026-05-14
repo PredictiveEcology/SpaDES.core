@@ -22,7 +22,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 # List the vignette-only packages this file *uses*:
-vignette_pkgs <- c("SpaDES.tools", "NLMR")
+vignette_pkgs <- c("SpaDES.tools")
 
 # Helper that checks availability without attaching:
 has_pkgs <- function(pkgs) all(vapply(pkgs, requireNamespace, quietly = TRUE, FUN.VALUE = logical(1)))
@@ -56,7 +56,7 @@ Included are numerous tools to rapidly visualize raster and other maps.
 
 ### Requirements
 
-This packages makes heavy use of the `raster` [@raster:2015] and `sp` [@sp:2005; @sp:2013] packages, so familiarity with these packages, their classes and methods is recommended.
+This package makes use of the `terra` and `sf` packages for spatial data handling. Familiarity with these (and optionally the older `raster` [@raster:2015] and `sp` [@sp:2005; @sp:2013] packages) is recommended.
 
 ## Objectives and motivations
 
@@ -149,11 +149,10 @@ This demo loads three sample modules provided with the packages: 1) `randomLands
 These sample modules, respectively, highlight several keys features of the package: 1) the import, update, and plotting of raster map layers; 2) the computational speed of modeling spatial spread processes; and 3) the implementation of an agent-based (a.k.a., individual-based) model.
 
 ```{r SpaDES-demo, eval=FALSE, echo=TRUE}
-## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
-#install.packages("SpaDES.taols")
-#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
+## NOTE: Suggested package SpaDES.tools must be installed
+#install.packages("SpaDES.tools")
 
-knitr::opts_chunk$set(eval = requireNamespace("SpaDES.tools") && !requireNamespace("NLMR"))
+knitr::opts_chunk$set(eval = requireNamespace("SpaDES.tools"))
 
 library(SpaDES.core)
 
@@ -188,8 +187,8 @@ Modules from this repository can be downloaded to a local directory using:
 downloadModule(name = "moduleName")
 ```
 
-**Note:** by default, modules and their data are saved to the directory specified by the `spades.modulesPath`.
-An alternate path can be provided to `downloadModule` directly via the `path` argument, or specified using `options(spades.modulesPath = "path/to/my/modules")`.
+**Note:** by default, modules and their data are saved to the directory specified by the `spades.modulePath` option.
+An alternate path can be provided to `downloadModule` directly via the `path` argument, or specified using `options(spades.modulePath = "path/to/my/modules")`.
 
 A detailed guide to module development is provided in the [modules vignette](ii-modules.html).
 
@@ -221,8 +220,8 @@ Each of these are passed as named lists to the simulation object upon initializa
 
 The details of each simulation are stored in a `simList` object, including the simulation parameters and modules used, as well as storing the current state of the simulation and the future event queue.
 A list of completed events is also stored, which can provide useful debugging information.
-This `simList` object contains a unique `unique` object, along with data used/created during the simulation.
-The `envir` object is simply an environment, which means objects stored in it are updated using reference semantics (so objects don't need to be copied).
+The `simList` object contains an environment (the `.xData` slot, accessed via `envir(sim)`) that holds the data used/created during the simulation.
+The simulation environment uses reference semantics, so objects stored in it are updated in place rather than copied.
 You can access objects stored in environments using the same syntax as for lists (*e.g.*, `$`, `[[`), in addition to `get`, which makes working with simulated data easy to do inside modules.
 
 A new simulation is initialized using the `simInit` function, which does all the work of creating the `envir` and `simList` objects for your simulation.
@@ -305,13 +304,14 @@ A primary goal of developing `SpaDES` was to facilitate the development of agent
 ### Point agents
 
 As ecologists, we are often concerned with modelling individuals (agents) in time and space, and whose spatial location (position) can be represented as a single point on a map.
-These types of agents can easily be represented most simply by a single set of coordinates indicating their current position, and can simulated using a `SpatialPoints` object.
-Additionally, a `SpatialPointsDataFrame` can be used, which provides storage of additional information beyond agents' coordinates as needed.
+These agents are most simply represented by a single set of coordinates indicating their current position, and can be simulated using a `SpatVector` of points (from `terra`), or an `sf` object of points.
+Additional per-agent attributes (age, sex, state, etc.) attach to the same object as a `data.frame`, so all information travels together.
+For older code, `sp` classes like `SpatialPoints` and `SpatialPointsDataFrame` are still supported.
 
 ### Polygon agents
 
-Analogously, it is possible to use `SpatialPolygons*`.
-Plotting methods using `Plot` are optimized for speed and are much faster than the default `plot` methods for polygons (via spatial subsampling of vector data), so have fewer options for customization than other approaches to visualizing polygons.
+Polygon agents work the same way using `SpatVector` polygons (or `sf` polygons), with `sp::SpatialPolygons*` still supported for backwards compatibility.
+Plotting methods using `Plot` are optimized for speed and are much faster than the default `plot` methods for polygons (via spatial subsampling of vector data), so they have fewer options for customization than other approaches to visualizing polygons.
 
 # Simulation experiments
 

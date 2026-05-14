@@ -13,7 +13,8 @@
 
 \item{k}{numeric index of module name in sim@depends@dependencies, should align with \code{m}}
 
-\item{hadPrevMessage}{}
+\item{hadPrevMessage}{logical; if \code{TRUE}, indicates a prior check already emitted a
+message for this module, used to adjust spacing of subsequent diagnostics.}
 }
 \value{
 NULL (invisibly); invoked for side effect of generating message with that starts with

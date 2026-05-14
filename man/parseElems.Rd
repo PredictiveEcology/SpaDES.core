@@ -17,8 +17,8 @@
 An object, parsed from a character string and an environment.
 }
 \description{
-See \code{\link[quickPlot:parseElems]{quickPlot::.parseElems()}}.
+See \code{\link[quickPlot:.parseElems]{quickPlot::.parseElems()}}.
 }
 \seealso{
-\link[quickPlot:parseElems]{quickPlot::.parseElems}
+\link[quickPlot:.parseElems]{quickPlot::.parseElems}
 }
