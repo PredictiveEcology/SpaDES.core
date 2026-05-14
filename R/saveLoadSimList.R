@@ -20,6 +20,10 @@
 #' loading `simList` objects and their associated files (e.g., file-backed
 #' `Raster*`, `inputs`, `outputs`, `cache`) [saveSimList()], [loadSimList()].
 #'
+#' The `sim@.xData$._sim` slot (a circular reference used internally during a
+#' running simulation) is removed before saving to avoid redundant data.
+#' It is not needed for a saved/restored `simList`.
+#'
 #' Additional arguments may be passed via `...`, including:
 #' - `files`: logical indicating whether files should be included in the archive.
 #'            if `FALSE`, will override `cache`, `inputs`, `outputs`, setting them to `FALSE`.
@@ -61,6 +65,12 @@
 #'   `inputs` or `cache` are `TRUE`. Setting this to `FALSE` will turn off the
 #'   saving of files specified in `inputs(sim)`, `outputs(sim)` or the cache.
 #'
+#' @param lazy Logical. If `TRUE`, the user objects in `sim@.xData` are saved
+#'   into a sibling lazy-load DB (a `<filename>_xData.rdx`/`.rdb` pair built
+#'   by `tools:::makeLazyLoadDB()`) alongside the shell `simList` file,
+#'   rather than monolithically. [loadSimList()] detects this layout
+#'   automatically and restores the objects via [lazyLoad()], materializing
+#'   each one only on first access. Defaults to `FALSE`.
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
@@ -80,7 +90,7 @@
 #' @seealso [loadSimList()]
 saveSimList <- function(sim, filename, projectPath = getwd(),
                         outputs = TRUE, inputs = TRUE, cache = FALSE, envir,
-                        files = TRUE, ...) {
+                        files = TRUE, ..., lazy = FALSE) {
   checkSimListExts(filename)
 
   dots <- list(...)
@@ -133,6 +143,19 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     sim <- get(simName, envir = envir)
   }
 
+  ## Break every pass-by-reference link into the caller's sim. simList
+  ## state lives almost entirely in environments (@.xData and the nested
+  ## .mods / .modObjs / .objects envs), and the subsequent rebindings
+  ## (._randomSeed/._rng.kind, .wrapResiliently's per-object Path wrapping,
+  ## paths() rewrite, lazy rm) would otherwise mutate the caller's state.
+  ## We avoid reproducible::Copy(sim) here because its SpatRaster path
+  ## eagerly duplicates backing files (filebackedDir = NULL is documented
+  ## but not honored by the ANY method). .cloneSimEnvs recursively clones
+  ## every environment but leaves leaf values (SpatRasters, data.tables,
+  ## etc.) alone — saveSimList rebinds names, not nested object internals,
+  ## so leaf-pointer sharing is harmless.
+  sim <- .cloneSimEnvs(sim)
+
   if (!exists(".Random.seed", envir = .GlobalEnv, inherits = FALSE)) tmp <- runif(1)
   sim@.xData$._randomSeed <- get(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
   sim@.xData$._rng.kind <- RNGkind()
@@ -145,7 +168,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     sim <- get(simName, envir = tmpEnv)
   }
 
-  sim <- .wrap(sim, cachePath = NULL, paths = paths(sim)) # makes a copy of filebacked object files
+  ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
+  ## does not abort the entire save; failed objects are saved as NULL with a warning.
+  sim <- .wrapResiliently(sim)
+  sim <- .wrap(sim, cachePath = NULL, paths = paths(sim)) # wrap remaining / non-file-backed
+  sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
   if (isTRUE(files)) {
@@ -171,6 +198,78 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       modifyList(symlinks) |>
       relativizePaths(projectPath) |>
       as.list()
+  }
+
+  if (isTRUE(lazy)) {
+    ext <- tools::file_ext(filename)
+    lazyBase <- paste0(tools::file_path_sans_ext(filename), "_xData")
+    lazyDbFiles <- paste0(lazyBase, c(".rdx", ".rdb"))
+
+    userObjNames <- ls(sim@.xData, all.names = FALSE)
+    if (length(userObjNames)) {
+      ## makeLazyLoadDB is internal to tools but stable; use getFromNamespace
+      ## to avoid the R CMD check NOTE for ::: usage.
+      ## Restrict to user objects: dot-prefixed internals (.mods, .modObjs, ...)
+      ## stay in @.xData and ride along in saveRDS(). Without `variables`,
+      ## makeLazyLoadDB defaults to all.names = TRUE and bundles each nested
+      ## env's bindings into a single serialized blob via its envhook --
+      ## .mods alone can exceed the 2 GB single-value lazyLoadDB limit.
+      utils::getFromNamespace("makeLazyLoadDB", "tools")(
+        sim@.xData, lazyBase, variables = userObjNames
+      )
+      rm(list = userObjNames, envir = sim@.xData)
+    }
+
+    if (ext == "rds") {
+      saveRDS(sim, file = filename)
+    } else {
+      qs2::qs_save(sim, file = filename, nthreads = getOption("spades.qsThreads", 1))
+    }
+
+    if (isTRUE(files) && length(fns)) {
+      fileToDelete <- filename
+      otherFns <- c()
+      if (isTRUE(outputs)) {
+        os <- outputs(sim)
+        if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE]$file)
+      }
+      if (isTRUE(inputs)) {
+        ins <- inputs(sim)
+        if (NROW(ins)) otherFns <- c(otherFns, ins[ins$loaded %in% TRUE, ]$file)
+      }
+
+      srcFiles <- mapply(mod = modules(sim), mp = modulePath(sim),
+                         function(mod, mp) {
+                           fls <- dir(file.path(mp, mod), recursive = TRUE, full.names = TRUE)
+                           grep("^\\<data\\>", invert = TRUE, value = TRUE, fls)
+                         })
+      srcFilesRel <- makeRelative(srcFiles, projectPath)
+      if (any(isAbsolutePath(srcFilesRel))) {
+        guessProjPath <- fs::path_common(origPaths["modulePath"]) |> unique() |> dirname()
+        srcFilesRel <- makeRelative(srcFiles, guessProjPath)
+        tmpSrcFiles <- file.path(projectPath, srcFilesRel)
+        linkOrCopy(srcFiles, tmpSrcFiles, verbose = verbose - 1)
+        on.exit(unlink(tmpSrcFiles))
+        srcFiles <- tmpSrcFiles
+      }
+
+      lazyDbExisting <- lazyDbFiles[file.exists(lazyDbFiles)]
+      allFns <- c(fns, otherFns, srcFilesRel)
+      if (!is.null(symlinks)) {
+        for (p in names(symlinks)) {
+          allFns <- gsub(origPaths[[p]], symlinks[[p]], allFns)
+        }
+      }
+      allFns <- na.omit(allFns)
+
+      relFns <- makeRelative(c(fileToDelete, lazyDbExisting, allFns), projectPath) |> unname()
+      archiveWrite(filename, relFns, verbose)
+      unlink(fileToDelete)
+      unlink(lazyDbExisting)
+    }
+
+    messageVerbose("    ... saved!", verbose = verbose)
+    return(invisible())
   }
 
   # filename <- gsub(tools::file_ext(filename), "qs2", filename)
@@ -296,14 +395,31 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     td <- tempdir2(sub = .rndstr())
     filename <- archiveExtract(filename, exdir = td)
     on.exit(unlink(td, recursive = TRUE), add = TRUE)
-    filenameRel <- gsub(paste0(td, "/"), "", filename[-1])  ## TODO: WRONG!
 
+    baseNameNoExt <- tools::file_path_sans_ext(basename(filename[1]))
+    lazyBaseName <- paste0(baseNameNoExt, "_xData")
+    lazyDbBasenames <- paste0(lazyBaseName, c(".rdx", ".rdb"))
+    isLazyDb <- basename(filename[-1]) %in% lazyDbBasenames
+
+    filenameRel <- gsub(paste0(td, "/"), "", filename[-1][!isLazyDb])  ## TODO: WRONG!
     ## This will put the files to relative path of projectPath
     newFns <- file.path(projectPath, filenameRel)
-    linkOrCopy(filename[-1], newFns, verbose = verbose - 1)
+    linkOrCopy(filename[-1][!isLazyDb], newFns, verbose = verbose - 1)
+
+    ## Persist .rdb/.rdx beyond tempdir cleanup so lazy promises can resolve
+    lazyBase <- file.path(tempPath, lazyBaseName)
+    for (ex in c(".rdx", ".rdb")) {
+      srcs <- filename[-1][isLazyDb & basename(filename[-1]) == paste0(lazyBaseName, ex)]
+      if (length(srcs)) {
+        dst <- paste0(lazyBase, ex)
+        if (file.exists(dst)) unlink(dst)
+        file.copy(srcs[[1L]], dst)
+      }
+    }
   } else {
     # filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
     filenameRel <- getRelative(filename, projectPath)
+    lazyBase <- paste0(tools::file_path_sans_ext(filename[1]), "_xData")
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
@@ -352,6 +468,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
         newNames <- unique(newFiles$newName)
         for (elem in names(tmpsim[[nam]])) {
           fileHere <- tmpsim[[nam]][[elem]] # should only have 1 element's file(s)
+          if (!is.character(fileHere) || !length(fileHere)) next # NULL'd by .wrapResiliently
           dirToFileHere <- dirname(fileHere)
           nParents <- attr(fileHere, "nParentDirs")
           1
@@ -371,7 +488,24 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     }
   }
 
-  tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim)) # convert e.g., PackedSpatRaster
+  ## Detect lazy load before .unwrap so we can clear .modObjs (which holds per-module
+  ## copies of file-backed objects) from the shell simList. Those objects were NOT saved
+  ## as part of the shell — their backing files may not exist — and .unwrap would fail on
+  ## them. They are rebuilt by spades() on the next run, so it is safe to clear them here.
+  isLazyLoad <- file.exists(paste0(lazyBase, ".rdx"))
+
+  if (isLazyLoad) {
+    modObjsEnv <- tmpsim@.xData[[".modObjs"]]
+    if (is.environment(modObjsEnv)) {
+      nms <- ls(modObjsEnv, all.names = TRUE)
+      if (length(nms)) rm(list = nms, envir = modObjsEnv)
+    } else if (!is.null(modObjsEnv)) {
+      tmpsim@.xData[[".modObjs"]] <- NULL
+    }
+  }
+
+  tmpsim <- .unwrapResiliently(tmpsim, paths(tmpsim))
+  tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim))
 
   ## Work around for bug in qs that recovers data.tables as lists
   # tmpsim <- recoverDataTableFromQs(tmpsim)
@@ -381,6 +515,34 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     .dealWithRasterBackends(tmpsim) # no need to assign to sim b/c uses list2env
   }
   makeSimListActiveBindings(tmpsim)
+
+  ## Lazy loading: if a sibling .rdx/.rdb pair exists, restore the user objects
+  ## via lazyLoad() into a holding env, then bind delayedAssign wrappers on the
+  ## simList so each access triggers the underlying lazy promise plus our
+  ## remap/unwrap pass.
+  if (isLazyLoad) {
+    lazyEnv <- new.env(parent = emptyenv())
+    tryCatch(lazyLoad(lazyBase, envir = lazyEnv),
+             error = function(e) warning("Could not attach lazy DB '", lazyBase,
+                                         "': ", conditionMessage(e), call. = FALSE))
+    simPaths <- paths(tmpsim)
+    for (nm in ls(lazyEnv, all.names = TRUE)) {
+      local({
+        .nm <- nm
+        .lazyEnv     <- lazyEnv
+        .projectPath <- projectPath
+        .simPaths    <- simPaths
+        delayedAssign(.nm, tryCatch({
+          obj <- get(.nm, envir = .lazyEnv)
+          obj <- .remapFileBackedObj(obj, .projectPath, .simPaths)
+          .unwrap(obj, cachePath = NULL, paths = .simPaths)
+        }, error = function(e) {
+          warning("Could not load lazy object '", .nm, "': ", conditionMessage(e), call. = FALSE)
+          NULL
+        }), eval.env = environment(), assign.env = envir(tmpsim))
+      })
+    }
+  }
 
   return(tmpsim)
 }
@@ -515,6 +677,131 @@ recoverDataTableFromQs <- function(sim) {
   })
 
   list2env(reworkedRas, envir = envir(sim))
+}
+
+## Recursively clone every environment reachable from a simList so that
+## subsequent rebindings inside saveSimList don't mutate the caller's state.
+## Leaf values (SpatRasters, data.tables, lists, etc.) are kept by reference
+## — saveSimList rebinds names in the cloned envs rather than mutating the
+## internals of those leaves, and avoiding leaf duplication is the whole
+## point of doing this instead of reproducible::Copy(sim) (which eagerly
+## duplicates SpatRaster backing files).
+.cloneSimEnvs <- function(sim) {
+  sim@.xData    <- .cloneEnvDeep(sim@.xData)
+  sim@.envir    <- sim@.xData
+  sim@completed <- .cloneEnvDeep(sim@completed)
+  sim
+}
+
+## Recursive environment cloner. For each binding: if it's an environment,
+## recurse; otherwise pass it through. Preserves attributes.
+.cloneEnvDeep <- function(env, .seen = NULL) {
+  if (!is.environment(env)) return(env)
+  if (is.null(.seen)) .seen <- new.env(parent = emptyenv())
+  key <- format(env)
+  if (exists(key, envir = .seen, inherits = FALSE)) {
+    return(get(key, envir = .seen, inherits = FALSE))
+  }
+  out <- new.env(parent = parent.env(env))
+  assign(key, out, envir = .seen)  # cycle guard before recursing
+  for (nm in ls(env, all.names = TRUE)) {
+    if (bindingIsActive(nm, env)) {
+      ## Re-attach the same active binding (its backing function is what
+      ## defines its behavior; copying the function is enough).
+      makeActiveBinding(nm, activeBindingFunction(nm, env), out)
+    } else {
+      val <- get(nm, envir = env, inherits = FALSE)
+      assign(nm, .cloneEnvDeep(val, .seen = .seen), envir = out)
+    }
+  }
+  attributes(out) <- attributes(env)
+  out
+}
+
+## Pre-wrap each file-backed object in sim@.xData individually so that one
+## inaccessible backing file does not abort saveSimList. Failed objects are
+## replaced with NULL and a warning is issued; the subsequent monolithic
+## .wrap(sim, ...) then succeeds on the remaining objects.
+.wrapResiliently <- function(sim) {
+  nms <- ls(sim@.xData, all.names = FALSE)
+  simPaths <- paths(sim)
+  for (nm in nms) {
+    obj <- sim@.xData[[nm]]
+    fns <- tryCatch(Filenames(obj), error = function(e) character(0))
+    if (length(fns) && any(nchar(fns) > 0L)) {
+      sim@.xData[[nm]] <- tryCatch(
+        .wrap(obj, cachePath = NULL, paths = simPaths),
+        error = function(e) {
+          warning("saveSimList: could not wrap '", nm,
+                  "' (backing file inaccessible); saving as NULL.\n",
+                  "  Error: ", conditionMessage(e), call. = FALSE)
+          NULL
+        }
+      )
+    }
+  }
+  sim
+}
+
+## Pre-unwrap each file-backed object in sim@.xData individually so that one
+## inaccessible backing file does not abort loadSimList. Failed objects are
+## replaced with NULL and a warning is issued; the subsequent monolithic
+## .unwrap(sim, ...) then succeeds on the remaining objects. Mirror image of
+## .wrapResiliently — load-time failures are independent of save-time
+## failures (e.g. backing files may have been present at save time but
+## missing on the machine doing the load).
+.unwrapResiliently <- function(sim, simPaths) {
+  nms <- ls(sim@.xData, all.names = FALSE)
+  for (nm in nms) {
+    obj <- sim@.xData[[nm]]
+    if (is.null(attr(obj, "tags"))) next  # not wrapped
+    fns <- tryCatch(Filenames(obj), error = function(e) character(0))
+    if (length(fns) && any(nchar(fns) > 0L)) {
+      sim@.xData[[nm]] <- tryCatch(
+        .unwrap(obj, cachePath = NULL, paths = simPaths),
+        error = function(e) {
+          warning("loadSimList: could not unwrap '", nm,
+                  "' (backing file inaccessible); loading as NULL.\n",
+                  "  Error: ", conditionMessage(e), call. = FALSE)
+          NULL
+        }
+      )
+    }
+  }
+  sim
+}
+
+## Remap file paths in a single wrapped object (mirrors the per-object logic in
+## loadSimList's remap loop, extracted so lazy promises can reuse it).
+.remapFileBackedObj <- function(obj, projectPath, simPaths) {
+  tags <- attr(obj, "tags")
+  if (is.null(tags)) return(obj)
+  ## Only remap objects that are truly file-backed (mirrors the Filenames filter in
+  ## the non-lazy remap loop — wrapped non-file objects have tags but no filenames).
+  fns <- tryCatch(Filenames(obj), error = function(e) character(0))
+  if (!length(fns) || all(nchar(fns) == 0L)) return(obj)
+  pths <- if (identical(projectPath, getwd())) simPaths else list(projectPath = projectPath)
+  newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
+  if (is(obj, "list")) {
+    newNames <- unique(newFiles$newName)
+    for (elem in names(obj)) {
+      fileHere      <- obj[[elem]]
+      if (!is.character(fileHere) || !length(fileHere)) next # NULL'd by .wrapResiliently
+      dirToFileHere <- dirname(fileHere)
+      nParents      <- attr(fileHere, "nParentDirs")
+      for (nPar in rev(seq(nParents + 1))) {
+        dirToFileHere <- dirname(dirToFileHere)
+      }
+      newNames1    <- fs::path_rel(newNames, dirToFileHere)
+      thisFile     <- fs::path_rel(fileHere, dirToFileHere)
+      newNames1    <- newNames1[newNames1 %in% thisFile]
+      newNamesHere <- file.path(dirToFileHere, newNames1)
+      obj[[elem]][] <- unique(newNamesHere)
+    }
+  } else {
+    obj[] <- newFiles$newName[]
+  }
+  obj
 }
 
 checkSimListExts <- function(filename) {

@@ -11,6 +11,7 @@ utils::globalVariables(c(
 #'
 #' @author Alex Chubaty
 #' @export
+#' @importFrom rlang env_binding_are_lazy
 #' @importFrom stats na.omit
 #' @importFrom utils capture.output ls.str
 #' @include simList-class.R
@@ -54,7 +55,14 @@ setMethod(
 
     ### list stored objects
     out[[14]] <- capture.output(cat(">> Objects stored:\n"))
-    out[[15]] <- capture.output(print(ls.str(envir(object))))
+    env <- envir(object)
+    nms <- ls(env)
+    lazyNms  <- if (length(nms)) nms[rlang::env_binding_are_lazy(env, nms)] else character(0)
+    eagerNms <- setdiff(nms, lazyNms)
+    out[[15]] <- capture.output({
+      if (length(eagerNms)) print(ls.str(env, name = eagerNms))
+      if (length(lazyNms))  cat("Lazy (not yet loaded):", paste(sort(lazyNms), collapse = ", "), "\n")
+    })
     out[[16]] <- capture.output(cat("\n"))
 
     ### params
@@ -1426,9 +1434,9 @@ outputsAppend <- function(outputs, saveTime, objectName = NA, file = NA, fun = N
   df <- data.frame(file = file, saved = TRUE, objectName = objectName, fun = fun, args = args)
 
   outs <- .fillOutputRows(df, endTime = saveTime)
-  if (!is(outputs[["arguments"]], "AsIs")) {
+  if (!is(outputs[[.txtArguments]], "AsIs")) {
     ## needed for rbindlist
-    outputs[["arguments"]] <- I(outputs[["arguments"]])
+    outputs[[.txtArguments]] <- I(outputs[[.txtArguments]])
   }
   rbindlist(list(outputs, outs), use.names = TRUE, fill = TRUE)
 }
@@ -1560,9 +1568,9 @@ setReplaceMethod(
   signature = "simList",
   function(sim, value) {
    if (is.list(value) & !is.data.frame(value)) {
-     sim@inputs$args <- value
+     sim@inputs[[.txtArguments]] <- value
    } else if (is.null(value)) {
-     sim@inputs$args <- rep(list(NULL), NROW(inputs(sim)))
+     sim@inputs[[.txtArguments]] <- rep(list(NULL), NROW(inputs(sim)))
    } else {
      stop("value passed to inputArgs() must be a list of named elements")
    }
@@ -3510,3 +3518,4 @@ setMethod(
     x2
   }
 )
+

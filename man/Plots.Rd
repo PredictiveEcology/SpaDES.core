@@ -60,6 +60,10 @@ e.g., plotting a \code{RasterLayer}.}
 \item{envir}{The environment where the \code{data} argument should be evaluated if it is
 a \code{call}. Normally, this should be left at its default, \code{parent.frame()}.}
 
+\item{useCache}{Logical or character vector. If \code{TRUE}, caching is enabled for
+all non-screen output types. If a character vector, caching is enabled only
+for the matching \code{types}. Default is \code{FALSE}.}
+
 \item{...}{Anything needed by \code{fn}, all named.}
 }
 \value{

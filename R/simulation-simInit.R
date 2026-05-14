@@ -212,6 +212,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' @include simList-class.R
 #' @include simulation-parseModule.R
 #' @include priority.R
+#' @importFrom cli ansi_strip start_app
 #' @importFrom data.table setDTthreads
 #' @importFrom reproducible basename2
 #' @importFrom Require Require trimVersionNumber modifyList2
@@ -541,6 +542,9 @@ setMethod(
 
     # From here, capture messaging and prepend it
     withCallingHandlers({
+      cli::start_app(output = "message", .auto_close = TRUE, .envir = environment())
+      .pkgEnv$.inProgressBar <- FALSE
+      .pkgEnv$.progressLastShown <- NULL
       simDTthreads <- getOption("spades.DTthreads", 1L)
       messageVerbose("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.", verbose = verbose)
       origDTthreads <- setDTthreads(simDTthreads)
@@ -871,7 +875,33 @@ setMethod(
       #._startClockTime <- Sys.time()
     },
     message = function(m) {
-      message(loggingMessage(m$message, prefix = prefixSimInit))
+      msg <- m$message
+      # Detect cli progress ticks routed through message() by start_app(output="message").
+      # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
+      # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
+      # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
+      # are intentionally excluded so colored regular messages are not mistaken for ticks.
+      if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
+        clean <- trimws(cli::ansi_strip(msg))
+        if (nchar(clean) == 0L) {
+          tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+          return()
+        }
+        now <- Sys.time()
+        if (!isTRUE(.pkgEnv$.inProgressBar)) {
+          .pkgEnv$.inProgressBar <- TRUE
+          .pkgEnv$.progressLastShown <- now
+          message(loggingMessage(clean, prefix = prefixSimInit))
+        } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
+                   getOption("spades.progressInterval", 2)) {
+          message(loggingMessage(clean, prefix = prefixSimInit))
+          .pkgEnv$.progressLastShown <- now
+        }
+        tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+        return()
+      }
+      .pkgEnv$.inProgressBar <- FALSE
+      message(loggingMessage(msg, prefix = prefixSimInit))
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
     },
@@ -1526,22 +1556,25 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             #                      depends = dependsSlots,
             #                      # .globals = globsWoKnowns,
             #                     modules = mBase)
-            fnCallAsExpr <- expression(
-              .inputObjects(sim) |>
-                Cache(
-                  .objects = objectsToEvaluateForCaching,
-                  notOlderThan = notOlderThan,
-                  outputObjects = moduleSpecificInputObjects,
-                  quick = getOption("reproducible.quick", FALSE),
-                  cachePath = sim@paths$cachePath,
-                  classOptions = classOptions,
-                  showSimilar = showSimilar,
-                  .functionName = paste0(".inputObjects_", mBase),
-                  userTags = c(paste0("module:", mBase),
-                               "eventType:.inputObjects"),
-                  verbose = verbose)
+            extraCacheArgs <- sim@params[[mBase]][[._txtDotUseCacheArgs]][[".inputObjects"]]
+            if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
 
+            defaultCacheArgs <- list(
+              FUN = quote(.inputObjects(sim)),
+              .objects = quote(objectsToEvaluateForCaching),
+              notOlderThan = quote(notOlderThan),
+              outputObjects = quote(moduleSpecificInputObjects),
+              quick = quote(getOption("reproducible.quick", FALSE)),
+              cachePath = quote(sim@paths$cachePath),
+              classOptions = quote(classOptions),
+              showSimilar = quote(showSimilar),
+              .functionName = quote(paste0(".inputObjects_", mBase)),
+              userTags = quote(c(paste0("module:", mBase),
+                                 "eventType:.inputObjects")),
+              verbose = quote(verbose)
             )
+            fnCallAsExpr <- as.expression(as.call(c(list(quote(Cache)),
+                                                    modifyList(defaultCacheArgs, extraCacheArgs))))
 
             cacheChaining <- getOption("spades.cacheChaining", FALSE)
             if (cacheChaining) {

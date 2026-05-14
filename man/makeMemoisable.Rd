@@ -22,5 +22,5 @@ memoise a \code{simList}.
 This method for \code{simList} converts the object to a \code{simList_} first.
 }
 \seealso{
-\code{\link[reproducible:exportedMethods]{reproducible::makeMemoisable()}}
+\code{\link[reproducible:makeMemoisable]{reproducible::makeMemoisable()}}
 }

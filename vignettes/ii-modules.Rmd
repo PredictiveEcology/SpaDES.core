@@ -141,7 +141,7 @@ Every module requires complete metadata, structured as a named list, and passed 
 **`childModules`**    | Character vector containing the names of the child modules that are part of this module.
 **`authors`**         | The author(s) of the module as a `person` object.
 **`version`**         | The module version as a character, numeric, or `numeric_version`. [Semantic versioning](https://semver.org/) is assumed.
-**`spatialExtent`**   | Specifies the module's spatial extent as an `Extent` object.
+**`spatialExtent`**   | Specifies the module's spatial extent as a `SpatExtent` (from `terra`; an `Extent` from `raster` is also accepted for backwards compatibility).
 **`timeframe`**       | Specifies the valid timeframe for which the module was designed to simulate.
 &nbsp;                | Must be a `POSIXt` object of length `2`, specifying the start and end times.
 &nbsp;                | (NOT YET FULLY IMPLEMENTED.)
@@ -247,7 +247,7 @@ Keep these function definitions as short and clean as possible (you can further 
 
 Functions should get and return objects in the simulation environment (`envir`), rather than pass them as function arguments.
 This mostly allows for function definitions to be simpler, *i.e.*, they just take the one `sim` argument if parameters are passed within the `simInit` call.
-Accessing objects in the `envir` is similar to accessing items in a list, *i.e.*, `sim[["object"]]` or `sim$object` can be used, in addition to `get("object", envir=envir(sim))`. Likewise, simulation functions (*i.e.*, those defined in modules) are also accessed using the `$` accessor (*e.g.*, `sim$myFunction()`).
+Accessing objects in the `envir` is similar to accessing items in a list, *i.e.*, `sim[["object"]]` or `sim$object` can be used, in addition to `get("object", envir=envir(sim))`. Module functions are namespaced and called directly by name (e.g., `myFunction(sim)`), not via `sim$myFunction(sim)`; that old style is no longer supported.
 
 Note that every module requires an `"init"` event type, which defines the initialization of the module; however, this `init` event need not do a whole lot (*i.e.*, it can be a stub).
 As such, the `Init()` function is required for initialization.
@@ -372,7 +372,7 @@ Modularity in `SpaDES` simulations is maintained by ensuring modules interact in
 
 As you build your modules for your simulation, you can use any of `R`'s data types to store your objects and data.
 In particular, matrices (including vectors) and lists work well for this purpose because, as of `R` version `3.1.0`, they are more efficient, reducing your model's memory footprint and speeding up your code's execution.
-Other useful data types include `Raster*` and `SpatialPoints*` objects (see examples below).
+Other useful data types include `SpatRaster` and `SpatVector` objects from `terra`, or `sf` objects (see examples below). Older `Raster*` and `Spatial*` classes from the `raster`/`sp` packages are still accepted.
 
 ## Global objects and the simulation environment
 
@@ -398,7 +398,7 @@ To view the dependencies for a simulation:
 
 ```{r module-object-diagrams, echo=TRUE, message=FALSE, fig.width=7}
 ## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed
-#install.packages("SpaDES.taols")
+#install.packages("SpaDES.tools")
 #install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")
 
 library(SpaDES.core)
@@ -638,7 +638,7 @@ params(mySim)$randomLandscapes$.plotInterval
 
 # schedule a recurring plot event
 nextPlot <- time(mySim) + params(mySim)$randomLandscapes$.plotInterval
-mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "save")
+mySim <- scheduleEvent(mySim, nextPlot, "randomLandscapes", "plot")
 ```
 
 # Using existing `SpaDES` modules
@@ -690,8 +690,8 @@ Modules from this (or another suitable GitHub repository) can be downloaded usin
 downloadModule("moduleName")
 ```
 
-**Note:** by default, modules and their data are saved to the directory specified by the `spades.modulesPath`.
-An alternate path can be provided to `downloadModule` directly via the `path` argument, or specified using `options(spades.modulesPath = "path/to/my/modules")`.
+**Note:** by default, modules and their data are saved to the directory specified by the `spades.modulePath` option.
+An alternate path can be provided to `downloadModule` directly via the `path` argument, or specified using `options(spades.modulePath = "path/to/my/modules")`.
 
 # Creating new modules
 

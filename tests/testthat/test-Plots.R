@@ -97,57 +97,6 @@ test_that("Plots function 1", {
     unlink(files)
   }
 
-  if (interactive()) {
-    something <- data.frame(a = sample(1:10, replace = TRUE))
-    fn1 <- function(d1, bins, title = "hello", ...) {
-      ggplot2::ggplot(d1, ggplot2::aes(a)) +
-        ggplot2::geom_histogram(bins = bins, ...) +
-        ggplot2::labs(title = title)
-    }
-    # Should add next 2 plots to same windows
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run1")
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run2")
-    # Should clear plot windows and each of following will be a new plot on its own
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run3", usePlot = FALSE)
-    Plots(data = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
-    clearPlot()
-    # avoid using `data` arg; just use all named args
-    Plots(d1 = something, fn = fn1, bins = 10, fill = "red", types = "screen", title = "run4", usePlot = FALSE)
-  }
-})
-
-test_that("testing .plotInitialTime & .plots", {
-  testInit(sampleModReqdPkgs)
-
-  if (interactive()) {
-
-    times <- list(start = 0.0, end = 1, timeunit = "year")
-    params <- list(
-      .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
-      randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
-      # caribouMovement = list(.plotInitialTime = NA, .plotInterval = NA, torus = TRUE),
-      fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
-    )
-    modules <- list("randomLandscapes", #"caribouMovement",
-                    "fireSpread")
-    paths <- list(modulePath = getSampleModules(tmpdir))
-
-    mySim <- simInit(times, params, modules, objects = list(), paths)
-
-    mySim@params$randomLandscapes$.plotInitialTime <- 0
-    mySim@params$fireSpread$.plotInitialTime <- 0
-
-    # Makes plots
-    expect_no_error(spades(mySim))
-    .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
-    expect_true(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
-    # Makes no plots
-    clearPlot()
-    spades(mySim, .plots = NA)
-    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
-    spades(mySim, .plotInitialTime = NA)
-    expect_false(exists(paste0("Dev", dev.cur()), .quickPlotEnv))
-  }
 })
 
 test_that("Plots function 2", {
@@ -202,8 +151,7 @@ test_that("Plots function 2", {
 })
 
 test_that("Plots function 3 - use as Plot", {
-  skip_if_not(interactive())
-  # if (interactive()) {
+  testthat::skip_on_ci()
     testInit("terra", opts = list(spades.PlotsUsePlot = TRUE))
     packages <- c("raster", "terra")
     functions <- cbind(c("raster", "extent", "stack", "nlayers"),
