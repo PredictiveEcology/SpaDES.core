@@ -28,8 +28,10 @@
 #'
 #' \tabular{ll}{
 #'   [simInit()] \tab Set up a new simulation.\cr
+#'   [simInit2()] \tab Like [simInit()], but takes all arguments as a single list.\cr
 #'   [spades()] \tab Run the simulation that `simInit()` set up.\cr
 #'   [simInitAndSpades()] \tab Convenience: `simInit()` then `spades()` in one call.\cr
+#'   [simInitAndSpades2()] \tab Like [simInitAndSpades()], but takes all arguments as a single list.\cr
 #'   [restartSpades()] \tab Resume a simulation after an error or interruption.\cr
 #'   [restartOrSimInitAndSpades()] \tab Try to restart from a saved state; otherwise start fresh.\cr
 #' }
@@ -221,9 +223,6 @@
 #'
 #' \tabular{ll}{
 #'   [Plots()] \tab Module-friendly wrapper for any plotting function.\cr
-#'   [quickPlot::Plot()] \tab The workhorse plotter.\cr
-#'   [quickPlot::clearPlot()] \tab Reset the plotting device.\cr
-#'   [quickPlot::rePlot()] \tab Re-render all elements on the device.\cr
 #'   [anyPlotting()] \tab `TRUE` if the current `.plots` setting will produce any output.\cr
 #' }
 #'
@@ -268,8 +267,6 @@
 #' @section 12 Module repository and downloads:
 #'
 #' \tabular{ll}{
-#'   [downloadModule()] \tab Download a module from the repository.\cr
-#'   [downloadData()] \tab Download just the data for a module.\cr
 #'   [getModuleVersion()] \tab Get the latest version number on the repository.\cr
 #'   [getSampleModules()] \tab Copy the bundled sample modules somewhere usable.\cr
 #' }

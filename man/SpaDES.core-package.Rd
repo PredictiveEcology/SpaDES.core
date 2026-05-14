@@ -30,8 +30,10 @@ Wiki: \url{https://github.com/PredictiveEcology/SpaDES/wiki}
 
 \tabular{ll}{
 \code{\link[=simInit]{simInit()}} \tab Set up a new simulation.\cr
+\code{\link[=simInit2]{simInit2()}} \tab Like \code{\link[=simInit]{simInit()}}, but takes all arguments as a single list.\cr
 \code{\link[=spades]{spades()}} \tab Run the simulation that \code{simInit()} set up.\cr
 \code{\link[=simInitAndSpades]{simInitAndSpades()}} \tab Convenience: \code{simInit()} then \code{spades()} in one call.\cr
+\code{\link[=simInitAndSpades2]{simInitAndSpades2()}} \tab Like \code{\link[=simInitAndSpades]{simInitAndSpades()}}, but takes all arguments as a single list.\cr
 \code{\link[=restartSpades]{restartSpades()}} \tab Resume a simulation after an error or interruption.\cr
 \code{\link[=restartOrSimInitAndSpades]{restartOrSimInitAndSpades()}} \tab Try to restart from a saved state; otherwise start fresh.\cr
 }
@@ -237,9 +239,6 @@ or no output at all.
 
 \tabular{ll}{
 \code{\link[=Plots]{Plots()}} \tab Module-friendly wrapper for any plotting function.\cr
-\code{\link[quickPlot:Plot]{quickPlot::Plot()}} \tab The workhorse plotter.\cr
-\code{\link[quickPlot:clearPlot]{quickPlot::clearPlot()}} \tab Reset the plotting device.\cr
-\code{\link[quickPlot:rePlot]{quickPlot::rePlot()}} \tab Re-render all elements on the device.\cr
 \code{\link[=anyPlotting]{anyPlotting()}} \tab \code{TRUE} if the current \code{.plots} setting will produce any output.\cr
 }
 }
@@ -292,8 +291,6 @@ the background sampler with \code{options(spades.memoryUseInterval = ...)}.
 
 
 \tabular{ll}{
-\code{\link[=downloadModule]{downloadModule()}} \tab Download a module from the repository.\cr
-\code{\link[=downloadData]{downloadData()}} \tab Download just the data for a module.\cr
 \code{\link[=getModuleVersion]{getModuleVersion()}} \tab Get the latest version number on the repository.\cr
 \code{\link[=getSampleModules]{getSampleModules()}} \tab Copy the bundled sample modules somewhere usable.\cr
 }
