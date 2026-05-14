@@ -6,7 +6,7 @@
 \alias{SpaDES.core-package}
 \title{Categorized overview of the \code{SpaDES.core} package}
 \description{
-\code{SpaDES.core} is a framework for building spatial discrete-event simulations
+\code{SpaDES.core} is a framework for building spatial discrete-event systems
 from re-usable modules. A simulation is held in a single \code{simList} object,
 modules schedule events that change the \code{simList}, and the events run in
 time order until the simulation ends.
