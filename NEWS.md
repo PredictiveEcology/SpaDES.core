@@ -15,8 +15,7 @@
 * `restartSpades()` now defaults to `numEvents = 1L` (previously `Inf`).
   Callers that relied on the old default to replay every saved event must
   pass `numEvents = Inf` explicitly.
-* Requires `reproducible` ≥ 3.0.0, which itself contains breaking changes in
-  the cache layer (option renames, sidecar format, `qs2` instead of `qs`).
+* Requires `reproducible` ≥ 3.0.0.
   See the `reproducible` NEWS for migration notes.
 
 ## Enhancements and fixes
