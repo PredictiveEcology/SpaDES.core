@@ -303,8 +303,6 @@ test_that("spades calls - diff't signatures", {
 })
 
 test_that("simInit with R subfolder scripts", {
-  skip_if_not_installed("NLMR")
-
   testInit()
 
   newModule("child1", ".", open = FALSE)

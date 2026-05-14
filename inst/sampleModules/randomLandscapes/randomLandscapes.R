@@ -107,7 +107,7 @@ Init <- function(sim) {
   template <- rast(nrows = ny, ncols = nx, xmin = -nx / 2, xmax = nx / 2, ymin = -ny / 2, ymax = ny / 2)
 
   ## Make dummy maps for testing of models.
-  ## Uses the built-in 'gaussian' generator (no NLMR required).
+  ## Uses the built-in 'gaussian' generator in SpaDES.tools::neutralLandscapeMap.
   ## `smooth` controls spatial autocorrelation: larger = smoother.
   DEM <- SpaDES.tools::neutralLandscapeMap(template, smooth = 5L)
   DEM[] <- round(values(DEM), 1) * 300

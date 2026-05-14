@@ -71,8 +71,7 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
   return(invisible(out))
 }
 
-sampleModReqdPkgs <- c("NLMR", # Only randomLandscapes
-                       "terra", "SpaDES.tools", "RColorBrewer", # randomLandscapes & fireSpread
+sampleModReqdPkgs <- c("terra", "SpaDES.tools", "RColorBrewer", # randomLandscapes & fireSpread
                        "sf", "CircStats") # caribouMovement
 
 testCode <- '

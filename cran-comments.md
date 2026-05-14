@@ -27,20 +27,7 @@ This also has many enhancemenets and addresses many minor bugfixes.
 
 ## R CMD check results
 
-There are no errors, or warnings in any of the above.
-
-There is one NOTE:
-
-1. The `NLMR` package in Suggests is optionally installed from our R-universe repository
-  (until the maintainers of that package are able to get it back on CRAN).
-  Instructions for installation are provided in the README, DESCRIPTION, and via a message to the user.
-  We believe this should satisfy the CRAN policy requirement regarding additional dependencies.
-
-        Suggests or Enhances not in mainstream repositories:
-          NLMR
-        Availability using Additional_repositories specification:
-          NLMR         yes   https://predictiveecology.r-universe.dev/
-
+There are no errors, warnings, or notes in any of the above.
 
 ## Downstream dependencies
 

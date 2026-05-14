@@ -79,6 +79,15 @@
   per-layer `smooth` argument to control autocorrelation length. `NLMR`
   removed from `reqdPkgs`; bumped `SpaDES.tools` requirement to `>= 2.1.1.9001`.
   Step toward closing #334.
+* `NLMR` dependency fully removed from the package: dropped from `Suggests`
+  and `Remotes` in `DESCRIPTION`, removed from vignettes
+  (`i-introduction.Rmd`, `ii-modules.Rmd`, `iii-cache.Rmd`) and their
+  `vignette_pkgs` lists, removed from test helpers (`helper-initTests.R`'s
+  `sampleModReqdPkgs`) and from the `skip_if_not_installed("NLMR")` /
+  `skip_on_cran()` guards in `test-simulation.R` and
+  `test-module-deps-methods.R`. Mentions in `README.md` and `cran-comments.md`
+  removed. All neutral-landscape generation is now via
+  `SpaDES.tools::neutralLandscapeMap()`. Closes #334.
 * New module parameter `.useCacheArgs`: optional named list (keyed by event name) of extra arguments spliced into the per-event `reproducible::Cache()` call. Lets a developer pin a fixed `cacheId` so a pre-seeded cloud folder (`useCloud = TRUE`, `cloudFolderID = ...`) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The `newModule()` template emits a commented-out opt-in example.
 * `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`
