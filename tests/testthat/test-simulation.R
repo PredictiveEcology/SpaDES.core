@@ -250,7 +250,9 @@ test_that("spades calls - diff't signatures", {
   expect_message(spades(a, debug = "simList", .plotInitialTime = NA), "Completed Events")
 
   if (interactive()) {
-    # warnings occur on Rstudio-server related to can't use display 0:, when using devtools::test() interactively
+    # progress = "text" is gated on interactive() inside R/progress.R and
+    # R/simulation-simInit.R, so the txtProgressBar is never created in a
+    # non-interactive test session and expect_output() has nothing to capture.
     suppressWarnings(expect_output(spades(a, progress = "text", debug = TRUE), "10%"))
     suppressWarnings(expect_output(spades(a, progress = "text", debug = TRUE), "20%"))
     suppressWarnings(expect_output(spades(a, progress = "text"), "..........| 100%"))

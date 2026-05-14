@@ -1,5 +1,3 @@
-if (interactive()) library(testthat)
-
 test_that("simulation runs with simInit and spades", {
   testInit(sampleModReqdPkgs, opts = list(spades.moduleCodeChecks = FALSE))
 
