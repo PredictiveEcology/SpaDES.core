@@ -74,6 +74,12 @@
   function `checkModuleMetadata()` runs the checks on a module file
   on disk (no `simInit()` needed). Adding a new check is one entry
   in the registry — no surgery elsewhere. Closes #325.
+* Sample module `randomLandscapes` (`inst/sampleModules/randomLandscapes`) no
+  longer requires `NLMR`. It now uses the new `type = "gaussian"` default of
+  `SpaDES.tools::neutralLandscapeMap()` (built-in, dependency-free) with a
+  per-layer `smooth` argument to control autocorrelation length. `NLMR`
+  removed from `reqdPkgs`; bumped `SpaDES.tools` requirement to `>= 2.1.1.9001`.
+  Step toward closing #334.
 * `Plots` now has `useCache` argument, which allows plotting to be cached; this is only relevant when `types` is file type, e.g., `"png"`
 * `restartSpades` now has default `numEvents = 1L` instead of `Inf`
 * if `options(spades.dotInputObjects = FALSE)`, then it will not do `.inputObjects` even 
