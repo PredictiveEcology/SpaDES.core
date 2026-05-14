@@ -253,7 +253,8 @@ cantCodeCheckMessage <- ": line could not be checked "
 #' @param sim a `simList` object
 #' @param m module name
 #' @param k numeric index of module name in sim@depends@dependencies, should align with `m`
-#' @param hadPrevMessage
+#' @param hadPrevMessage logical; if `TRUE`, indicates a prior check already emitted a
+#'   message for this module, used to adjust spacing of subsequent diagnostics.
 #'
 #' @return NULL (invisibly); invoked for side effect of generating message with that starts with
 #' `paste0(m, ":", message)`.
