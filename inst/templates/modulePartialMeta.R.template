@@ -19,6 +19,20 @@
                     "Named list of seeds to use for each event (names)."),
     defineParameter(".useCache", "logical", FALSE, NA, NA,
                     "Should caching of events or module be used?")
+    ## Opt-in: pin a fixed cacheId per event so a pre-seeded Google Drive folder
+    ## can short-circuit a deterministic event to a download. To enable,
+    ## uncomment the block below (the leading `,` is valid R as a continuation),
+    ## edit the cacheId/cloudFolderID, and set `.useCache` above to include the
+    ## relevant event name(s), e.g. `c("init")`.
+    # ,defineParameter(".useCacheArgs", "list",
+    #                  list(init = list(cacheId       = "{{{name}}}_v1.0",
+    #                                   useCloud      = TRUE,
+    #                                   cloudFolderID = "<google-drive-folder-id>")),
+    #                  NA, NA,
+    #                  paste("Optional named list, keyed by event name, of extra arguments",
+    #                        "passed to reproducible::Cache() for that event. Useful for",
+    #                        "pinning a fixed cacheId so a pre-seeded cloud folder can",
+    #                        "short-circuit a deterministic event."))
   ),
   inputObjects = bindrows(
     #expectsInput("objectName", "objectClass", "input object description", sourceURL, ...),

@@ -238,6 +238,7 @@ spadesOptions <- function() {
       suppressPartialMatchArgs = FALSE,
       suppressUndefined = TRUE
     ),
+    spades.codeCheckEngine = "v1",
     spades.modulePath = file.path(.spadesTempDir(), "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
     spades.moduleDocument = TRUE,

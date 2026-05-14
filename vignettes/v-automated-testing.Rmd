@@ -58,7 +58,7 @@ For example, to determine the system dependencies required for the `usefulFuns` 
 ```{bash, get-sysdeps}
 $ git clone https://github.com/PredictiveEcology/usefulFuns
 $ cd usefulFuns
-$ Rscript -e 'remotes::system_requirements("ubuntu", "18.04")'
+$ Rscript -e 'remotes::system_requirements("ubuntu", "24.04")'
  [1] "apt-get install -y libcurl4-openssl-dev"
  [2] "apt-get install -y libssl-dev"          
  [3] "apt-get install -y imagemagick"         

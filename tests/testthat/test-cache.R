@@ -270,19 +270,6 @@ test_that("test .prepareOutput", {
   simCached1 <- spades(Copy(mySim), cache = TRUE, notOlderThan = Sys.time(), debug = FALSE) # not sure why
   simCached2 <- spades(Copy(mySim), cache = TRUE, debug = FALSE)
 
-  if (interactive()) {
-    tmpDir <- "~/tmp"
-    testFile <- file.path(tmpDir, "test-cache-out.txt")
-    if (!dir.exists(tmpDir)) dir.create(tmpDir, recursive = TRUE)
-    cat(file = testFile, names(params(mySim)$.progress), append = FALSE)
-    cat(file = testFile, "\n##############################\n", append = TRUE)
-    cat(file = testFile, names(params(simCached1)$.progress), append = TRUE)
-    cat(file = testFile, "\n##############################\n", append = TRUE)
-    cat(file = testFile, names(params(simCached2)$.progress), append = TRUE)
-    cat(file = testFile, "\n##############################\n", append = TRUE)
-    cat(file = testFile, all.equal(simCached1, simCached2), append = TRUE)
-  }
-
   # The Filebacking changed during `.wrap`
   simCached1$landscape[] <- simCached1$landscape[]
   simCached2$landscape[] <- simCached2$landscape[]

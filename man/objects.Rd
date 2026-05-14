@@ -69,18 +69,18 @@ findObjects(path = path, module = dir(path), objects = "caribou")
 \seealso{
 \link{SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.
 
-Other functions to access elements of a 'simList' object: 
-\code{\link{.addDepends}()},
-\code{\link{checkpointFile}()},
-\code{\link{envir}()},
-\code{\link{events}()},
-\code{\link{globals}()},
-\code{\link{inputs}()},
-\code{\link{modules}()},
-\code{\link{packages}()},
-\code{\link{params}()},
-\code{\link{paths}()},
-\code{\link{progressInterval}()},
-\code{\link{times}()}
+Other functions to access elements of a 'simList' object:
+\code{\link[=.addDepends]{.addDepends()}},
+\code{\link[=checkpointFile]{checkpointFile()}},
+\code{\link[=envir]{envir()}},
+\code{\link[=events]{events()}},
+\code{\link[=globals]{globals()}},
+\code{\link[=inputs]{inputs()}},
+\code{\link[=modules]{modules()}},
+\code{\link[=packages]{packages()}},
+\code{\link[=params]{params()}},
+\code{\link[=paths]{paths()}},
+\code{\link[=progressInterval]{progressInterval()}},
+\code{\link[=times]{times()}}
 }
 \concept{functions to access elements of a 'simList' object}

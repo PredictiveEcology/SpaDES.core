@@ -263,7 +263,7 @@ setMethod(
     if (length(curMod) > 0) {
       # See note above about object@inputs
       # object@outputs <- object@outputs[0]
-      object@outputs <- object@outputs[0, c("objectName", "saveTime", "file", "arguments")]
+      object@outputs <- object@outputs[0, c("objectName", "saveTime", "file", .txtArguments)]
       # outputsFromThisMod <- object@depends@dependencies[[curMod]]$outputObjects$objectName
       # object@outputs <- object@outputs[object@outputs$objectName %in% outputsFromThisMod,]
     }
@@ -279,7 +279,7 @@ setMethod(
     obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
     # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
-    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", "arguments")],
+    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", .txtArguments)],
                                     quick = TRUE, algo = algo)
     if (!is.null(classOptions$depends)) { # this is used for Cache(.inputObjects(...))
       keep <- intersect(names(obj$depends[[curMod]]), classOptions$depends)
@@ -852,7 +852,14 @@ setMethod(
             simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
             use.names = TRUE, fill = TRUE)
           allowedColumnsForUnique <- (sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE
-          simPost@outputs <- unique(ooo, by = names(ooo)[allowedColumnsForUnique])
+          
+          # the file column must be changed to be the local one: there could be a different outputPath
+          #   so the file names will be slightly different if they include the outputPath
+          #   if they were being run in a different outputPath, but shared cachePath
+          allowedColumnsForUnique <- setdiff(names(ooo)[allowedColumnsForUnique], "file")
+          # because they were rbindlisted in order of simPost, then simCache (i.e., object), it will
+          #   keep the simPost, which is the local path
+          simPost@outputs <- unique(ooo, by = allowedColumnsForUnique)
 
         }
 
