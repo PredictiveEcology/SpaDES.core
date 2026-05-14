@@ -412,7 +412,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
-#'  (sim) # shows all scheduled , with eventTime and priority
+#'  events(sim) # shows all scheduled , with eventTime and priority
 scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
@@ -444,7 +444,7 @@ scheduleEvent <- function(sim,
 
   }
   if (length(eventTime)) {
-    sim <- append(sim, eventTime, eventType, moduleName, eventPriority)
+    sim <- appendEvents(sim, eventTime, eventType, moduleName, eventPriority)
   } else {
     warning(
       paste(
@@ -462,11 +462,11 @@ scheduleEvent <- function(sim,
 #'
 #' Adds a new event to the simulation's conditional event queue,
 #' updating the simulation object by creating or appending to
-#' `sim$._conditional`.
+#' `sim$._conditionalEvents`.
 #' *This is very experimental. Use with caution.*
 #'
 #' This conditional event queue will be assessed at every single event in the normal event
-#' queue. If there are no conditional , then `spades` will proceed as normal.
+#' queue. If there are no conditional events, then `spades` will proceed as normal.
 #' As conditional event conditions are found to be true, then it will trigger a call to
 #' `scheduleEvent(...)` with the current time passed to `eventTime` *and*
 #' it will remove the conditional event from the conditional queue.
@@ -487,13 +487,13 @@ scheduleEvent <- function(sim,
 #'      It can access objects in the `simList` by using functions of `sim`,
 #'      e.g., `"sim$age > 1"`
 #'
-#' @return Returns the modified `simList` object, i.e., `sim$._conditional`.
+#' @return Returns the modified `simList` object, i.e., `sim$._conditionalEvents`.
 #'
 #'
 #' @include priority.R
 #' @export
 #' @rdname scheduleConditionalEvent
-#' @seealso [scheduleEvent()], [conditional()]
+#' @seealso [scheduleEvent()], [conditionalEvents()]
 #'
 #' @author Eliot McIntire
 #'
@@ -507,7 +507,7 @@ scheduleEvent <- function(sim,
 #'   condition <- quote(sim$age > 1) # provide as a call
 #'   condition <- expression(sim$age > 1) # provide as an expression
 #'   sim <- scheduleConditionalEvent(sim, condition, "firemodule", "burn")
-#'   conditional(sim)
+#'   conditionalEvents(sim)
 #'   sim <- spades(sim) # no changes to sim$age, i.e., it is absent
 #'   events(sim) # nothing scheduled
 #'   sim$age <- 2 # change the value
@@ -829,13 +829,13 @@ scheduleConditionalEvent <- function(sim,
 #'    paths = list(modulePath = getSampleModules(tempdir()))
 #'   )
 #'   spades(mySim)
-#'                                   
+#'
 #' # Example of `events` misuse: only the .inputObjects runs because "init" (an internal event) was not listed,
 #' # does not run and, therefore, does not schedule other events
 #' spades(mySim, events = c(".inputObjects", "burn", "move", "stats"))
 #' completed(mySim)
-#' 
-#' # Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module, 
+#'
+#' # Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module,
 #' ##without affecting the events of other modules or internal events
 #' spades(mySim, events = list(caribouMovement = c(".inputObjects", "init", "move")))
 #' completed(mySim)
@@ -925,12 +925,12 @@ setMethod(
       if (!useLoggingPkg)
         debug <- unlist(debug)
       # }
-    } 
+    }
     if (!identical(debug, getOption("spades.debug"))) {
       opts <- options("spades.debug" = debug)
       on.exit(options(opts), add = TRUE)
     }
-    
+
 
     ## need to recheck package loading because `simInit` may have been cached
     if (getOption("spades.loadReqdPkgs", TRUE)) {
