@@ -85,7 +85,9 @@ the simulations will only do the events indicated here. If a named list, the nam
 must correspond to the modules and the character vectors can be specific events within
 each of the named modules. With the \code{list} form, all unspecified modules
 will run \emph{all} their events, including internal spades modules, e.g., \code{save},
-that get invoked with the \code{outputs} argument in  \code{simInit}. See example.}
+that get invoked with the \code{outputs} argument in  \code{simInit}. However, if NOT a named list
+internal spades modules' events will not run, if not listed in the character vector.
+See example.}
 
 \item{.plots}{Character. Sets the parameter of this name in all modules.
 See \code{\link[=Plots]{Plots()}} for possible values. The parameter is intended to slowly
@@ -251,6 +253,16 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
    paths = list(modulePath = getSampleModules(tempdir()))
   )
   spades(mySim)
+
+# Example of `events` misuse: only the .inputObjects runs because "init" (an internal event) was not listed,
+# does not run and, therefore, does not schedule other events
+spades(mySim, events = c(".inputObjects", "burn", "move", "stats"))
+completed(mySim)
+
+# Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module,
+##without affecting the events of other modules or internal events
+spades(mySim, events = list(caribouMovement = c(".inputObjects", "init", "move")))
+completed(mySim)
 
   options(opts) # reset options
 }

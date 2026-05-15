@@ -412,7 +412,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
-#'  events(sim) # shows all scheduled events, with eventTime and priority
+#'  events(sim) # shows all scheduled , with eventTime and priority
 scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
@@ -666,7 +666,9 @@ scheduleConditionalEvent <- function(sim,
 #'   must correspond to the modules and the character vectors can be specific events within
 #'   each of the named modules. With the `list` form, all unspecified modules
 #'   will run *all* their events, including internal spades modules, e.g., `save`,
-#'   that get invoked with the `outputs` argument in  `simInit`. See example.
+#'   that get invoked with the `outputs` argument in  `simInit`. However, if NOT a named list
+#'   internal spades modules' events will not run, if not listed in the character vector.
+#'   See example.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
 #'            This will be included in the `Cache` call, so will be unique
@@ -828,6 +830,16 @@ scheduleConditionalEvent <- function(sim,
 #'   )
 #'   spades(mySim)
 #'
+#' # Example of `events` misuse: only the .inputObjects runs because "init" (an internal event) was not listed,
+#' # does not run and, therefore, does not schedule other events
+#' spades(mySim, events = c(".inputObjects", "burn", "move", "stats"))
+#' completed(mySim)
+#'
+#' # Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module,
+#' ##without affecting the events of other modules or internal events
+#' spades(mySim, events = list(caribouMovement = c(".inputObjects", "init", "move")))
+#' completed(mySim)
+#'
 #'   options(opts) # reset options
 #' }
 #' }
@@ -913,12 +925,12 @@ setMethod(
       if (!useLoggingPkg)
         debug <- unlist(debug)
       # }
-    } 
+    }
     if (!identical(debug, getOption("spades.debug"))) {
       opts <- options("spades.debug" = debug)
       on.exit(options(opts), add = TRUE)
     }
-    
+
 
     ## need to recheck package loading because `simInit` may have been cached
     if (getOption("spades.loadReqdPkgs", TRUE)) {

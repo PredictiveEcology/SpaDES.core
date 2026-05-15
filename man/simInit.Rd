@@ -118,10 +118,10 @@ columns with following column names: \code{objectName} (character, required),
 \code{interval} (numeric), \code{loadTime} (numeric).
 See \code{\link[=inputs]{inputs()}} and vignette("ii-modules") section about inputs.}
 
-\item{outputs}{A \code{data.frame}. Can specify from 1 to 5
+\item{outputs}{A \code{data.frame}. Can specify from 1 to 7
 columns with following column names: \code{objectName} (character, required),
 \code{file} (character), \code{fun} (character), \code{package} (character),
-\code{saveTime} (numeric) and \code{eventPriority} (numeric). If
+\code{saveTime} (numeric), \code{arguments} (list) and \code{eventPriority} (numeric). If
 \code{eventPriority} is not set, it defaults to \code{.last()}. If \code{eventPriority}
 is set to a low value, e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)},
 it should give "initial conditions".
