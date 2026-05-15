@@ -253,13 +253,13 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
    paths = list(modulePath = getSampleModules(tempdir()))
   )
   spades(mySim)
-                                  
+
 # Example of `events` misuse: only the .inputObjects runs because "init" (an internal event) was not listed,
 # does not run and, therefore, does not schedule other events
 spades(mySim, events = c(".inputObjects", "burn", "move", "stats"))
 completed(mySim)
 
-# Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module, 
+# Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module,
 ##without affecting the events of other modules or internal events
 spades(mySim, events = list(caribouMovement = c(".inputObjects", "init", "move")))
 completed(mySim)
