@@ -81,11 +81,17 @@
 
 ## Build a generic finding for a "declared but unused" object (no source pos).
 .cc_declaredUnused <- function(id, severity, module, name, kind) {
+  message <- switch(
+    id,
+    in_no_default = sprintf("input '%s' has no fallback default in .inputObjects(); the simulation will fail unless it is supplied via simInit() or another module",
+                            name),
+    sprintf("'%s' is declared in metadata %s but is not %s in module code",
+            name, kind,
+            if (grepl("unused$", id)) "used" else "assigned")
+  )
   .cc_finding(id = id, severity = severity, module = module,
               where = "<metadata only>", name = name,
-              message = sprintf("'%s' is declared in metadata %s but is not %s in module code",
-                                name, kind,
-                                if (grepl("unused$", id)) "used" else "assigned"),
+              message = message,
               suggestion = switch(
                 id,
                 out_declared_unused   = sprintf("either remove '%s' from outputObjects, or add `sim$%s <- ...` in an event function",
@@ -94,7 +100,7 @@
                                                 name, name),
                 param_declared_unused = sprintf("either remove `defineParameter('%s', ...)` or add `Par$%s` (or P(sim)$%s) in module code",
                                                 name, name, name),
-                in_no_default         = sprintf("add `if (!suppliedElsewhere('%s', sim)) sim$%s <- <default>` to .inputObjects()",
+                in_no_default         = sprintf("if a default is appropriate, add `if (!suppliedElsewhere('%s', sim)) sim$%s <- <default>` to .inputObjects(); otherwise ignore",
                                                 name, name),
                 NA_character_
               ))
