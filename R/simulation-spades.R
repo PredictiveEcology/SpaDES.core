@@ -38,8 +38,7 @@ savedSimEnv <- function(envir = .GlobalEnv) {
 #' @return Returns the modified `simList` object.
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @author Alex Chubaty
 #' @export
@@ -399,8 +398,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #' @author Alex Chubaty
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @examples
 #'  sim <- simInit()
@@ -498,8 +496,7 @@ scheduleEvent <- function(sim,
 #' @author Eliot McIntire
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @examples
 #'   sim <- simInit(times = list(start = 0, end = 2))
@@ -808,8 +805,7 @@ scheduleConditionalEvent <- function(sim,
 #' @export
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @examples
 #' \donttest{
@@ -830,13 +826,15 @@ scheduleConditionalEvent <- function(sim,
 #'   )
 #'   spades(mySim)
 #'
-#' # Example of `events` misuse: only the .inputObjects runs because "init" (an internal event) was not listed,
-#' # does not run and, therefore, does not schedule other events
+#' # Example of `events` misuse: only the .inputObjects runs because "init"
+#' # (an internal event) was not listed, does not run and, therefore, does
+#' # not schedule other events
 #' spades(mySim, events = c(".inputObjects", "burn", "move", "stats"))
 #' completed(mySim)
 #'
-#' # Example of correct use of `events`: this adequately narrows down the events to be execucted by a particular module,
-#' ##without affecting the events of other modules or internal events
+#' # Example of correct use of `events`: this adequately narrows down the
+#' # events to be executed by a particular module, without affecting the
+#' # events of other modules or internal events
 #' spades(mySim, events = list(caribouMovement = c(".inputObjects", "init", "move")))
 #' completed(mySim)
 #'

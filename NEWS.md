@@ -1,4 +1,4 @@
-# SpaDES.core (development version)
+# SpaDES.core 3.1.0
 
 ## Breaking changes
 
@@ -26,17 +26,6 @@
   [spadesOptions()] (which is the single source of truth). New sections cover
   code checking, persistence/recovery, memory monitoring, and conditional
   events.
-* Documentation: vignette accuracy pass. Fixed: typo `SpaDES.taols`,
-  wrong option name `spades.modulesPath` → `spades.modulePath`,
-  broken sentence about `simList`'s environment slot,
-  stale `raster::Extent` reference in module-metadata table,
-  stale `sim$myFunction()` call style (modules now use namespaced calls),
-  wrong event name `"save"` in a `scheduleEvent()` plot example,
-  stale `getOption("spades.cachePath")` → `reproducible.cachePath`,
-  stale `SpaDES::setPaths()` → `SpaDES.core::setPaths()`,
-  stale Ubuntu 18.04 example → 24.04. `sp` references kept with a note that
-  modern `terra`/`sf` classes are preferred but `sp` still works. The
-  Advanced vignette gains a section on the static code checker.
 * New code-checking engine v2 (opt-in; `options(spades.codeCheckEngine = "v2")`),
   built on `xmlparsedata` + `xml2`. Adds: parameter-use checks (`Par$x`,
   `P(sim)$x`, `P(sim, module = "other")$x`, `params(sim)$mod$x`,
@@ -88,12 +77,6 @@
   `test-module-deps-methods.R`. Mentions in `README.md` and `cran-comments.md`
   removed. All neutral-landscape generation is now via
   `SpaDES.tools::neutralLandscapeMap()`. Closes #334.
-* New module parameter `.useCacheArgs`: optional named list (keyed by event name) of extra arguments spliced into the per-event `reproducible::Cache()` call. Lets a developer pin a fixed `cacheId` so a pre-seeded cloud folder (`useCloud = TRUE`, `cloudFolderID = ...`) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The `newModule()` template emits a commented-out opt-in example.
-* Documentation: rewrite of the categorized package overview (`?SpaDES.core`).
-  Restructured into 14 sections with simpler language; every user-facing export
-  is now linked. The inlined options table is replaced with a pointer to
-  [`spadesOptions()`] (the single source of truth). New sections cover code
-  checking, persistence/recovery, and memory monitoring.
 * Documentation: vignette accuracy pass. Fixed: typo `SpaDES.taols` →
   `SpaDES.tools` (in `i-introduction` and `ii-modules`); wrong option name
   `spades.modulesPath` → `spades.modulePath` (three places); broken sentence

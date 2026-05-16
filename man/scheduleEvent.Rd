@@ -60,8 +60,7 @@ instead of \code{data.frame} to implement the event queue (because it is much fa
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-San Francisco, CA: No Starch Press, Inc..
-Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 }
 \seealso{
 \code{\link[=priority]{priority()}}, \code{\link[=scheduleConditionalEvent]{scheduleConditionalEvent()}}

@@ -77,8 +77,7 @@ to very low or even negative to ensure it gets inserted at the top of the event 
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-San Francisco, CA: No Starch Press, Inc..
-Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 }
 \seealso{
 \code{\link[=scheduleEvent]{scheduleEvent()}}, \code{\link[=conditionalEvents]{conditionalEvents()}}
