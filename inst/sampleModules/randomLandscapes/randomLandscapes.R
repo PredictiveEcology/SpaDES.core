@@ -106,23 +106,8 @@ Init <- function(sim) {
   ny <- Par$ny
   template <- rast(nrows = ny, ncols = nx, xmin = -nx / 2, xmax = nx / 2, ymin = -ny / 2, ymax = ny / 2)
 
-  ## Make dummy maps for testing of models.
-  ## `neutralLandscapeMap()` gained a built-in 'gaussian' generator (with a
-  ## `smooth` argument controlling spatial autocorrelation) in SpaDES.tools
-  ## 2.1.2; older CRAN versions (2.1.1) use NLMR's `nlm_mpd` generator
-  ## instead. Call whichever the installed SpaDES.tools supports so this
-  ## module works on both.
-  nlmCanSmooth <- "smooth" %in% names(formals(SpaDES.tools::neutralLandscapeMap))
-  makeNLM <- function(template, smooth, roughness, rescale) {
-    if (nlmCanSmooth) {
-      SpaDES.tools::neutralLandscapeMap(template, smooth = smooth)
-    } else {
-      SpaDES.tools::neutralLandscapeMap(template, roughness = roughness,
-                                        rand_dev = 10, rescale = rescale,
-                                        verbose = FALSE)
-    }
-  }
-
+  ## Make dummy maps for testing of models, via the module-level
+  ## `makeNLM()` helper (defined at the bottom of this file).
   DEM <- makeNLM(template, smooth = 5L, roughness = 0.3, rescale = TRUE)
   DEM[] <- round(values(DEM), 1) * 300
   # terra::plot(DEM)
@@ -165,4 +150,40 @@ Init <- function(sim) {
   }
   sim
 
+}
+
+## Generate a random landscape using the best available method, with no
+## hard dependency on any one:
+##  1. SpaDES.tools (>= 2.1.2): built-in 'gaussian' generator (the
+##     `smooth` argument controls spatial autocorrelation);
+##  2. older SpaDES.tools (e.g. CRAN 2.1.1) *and* `NLMR` installed:
+##     NLMR's `nlm_mpd` generator (preserves prior behaviour for users
+##     who have `NLMR`);
+##  3. otherwise: a zero-dependency `terra` fallback (smoothed i.i.d.
+##     normal noise) so the module never errors, even on machines
+##     without `NLMR` (e.g. CRAN's check farm).
+makeNLM <- function(template, smooth, roughness, rescale) {
+  if ("smooth" %in% names(formals(SpaDES.tools::neutralLandscapeMap))) {
+    SpaDES.tools::neutralLandscapeMap(template, smooth = smooth)
+  } else if (requireNamespace("NLMR", quietly = TRUE)) {
+    SpaDES.tools::neutralLandscapeMap(template, roughness = roughness,
+                                      rand_dev = 10, rescale = rescale,
+                                      verbose = FALSE)
+  } else {
+    r <- rast(template)
+    terra::values(r) <- stats::rnorm(terra::ncell(r))
+    k <- 2L * as.integer(smooth) + 1L
+    ## terra::focal() requires the window to be no larger than the raster
+    ## (nrow(w) <= 2*nrow(x), ncol(w) <= 2*ncol(x)); clamp for small grids.
+    k <- min(k, 2L * terra::nrow(r) - 1L, 2L * terra::ncol(r) - 1L)
+    if (k %% 2L == 0L) k <- k - 1L
+    if (k >= 3L)
+      r <- terra::focal(r, w = matrix(1, k, k), fun = "mean", na.rm = TRUE)
+    if (isTRUE(rescale)) {
+      v <- terra::values(r)
+      rng <- range(v, na.rm = TRUE)
+      if (diff(rng) > 0) terra::values(r) <- (v - rng[1]) / diff(rng)
+    }
+    r
+  }
 }

@@ -1,3 +1,26 @@
+# SpaDES.core 3.1.1
+
+## Bug fixes
+
+* Fix CRAN check ERRORs in 3.1.0 (r-devel-fedora-gcc, macOS, M1mac): the
+  `randomLandscapes` sample module called `SpaDES.tools::neutralLandscapeMap()`
+  via a path that required `NLMR` whenever the installed `SpaDES.tools` was
+  the CRAN version (2.1.1, which lacks the built-in `gaussian` generator).
+  CRAN's check machines do not install `NLMR` (it is not on a mainstream
+  repository, and `Additional_repositories` is not used to install Suggests
+  during routine checks), so every test that ran `spades()` with this
+  module errored with "Package 'NLMR' not available".
+* `randomLandscapes`'s `makeNLM()` helper now degrades gracefully with no
+  hard dependency: (1) `SpaDES.tools (>= 2.1.2)` -> built-in `gaussian`
+  generator; (2) older `SpaDES.tools` with `NLMR` installed -> NLMR's
+  `nlm_mpd` (unchanged behaviour for users who have `NLMR`); (3) otherwise
+  -> a zero-dependency `terra` fallback (smoothed i.i.d. normal noise), so
+  the module never errors.
+* `NLMR` fully removed as a declared dependency: dropped from `Suggests`,
+  `Additional_repositories`, and the `Description` field. It is now used
+  only opportunistically by the `randomLandscapes` sample module when the
+  user happens to have it installed. Closes #334.
+
 # SpaDES.core 3.1.0
 
 ## Breaking changes

@@ -9,13 +9,11 @@ Description: Provides the core framework for a discrete event system to
     reusable modules, tools for developing arbitrary automated workflows,
     automated interweaving of modules of different temporal resolution,
     and tools for visualizing and understanding the within-project dependencies.
-    The suggested package 'NLMR' can be installed from the repository
-    (<https://PredictiveEcology.r-universe.dev>).
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2026-05-18
-Version: 3.1.0
+Date: 2026-05-19
+Version: 3.1.1
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -78,7 +76,6 @@ Suggests:
     RSQLite,
     rstudioapi,
     sp,
-    NLMR (>= 1.1.1),
     SpaDES.tools (>= 2.1.1),
     tcltk,
     testthat (>= 1.0.2),
@@ -86,7 +83,6 @@ Suggests:
 Remotes:
     PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.tools@development
-Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
