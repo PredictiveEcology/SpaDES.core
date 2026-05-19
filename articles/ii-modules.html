@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@
                         <h4 data-toc-skip class="author">Alex M.
 Chubaty</h4>
             
-            <h4 data-toc-skip class="date">May 07 2026</h4>
+            <h4 data-toc-skip class="date">May 19 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/vignettes/ii-modules.Rmd" class="external-link"><code>vignettes/ii-modules.Rmd</code></a></small>
       <div class="hidden name"><code>ii-modules.Rmd</code></div>
@@ -282,8 +282,9 @@ versioning</a> is assumed.</td>
 </tr>
 <tr class="odd">
 <td><strong><code>spatialExtent</code></strong></td>
-<td>Specifies the module’s spatial extent as an <code>Extent</code>
-object.</td>
+<td>Specifies the module’s spatial extent as a <code>SpatExtent</code>
+(from <code>terra</code>; an <code>Extent</code> from
+<code>raster</code> is also accepted for backwards compatibility).</td>
 </tr>
 <tr class="even">
 <td><strong><code>timeframe</code></strong></td>
@@ -565,10 +566,10 @@ passed within the <code>simInit</code> call. Accessing objects in the
 <code>envir</code> is similar to accessing items in a list,
 <em>i.e.</em>, <code>sim[["object"]]</code> or <code>sim$object</code>
 can be used, in addition to
-<code>get("object", envir=envir(sim))</code>. Likewise, simulation
-functions (<em>i.e.</em>, those defined in modules) are also accessed
-using the <code>$</code> accessor (<em>e.g.</em>,
-<code>sim$myFunction()</code>).</p>
+<code>get("object", envir=envir(sim))</code>. Module functions are
+namespaced and called directly by name (e.g.,
+<code>myFunction(sim)</code>), not via <code>sim$myFunction(sim)</code>;
+that old style is no longer supported.</p>
 <p>Note that every module requires an <code>"init"</code> event type,
 which defines the initialization of the module; however, this
 <code>init</code> event need not do a whole lot (<em>i.e.</em>, it can
@@ -716,8 +717,10 @@ particular, matrices (including vectors) and lists work well for this
 purpose because, as of <code>R</code> version <code>3.1.0</code>, they
 are more efficient, reducing your model’s memory footprint and speeding
 up your code’s execution. Other useful data types include
-<code>Raster*</code> and <code>SpatialPoints*</code> objects (see
-examples below).</p>
+<code>SpatRaster</code> and <code>SpatVector</code> objects from
+<code>terra</code>, or <code>sf</code> objects (see examples below).
+Older <code>Raster*</code> and <code>Spatial*</code> classes from the
+<code>raster</code>/<code>sp</code> packages are still accepted.</p>
 </div>
 <div class="section level3">
 <h3 id="global-objects-and-the-simulation-environment">Global objects and the simulation environment<a class="anchor" aria-label="anchor" href="#global-objects-and-the-simulation-environment"></a>
@@ -756,9 +759,8 @@ B may depend on module A (for example to initialize a data object),
 without module A depending on module B.</p>
 <p>To view the dependencies for a simulation:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed</span></span>
-<span><span class="co">#install.packages("SpaDES.taols")</span></span>
-<span><span class="co">#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")</span></span>
+<code class="sourceCode R"><span><span class="co">## NOTE: Suggested package SpaDES.tools must be installed</span></span>
+<span><span class="co">#install.packages("SpaDES.tools")</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span>
 <span></span>
@@ -1216,7 +1218,7 @@ objects have been saved.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/simList-accessors-outputs.html">outputs</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>   <span class="co"># shows all files and objects that are "outputs"</span></span></code></pre></div>
 <pre><code><span><span class="co">##   objectName                                           file     fun package saveTime saved arguments</span></span>
-<span><span class="co">## 1  landscape /tmp/RtmpEPifFm/simOutputs/landscape_year5.rds saveRDS    base        5    NA        NA</span></span></code></pre>
+<span><span class="co">## 1  landscape /tmp/RtmpPvINWW/simOutputs/landscape_year5.rds saveRDS    base        5    NA        NA</span></span></code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.saveInitialTime</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
@@ -1228,7 +1230,7 @@ objects have been saved.</p>
 <pre><code><span><span class="co">## [1] "landscape"</span></span></code></pre>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.savePath</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "/tmp/RtmpEPifFm/simOutputs/randomLandscapes"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "/tmp/RtmpPvINWW/simOutputs/randomLandscapes"</span></span></code></pre>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ftmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"spades_vignetteOutputs"</span>, fileext <span class="op">=</span> <span class="st">".pdf"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf</a></span><span class="op">(</span><span class="va">ftmp</span><span class="op">)</span></span>
@@ -1292,7 +1294,7 @@ plotted. Used to schedule plot events.</li>
 <span></span>
 <span><span class="co"># schedule a recurring plot event</span></span>
 <span><span class="va">nextPlot</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.plotInterval</span></span>
-<span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="va">nextPlot</span>, <span class="st">"randomLandscapes"</span>, <span class="st">"save"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/scheduleEvent.html">scheduleEvent</a></span><span class="op">(</span><span class="va">mySim</span>, <span class="va">nextPlot</span>, <span class="st">"randomLandscapes"</span>, <span class="st">"plot"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -1360,10 +1362,10 @@ downloaded using:</p>
 <div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span><span class="op">(</span><span class="st">"moduleName"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved
-to the directory specified by the <code>spades.modulesPath</code>. An
-alternate path can be provided to <code>downloadModule</code> directly
-via the <code>path</code> argument, or specified using
-<code>options(spades.modulesPath = "path/to/my/modules")</code>.</p>
+to the directory specified by the <code>spades.modulePath</code> option.
+An alternate path can be provided to <code>downloadModule</code>
+directly via the <code>path</code> argument, or specified using
+<code>options(spades.modulePath = "path/to/my/modules")</code>.</p>
 </div>
 </div>
 <div class="section level2">

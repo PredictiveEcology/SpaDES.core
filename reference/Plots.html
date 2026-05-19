@@ -35,7 +35,7 @@ See below and examples."><!-- mathjax --><script src="https://cdnjs.cloudflare.c
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -116,6 +116,7 @@ See below and examples.</p>
 <span>  usePlot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"spades.PlotsUsePlot"</span>, <span class="cn">FALSE</span><span class="op">)</span>,</span>
 <span>  deviceArgs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  envir <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  useCache <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -182,6 +183,12 @@ e.g., plotting a <code>RasterLayer</code>.</p></dd>
 <dt id="arg-envir">envir<a class="anchor" aria-label="anchor" href="#arg-envir"></a></dt>
 <dd><p>The environment where the <code>data</code> argument should be evaluated if it is
 a <code>call</code>. Normally, this should be left at its default, <code><a href="https://rdrr.io/r/base/sys.parent.html" class="external-link">parent.frame()</a></code>.</p></dd>
+
+
+<dt id="arg-usecache">useCache<a class="anchor" aria-label="anchor" href="#arg-usecache"></a></dt>
+<dd><p>Logical or character vector. If <code>TRUE</code>, caching is enabled for
+all non-screen output types. If a character vector, caching is enabled only
+for the matching <code>types</code>. Default is <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -278,20 +285,27 @@ the file(s) that is/are saved will be appended to the <code>outputs</code> slot 
 <span class="r-in"><span>            .plotInitialTime <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span>    <span class="op">}</span></span></span>
 <span class="r-in"><span>  <span class="op">}</span> <span class="co"># end ggplot</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.04325557 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp03crdC/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp03crdC/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp03crdC/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp03crdC/SpaDES/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp03crdC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:32:41 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.04515338 secs</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp4PsE8s/file2b0c67f79f2a.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Saving 6.67 x 6.67 in image</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp4PsE8s/file2b0c6945cde.png</span>
 <span class="r-plt img"><img src="Plots-1.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp4PsE8s/file2b0c7771b241.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp03crdC/file8b21597b7568.png</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: ggplotify</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Loading required package: lattice</span>
 <span class="r-plt img"><img src="Plots-2.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp4PsE8s/file2b0c128965d.png</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Saved figure to: /tmp/Rtmp03crdC/file8b213243b509.png</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="st">"figures"</span><span class="op">)</span> <span class="co"># clean up</span></span></span>
 <span class="r-in"><span><span class="co"># } # end of dontrun</span></span></span>
 </code></pre></div>

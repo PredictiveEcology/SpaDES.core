@@ -27,6 +27,7 @@
 <url><loc>https://spades-core.predictiveecology.org/reference/checkCacheRepo.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/checkModule.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/checkModuleLocal.html</loc></url>
+<url><loc>https://spades-core.predictiveecology.org/reference/checkModuleMetadata.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/checkModulePath.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/checkObject.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/checkParams.html</loc></url>
@@ -36,10 +37,10 @@
 <url><loc>https://spades-core.predictiveecology.org/reference/classFilter.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/clearCache.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/clearCacheEventsOnly.html</loc></url>
+<url><loc>https://spades-core.predictiveecology.org/reference/codeCheckModule.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/convertToPackage.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/copyModule.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/coreModules.html</loc></url>
-<url><loc>https://spades-core.predictiveecology.org/reference/createDESCRIPTIONandDocs.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/createsOutput.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/dealWithClass.html</loc></url>
 <url><loc>https://spades-core.predictiveecology.org/reference/defineEvent.html</loc></url>

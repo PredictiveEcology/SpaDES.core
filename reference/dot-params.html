@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -84,10 +84,6 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="va">.knownDotParams</span></span></code></pre></div>
     </div>
 
-    <div id="format">
-    <h2>Format</h2>
-    <p>An object of class <code>character</code> of length 7.</p>
-    </div>
     <div id="details">
     <h2>Details</h2>
 
@@ -97,6 +93,10 @@
 <li><p><code>.saveInitialTime</code>: the initial time for saving;</p></li>
 <li><p><code>.saveInterval</code>: the interval between saves;</p></li>
 <li><p><code>.useCache</code>: whether to use caching, or which events to cache;</p></li>
+<li><p><code>.useCacheArgs</code>: optional named list (keyed by event name) of extra arguments
+passed to <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache()</a></code> for that event (e.g. <code>cacheId</code>,
+<code>useCloud</code>, <code>cloudFolderID</code>); enables a developer to pin a fixed cloud
+cache key for a deterministic event;</p></li>
 <li><p><code>.useParallel</code>: whether to use parallel processing, or the number of parallel cores to use;</p></li>
 </ul></div>
 

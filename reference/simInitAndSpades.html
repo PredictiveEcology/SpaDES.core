@@ -24,7 +24,7 @@ Passes all arguments to simInit(), then passes the created simList to spades()."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -165,10 +165,10 @@ See <code><a href="simList-accessors-inputs.html">inputs()</a></code> and vignet
 
 
 <dt id="arg-outputs">outputs<a class="anchor" aria-label="anchor" href="#arg-outputs"></a></dt>
-<dd><p>A <code>data.frame</code>. Can specify from 1 to 5
+<dd><p>A <code>data.frame</code>. Can specify from 1 to 7
 columns with following column names: <code>objectName</code> (character, required),
 <code>file</code> (character), <code>fun</code> (character), <code>package</code> (character),
-<code>saveTime</code> (numeric) and <code>eventPriority</code> (numeric). If
+<code>saveTime</code> (numeric), <code>arguments</code> (list) and <code>eventPriority</code> (numeric). If
 <code>eventPriority</code> is not set, it defaults to <code><a href="priority.html">.last()</a></code>. If <code>eventPriority</code>
 is set to a low value, e.g., 0, 1, 2 and <code>saveTime</code> is <code>start(sim)</code>,
 it should give "initial conditions".</p>
@@ -241,7 +241,9 @@ the simulations will only do the events indicated here. If a named list, the nam
 must correspond to the modules and the character vectors can be specific events within
 each of the named modules. With the <code>list</code> form, all unspecified modules
 will run <em>all</em> their events, including internal spades modules, e.g., <code>save</code>,
-that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. See example.</p></dd>
+that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. However, if NOT a named list
+internal spades modules' events will not run, if not listed in the character vector.
+See example.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

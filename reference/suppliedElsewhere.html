@@ -32,7 +32,7 @@ to proceed in getting and assigning its default value."><!-- mathjax --><script 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -153,7 +153,16 @@ that is loaded prior to this one.</p>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.02508974 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp03crdC/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp03crdC/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp03crdC'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp03crdC/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp03crdC/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:20 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.0270822 secs</span>
 <span class="r-in"><span><span class="fu">suppliedElsewhere</span><span class="op">(</span><span class="st">"test"</span>, <span class="va">mySim</span><span class="op">)</span> <span class="co"># FALSE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
 <span class="r-in"><span></span></span>
@@ -167,7 +176,19 @@ that is loaded prior to this one.</p>
 <span class="r-in"><span><span class="co">#   but the user supplied values come *after* the module's .inputObjects, so</span></span></span>
 <span class="r-in"><span><span class="co">#   a basic is.null(sim$test) would return TRUE even though the user supplied test</span></span></span>
 <span class="r-in"><span><span class="va">mySim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"test"</span> <span class="op">=</span> <span class="va">test</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.02889013 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp03crdC/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp03crdC/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp03crdC'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp03crdC/sampleModules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp03crdC/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:21 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:21 simInit <span style="color: #BBBB00;">User-supplied objects passed into sim for spades call:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:21 simInit <span style="color: #BBBB00;">       &lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:21 simInit <span style="color: #BBBB00;">1:       test</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.03240228 secs</span>
 <span class="r-in"><span><span class="fu">suppliedElsewhere</span><span class="op">(</span><span class="st">"test"</span>, <span class="va">mySim</span><span class="op">)</span> <span class="co"># TRUE</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
 <span class="r-in"><span></span></span>

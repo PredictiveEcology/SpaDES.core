@@ -29,7 +29,7 @@ The returned object also has an attribute, "total", which shows the total size.'
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -127,9 +127,22 @@ it will also return the recursive sizes of the elements of a list or environment
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span>objects <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>d <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, b <span class="op">=</span> <span class="fl">2</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.02947688 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp03crdC/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp03crdC/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp03crdC/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp03crdC/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp03crdC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:07 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:07 simInit <span style="color: #BBBB00;">User-supplied objects passed into sim for spades call:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:07 simInit <span style="color: #BBBB00;">       &lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:07 simInit <span style="color: #BBBB00;">1:          b</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:07 simInit <span style="color: #BBBB00;">2:          d</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.0313251 secs</span>
 <span class="r-in"><span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/objSize.html" class="external-link">objSize</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 505.41 kB</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 460.93 kB</span>
 <span class="r-in"><span><span class="fu">utils</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/utils/object.size.html" class="external-link">object.size</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 17184 bytes</span>
 </code></pre></div>

@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -102,7 +102,7 @@ Chubaty</h4>
                         <h4 data-toc-skip class="author">Eliot J. B.
 McIntire</h4>
             
-            <h4 data-toc-skip class="date">May 07 2026</h4>
+            <h4 data-toc-skip class="date">May 19 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/vignettes/i-introduction.Rmd" class="external-link"><code>vignettes/i-introduction.Rmd</code></a></small>
       <div class="hidden name"><code>i-introduction.Rmd</code></div>
@@ -127,9 +127,11 @@ visualize raster and other maps.</p>
 <div class="section level4">
 <h4 id="requirements">Requirements<a class="anchor" aria-label="anchor" href="#requirements"></a>
 </h4>
-<p>This packages makes heavy use of the <code>raster</code> <span class="citation">(Hijmans 2015)</span> and <code>sp</code> <span class="citation">(Pebesma and Bivand 2005; Bivand et al. 2013)</span>
-packages, so familiarity with these packages, their classes and methods
-is recommended.</p>
+<p>This package makes use of the <code>terra</code> and <code>sf</code>
+packages for spatial data handling. Familiarity with these (and
+optionally the older <code>raster</code> <span class="citation">(Hijmans
+2015)</span> and <code>sp</code> <span class="citation">(Pebesma and
+Bivand 2005; Bivand et al. 2013)</span> packages) is recommended.</p>
 </div>
 </div>
 <div class="section level3">
@@ -305,11 +307,10 @@ and plotting of raster map layers; 2) the computational speed of
 modeling spatial spread processes; and 3) the implementation of an
 agent-based (a.k.a., individual-based) model.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">## NOTE: Suggested packages SpaDES.tools and NLMR packages must be installed</span></span>
-<span><span class="co">#install.packages("SpaDES.taols")</span></span>
-<span><span class="co">#install.packages("NLMR", repos = "https://predictiveecology.r-universe.dev/")</span></span>
+<code class="sourceCode R"><span><span class="co">## NOTE: Suggested package SpaDES.tools must be installed</span></span>
+<span><span class="co">#install.packages("SpaDES.tools")</span></span>
 <span></span>
-<span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>eval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"SpaDES.tools"</span><span class="op">)</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"NLMR"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html" class="external-link">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>eval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"SpaDES.tools"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://spades-core.predictiveecology.org/">SpaDES.core</a></span><span class="op">)</span></span>
 <span></span>
@@ -342,10 +343,10 @@ using:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/downloadModule.html">downloadModule</a></span><span class="op">(</span>name <span class="op">=</span> <span class="st">"moduleName"</span><span class="op">)</span></span></code></pre></div>
 <p><strong>Note:</strong> by default, modules and their data are saved
-to the directory specified by the <code>spades.modulesPath</code>. An
-alternate path can be provided to <code>downloadModule</code> directly
-via the <code>path</code> argument, or specified using
-<code>options(spades.modulesPath = "path/to/my/modules")</code>.</p>
+to the directory specified by the <code>spades.modulePath</code> option.
+An alternate path can be provided to <code>downloadModule</code>
+directly via the <code>path</code> argument, or specified using
+<code>options(spades.modulePath = "path/to/my/modules")</code>.</p>
 <p>A detailed guide to module development is provided in the <a href="ii-modules.html">modules vignette</a>.</p>
 </div>
 </div>
@@ -402,14 +403,15 @@ passed as named lists to the simulation object upon initialization.</p>
 object, including the simulation parameters and modules used, as well as
 storing the current state of the simulation and the future event queue.
 A list of completed events is also stored, which can provide useful
-debugging information. This <code>simList</code> object contains a
-unique <code>unique</code> object, along with data used/created during
-the simulation. The <code>envir</code> object is simply an environment,
-which means objects stored in it are updated using reference semantics
-(so objects don’t need to be copied). You can access objects stored in
-environments using the same syntax as for lists (<em>e.g.</em>,
-<code>$</code>, <code>[[</code>), in addition to <code>get</code>, which
-makes working with simulated data easy to do inside modules.</p>
+debugging information. The <code>simList</code> object contains an
+environment (the <code>.xData</code> slot, accessed via
+<code>envir(sim)</code>) that holds the data used/created during the
+simulation. The simulation environment uses reference semantics, so
+objects stored in it are updated in place rather than copied. You can
+access objects stored in environments using the same syntax as for lists
+(<em>e.g.</em>, <code>$</code>, <code>[[</code>), in addition to
+<code>get</code>, which makes working with simulated data easy to do
+inside modules.</p>
 <p>A new simulation is initialized using the <code>simInit</code>
 function, which does all the work of creating the <code>envir</code> and
 <code>simList</code> objects for your simulation. This function also
@@ -509,21 +511,27 @@ individual-based models (IBMs).</p>
 </h4>
 <p>As ecologists, we are often concerned with modelling individuals
 (agents) in time and space, and whose spatial location (position) can be
-represented as a single point on a map. These types of agents can easily
-be represented most simply by a single set of coordinates indicating
-their current position, and can simulated using a
-<code>SpatialPoints</code> object. Additionally, a
-<code>SpatialPointsDataFrame</code> can be used, which provides storage
-of additional information beyond agents’ coordinates as needed.</p>
+represented as a single point on a map. These agents are most simply
+represented by a single set of coordinates indicating their current
+position, and can be simulated using a <code>SpatVector</code> of points
+(from <code>terra</code>), or an <code>sf</code> object of points.
+Additional per-agent attributes (age, sex, state, etc.) attach to the
+same object as a <code>data.frame</code>, so all information travels
+together. For older code, <code>sp</code> classes like
+<code>SpatialPoints</code> and <code>SpatialPointsDataFrame</code> are
+still supported.</p>
 </div>
 <div class="section level4">
 <h4 id="polygon-agents">Polygon agents<a class="anchor" aria-label="anchor" href="#polygon-agents"></a>
 </h4>
-<p>Analogously, it is possible to use <code>SpatialPolygons*</code>.
-Plotting methods using <code>Plot</code> are optimized for speed and are
-much faster than the default <code>plot</code> methods for polygons (via
-spatial subsampling of vector data), so have fewer options for
-customization than other approaches to visualizing polygons.</p>
+<p>Polygon agents work the same way using <code>SpatVector</code>
+polygons (or <code>sf</code> polygons), with
+<code>sp::SpatialPolygons*</code> still supported for backwards
+compatibility. Plotting methods using <code>Plot</code> are optimized
+for speed and are much faster than the default <code>plot</code> methods
+for polygons (via spatial subsampling of vector data), so they have
+fewer options for customization than other approaches to visualizing
+polygons.</p>
 </div>
 </div>
 </div>

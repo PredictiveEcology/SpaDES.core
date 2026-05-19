@@ -36,7 +36,7 @@ as the code will search based on the filename without the file extension."><!-- 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -116,7 +116,8 @@ as the code will search based on the filename without the file extension.</p>
 <span>  cache <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">envir</span>,</span>
 <span>  files <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  <span class="va">...</span></span>
+<span>  <span class="va">...</span>,</span>
+<span>  lazy <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -176,6 +177,15 @@ saving of files specified in <code>inputs(sim)</code>, <code>outputs(sim)</code>
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Additional arguments. See Details.</p></dd>
 
+
+<dt id="arg-lazy">lazy<a class="anchor" aria-label="anchor" href="#arg-lazy"></a></dt>
+<dd><p>Logical. If <code>TRUE</code>, the user objects in <code>sim@.xData</code> are saved
+into a sibling lazy-load DB (a <code>&lt;filename&gt;_xData.rdx</code>/<code>.rdb</code> pair built
+by <code>tools:::makeLazyLoadDB()</code>) alongside the shell <code>simList</code> file,
+rather than monolithically. <code><a href="loadSimList.html">loadSimList()</a></code> detects this layout
+automatically and restores the objects via <code><a href="https://rdrr.io/r/base/lazyload.html" class="external-link">lazyLoad()</a></code>, materializing
+each one only on first access. Defaults to <code>FALSE</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -187,6 +197,9 @@ and a compressed archive (one of <code>.tar.gz</code> if using non-Windows OS or
     <p>There is a family of 2 functions that are mutually useful for saving and
 loading <code>simList</code> objects and their associated files (e.g., file-backed
 <code>Raster*</code>, <code>inputs</code>, <code>outputs</code>, <code>cache</code>) <code>saveSimList()</code>, <code><a href="loadSimList.html">loadSimList()</a></code>.</p>
+<p>The <code>sim@.xData$._sim</code> slot (a circular reference used internally during a
+running simulation) is removed before saving to avoid redundant data.
+It is not needed for a saved/restored <code>simList</code>.</p>
 <p>Additional arguments may be passed via <code>...</code>, including:</p><ul><li><p><code>files</code>: logical indicating whether files should be included in the archive.
 if <code>FALSE</code>, will override <code>cache</code>, <code>inputs</code>, <code>outputs</code>, setting them to <code>FALSE</code>.</p></li>
 <li><p><code>symlinks</code>: a named list of paths corresponding to symlinks, which will be used to substitute

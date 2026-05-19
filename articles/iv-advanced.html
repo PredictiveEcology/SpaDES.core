@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -101,7 +101,7 @@ Chubaty</h4>
                         <h4 data-toc-skip class="author">Eliot J. B.
 McIntire</h4>
             
-            <h4 data-toc-skip class="date">May 07 2026</h4>
+            <h4 data-toc-skip class="date">May 19 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/vignettes/iv-advanced.Rmd" class="external-link"><code>vignettes/iv-advanced.Rmd</code></a></small>
       <div class="hidden name"><code>iv-advanced.Rmd</code></div>
@@ -113,49 +113,158 @@ McIntire</h4>
 <div class="section level2">
 <h2 id="advanced-spades-use">Advanced <code>SpaDES</code> use<a class="anchor" aria-label="anchor" href="#advanced-spades-use"></a>
 </h2>
-<p><em>This vignette is still a work in progress.</em></p>
+<p>This vignette covers tools that become useful once you are building
+or maintaining a substantial <code>SpaDES</code> workflow: monitoring
+memory use across events, and statically checking that a module’s code
+agrees with its declared metadata.</p>
 <div class="section level3">
 <h3 id="memory-monitoring">Memory monitoring<a class="anchor" aria-label="anchor" href="#memory-monitoring"></a>
 </h3>
-<p>While <code>profvis::profvis</code> is an essential tool for memory
-monitoring using deep R internals, it is often not sufficient for a
-discrete event situation. For example, it may be useful to know the
-<em>peak memory use</em> of an event, as this may be the limiting step
-for setting up many parallel instances. There is an experimental tool
-that gets triggered with
-<code>options("spades.memoryUseInterval" = xxx)</code> where
-<code>xxx</code> is a <code>numeric</code> in seconds, e.g.,
-<code>0.2</code>. If this is set, and <code>future</code> and
-<code>future.callr</code> are installed, then whenever a
-<code>spades</code> call is made, the memory use will be assessed at
-that regular interval. The procedure is: 1. spawn a future session
-(i.e., a parallel session) that runs <code>system('ps')</code> which
-lists all processes. It only keeps the process that represents the
-process ID of the main R session; 2. that <code>ps</code> call writes to
-a text file every <code>getOption('spades.memoryUseInterval')</code>; 3.
-if you ran this with a <code>spades</code> call, setting
-<code>options("spades.memoryUseInterval" = 0.5)</code> or some other
-interval (in seconds), it will read that text file into the
-<code>simList</code> at the end (<code>on.exit</code>) of the
-<code>spades</code> call (<em>doing this triggers a file deletion of the
-text file</em>); 4. the object is then in
-<code>sim$.memoryUse$obj</code>.</p>
-<p>At that point, the function <code>memoryUse</code> can be called on
-the <code>simList</code> and it will do a join on the
-<code>sim$.memoryUse$obj</code> with the <code>completed(sim)</code>
-<em>by</em> time stamp, so each event shows its memory use.</p>
+<p><code>profvis::profvis</code> is great for digging into R internals,
+but it doesn’t fit the discrete-event pattern very well. Often the
+question is simpler: which event uses the most memory, and how much?
+That number sets how many parallel runs you can fit on a machine.</p>
+<p><code>SpaDES.core</code> ships a small background sampler. Turn it on
+by setting the option <code>spades.memoryUseInterval</code> to a
+sampling interval in seconds (e.g., <code>0.2</code>). If
+<code>future</code> and <code>future.callr</code> are installed, each
+<code><a href="../reference/spades.html">spades()</a></code> call will then:</p>
+<ol style="list-style-type: decimal">
+<li>spawn a <code>future</code> (parallel) R session that runs
+<code>system('ps')</code> once per interval, keeping only the row for
+the main R process;</li>
+<li>write that to a text file;</li>
+<li>when <code><a href="../reference/spades.html">spades()</a></code> returns, read the file into
+<code>sim@.xData$.memoryUse$obj</code> and delete the file;</li>
+<li>[memoryUse()] joins that table to [completed()] by timestamp, so
+each event is annotated with its memory use.</li>
+</ol>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"future"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">&amp;&amp;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"future.callr"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="st">"spades.memoryUseInterval"</span> <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># run your simInit and spades calls here</span></span>
-<span>  <span class="co"># sim &lt;- simInit()</span></span>
-<span>  <span class="co"># sim &lt;- spades(sim)  </span></span>
-<span>  </span>
-<span>  <span class="fu"><a href="../reference/memoryUse.html">memoryUse</a></span><span class="op">(</span><span class="va">sim</span>, max <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="co"># this should show peak memory use by eventType -- i.e., summarizes if multiple times</span></span>
-<span>  <span class="fu"><a href="../reference/memoryUse.html">memoryUse</a></span><span class="op">(</span><span class="va">sim</span>, max <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># this should show peak memory use by event</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"future.callr"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>spades.memoryUseInterval <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="co"># sim &lt;- simInit(...)</span></span>
+<span>  <span class="co"># sim &lt;- spades(sim)</span></span>
+<span></span>
+<span>  <span class="fu"><a href="../reference/memoryUse.html">memoryUse</a></span><span class="op">(</span><span class="va">sim</span>, max <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># peak memory by event type (summarised across times)</span></span>
+<span>  <span class="fu"><a href="../reference/memoryUse.html">memoryUse</a></span><span class="op">(</span><span class="va">sim</span>, max <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="co"># peak memory for every individual event</span></span>
 <span><span class="op">}</span></span></code></pre></div>
+<p>[memoryUseThisSession()] returns the memory currently used by the
+running R session; useful as a quick sanity check between events.</p>
+</div>
+<div class="section level3">
+<h3 id="static-code-checking">Static code checking<a class="anchor" aria-label="anchor" href="#static-code-checking"></a>
+</h3>
+<p><code><a href="../reference/simInit.html">simInit()</a></code> parses your module’s source and statically
+checks that the code agrees with the metadata: every read of
+<code>sim$x</code> should have <code>x</code> listed in
+<code><a href="../reference/expectsInput.html">expectsInput()</a></code> or <code><a href="../reference/createsOutput.html">createsOutput()</a></code>, every
+parameter access (<code>Par$y</code>, <code>P(sim)$y</code>,
+<code>params(sim)$mod$y</code>) should match a
+<code><a href="../reference/defineParameter.html">defineParameter()</a></code> entry, every <code>doEvent.*</code>
+function should return <code>sim</code>, and so on. Mismatches are
+reported as a structured table with file/line/column locations.</p>
+<p>The checks are controlled by two options:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>spades.moduleCodeChecks <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>    <span class="co"># turn checking on/off</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>spades.codeCheckEngine <span class="op">=</span> <span class="st">"v2"</span><span class="op">)</span>     <span class="co"># "v1" (legacy) or "v2" (new, structured)</span></span></code></pre></div>
+<p>You can also run the checks on a module on disk, without going
+through <code><a href="../reference/simInit.html">simInit()</a></code>. This is handy while authoring or
+refactoring a module:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># returns a data.frame of findings; also prints a grouped report</span></span>
+<span><span class="va">findings</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/codeCheckModule.html">codeCheckModule</a></span><span class="op">(</span><span class="st">"path/to/myModule"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># subset by severity or rule id</span></span>
+<span><span class="va">findings</span><span class="op">[</span><span class="va">findings</span><span class="op">$</span><span class="va">severity</span> <span class="op">==</span> <span class="st">"warning"</span>, <span class="op">]</span></span>
+<span><span class="va">findings</span><span class="op">[</span><span class="va">findings</span><span class="op">$</span><span class="va">id</span> <span class="op">==</span> <span class="st">"param_used_undeclared"</span>, <span class="op">]</span></span></code></pre></div>
+<p>A finding has columns <code>id</code>, <code>severity</code>,
+<code>module</code>, <code>where</code>, <code>name</code>,
+<code>fn</code>, <code>file</code>, <code>line</code>, <code>col</code>,
+<code>message</code>, <code>suggestion</code>. The suggestion is a
+plain-language fix (e.g., “add
+<code>defineParameter('coverThresh', ...)</code> to parameters”). When
+<code><a href="../reference/simInit.html">simInit()</a></code> runs the checks, the same data.frame is stashed
+at <code>sim@.xData$.codeCheck[[moduleName]]</code>.</p>
+<p>Typical findings the checker flags:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th>id</th>
+<th>what it catches</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code>out_declared_unused</code></td>
+<td>output declared in metadata, never assigned in code</td>
+</tr>
+<tr class="even">
+<td><code>out_used_undeclared</code></td>
+<td>
+<code>sim$x &lt;- ...</code> for <code>x</code> not in
+<code><a href="../reference/createsOutput.html">createsOutput()</a></code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>in_declared_unused</code></td>
+<td>input declared, never read</td>
+</tr>
+<tr class="even">
+<td><code>in_used_undeclared</code></td>
+<td>
+<code>sim$x</code> read for <code>x</code> not in
+<code><a href="../reference/expectsInput.html">expectsInput()</a></code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>param_declared_unused</code></td>
+<td>
+<code>defineParameter("x", ...)</code> but no <code>Par$x</code> in
+the code</td>
+</tr>
+<tr class="even">
+<td><code>param_used_undeclared</code></td>
+<td>
+<code>Par$x</code> / <code>P(sim)$x</code> for <code>x</code> not
+declared</td>
+</tr>
+<tr class="odd">
+<td><code>unresolved_accessor</code></td>
+<td>
+<code>sim[[expr]]</code> or <code>get(var, envir=envir(sim))</code>
+— can’t be checked statically</td>
+</tr>
+<tr class="even">
+<td><code>must_return_sim</code></td>
+<td>
+<code>doEvent.*</code> not ending with
+<code>return(invisible(sim))</code>
+</td>
+</tr>
+<tr class="odd">
+<td><code>must_assign_to_sim</code></td>
+<td>
+<code>scheduleEvent(...)</code> or <code>saveFiles(...)</code> not
+assigned back to <code>sim</code>
+</td>
+</tr>
+<tr class="even">
+<td><code>module_named_object</code></td>
+<td>
+<code>sim$&lt;moduleName&gt; &lt;- ...</code> (forbidden)</td>
+</tr>
+<tr class="odd">
+<td><code>conflicting_fn_unqualified</code></td>
+<td>bare <code>levels</code>/<code>scale</code>/<code>which.max</code>
+(ambiguous with <code>raster::</code>)</td>
+</tr>
+</tbody>
+</table>
+<p>See [codeCheckModule()] for details.</p>
 </div>
 </div>
 <div class="section level2">

@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -141,8 +141,7 @@ instead of <code>data.frame</code> to implement the event queue (because it is m
     <div id="references">
     <h2>References</h2>
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-San Francisco, CA: No Starch Press, Inc..
-Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">https://nostarch.com/artofr.htm</a></p>
+San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -156,7 +155,16 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="simInit.html">simInit</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.02565598 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp03crdC/myProject/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp03crdC/myProject/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp03crdC/myProject/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp03crdC/myProject/modules'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp03crdC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May19 23:33:15 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.03575778 secs</span>
 <span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">scheduleEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span>, <span class="st">"fireSpread"</span>, <span class="st">"burn"</span><span class="op">)</span> <span class="co"># default priority</span></span></span>
 <span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">scheduleEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span>, <span class="st">"fireSpread"</span>, <span class="st">"burn"</span>, <span class="fu"><a href="priority.html">.normal</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># default priority</span></span></span>
 <span class="r-in"><span></span></span>
@@ -165,7 +173,7 @@ Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">h
 <span class="r-in"><span></span></span>
 <span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">scheduleEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span>, <span class="st">"fireSpread"</span>, <span class="st">"burn"</span>, <span class="fu"><a href="priority.html">.highest</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># highest priority</span></span></span>
 <span class="r-in"><span> <span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">scheduleEvent</span><span class="op">(</span><span class="va">sim</span>, <span class="fu"><a href="https://rdrr.io/r/stats/time.html" class="external-link">time</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">+</span> <span class="fl">1.0</span>, <span class="st">"fireSpread"</span>, <span class="st">"burn"</span>, <span class="fu"><a href="priority.html">.lowest</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># lowest priority</span></span></span>
-<span class="r-in"><span> <span class="fu"><a href="simList-accessors-events.html">events</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># shows all scheduled events, with eventTime and priority</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="simList-accessors-events.html">events</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="co"># shows all scheduled , with eventTime and priority</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     eventTime moduleName eventType eventPriority</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;num&gt;     &lt;char&gt;    &lt;char&gt;         &lt;num&gt;</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>  1:         0 checkpoint      init             0</span>

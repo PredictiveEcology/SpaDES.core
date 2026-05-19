@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -123,7 +123,9 @@ the simulations will only do the events indicated here. If a named list, the nam
 must correspond to the modules and the character vectors can be specific events within
 each of the named modules. With the <code>list</code> form, all unspecified modules
 will run <em>all</em> their events, including internal spades modules, e.g., <code>save</code>,
-that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. See example.</p></dd>
+that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. However, if NOT a named list
+internal spades modules' events will not run, if not listed in the character vector.
+See example.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -146,8 +148,7 @@ submodules to the simulation. We use S4 classes and methods.</p>
     <div id="references">
     <h2>References</h2>
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-San Francisco, CA: No Starch Press, Inc..
-Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">https://nostarch.com/artofr.htm</a></p>
+San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.</p>
     </div>
     <div id="author">
     <h2>Author</h2>

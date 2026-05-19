@@ -25,7 +25,7 @@ instead of data.frame to implement the event queue (because it is much faster)."
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -185,7 +185,9 @@ the simulations will only do the events indicated here. If a named list, the nam
 must correspond to the modules and the character vectors can be specific events within
 each of the named modules. With the <code>list</code> form, all unspecified modules
 will run <em>all</em> their events, including internal spades modules, e.g., <code>save</code>,
-that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. See example.</p></dd>
+that get invoked with the <code>outputs</code> argument in  <code>simInit</code>. However, if NOT a named list
+internal spades modules' events will not run, if not listed in the character vector.
+See example.</p></dd>
 
 
 <dt id="arg--plots">.plots<a class="anchor" aria-label="anchor" href="#arg--plots"></a></dt>
@@ -316,8 +318,7 @@ with the one just edited. There may be some unexpected consequences if the
     <div id="references">
     <h2>References</h2>
     <p>Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-San Francisco, CA: No Starch Press, Inc..
-Retrieved from <a href="https://nostarch.com/artofr.htm" class="external-link">https://nostarch.com/artofr.htm</a></p>
+San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
@@ -351,6 +352,18 @@ uses <code><a href="https://reproducible.predictiveecology.org/reference/Cache.h
 <span class="r-in"><span>   paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>modulePath <span class="op">=</span> <span class="fu"><a href="getSampleFiles.html">getSampleModules</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempdir</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example of `events` misuse: only the .inputObjects runs because "init"</span></span></span>
+<span class="r-in"><span><span class="co"># (an internal event) was not listed, does not run and, therefore, does</span></span></span>
+<span class="r-in"><span><span class="co"># not schedule other events</span></span></span>
+<span class="r-in"><span><span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".inputObjects"</span>, <span class="st">"burn"</span>, <span class="st">"move"</span>, <span class="st">"stats"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="simList-accessors-events.html">completed</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Example of correct use of `events`: this adequately narrows down the</span></span></span>
+<span class="r-in"><span><span class="co"># events to be executed by a particular module, without affecting the</span></span></span>
+<span class="r-in"><span><span class="co"># events of other modules or internal events</span></span></span>
+<span class="r-in"><span><span class="fu">spades</span><span class="op">(</span><span class="va">mySim</span>, events <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>caribouMovement <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">".inputObjects"</span>, <span class="st">"init"</span>, <span class="st">"move"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="simList-accessors-events.html">completed</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span><span class="va">opts</span><span class="op">)</span> <span class="co"># reset options</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>

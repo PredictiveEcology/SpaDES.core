@@ -38,7 +38,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
       </span>
     </div>
 
@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">Eliot J. B.
 McIntire</h4>
             
-            <h4 data-toc-skip class="date">May 07 2026</h4>
+            <h4 data-toc-skip class="date">May 19 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/vignettes/iii-cache.Rmd" class="external-link"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -109,7 +109,7 @@ McIntire</h4>
     
     
 <p>As part of a reproducible work flow, caching of various function
-calls are a critical component. Down the road, it is likely that an
+calls is a critical component. Down the road, it is likely that an
 entire work flow from raw data to publication, decision support, report
 writing, presentation building etc., could be built and be reproducible
 anywhere, on demand. The <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache</a></code> function is
@@ -120,8 +120,7 @@ applications that are transparent and tied to the raw data that may be
 have built several customizations within the <code>SpaDES</code>
 package. Important to this is dealing correctly with the
 <code>simList</code>, which is an object that has slot that is an
-environment. But more important are the various tools that can be used
-at higher levels, <em>i.e.</em>, not just for “standard” functions.</p>
+environment.</p>
 <div class="section level2">
 <h2 id="caching-as-part-of-spades">Caching as part of <code>SpaDES</code><a class="anchor" aria-label="anchor" href="#caching-as-part-of-spades"></a>
 </h2>
@@ -135,14 +134,11 @@ attribute, using <code>format</code> if a function, and
 environment.</p></li>
 <li><p>When used within <code>SpaDES</code> modules, <code>Cache</code>
 (capital C) does not require that the argument <code>cachePath</code> be
-specified. If called from inside a SpaDES module, <code>Cache</code>
-will use the <code>cachePath</code> argument from a call to
-<code>cachePath(sim)</code>, taking the <code>sim</code> from the call
-stack. Similarly, if no <code>cachePath</code> argument is specified,
-then it will use <code>getOption("spades.cachePath")</code>, which will,
-by default, be a temporary location with no persistence between R
-sessions! To persist between sessions, use
-<code>SpaDES::setPaths()</code> every session.</p></li>
+specified. <code>Cache</code> will use the <code>cachePath</code>
+argument from a call to <code>cachePath(sim)</code>, taking the
+<code>sim</code> from the call stack. Similarly, if no
+<code>cachePath</code> argument is specified, then it will use
+<code>getOption("reproducible.cachePath")</code>.</p></li>
 </ul>
 <p>In a <code>SpaDES</code> context, there are several levels of caching
 that can be used as part of a reproducible workflow. Each level can be
@@ -180,7 +176,7 @@ call.</p>
 <span>  <span class="va">outSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span>, notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   3.496   0.257   3.753</span></span></code></pre>
+<span><span class="co">##   1.306   0.034   1.341</span></span></code></pre>
 <p>Note that if there were any visualizations (here we turned them off
 with <code>.plotInitialTime = NA</code> above) they will happen the
 first time through, but not the cached times.</p>
@@ -190,7 +186,7 @@ first time through, but not the cached times.</p>
 <span>  <span class="va">outSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.637   0.000   0.637</span></span></code></pre>
+<span><span class="co">##   0.412   0.000   0.412</span></span></code></pre>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">outSim</span>, <span class="va">outSimCached</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Length mismatch: comparison on first 5 components"</span></span></code></pre>
@@ -222,14 +218,14 @@ support, etc.).</p>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   1.099   0.000   1.099</span></span></code></pre>
+<span><span class="co">##   1.378   0.375   1.372</span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.798   0.001   0.800</span></span></code></pre>
+<span><span class="co">##   0.540   0.377   0.917</span></span></code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are
 identical, not <code>fireSpread</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -281,44 +277,25 @@ for <code>randomLandscapes</code>, but we add to it a cache for only the
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.478   0.005   0.484</span></span></code></pre>
+<span><span class="co">##   0.778   0.241   0.611</span></span></code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.237   0.001   0.237</span></span></code></pre>
+<span><span class="co">##   0.219   0.175   0.394</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="function-level-caching">Function-level caching<a class="anchor" aria-label="anchor" href="#function-level-caching"></a>
 </h3>
-<p>Any function can be cached using:
-<code>Cache(FUN = functionName, ...)</code>.</p>
-<p>This will be a slight change to a function call, such as:
-<code>projectRaster(raster, crs = crs(newRaster))</code> to
-<code>Cache(projectRaster, raster, crs = crs(newRaster))</code>.</p>
+<p>Function-level caching is provided by
+<code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache()</a></code> and is documented there; see
+<code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">?reproducible::Cache</a></code> for the full set of arguments and
+behaviour. Any call can be wrapped in <code><a href="../reference/robustDigest.html">Cache()</a></code> so that
+re-running it returns the stored result instead of recomputing:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"SpaDES.tools"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">ras</span> <span class="op">&lt;-</span> <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/ext.html" class="external-link">ext</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1e3</span>, <span class="fl">0</span>, <span class="fl">1e3</span><span class="op">)</span>, res <span class="op">=</span> <span class="fl">1</span>, vals <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>    <span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="fu">SpaDES.tools</span><span class="fu">::</span><span class="fu"><a href="https://spades-tools.predictiveecology.org/reference/neutralLandscapeMap.html" class="external-link">neutralLandscapeMap</a></span><span class="op">(</span><span class="va">ras</span><span class="op">)</span>,</span>
-<span>                 cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>,</span>
-<span>                 userTags <span class="op">=</span> <span class="st">"neutralLandscapeMap"</span>,</span>
-<span>                 notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># faster the second time</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
-<span>    <span class="va">mapCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="fu">SpaDES.tools</span><span class="fu">::</span><span class="fu"><a href="https://spades-tools.predictiveecology.org/reference/neutralLandscapeMap.html" class="external-link">neutralLandscapeMap</a></span><span class="op">(</span><span class="va">ras</span><span class="op">)</span>,</span>
-<span>                       cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>,</span>
-<span>                       userTags <span class="op">=</span> <span class="st">"neutralLandscapeMap"</span><span class="op">)</span></span>
-<span>  <span class="op">}</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co">## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()</span></span>
-<span>  <span class="fu"><a href="https://rspatial.github.io/terra/reference/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">map</span><span class="op">[</span><span class="op">]</span>, <span class="va">mapCached</span><span class="op">[</span><span class="op">]</span><span class="op">)</span> </span>
-<span><span class="op">}</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
+<code class="sourceCode R"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">3e6</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rspatial.github.io/terra/reference/summarize-generics.html" class="external-link">mean</a></span><span class="op">(</span><span class="op">)</span><span class="op">}</span> <span class="op">|&gt;</span> <span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="working-with-the-cache-manually">Working with the Cache manually<a class="anchor" aria-label="anchor" href="#working-with-the-cache-manually"></a>
@@ -332,15 +309,30 @@ several helpers in the <code>reproducible</code> package, including
 <code>saveToCache</code> that may be useful. Also, one can access cached
 items manually (rather than simply rerunning the same <code>Cache</code>
 function again).</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cacheDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/viewCache.html" class="external-link">showCache</a></span><span class="op">(</span><span class="va">mySim</span>, userTags <span class="op">=</span> <span class="st">"neutralLandscapeMap"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co">## get the RasterLayer that was produced with neutralLandscapeMap()</span></span>
-<span><span class="va">map</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/CacheHelpers.html" class="external-link">loadFromCache</a></span><span class="op">(</span>cacheId <span class="op">=</span> <span class="va">cacheDB</span><span class="op">$</span><span class="va">cacheId</span>, cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/clearPlot.html" class="external-link">clearPlot</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://quickplot.predictiveecology.org/reference/Plot.html" class="external-link">Plot</a></span><span class="op">(</span><span class="va">map</span><span class="op">)</span></span></code></pre></div>
-<p><img src="iii-cache_files/figure-html/manual-cache-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## cache something, then retrieve it manually rather than re-running Cache()</span></span>
+<span><span class="fu"><a href="../reference/robustDigest.html">Cache</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>, cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, userTags <span class="op">=</span> <span class="st">"manualExample"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##  [1]  0.6452220 -0.1071616  1.5687327  1.0917958 -0.7288291  1.3640369 -0.6072833 -0.9373484  0.1348590 -0.3572738</span></span>
+<span><span class="co">## attr(,".Cache")</span></span>
+<span><span class="co">## attr(,".Cache")$newCache</span></span>
+<span><span class="co">## [1] TRUE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## attr(,"tags")</span></span>
+<span><span class="co">## [1] "cacheId:89c7ffbc299fd29a"</span></span>
+<span><span class="co">## attr(,"callInCache")</span></span>
+<span><span class="co">## [1] ""</span></span></code></pre>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cacheDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/viewCache.html" class="external-link">showCache</a></span><span class="op">(</span><span class="va">mySim</span>, userTags <span class="op">=</span> <span class="st">"manualExample"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/CacheHelpers.html" class="external-link">loadFromCache</a></span><span class="op">(</span>cacheId <span class="op">=</span> <span class="va">cacheDB</span><span class="op">$</span><span class="va">cacheId</span>, cachePath <span class="op">=</span> <span class="fu"><a href="../reference/simList-accessors-paths.html">cachePath</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##  [1]  0.6452220 -0.1071616  1.5687327  1.0917958 -0.7288291  1.3640369 -0.6072833 -0.9373484  0.1348590 -0.3572738</span></span>
+<span><span class="co">## attr(,".Cache")</span></span>
+<span><span class="co">## attr(,".Cache")$newCache</span></span>
+<span><span class="co">## [1] TRUE</span></span>
+<span><span class="co">## </span></span>
+<span><span class="co">## attr(,"tags")</span></span>
+<span><span class="co">## [1] "cacheId:89c7ffbc299fd29a"</span></span>
+<span><span class="co">## attr(,"callInCache")</span></span>
+<span><span class="co">## [1] ""</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -359,9 +351,9 @@ accommodated by caching.</p>
 <li>To run this would have a nested structure with the following
 functions:</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a><span class="fu">simInit</span>() <span class="sc">-</span><span class="ot">-&gt;</span> many .inputObjects calls</span>
-<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a></span>
-<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a><span class="fu">spades</span>() call <span class="sc">-</span><span class="ot">-&gt;</span> many module calls <span class="sc">-</span><span class="ot">-&gt;</span> many event calls <span class="sc">-</span><span class="ot">-&gt;</span> many <span class="cf">function</span> calls</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">simInit</span>() <span class="sc">-</span><span class="ot">-&gt;</span> many .inputObjects calls</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="fu">spades</span>() call <span class="sc">-</span><span class="ot">-&gt;</span> many module calls <span class="sc">-</span><span class="ot">-&gt;</span> many event calls <span class="sc">-</span><span class="ot">-&gt;</span> many <span class="cf">function</span> calls</span></code></pre></div>
 <p>Lets say we start to introduce caching to this structure. We start
 from the “inner” most functions that we could imaging Caching would be
 useful. Lets say there are some GIS operations, like
@@ -397,7 +389,7 @@ during the <code>simInit</code></p>
 <p>Some modules are inherently non-random, such as GIS modules, or
 parameter fitting statistical modules. We expect these to be identical
 results each time, so we can safely cache the entire module.</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">parameters</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>  FireModule <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>.useCache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
