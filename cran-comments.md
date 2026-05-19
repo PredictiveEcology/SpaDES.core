@@ -4,8 +4,13 @@ This is a minor release. Highlights:
 
 * New opt-in v2 static code-checking engine (`options(spades.codeCheckEngine = "v2")`),
   plus standalone `codeCheckModule()` / `checkModuleMetadata()` APIs.
-* The `NLMR` dependency has been fully removed; sample modules and vignettes now
-  use `SpaDES.tools::neutralLandscapeMap()`.
+* `NLMR` is no longer a hard dependency. Sample modules and vignettes call
+  `SpaDES.tools::neutralLandscapeMap()`, which uses a built-in generator with
+  `SpaDES.tools (>= 2.1.2)`; with the current CRAN `SpaDES.tools` (2.1.1) it
+  falls back to a path that uses `NLMR`. `NLMR` is therefore retained as a
+  Suggested package, available from the additional repository
+  (<https://predictiveecology.r-universe.dev>). It can be dropped entirely
+  once `SpaDES.tools` 2.1.2 reaches CRAN.
 * `Plots()` refactor: deterministic filenames, optional caching, and direct
   `ggplot` input.
 * Per-event cache key change and a changed `restartSpades()` default
@@ -31,11 +36,16 @@ This is a minor release. Highlights:
 ### Development R version
 * Ubuntu 24.04                 (GitHub), R-devel
 * Ubuntu 24.04                  (local), R-devel
-* Windows                 (win-builder), R-devel (TODO: fill exact revision from win-builder result)
+* Windows                 (win-builder), R-devel
 
 ## R CMD check results
 
-There are no errors, warnings, or notes in any of the above.
+There were no ERRORs or WARNINGs.
+
+There is one NOTE: the suggested package `NLMR` is not available from a
+mainstream repository. It is available from the additional repository
+declared in `DESCRIPTION` (<https://predictiveecology.r-universe.dev>),
+and the `Description` field documents how to install it.
 
 ## Downstream dependencies
 

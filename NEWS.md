@@ -62,21 +62,24 @@
   function `checkModuleMetadata()` runs the checks on a module file
   on disk (no `simInit()` needed). Adding a new check is one entry
   in the registry — no surgery elsewhere. Closes #325.
-* Sample module `randomLandscapes` (`inst/sampleModules/randomLandscapes`) no
-  longer requires `NLMR`. It now uses the new `type = "gaussian"` default of
-  `SpaDES.tools::neutralLandscapeMap()` (built-in, dependency-free) with a
-  per-layer `smooth` argument to control autocorrelation length. `NLMR`
-  removed from `reqdPkgs`; bumped `SpaDES.tools` requirement to `>= 2.1.1.9001`.
-  Step toward closing #334.
-* `NLMR` dependency fully removed from the package: dropped from `Suggests`
-  and `Remotes` in `DESCRIPTION`, removed from vignettes
-  (`i-introduction.Rmd`, `ii-modules.Rmd`, `iii-cache.Rmd`) and their
-  `vignette_pkgs` lists, removed from test helpers (`helper-initTests.R`'s
-  `sampleModReqdPkgs`) and from the `skip_if_not_installed("NLMR")` /
-  `skip_on_cran()` guards in `test-simulation.R` and
-  `test-module-deps-methods.R`. Mentions in `README.md` and `cran-comments.md`
-  removed. All neutral-landscape generation is now via
-  `SpaDES.tools::neutralLandscapeMap()`. Closes #334.
+* Sample module `randomLandscapes` (`inst/sampleModules/randomLandscapes`)
+  now calls `SpaDES.tools::neutralLandscapeMap()` in a version-adaptive
+  way: with `SpaDES.tools (>= 2.1.2)` it uses the new built-in
+  `type = "gaussian"` generator (dependency-free) and the per-layer
+  `smooth` argument to control autocorrelation length; with the current
+  CRAN `SpaDES.tools` (2.1.1) it falls back to the `nlm_mpd` generator,
+  which requires `NLMR`. `NLMR` is not in the module's `reqdPkgs`; the
+  `SpaDES.tools` requirement is relaxed to `>= 2.1.1`. Step toward
+  closing #334.
+* `NLMR` is no longer a hard dependency, but it is **not** fully removed.
+  It remains a Suggested package, available from the additional
+  repository <https://predictiveecology.r-universe.dev> (declared via
+  `Additional_repositories`, with installation instructions in the
+  `DESCRIPTION` `Description` field). It is needed only when
+  neutral-landscape generation runs against `SpaDES.tools` < 2.1.2;
+  it can be dropped entirely once `SpaDES.tools` 2.1.2 reaches CRAN. The
+  `Remotes` entry for `NLMR` was removed (no longer needed). Partial
+  progress on #334.
 * Documentation: vignette accuracy pass. Fixed: typo `SpaDES.taols` →
   `SpaDES.tools` (in `i-introduction` and `ii-modules`); wrong option name
   `spades.modulesPath` → `spades.modulePath` (three places); broken sentence
