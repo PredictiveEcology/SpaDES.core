@@ -76,13 +76,15 @@ Suggests:
     RSQLite,
     rstudioapi,
     sp,
-    SpaDES.tools (>= 2.1.1.9001),
+    NLMR (>= 1.1.1),
+    SpaDES.tools (>= 2.1.1),
     tcltk,
     testthat (>= 1.0.2),
     withr
 Remotes:
     PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.tools@development
+Additional_repositories: https://predictiveecology.r-universe.dev/
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
