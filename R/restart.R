@@ -89,7 +89,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' s <- restartSpades(s)
 #'
 #' }
-restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = TRUE,
+restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = TRUE,
                           verbose = getOption("reproducible.verbose", 1L), ...) {
   message("This is experimental and should be used with caution.")
 
@@ -113,6 +113,17 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
+  
+  if (numMods == 0) {
+    message("There no saved state prior to any changes that happened in ",
+            module, ". Would you like to proceed from the last state of the ",
+            "simList anyway? i.e., any changes that had already happened ",
+            "inside the module: ", module, " before the fail will be kept...")
+    continue <- readline("Would you like to restart anyway? (y or n) ")
+    continue <- tolower(substr(continue, start = 1, stop = 1))
+    if (continue %in% "y")
+      numMods <- 1
+  }
   if (numMods > 0) {
     com <- completed(sim)
     etSecs <- sum(com[, et := difftime(get(._txtClockTime), get(._txtPrevEventTimeFinish), units = "secs"),
@@ -134,9 +145,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     sim@completed[[last]][[._txtClockTime]] <- st
 
     eventsToReplayDT <- events(sim)[seq_len(numMods)]
-    if (numMods > length(sim$.recoverableObjs))
-      message("Cannot replay ", numMods, " events as requested by numMods; ",
-              "there are only ", length(sim$.recoverableObjs), " that can be recovered.")
     if (numMods < length(sim$.recoverableObjs))
       sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
     eventIndices <- seq_len(NROW(eventsToReplayDT))
@@ -144,7 +152,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
     # names(sim$.recoverableObjs) <- eventsToReplayDT$moduleName[eventIndicesRev]
 
     modules <- eventsToReplayDT$moduleName[eventIndicesRev]
-    modules <- unique(modules)
+    # modules <- modules
     names(modules) <- modules
     modules <- modules[!modules %in% unlist(.coreModules())]
     ## move objects back in place
@@ -173,30 +181,61 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
           objsToCopy <- objsToCopy[keeps]
         }
 
-        fd1 <- lapply(objsToCopy, function(obj) .robustDigest(obj))
-        objNames <- objNames[objNames %in% ls(sim@.xData)]
-        fd2 <- lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj))
-        if (!is.null(fd2)) {
-          fd1 <- fd1[match(names(fd2), names(fd1))]
-          stopifnot(all.equal(sort(names(fd1)), sort(names(fd2))))
-          fd1 <- fd1[!unlist(unname(fd1)) %in% unlist(unname(fd2))]
+        # Turns out it is much slower in most cases to digest, then "only copy changed"
+        if (FALSE) {
+          # fd1 is the current state of the objects in the recoveryObjs, i.e., the ones to get
+          # fd2 is the state of the objects in the sim
+          # Don't use `digest::digest` (of course) because it fails on SpatRaster, for example
+          # fd1 <- lapply(objsToCopy, function(obj) obj2 <- digest::digest(obj, algo = "xxhash64"))
+          fd1 <- lapply(objsToCopy, function(obj) .robustDigest(obj))
+          # the dots in the sim include e.g., .recoverableObjs now; so no ls(all.names = TRUE)
+          objNames <- objNames[objNames %in% ls(sim@.xData)]
+          fd2 <- lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj))
+          # fd2 <- lapply(mget(objNames, envir = sim@.xData), function(obj) obj2 <- digest::digest(obj, algo = "xxhash64"))
+          if (!is.null(fd2)) {
+            changed <- setdiffNamed(fd1, fd2)
+            fd1 <- changed
+          }
+          ## move the changed ones to the simList
+          if (NROW(fd1)) {
+            # list2env(objsToCopy[names(fd1)], envir = sim@.xData)
+            list2env(Copy(objsToCopy[names(fd1)]), envir = sim@.xData)
+          }
         }
-        ## move the changed ones to the simList
-        if (NROW(fd1)) {
-          list2env(objsToCopy[names(fd1)], envir = sim@.xData)
+        if (NROW(objsToCopy)) {
+          message(cli::col_blue("Setting all changed objects to their values at the start of ", modules[event]))
+          list2env(Copy(objsToCopy), envir = sim@.xData)
+        } else {
+          message(cli::col_blue("no objects to reset/recover in ", modules[event], ":",
+                                rev(tail(completed(sim), max(eventIndices))$eventType)[event]))
         }
+
+
       }
 
       if (length(sim$.recoverableModObjs)) {
-        modObjNames <- names(sim$.recoverableModObjs[[event]])
-        modObjEnv <- sim[[dotObjs]][[modules[event]]] # $.objects
-        modObjLs <- ls(modObjEnv)
-        if (length(modObjLs)) { # there are some --> maybe need to delete them
-          toDelete <- setdiff(modObjLs, modObjNames)
-          if (length(toDelete)) {
-            rm(list = toDelete, envir = modObjEnv)
+        if (FALSE) {
+          modObjNames <- names(sim$.recoverableModObjs[[event]])
+          modObjsToCopy <- sim$.recoverableModObjs[[event]]
+          modObjEnv <- sim[[dotObjs]][[modules[event]]] # $.objects
+          modObjLs <- ls(modObjEnv)
+          fd1 <- lapply(modObjsToCopy, function(obj) .robustDigest(obj))
+          modObjNames <- modObjNames[modObjNames %in% modObjLs]
+          fd2 <- lapply(mget(modObjNames, envir = modObjEnv), function(obj) .robustDigest(obj))
+          if (!is.null(fd2)) {
+            changed <- setdiffNamed(fd1, fd2)
+            fd1 <- changed
+          }
+
+          if (NROW(fd1)) {
+            # list2env(objsToCopy[names(fd1)], envir = sim@.xData)
+            list2env(Copy(modObjsToCopy[names(fd1)]), envir = modObjEnv)
           }
         }
+        modObjEnv <- sim[[dotObjs]][[modules[event]]] # $.objects
+        modObjsToCopy <- sim$.recoverableModObjs[[event]]
+        list2env(Copy(modObjsToCopy), envir = modObjEnv)
+
       }
 
       message(cli::col_blue("Reversing event: ",
@@ -204,9 +243,6 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
                                   paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
       invisible()
     })
-
-    ## Once reversed, remove the .recoverableObjs
-    sim$.recoverableObjs <- NULL
 
     # modules <- if (!is.list(module)) as.list(module) else module
 
@@ -262,8 +298,17 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = Inf, restart = 
   })
   options(opt)
 
-  if (restart)
+  ## Once reversed, remove the .recoverableObjs
+  sim$.recoverableObjs <- NULL
+
+  if (restart) {
+    # All packages are guaranteed already loaded in this session; skip the
+    # Require() call in loadPkgs which can hang non-interruptibly (dyn.load on
+    # an NFS-backed .so) when packages are touched again unnecessarily.
+    opts <- options(spades.loadReqdPkgs = FALSE)
+    on.exit(options(opts), add = TRUE)
     sim <- spades(sim, ...)
+  }
   # } else {
   #   message("There was no interrupted spades call; returning sim as is")
   # }

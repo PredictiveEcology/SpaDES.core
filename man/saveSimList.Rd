@@ -14,7 +14,8 @@ saveSimList(
   cache = FALSE,
   envir,
   files = TRUE,
-  ...
+  ...,
+  lazy = FALSE
 )
 }
 \arguments{
@@ -52,6 +53,13 @@ silently converted to an archive file with the appropriate extension e.g.,
 saving of files specified in \code{inputs(sim)}, \code{outputs(sim)} or the cache.}
 
 \item{...}{Additional arguments. See Details.}
+
+\item{lazy}{Logical. If \code{TRUE}, the user objects in \code{sim@.xData} are saved
+into a sibling lazy-load DB (a \verb{<filename>_xData.rdx}/\code{.rdb} pair built
+by \code{tools:::makeLazyLoadDB()}) alongside the shell \code{simList} file,
+rather than monolithically. \code{\link[=loadSimList]{loadSimList()}} detects this layout
+automatically and restores the objects via \code{\link[=lazyLoad]{lazyLoad()}}, materializing
+each one only on first access. Defaults to \code{FALSE}.}
 }
 \value{
 Invoked for side effects of saving both a \code{.qs2} (or \code{.rds}) file,
@@ -77,6 +85,10 @@ as the code will search based on the filename without the file extension.
 There is a family of 2 functions that are mutually useful for saving and
 loading \code{simList} objects and their associated files (e.g., file-backed
 \verb{Raster*}, \code{inputs}, \code{outputs}, \code{cache}) \code{\link[=saveSimList]{saveSimList()}}, \code{\link[=loadSimList]{loadSimList()}}.
+
+The \code{sim@.xData$._sim} slot (a circular reference used internally during a
+running simulation) is removed before saving to avoid redundant data.
+It is not needed for a saved/restored \code{simList}.
 
 Additional arguments may be passed via \code{...}, including:
 \itemize{

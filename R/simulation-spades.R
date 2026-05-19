@@ -38,8 +38,7 @@ savedSimEnv <- function(envir = .GlobalEnv) {
 #' @return Returns the modified `simList` object.
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @author Alex Chubaty
 #' @export
@@ -399,8 +398,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #' @author Alex Chubaty
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @examples
 #'  sim <- simInit()
@@ -412,7 +410,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 #'
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
 #'  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
-#'  events(sim) # shows all scheduled events, with eventTime and priority
+#'  events(sim) # shows all scheduled , with eventTime and priority
 scheduleEvent <- function(sim,
                           eventTime,
                           moduleName,
@@ -498,8 +496,7 @@ scheduleEvent <- function(sim,
 #' @author Eliot McIntire
 #'
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @examples
 #'   sim <- simInit(times = list(start = 0, end = 2))
@@ -666,7 +663,9 @@ scheduleConditionalEvent <- function(sim,
 #'   must correspond to the modules and the character vectors can be specific events within
 #'   each of the named modules. With the `list` form, all unspecified modules
 #'   will run *all* their events, including internal spades modules, e.g., `save`,
-#'   that get invoked with the `outputs` argument in  `simInit`. See example.
+#'   that get invoked with the `outputs` argument in  `simInit`. However, if NOT a named list
+#'   internal spades modules' events will not run, if not listed in the character vector.
+#'   See example.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
 #'            This will be included in the `Cache` call, so will be unique
@@ -800,14 +799,13 @@ scheduleConditionalEvent <- function(sim,
 #' See <https://github.com/PredictiveEcology/SpaDES/wiki/Debugging> for details.
 #'
 #' @author Alex Chubaty and Eliot McIntire
-#' @importFrom cli col_blue col_magenta
+#' @importFrom cli ansi_strip col_blue col_magenta start_app
 #' @importFrom data.table setDTthreads
 #' @seealso vignettes
 #' @export
 #' @rdname spades
 #' @references Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-#'             San Francisco, CA: No Starch Press, Inc..
-#'             Retrieved from <https://nostarch.com/artofr.htm>
+#'             San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 #'
 #' @examples
 #' \donttest{
@@ -827,6 +825,18 @@ scheduleConditionalEvent <- function(sim,
 #'    paths = list(modulePath = getSampleModules(tempdir()))
 #'   )
 #'   spades(mySim)
+#'
+#' # Example of `events` misuse: only the .inputObjects runs because "init"
+#' # (an internal event) was not listed, does not run and, therefore, does
+#' # not schedule other events
+#' spades(mySim, events = c(".inputObjects", "burn", "move", "stats"))
+#' completed(mySim)
+#'
+#' # Example of correct use of `events`: this adequately narrows down the
+#' # events to be executed by a particular module, without affecting the
+#' # events of other modules or internal events
+#' spades(mySim, events = list(caribouMovement = c(".inputObjects", "init", "move")))
+#' completed(mySim)
 #'
 #'   options(opts) # reset options
 #' }
@@ -914,6 +924,11 @@ setMethod(
         debug <- unlist(debug)
       # }
     }
+    if (!identical(debug, getOption("spades.debug"))) {
+      opts <- options("spades.debug" = debug)
+      on.exit(options(opts), add = TRUE)
+    }
+
 
     ## need to recheck package loading because `simInit` may have been cached
     if (getOption("spades.loadReqdPkgs", TRUE)) {
@@ -922,6 +937,9 @@ setMethod(
     }
 
     sim <- withCallingHandlers({
+      cli::start_app(output = "message", .auto_close = TRUE, .envir = environment())
+      .pkgEnv$.inProgressBar <- FALSE
+      .pkgEnv$.progressLastShown <- NULL
 
       ## RecoverMode Step 1 -- set up
       recoverModeTypo()
@@ -1271,13 +1289,39 @@ setMethod(
       }
     },
     message = function(m) {
-      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
-        logging::loginfo(m$message)
-      } else {
-        if (isTRUE(any(grepl("\b", m$message)))) {
-          m$message <- paste0("\b", gsub("\b *", " ", m$message), "\b")
+      msg <- m$message
+      # Detect cli progress ticks routed through message() by start_app(output="message").
+      # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
+      # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
+      # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
+      # are intentionally excluded so colored regular messages are not mistaken for ticks.
+      if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
+        clean <- trimws(cli::ansi_strip(msg))
+        if (nchar(clean) == 0L) {
+          tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+          return()
         }
-        message(loggingMessage(m$message))
+        now <- Sys.time()
+        if (!isTRUE(.pkgEnv$.inProgressBar)) {
+          .pkgEnv$.inProgressBar <- TRUE
+          .pkgEnv$.progressLastShown <- now
+          message(loggingMessage(clean))
+        } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
+                   getOption("spades.progressInterval", 2)) {
+          message(loggingMessage(clean))
+          .pkgEnv$.progressLastShown <- now
+        }
+        tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+        return()
+      }
+      .pkgEnv$.inProgressBar <- FALSE
+      if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
+        logging::loginfo(msg)
+      } else {
+        if (isTRUE(any(grepl("\b", msg)))) {
+          msg <- paste0("\b", gsub("\b *", " ", msg), "\b")
+        }
+        message(loggingMessage(msg))
       }
       # This will "muffle" the original message
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -1409,28 +1453,36 @@ setMethod(
     modCall <- get(moduleCall, envir = fnEnv)
     # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
 
-    expression(Cache(FUN =
-                       modCall(
-                         sim = sim,
-                         eventTime = cur[["eventTime"]], eventType = cur[["eventType"]]),
-                     # debugCache = "quick",
-                     .objects = moduleSpecificObjects,
-                     notOlderThan = notOlderThan,
-                     outputObjects = moduleSpecificOutputObjects,
-                     classOptions = classOptions,
-                     showSimilar = showSimilar,
-                     cachePath = sim@paths[["cachePath"]],
-                     .functionName = paste0(moduleCall, "::", cur[["eventType"]]),
-                     verbose = verbose,
-                     userTags = c(paste0("module:", cur[["moduleName"]]),
-                                  paste0("eventType:", cur[["eventType"]]),
-                                  paste0("eventTime:", time(sim)))))
+    extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
+    if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+    isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
+    if (isTRUE(any(isCalls))) 
+      extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())
+    
+    defaultCacheArgs <- list(
+      FUN = quote(modCall(sim = sim,
+                          eventTime = cur[["eventTime"]],
+                          eventType = cur[["eventType"]])),
+      .objects = quote(moduleSpecificObjects),
+      notOlderThan = quote(notOlderThan),
+      outputObjects = quote(moduleSpecificOutputObjects),
+      classOptions = quote(classOptions),
+      showSimilar = quote(showSimilar),
+      cachePath = quote(sim@paths[["cachePath"]]),
+      .functionName = quote(paste0(moduleCall, "::", cur[["eventType"]])),
+      verbose = quote(verbose),
+      userTags = quote(c(paste0("module:", cur[["moduleName"]]),
+                         paste0("eventType:", cur[["eventType"]]),
+                         paste0("eventTime:", time(sim))))
+    )
+    as.expression(as.call(c(list(quote(Cache)),
+                            modifyList(defaultCacheArgs, extraCacheArgs))))
   } else {
     ## Faster just to pass the NULL and just call it directly inside .runEvent
     expression(get(moduleCall, envir = fnEnv)(sim, cur[["eventTime"]], cur[["eventType"]]))
   }
 
-  if (debugToVerbose(debug)) {
+  if (verbose) {
     objsIsNullBefore <- objsAreNull(sim)
   }
 
@@ -1497,7 +1549,7 @@ setMethod(
     }
   }
 
-  if (debugToVerbose(debug)) {
+  if (verbose) {
     sim <- objectsCreatedPost(sim, objsIsNullBefore, verbose = verbose)
   }
   evalPostEvent() # this is getOption("spades.evalPostEvent")
@@ -1583,7 +1635,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
     allObjNames <- outputObjectNames(sim)
   }
 
-  if (is.null(rmo))
+  if (is.null(rmo)) {
     rmo <- list(
       recoverModeTiming = 0,
       recoverableObjs = list(),
@@ -1591,6 +1643,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
       addedEvents = list(list()),
       randomSeed = list(list())
     )
+  }
 
   # Remove the tail entry in each of the lists
   if (length(rmo$addedEvents) > (recoverMode - 1))
@@ -1608,7 +1661,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
 
   if (length(sim@events) > 0) {
     curMod <- sim@events[[1]][["moduleName"]]
-    objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod  ]]
+    objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
 
     mess <- capture.output(type = "message", {
@@ -1627,22 +1680,24 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
     })
 
     if (exists(curMod, envir = sim[[dotObjs]])) {
-      if (!is.null(sim[[dotObjs]][[curMod]])) {
-        # if (exists(".objects", sim[[dotObjs]][[curMod]])) {
+      newList <- if (!is.null(sim[[dotObjs]][[curMod]])) {
           modObjEnv <- sim[[dotObjs]][[curMod]]# $.objects
-          objsInModObjects <- ls(modObjEnv)
-          mess2 <- capture.output(type = "message",
-                                  rmo$recoverableModObjs <- append(list(if (length(objsInModObjects)) {
-                                    Copy(mget(objsInModObjects, envir = modObjEnv),
-                                         # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
-                                         filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
-
-                                  } else {
-                                    list()
-                                  }), rmo$recoverableModObjs)
-          )
-        # }
+          objsInModObjects <- ls(modObjEnv, all.names = TRUE)
+          list(
+            if (length(objsInModObjects)) {
+              Copy(mget(objsInModObjects, envir = modObjEnv),
+                   # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
+                   filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
+            } else {
+              list()
+            })
+      } else {
+        list()
       }
+      names(newList) <- curMod
+      mess2 <- capture.output(type = "message",
+                              rmo$recoverableModObjs <- append(newList, rmo$recoverableModObjs)
+      )
     }
 
     mess <- grep("Hardlinked version", mess, invert = TRUE)

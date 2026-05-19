@@ -4,7 +4,7 @@
 [![R build status](https://github.com/PredictiveEcology/SpaDES.core/workflows/R-CMD-check/badge.svg)](https://github.com/PredictiveEcology/SpaDES.core/actions)
 <!-- badges: end -->
 
-<img align="right" width="80" pad="20" src="https://github.com/PredictiveEcology/SpaDES/raw/master/man/figures/SpaDES.png">
+<img align="right" width="80" pad="20" src="https://github.com/PredictiveEcology/SpaDES/raw/main/man/figures/SpaDES.png">
 
 # SpaDES.core
 
@@ -19,9 +19,7 @@ and enable the user to include additional functionality by running user-built mo
 Includes conditional scheduling, restart after interruption, packaging of
 reusable modules, tools for developing arbitrary automated workflows,
 automated interweaving of modules of different temporal resolution,
-and tools for visualizing and understanding the within-project dependencies. 
-The suggested package `NLMR` can be installed from the repository 
-(<https://PredictiveEcology.r-universe.dev>).
+and tools for visualizing and understanding the within-project dependencies.
 
 **Website:** [https://SpaDES-core.PredictiveEcology.org](https://SpaDES-core.PredictiveEcology.org)
 

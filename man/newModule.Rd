@@ -147,14 +147,8 @@ if (requireNamespace("ggplot2")) {
 
 }
 \seealso{
-Other module creation helpers: 
-\code{\link{newModuleTests}()}
-
-Other module creation helpers: 
-\code{\link{newModuleTests}()}
-
-Other module creation helpers: 
-\code{\link{newModuleTests}()}
+Other module creation helpers:
+\code{\link[=newModuleTests]{newModuleTests()}}
 }
 \author{
 Alex Chubaty and Eliot McIntire

@@ -15,8 +15,8 @@
 character string representing a directory path to the cache repo
 }
 \description{
-See \code{\link[reproducible:exportedMethods]{reproducible::.checkCacheRepo()}}.
+See \code{\link[reproducible:.checkCacheRepo]{reproducible::.checkCacheRepo()}}.
 }
 \seealso{
-\link[reproducible:exportedMethods]{reproducible::.checkCacheRepo}
+\link[reproducible:.checkCacheRepo]{reproducible::.checkCacheRepo}
 }

@@ -44,3 +44,7 @@ revdep/.cache.rds
 
 timings.rds
 .Rprofile
+
+.vscode/
+
+.claude/

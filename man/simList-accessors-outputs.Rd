@@ -88,7 +88,7 @@ correct \code{fun} and \code{package}.
 
 
 \code{outputs} accepts a data.frame similar to the \code{inputs} data.frame, but
-with up to 6 columns.
+with up to 7 columns.
 
 \tabular{ll}{
 \code{objectName} \tab required, character string indicating the name of the object
@@ -109,12 +109,17 @@ which to find the \code{fun});\cr
 should be saved. The default is the lowest priority at \code{end(sim)},
 i.e., at the very end. \cr
 
-\code{arguments} \tab is a list of lists of named arguments, one list for each
+\code{arguments} \tab optional list of lists of named arguments, one list for each
 \code{fun}. For example, if \code{fun = "write.csv"},
 \code{arguments = list(row.names = TRUE)} will pass the argument
 \code{row.names = TRUE} to \code{write.csv}  If there is only one list,
 then it is assumed to apply to all files and will be recycled as per normal R
 rules of recycling for each \code{fun}.\cr
+
+\code{eventPriority} \tab optional numeric setting the priority given to saving the
+specified object. If not set, it defaults to \code{.last()}. If set to a low value,
+e.g., 0, 1, 2 and \code{saveTime} is \code{start(sim)}, it should give "initial conditions"
+at \code{saveTime}.
 }
 
 See the modules vignette for more details (\code{browseVignettes("SpaDES.core")}).

@@ -56,12 +56,11 @@ instead of \code{data.frame} to implement the event queue (because it is much fa
 
  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .highest()) # highest priority
  sim <- scheduleEvent(sim, time(sim) + 1.0, "fireSpread", "burn", .lowest()) # lowest priority
- events(sim) # shows all scheduled events, with eventTime and priority
+ events(sim) # shows all scheduled , with eventTime and priority
 }
 \references{
 Matloff, N. (2011). The Art of R Programming (ch. 7.8.3).
-San Francisco, CA: No Starch Press, Inc..
-Retrieved from \url{https://nostarch.com/artofr.htm}
+San Francisco, CA: No Starch Press, Inc. ISBN 978-1-59327-384-2.
 }
 \seealso{
 \code{\link[=priority]{priority()}}, \code{\link[=scheduleConditionalEvent]{scheduleConditionalEvent()}}

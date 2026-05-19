@@ -20,3 +20,4 @@ vignettes/.*\.log$
 timings.rds
 ^[.]?air[.]toml$
 ^\.vscode$
+^\.claude$

@@ -9,7 +9,7 @@
 restartSpades(
   sim = NULL,
   module = NULL,
-  numEvents = Inf,
+  numEvents = 1L,
   restart = TRUE,
   verbose = getOption("reproducible.verbose", 1L),
   ...

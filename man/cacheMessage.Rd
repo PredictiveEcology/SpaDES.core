@@ -26,8 +26,8 @@ Caching, which may help diagnose Caching challenges. Can set globally with an
 option, e.g., \verb{options('reproducible.verbose' = 0) to reduce to minimal}}
 }
 \description{
-See \code{\link[reproducible:exportedMethods]{reproducible::.cacheMessage()}}.
+See \code{\link[reproducible:.cacheMessage]{reproducible::.cacheMessage()}}.
 }
 \seealso{
-\link[reproducible:exportedMethods]{reproducible::.cacheMessage}
+\link[reproducible:.cacheMessage]{reproducible::.cacheMessage}
 }

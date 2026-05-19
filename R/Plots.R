@@ -1,3 +1,5 @@
+utils::globalVariables("str")
+
 baseClassesCanHandle <- c("pdf", "jpeg", "png", "tiff", "bmp")
 ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "bmp", "svg", "wmf")
 
@@ -67,6 +69,10 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @param usePlot Logical. If `TRUE`, the default, then the plot will occur
 #'   with `quickPlot::Plot`, so it will be arranged with previously existing plots.
 #'
+#' @param useCache Logical or character vector. If `TRUE`, caching is enabled for
+#'   all non-screen output types. If a character vector, caching is enabled only
+#'   for the matching `types`. Default is `FALSE`.
+#'
 #' @param envir The environment where the `data` argument should be evaluated if it is
 #'   a `call`. Normally, this should be left at its default, `parent.frame()`.
 #'
@@ -98,6 +104,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @importFrom grDevices dev.off dev.cur
 #' @importFrom qs2 qs_save
 #' @importFrom quickPlot clearPlot Plot
+#' @importFrom rlang as_label is_quosure
 #' @importFrom terra writeRaster
 #' @importFrom tools file_path_sans_ext
 #'
@@ -157,7 +164,7 @@ Plots <- function(data, fn, filename,
                   path = quote(figurePath(sim)),
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
-                  deviceArgs = list(), envir = parent.frame(),
+                  deviceArgs = list(), envir = parent.frame(), useCache = FALSE,
                   ...) {
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
@@ -230,119 +237,16 @@ Plots <- function(data, fn, filename,
     }
   }
   fnIsPlot <- identical(fn, Plot) # || identical(fn, plot) || identical(fn, terra::plot)
-  if (fnIsPlot) {
-    ## make dummies
-    gg <- 1
-    objNamePassedToData1 <- substitute(data)
-    origEnv <- parent.frame()
-    objNamePassedToData <- evalAttempt(objNamePassedToData1, origEnv)
-    if (!is.character(objNamePassedToData)) {
-      objNamePassedToData <- deparse1(objNamePassedToData)
-    }
 
-    ## Try to see if the object is in the parent.frame(). If it isn't, default back to here.
-    if (!objNamePassedToData %in% ls(origEnv))
-      origEnv <- environment()
-    if (!(is(data, "list") && length(names(data)) == length(data))) {
-      ggListToScreen <- list(data)
-      names(ggListToScreen) <- objNamePassedToData
-    } else {
-      ggListToScreen <- data
-    }
-  } else {
-    if ( (needScreen || needSave) ) {
-      if (is.null(data)) {
-        gg <- fn(...)
-      } else {
-        gg <- NULL
-        if (is(data, "ggplot")) {
-          gg <- data
-        } else {
-          # don't plot or terra::plot if needScreen is FALSE
-          if ( (!(identical(plot, fn) || identical(terra::plot, fn)) ) || needScreen)
-            gg <- fn(data, ...) # This will plot to screen if it is base::plot or terra::plot
-        }
-      }
-
-      if (!is(gg, ".quickPlot")) {
-        ggListToScreen <- setNames(list(gg), "gg")
-        if (!is.null(gg$labels$title) && needScreen) {
-          ggListToScreen <- setNames(ggListToScreen,
-                                     format(paste(gg$labels$title, collapse = " ")))
-          ggListToScreen[[1]]$labels$title <- NULL
-        }
-      }
-    }
-  }
-
-  if (needScreen) {
-    if (fnIsPlot) {
-      if (is.list(data)) {# || is(data, "RasterStack") || is(data, "RasterBrick") ||
-      #    (is(data, "SpatRaster") || is(data, "SpatVector")) && nlayers2(data) > 1)
-      #  {
-        dataListToScreen <- data
-      } else {
-        dataListToScreen <- list(data)
-      }
-      if (is(data, "ggplot")) {
-        dataListToScreen <- setNames(list(data), "gg")
-        if (!is.null(data$labels$title) && needScreen) {
-          dataListToScreen <- setNames(dataListToScreen, data$labels$title)
-          dataListToScreen[[1]]$labels$title <- NULL
-        }
-      } else {
-        if (!is.null(objNamePassedToData)) {
-          dataListToScreen <- setNames(dataListToScreen, objNamePassedToData)
-        } else {
-          if (!is.null(names(data))) {
-            dataListToScreen <- setNames(dataListToScreen, names(data))
-          } else {
-            dataListToScreen <- setNames(dataListToScreen, "data")
-          }
-        }
-      }
-
-      ## Necessary for inheritance -- pass the environment with correct inheritance
-      if (!is.null(simIsIn)) {
-        newEnv <- new.env(parent = simIsIn)
-      } else {
-        newEnv <- environment()
-      }
-      newEnv$dataListToScreen <- dataListToScreen
-      gg <- fn(dataListToScreen, ..., env = newEnv)
-
-      if (FALSE) {
-        # .quickPlotEnv <- getFromNamespace(".quickPlotEnv", "quickPlot")
-        qpob <- get(paste0("quickPlot", dev.cur()), .quickPlotEnv)
-        objNamesInQuickPlotObj <- sapply(qpob$curr@quickPlotGrobList, function(x) slot(x[[1]], "objName"))
-        objNamesInQuickPlotObj <- seq_along(objNamesInQuickPlotObj %in% names(ggListToScreen))
-        curPlotDev <- paste0("quickPlot", dev.cur())
-        ignore <- lapply(objNamesInQuickPlotObj, function(x) {
-          slot(.quickPlotEnv[[curPlotDev]]$curr@quickPlotGrobList[[x]][[1]], "envir") <- origEnv
-        })
-      }
-    } else {
-      if (is(gg, "gg"))
-        if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
-      if (usePlot) {
-        names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
-        Plot(ggListToScreen, addTo = gg$labels$title)
-      } else {
-        if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
-            !is(gg, ".quickPlot"))
-          print(gg)
-      }
-    }
-  }
+  saveTypes <- setdiff(types, "screen")
+  filenamesForSave <- character(length(saveTypes)) |> setNames(saveTypes)
+  funsUsed <- character(length(saveTypes)) |> setNames(saveTypes)
   needSaveRaw <- any(grepl("raw", types))
   if (needSave || needSaveRaw) {
     if (missing(filename)) {
       dataObjName <- deparse(substitute(data))
-      filename <- paste0(dataObjName, "_", basename(gsub("file", "", tempfile(fileext = "")))) ## TODO: can we use e.g. the object name + sim time??
-      if (exists("sim", inherits = FALSE)) {
-        simTime <- round(as.numeric(time(sim)), 3)
-        filename <- paste0("sim", "_", filename)
-      }
+      simTime <- if (exists("sim", inherits = FALSE)) round(as.numeric(time(sim)), 2) else 0
+      filename <- paste0(dataObjName, "_time", simTime)
     } else {
       filename <- filename |> tools::file_path_sans_ext()
     }
@@ -362,93 +266,246 @@ Plots <- function(data, fn, filename,
     if (is(path, "character")) {
       checkPath(path, create = TRUE)
     }
-  }
 
-  if (needSaveRaw) {
-    if (is(data, "Raster") || is(data, "SpatRaster")) {
-      rasterFilename <- file.path(path, paste0(filename, "_data.tif"))
-      writeRaster(data, filename = rasterFilename, overwrite = TRUE)
-      if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(
-          outputs = sim@outputs, saveTime = time(sim),
-          objectName = tools::file_path_sans_ext(basename(rasterFilename)),
-          file = rasterFilename, fun = "terra::writeRaster",
-          ...
-        )
-    } else {
-      rawFilename <- file.path(path, paste0(filename, "_data.qs2"))
-      qs2::qs_save(data, rawFilename)
-      if (exists("sim", inherits = FALSE))
-        sim@outputs <- outputsAppend(
-          outputs = sim@outputs, saveTime = time(sim),
-          objectName = tools::file_path_sans_ext(basename(rawFilename)),
-          file = rawFilename,
-          fun = "qs2::qs_save",
-          ...
-        )
+    if (needSaveRaw) {
+      if (is(data, "Raster") || is(data, "SpatRaster")) {
+        filenamesForSave[["raw"]] <- file.path(path, paste0(filename, "_data.tif"))
+        funsUsed[["raw"]] <- "terra::writeRaster"
+      } else {
+        filenamesForSave[["raw"]] <- file.path(path, paste0(filename, "_data.qs2"))
+        funsUsed[["raw"]] <- "qs2::qs_save"
+      }
     }
   }
+  objChar <- "object"
+
+  # Setup one special case of gg
+  gg <- NULL
+  if (is(data, "gg")) {
+    gg <- data
+  }
+
   if (needSave) {
     if (is.null(simIsIn)) {
-      if (is.call(path))
+      if (is.call(path)) {
         path <- "."
-      if (is.call(path))
-        path <- "."
+      }
     }
-    if (fnIsPlot || !is(gg, "gg") ) {
-      baseSaveFormats <- intersect(baseClassesCanHandle, types)
-      for (bsf in baseSaveFormats) {
-        type <- get(bsf)
-        theFilename <- file.path(path, paste0(filename, ".", bsf))
-        do.call(type, modifyList2(list(theFilename), deviceArgs))
-        # curDev <- dev.cur()
-        if (isTRUE(fnIsPlot)) clearPlot()
-        plotted <- try(fn(data, ...)) # if this fails, catch so it can be dev.off'd
-        dev.off()
-        if (!is(plotted, "try-error")) {
-          if (exists("sim", inherits = FALSE)) {
-            pkgAndFn <- .guessPkgFun(bsf)
-            sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                         objectName = tools::file_path_sans_ext(basename(theFilename)),
-                                         file = theFilename, fun = pkgAndFn, ...)
-          }
-          message("Saved figure to: ", theFilename)
-        }
+    filenameStart <- file.path(path, filename)
+    if (fnIsPlot || ( !is(gg, "gg") && !is(data, "gg")) ) {
+      for (bsf in intersect(baseClassesCanHandle, types)) {
+        filenamesForSave[[bsf]] <- paste0(filenameStart, ".", bsf)
+        funsUsed[[bsf]] <- .guessPkgFun(bsf)
       }
     } else {
-      ggSaveFormats <- intersect(ggplotClassesCanHandle, types)
-      for (ggsf in ggSaveFormats) {
-        theFilename <- file.path(path, paste0(filename, ".", ggsf))
-        if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
-        args <- list(plot = gg,
-                     filename = theFilename)
-        if (length(ggsaveArgs)) {
-          args <- modifyList2(args, ggsaveArgs)
-        }
-        do.call(ggplot2::ggsave, args = args)
-
-        if (exists("sim", inherits = FALSE))
-          sim@outputs <- outputsAppend(outputs = sim@outputs, saveTime = time(sim),
-                                       objectName = tools::file_path_sans_ext(basename(theFilename)),
-                                       file = theFilename, fun = "ggplot2::ggsave", ...)
-        message("Saved figure to: ", theFilename)
+      for (ggsf in intersect(ggplotClassesCanHandle, types)) {
+        filenamesForSave[[ggsf]] <- paste0(filenameStart, ".", ggsf)
+        funsUsed[[ggsf]] <- "ggplot2::ggsave"
       }
     }
 
-    if (any(grepl("object", types))) {
-      filename11 <- file.path(path, paste0(filename, "_gg.qs2"))
-      qs2::qs_save(gg, file = filename11)
+    if (any(grepl(objChar, types))) {
+      filenamesForSave[[objChar]] <- paste0(filenameStart, "_gg.qs2")
+      funsUsed[[objChar]] <- "qs2::qs_save"
+    }
+  }
 
-      if (exists("sim", inherits = FALSE)) {
+  needNewPlot <- TRUE
+  
+  hasNonScreenTypes <- length(setdiff(types, "screen")) > 0
+  useCache <- hasNonScreenTypes && (isTRUE(useCache) || length(intersect(types, useCache)) > 0)
+  if (useCache) {
+    useCacheNNP <- useCacheNeedNewPlot(filenamesForSave, ...) # creates a TRUE if it needs new plot
+    cacheId <- cacheId(useCacheNNP)
+    needNewPlot <- useCacheNNP
+  }
+
+  if (needNewPlot) {
+    if (fnIsPlot) {
+      ## make dummies
+      gg <- 1
+      objNamePassedToData1 <- substitute(data)
+      origEnv <- parent.frame()
+      objNamePassedToData <- evalAttempt(objNamePassedToData1, origEnv)
+      if (!is.character(objNamePassedToData)) {
+        objNamePassedToData <- deparse1(objNamePassedToData)
+      }
+
+      ## Try to see if the object is in the parent.frame(). If it isn't, default back to here.
+      if (!objNamePassedToData %in% ls(origEnv))
+        origEnv <- environment()
+      if (!(is(data, "list") && length(names(data)) == length(data))) {
+        ggListToScreen <- list(data)
+        names(ggListToScreen) <- objNamePassedToData
+      } else {
+        ggListToScreen <- data
+      }
+    } else {
+      if ( (needScreen || needSave) ) {
+        if (missing(data) || is.null(data)) {
+          gg <- fn(...)
+        } else {
+          gg <- NULL
+          if (is(data, "ggplot")) {
+            gg <- data
+          } else {
+            # don't plot or terra::plot if needScreen is FALSE
+            if ( (!(identical(plot, fn) || identical(terra::plot, fn)) ) || needScreen)
+              gg <- fn(data, ...) # This will plot to screen if it is base::plot or terra::plot
+          }
+        }
+
+        if (!is(gg, ".quickPlot")) {
+          ggListToScreen <- setNames(list(gg), "gg")
+          if (!is.null(gg$labels$title) && needScreen) {
+            ggListToScreen <- setNames(ggListToScreen,
+                                       format(paste(gg$labels$title, collapse = " ")))
+            ggListToScreen[[1]]$labels$title <- NULL
+          }
+        }
+      }
+    }
+
+    if (needScreen) {
+      if (fnIsPlot) {
+        if (is.list(data)) {# || is(data, "RasterStack") || is(data, "RasterBrick") ||
+          #    (is(data, "SpatRaster") || is(data, "SpatVector")) && nlayers2(data) > 1)
+          #  {
+          dataListToScreen <- data
+        } else {
+          dataListToScreen <- list(data)
+        }
+        if (is(data, "ggplot")) {
+          dataListToScreen <- setNames(list(data), "gg")
+          if (!is.null(data$labels$title) && needScreen) {
+            dataListToScreen <- setNames(dataListToScreen, data$labels$title)
+            dataListToScreen[[1]]$labels$title <- NULL
+          }
+        } else {
+          if (!is.null(objNamePassedToData)) {
+            dataListToScreen <- setNames(dataListToScreen, objNamePassedToData)
+          } else {
+            if (!is.null(names(data))) {
+              dataListToScreen <- setNames(dataListToScreen, names(data))
+            } else {
+              dataListToScreen <- setNames(dataListToScreen, "data")
+            }
+          }
+        }
+
+        ## Necessary for inheritance -- pass the environment with correct inheritance
+        if (!is.null(simIsIn)) {
+          newEnv <- new.env(parent = simIsIn)
+        } else {
+          newEnv <- environment()
+        }
+        newEnv$dataListToScreen <- dataListToScreen
+        gg <- fn(dataListToScreen, ..., env = newEnv)
+
+      } else {
+        if (is(gg, "gg"))
+          if (!requireNamespace("ggplot2")) stop("Please install ggplot2")
+        if (usePlot) {
+          names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
+          Plot(ggListToScreen, addTo = gg$labels$title)
+        } else {
+          if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
+              !is(gg, ".quickPlot")) {
+            print(gg)
+          }
+        }
+      }
+    }
+  }
+  
+  if (!is(data, "ggplot")) {
+    if (needSaveRaw) {
+      if (is(data, "Raster") || is(data, "SpatRaster")) {
+        writeRaster(data, filename = filenamesForSave[["raw"]], overwrite = TRUE)
+      } else {
+        qs2::qs_save(data, filenamesForSave[["raw"]])
+      }
+    }
+  } else {
+    if (needSaveRaw) {
+      message("Can't save raw ggplot2 objects as the file is too large; saving as image...")
+      needSave <- TRUE
+    }
+  }
+  isBaseFormat <- fnIsPlot || (!is(gg, "gg") && !is(data, "gg"))
+  failedFiles <- character(0)
+  if (needSave && needNewPlot) {
+    if (isBaseFormat) {
+      for (bsf in intersect(baseClassesCanHandle, types)) {
+        type <- get(bsf)
+        theFilename <- filenamesForSave[[bsf]]
+
+        # the plot saving ###
+        do.call(type, modifyList2(list(theFilename), deviceArgs))
+        if (isTRUE(fnIsPlot)) clearPlot()
+        if (missing(data) || is.null(data)) {
+          plotted <- fn(...)
+        } else {
+          plotted <- try(fn(data, ...), silent = TRUE) # if this fails, catch so it can be dev.off'd
+        }
+        dev.off()
+        if (is(plotted, "try-error")) {
+          warning("Plots: fn(data, ...) failed for file '", theFilename, "': ",
+                  conditionMessage(attr(plotted, "condition")))
+          failedFiles <- c(failedFiles, theFilename)
+        } else {
+          funsUsed[[bsf]] <- .guessPkgFun(bsf)
+        }
+        # end plot saving ###
+      }
+    } else {
+      if (!requireNamespace("ggplot2")) stop("To save gg objects, need ggplot2 installed")
+      for (ggsf in intersect(ggplotClassesCanHandle, types)) {
+        theFilename <- filenamesForSave[[ggsf]]
+
+        # the plot saving ###
+        args <- list(plot = gg, filename = theFilename)
+        if (length(ggsaveArgs))
+          args <- modifyList2(args, ggsaveArgs)
+        do.call(ggplot2::ggsave, args = args)
+        funsUsed[[ggsf]] <- "ggplot2::ggsave"
+        # end plot saving ###
+      }
+    }
+
+    if (any(grepl(objChar, types)))
+      qs2::qs_save(gg, file = filenamesForSave[[objChar]])
+  }
+
+  if (needSave || needSaveRaw) {
+    if (exists("sim", inherits = FALSE)) {
+      for (i in seq(filenamesForSave)) {
+        if (filenamesForSave[i] %in% failedFiles) next
+
         sim@outputs <- outputsAppend(
-          outputs = sim@outputs,
-          saveTime = time(sim),
-          objectName = tools::file_path_sans_ext(basename(filename11)),
-          file = filename11,
-          fun = "qs2::qs_save",
+          outputs = sim@outputs, saveTime = time(sim),
+          objectName = tools::file_path_sans_ext(basename(filenamesForSave[i])),
+          file = filenamesForSave[i],
+          fun = funsUsed[i],
           ...
         )
+        sim <- rmDups(sim)
+
+        if (needNewPlot)
+          message("Saved figure to: ", filenamesForSave[i])
+        else
+          message("Previously saved figure (", filenamesForSave[i], ") still valid")
       }
+    }
+  }
+
+  if (useCache) {
+    typesNoScreen <- setdiff(types, "screen")
+    for (i in seq(filenamesForSave)) {
+      type <- typesNoScreen[i]
+      filenameSaved <- .robustDigest(asPath(filenamesForSave[i]))[[1]]
+      if (needNewPlot)
+        .addTagsRepo(cacheId, cachePath = cachePath(sim), tagKey = tagKeySavedFile, tagValue = paste0(type, ":", filenameSaved))
     }
   }
 
@@ -456,6 +513,7 @@ Plots <- function(data, fn, filename,
     assign("sim", sim, envir = simIsIn)
   }
 
+  on.exit() # clear the clearCache if it gets to here
   if (exists("gg", inherits = FALSE))
     return(invisible(gg))
   else
@@ -514,3 +572,211 @@ evalAttempt <- function(subs, envir) {
   }
   subs
 }
+
+
+
+useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
+  allArgs <- mget(formalArgs(Plots), envir = envir)
+  # check dots
+  mc <- match.call(Plots, sys.call(-1), expand.dots = TRUE)[-1]
+  allNamed <- names(mc) %in% formalArgs(Plots)
+  if (any(allNamed %in% FALSE)) {
+    dotArgs <- list(...)
+    allArgs <- append(allArgs, dotArgs)
+  }
+  allArgs$envir <- NULL
+  allArgs$... <- NULL
+  if (is(allArgs$data, "ggplot")) {
+    metadata <- strip_ggplot_metadata(allArgs$data)
+    allArgs[["data"]] <- .robustDigest(metadata)
+  }
+  cached <- list(allArgs) |> Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
+  reproducible:::on.exit2({
+    clearCache(cacheId = cacheId(cached), ask = FALSE, verbose = FALSE)
+    message("Plots did not complete; clearing the cached record")
+    })
+  
+  ret <- attr(cached, ".Cache")$newCache %in% TRUE
+  attributes(ret) <- attributes(cached)
+  if (ret %in% FALSE) { # means it doesn't need a new plotting
+    sc <- showCacheFast(cacheId = cacheId(cached))
+    files <- sc[tagKey %in% tagKeySavedFile]$tagValue
+    digs <- .robustDigest(asPath(filenamesForSave))
+    digsToCompare <- paste0(names(digs), ":", unname(digs))
+    if (!all(files %in% digsToCompare)) {# don't have the correct files
+      reproducible::messageCache("*** but saved files are incorrect; rerunning to reproduce figures ***")
+      ret <- TRUE
+    }
+  }
+  ret
+}
+
+tagKeySavedFile <- "savedFile"
+
+
+
+rmDups <- function(sim) {
+  cantUniqueOn <- sapply(sim@outputs, function(x) is(x, "list") || is(x, "AsIs"))
+  checkForDups <- duplicated(sim@outputs, by = names(cantUniqueOn)[!cantUniqueOn])
+  if (any(checkForDups)) {
+    for (nam in names(cantUniqueOn)[cantUniqueOn]) {
+      dupsInCantDoCols <- duplicated(sim@outputs[[nam]])
+      alsoDup <- checkForDups[checkForDups] == dupsInCantDoCols[checkForDups]
+      checkForDups[!alsoDup] <- FALSE
+    }
+    sim@outputs <- sim@outputs[checkForDups %in% FALSE]
+  }
+  sim
+}
+
+# Canonical digestable representation of a ggplot object
+# Returns a base R list with deterministic ordering & values.
+# You can serialize with jsonlite::toJSON(auto_unbox=TRUE, null="null", digits=15)
+# and hash with digest::digest(., algo = "sha256")
+
+# Canonical digestable representation of a ggplot object
+# Adds data-dependent fingerprints from ggplot_build().
+# Output is a base R list; serialize (e.g., jsonlite::toJSON) then hash.
+
+# Canonical digestable representation of a ggplot object
+# Adds data-dependent fingerprints from ggplot_build().
+# Output is a base R list; serialize (e.g., jsonlite::toJSON) then hash.
+
+strip_ggplot_metadata <- canonicalize_ggplot <- function(
+    p,
+    numeric_digits = 15#,
+    #hash_fun = function(x) digest::digest(x, algo = "xxhash64")
+) {
+  stopifnot(inherits(p, "ggplot"))
+  
+  `%||%` <- function(x, y) if (is.null(x)) y else x
+  
+  as_label_safe <- function(x) {
+    if (is.null(x)) return(NULL)
+    tryCatch(rlang::as_label(x), error = function(e) NULL)
+  }
+  
+  map_labels <- function(m) {
+    if (is.null(m)) return(NULL)
+    out <- lapply(m, as_label_safe)
+    out[order(names(out))]
+  }
+  
+  drop_nulls <- function(x) if (is.null(x)) NULL else x[!vapply(x, is.null, logical(1))]
+  sort_list_recursive <- function(x) {
+    if (is.list(x) && !is.null(names(x))) x <- x[order(names(x))]
+    lapply(x, function(v) if (is.list(v)) sort_list_recursive(v) else v)
+  }
+  
+  keep_simple_fields <- function(x) {
+    if (is.null(x)) return(NULL)
+    y <- list()
+    nms <- names(x)
+    for (nm in nms) {
+      v <- x[[nm]]
+      if (is.atomic(v) && !is.object(v)) {
+        y[[nm]] <- v
+      } else if (is.list(v) && all(vapply(v, function(i) is.atomic(i) && !is.object(i), logical(1)))) {
+        y[[nm]] <- v
+      }
+    }
+    drop_nulls(y)
+  }
+  
+  # --- RAW DATA DIGEST -------------------------------------------------------
+  raw_plot_data_digest <- if (is.data.frame(p$data)) .robustDigest(p$data) else NULL
+  
+  raw_layer_data <- lapply(p$layers, function(l) {
+    if (is.null(l$data)) {
+      list(source = "plot", digest = raw_plot_data_digest)
+    } else if (is.data.frame(l$data)) {
+      list(source = "layer", digest = .robustDigest(l$data))
+    } else {
+      # data as function or other object -> hash its deparsed form
+      list(source = "other", digest = .robustDigest(utils::capture.output(str(l$data))))
+    }
+  })
+  
+  # --- SPEC PART (same as before) --------------------------------------------
+  plot_data_cols <- if (is.data.frame(p$data)) sort(names(p$data)) else NULL
+  plot_mapping   <- map_labels(p$mapping)
+  
+  layers_spec <- lapply(seq_along(p$layers), function(i) {
+    l <- p$layers[[i]]
+    list(
+      geom_class     = class(l$geom)[1],
+      stat_class     = class(l$stat)[1],
+      position_class = class(l$position)[1],
+      inherit_aes    = isTRUE(l$inherit.aes),
+      mapping        = map_labels(l$mapping),
+      aes_params     = keep_simple_fields(l$aes_params),
+      geom_params    = keep_simple_fields(l$geom_params),
+      stat_params    = keep_simple_fields(l$stat_params),
+      show_legend    = if (is.null(l$show.legend)) NULL else as.character(l$show.legend),
+      data_digest    = raw_layer_data[[i]]   # <-- added here
+    )
+  })
+  
+  facet <- NULL
+  if (!is.null(p$facet$params)) {
+    fp <- p$facet$params
+    facet <- list(
+      facet_class = class(p$facet)[1],
+      vars        = if (!is.null(fp$facets)) sort(names(fp$facets)) else NULL,
+      nrow        = fp$nrow %||% NULL,
+      ncol        = fp$ncol %||% NULL,
+      free        = fp$free   %||% NULL,
+      strip_pos   = fp$strip.position %||% NULL
+    )
+  }
+  
+  scales <- lapply(p$scales$scales, function(s) {
+    list(
+      scale_class = class(s)[1],
+      aesthetics  = sort(unique(s$aesthetics %||% character(0))),
+      limits      = s$limits,
+      trans       = tryCatch(s$trans$name, error = function(e) NULL),
+      position    = s$position %||% NULL,
+      guide       = if (!is.null(s$guide) && !is.logical(s$guide)) as.character(s$guide) else s$guide
+    )
+  })
+  
+  coords <- list(
+    coord_class = class(p$coordinates)[1],
+    params      = keep_simple_fields(p$coordinates)
+  )
+  
+  theme_elems <- NULL
+  if (length(p$theme)) {
+    theme_elems <- lapply(as.list(p$theme), keep_simple_fields)
+    theme_elems <- drop_nulls(theme_elems)
+    if (length(theme_elems)) theme_elems <- theme_elems[order(names(theme_elems))]
+  }
+  
+  labels <- NULL
+  if (!is.null(p$labels) && length(p$labels)) {
+    labels <- lapply(p$labels, function(v) {
+      if (is.symbol(v) || rlang::is_quosure(v)) as_label_safe(v) else as.character(v)
+    })
+    labels <- labels[order(names(labels))]
+  }
+  
+  out <- list(
+    spec_version = "ggplot-dna/3",
+    data_cols    = plot_data_cols,
+    data_digest  = raw_plot_data_digest,   # <-- also top-level digest
+    mapping      = plot_mapping,
+    layers       = layers_spec,
+    scales       = scales,
+    coordinates  = coords,
+    facet        = facet,
+    labels       = labels,
+    theme        = theme_elems
+  )
+  
+  out <- drop_nulls(out)
+  out <- sort_list_recursive(out)
+  out
+}
+      
+`%||%` <- function(x, y) if (is.null(x)) y else x

@@ -39,12 +39,6 @@ jobs:
           extra-packages: |
             any::cffr
             any::V8
-            NLMR=?ignore
-
-      - name: Install additional package dependencies
-        run: |
-          pak::pkg_install("ropensci/NLMR")
-        shell: Rscript {0}
 
       - name: Update CITATION.cff
         run: |

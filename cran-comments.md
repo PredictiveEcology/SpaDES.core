@@ -1,8 +1,17 @@
 ## Release information
 
-This is a major release update to address changes in the package dependency, reproducible.
+This is a minor release. Highlights:
 
-This also has many enhancemenets and addresses many minor bugfixes.
+* New opt-in v2 static code-checking engine (`options(spades.codeCheckEngine = "v2")`),
+  plus standalone `codeCheckModule()` / `checkModuleMetadata()` APIs.
+* The `NLMR` dependency has been fully removed; sample modules and vignettes now
+  use `SpaDES.tools::neutralLandscapeMap()`.
+* `Plots()` refactor: deterministic filenames, optional caching, and direct
+  `ggplot` input.
+* Per-event cache key change and a changed `restartSpades()` default
+  (both documented in NEWS.md).
+* Requires `reproducible` >= 3.0.0.
+* Numerous documentation/vignette accuracy fixes and minor bugfixes.
 
 ## Test environments
 
@@ -14,33 +23,19 @@ This also has many enhancemenets and addresses many minor bugfixes.
 ### Current R versions
 * macOS 14.7.6                 (GitHub), R 4.5.2
 * Ubuntu 24.04                 (GitHub), R 4.5.2
-* Ubuntu 24.04                  (local), R 4.5.2
+* Ubuntu 24.04                  (local), R 4.5.3
 * Windows                      (GitHub), R 4.5.2
-* Windows                       (local), R 4.5.2
-* Windows                 (win-builder), R 4.5.2
+* Windows                       (local), R 4.5.3
+* Windows                 (win-builder), R 4.5.x
 
 ### Development R version
-* Ubuntu 24.04                 (GitHub), R-devel (2026-01-07 r89288)
-* Ubuntu 24.04                  (local), R-devel (2026-01-07 r89288)
-* Windows                      (GitHub), R-devel (2026-01-07 r89288 ucrt)
-* Windows                 (win-builder), R-devel (2026-01-07 r89288 ucrt)
+* Ubuntu 24.04                 (GitHub), R-devel
+* Ubuntu 24.04                  (local), R-devel
+* Windows                 (win-builder), R-devel (TODO: fill exact revision from win-builder result)
 
 ## R CMD check results
 
-There are no errors, or warnings in any of the above.
-
-There is one NOTE:
-
-1. The `NLMR` package in Suggests is optionally installed from our R-universe repository
-  (until the maintainers of that package are able to get it back on CRAN).
-  Instructions for installation are provided in the README, DESCRIPTION, and via a message to the user.
-  We believe this should satisfy the CRAN policy requirement regarding additional dependencies.
-
-        Suggests or Enhances not in mainstream repositories:
-          NLMR
-        Availability using Additional_repositories specification:
-          NLMR         yes   https://predictiveecology.r-universe.dev/
-
+There are no errors, warnings, or notes in any of the above.
 
 ## Downstream dependencies
 
