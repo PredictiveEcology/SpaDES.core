@@ -1,7 +1,12 @@
 ## Release information
 
-This is a patch release that fixes the check ERRORs in 3.1.0 on
-r-devel-linux-x86_64-fedora-gcc, the macOS builders, and M1mac.
+This release is in response to a CRAN-flagged check failure: SpaDES.core
+3.1.0 ERRORed on the CRAN check farm (`r-devel-fedora-gcc`,
+`r-release/oldrel-macos`, `r-release-macos-arm64`) and on the M1mac
+"Additional issues" report. We apologise for the rapid resubmission (the
+"Days since last update: 0" NOTE that will appear in CRAN incoming
+feasibility); 3.1.1 fixes the underlying defect and we wanted to clear
+the ERROR promptly.
 
 Cause: the `randomLandscapes` sample module called
 `SpaDES.tools::neutralLandscapeMap()` via a path that required the
