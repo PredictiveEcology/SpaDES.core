@@ -9,6 +9,8 @@ Description: Provides the core framework for a discrete event system to
     reusable modules, tools for developing arbitrary automated workflows,
     automated interweaving of modules of different temporal resolution,
     and tools for visualizing and understanding the within-project dependencies.
+    The suggested package 'NLMR' can be installed from the repository
+    (<https://PredictiveEcology.r-universe.dev>).
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
