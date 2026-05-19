@@ -165,33 +165,13 @@ system.time({
 
 ## Function-level caching
 
-Any function can be cached using: `Cache(FUN = functionName, ...)`.
-
-This will be a slight change to a function call, such as:
-`projectRaster(raster, crs = crs(newRaster))`
-to
-`Cache(projectRaster, raster, crs = crs(newRaster))`.
+Function-level caching is provided by `reproducible::Cache()` and is
+documented there; see `?reproducible::Cache` for the full set of arguments
+and behaviour. Any call can be wrapped in `Cache()` so that re-running it
+returns the stored result instead of recomputing:
 
 ```{r function-level, echo=TRUE}
-if (requireNamespace("SpaDES.tools")) {
-  ras <- terra::rast(terra::ext(0, 1e3, 0, 1e3), res = 1, vals = 1)
-  system.time({
-    map <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
-                 cachePath = cachePath(mySim),
-                 userTags = "neutralLandscapeMap",
-                 notOlderThan = Sys.time())
-  })
-  
-  # faster the second time
-  system.time({
-    mapCached <- Cache(SpaDES.tools::neutralLandscapeMap(ras),
-                       cachePath = cachePath(mySim),
-                       userTags = "neutralLandscapeMap")
-  })
-  
-  ## NOTE: can't use all.equal on SpatRaster (they are pointers); use compareGeom()
-  all.equal(map[], mapCached[]) 
-}
+obj <- system.time({rnorm(3e6) |> mean()} |> Cache())
 ```
 
 ## Working with the Cache manually
@@ -201,13 +181,10 @@ In addition, there are several helpers in the `reproducible` package, including 
 Also, one can access cached items manually (rather than simply rerunning the same `Cache` function again).
 
 ```{r manual-cache}
-cacheDB <- showCache(mySim, userTags = "neutralLandscapeMap")
-
-## get the RasterLayer that was produced with neutralLandscapeMap()
-map <- loadFromCache(cacheId = cacheDB$cacheId, cachePath = cachePath(mySim))
-
-clearPlot()
-Plot(map)
+## cache something, then retrieve it manually rather than re-running Cache()
+Cache(rnorm(10), cachePath = cachePath(mySim), userTags = "manualExample")
+cacheDB <- showCache(mySim, userTags = "manualExample")
+loadFromCache(cacheId = cacheDB$cacheId, cachePath = cachePath(mySim))
 ```
 
 # Reproducible Workflow

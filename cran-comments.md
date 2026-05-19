@@ -1,16 +1,25 @@
 ## Release information
 
-This is a minor release. Highlights:
+This is a patch release that fixes the check ERRORs in 3.1.0 on
+r-devel-linux-x86_64-fedora-gcc, the macOS builders, and M1mac.
+
+Cause: the `randomLandscapes` sample module called
+`SpaDES.tools::neutralLandscapeMap()` via a path that required the
+non-mainstream package `NLMR` whenever the installed `SpaDES.tools` was the
+CRAN version (2.1.1). Since CRAN does not install `NLMR`, the tests that run
+that module errored.
+
+Fix: the module's landscape generator now degrades gracefully with no hard
+dependency — it uses the built-in `gaussian` generator with
+`SpaDES.tools (>= 2.1.2)`, NLMR's `nlm_mpd` only if a user happens to have
+`NLMR` installed, and otherwise a zero-dependency `terra` fallback. `NLMR`
+has been removed entirely as a declared dependency: it is no longer in
+`Suggests`, `Additional_repositories`, or the `Description` field.
+
+Other highlights (carried from 3.1.0):
 
 * New opt-in v2 static code-checking engine (`options(spades.codeCheckEngine = "v2")`),
   plus standalone `codeCheckModule()` / `checkModuleMetadata()` APIs.
-* `NLMR` is no longer a hard dependency. Sample modules and vignettes call
-  `SpaDES.tools::neutralLandscapeMap()`, which uses a built-in generator with
-  `SpaDES.tools (>= 2.1.2)`; with the current CRAN `SpaDES.tools` (2.1.1) it
-  falls back to a path that uses `NLMR`. `NLMR` is therefore retained as a
-  Suggested package, available from the additional repository
-  (<https://predictiveecology.r-universe.dev>). It can be dropped entirely
-  once `SpaDES.tools` 2.1.2 reaches CRAN.
 * `Plots()` refactor: deterministic filenames, optional caching, and direct
   `ggplot` input.
 * Per-event cache key change and a changed `restartSpades()` default
@@ -40,12 +49,9 @@ This is a minor release. Highlights:
 
 ## R CMD check results
 
-There were no ERRORs or WARNINGs.
-
-There is one NOTE: the suggested package `NLMR` is not available from a
-mainstream repository. It is available from the additional repository
-declared in `DESCRIPTION` (<https://predictiveecology.r-universe.dev>),
-and the `Description` field documents how to install it.
+There were no ERRORs, WARNINGs, or NOTEs. (`NLMR` is no longer declared, so
+the previous `Additional_repositories` / non-mainstream-Suggests NOTE no
+longer applies.)
 
 ## Downstream dependencies
 
