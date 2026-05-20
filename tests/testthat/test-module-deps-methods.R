@@ -173,6 +173,13 @@ test_that("depsEdgeList and depsGraph work", {
 })
 
 test_that("3 levels of parent and child modules load and show correctly", {
+  ## Unconditionally skipped on CRAN: this test asserts an exact count of
+  ## igraph::cluster_optimal() communities, which is sensitive to the
+  ## installed igraph version and to whether the local igraph build links
+  ## GLPK. CRAN's check farm has reproduced the assertion failure on
+  ## individual Linux configurations despite our platform-specific skips,
+  ## so we keep the test for local/CI runs but never run it on CRAN.
+  skip_on_cran()
   skip_if_not_installed("ggplot2")
 
   testInit("terra", smcc = FALSE)
