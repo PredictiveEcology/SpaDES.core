@@ -1,3 +1,15 @@
+# SpaDES.core 3.1.2
+
+## Bug fixes
+
+* Test fix only (no user-visible changes). The 3-level parent/child module
+  community-count assertion in `test-module-deps-methods.R` (using
+  `igraph::cluster_optimal()`) is fragile across `igraph` versions and
+  GLPK link configurations. Despite existing platform-specific skips,
+  individual Linux configurations on the CRAN check farm still triggered
+  the assertion. The test now unconditionally `skip_on_cran()`, while
+  retaining the existing platform skips for local/CI runs.
+
 # SpaDES.core 3.1.1
 
 ## Bug fixes
