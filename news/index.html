@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
       </span>
     </div>
 
@@ -75,6 +75,13 @@
       <small>Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.1.2" id="spadescore-312">SpaDES.core 3.1.2<a class="anchor" aria-label="anchor" href="#spadescore-312"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-3-1-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-1-2"></a></h3>
+<ul><li>Test fix only (no user-visible changes). The 3-level parent/child module community-count assertion in <code>test-module-deps-methods.R</code> (using <code><a href="https://r.igraph.org/reference/cluster_optimal.html" class="external-link">igraph::cluster_optimal()</a></code>) is fragile across <code>igraph</code> versions and GLPK link configurations. Despite existing platform-specific skips, individual Linux configurations on the CRAN check farm still triggered the assertion. The test now unconditionally <code>skip_on_cran()</code>, while retaining the existing platform skips for local/CI runs.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="3.1.1" id="spadescore-311">SpaDES.core 3.1.1<a class="anchor" aria-label="anchor" href="#spadescore-311"></a></h2>
 <div class="section level3">
