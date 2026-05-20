@@ -217,25 +217,25 @@ A message with the correct lines to copy and paste is provided.</p>
 <span class="r-in"><span>  <span class="va">tmpdir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://reproducible.predictiveecology.org/reference/tempdir2.html" class="external-link">tempdir2</a></span><span class="op">(</span><span class="st">"exampleNewModule"</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="co">## create a "myModule" module in the "modules" subdirectory.</span></span></span>
 <span class="r-in"><span>  <span class="fu">newModule</span><span class="op">(</span><span class="st">"myModule"</span>, <span class="va">tmpdir</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpPLW5sC/reproducible/exampleNewModule</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp4BAZIc/reproducible/exampleNewModule</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in</span> <span style="color: #BBBB00;">myModule.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in</span> <span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in</span> <span style="color: #BBBB00;">myModule.Rmd</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing</span> <span style="color: #BBBB00;">citation.bib</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see</span> <span style="color: #BBBB00;">LICENSE.md</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/RtmpPLW5sC/reproducible/exampleNewModule/myModule/myModule.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/RtmpPLW5sC/reproducible/exampleNewModule/myModule/myModule.Rmd</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmp4BAZIc/reproducible/exampleNewModule/myModule/myModule.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmp4BAZIc/reproducible/exampleNewModule/myModule/myModule.Rmd</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co">## create a new parent module in the "modules" subdirectory.</span></span></span>
 <span class="r-in"><span>  <span class="fu">newModule</span><span class="op">(</span><span class="st">"myParentModule"</span>, <span class="va">tmpdir</span>, type <span class="op">=</span> <span class="st">"parent"</span>, children <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"child1"</span>, <span class="st">"child2"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myParentModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpPLW5sC/reproducible/exampleNewModule</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">myParentModule</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp4BAZIc/reproducible/exampleNewModule</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in</span> <span style="color: #BBBB00;">myParentModule.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in</span> <span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in</span> <span style="color: #BBBB00;">myParentModule.Rmd</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing</span> <span style="color: #BBBB00;">citation.bib</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see</span> <span style="color: #BBBB00;">LICENSE.md</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/RtmpPLW5sC/reproducible/exampleNewModule/myParentModule/myParentModule.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/RtmpPLW5sC/reproducible/exampleNewModule/myParentModule/myParentModule.Rmd</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmp4BAZIc/reproducible/exampleNewModule/myParentModule/myParentModule.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmp4BAZIc/reproducible/exampleNewModule/myParentModule/myParentModule.Rmd</span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="va">tmpdir</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
@@ -267,71 +267,71 @@ A message with the correct lines to copy and paste is provided.</p>
 <span class="r-in"><span>  <span class="co"># clean up</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/unlink.html" class="external-link">unlink</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="va">modulePath</span>, pattern <span class="op">=</span> <span class="va">nm</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/RtmpPLW5sC/Require</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00; font-weight: bold;">New module</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">test</span><span style="font-weight: bold;"> </span><span style="color: #00BB00; font-weight: bold;">created at</span><span style="font-weight: bold;"> </span><span style="color: #BBBB00; font-weight: bold;">/tmp/Rtmp4BAZIc/Require</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* edit module code in</span> <span style="color: #BBBB00;">test.R</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* write tests for your module code in</span> <span style="color: #BBBB00;">tests/</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* describe and document your module in</span> <span style="color: #BBBB00;">test.Rmd</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* tell others how to cite your module by editing</span> <span style="color: #BBBB00;">citation.bib</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">* choose a license for your module; see</span> <span style="color: #BBBB00;">LICENSE.md</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/RtmpPLW5sC/Require/test/test.R</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/RtmpPLW5sC/Require/test/test.Rmd</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main module file is: /tmp/Rtmp4BAZIc/Require/test/test.R</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Main documentation file is: /tmp/Rtmp4BAZIc/Require/test/test.Rmd</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Setting:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpPLW5sC/Require'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp4BAZIc/Require'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Paths set to:</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   options(</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/RtmpPLW5sC/SpaDES/scratch/raster'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/RtmpPLW5sC/reproducible/cache'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/RtmpPLW5sC/SpaDES/inputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/RtmpPLW5sC/SpaDES/outputs'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/RtmpPLW5sC/Require'</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/RtmpPLW5sC/SpaDES/scratch'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     rasterTmpDir = '/tmp/Rtmp4BAZIc/SpaDES/scratch/raster'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     reproducible.cachePath = '/tmp/Rtmp4BAZIc/reproducible/cache'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.inputPath = '/tmp/Rtmp4BAZIc/SpaDES/inputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.outputPath = '/tmp/Rtmp4BAZIc/SpaDES/outputs'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.modulePath = '/tmp/Rtmp4BAZIc/Require'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>     spades.scratchPath = '/tmp/Rtmp4BAZIc/SpaDES/scratch'</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span>   )</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/RtmpPLW5sC/SpaDES/scratch/terra')</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 simInit <span style="color: #BB00BB;">test: outputObjects: a is assigned to sim inside Init, but is not declared in metadata outputObjects</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">.inputObjects</span> <span style="color: #00BB00;">total elpsd: 0.086 secs | 0 test .inputObjects 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">.inputObjects</span> test: using dataPath '/tmp/RtmpPLW5sC/Require/test/data'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.09031463 secs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.093 secs | 0 checkpoint init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.095 secs | 0 save init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.097 secs | 0 progress init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 0 load init 0</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.1 secs | 0 test init 1</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:          a</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.49 secs | 1 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   terra::terraOptions(tempdir = '/tmp/Rtmp4BAZIc/SpaDES/scratch/terra')</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 simInit <span style="color: #BB00BB;">test: outputObjects: a is assigned to sim inside Init, but is not declared in metadata outputObjects</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">.inputObjects</span> <span style="color: #00BB00;">total elpsd: 0.07 secs | 0 test .inputObjects 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">.inputObjects</span> test: using dataPath '/tmp/Rtmp4BAZIc/Require/test/data'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Elapsed time for simInit: 0.07329392 secs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 simInit Using setDTthreads(1). To change: 'options(spades.DTthreads = X)'.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 chckpn:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.075 secs | 0 checkpoint init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 save  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.077 secs | 0 save init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 prgrss:<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.079 secs | 0 progress init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 load  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.08 secs | 0 load init 0</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">init</span> <span style="color: #00BB00;">total elpsd: 0.082 secs | 0 test init 1</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">New objects created:</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">       &lt;char&gt;</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">init</span> <span style="color: #BBBB00;">1:          a</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.55 secs | 1 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-1.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.59 secs | 2 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.63 secs | 2 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-2.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.69 secs | 3 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:20 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.71 secs | 3 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-3.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.79 secs | 4 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:42 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.8 secs | 4 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-4.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.9 secs | 5 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.88 secs | 5 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-5.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1 secs | 6 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 0.98 secs | 6 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-6.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.1 secs | 7 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.1 secs | 7 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-7.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.2 secs | 8 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.1 secs | 8 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-8.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.3 secs | 9 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.2 secs | 9 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-9.png" alt="" width="700" height="433"></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.4 secs | 10 test plot 5</span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 17:42:21 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> <span style="color: #00BB00;">total elpsd: 1.3 secs | 10 test plot 5</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> May20 20:31:43 test  :<span style="color: #00BB00;">plot</span> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span>
 <span class="r-plt img"><img src="newModule-10.png" alt="" width="700" height="433"></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BB00BB;">simList saved in</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #0000BB;">SpaDES.core:::savedSimEnv()$.sim</span></span>
