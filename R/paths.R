@@ -81,7 +81,7 @@ spPaths <- c(corePaths, tmpPaths)
   }
 
   list(
-    cachePath = .getOption("reproducible.cachePath"), # nolint
+    cachePath = .cachePathDefault(), # nolint
     inputPath = getOption("spades.inputPath"), # nolint
     modulePath = getOption("spades.modulePath"), # nolint
     outputPath = getOption("spades.outputPath"), # nolint
@@ -89,6 +89,22 @@ spPaths <- c(corePaths, tmpPaths)
     scratchPath = getOption("spades.scratchPath"), # nolint
     terraPath = file.path(getOption("spades.scratchPath"), "terra") # nolint
   )
+}
+
+# Resolve the cache path, falling back to a session-temp default.
+# As of reproducible >= 3.1.1.9xxx (development), `reproducible.cachePath`
+# defaults to NULL at load time and is resolved lazily by
+# reproducible:::.checkCacheRepo() on first use. SpaDES.core reads the option
+# directly (in setPaths() and .paths()) and passes it to checkPath(), which
+# errors on NULL. This mirrors reproducible's lazy fallback so a NULL option
+# still yields a usable path.
+.cachePathDefault <- function() {
+  cp <- .getOption("reproducible.cachePath") # nolint
+  if (is.null(cp) || !nzchar(cp[1])) {
+    tempPath <- getOption("reproducible.tempPath", file.path(tempdir(), "reproducible"))
+    cp <- file.path(tempPath, "cache")
+  }
+  cp
 }
 
 #' @export
@@ -118,7 +134,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     TP = FALSE
   )
   if (missing(cachePath)) {
-    cachePath <- .getOption("reproducible.cachePath") # nolint
+    cachePath <- .cachePathDefault() # nolint
     defaults$CP <- TRUE
   }
   if (missing(inputPath)) {

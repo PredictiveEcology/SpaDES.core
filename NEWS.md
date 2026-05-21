@@ -1,3 +1,18 @@
+# SpaDES.core 3.1.2.9000
+
+## Bug fixes
+
+* `setPaths()` and `getPaths()`/`.paths()` no longer error with
+  "Invalid path: cannot be NULL" when `getOption("reproducible.cachePath")`
+  is `NULL`. Recent `reproducible` (development) leaves this option unset at
+  load time and resolves it lazily on first cache use; SpaDES.core read the
+  option directly and passed `NULL` to `reproducible::checkPath()`. This
+  surfaced at package attach (`.onAttach()` calls `setPaths()`), preventing
+  the package from loading. SpaDES.core now mirrors reproducible's lazy
+  fallback (`file.path(getOption("reproducible.tempPath"), "cache")`).
+  Compatible with both CRAN `reproducible` (>= 3.1.1, which still ships a
+  non-`NULL` default) and `reproducible` `@development`.
+
 # SpaDES.core 3.1.2
 
 ## Bug fixes
