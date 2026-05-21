@@ -293,7 +293,7 @@
   do.call(rbind, lapply(seq_len(nrow(bad)), function(i) {
     u <- bad[i, ]
     .cc_findingFromUse("module_named_object", "error", meta$module, u,
-                       message = sprintf("`sim$%s <- ...` collides with the module name; not allowed",
+                       message = sprintf("`sim$%s <- ...` collides with module name; should be changed because it can cause unwanted problems",
                                          u$name),
                        suggestion = "rename the object")
   }))

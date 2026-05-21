@@ -2,9 +2,17 @@
 % Please edit documentation in R/codecheck-api.R
 \name{codeCheckModule}
 \alias{codeCheckModule}
+\alias{codeCheckModules}
 \title{Statically check a SpaDES module's source code (v2)}
 \usage{
 codeCheckModule(path, print = TRUE, enable = NULL, disable = NULL)
+
+codeCheckModules(
+  paths = dir(getOption("spades.modulePath"), full.names = TRUE),
+  print = TRUE,
+  enable = NULL,
+  disable = NULL
+)
 }
 \arguments{
 \item{path}{Path to a module directory (containing \verb{<modName>/<modName>.R},
@@ -15,10 +23,15 @@ file. If a directory, the module name is the directory's basename.}
 
 \item{enable, disable}{Optional character vectors of rule IDs to restrict
 the run. See \code{names(SpaDES.core:::.CC_RULES)} for the catalogue.}
+
+\item{paths}{A character vector of module directories (or \code{.R} files), as
+accepted by \code{path}. Defaults to
+\code{dir(getOption("spades.modulePath"), full.names = TRUE)}.}
 }
 \value{
-A \code{data.frame} of findings (one row per problem). Returned
-invisibly. Empty if the module is clean.
+\code{codeCheckModule()} returns a \code{data.frame} of findings (one row per
+problem), invisibly; empty if the module is clean. \code{codeCheckModules()}
+returns, invisibly, a named list of such \code{data.frame}s (named by module).
 }
 \description{
 Walks the module's source via \code{xmlparsedata}, collects every reference to
@@ -31,4 +44,12 @@ structured tibble of findings, optionally printed as grouped tables.
 This is the v2 implementation, selectable at \code{simInit()} time via
 \code{options(spades.codeCheckEngine = "v2")} (the default). The legacy v1
 checker is still available via \code{options(spades.codeCheckEngine = "v1")}.
+
+\code{codeCheckModule()} checks a single module. \code{codeCheckModules()} is the
+vectorized form: it runs \code{codeCheckModule()} on each path in \code{paths} and
+returns a list of findings named by module. When \code{paths} is not supplied it
+defaults to every module directory under \code{getOption("spades.modulePath")},
+so \code{codeCheckModules()} with no arguments checks the whole project. It
+replaces the manual idiom
+\code{Map(codeCheckModule, dir(getOption("spades.modulePath"), full.names = TRUE))}.
 }

@@ -108,6 +108,32 @@ test_that("paths file does not work correctly", {
   expect_equal(terraPath(mySim), tmpdir)
 })
 
+test_that("NULL reproducible.cachePath does not error in setPaths/getPaths", {
+  # Regression: reproducible (>= 3.1.1.9xxx, dev) defaults `reproducible.cachePath`
+  # to NULL at load time, resolving it lazily on first cache use. setPaths() and
+  # .paths() read the option directly and fed it to checkPath(), which errors on
+  # NULL ("Invalid path: cannot be NULL"). This fired at package attach via
+  # .onAttach() -> setPaths(). They must now fall back to a usable default.
+  testInit(opts = list(reproducible.cachePath = NULL))
+
+  expect_null(getOption("reproducible.cachePath"))
+
+  expect_no_error(p <- getPaths())
+  expect_false(is.null(p$cachePath))
+  expect_true(nzchar(p$cachePath))
+
+  # resolves to reproducible's lazy fallback: <tempPath>/cache
+  expect_identical(
+    normPath(p$cachePath),
+    normPath(file.path(getOption("reproducible.tempPath"), "cache"))
+  )
+
+  options(reproducible.cachePath = NULL) # getPaths() above does not set it; ensure still NULL
+  expect_no_error(sp <- setPaths())
+  expect_false(is.null(sp$cachePath))
+  expect_true(nzchar(sp$cachePath))
+})
+
 test_that("absolutizePaths can handle multiple paths", {
   test_paths <- list(
     cachePath = "/mnt/scratch/achubaty/BC_HRV/cache",

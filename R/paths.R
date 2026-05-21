@@ -71,22 +71,6 @@ spPaths <- c(corePaths, tmpPaths)
 #' Paths # shows change
 #' }
 #'
-## reproducible (>= 3.1.1.9002) leaves options("reproducible.cachePath") unset
-## (NULL) until first use, so setup layers can detect "unset". SpaDES is such a
-## layer: resolve a default here -- mirroring reproducible's own temp-cache
-## fallback (file.path(reproducible.tempPath, "cache")) -- so checkPath() never
-## receives NULL.
-.cachePathOrDefault <- function() {
-  cp <- .getOption("reproducible.cachePath")
-  if (is.null(cp)) {
-    tempPath <- getOption("reproducible.tempPath",
-                          file.path(tempdir(), "reproducible"))
-    file.path(tempPath, "cache")
-  } else {
-    cp
-  }
-}
-
 .paths <- function() {
   if (!is.null(.getOption("spades.cachePath"))) {
     message(
@@ -97,7 +81,7 @@ spPaths <- c(corePaths, tmpPaths)
   }
 
   list(
-    cachePath = .cachePathOrDefault(), # nolint
+    cachePath = .cachePathDefault(), # nolint
     inputPath = getOption("spades.inputPath"), # nolint
     modulePath = getOption("spades.modulePath"), # nolint
     outputPath = getOption("spades.outputPath"), # nolint
@@ -105,6 +89,22 @@ spPaths <- c(corePaths, tmpPaths)
     scratchPath = getOption("spades.scratchPath"), # nolint
     terraPath = file.path(getOption("spades.scratchPath"), "terra") # nolint
   )
+}
+
+# Resolve the cache path, falling back to a session-temp default.
+# As of reproducible >= 3.1.1.9xxx (development), `reproducible.cachePath`
+# defaults to NULL at load time and is resolved lazily by
+# reproducible:::.checkCacheRepo() on first use. SpaDES.core reads the option
+# directly (in setPaths() and .paths()) and passes it to checkPath(), which
+# errors on NULL. This mirrors reproducible's lazy fallback so a NULL option
+# still yields a usable path.
+.cachePathDefault <- function() {
+  cp <- .getOption("reproducible.cachePath") # nolint
+  if (is.null(cp) || !nzchar(cp[1])) {
+    tempPath <- getOption("reproducible.tempPath", file.path(tempdir(), "reproducible"))
+    cp <- file.path(tempPath, "cache")
+  }
+  cp
 }
 
 #' @export
@@ -134,7 +134,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     TP = FALSE
   )
   if (missing(cachePath)) {
-    cachePath <- .cachePathOrDefault() # nolint
+    cachePath <- .cachePathDefault() # nolint
     defaults$CP <- TRUE
   }
   if (missing(inputPath)) {
