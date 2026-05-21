@@ -151,6 +151,8 @@ codeCheckModules <- function(paths = dir(getOption("spades.modulePath"), full.na
     otherModuleParams = .cc_otherModuleParams(sim, m),
     moduleEnv = modEnv,
     codetoolsOpts = .cc_codetoolsOpts(),
+    reqdPkgs = .cc_reqdPkgsFromDep(dep, file = if (file.exists(mainFile)) mainFile else NA_character_),
+    mainFile = if (file.exists(mainFile)) mainFile else NA_character_,
     files = files
   )
 
@@ -225,8 +227,45 @@ codeCheckModules <- function(paths = dir(getOption("spades.modulePath"), full.na
     inputs  = .cc_namesOfArg(doc, "expectsInput", "objectName"),
     outputs = .cc_namesOfArg(doc, "createsOutput", "objectName"),
     params  = .cc_namesOfArg(doc, "defineParameter", "name"),
-    otherModuleParams = list()
+    otherModuleParams = list(),
+    reqdPkgs = .cc_reqdPkgsFromSource(doc, file = mainFile),
+    mainFile = mainFile
   )
+}
+
+## Harvest the `reqdPkgs` list from a `defineModule()` block. Returns a
+## data.frame(spec, pkg, file, line): `spec` is the raw entry (e.g.
+## "PredictiveEcology/SpaDES.core@branch (>= 3.0.4)"), `pkg` the bare package
+## name via Require::extractPkgName(). Empty data.frame if none found.
+.cc_reqdPkgsFromSource <- function(doc, file = NA_character_) {
+  empty <- data.frame(spec = character(), pkg = character(),
+                      file = character(), line = integer(),
+                      stringsAsFactors = FALSE)
+  valExpr <- xml2::xml_find_first(
+    doc, "//SYMBOL_SUB[text()='reqdPkgs']/following-sibling::expr[1]")
+  if (length(valExpr) == 0) return(empty)
+  strs <- xml2::xml_find_all(valExpr, ".//STR_CONST")
+  if (length(strs) == 0) return(empty)
+  spec <- gsub('^["\']|["\']$', "", xml2::xml_text(strs))
+  pkg <- tryCatch(Require::extractPkgName(spec), error = function(e) spec)
+  data.frame(spec = spec, pkg = pkg, file = file %||% NA_character_,
+             line = as.integer(xml2::xml_attr(strs, "line1")),
+             stringsAsFactors = FALSE)
+}
+
+## Same as .cc_reqdPkgsFromSource() but from an already-parsed module
+## dependency object (simInit path). `dep@reqdPkgs` is an unevaluated list of
+## strings; line numbers aren't available, so `line` is NA.
+.cc_reqdPkgsFromDep <- function(dep, file = NA_character_) {
+  empty <- data.frame(spec = character(), pkg = character(),
+                      file = character(), line = integer(),
+                      stringsAsFactors = FALSE)
+  spec <- tryCatch(unlist(eval(dep@reqdPkgs)), error = function(e) NULL)
+  spec <- spec[nzchar(spec)]
+  if (length(spec) == 0) return(empty)
+  pkg <- tryCatch(Require::extractPkgName(spec), error = function(e) spec)
+  data.frame(spec = spec, pkg = pkg, file = file %||% NA_character_,
+             line = NA_integer_, stringsAsFactors = FALSE)
 }
 
 ## Find first positional or named arg `argName` of every `fnName(...)` call

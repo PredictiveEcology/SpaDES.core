@@ -33,7 +33,8 @@
   module_named_object      = function(uses, meta) .ccr_module_named_object(uses, meta),
   conflicting_fn_unqualified = function(uses, meta) .ccr_conflicting_fn(uses, meta),
   clashing_module_fn       = function(uses, meta) .ccr_clashing_fn(uses, meta),
-  codetools                = function(uses, meta) .ccr_codetools(uses, meta)
+  codetools                = function(uses, meta) .ccr_codetools(uses, meta),
+  reqd_pkg_duplicate       = function(uses, meta) .ccr_reqd_pkg_duplicate(uses, meta)
 )
 
 ## Display bucket each rule id is reported under (the `• <group>` headers).
@@ -54,7 +55,8 @@
   module_named_object        = "module functions",
   conflicting_fn_unqualified = "globals",
   clashing_module_fn         = "module functions",
-  codetools                  = "codetools"
+  codetools                  = "codetools",
+  reqd_pkg_duplicate         = "reqdPkgs"
 )
 
 ## Public entry: returns a Findings data.frame
@@ -494,5 +496,32 @@
   do.call(rbind, lapply(msgs, function(m) {
     .cc_finding("codetools", "note", meta$module,
                 message = m, suggestion = NA_character_)
+  }))
+}
+
+## reqdPkgs rules ------------------------------------------------------------
+
+## A package declared more than once in reqdPkgs. Different source/version
+## specs for the same package (e.g. CRAN `SpaDES.core (>= 3.0.1)` plus
+## `PredictiveEcology/SpaDES.core@branch (>= 3.0.4)`) are a real conflict
+## (warning); exact repeats are a note.
+.ccr_reqd_pkg_duplicate <- function(uses, meta) {
+  rp <- meta$reqdPkgs
+  if (is.null(rp) || NROW(rp) == 0) return(.cc_emptyFindings())
+  dups <- unique(rp$pkg[duplicated(rp$pkg)])
+  if (length(dups) == 0) return(.cc_emptyFindings())
+  do.call(rbind, lapply(dups, function(p) {
+    entries <- rp[rp$pkg == p, , drop = FALSE]
+    specs <- unique(entries$spec)
+    conflict <- length(specs) > 1
+    .cc_finding(
+      "reqd_pkg_duplicate", if (conflict) "warning" else "note", meta$module,
+      where = "reqdPkgs", name = p,
+      file = entries$file[1], line = entries$line[1],
+      message = sprintf("package '%s' is declared %d times in reqdPkgs%s: %s",
+                        p, nrow(entries),
+                        if (conflict) " with differing source/version" else "",
+                        paste(specs, collapse = " | ")),
+      suggestion = "keep a single declaration (the most specific source/version) and remove the rest")
   }))
 }

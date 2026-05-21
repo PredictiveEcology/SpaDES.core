@@ -344,6 +344,30 @@ Init <- function(sim) {
   expect_false("param_used_undeclared" %in% f$id)
 })
 
+test_that("reqd_pkg_duplicate flags a package declared twice (conflict)", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("Require")
+  src <- '
+defineModule(sim, list(
+  name = "m",
+  reqdPkgs = list("terra",
+                  "SpaDES.core (>= 3.0.1)",
+                  "PredictiveEcology/SpaDES.core@branch (>= 3.0.4)",
+                  "deldir"),
+  inputObjects = bindrows(),
+  outputObjects = bindrows()
+))
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  dup <- f[f$id == "reqd_pkg_duplicate", , drop = FALSE]
+  expect_equal(dup$name, "SpaDES.core")
+  expect_equal(dup$severity, "warning")          # differing source/version -> conflict
+  expect_false(any(c("terra", "deldir") %in% dup$name))
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")
