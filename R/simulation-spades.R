@@ -979,6 +979,12 @@ setMethod(
       if (is.null(sim@.xData[["._startClockTime"]]))
         sim@.xData[["._startClockTime"]] <- Sys.time()
 
+      ## store the events filter so a subsequent restartSpades reuses the same
+      ## subset of events (issue #354). The sim env is the one saved on a crash,
+      ## so this persists into savedSimEnv()$.sim. Set unconditionally (incl. NULL)
+      ## so a later spades() call without `events` clears any stale filter.
+      sim@.xData[["._spadesEvents"]] <- events
+
       if (is.list(events)) {
         unspecifiedEvents <- setdiff(unlist(modules(sim, TRUE)), names(events))
         unspecifiedEvents <- setdiff(unspecifiedEvents, "progress")

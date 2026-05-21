@@ -307,7 +307,12 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     # an NFS-backed .so) when packages are touched again unnecessarily.
     opts <- options(spades.loadReqdPkgs = FALSE)
     on.exit(options(opts), add = TRUE)
-    sim <- spades(sim, ...)
+    ## reuse the `events` filter from the interrupted spades call (issue #354),
+    ## unless the user supplied a new one to restartSpades(...)
+    dots <- list(...)
+    if (!"events" %in% ...names() && !is.null(sim@.xData[["._spadesEvents"]]))
+      dots$events <- sim@.xData[["._spadesEvents"]]
+    sim <- do.call(spades, append(list(sim), dots))
   }
   # } else {
   #   message("There was no interrupted spades call; returning sim as is")
