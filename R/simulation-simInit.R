@@ -392,7 +392,7 @@ setMethod(
     sim[[._txtSimNesting]] <- ._simNestingLocal
 
     # URL access log: route prepInputs/preProcess calls during simInit into
-    # envir(sim)$.urlLog. See R/urlLog.R.
+    # envir(sim)$._urlLog. See R/urlLog.R.
     .urlLogToken <- .installUrlLog(sim)
     on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
 

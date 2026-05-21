@@ -2,10 +2,12 @@
 ##
 ## SpaDES wires the simList's environment into `reproducible.urlLog` so any
 ## prepInputs() / preProcess() call inside simInit or spades is recorded
-## against the sim. The records live at envir(sim)$.urlLog$records and use a
-## leading dot so they don't surface in default ls() output.
+## against the sim. The records live at envir(sim)$._urlLog$records. The name
+## uses the leading-dot-underscore (`._`) convention for volatile SpaDES
+## bookkeeping, so it is hidden from default ls() AND ignored by
+## all.equal.simList() and other `._`-aware machinery.
 ##
-## Each event dispatch updates envir(sim)$.urlLog$extra with the current
+## Each event dispatch updates envir(sim)$._urlLog$extra with the current
 ## module + event so reproducible tags every recorded URL access with the
 ## right context.
 
@@ -15,7 +17,7 @@
 ## spades.urlLog = FALSE is a hard off-switch: because reproducible's urlLog
 ## is on by default, we must set reproducible.urlLog = FALSE for the duration
 ## (otherwise reproducible would still log at the package level). Otherwise we
-## point reproducible.urlLog at the sim's hidden .urlLog env.
+## point reproducible.urlLog at the sim's hidden ._urlLog env.
 .installUrlLog <- function(sim) {
   prev <- getOption("reproducible.urlLog")
   if (!isTRUE(getOption("spades.urlLog", TRUE))) {
@@ -23,12 +25,12 @@
     return(list(prev = prev))
   }
   e <- envir(sim)
-  if (is.null(e$.urlLog)) {
-    e$.urlLog <- new.env(parent = emptyenv())
-    e$.urlLog$records <- list()
-    e$.urlLog$seen    <- character()
+  if (is.null(e$._urlLog)) {
+    e$._urlLog <- new.env(parent = emptyenv())
+    e$._urlLog$records <- list()
+    e$._urlLog$seen    <- character()
   }
-  options(reproducible.urlLog = e$.urlLog)
+  options(reproducible.urlLog = e$._urlLog)
   list(prev = prev)
 }
 
@@ -38,11 +40,11 @@
   invisible()
 }
 
-## Set envir(sim)$.urlLog$extra to the current module + event so that the
+## Set envir(sim)$._urlLog$extra to the current module + event so that the
 ## next URL access recorded via reproducible is tagged accordingly. No-op
-## if logging is off or no .urlLog is installed.
+## if logging is off or no ._urlLog is installed.
 .updateUrlLogExtra <- function(sim) {
-  log <- envir(sim)$.urlLog
+  log <- envir(sim)$._urlLog
   if (!is.environment(log)) return(invisible())
   cur <- sim@current
   if (!length(cur)) return(invisible())

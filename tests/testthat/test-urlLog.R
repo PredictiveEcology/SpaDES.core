@@ -2,7 +2,7 @@
 ##
 ## Strategy: two tiny modules invoke reproducible:::.logUrlAccess from inside
 ## .inputObjects and from inside their init / event1 events. We assert that
-## envir(sim)$.urlLog$records accumulates correctly and that each record
+## envir(sim)$._urlLog$records accumulates correctly and that each record
 ## carries the right module + event labels via the sink$extra mechanism.
 
 modAcode <- '
@@ -92,7 +92,7 @@ doEvent.modB = function(sim, eventTime, eventType, debug = FALSE) {
 }
 '
 
-test_that("urlLog: simInit + spades populate envir(sim)$.urlLog with module+event labels", {
+test_that("urlLog: simInit + spades populate envir(sim)$._urlLog with module+event labels", {
   testInit("terra", smcc = FALSE,
            opts = list(reproducible.useMemoise = FALSE))
   withr::local_options(reproducible.cachePath = tmpCache)
@@ -107,13 +107,13 @@ test_that("urlLog: simInit + spades populate envir(sim)$.urlLog with module+even
                    paths = list(modulePath = tmpdir),
                    modules = c("modA", "modB"))
 
-  ## .urlLog env was created on envir(sim) and is a "dot" object.
-  expect_true(".urlLog" %in% ls(envir(mySim), all.names = TRUE))
-  expect_false(".urlLog" %in% ls(envir(mySim)))   # hidden from default ls()
-  expect_true(is.environment(envir(mySim)$.urlLog))
+  ## ._urlLog env was created on envir(sim) and is a "dot" object.
+  expect_true("._urlLog" %in% ls(envir(mySim), all.names = TRUE))
+  expect_false("._urlLog" %in% ls(envir(mySim)))   # hidden from default ls()
+  expect_true(is.environment(envir(mySim)$._urlLog))
 
   ## simInit phase: .inputObjects of each module ran -> 2 records.
-  recs <- envir(mySim)$.urlLog$records
+  recs <- envir(mySim)$._urlLog$records
   expect_length(recs, 2L)
   iomods <- vapply(recs, function(r) r$module %||% NA_character_, character(1))
   ioevts <- vapply(recs, function(r) r$event  %||% NA_character_, character(1))
@@ -122,7 +122,7 @@ test_that("urlLog: simInit + spades populate envir(sim)$.urlLog with module+even
 
   ## Now run spades. modA: init + step events, modB: init only.
   out <- spades(mySim)
-  recs <- envir(out)$.urlLog$records
+  recs <- envir(out)$._urlLog$records
   ## 2 (.inputObjects) + 2 (init) + 1 (step) = 5 records total
   expect_length(recs, 5L)
   mods <- vapply(recs, function(r) r$module %||% NA_character_, character(1))
@@ -149,7 +149,7 @@ test_that("urlLog: option spades.urlLog = FALSE disables the wiring", {
 
   mySim <- simInit(times = list(start = 0, end = 0),
                    paths = list(modulePath = tmpdir), modules = "modA")
-  expect_null(envir(mySim)$.urlLog)
+  expect_null(envir(mySim)$._urlLog)
 })
 
 test_that("urlLog: caller-supplied reproducible.urlLog env is respected (not clobbered)", {
@@ -160,7 +160,7 @@ test_that("urlLog: caller-supplied reproducible.urlLog env is respected (not clo
 
   ## A user-owned env that simInit/spades should overwrite for the duration
   ## of the call; the prior option value is restored on exit. This documents
-  ## the chosen behavior: the sim's .urlLog always wins inside simInit/spades.
+  ## the chosen behavior: the sim's ._urlLog always wins inside simInit/spades.
   userEnv <- new.env(parent = emptyenv())
   userEnv$records <- list()
   userEnv$seen    <- character()
@@ -172,9 +172,9 @@ test_that("urlLog: caller-supplied reproducible.urlLog env is respected (not clo
   mySim <- simInit(times = list(start = 0, end = 0),
                    paths = list(modulePath = tmpdir), modules = "modA")
 
-  ## sim's .urlLog was populated by simInit (not userEnv).
-  expect_true(is.environment(envir(mySim)$.urlLog))
-  expect_true(length(envir(mySim)$.urlLog$records) >= 1L)
+  ## sim's ._urlLog was populated by simInit (not userEnv).
+  expect_true(is.environment(envir(mySim)$._urlLog))
+  expect_true(length(envir(mySim)$._urlLog$records) >= 1L)
   expect_length(userEnv$records, 0L)
 
   ## And the user's option value is back after simInit returned.

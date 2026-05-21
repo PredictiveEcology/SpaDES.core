@@ -877,7 +877,7 @@ setMethod(
     sim[[._txtSimNesting]] <- ._simNesting
 
     ## URL access log: route prepInputs/preProcess calls during spades into
-    ## envir(sim)$.urlLog. See R/urlLog.R.
+    ## envir(sim)$._urlLog. See R/urlLog.R.
     .urlLogToken <- .installUrlLog(sim)
     on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
 
