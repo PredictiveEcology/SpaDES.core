@@ -396,6 +396,28 @@ Init <- function(sim) {
   expect_false("stats" %in% missing)             # base package
 })
 
+test_that("# nolint: vars asserts produced outputs for a dynamic bulk assign", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  sppOuts <- sppHarmonize(sim$sppEquiv, P(sim)$sppEquivCol)
+  list2env(sppOuts, envir = envir(sim))  # nolint: vars sppEquiv, sppColorVect
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  expect_setequal(uses$name[uses$kind == "declared_var"], c("sppEquiv", "sppColorVect"))
+  meta <- list(module = "m", inputs = character(),
+               outputs = c("sppEquiv", "sppColorVect", "notProduced"),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  unused <- f$name[f$id == "out_declared_unused"]
+  expect_false("sppEquiv" %in% unused)
+  expect_false("sppColorVect" %in% unused)
+  expect_true("notProduced" %in% unused)         # no assertion -> still flagged
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

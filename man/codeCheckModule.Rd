@@ -69,6 +69,11 @@ without editing its source.
 \item \strong{\code{options(spades.moduleCodeChecks = list(disable = ...))}.} Disable
 whole rules by id (or restrict with \code{enable = ...}).
 }
+
+A related developer hint is \verb{# nolint: vars a, b}: placed on a dynamic
+bulk-assign line whose names can't be seen statically (e.g.
+\code{list2env(someList, envir(sim))}), it asserts that objects \code{a}, \code{b} are
+produced there, so they aren't reported as \code{out_declared_unused}.
 }
 
 \section{Rule catalogue}{

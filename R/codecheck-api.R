@@ -49,6 +49,11 @@
 #'     whole rules by id (or restrict with `enable = ...`).
 #' }
 #'
+#' A related developer hint is `# nolint: vars a, b`: placed on a dynamic
+#' bulk-assign line whose names can't be seen statically (e.g.
+#' `list2env(someList, envir(sim))`), it asserts that objects `a`, `b` are
+#' produced there, so they aren't reported as `out_declared_unused`.
+#'
 #' @section Rule catalogue:
 #' The rule ids (printed in brackets in the report), grouped by the bucket they
 #' appear under:

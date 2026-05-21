@@ -631,6 +631,7 @@
     uses[[length(uses) + 1]] <- .cc_collect_globalsConflicts(p)
     uses[[length(uses) + 1]] <- .cc_collect_localAndBulk(p)
     uses[[length(uses) + 1]] <- .cc_collect_nsCalls(p)
+    uses[[length(uses) + 1]] <- .cc_collect_declaredVars(p)
   }
   out <- do.call(rbind, uses)
   ## Attach suppression context so rules can honour inline `# nolint` markers.
@@ -678,6 +679,31 @@
   do.call(rbind, out)
 }
 
+## Collect developer assertions of the form `# nolint: vars a, b, c`, used on a
+## dynamic bulk-assign line (e.g. list2env(<computedList>, envir(sim))) whose
+## element names cannot be seen statically. Each named object is recorded as a
+## "declared_var" use so out_declared_unused treats it as produced.
+.cc_collect_declaredVars <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  out <- list()
+  for (cm in xml2::xml_find_all(doc, "//COMMENT")) {
+    m <- regmatches(xml2::xml_text(cm),
+                    regexec("#+\\s*nolint\\s*:\\s*vars\\b\\s*(.*)$",
+                            xml2::xml_text(cm), ignore.case = TRUE))[[1]]
+    if (length(m) < 2 || !nzchar(trimws(m[2]))) next
+    vars <- trimws(strsplit(trimws(m[2]), "[,[:space:]]+")[[1]])
+    vars <- vars[nzchar(vars)]
+    pos <- .cc_pos(cm)
+    for (v in vars) {
+      out[[length(out) + 1]] <- .cc_use(
+        "declared_var", name = v, fn = NA_character_, file = file,
+        line = pos$line, col = NA_integer_, resolved = TRUE, extra = "nolint:vars")
+    }
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
+}
+
 ## Collect inline `# nolint` directives from the source comments. A bare
 ## `# nolint` suppresses every rule on that line; `# nolint: id1, id2`
 ## suppresses only the listed rule ids. Returns a data.frame(file, line,
@@ -695,6 +721,9 @@
     rules <- if (nzchar(rulesStr)) {
       trimws(strsplit(rulesStr, "[,[:space:]]+")[[1]])
     } else NA_character_
+    ## `# nolint: vars a, b` is a declared-vars assertion, not a rule
+    ## suppression (handled by .cc_collect_declaredVars); skip it here
+    if (!all(is.na(rules)) && identical(tolower(rules[1]), "vars")) next
     out[[length(out) + 1]] <- data.frame(
       file = file %||% NA_character_,
       line = as.integer(xml2::xml_attr(cm, "line1")),

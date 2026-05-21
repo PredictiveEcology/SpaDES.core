@@ -248,6 +248,10 @@
     assignedNames <- c(assignedNames,
                        uses$name[uses$kind == "local_assign" & !is.na(uses$name)])
   }
+  ## developer assertions via `# nolint: vars a, b` (e.g. on a list2env line
+  ## whose list element names can't be seen statically) -- treat as produced
+  assignedNames <- c(assignedNames,
+                     uses$name[uses$kind == "declared_var" & !is.na(uses$name)])
   missing <- setdiff(meta$outputs, assignedNames)
   if (length(missing) == 0) return(.cc_emptyFindings())
   do.call(rbind, lapply(missing, function(n)
