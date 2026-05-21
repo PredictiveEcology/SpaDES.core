@@ -3,6 +3,7 @@
 ## Two entry points:
 ##   * codeCheckModule(path = ...) -- standalone, runs against a module
 ##     directory on disk. No simInit required. Useful while authoring.
+##     codeCheckModules() is the vectorized form (one or more modules).
 ##   * .runCodeChecks2(sim, m, k) -- internal entry called from
 ##     simulation-parseModule.R when getOption("spades.codeCheckEngine")
 ##     is "v2" (the default once wired in). v1 (.runCodeChecks) remains
@@ -24,14 +25,26 @@
 #' `options(spades.codeCheckEngine = "v2")` (the default). The legacy v1
 #' checker is still available via `options(spades.codeCheckEngine = "v1")`.
 #'
+#' `codeCheckModule()` checks a single module. `codeCheckModules()` is the
+#' vectorized form: it runs `codeCheckModule()` on each path in `paths` and
+#' returns a list of findings named by module. When `paths` is not supplied it
+#' defaults to every module directory under `getOption("spades.modulePath")`,
+#' so `codeCheckModules()` with no arguments checks the whole project. It
+#' replaces the manual idiom
+#' `Map(codeCheckModule, dir(getOption("spades.modulePath"), full.names = TRUE))`.
+#'
 #' @param path Path to a module directory (containing `<modName>/<modName>.R`,
 #'   and optionally an `R/` subfolder of helper scripts) or to a single `.R`
 #'   file. If a directory, the module name is the directory's basename.
+#' @param paths A character vector of module directories (or `.R` files), as
+#'   accepted by `path`. Defaults to
+#'   `dir(getOption("spades.modulePath"), full.names = TRUE)`.
 #' @param print Logical; print the grouped report. Default `TRUE`.
 #' @param enable,disable Optional character vectors of rule IDs to restrict
 #'   the run. See `names(SpaDES.core:::.CC_RULES)` for the catalogue.
-#' @return A `data.frame` of findings (one row per problem). Returned
-#'   invisibly. Empty if the module is clean.
+#' @return `codeCheckModule()` returns a `data.frame` of findings (one row per
+#'   problem), invisibly; empty if the module is clean. `codeCheckModules()`
+#'   returns, invisibly, a named list of such `data.frame`s (named by module).
 #' @export
 #' @rdname codeCheckModule
 codeCheckModule <- function(path, print = TRUE, enable = NULL, disable = NULL) {
@@ -42,6 +55,16 @@ codeCheckModule <- function(path, print = TRUE, enable = NULL, disable = NULL) {
                                               moduleEnv = NULL)),
                            enable = enable, disable = disable)
   if (isTRUE(print)) .cc_report(findings, module = info$module)
+  invisible(findings)
+}
+
+#' @export
+#' @rdname codeCheckModule
+codeCheckModules <- function(paths = dir(getOption("spades.modulePath"), full.names = TRUE),
+                             print = TRUE, enable = NULL, disable = NULL) {
+  names(paths) <- basename(paths)
+  findings <- lapply(paths, codeCheckModule, print = print,
+                     enable = enable, disable = disable)
   invisible(findings)
 }
 

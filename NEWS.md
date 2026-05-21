@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9001
+
+## New features
+
+* `codeCheckModules()` is a vectorized `codeCheckModule()`; with no arguments it checks every module under `getOption("spades.modulePath")`.
+
 # SpaDES.core 3.1.2.9000
 
 ## Bug fixes
