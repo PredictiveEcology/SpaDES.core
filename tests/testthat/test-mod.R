@@ -261,6 +261,113 @@ test_that("spades.recoveryMode = FALSE does not populate .recoverableObjs", {
   expect_null(saved$.recoverableObjs)
 })
 
+test_that("restartSpades reuses the `events` filter from the interrupted spades call (#354)", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE,
+                       ## boom crashes while this is TRUE; we flip it before restart
+                       spades.test354.crash = TRUE)
+
+  ## A one-module workflow with an extra `final` event that the `events` filter
+  ## deliberately excludes. The bug: restartSpades dropped the filter and ran it.
+  newModule(
+    name = "m354", path = tmpdir, open = FALSE, useGitHub = FALSE, unitTests = FALSE,
+    events = list(
+      init = {
+        sim$steps <- "init"
+        sim <- scheduleEvent(sim, start(sim), "m354", "advance")
+        sim <- scheduleEvent(sim, start(sim), "m354", "boom")
+        sim <- scheduleEvent(sim, start(sim), "m354", "final")
+      },
+      advance = {
+        sim$steps <- c(sim$steps, "advance")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354", "advance")
+      },
+      boom = {
+        if (isTRUE(getOption("spades.test354.crash"))) stop("intentional crash #354")
+        sim$steps <- c(sim$steps, "boom-fixed")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354", "boom")
+      },
+      final = {
+        sim$steps <- c(sim$steps, "final")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354", "final")
+      }
+    )
+  )
+
+  mySim <- simInit(modules = "m354", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 3))
+
+  ## first run: filter to init/advance/boom (no `final`); boom crashes
+  err <- try(spades(mySim, events = list(m354 = c("init", "advance", "boom")),
+                    debug = FALSE), silent = TRUE)
+  expect_s3_class(err, "try-error")
+  expect_match(attr(err, "condition")$message, "intentional crash #354")
+
+  ## the filter must have been stashed on the saved sim
+  saved <- savedSimEnv()$.sim
+  expect_identical(saved@.xData[["._spadesEvents"]], list(m354 = c("init", "advance", "boom")))
+
+  ## fix the crash and restart WITHOUT re-passing `events`
+  withr::local_options(spades.test354.crash = FALSE)
+  resumed <- restartSpades(debug = FALSE)
+  expect_s4_class(resumed, "simList")
+
+  ## the excluded `final` event must never have run; advance/boom did
+  expect_false("final" %in% resumed$steps)
+  expect_true("boom-fixed" %in% resumed$steps)
+  expect_true("advance" %in% resumed$steps)
+})
+
+test_that("restartSpades(events=) overrides the stashed filter (#354)", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE,
+                       spades.test354.crash = TRUE)
+
+  newModule(
+    name = "m354b", path = tmpdir, open = FALSE, useGitHub = FALSE, unitTests = FALSE,
+    events = list(
+      init = {
+        sim$steps <- "init"
+        sim <- scheduleEvent(sim, start(sim), "m354b", "advance")
+        sim <- scheduleEvent(sim, start(sim), "m354b", "boom")
+        sim <- scheduleEvent(sim, start(sim), "m354b", "final")
+      },
+      advance = {
+        sim$steps <- c(sim$steps, "advance")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354b", "advance")
+      },
+      boom = {
+        if (isTRUE(getOption("spades.test354.crash"))) stop("intentional crash #354")
+        sim$steps <- c(sim$steps, "boom-fixed")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354b", "boom")
+      },
+      final = {
+        sim$steps <- c(sim$steps, "final")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354b", "final")
+      }
+    )
+  )
+
+  mySim <- simInit(modules = "m354b", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 3))
+
+  err <- try(spades(mySim, events = list(m354b = c("init", "advance", "boom")),
+                    debug = FALSE), silent = TRUE)
+  expect_s3_class(err, "try-error")
+
+  ## a fresh filter passed to restartSpades wins over the stashed one
+  withr::local_options(spades.test354.crash = FALSE)
+  resumed <- restartSpades(events = list(m354b = c("init", "advance", "boom", "final")),
+                           debug = FALSE)
+  expect_true("final" %in% resumed$steps)
+})
+
 test_that("convertToPackage testing", {
   skip_on_cran()
 
