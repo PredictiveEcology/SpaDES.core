@@ -74,6 +74,12 @@
 #'     not be resolved statically).
 #'   \item **codetools** — `codetools` (findings relayed from
 #'     `codetools::checkUsageEnv`).
+#'   \item **reqdPkgs** — `reqd_pkg_duplicate` (a package declared more than
+#'     once in `reqdPkgs`, especially with conflicting source/version),
+#'     `reqd_pkg_undeclared` (a `pkg::fn` whose `pkg` is not in `reqdPkgs`),
+#'     `reqd_pkg_no_source` (best-effort, info: bare calls with no apparent
+#'     source among the declared packages — only when all declared packages are
+#'     installed).
 #' }
 #'
 #' `codeCheckModule()` checks a single module. `codeCheckModules()` is the

@@ -97,6 +97,12 @@ collides with a \verb{raster::} namesake; qualify it, e.g. \code{raster::scale})
 not be resolved statically).
 \item \strong{codetools} — \code{codetools} (findings relayed from
 \code{codetools::checkUsageEnv}).
+\item \strong{reqdPkgs} — \code{reqd_pkg_duplicate} (a package declared more than
+once in \code{reqdPkgs}, especially with conflicting source/version),
+\code{reqd_pkg_undeclared} (a \code{pkg::fn} whose \code{pkg} is not in \code{reqdPkgs}),
+\code{reqd_pkg_no_source} (best-effort, info: bare calls with no apparent
+source among the declared packages — only when all declared packages are
+installed).
 }
 
 \code{codeCheckModule()} checks a single module. \code{codeCheckModules()} is the

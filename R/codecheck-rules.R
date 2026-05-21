@@ -35,7 +35,8 @@
   clashing_module_fn       = function(uses, meta) .ccr_clashing_fn(uses, meta),
   codetools                = function(uses, meta) .ccr_codetools(uses, meta),
   reqd_pkg_duplicate       = function(uses, meta) .ccr_reqd_pkg_duplicate(uses, meta),
-  reqd_pkg_undeclared      = function(uses, meta) .ccr_reqd_pkg_undeclared(uses, meta)
+  reqd_pkg_undeclared      = function(uses, meta) .ccr_reqd_pkg_undeclared(uses, meta),
+  reqd_pkg_no_source       = function(uses, meta) .ccr_reqd_pkg_no_source(uses, meta)
 )
 
 ## Base-priority packages that are always available and never declared in
@@ -64,7 +65,8 @@
   clashing_module_fn         = "module functions",
   codetools                  = "codetools",
   reqd_pkg_duplicate         = "reqdPkgs",
-  reqd_pkg_undeclared        = "reqdPkgs"
+  reqd_pkg_undeclared        = "reqdPkgs",
+  reqd_pkg_no_source         = "reqdPkgs"
 )
 
 ## Public entry: returns a Findings data.frame
@@ -548,4 +550,35 @@
                         p, eg),
       suggestion = sprintf("add '%s' to reqdPkgs", p))
   }))
+}
+
+## Quiet, best-effort: bare function calls that have no apparent source among
+## the declared reqdPkgs (their installed namespace exports), base packages,
+## SpaDES.core, or functions defined locally in the module. Only runs when
+## every declared (non-base) package is installed -- otherwise we can't tell
+## where bare calls come from, so we stay silent. Info-level.
+.ccr_reqd_pkg_no_source <- function(uses, meta) {
+  bare <- unique(uses$name[uses$kind == "bare_call" & !is.na(uses$name)])
+  if (length(bare) == 0) return(.cc_emptyFindings())
+  declared <- if (is.null(meta$reqdPkgs)) character() else unique(meta$reqdPkgs$pkg)
+  declared <- setdiff(declared, .CC_BASE_PKGS)
+  if (length(declared) &&
+      !all(vapply(declared, requireNamespace, logical(1), quietly = TRUE))) {
+    return(.cc_emptyFindings())   # incomplete export info -> stay quiet
+  }
+  ## exclude tcltk -- loading its namespace warns when there is no DISPLAY
+  exportPkgs <- setdiff(unique(c("SpaDES.core", .CC_BASE_PKGS, declared)), "tcltk")
+  exports <- suppressWarnings(unlist(lapply(exportPkgs, function(p)
+    tryCatch(getNamespaceExports(p), error = function(e) character()))))
+  ## locally-defined names (functions and other locals) and enclosing fn names
+  localNames <- unique(c(uses$name[uses$kind == "local_assign"], uses$fn))
+  localNames <- localNames[!is.na(localNames)]
+  noSource <- setdiff(bare, c(exports, localNames))
+  if (length(noSource) == 0) return(.cc_emptyFindings())
+  .cc_finding(
+    "reqd_pkg_no_source", "info", meta$module,
+    where = "reqdPkgs", file = meta$mainFile %||% NA_character_,
+    message = sprintf("within the named packages in reqdPkgs, there is no apparent source for the function(s): %s",
+                      paste(sort(noSource), collapse = ", ")),
+    suggestion = "declare the providing package in reqdPkgs, qualify the call as pkg::fn, or ignore if defined elsewhere")
 }

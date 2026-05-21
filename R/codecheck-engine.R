@@ -581,6 +581,30 @@
   do.call(rbind, out)
 }
 
+## Bare (unqualified) function calls -- every `fn(...)` that is not `pkg::fn`.
+## Deduplicated by name (first occurrence keeps a position), since the
+## consumer (reqd_pkg_no_source) only needs the set of called names.
+.cc_collect_bareCalls <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  calls <- xml2::xml_find_all(doc, "//SYMBOL_FUNCTION_CALL")
+  if (length(calls) == 0) return(.cc_emptyUses())
+  out <- list(); seen <- character()
+  for (cal in calls) {
+    ## skip namespaced calls (pkg::fn / pkg:::fn)
+    if (length(xml2::xml_find_first(
+      cal, "preceding-sibling::NS_GET | preceding-sibling::NS_GET_INT")) > 0) next
+    nm <- xml2::xml_text(cal)
+    if (nm %in% seen) next
+    seen <- c(seen, nm)
+    pos <- .cc_pos(cal)
+    out[[length(out) + 1]] <- .cc_use("bare_call", name = nm,
+                                      fn = .cc_enclosingFn(cal), file = file,
+                                      line = pos$line, col = pos$col, resolved = TRUE)
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
+}
+
 ## Conflicting/clashing function uses (raster::levels, quickPlot::Plot, etc.).
 ## These are flagged by name only -- we don't care about positions for the
 ## clashing-defined-fn check (handled via env name listing, not parsing).
@@ -632,6 +656,7 @@
     uses[[length(uses) + 1]] <- .cc_collect_localAndBulk(p)
     uses[[length(uses) + 1]] <- .cc_collect_nsCalls(p)
     uses[[length(uses) + 1]] <- .cc_collect_declaredVars(p)
+    uses[[length(uses) + 1]] <- .cc_collect_bareCalls(p)
   }
   out <- do.call(rbind, uses)
   ## Attach suppression context so rules can honour inline `# nolint` markers.

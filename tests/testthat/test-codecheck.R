@@ -443,6 +443,52 @@ helper <- function(sim) {
   expect_false(any(grepl("inputObjects|helper|lines", gf$message)))
 })
 
+test_that("reqd_pkg_no_source reports bare calls with no apparent source", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("terra")
+  src <- '
+defineModule(sim, list(
+  name = "m", reqdPkgs = list("terra"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+myHelper <- function(x) x + 1
+Init <- function(sim) {
+  a <- rast(2)                # terra export -> sourced
+  b <- myHelper(3)            # local -> sourced
+  d <- paste("x")             # base -> sourced
+  e <- totallyMadeUpFn(4)     # no apparent source
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  ns <- f[f$id == "reqd_pkg_no_source", , drop = FALSE]
+  expect_equal(nrow(ns), 1L)
+  expect_match(ns$message, "totallyMadeUpFn")
+  expect_false(grepl("\\brast\\b|myHelper|\\bpaste\\b", ns$message))
+})
+
+test_that("reqd_pkg_no_source stays quiet if a declared package is not installed", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+defineModule(sim, list(
+  name = "m", reqdPkgs = list("aPackageThatIsNotInstalled12345"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+Init <- function(sim) {
+  e <- totallyMadeUpFn(4)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  expect_false("reqd_pkg_no_source" %in% f$id)   # incomplete export info -> quiet
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")
