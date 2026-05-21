@@ -45,6 +45,10 @@
                    "grid", "methods", "parallel", "splines", "stats", "stats4",
                    "tcltk", "tools", "utils")
 
+## "Call" tokens that are special syntax rather than package functions, so the
+## no-source check must never report them. `.` is data.table's `DT[, .(...)]`.
+.CC_NONFUNCTION_CALLS <- c(".")
+
 ## Display bucket each rule id is reported under (the `• <group>` headers).
 ## Shared by the reporter and by `# nolint` / codeChecksIgnore suppression, so
 ## either the rule id or its group name can be used to silence a finding.
@@ -565,8 +569,11 @@
 ## every declared (non-base) package is installed -- otherwise we can't tell
 ## where bare calls come from, so we stay silent. Info-level.
 .ccr_reqd_pkg_no_source <- function(uses, meta) {
-  bare <- unique(uses$name[uses$kind == "bare_call" & !is.na(uses$name)])
-  if (length(bare) == 0) return(.cc_emptyFindings())
+  bareUses <- uses[uses$kind == "bare_call" & !is.na(uses$name), , drop = FALSE]
+  ## `.` is data.table syntax (DT[, .(...)]) and similar non-functions, not a
+  ## package export -- never report it
+  bareUses <- bareUses[!bareUses$name %in% .CC_NONFUNCTION_CALLS, , drop = FALSE]
+  if (nrow(bareUses) == 0) return(.cc_emptyFindings())
   declared <- if (is.null(meta$reqdPkgs)) character() else unique(meta$reqdPkgs$pkg)
   declared <- setdiff(declared, .CC_BASE_PKGS)
   if (length(declared) &&
@@ -580,12 +587,15 @@
   ## locally-defined names (functions and other locals) and enclosing fn names
   localNames <- unique(c(uses$name[uses$kind == "local_assign"], uses$fn))
   localNames <- localNames[!is.na(localNames)]
-  noSource <- setdiff(bare, c(exports, localNames))
-  if (length(noSource) == 0) return(.cc_emptyFindings())
-  .cc_finding(
-    "reqd_pkg_no_source", "info", meta$module,
-    where = "reqdPkgs", file = meta$mainFile %||% NA_character_,
-    message = sprintf("within the named packages in reqdPkgs, there is no apparent source for the function(s): %s",
-                      paste(sort(noSource), collapse = ", ")),
-    suggestion = "declare the providing package in reqdPkgs, qualify the call as pkg::fn, or ignore if defined elsewhere")
+  noSource <- bareUses[!(bareUses$name %in% c(exports, localNames)), , drop = FALSE]
+  if (nrow(noSource) == 0) return(.cc_emptyFindings())
+  ## one finding per function (carrying its first source position) with a
+  ## generic message, so the report collapses them under one header with a
+  ## `fn (file:line)` line apiece.
+  do.call(rbind, lapply(seq_len(nrow(noSource)), function(i) {
+    .cc_findingFromUse(
+      "reqd_pkg_no_source", "info", meta$module, noSource[i, ],
+      message = "no apparent source among the packages named in reqdPkgs",
+      suggestion = "declare the providing package in reqdPkgs, qualify the call as pkg::fn, or ignore if defined elsewhere")
+  }))
 }

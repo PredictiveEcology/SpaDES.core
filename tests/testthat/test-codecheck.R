@@ -465,9 +465,30 @@ Init <- function(sim) {
   writeLines(src, tf)
   f <- codeCheckModule(tf, print = FALSE)
   ns <- f[f$id == "reqd_pkg_no_source", , drop = FALSE]
-  expect_equal(nrow(ns), 1L)
-  expect_match(ns$message, "totallyMadeUpFn")
-  expect_false(grepl("\\brast\\b|myHelper|\\bpaste\\b", ns$message))
+  ## one finding per no-source function, carrying its name + source line
+  expect_equal(ns$name, "totallyMadeUpFn")
+  expect_true(all(!is.na(ns$line)))
+  expect_false(any(c("rast", "myHelper", "paste") %in% ns$name))
+})
+
+test_that("reqd_pkg_no_source ignores data.table `.` syntax", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("data.table")
+  src <- '
+defineModule(sim, list(
+  name = "m", reqdPkgs = list("data.table"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+Init <- function(sim) {
+  DT[, .(s = sum(x))]
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  expect_false("." %in% f$name[f$id == "reqd_pkg_no_source"])
 })
 
 test_that("reqd_pkg_no_source stays quiet if a declared package is not installed", {
