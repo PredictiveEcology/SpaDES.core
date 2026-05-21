@@ -111,6 +111,25 @@ anon <- function(sim) {
   expect_true(is.na(inner$fn))
 })
 
+test_that("sim[[var]] in an anonymous lapply callback is not flagged unresolved", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  ## a dynamic accessor inside an anonymous callback (fn = NA) must not surface
+  ## as an unresolved_accessor finding (which requires a known enclosing fn)
+  src <- '
+Init <- function(sim) {
+  haveAllRasters <- all(!unlist(lapply(rasterNamesToCompare,
+                                       function(rn) is.null(sim[[rn]]))))
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("unresolved_accessor" %in% f$id)
+})
+
 test_that("collector recognizes all parameter accessor forms", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

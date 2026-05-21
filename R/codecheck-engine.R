@@ -126,7 +126,8 @@
     if (length(parent) == 0 || xml2::xml_name(parent) != "expr") {
       return(NA_character_)
     }
-    knames <- xml2::xml_name(xml2::xml_children(parent))
+    kids <- xml2::xml_children(parent)
+    knames <- xml2::xml_name(kids)
     if (any(knames %in% c("LEFT_ASSIGN", "EQ_ASSIGN"))) {
       lhs <- xml2::xml_find_first(parent, "expr[1]/SYMBOL")
       if (length(lhs) > 0 && !is.na(xml2::xml_text(lhs))) return(xml2::xml_text(lhs))
@@ -137,7 +138,19 @@
       if (length(rhs) > 0 && !is.na(xml2::xml_text(rhs))) return(xml2::xml_text(rhs))
       return(NA_character_)
     }
+    ## Don't ascend into a function's formals, and only ascend through a
+    ## call/grouping that wraps `cur` as the *first* thing inside its parens
+    ## (e.g. cmpfun(function(){}) or Cache(function(){})). A function that is a
+    ## later argument (e.g. lapply(x, function(){})) is an anonymous callback
+    ## and must not be attributed to whatever the surrounding expression binds.
     if (any(knames == "FUNCTION")) return(NA_character_)
+    parenIdx <- which(knames == "OP-LEFT-PAREN")
+    if (length(parenIdx) == 0) return(NA_character_)
+    afterParen <- which(knames == "expr" & seq_along(knames) > parenIdx[1])
+    if (length(afterParen) == 0 ||
+        !identical(xml2::xml_path(kids[[afterParen[1]]]), xml2::xml_path(cur))) {
+      return(NA_character_)
+    }
     cur <- parent
   }
 }
