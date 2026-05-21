@@ -591,6 +591,7 @@
     uses[[length(uses) + 1]] <- .cc_collect_returnSim(p)
     uses[[length(uses) + 1]] <- .cc_collect_assignToSim(p)
     uses[[length(uses) + 1]] <- .cc_collect_globalsConflicts(p)
+    uses[[length(uses) + 1]] <- .cc_collect_localAndBulk(p)
   }
   out <- do.call(rbind, uses)
   ## Attach suppression context so rules can honour inline `# nolint` markers.
@@ -598,6 +599,44 @@
   attr(out, "nolint")    <- do.call(rbind, lapply(parses, .cc_collectNolint))
   attr(out, "declLines") <- do.call(rbind, lapply(parses, .cc_collectDeclLines))
   out
+}
+
+## Collect bare-symbol local assignments (`name <- ...`, `name = ...`,
+## `... -> name`) and detect a bulk write into `envir(sim)` via
+## `list2env(<x>, envir(sim))`. The local assignments let `out_declared_unused`
+## recognise outputs that are computed as a same-named local and then pushed to
+## the sim env in bulk (a common idiom). The bulk-write marker (kind
+## "sim_bulk_assign") gates that behaviour. Both are `resolved = TRUE` so they
+## are ignored by the unresolved-accessor rule.
+.cc_collect_localAndBulk <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  out <- list()
+  emit <- function(kind, name, node, extra = NA_character_) {
+    pos <- .cc_pos(node)
+    .cc_use(kind, name = name, fn = .cc_enclosingFn(node), file = file,
+            line = pos$line, col = pos$col, resolved = TRUE, extra = extra)
+  }
+  ## `name <- ...` / `name = ...` (LHS is a single bare SYMBOL)
+  for (n in xml2::xml_find_all(
+    doc, "//expr[(LEFT_ASSIGN or EQ_ASSIGN) and expr[1][SYMBOL and count(*)=1]]")) {
+    sym <- xml2::xml_find_first(n, "expr[1]/SYMBOL")
+    if (length(sym) > 0) out[[length(out) + 1]] <- emit("local_assign", xml2::xml_text(sym), n)
+  }
+  ## `... -> name` (RHS is a single bare SYMBOL)
+  for (n in xml2::xml_find_all(
+    doc, "//expr[RIGHT_ASSIGN and expr[last()][SYMBOL and count(*)=1]]")) {
+    sym <- xml2::xml_find_first(n, "expr[last()]/SYMBOL")
+    if (length(sym) > 0) out[[length(out) + 1]] <- emit("local_assign", xml2::xml_text(sym), n)
+  }
+  ## `list2env(<x>, envir(sim))` -- a bulk write into the sim environment
+  for (n in xml2::xml_find_all(
+    doc,
+    paste0("//expr[expr/SYMBOL_FUNCTION_CALL[text()='list2env'] and ",
+           ".//expr[expr/SYMBOL_FUNCTION_CALL[text()='envir'] and expr/SYMBOL[text()='sim']]]"))) {
+    out[[length(out) + 1]] <- emit("sim_bulk_assign", NA_character_, n, extra = "list2env()")
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
 }
 
 ## Collect inline `# nolint` directives from the source comments. A bare

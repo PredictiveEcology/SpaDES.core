@@ -296,6 +296,32 @@ Init <- function(sim) {
   expect_false(any(grepl("otherwise ignore", f$suggestion, fixed = TRUE)))
 })
 
+test_that("list2env(..., envir(sim)) bulk write counts local assigns as outputs", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  studyArea <- makeSA()
+  rasterToMatch <- makeRTM()
+  objsHere <- depends(sim)@dependencies[[currentModule(sim)]]@outputObjects$objectName
+  list2env(mget(objsHere, envir = environment()), envir = envir(sim))
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m",
+               inputs = character(),
+               outputs = c("studyArea", "rasterToMatch", "neverProduced"),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  unused <- f$name[f$id == "out_declared_unused"]
+  ## locally-assigned outputs are treated as produced via the bulk write
+  expect_false("studyArea" %in% unused)
+  expect_false("rasterToMatch" %in% unused)
+  ## an output that is neither sim$-assigned nor a local assignment is still flagged
+  expect_true("neverProduced" %in% unused)
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

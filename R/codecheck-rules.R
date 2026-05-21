@@ -228,7 +228,17 @@
   if (length(meta$outputs) == 0) return(.cc_emptyFindings())
   outsideInit <- .cc_outsideDotInputObjects(uses)
   assigns <- outsideInit[outsideInit$kind == "sim_assign" & !is.na(outsideInit$name), , drop = FALSE]
-  missing <- setdiff(meta$outputs, assigns$name)
+  assignedNames <- assigns$name
+  ## A bulk write into envir(sim) -- e.g. list2env(mget(outputNames,
+  ## environment()), envir(sim)) -- assigns outputs by run-time name. In that
+  ## case treat an output that is computed as a same-named local variable as
+  ## produced. (mget() would error at run time if such a local were missing, so
+  ## this is reliable; outputs with no local assignment are still flagged.)
+  if (any(uses$kind == "sim_bulk_assign")) {
+    assignedNames <- c(assignedNames,
+                       uses$name[uses$kind == "local_assign" & !is.na(uses$name)])
+  }
+  missing <- setdiff(meta$outputs, assignedNames)
   if (length(missing) == 0) return(.cc_emptyFindings())
   do.call(rbind, lapply(missing, function(n)
     .cc_declaredUnused("out_declared_unused", "warning", meta$module, n, "outputObjects")))
