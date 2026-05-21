@@ -166,6 +166,27 @@ Init <- function(sim) {
   expect_true("levels" %in% conf)
 })
 
+test_that("# nolint accepts a group name as well as a rule id", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- scale(1)                            # nolint: globals
+  b <- levels(2)                           # nolint: conflicting_fn_unqualified
+  d <- scale(3)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  conf <- f[f$id == "conflicting_fn_unqualified", , drop = FALSE]
+  ## the group-name and rule-id markers each silence their own line; the
+  ## un-marked scale(3) remains
+  expect_equal(nrow(conf), 1L)
+  expect_equal(conf$name, "scale")
+})
+
 test_that("options(spades.codeChecksIgnore) suppresses by rule + object name", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

@@ -16,25 +16,10 @@
     return(invisible(findings))
   }
 
-  ## group: which broad bucket does each rule belong to?
-  groups <- c(
-    out_declared_unused      = "outputObjects",
-    out_used_undeclared      = "outputObjects",
-    in_declared_unused       = "inputObjects",
-    in_used_undeclared       = "inputObjects",
-    in_no_default            = "inputObjects",
-    param_declared_unused    = "parameters",
-    param_used_undeclared    = "parameters",
-    param_used_other_module  = "parameters",
-    unresolved_accessor      = "unresolved",
-    must_return_sim          = "module functions",
-    must_assign_to_sim       = "module functions",
-    module_named_object      = "module functions",
-    conflicting_fn_unqualified = "globals",
-    clashing_module_fn       = "module functions",
-    codetools                = "codetools"
-  )
-  findings$group <- groups[findings$id] %||% "other"
+  ## group: which broad bucket does each rule belong to? (shared map, so the
+  ## report and `# nolint`/codeChecksIgnore suppression stay in sync)
+  findings$group <- unname(.CC_RULE_GROUPS[findings$id])
+  findings$group[is.na(findings$group)] <- "other"
 
   if (quiet) return(invisible(findings))
 
@@ -69,16 +54,19 @@
       idx <- which(key == k)
       r0 <- sub[idx[1], ]
       tag <- sevTag(r0$severity)
+      ## show the rule id so it can be copied into a `# nolint: <id>` marker
+      ## or options(spades.codeChecksIgnore = list(<id> = ...))
+      idTag <- cli::col_silver(paste0("[", r0$id, "]"))
       if (length(idx) == 1L) {
         msgLoc <- paste0(r0$message, loc(r0))
-        cli::cli_text("  {tag} {msgLoc}")
+        cli::cli_text("  {tag} {msgLoc} {idTag}")
         if (!is.na(r0$suggestion)) {
           cli::cli_text(cli::col_silver("        \u21aa  {r0$suggestion}"))
         }
       } else {
         ## one header for the shared issue, then one line per hit
         header <- gmsg[idx[1]]
-        cli::cli_text("  {tag} {header}")
+        cli::cli_text("  {tag} {header} {idTag}")
         for (j in idx) {
           r <- sub[j, ]
           nm <- if (!is.na(r$name)) paste0("`", r$name, "`") else ""

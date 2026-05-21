@@ -36,6 +36,27 @@
   codetools                = function(uses, meta) .ccr_codetools(uses, meta)
 )
 
+## Display bucket each rule id is reported under (the `• <group>` headers).
+## Shared by the reporter and by `# nolint` / codeChecksIgnore suppression, so
+## either the rule id or its group name can be used to silence a finding.
+.CC_RULE_GROUPS <- c(
+  out_declared_unused        = "outputObjects",
+  out_used_undeclared        = "outputObjects",
+  in_declared_unused         = "inputObjects",
+  in_used_undeclared         = "inputObjects",
+  in_no_default              = "inputObjects",
+  param_declared_unused      = "parameters",
+  param_used_undeclared      = "parameters",
+  param_used_other_module    = "parameters",
+  unresolved_accessor        = "unresolved",
+  must_return_sim            = "module functions",
+  must_assign_to_sim         = "module functions",
+  module_named_object        = "module functions",
+  conflicting_fn_unqualified = "globals",
+  clashing_module_fn         = "module functions",
+  codetools                  = "codetools"
+)
+
 ## Public entry: returns a Findings data.frame
 .cc_runRules <- function(uses, meta, enable = NULL, disable = NULL) {
   ids <- names(.CC_RULES)
@@ -89,9 +110,11 @@
 
   keep <- vapply(seq_len(nrow(findings)), function(i) {
     fid <- findings$id[i]; fname <- findings$name[i]
-    ## user option: ignore named objects for a given rule
-    if (is.list(ignore) && !is.null(ignore[[fid]]) &&
-        !is.na(fname) && fname %in% ignore[[fid]]) {
+    ## a finding can be referenced by its rule id or by its group name
+    fkeys <- c(fid, .CC_RULE_GROUPS[[fid]])
+    ## user option: ignore named objects for a given rule (or group)
+    if (is.list(ignore) && !is.na(fname) &&
+        any(vapply(fkeys, function(k) fname %in% ignore[[k]], logical(1)))) {
       return(FALSE)
     }
     ## inline `# nolint`
@@ -103,7 +126,7 @@
             (!is.na(nolint$file[j]) & nolint$file[j] == cand$file)
           if (any(sameFile & nolint$line[j] == cand$line)) {
             r <- nolint$rules[[j]]
-            if (all(is.na(r)) || fid %in% r) return(FALSE)
+            if (all(is.na(r)) || any(fkeys %in% r)) return(FALSE)
           }
         }
       }

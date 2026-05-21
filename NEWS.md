@@ -7,6 +7,7 @@
 ## Enhancements
 
 * Code check report: hits of the same issue (e.g. several `scale()`/`levels()` ambiguities, or several inputs with no default) are collapsed under one header with one line per location, instead of repeating the full message + suggestion per hit.
+* Code check report now tags each finding with its rule id (e.g. `[conflicting_fn_unqualified]`) so it can be copied into a `# nolint`/`codeChecksIgnore`; the group name (e.g. `globals`) is also accepted there. Rule catalogue documented in `?codeCheckModule`.
 
 ## Bug fixes
 
