@@ -391,6 +391,11 @@ setMethod(
     # loggingMessage helpers
     sim[[._txtSimNesting]] <- ._simNestingLocal
 
+    # URL access log: route prepInputs/preProcess calls during simInit into
+    # envir(sim)$._urlLog. See R/urlLog.R.
+    .urlLogToken <- .installUrlLog(sim)
+    on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
+
     opt <- options("encoding" = "UTF-8")
     # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
     #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
@@ -1415,6 +1420,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     eventType = ".inputObjects",
     eventPriority = .normal()
   )
+  .updateUrlLogExtra(sim)
 
   # loggingMessage helpers
   simNestingRevert <- sim[[._txtSimNesting]]

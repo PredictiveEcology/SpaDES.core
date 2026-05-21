@@ -133,6 +133,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
   # catches the situation where no future event is scheduled,
   #  but stop time is not reached
   cur <- sim@current
+  .updateUrlLogExtra(sim)  # tag any URL accesses inside this event w/ module + event
 
   # loggingMessage helpers
   simNestingRevert <- sim[[._txtSimNesting]]
@@ -874,6 +875,11 @@ setMethod(
     ._simNesting <- simNestingSetup(...)
     # sim[[._txtSimNesting]] <- ._simNesting
     sim[[._txtSimNesting]] <- ._simNesting
+
+    ## URL access log: route prepInputs/preProcess calls during spades into
+    ## envir(sim)$._urlLog. See R/urlLog.R.
+    .urlLogToken <- .installUrlLog(sim)
+    on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
 
     # cacheChaining -- remove Cache tag if it isn't inside a simInitAndSpades call
     cacheChaining <- getOption("spades.cacheChaining", FALSE)
