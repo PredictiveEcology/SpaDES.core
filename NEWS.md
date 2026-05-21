@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9001
+
+## Bug fixes
+
+* Code check `module_named_object`: reworded the `sim$<module> <- ...` finding to "collides with module name; should be changed because it can cause unwanted problems".
+
 # SpaDES.core 3.1.2.9000
 
 ## Bug fixes
