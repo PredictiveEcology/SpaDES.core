@@ -418,6 +418,31 @@ Init <- function(sim) {
   expect_true("notProduced" %in% unused)         # no assertion -> still flagged
 })
 
+test_that("unresolved accessors share a generic message so the report collapses them", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+.inputObjects <- function(sim) {
+  d <- mget(names, envir(sim))
+  sim
+}
+helper <- function(sim) {
+  e <- get(nm, envir(sim))
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  gf <- f[f$id == "unresolved_accessor", , drop = FALSE]
+  ## two get-family occurrences in different functions, one finding each, but
+  ## with an identical (location-free) message so the report groups them
+  expect_equal(nrow(gf), 2L)
+  expect_equal(length(unique(gf$message)), 1L)
+  expect_false(any(grepl("inputObjects|helper|lines", gf$message)))
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")
