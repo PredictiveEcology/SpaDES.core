@@ -4,6 +4,10 @@
 
 * Code check `module_named_object`: reworded the `sim$<module> <- ...` finding to "collides with module name; should be changed because it can cause unwanted problems".
 
+## New features
+
+* `codeCheckModules()` is a vectorized `codeCheckModule()`; with no arguments it checks every module under `getOption("spades.modulePath")`.
+
 # SpaDES.core 3.1.2.9000
 
 ## Bug fixes
