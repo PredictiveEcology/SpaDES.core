@@ -273,6 +273,29 @@ Init <- function(sim) {
   expect_false("conflicting_fn_unqualified" %in% f$id)
 })
 
+test_that("suggestions end with a `# nolint: <rule_id>` acknowledgement", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- scale(1)
+  sim$undeclared <- 1
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  withSug <- f[!is.na(f$suggestion), , drop = FALSE]
+  expect_true(nrow(withSug) > 0)
+  ## each suggestion references nolint with the finding's own rule id
+  expect_true(all(mapply(function(s, id) grepl(paste0("# nolint: ", id), s, fixed = TRUE),
+                         withSug$suggestion, withSug$id)))
+  ## the old vague wording is gone
+  expect_false(any(grepl("otherwise ignore", f$suggestion, fixed = TRUE)))
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

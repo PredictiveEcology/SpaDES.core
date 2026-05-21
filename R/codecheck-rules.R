@@ -80,7 +80,24 @@
   out <- out[lengths(out) > 0]
   if (length(out) == 0) return(.cc_emptyFindings())
   findings <- do.call(rbind, out)
+  findings <- .cc_appendNolintHint(findings)
   .cc_applySuppression(findings, uses)
+}
+
+## Every suggestion ends by telling the developer how to acknowledge the
+## finding: `otherwise add # nolint: <rule_id>`. Replaces the vaguer
+## "otherwise ignore" and is appended to suggestions that don't already mention
+## `nolint`, using each finding's own rule id.
+.cc_appendNolintHint <- function(findings) {
+  if (nrow(findings) == 0) return(findings)
+  findings$suggestion <- vapply(seq_len(nrow(findings)), function(i) {
+    s <- findings$suggestion[i]
+    if (is.na(s)) return(NA_character_)
+    if (grepl("nolint", s, fixed = TRUE)) return(s)   # already mentions it
+    s <- sub("[[:space:];,]*otherwise ignore\\.?[[:space:]]*$", "", s)
+    paste0(s, "; otherwise add `# nolint: ", findings$id[i], "`")
+  }, character(1))
+  findings
 }
 
 ## Drop findings silenced either by an inline `# nolint` marker (carried on
@@ -189,7 +206,7 @@
                                                 name, name),
                 param_declared_unused = sprintf("either remove `defineParameter('%s', ...)` or add `Par$%s` (or P(sim)$%s) in module code",
                                                 name, name, name),
-                in_no_default         = sprintf("if a default is appropriate, add `if (!suppliedElsewhere('%s', sim)) sim$%s <- <default>` to .inputObjects(); otherwise ignore",
+                in_no_default         = sprintf("if a default is appropriate, add `if (!suppliedElsewhere('%s', sim)) sim$%s <- <default>` to .inputObjects()",
                                                 name, name),
                 NA_character_
               ))
@@ -332,17 +349,42 @@
 .ccr_unresolved_accessor <- function(uses, meta) {
   bad <- uses[!uses$resolved & !is.na(uses$fn), , drop = FALSE]
   if (nrow(bad) == 0) return(.cc_emptyFindings())
-  ## Aggregate: one finding per (fn, kind) showing all line numbers, so the
+  ## Classify the kind of dynamic access so the message can be specific. The
+  ## get-family (get/mget/exists/assign with a computed name) and `sim[[var]]`
+  ## are inherently un-checkable statically -- the developer must decide whether
+  ## the access is intentional (add `# nolint: unresolved_accessor`) or a bug.
+  getFamily <- c("get()", "mget()", "exists()", "assign()")
+  bad$access <- ifelse(bad$extra %in% getFamily, "getfam",
+                       ifelse(bad$kind %in% c("sim_get", "sim_assign"),
+                              "bracket", "other"))
+  ## Aggregate: one finding per (fn, access) showing all line numbers, so the
   ## report doesn't spew one row per occurrence. Tests can still see the raw
   ## Uses on .codeCheck if they want.
-  by <- split(bad, list(bad$fn, bad$kind), drop = TRUE)
+  by <- split(bad, list(bad$fn, bad$access), drop = TRUE)
   do.call(rbind, lapply(by, function(g) {
     lines <- paste(g$line, collapse = ", ")
     u <- g[1, ]
+    nolintHint <- paste0("cannot be checked statically (the object name is ",
+                         "computed at run time); if intentional, add ",
+                         "`# nolint: unresolved_accessor` on the line(s), ",
+                         "otherwise use a literal name (`sim$x`) or declare ",
+                         "the object in inputObjects/outputObjects")
+    msgSug <- switch(
+      u$access,
+      getfam = list(
+        msg = sprintf("%d dynamic `get()`/`mget()`-family access(es) of `sim` in %s (lines %s)",
+                      nrow(g), u$fn, lines),
+        sug = nolintHint),
+      bracket = list(
+        msg = sprintf("%d dynamic `sim[[<var>]]` access(es) in %s (lines %s)",
+                      nrow(g), u$fn, lines),
+        sug = nolintHint),
+      list(
+        msg = sprintf("%d unresolved %s accessor(s) in %s (lines %s) \u2014 skipped",
+                      nrow(g), u$kind, u$fn, lines),
+        sug = "if these objects should be checked, declare them explicitly in inputObjects/outputObjects"))
     .cc_findingFromUse("unresolved_accessor", "info", meta$module, u,
-                       message = sprintf("%d unresolved %s accessor(s) in %s (lines %s) \u2014 skipped",
-                                         nrow(g), u$kind, u$fn, lines),
-                       suggestion = "if these objects should be checked, declare them explicitly in inputObjects/outputObjects")
+                       message = msgSug$msg, suggestion = msgSug$sug)
   }))
 }
 
