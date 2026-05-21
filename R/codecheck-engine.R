@@ -346,6 +346,25 @@
     )
   }
 
+  ## paramCheckOtherMods(sim, "x") -- treats "x" as a used parameter. The
+  ## function deliberately reads a parameter that may be defined in other
+  ## modules, so it is recorded as a use (no module attribution) and exempted
+  ## from the "used but not declared here" rule via its extra tag.
+  pcomNodes <- xml2::xml_find_all(
+    doc, "//expr[expr/SYMBOL_FUNCTION_CALL[text()='paramCheckOtherMods']]"
+  )
+  for (n in pcomNodes) {
+    nameNode <- xml2::xml_find_first(n, ".//STR_CONST[1]")
+    if (length(nameNode) == 0 || is.na(xml2::xml_text(nameNode))) next
+    pos <- .cc_pos(n)
+    out[[length(out) + 1]] <- .cc_use(
+      "param", name = gsub('^["\']|["\']$', "", xml2::xml_text(nameNode)),
+      fn = .cc_enclosingFn(n), file = file,
+      line = pos$line, col = pos$col, resolved = TRUE,
+      module = currentModule, extra = "paramCheckOtherMods()"
+    )
+  }
+
   if (length(out) == 0) return(.cc_emptyUses())
   do.call(rbind, out)
 }

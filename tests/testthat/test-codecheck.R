@@ -322,6 +322,28 @@ Init <- function(sim) {
   expect_true("neverProduced" %in% unused)
 })
 
+test_that("paramCheckOtherMods(sim, 'x') marks x a used parameter", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- SpaDES.core::paramCheckOtherMods(sim, "spreadFitFilename")
+  b <- paramCheckOtherMods(sim, "otherParam")
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  pc <- uses[uses$kind == "param" & uses$extra == "paramCheckOtherMods()", , drop = FALSE]
+  expect_setequal(pc$name, c("spreadFitFilename", "otherParam"))
+  ## a declared param read only via paramCheckOtherMods is "used"
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = "spreadFitFilename", otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("spreadFitFilename" %in% f$name[f$id == "param_declared_unused"])
+  ## and is exempt from used-but-not-declared (it belongs to other modules)
+  expect_false("param_used_undeclared" %in% f$id)
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

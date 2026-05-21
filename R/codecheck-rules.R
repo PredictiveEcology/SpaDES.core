@@ -326,6 +326,9 @@
   ## core machinery defines these implicitly; modules legitimately reference
   ## them without declaring in defineParameter()
   pUses <- pUses[!.cc_isInternalParam(pUses$name), , drop = FALSE]
+  ## paramCheckOtherMods(sim, "x") deliberately reads parameters owned by other
+  ## modules, so such uses must not be reported as "used but not declared here"
+  pUses <- pUses[is.na(pUses$extra) | pUses$extra != "paramCheckOtherMods()", , drop = FALSE]
   bad <- pUses[!(pUses$name %in% meta$params), , drop = FALSE]
   if (nrow(bad) == 0) return(.cc_emptyFindings())
   do.call(rbind, lapply(seq_len(nrow(bad)), function(i) {
