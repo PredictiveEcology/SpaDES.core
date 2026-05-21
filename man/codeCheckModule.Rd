@@ -44,6 +44,28 @@ structured tibble of findings, optionally printed as grouped tables.
 This is the v2 implementation, selectable at \code{simInit()} time via
 \code{options(spades.codeCheckEngine = "v2")} (the default). The legacy v1
 checker is still available via \code{options(spades.codeCheckEngine = "v1")}.
+}
+\section{Silencing findings}{
+
+Individual findings can be suppressed three ways (all honoured both here and
+during \code{simInit()}):
+\itemize{
+\item \strong{Inline \verb{# nolint} (module developer).} Put a \verb{# nolint} comment on
+the offending source line to silence every rule there, or
+\verb{# nolint: <rule_id>[, <rule_id>]} to silence only specific rules. For a
+metadata finding such as \code{in_no_default}, place it anywhere within the
+\code{expectsInput()} / \code{createsOutput()} / \code{defineParameter()} declaration,
+e.g. \code{expectsInput("cloudFolderID", "character", desc = "...") # nolint: in_no_default}.
+This travels with the module and documents the intent.
+\item \strong{\code{options(spades.codeChecksIgnore = ...)} (module user).} A named
+list keyed by rule id whose values are object names to ignore, e.g.
+\code{options(spades.codeChecksIgnore = list(in_no_default = c("cloudFolderID", "ecoregionRst")))}.
+Lets someone running another author's module quiet specific findings
+without editing its source.
+\item \strong{\code{options(spades.moduleCodeChecks = list(disable = ...))}.} Disable
+whole rules by id (or restrict with \code{enable = ...}); see
+\code{names(SpaDES.core:::.CC_RULES)} for the catalogue.
+}
 
 \code{codeCheckModule()} checks a single module. \code{codeCheckModules()} is the
 vectorized form: it runs \code{codeCheckModule()} on each path in \code{paths} and
@@ -53,3 +75,4 @@ so \code{codeCheckModules()} with no arguments checks the whole project. It
 replaces the manual idiom
 \code{Map(codeCheckModule, dir(getOption("spades.modulePath"), full.names = TRUE))}.
 }
+

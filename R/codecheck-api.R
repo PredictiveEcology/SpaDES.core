@@ -25,6 +25,27 @@
 #' `options(spades.codeCheckEngine = "v2")` (the default). The legacy v1
 #' checker is still available via `options(spades.codeCheckEngine = "v1")`.
 #'
+#' @section Silencing findings:
+#' Individual findings can be suppressed three ways (all honoured both here and
+#' during `simInit()`):
+#' \itemize{
+#'   \item **Inline `# nolint` (module developer).** Put a `# nolint` comment on
+#'     the offending source line to silence every rule there, or
+#'     `# nolint: <rule_id>[, <rule_id>]` to silence only specific rules. For a
+#'     metadata finding such as `in_no_default`, place it anywhere within the
+#'     `expectsInput()` / `createsOutput()` / `defineParameter()` declaration,
+#'     e.g. `expectsInput("cloudFolderID", "character", desc = "...") # nolint: in_no_default`.
+#'     This travels with the module and documents the intent.
+#'   \item **`options(spades.codeChecksIgnore = ...)` (module user).** A named
+#'     list keyed by rule id whose values are object names to ignore, e.g.
+#'     `options(spades.codeChecksIgnore = list(in_no_default = c("cloudFolderID", "ecoregionRst")))`.
+#'     Lets someone running another author's module quiet specific findings
+#'     without editing its source.
+#'   \item **`options(spades.moduleCodeChecks = list(disable = ...))`.** Disable
+#'     whole rules by id (or restrict with `enable = ...`); see
+#'     `names(SpaDES.core:::.CC_RULES)` for the catalogue.
+#' }
+#'
 #' `codeCheckModule()` checks a single module. `codeCheckModules()` is the
 #' vectorized form: it runs `codeCheckModule()` on each path in `paths` and
 #' returns a list of findings named by module. When `paths` is not supplied it

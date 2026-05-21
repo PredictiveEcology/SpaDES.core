@@ -11,7 +11,10 @@
 ##               files = chr)
 ##
 ## Rules are dispatched by .cc_runRules(); each is enabled unless disabled via
-## options(spades.moduleCodeChecks = list(disable = c("rule_id", ...))).
+## options(spades.moduleCodeChecks = list(disable = c("rule_id", ...))). Per
+## finding, output is further filtered by .cc_applySuppression(): inline
+## `# nolint` markers in the module source, and
+## options(spades.codeChecksIgnore = list(<rule_id> = c("obj", ...))).
 
 ## Rule catalogue ------------------------------------------------------------
 
@@ -36,8 +39,15 @@
 ## Public entry: returns a Findings data.frame
 .cc_runRules <- function(uses, meta, enable = NULL, disable = NULL) {
   ids <- names(.CC_RULES)
-  if (!is.null(enable)) ids <- intersect(ids, enable)
-  if (!is.null(disable)) ids <- setdiff(ids, disable)
+  ## Honour rule enable/disable supplied via the option, in addition to the
+  ## function arguments: options(spades.moduleCodeChecks = list(disable = ...)).
+  opt <- getOption("spades.moduleCodeChecks")
+  if (is.list(opt)) {
+    enable  <- c(enable,  opt[["enable"]])
+    disable <- c(disable, opt[["disable"]])
+  }
+  if (length(enable))  ids <- intersect(ids, enable)
+  if (length(disable)) ids <- setdiff(ids, disable)
   out <- lapply(ids, function(id) {
     fn <- .CC_RULES[[id]]
     tryCatch(fn(uses, meta),
@@ -48,7 +58,59 @@
   })
   out <- out[lengths(out) > 0]
   if (length(out) == 0) return(.cc_emptyFindings())
-  do.call(rbind, out)
+  findings <- do.call(rbind, out)
+  .cc_applySuppression(findings, uses)
+}
+
+## Drop findings silenced either by an inline `# nolint` marker (carried on
+## `uses` as the "nolint"/"declLines" attributes) or by the user option
+## options(spades.codeChecksIgnore = list(<rule_id> = c("obj1", "obj2"))).
+.cc_applySuppression <- function(findings, uses) {
+  if (nrow(findings) == 0) return(findings)
+  nolint    <- attr(uses, "nolint")
+  declLines <- attr(uses, "declLines")
+  ignore    <- getOption("spades.codeChecksIgnore")
+
+  ## candidate (file, line) locations a `# nolint` could sit on to silence
+  ## finding `i`: its own source line, or — for metadata-only findings with no
+  ## line — every line of the matching declaration's span.
+  candLines <- function(i) {
+    if (!is.na(findings$line[i])) {
+      return(data.frame(file = findings$file[i], line = findings$line[i],
+                        stringsAsFactors = FALSE))
+    }
+    if (is.null(declLines) || is.na(findings$name[i])) return(NULL)
+    dl <- declLines[declLines$name == findings$name[i], , drop = FALSE]
+    if (nrow(dl) == 0) return(NULL)
+    do.call(rbind, Map(function(f, a, b)
+      data.frame(file = f, line = seq.int(a, b), stringsAsFactors = FALSE),
+      dl$file, dl$line1, dl$line2))
+  }
+
+  keep <- vapply(seq_len(nrow(findings)), function(i) {
+    fid <- findings$id[i]; fname <- findings$name[i]
+    ## user option: ignore named objects for a given rule
+    if (is.list(ignore) && !is.null(ignore[[fid]]) &&
+        !is.na(fname) && fname %in% ignore[[fid]]) {
+      return(FALSE)
+    }
+    ## inline `# nolint`
+    if (!is.null(nolint) && nrow(nolint)) {
+      cand <- candLines(i)
+      if (!is.null(cand) && nrow(cand)) {
+        for (j in seq_len(nrow(nolint))) {
+          sameFile <- (is.na(nolint$file[j]) & is.na(cand$file)) |
+            (!is.na(nolint$file[j]) & nolint$file[j] == cand$file)
+          if (any(sameFile & nolint$line[j] == cand$line)) {
+            r <- nolint$rules[[j]]
+            if (all(is.na(r)) || fid %in% r) return(FALSE)
+          }
+        }
+      }
+    }
+    TRUE
+  }, logical(1))
+  findings[keep, , drop = FALSE]
 }
 
 ## Helpers -------------------------------------------------------------------

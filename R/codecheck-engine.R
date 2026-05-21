@@ -561,5 +561,62 @@
     uses[[length(uses) + 1]] <- .cc_collect_assignToSim(p)
     uses[[length(uses) + 1]] <- .cc_collect_globalsConflicts(p)
   }
-  do.call(rbind, uses)
+  out <- do.call(rbind, uses)
+  ## Attach suppression context so rules can honour inline `# nolint` markers.
+  ## (Carried as attributes; read by .cc_runRules before `out` is subset.)
+  attr(out, "nolint")    <- do.call(rbind, lapply(parses, .cc_collectNolint))
+  attr(out, "declLines") <- do.call(rbind, lapply(parses, .cc_collectDeclLines))
+  out
+}
+
+## Collect inline `# nolint` directives from the source comments. A bare
+## `# nolint` suppresses every rule on that line; `# nolint: id1, id2`
+## suppresses only the listed rule ids. Returns a data.frame(file, line,
+## rules) where `rules` is a list-column (NA = blanket), or NULL if none.
+.cc_collectNolint <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  comments <- xml2::xml_find_all(doc, "//COMMENT")
+  out <- list()
+  for (cm in comments) {
+    txt <- xml2::xml_text(cm)
+    m <- regmatches(txt, regexec("#+\\s*nolint\\b\\s*(?::\\s*(.*))?$", txt,
+                                 ignore.case = TRUE))[[1]]
+    if (length(m) == 0) next
+    rulesStr <- if (length(m) >= 2) trimws(m[2]) else ""
+    rules <- if (nzchar(rulesStr)) {
+      trimws(strsplit(rulesStr, "[,[:space:]]+")[[1]])
+    } else NA_character_
+    out[[length(out) + 1]] <- data.frame(
+      file = file %||% NA_character_,
+      line = as.integer(xml2::xml_attr(cm, "line1")),
+      rules = I(list(rules)), stringsAsFactors = FALSE)
+  }
+  if (length(out) == 0) return(NULL)
+  do.call(rbind, out)
+}
+
+## Record the source line span of each metadata declaration
+## (expectsInput/createsOutput/defineParameter), keyed by object name, so a
+## `# nolint` placed anywhere within a (possibly multi-line) declaration can
+## suppress the corresponding metadata-only finding. Returns NULL if none.
+.cc_collectDeclLines <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  spec <- list(expectsInput = "objectName", createsOutput = "objectName",
+               defineParameter = "name")
+  out <- list()
+  for (fnName in names(spec)) {
+    calls <- xml2::xml_find_all(
+      doc, sprintf("//expr[expr/SYMBOL_FUNCTION_CALL[text()='%s']]", fnName))
+    for (cal in calls) {
+      val <- .cc_argValueStr(cal, spec[[fnName]])
+      if (is.na(val)) next
+      out[[length(out) + 1]] <- data.frame(
+        name = val, file = file %||% NA_character_,
+        line1 = as.integer(xml2::xml_attr(cal, "line1")),
+        line2 = as.integer(xml2::xml_attr(cal, "line2")),
+        stringsAsFactors = FALSE)
+    }
+  }
+  if (length(out) == 0) return(NULL)
+  do.call(rbind, out)
 }

@@ -1,5 +1,9 @@
 # SpaDES.core 3.1.2.9002
 
+## New features
+
+* Code check findings can now be silenced: an inline `# nolint` (or `# nolint: <rule_id>`) comment in the module source (developers), `options(spades.codeChecksIgnore = list(<rule_id> = c("obj", ...)))` (users), and `options(spades.moduleCodeChecks = list(disable = ...))` (now actually wired). See `?codeCheckModule`.
+
 ## Enhancements
 
 * Code check report: hits of the same issue (e.g. several `scale()`/`levels()` ambiguities, or several inputs with no default) are collapsed under one header with one line per location, instead of repeating the full message + suggestion per hit.

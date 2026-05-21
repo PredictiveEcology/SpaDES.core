@@ -130,6 +130,82 @@ Init <- function(sim) {
   expect_true(any(uses$kind == "param" & !uses$resolved))
 })
 
+test_that("inline # nolint suppresses findings (line and declaration span)", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+defineModule(sim, list(
+  name = "nolintMod",
+  inputObjects = bindrows(
+    expectsInput("cloudFolderID", "character", desc = "x"), # nolint: in_no_default
+    expectsInput("ecoregionRst", "RasterLayer",
+                 desc = "multi-line"), # nolint
+    expectsInput("needsIt", "character", desc = "still flagged")
+  ),
+  outputObjects = bindrows()
+))
+.inputObjects <- function(sim) sim
+Init <- function(sim) {
+  a <- scale(1)            # nolint: conflicting_fn_unqualified
+  b <- levels(2)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  inNoDef <- f$name[f$id == "in_no_default"]
+  ## rule-specific nolint on the line, and blanket nolint within the
+  ## (multi-line) declaration span, both silence in_no_default
+  expect_false("cloudFolderID" %in% inNoDef)
+  expect_false("ecoregionRst" %in% inNoDef)
+  expect_true("needsIt" %in% inNoDef)
+  ## rule-specific nolint silences only that rule on that line
+  conf <- f$name[f$id == "conflicting_fn_unqualified"]
+  expect_false("scale" %in% conf)
+  expect_true("levels" %in% conf)
+})
+
+test_that("options(spades.codeChecksIgnore) suppresses by rule + object name", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+defineModule(sim, list(
+  name = "ignoreMod",
+  inputObjects = bindrows(
+    expectsInput("a", "character", desc = "x"),
+    expectsInput("b", "character", desc = "y")
+  ),
+  outputObjects = bindrows()
+))
+.inputObjects <- function(sim) sim
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  withr::local_options(spades.codeChecksIgnore = list(in_no_default = "a"))
+  f <- codeCheckModule(tf, print = FALSE)
+  inNoDef <- f$name[f$id == "in_no_default"]
+  expect_false("a" %in% inNoDef)
+  expect_true("b" %in% inNoDef)
+})
+
+test_that("options(spades.moduleCodeChecks=list(disable=)) disables a whole rule", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- scale(1)
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  withr::local_options(spades.moduleCodeChecks = list(disable = "conflicting_fn_unqualified"))
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("conflicting_fn_unqualified" %in% f$id)
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")
