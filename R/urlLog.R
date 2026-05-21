@@ -11,17 +11,23 @@
 
 ## Install the option for the duration of a simInit / spades call. Returns
 ## a sentinel the caller must hand back to .restoreUrlLog() on exit.
-## NULL sentinel means nothing was installed (option already opted out, or
-## a user has set their own sink, or no sim available).
+##
+## spades.urlLog = FALSE is a hard off-switch: because reproducible's urlLog
+## is on by default, we must set reproducible.urlLog = FALSE for the duration
+## (otherwise reproducible would still log at the package level). Otherwise we
+## point reproducible.urlLog at the sim's hidden .urlLog env.
 .installUrlLog <- function(sim) {
-  if (!isTRUE(getOption("spades.urlLog", TRUE))) return(NULL)
+  prev <- getOption("reproducible.urlLog")
+  if (!isTRUE(getOption("spades.urlLog", TRUE))) {
+    options(reproducible.urlLog = FALSE)
+    return(list(prev = prev))
+  }
   e <- envir(sim)
   if (is.null(e$.urlLog)) {
     e$.urlLog <- new.env(parent = emptyenv())
     e$.urlLog$records <- list()
     e$.urlLog$seen    <- character()
   }
-  prev <- getOption("reproducible.urlLog")
   options(reproducible.urlLog = e$.urlLog)
   list(prev = prev)
 }
