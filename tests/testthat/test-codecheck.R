@@ -84,6 +84,33 @@ Init <- function(sim) {
   expect_equal(sum(uses$kind == "sim_get" & !uses$resolved), 1L)
 })
 
+test_that("enclosing fn is found through wrapper calls (e.g. cmpfun)", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+SummaryBGM <- compiler::cmpfun(function(sim) {
+  sim$ANPPMap <- rasterizeReduced(x, sim$pixelGroupMap, "uniqueSumANPP")
+  sim
+})
+anon <- function(sim) {
+  lapply(1:2, function(z) sim$inner <- z)   # anonymous: not attributed
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  ## the assign wrapped in cmpfun() is attributed to its binding name
+  anpp <- uses[uses$name == "ANPPMap" & uses$kind == "sim_assign", , drop = FALSE]
+  expect_equal(anpp$fn, "SummaryBGM")
+  ## an assign declared as an output is therefore seen as "used"
+  meta <- list(module = "m", inputs = character(), outputs = "ANPPMap",
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("ANPPMap" %in% f$name[f$id == "out_declared_unused"])
+  ## the anonymous lapply callback is not misattributed to the outer function
+  inner <- uses[uses$name == "inner" & uses$kind == "sim_assign", , drop = FALSE]
+  expect_true(is.na(inner$fn))
+})
+
 test_that("collector recognizes all parameter accessor forms", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

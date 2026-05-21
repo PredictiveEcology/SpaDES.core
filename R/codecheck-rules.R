@@ -160,8 +160,12 @@
   uses[!is.na(uses$fn) & uses$fn == ".inputObjects", , drop = FALSE]
 }
 
+## Everything that is not provably inside .inputObjects(). A use whose
+## enclosing function could not be identified (fn = NA, e.g. a function wrapped
+## in compiler::cmpfun()/Cache()) is treated as outside, so an unrecognised
+## wrapper never produces a false "declared but unused" finding.
 .cc_outsideDotInputObjects <- function(uses) {
-  uses[!is.na(uses$fn) & uses$fn != ".inputObjects", , drop = FALSE]
+  uses[is.na(uses$fn) | uses$fn != ".inputObjects", , drop = FALSE]
 }
 
 ## Build a generic finding for a "declared but unused" object (no source pos).

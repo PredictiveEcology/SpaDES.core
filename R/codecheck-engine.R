@@ -114,14 +114,32 @@
     "ancestor::expr[FUNCTION][1]")
   if (length(ancs) == 0) return(NA_character_)
   fnExpr <- ancs[[length(ancs)]]
-  ## The function definition expr is typically the RHS of a top-level
-  ## `name <- function(...) {...}` assignment. The LHS SYMBOL is two siblings
-  ## back: <expr><SYMBOL>name</SYMBOL></expr><LEFT_ASSIGN>...<expr>function...
-  parent <- xml2::xml_parent(fnExpr)
-  if (xml2::xml_name(parent) != "expr") return(NA_character_)
-  lhs <- xml2::xml_find_first(parent, "expr[1]/SYMBOL")
-  if (length(lhs) == 0 || is.na(xml2::xml_text(lhs))) return(NA_character_)
-  xml2::xml_text(lhs)
+  ## The function-def expr is usually the RHS of a `name <- function(...) {...}`
+  ## assignment, but it may be wrapped in one or more calls, e.g.
+  ## `name <- compiler::cmpfun(function(...) {...})` or `Cache(function(...))`.
+  ## Walk up through such wrappers to the binding assignment. Stop (returning
+  ## NA) if we reach another function boundary first -- an anonymous function in
+  ## an outer function body must not be misattributed to that outer function.
+  cur <- fnExpr
+  repeat {
+    parent <- xml2::xml_parent(cur)
+    if (length(parent) == 0 || xml2::xml_name(parent) != "expr") {
+      return(NA_character_)
+    }
+    knames <- xml2::xml_name(xml2::xml_children(parent))
+    if (any(knames %in% c("LEFT_ASSIGN", "EQ_ASSIGN"))) {
+      lhs <- xml2::xml_find_first(parent, "expr[1]/SYMBOL")
+      if (length(lhs) > 0 && !is.na(xml2::xml_text(lhs))) return(xml2::xml_text(lhs))
+      return(NA_character_)
+    }
+    if (any(knames == "RIGHT_ASSIGN")) {
+      rhs <- xml2::xml_find_first(parent, "expr[last()]/SYMBOL")
+      if (length(rhs) > 0 && !is.na(xml2::xml_text(rhs))) return(xml2::xml_text(rhs))
+      return(NA_character_)
+    }
+    if (any(knames == "FUNCTION")) return(NA_character_)
+    cur <- parent
+  }
 }
 
 ## Is `node` (an expr) the LHS of an assignment? An expr is an LHS iff its
