@@ -71,6 +71,22 @@ spPaths <- c(corePaths, tmpPaths)
 #' Paths # shows change
 #' }
 #'
+## reproducible (>= 3.1.1.9002) leaves options("reproducible.cachePath") unset
+## (NULL) until first use, so setup layers can detect "unset". SpaDES is such a
+## layer: resolve a default here -- mirroring reproducible's own temp-cache
+## fallback (file.path(reproducible.tempPath, "cache")) -- so checkPath() never
+## receives NULL.
+.cachePathOrDefault <- function() {
+  cp <- .getOption("reproducible.cachePath")
+  if (is.null(cp)) {
+    tempPath <- getOption("reproducible.tempPath",
+                          file.path(tempdir(), "reproducible"))
+    file.path(tempPath, "cache")
+  } else {
+    cp
+  }
+}
+
 .paths <- function() {
   if (!is.null(.getOption("spades.cachePath"))) {
     message(
@@ -81,7 +97,7 @@ spPaths <- c(corePaths, tmpPaths)
   }
 
   list(
-    cachePath = .getOption("reproducible.cachePath"), # nolint
+    cachePath = .cachePathOrDefault(), # nolint
     inputPath = getOption("spades.inputPath"), # nolint
     modulePath = getOption("spades.modulePath"), # nolint
     outputPath = getOption("spades.outputPath"), # nolint
@@ -118,7 +134,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     TP = FALSE
   )
   if (missing(cachePath)) {
-    cachePath <- .getOption("reproducible.cachePath") # nolint
+    cachePath <- .cachePathOrDefault() # nolint
     defaults$CP <- TRUE
   }
   if (missing(inputPath)) {
