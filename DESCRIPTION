@@ -81,7 +81,7 @@ Suggests:
     testthat (>= 1.0.2),
     withr
 Remotes:
-    PredictiveEcology/reproducible@development,
+    PredictiveEcology/reproducible@prepInputsLog,
     PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
@@ -141,6 +141,7 @@ Collate:
     'spades-core-deprecated.R'
     'spades-core-package.R'
     'suppliedElsewhere.R'
+    'urlLog.R'
     'zzz.R'
 Roxygen: list(markdown = TRUE)
 Config/roxygen2/version: 8.0.0
