@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9002
+
+## Enhancements
+
+* Code check report: hits of the same issue (e.g. several `scale()`/`levels()` ambiguities, or several inputs with no default) are collapsed under one header with one line per location, instead of repeating the full message + suggestion per hit.
+
 # SpaDES.core 3.1.2.9001
 
 ## New features
