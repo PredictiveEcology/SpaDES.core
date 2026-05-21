@@ -81,7 +81,7 @@ Suggests:
     testthat (>= 1.0.2),
     withr
 Remotes:
-    PredictiveEcology/reproducible@development,
+    PredictiveEcology/reproducible@prepInputsLog,
     PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
