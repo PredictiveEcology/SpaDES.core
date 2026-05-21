@@ -34,8 +34,15 @@
   conflicting_fn_unqualified = function(uses, meta) .ccr_conflicting_fn(uses, meta),
   clashing_module_fn       = function(uses, meta) .ccr_clashing_fn(uses, meta),
   codetools                = function(uses, meta) .ccr_codetools(uses, meta),
-  reqd_pkg_duplicate       = function(uses, meta) .ccr_reqd_pkg_duplicate(uses, meta)
+  reqd_pkg_duplicate       = function(uses, meta) .ccr_reqd_pkg_duplicate(uses, meta),
+  reqd_pkg_undeclared      = function(uses, meta) .ccr_reqd_pkg_undeclared(uses, meta)
 )
+
+## Base-priority packages that are always available and never declared in
+## reqdPkgs.
+.CC_BASE_PKGS <- c("base", "compiler", "datasets", "graphics", "grDevices",
+                   "grid", "methods", "parallel", "splines", "stats", "stats4",
+                   "tcltk", "tools", "utils")
 
 ## Display bucket each rule id is reported under (the `• <group>` headers).
 ## Shared by the reporter and by `# nolint` / codeChecksIgnore suppression, so
@@ -56,7 +63,8 @@
   conflicting_fn_unqualified = "globals",
   clashing_module_fn         = "module functions",
   codetools                  = "codetools",
-  reqd_pkg_duplicate         = "reqdPkgs"
+  reqd_pkg_duplicate         = "reqdPkgs",
+  reqd_pkg_undeclared        = "reqdPkgs"
 )
 
 ## Public entry: returns a Findings data.frame
@@ -523,5 +531,25 @@
                         if (conflict) " with differing source/version" else "",
                         paste(specs, collapse = " | ")),
       suggestion = "keep a single declaration (the most specific source/version) and remove the rest")
+  }))
+}
+
+## A package referenced via `pkg::fn` but not present in reqdPkgs (and not a
+## base package). Likely a missing declaration.
+.ccr_reqd_pkg_undeclared <- function(uses, meta) {
+  ns <- uses[uses$kind == "ns_call" & !is.na(uses$name), , drop = FALSE]
+  if (nrow(ns) == 0) return(.cc_emptyFindings())
+  declared <- if (is.null(meta$reqdPkgs)) character() else unique(meta$reqdPkgs$pkg)
+  missing <- setdiff(unique(ns$name), c(declared, .CC_BASE_PKGS))
+  if (length(missing) == 0) return(.cc_emptyFindings())
+  do.call(rbind, lapply(missing, function(p) {
+    fns <- unique(stats::na.omit(ns$extra[ns$name == p]))
+    eg <- paste0(p, "::", utils::head(fns, 3), "()", collapse = ", ")
+    u <- ns[ns$name == p, , drop = FALSE][1, ]
+    .cc_findingFromUse(
+      "reqd_pkg_undeclared", "warning", meta$module, u,
+      message = sprintf("package '%s' is used via `::` (e.g. %s) but not declared in reqdPkgs",
+                        p, eg),
+      suggestion = sprintf("add '%s' to reqdPkgs", p))
   }))
 }

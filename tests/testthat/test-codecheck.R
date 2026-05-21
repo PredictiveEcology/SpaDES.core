@@ -368,6 +368,34 @@ defineModule(sim, list(
   expect_false(any(c("terra", "deldir") %in% dup$name))
 })
 
+test_that("reqd_pkg_undeclared flags pkg::fn whose pkg is not in reqdPkgs", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("Require")
+  src <- '
+defineModule(sim, list(
+  name = "m",
+  reqdPkgs = list("terra", "PredictiveEcology/reproducible@dev (>= 3.0.0)"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+Init <- function(sim) {
+  a <- terra::rast(1)
+  b <- reproducible::Cache(f)
+  d <- data.table::data.table()
+  e <- stats::lm(y ~ x)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  missing <- f$name[f$id == "reqd_pkg_undeclared"]
+  expect_true("data.table" %in% missing)        # used via :: but not declared
+  expect_false("terra" %in% missing)             # declared
+  expect_false("reproducible" %in% missing)      # declared via GitHub spec
+  expect_false("stats" %in% missing)             # base package
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

@@ -562,6 +562,25 @@
   do.call(rbind, out)
 }
 
+## Namespaced references: every `pkg::name` / `pkg:::name`. Emits one
+## use per occurrence with name = pkg (the SYMBOL_PACKAGE token) and
+## extra = the referenced symbol, so reqd_pkg_undeclared can see which
+## packages are used via `::`.
+.cc_collect_nsCalls <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  pkgNodes <- xml2::xml_find_all(doc, "//SYMBOL_PACKAGE")
+  if (length(pkgNodes) == 0) return(.cc_emptyUses())
+  out <- lapply(pkgNodes, function(p) {
+    parent <- xml2::xml_parent(p)
+    fnNode <- xml2::xml_find_first(parent, "SYMBOL_FUNCTION_CALL | SYMBOL")
+    pos <- .cc_pos(p)
+    .cc_use("ns_call", name = xml2::xml_text(p), fn = .cc_enclosingFn(p),
+            file = file, line = pos$line, col = pos$col, resolved = TRUE,
+            extra = if (length(fnNode) > 0) xml2::xml_text(fnNode) else NA_character_)
+  })
+  do.call(rbind, out)
+}
+
 ## Conflicting/clashing function uses (raster::levels, quickPlot::Plot, etc.).
 ## These are flagged by name only -- we don't care about positions for the
 ## clashing-defined-fn check (handled via env name listing, not parsing).
@@ -611,6 +630,7 @@
     uses[[length(uses) + 1]] <- .cc_collect_assignToSim(p)
     uses[[length(uses) + 1]] <- .cc_collect_globalsConflicts(p)
     uses[[length(uses) + 1]] <- .cc_collect_localAndBulk(p)
+    uses[[length(uses) + 1]] <- .cc_collect_nsCalls(p)
   }
   out <- do.call(rbind, uses)
   ## Attach suppression context so rules can honour inline `# nolint` markers.
