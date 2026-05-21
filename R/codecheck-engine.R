@@ -333,6 +333,12 @@
     inner, "OP-DOLLAR | LBB")) > 0
   if (innerHasAccessor) {
     modName <- .cc_chainTail(inner)
+    if (!is.null(modName) && isTRUE(modName$current)) {
+      ## params(sim)[[currentModule(sim)]]$x -- the key resolves to the
+      ## current module, so treat it like the no-module form below
+      return(list(module = NULL, param = outerName$name,
+                  resolved = outerName$resolved))
+    }
     list(module = modName$name,
          param = outerName$name,
          resolved = outerName$resolved && (is.null(modName) || modName$resolved))
@@ -354,10 +360,17 @@
     if (length(sym) == 0) return(NULL)
     return(list(name = xml2::xml_text(sym), resolved = TRUE))
   } else if (opName == "LBB") {
-    str <- xml2::xml_find_first(expr, "expr[2]/STR_CONST")
+    key <- xml2::xml_find_first(expr, "expr[2]")
+    str <- xml2::xml_find_first(key, "STR_CONST")
     if (length(str) > 0 && !is.na(xml2::xml_text(str))) {
       return(list(name = gsub('^["\']|["\']$', "", xml2::xml_text(str)),
                   resolved = TRUE))
+    }
+    ## params(sim)[[currentModule(sim)]] -- key is a call to currentModule(),
+    ## i.e. the current module; resolvable even though it isn't a literal
+    fnCall <- xml2::xml_find_first(key, ".//SYMBOL_FUNCTION_CALL")
+    if (length(fnCall) > 0 && identical(xml2::xml_text(fnCall), "currentModule")) {
+      return(list(name = NA_character_, resolved = TRUE, current = TRUE))
     }
     return(list(name = NA_character_, resolved = FALSE))
   }

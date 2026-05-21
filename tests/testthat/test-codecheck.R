@@ -109,6 +109,27 @@ Init <- function(sim) {
   expect_equal(modByName[["epsilon"]], "other")
 })
 
+test_that("params(sim)[[currentModule(sim)]]$x resolves to the current module", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  params(sim)[[currentModule(sim)]]$pixelGroupAgeClass <- P(sim)$successionTimestep
+  z <- params(sim)[[someVar]]$bar   # genuinely unresolved
+  return(invisible(sim))
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "thisMod")
+  pUses <- uses[uses$kind == "param", , drop = FALSE]
+  ## the currentModule(sim) key resolves to the current module
+  pgac <- pUses[pUses$name == "pixelGroupAgeClass", , drop = FALSE]
+  expect_equal(nrow(pgac), 1L)
+  expect_true(pgac$resolved)
+  expect_equal(pgac$module, "thisMod")
+  ## a non-literal, non-currentModule key is still unresolved
+  expect_true(any(uses$kind == "param" & !uses$resolved))
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

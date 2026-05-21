@@ -4,6 +4,10 @@
 
 * Code check report: hits of the same issue (e.g. several `scale()`/`levels()` ambiguities, or several inputs with no default) are collapsed under one header with one line per location, instead of repeating the full message + suggestion per hit.
 
+## Bug fixes
+
+* Code check: `params(sim)[[currentModule(sim)]]$x` now resolves to the current module instead of being reported as an unresolved param accessor.
+
 # SpaDES.core 3.1.2.9001
 
 ## New features
