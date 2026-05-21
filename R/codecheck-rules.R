@@ -311,7 +311,14 @@
   if (length(meta$inputs) == 0) return(.cc_emptyFindings())
   initAssigns <- .cc_inDotInputObjects(uses)
   initAssigns <- initAssigns[initAssigns$kind == "sim_assign" & !is.na(initAssigns$name), , drop = FALSE]
-  missing <- setdiff(meta$inputs, initAssigns$name)
+  ## `# nolint: vars a, b` asserts a, b are assigned (e.g. a dynamic
+  ## sim[[namPlural]] <- ... in .inputObjects whose name can't be seen
+  ## statically); treat them as having a default.
+  declaredVars <- uses$name[uses$kind == "declared_var" & !is.na(uses$name)]
+  ## an input guarded by `suppliedElsewhere("x", sim)` (then assigned a default
+  ## OR stop()ped if absent) is intentionally handled -- not a missing default.
+  suppliedElsewhere <- uses$name[uses$kind == "supplied_elsewhere" & !is.na(uses$name)]
+  missing <- setdiff(meta$inputs, c(initAssigns$name, declaredVars, suppliedElsewhere))
   if (length(missing) == 0) return(.cc_emptyFindings())
   do.call(rbind, lapply(missing, function(n)
     .cc_declaredUnused("in_no_default", "note", meta$module, n, "inputObjects")))

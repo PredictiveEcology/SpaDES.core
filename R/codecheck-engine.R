@@ -581,6 +581,36 @@
   do.call(rbind, out)
 }
 
+## `suppliedElsewhere("x", sim)` references. Captures the first argument when
+## it is a string literal or a bare symbol (the object name). Used by
+## in_no_default: requiring an input via suppliedElsewhere (e.g. then stop()ing
+## if absent) is a legitimate alternative to providing a default.
+.cc_collect_suppliedElsewhere <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  calls <- xml2::xml_find_all(
+    doc, "//expr[expr/SYMBOL_FUNCTION_CALL[text()='suppliedElsewhere']]")
+  if (length(calls) == 0) return(.cc_emptyUses())
+  out <- list()
+  for (cal in calls) {
+    arg <- xml2::xml_find_first(cal, "expr[2]")     # first argument
+    if (length(arg) == 0) next
+    sc <- xml2::xml_find_first(arg, ".//STR_CONST")
+    name <- if (length(sc) > 0 && !is.na(xml2::xml_text(sc))) {
+      gsub('^["\']|["\']$', "", xml2::xml_text(sc))
+    } else {
+      sy <- xml2::xml_find_first(arg, ".//SYMBOL")
+      if (length(sy) > 0) xml2::xml_text(sy) else NA_character_
+    }
+    if (is.na(name)) next
+    pos <- .cc_pos(cal)
+    out[[length(out) + 1]] <- .cc_use("supplied_elsewhere", name = name,
+                                      fn = .cc_enclosingFn(cal), file = file,
+                                      line = pos$line, col = pos$col, resolved = TRUE)
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
+}
+
 ## Bare (unqualified) function calls -- every `fn(...)` that is not `pkg::fn`.
 ## Deduplicated by name (first occurrence keeps a position), since the
 ## consumer (reqd_pkg_no_source) only needs the set of called names.
@@ -657,6 +687,7 @@
     uses[[length(uses) + 1]] <- .cc_collect_nsCalls(p)
     uses[[length(uses) + 1]] <- .cc_collect_declaredVars(p)
     uses[[length(uses) + 1]] <- .cc_collect_bareCalls(p)
+    uses[[length(uses) + 1]] <- .cc_collect_suppliedElsewhere(p)
   }
   out <- do.call(rbind, uses)
   ## Attach suppression context so rules can honour inline `# nolint` markers.

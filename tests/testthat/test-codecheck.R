@@ -489,6 +489,37 @@ Init <- function(sim) {
   expect_false("reqd_pkg_no_source" %in% f$id)   # incomplete export info -> quiet
 })
 
+test_that("in_no_default honours # nolint: vars and suppliedElsewhere guards", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+.inputObjects <- function(sim) {
+  for (nam in objsHere) {
+    sim[[paste0(nam, "s")]] <- mget(x, envir(sim)) # nolint: vars cohortDatas
+  }
+  if (!suppliedElsewhere("historicalClimateRasters", sim)) {
+    stop("please supply it")
+  }
+  if (!suppliedElsewhere(standAgeMap, sim)) {
+    sim$standAgeMap <- makeDefault()
+  }
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m",
+               inputs = c("cohortDatas", "historicalClimateRasters",
+                          "standAgeMap", "propFlammables"),
+               outputs = character(), params = character(),
+               otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  flagged <- f$name[f$id == "in_no_default"]
+  expect_false("cohortDatas" %in% flagged)                # # nolint: vars
+  expect_false("historicalClimateRasters" %in% flagged)   # suppliedElsewhere + stop
+  expect_false("standAgeMap" %in% flagged)                # suppliedElsewhere + default
+  expect_true("propFlammables" %in% flagged)              # genuinely no default
+})
+
 test_that("LHS vs RHS distinction is correct", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")

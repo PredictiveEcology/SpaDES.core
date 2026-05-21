@@ -16,6 +16,7 @@
 
 ## Bug fixes
 
+* Code check: `in_no_default` no longer fires for an input that is handled via a `suppliedElsewhere("x", sim)` guard (whether followed by a default assignment or a `stop()`), nor for one asserted with `# nolint: vars` at a dynamic `.inputObjects()` assignment.
 * Code check: `params(sim)[[currentModule(sim)]]$x` now resolves to the current module instead of being reported as an unresolved param accessor.
 * Code check: no longer a false `out_declared_unused` (or `in_declared_unused`) when the assignment lives in a function wrapped in `compiler::cmpfun()` / `Cache()` etc.; the enclosing function is now found through such wrapper calls. Anonymous callbacks (e.g. `lapply(x, function(i) sim[[i]])`) are not misattributed, so a dynamic `sim[[var]]` inside one is no longer reported as an unresolved accessor.
 
