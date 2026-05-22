@@ -499,12 +499,26 @@ restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = 
   modulesToRun <- ctx$loadOrder[!ctx$loadOrder %in% succeeded]
 
   debug <- ctx$debug
+  ## Pass A' -- re-run .inputObjects only for modules that have not completed it (the
+  ##   interrupted module + any not-yet-run, plus any rewound ones); succeeded modules
+  ##   keep their results.
   for (m in modulesToRun) {
     if (isTRUE(getOption("spades.dotInputObjects", TRUE)))
       sim <- .runInputObjects(sim, m, ctx$objects, ctx$notOlderThan, debug = debug)
-    ## schedule the module's init event, then fill unspecified dotParams -- both shared
-    ##   with simInit()'s module loop
-    sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+  }
+
+  ## Pass B' -- schedule each module's init + fill dotParams, mirroring simInit()'s Pass B.
+  ##   simInit schedules init only *after* the whole .inputObjects phase, so an interrupted
+  ##   simInit left no user init events; (re)schedule them here for every module that still
+  ##   needs one (i.e., whose init did not already run via allowInitDuringSimInit), skipping
+  ##   any that somehow already have one queued.
+  needIO <- !(ctx$loadOrder %in% sim@.xData$._ranInitDuringSimInit)
+  alreadyScheduledInit <- vapply(sim@events, function(e)
+    if (identical(e[["eventType"]], "init")) e[["moduleName"]] else NA_character_, character(1))
+  for (idx in seq_along(ctx$loadOrder)) {
+    m <- ctx$loadOrder[idx]
+    if (needIO[idx] && !(m %in% alreadyScheduledInit))
+      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
     sim <- .fillDotParams(sim, m, ctx$dotParamsReal)
   }
 
