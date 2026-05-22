@@ -37,11 +37,15 @@ test_that("test spades.futureEvents", {
     writeLines(newModCode, con = f1)
   }
 
-  if (isWindows()) {
-    oldPlan <- future::plan(future.callr::callr, workers = 3)
-  } else {
-    oldPlan <- future::plan(future::multisession, workers = 3)
-  }
+  ## Use the callr backend on all platforms (not just Windows). With
+  ## future::multisession, the PSOCK worker processes inherit this session's
+  ## controlling terminal as their stderr. reproducible's Cache, running inside
+  ## a worker, briefly setwd()s into a scratch directory that it then removes,
+  ## leaving the worker in a non-existent working directory; a subprocess it
+  ## spawns then prints "sh: getcwd() failed" straight to our terminal. The
+  ## callr backend launches each worker with its own redirected stdout/stderr,
+  ## so that noise is contained instead of leaking into the test output.
+  oldPlan <- future::plan(future.callr::callr, workers = 3)
   # oldPlan <- future::plan("sequential", workers = 3)
   on.exit(future::plan(oldPlan), add = TRUE)
 
