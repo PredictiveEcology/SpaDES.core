@@ -1433,6 +1433,113 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   sim
 }
 
+#' Finish initialization of a `simList` after the `.inputObjects` phase
+#'
+#' The final part of [.runInputObjectsPhase()]: store the loaded modules, apply the
+#' user-supplied `objects`, `inputs`, and `outputs`, and check parameters. Split out for
+#' readability; it is reached on both the normal (`simInit`) and resumed
+#' (`restartSimInit`) paths, since both go through [.runInputObjectsPhase()].
+#'
+#' @param sim A `simList`.
+#' @param ctx The context list stored at `sim@.xData[["._simInitContext"]]` during
+#'   `simInit` (supplies `core`, `loadOrderBase`, `objects`, `objNames`, `inputs`,
+#'   `outputs`, `verbose`, `dotParams`, and `parentChildGraph`).
+#' @param modulesLoaded The named list of loaded modules (core + user), as assembled by
+#'   [.runInputObjectsPhase()].
+#' @return A finished `simList`.
+#' @keywords internal
+.finishSimInit <- function(sim, ctx, modulesLoaded) {
+  ## check that modules all loaded correctly and store result
+  if (all(append(ctx$core, ctx$loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
+    modules(sim) <- modulesLoaded
+  } else {
+    stop("There was a problem loading some modules.")
+  }
+  attr(sim@modules, "modulesGraph") <- ctx$parentChildGraph
+
+  objects <- ctx$objects
+  objNames <- ctx$objNames
+  inputs <- ctx$inputs
+  outputs <- ctx$outputs
+  verbose <- ctx$verbose
+
+  ## END OF MODULE PARSING AND LOADING
+  if (length(objects)) {
+    if (is.list(objects)) {
+      if (length(objNames) == length(objects)) {
+        if (isTRUE(getOption("spades.allowInitDuringSimInit") &&
+                   getOption("spades.dotInputObjects", TRUE))) {
+          inputObjectsAllMods <- inputObjects(sim)
+          if (is(inputObjectsAllMods, "list"))
+            inputObjectsAllMods <- inputObjectsAllMods |> rbindlist()
+          inputObjectsAllMods <- unique(inputObjectsAllMods$objectName)
+          objectNamesToUse <- inputObjectsAllMods[inputObjectsAllMods %in% sim$.userSuppliedObjNames]
+          objectsToUse <- objects[objectNamesToUse]
+          objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
+        } else {
+          objectsToUse <- objects
+        }
+        if (length(objectsToUse) && verbose) {
+          messageNewObjects(
+            objectsToUse[order(names(objectsToUse))], verbose = verbose,
+            prefix = "User-supplied objects passed into sim for spades call:")
+        }
+        if (NROW(objectsToUse))
+          objs(sim) <- objectsToUse
+      } else {
+        stop(
+          paste(
+            "objects must be a character vector of object names",
+            "to retrieve from the .GlobalEnv, or a named list of",
+            "objects"
+          )
+        )
+      }
+    } else {
+      newInputs <- data.frame(
+        objectName = objNames,
+        loadTime = as.numeric(sim@simtimes[["current"]]),
+        stringsAsFactors = FALSE
+      ) |>
+        .fillInputRows(startTime = start(sim))
+      inputs(sim) <- newInputs
+    }
+  }
+
+  ## load files in the filelist
+  if (NROW(inputs) | NROW(inputs(sim))) {
+    inputs(sim) <- rbind(inputs(sim), inputs)
+    if (NROW(events(sim)[moduleName == "load" &
+                         eventType == "inputs" &
+                         eventTime == start(sim)]) > 0) {
+      sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
+      events(sim) <- events(sim)[!(eventTime == time(sim) &
+                                     moduleName == "load" &
+                                     eventType == "inputs"), ]
+    }
+    if (any(events(sim)[["eventTime"]] < start(sim))) {
+      warning(
+        paste0(
+          "One or more objects in the inputs filelist was ",
+          "scheduled to load before start(sim). ",
+          "It is being be removed and not loaded. To ensure loading, loadTime ",
+          "must be start(sim) or later. See examples using ",
+          "loadTime in ?simInit"
+        )
+      )
+      events(sim) <- events(sim)[eventTime >= start(sim)]
+    }
+  }
+
+  if (length(outputs)) {
+    outputs(sim) <- outputs
+  }
+
+  ## check the parameters supplied by the user
+  checkParams(sim, ctx$dotParams, unlist(sim@paths[["modulePath"]]))
+  return(sim)
+}
+
 #' Run module's `.inputObjects`
 #'
 #' Run `.inputObjects()` from each module file from each module, one at a time,
