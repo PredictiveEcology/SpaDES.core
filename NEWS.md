@@ -17,6 +17,14 @@
   Supply a new `events` argument to `restartSpades()` to override it. See
   `?restartSpades`.
 
+## Bug fixes
+
+* Fixed a plotting test that could fail when the test suite was run more than
+  once in the same R session: the tests had been writing their figures to one
+  shared folder, so leftover files from one test could be mistaken for
+  another's. Each test now writes to its own folder. (Test-only change; no
+  effect on the package itself.)
+
 # SpaDES.core 3.1.2.9002 (development version)
 
 These changes are all to the module code checker, which warns module authors
