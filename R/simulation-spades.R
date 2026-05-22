@@ -1642,7 +1642,16 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
 
 #' @keywords internal
 #' @importFrom stats runif
-recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thisSpadesCallRandomStr) {
+# `curMod`: optional character string naming the module whose state should be captured.
+#   If `NULL` (the default, used by the `spades` event loop), the module of the next
+#   event (`sim@events[[1]]`) is used. The `.inputObjects` recovery in `simInit` passes
+#   the current module explicitly because there is no event queue yet.
+# `events`: optional event list used only to build the file-backed scratch directory
+#   (see `dotRMOFilepath`). Defaults to `sim@events`; the `.inputObjects` recovery passes
+#   a synthetic one-element list describing the `.inputObjects` "event".
+recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode,
+                           thisSpadesCallRandomStr, curMod = NULL, events = NULL) {
+  if (is.null(events)) events <- sim@events
   if (is.null(allObjNames)) {
     allObjNames <- outputObjectNames(sim)
   }
@@ -1671,8 +1680,10 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
     rmo$recoverableModObjs <- rmo$recoverableModObjs[seq_len(recoverMode - 1)]
   }
 
-  if (length(sim@events) > 0) {
+  if (is.null(curMod) && length(sim@events) > 0)
     curMod <- sim@events[[1]][["moduleName"]]
+
+  if (!is.null(curMod)) {
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
 
@@ -1680,7 +1691,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
       newList <- list(if (any(objsInSimListAndModule)) {
         # files may disappear for one reason or another; this will fail, silently
         try(Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-             filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events)))
+             filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, events)))
       } else {
         list()
       })
@@ -1691,7 +1702,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
       rmo$recoverableObjs <- append(newList, rmo$recoverableObjs)
     })
 
-    if (exists(curMod, envir = sim[[dotObjs]])) {
+    if (!is.null(sim[[dotObjs]]) && exists(curMod, envir = sim[[dotObjs]])) {
       newList <- if (!is.null(sim[[dotObjs]][[curMod]])) {
           modObjEnv <- sim[[dotObjs]][[curMod]]# $.objects
           objsInModObjects <- ls(modObjEnv, all.names = TRUE)
@@ -1699,7 +1710,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
             if (length(objsInModObjects)) {
               Copy(mget(objsInModObjects, envir = modObjEnv),
                    # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
-                   filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
+                   filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, events))
             } else {
               list()
             })
@@ -1742,7 +1753,13 @@ recoverModePost <- function(sim, rmo, recoverMode) {
 
 #' @keywords internal
 #' @importFrom cli cli_code cli_text col_magenta
-recoverModeOnExit <- function(sim, rmo, recoverMode) {
+# `unit`: length-2 character vector giving the singular and plural noun used in the
+#   recovery message (default `c("event", "events")`; `simInit` passes
+#   `c(".inputObjects", ".inputObjects")`).
+# `restartFn`: character string naming the function the user should call to recover
+#   (default `"restartSpades"`; `simInit` passes `"restartSimInit"`).
+recoverModeOnExit <- function(sim, rmo, recoverMode, unit = c("event", "events"),
+                              restartFn = "restartSpades") {
   sim@.xData$.recoverableObjs <- rmo$recoverableObjs
   sim@.xData$.recoverableModObjs <- rmo$recoverableModObjs
   recoverableObjsSize <- sum(unlist(objSize(rmo$recoverableObjs)))
@@ -1758,24 +1775,24 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
   message(cli::cli_text(cli::col_magenta(
     paste(
       "The initial state of the last ", recmod,
-      singularPlural(c("event", "events"), v = recmod),
+      singularPlural(unit, v = recmod),
       isAre(v = recmod)," cached and saved",
       "in the {.var simList} located at {.code savedSimEnv()$.sim} as",
-      "{.code sim$.recoverableObjs} with the most recent event as the first element in the list,",
-      "second most recent event as the second element, etc.",
+      "{.code sim$.recoverableObjs} with the most recent ", unit[[1]], " as the first element in the list,",
+      "second most recent ", unit[[1]], " as the second element, etc.",
       "The objects contained in each of those are only the objects that may have",
       "changed, according to the metadata for each module.\n",
-      "To recover, use: {.code restartSpades()}"
+      paste0("To recover, use: {.code ", restartFn, "()}")
     )
   )))
   return(sim)
 }
 
 #' @keywords internal
-messageInterrupt1 <- function(recoverMode) {
+messageInterrupt1 <- function(recoverMode, call = "spades") {
   message(
     cli::col_magenta(
-      "Because of an interrupted spades call, the sim object ",
+      "Because of an interrupted ", call, " call, the sim object ",
       c("at the time of interruption ",
         "at the start of the interrupted event ")[(recoverMode > 0) + 1],
       "was saved in"
@@ -2664,6 +2681,32 @@ saveSimOnExit <- function(recoverMode, sim, rmo) {
   svdSimEnv <- savedSimEnv() # can't assign to a function
   svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
   .pkgEnv$.cleanEnd <- NULL
+  sim
+}
+
+#' Save the `simList` on exit from `simInit`, mirroring `saveSimOnExit()`
+#'
+#' Like its `spades` counterpart, this is registered via `on.exit` inside
+#' `simInit` so it fires whether `simInit` completes cleanly or is interrupted
+#' (e.g., an error in a module's `.inputObjects`). On a non-clean exit, and when
+#' `options('spades.recoveryMode') > 0`, the accumulated recovery object (`rmo`)
+#' is written into the `simList` so that [restartSimInit()] can rewind the state
+#' to the start of the interrupted `.inputObjects`. The clean/interrupted
+#' distinction uses a separate flag (`.pkgEnv$.cleanEndSimInit`) so it does not
+#' interfere with the `spades` event-recovery flag (`.pkgEnv$.cleanEnd`).
+#' @keywords internal
+saveSimOnExitSimInit <- function(recoverMode, sim, rmo) {
+  if (!isTRUE(.pkgEnv$.cleanEndSimInit)) {
+    if (recoverMode > 0 && !is.null(rmo)) {
+      sim <- recoverModeOnExit(sim, rmo, recoverMode,
+                               unit = c(".inputObjects", ".inputObjects"),
+                               restartFn = "restartSimInit")
+      messageInterrupt1(recoverMode, call = "simInit")
+    }
+    svdSimEnv <- savedSimEnv() # can't assign to a function
+    svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
+  }
+  .pkgEnv$.cleanEndSimInit <- NULL
   sim
 }
 

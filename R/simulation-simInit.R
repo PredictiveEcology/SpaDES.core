@@ -721,6 +721,52 @@ setMethod(
         sim[["._spadesDebugWidth"]] <- spadesDebugWidthDefault
       }
 
+      ## RecoverMode for .inputObjects -- mirror of the spades event recovery (see
+      ##   simulation-spades.R). When options('spades.recoveryMode') > 0, the state of
+      ##   each module's input objects is captured just before its .inputObjects runs,
+      ##   so that an interrupted .inputObjects can be rewound by restartSimInit().
+      recoverModeTypo()
+      recoverMode <- getOption("spades.recoveryMode", FALSE)
+      ## clear any stale file-backed recovery objects left in the saved sim, then set
+      ##   up the pointer so an interrupted simInit is recoverable from savedSimEnv()$.sim
+      clearFileBackedObjs(savedSimEnv()$.sim$.recoverableObjs, recoverMode)
+      svdSimEnv <- savedSimEnv() # can't assign to a function
+      svdSimEnv$.sim <- NULL
+      svdSimEnv$.sim <- sim
+      .pkgEnv$.cleanEndSimInit <- NULL
+
+      rmo <- NULL ## the recovery mode object (accumulated across modules)
+      thisSimInitCallRandomStr <- basename(tempfile(pattern = "rmo"))
+      allInputObjNames <- NULL
+      if (recoverMode > 0) {
+        on.exit({
+          toDel <- dir(dotRMOFilepath(thisSimInitCallRandomStr), full.names = TRUE)
+          if (length(toDel) > 0)
+            unlink(toDel)
+        }, add = TRUE) # remove file-backed recovery files
+        allInputObjNames <- inputObjectNames(sim)
+        if (is.null(allInputObjNames)) recoverMode <- 0
+      }
+
+      ## store the context needed to resume an interrupted simInit via restartSimInit().
+      ##   Removed below on a clean exit so it does not bloat the returned simList.
+      sim@.xData[["._simInitContext"]] <- list(
+        loadOrder = loadOrder, loadOrderNames = loadOrderNames,
+        loadOrderBase = loadOrderBase, core = core,
+        objects = objects, objNames = objNames,
+        inputs = inputs, outputs = outputs,
+        notOlderThan = notOlderThan, debug = debug,
+        dotParams = dotParams, dotParamsReal = dotParamsReal,
+        parentChildGraph = parentChildGraph, verbose = verbose
+      )
+
+      ## RecoverMode on.exit -- saves the partial sim (with recovery objects) when
+      ##   simInit is interrupted during a module's .inputObjects (mirror of spades)
+      on.exit({
+        if (isTRUE(getOption("spades.saveSimOnExit", FALSE)))
+          sim <- saveSimOnExitSimInit(recoverMode, sim, rmo)
+      }, add = TRUE)
+
       for (m in loadOrder) {
         mFullPath <- loadOrderNames[match(m, loadOrder)]
 
@@ -733,6 +779,15 @@ setMethod(
         ## run .inputObjects() for each module
         if (needInitAndInputObjects)
           if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
+            ## RecoverMode Pre -- capture state of this module's input objects before
+            ##   .inputObjects runs (mirror of recoverModePre in the spades event loop)
+            if (recoverMode > 0) {
+              ioEvents <- list(list(moduleName = m, eventType = ".inputObjects",
+                                    eventTime = start(sim)))
+              rmo <- recoverModePre(sim, rmo, allInputObjNames, recoverMode,
+                                    thisSpadesCallRandomStr = thisSimInitCallRandomStr,
+                                    curMod = m, events = ioEvents)
+            }
             if (is.character(getOption("spades.covr", FALSE))) {
               mod <- getOption("spades.covr")
               tf <- tempfile()
@@ -750,9 +805,13 @@ setMethod(
               if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
               .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
             } else {
-              sim <- .runModuleInputObjects(sim, m, objects, notOlderThan, debug = debug)
-              cur <- list(eventTime = sim@simtimes$current, moduleName = m, eventType = ".inputObjects", eventPriority = 0)
-              sim <- appendCompleted(sim, cur)
+              ## shared with restartSimInit()'s resume loop via .runInputObjects()
+              sim <- .runInputObjects(sim, m, objects, notOlderThan, debug = debug)
+            }
+            ## RecoverMode Post -- mirror of recoverModePost (tracks events added during
+            ##   the .inputObjects; normally none, kept for symmetry with the spades loop)
+            if (recoverMode > 0) {
+              rmo <- recoverModePost(sim, rmo, recoverMode)
             }
           }
 
@@ -764,117 +823,24 @@ setMethod(
         names(m) <- mFullPath
         modulesLoaded <- append(modulesLoaded, m)
 
-        ### add NAs to any of the dotParams that are not specified by user
-        # ensure the modules sublist exists by creating a tmp value in it
-        if (is.null(sim@params[[m]])) {
-          sim@params[[m]] <- list(.tmp = NA_real_)
-        }
-
-        ## add the necessary values to the sublist
-        for (x in dotParamsReal) {
-          if (is.null(sim@params[[m]][[x]])) {
-            sim@params[[m]][[x]] <- NA_real_
-          } else if (isTRUE(all(is.na(sim@params[[m]][[x]])))) {
-            if (length(sim@params[[m]][[x]]) > 1)
-              sim@params[[m]][[x]] <- NA_real_
-          }
-        }
-
-        ## remove the tmp value from the module sublist
-        sim@params[[m]]$.tmp <- NULL
-
+        ## fill in any unspecified dotParams (shared with restartSimInit via .fillDotParams)
         ### Currently, everything in dotParamsChar is being checked for NULL
         ### values where used (i.e., in save.R).
+        sim <- .fillDotParams(sim, m, dotParamsReal)
       }
 
-      ## check that modules all loaded correctly and store result
-      if (all(append(core, loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
-        modules(sim) <- modulesLoaded
-      } else {
-        stop("There was a problem loading some modules.")
-      }
+      ## All .inputObjects ran without interruption: mark this a clean .inputObjects
+      ##   phase (so the on.exit save below does not treat a later, unrelated error as
+      ##   a recoverable .inputObjects interruption).
+      .pkgEnv$.cleanEndSimInit <- TRUE
 
-      ## Add the data.frame as an attribute
-      attr(sim@modules, "modulesGraph") <- parentChildGraph
+      ## Finish initialization (store loaded modules, apply user objects/inputs/outputs,
+      ##   check params). This is shared verbatim with restartSimInit()'s resume path via
+      ##   .finishSimInit(); the resume context built above supplies the needed locals.
+      sim <- .finishSimInit(sim, sim@.xData[["._simInitContext"]], modulesLoaded)
 
-      ## END OF MODULE PARSING AND LOADING
-      if (length(objects)) {
-        if (is.list(objects)) {
-          if (length(objNames) == length(objects)) {
-            # don't override all objects with user supplied objects if the init events have
-            #   been run
-            if (isTRUE(getOption("spades.allowInitDuringSimInit") &&
-                       getOption("spades.dotInputObjects", TRUE))) {
-              inputObjectsAllMods <- inputObjects(sim)
-              if (is(inputObjectsAllMods, "list"))
-                inputObjectsAllMods <- inputObjectsAllMods |> rbindlist() #@depends@dependencies[names()]@inputObjects[["objectName"]]
-              inputObjectsAllMods <- unique(inputObjectsAllMods$objectName)
-              objectNamesToUse <- inputObjectsAllMods[inputObjectsAllMods %in% sim$.userSuppliedObjNames]
-              objectsToUse <- objects[objectNamesToUse]
-              objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
-            } else {
-              objectsToUse <- objects
-            }
-
-            if (length(objectsToUse) && verbose) {
-              messageNewObjects(
-                objectsToUse[order(names(objectsToUse))], verbose = verbose,
-                prefix = "User-supplied objects passed into sim for spades call:")
-            }
-
-            if (NROW(objectsToUse))
-              objs(sim) <- objectsToUse
-          } else {
-            stop(
-              paste(
-                "objects must be a character vector of object names",
-                "to retrieve from the .GlobalEnv, or a named list of",
-                "objects"
-              )
-            )
-          }
-        } else {
-          newInputs <- data.frame(
-            objectName = objNames,
-            loadTime = as.numeric(sim@simtimes[["current"]]),
-            stringsAsFactors = FALSE
-          ) |>
-            .fillInputRows(startTime = start(sim))
-          inputs(sim) <- newInputs
-        }
-      }
-
-      ## load files in the filelist
-      if (NROW(inputs) | NROW(inputs(sim))) {
-        inputs(sim) <- rbind(inputs(sim), inputs)
-        if (NROW(events(sim)[moduleName == "load" &
-                             eventType == "inputs" &
-                             eventTime == start(sim)]) > 0) {
-          sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
-          events(sim) <- events(sim)[!(eventTime == time(sim) &
-                                         moduleName == "load" &
-                                         eventType == "inputs"), ]
-        }
-        if (any(events(sim)[["eventTime"]] < start(sim))) {
-          warning(
-            paste0(
-              "One or more objects in the inputs filelist was ",
-              "scheduled to load before start(sim). ",
-              "It is being be removed and not loaded. To ensure loading, loadTime ",
-              "must be start(sim) or later. See examples using ",
-              "loadTime in ?simInit"
-            )
-          )
-          events(sim) <- events(sim)[eventTime >= start(sim)]
-        }
-      }
-
-      if (length(outputs)) {
-        outputs(sim) <- outputs
-      }
-
-      ## check the parameters supplied by the user
-      checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
+      ## a complete simList: drop the resume context so it does not bloat the result
+      sim@.xData[["._simInitContext"]] <- NULL
       #sim <- elapsedTimeInSimInit(._startClockTime, sim)
       #._startClockTime <- Sys.time()
     },
@@ -1389,6 +1355,53 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   }
 
   return(parentNames)
+}
+
+#' Run a module's `.inputObjects` and record it as completed
+#'
+#' Thin wrapper around [.runModuleInputObjects()] that also appends the `.inputObjects`
+#' "event" to `completed(sim)`. Shared by `simInit()`'s module loop and
+#' [restartSimInit()]'s resume loop so the two stay in lock-step.
+#'
+#' @inheritParams .runModuleInputObjects
+#' @return The updated `simList`.
+#' @keywords internal
+.runInputObjects <- function(sim, m, objects, notOlderThan, debug = getOption("spades.debug")) {
+  sim <- .runModuleInputObjects(sim, m, objects, notOlderThan, debug = debug)
+  cur <- list(eventTime = sim@simtimes$current, moduleName = m,
+              eventType = ".inputObjects", eventPriority = 0)
+  sim <- appendCompleted(sim, cur)
+  sim
+}
+
+#' Fill in unspecified `dotParams` for a module
+#'
+#' Ensures the per-module parameter sublist exists and that the numeric "dot" parameters
+#' (e.g., `.saveInterval`) default to `NA_real_` when unset. Shared by `simInit()`'s
+#' module loop and [restartSimInit()]'s resume loop.
+#'
+#' @param sim A `simList`.
+#' @param m Character. The (base) module name.
+#' @param dotParamsReal A list of the numeric dot-parameter names to fill.
+#' @return The updated `simList`.
+#' @keywords internal
+.fillDotParams <- function(sim, m, dotParamsReal) {
+  # ensure the module sublist exists by creating a tmp value in it
+  if (is.null(sim@params[[m]])) {
+    sim@params[[m]] <- list(.tmp = NA_real_)
+  }
+  ## add the necessary values to the sublist
+  for (x in dotParamsReal) {
+    if (is.null(sim@params[[m]][[x]])) {
+      sim@params[[m]][[x]] <- NA_real_
+    } else if (isTRUE(all(is.na(sim@params[[m]][[x]])))) {
+      if (length(sim@params[[m]][[x]]) > 1)
+        sim@params[[m]][[x]] <- NA_real_
+    }
+  }
+  ## remove the tmp value from the module sublist
+  sim@params[[m]]$.tmp <- NULL
+  sim
 }
 
 #' Run module's `.inputObjects`

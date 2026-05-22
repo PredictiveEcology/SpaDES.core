@@ -1,3 +1,14 @@
+# SpaDES.core 3.1.2.9004 (development version)
+
+## New features
+
+* If setting up a simulation fails partway through, you no longer have to start
+  over. After fixing the module that caused the error, the new `restartSimInit()`
+  picks up where it left off instead of redoing everything. This works just like
+  `restartSpades()` already does for a running simulation, and is on by default.
+  You can also just call `restartSpades()` and it will do the right thing. See
+  `?restartSimInit`.
+
 # SpaDES.core 3.1.2.9003 (development version)
 
 ## New features

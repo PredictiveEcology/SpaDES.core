@@ -3,6 +3,7 @@
 \name{restartSpades}
 \alias{restartSpades}
 \alias{saveState}
+\alias{restartSimInit}
 \alias{restartOrSimInitAndSpades}
 \title{Restart an interrupted simulation}
 \usage{
@@ -17,6 +18,15 @@ restartSpades(
 
 saveState(filename, ...)
 
+restartSimInit(
+  sim = NULL,
+  module = NULL,
+  numEvents = 1L,
+  restart = TRUE,
+  verbose = getOption("reproducible.verbose", 1L),
+  ...
+)
+
 restartOrSimInitAndSpades(ll, file, reset = getOption("spades.resetRestart"))
 }
 \arguments{
@@ -25,16 +35,12 @@ restartOrSimInitAndSpades(ll, file, reset = getOption("spades.resetRestart"))
 this will take the \code{sim} from
 \code{savedSimEnv()$.sim}, i.e., the one that was interrupted}
 
-\item{module}{A character string length one naming the module that caused the error and
-whose source code was fixed. This module will be re-parsed and placed into the \code{simList}}
+\item{module}{A character string naming the module whose \code{.inputObjects} caused the
+error and whose source code was fixed. This module will be re-parsed into the
+\code{simList}. If \code{NULL} (default), it is taken from the most recent recovery snapshot.}
 
-\item{numEvents}{Numeric. Default is \code{1L} (rewind a single event). Use \code{Inf}
-to rewind all available events.
-The number of events to be rewound.
-In the \code{simList}, if \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric,
-then there will be a list in the \code{simList} called \code{.recoverableObjs}.
-These will be replayed backwards in time to reproduce the initial state of the \code{simList}
-before the event that is \code{numEvents} prior to the first event in \code{events(sim)}.}
+\item{numEvents}{Numeric. Default \code{1L} (rewind only the interrupted module's
+\code{.inputObjects}). Use \code{Inf} to rewind all recoverable \code{.inputObjects}.}
 
 \item{restart}{Logical. If \code{TRUE}, then the call to \code{spades} will be made, i.e.,
 restarting the simulation. If \code{FALSE}, then it will return a new \code{simList}
@@ -64,6 +70,9 @@ even if there is saved \code{sim} available.}
 \value{
 A \code{simList} as if \code{spades} had been called on a \code{simList}.
 
+A \code{simList} as if \code{\link[=simInit]{simInit()}} had completed (when \code{restart = TRUE}), or the
+rewound \code{simList} with the fixed module re-parsed (when \code{restart = FALSE}).
+
 A \code{simList}, that has been "executed" until \code{end(sim)}, if it does not
 hit an error.
 }
@@ -72,6 +81,16 @@ hit an error.
 If there is an error during an event, this function will rewind the simulation to a state
 \code{numEvents} prior to the event that led to the error. The developer may then modify the
 source code of the module that caused the break and resume the simulation.
+
+\strong{This is experimental and has not been thoroughly tested. Use with caution.}
+This is the \code{simInit}/\code{.inputObjects} analogue of \code{\link[=restartSpades]{restartSpades()}}. If a module's
+\code{.inputObjects} errors during \code{\link[=simInit]{simInit()}} and \code{options('spades.recoveryMode')} was
+set to \code{TRUE} or a numeric (the default, \code{1}), the interrupted \code{simList} is saved to
+\code{savedSimEnv()$.sim} with a list \code{.recoverableObjs} recording the state of each
+module's input objects at the start of its \code{.inputObjects}. \code{restartSimInit()} rewinds
+the \code{simList} to the start of the interrupted \code{.inputObjects} (i.e., \code{numEvents} prior),
+re-parses the (presumably fixed) module source, then resumes \code{simInit} by running the
+remaining modules' \code{.inputObjects} and completing the initialization.
 }
 \details{
 If \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric (default 1), then
@@ -83,6 +102,9 @@ first event in \code{events(sim)} (likely the one that caused the error).
 
 The random number seed will be reset to the state it was at the start of the
 earliest event recovered, thereby returning to the exact stochastic simulation trajectory.
+
+The random number seed is reset to its state at the start of the earliest recovered
+\code{.inputObjects}, so that any stochastic defaults are reproduced exactly.
 }
 \note{
 The \code{simList} will be in the state it was \code{numEvents} prior to the event
