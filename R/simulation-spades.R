@@ -1058,9 +1058,10 @@ setMethod(
         rm(".timeunits", envir = sim@.xData)
 
 
-        ## RecoverMode Step 2 -- on exit
+        ## RecoverMode Step 2 -- on exit (read the accumulator from sim@.xData so a
+        ##   snapshot taken before an erroring event is not lost)
         if (isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
-          sim <- saveSimOnExit(recoverMode, sim, rmo)
+          sim <- saveSimOnExit(recoverMode, sim, sim@.xData[["._rmo"]])
         }
         ## RecoverMode Step 2 -- End
 
@@ -1168,6 +1169,15 @@ setMethod(
       }
 
       ## RecoverMode Step 3 -- Initiate the RMO (recovery mode object)
+      ## The accumulator lives on sim@.xData[["._rmo"]] (an environment slot) so that the
+      ##   snapshot taken just before an event survives even if that event errors -- which
+      ##   is exactly when recovery is needed. (A return-value accumulator would be lost
+      ##   when an erroring `.stepEvent()` call never returns.) allObjNames and
+      ##   thisSpadesCallRandomStr are always defined so `.stepEvent()` can reference them
+      ##   even with recovery off.
+      sim@.xData[["._rmo"]] <- NULL ## the recovery mode object
+      allObjNames <- NULL
+      thisSpadesCallRandomStr <- NULL
       if (recoverMode > 0) {
         thisSpadesCallRandomStr <- basename(tempfile(pattern = "rmo"))
         on.exit({
@@ -1175,7 +1185,6 @@ setMethod(
           if (length(toDel) > 0)
             unlink(toDel)
                  }, add = TRUE) # for file-backed files)
-        rmo <- NULL ## the recovery mode object
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
       }
@@ -1208,18 +1217,15 @@ setMethod(
       on.exit(setDTthreads(origDTthreads), add = TRUE)
 
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
-        ## RecoverMode Step 4 -- Do Pre
-        if (recoverMode > 0) {
-          rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode, thisSpadesCallRandomStr = thisSpadesCallRandomStr)
-        }
+        ## RecoverMode Steps 4 & 5 + the event itself, as one shared step
+        ##   (`.stepEvent()` = recoverModePre -> doEvent -> recoverModePost, with the
+        ##   accumulator on sim@.xData[["._rmo"]]). The same step is intended to drive
+        ##   simInit's `.inputObjects` phase.
+        sim <- .stepEvent(sim, recoverMode, allObjNames,
+                          thisSpadesCallRandomStr = thisSpadesCallRandomStr,
+                          debug = debug, notOlderThan = notOlderThan,
+                          events = events, ...)
 
-        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
-                       events = events, ...)  # process the next event
-
-        ## RecoverMode Step 5 -- Do Post
-        if (recoverMode > 0) {
-          rmo <- recoverModePost(sim, rmo, recoverMode)
-        }
         ## Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
         if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
           condEventsToOmit <- integer()
@@ -1762,6 +1768,47 @@ recoverModePost <- function(sim, rmo, recoverMode) {
   rmo$postEvents <- sim@events
   rmo$addedEvents <- append(list(setdiff(rmo$postEvents, rmo$preEvents)), rmo$addedEvents)
   rmo
+}
+
+#' Process one event with recovery wrapping
+#'
+#' The single-event step shared by the `spades` event loop and (later) the `simInit`
+#' `.inputObjects` phase: take a recovery snapshot (`recoverModePre`), run the next event
+#' via `doEvent()`, then record any events it added (`recoverModePost`). Both recovery
+#' calls are skipped when `recoverMode <= 0`.
+#'
+#' The recovery accumulator is kept on `sim@.xData[["._rmo"]]` (an environment slot)
+#' rather than threaded as a return value. This is deliberate: `recoverModePre` snapshots
+#' the state *before* the event, and if `doEvent()` then errors, this function never
+#' returns -- so a returned accumulator would be lost exactly when recovery is needed.
+#' Mutating the environment slot makes the pre-event snapshot visible to the caller's
+#' `on.exit` handler regardless of whether the event succeeds.
+#'
+#' @param sim A `simList`.
+#' @param recoverMode Numeric/logical; `> 0` enables the pre/post snapshots.
+#' @param allObjNames Per-module object-name list to snapshot (output objects for the
+#'   `spades` loop; input objects for the `.inputObjects` phase). Passed to
+#'   `recoverModePre()`.
+#' @param thisSpadesCallRandomStr Scratch-dir token for file-backed snapshots.
+#' @param debug,notOlderThan,events,... Passed through to `doEvent()`.
+#' @return The updated `simList` (with `sim@.xData[["._rmo"]]` advanced).
+#' @keywords internal
+.stepEvent <- function(sim, recoverMode, allObjNames, thisSpadesCallRandomStr,
+                       debug, notOlderThan, events = NULL, ...) {
+  ## RecoverMode -- snapshot state before the event (was "Step 4" inline in the loop)
+  if (recoverMode > 0)
+    sim@.xData[["._rmo"]] <- recoverModePre(sim, sim@.xData[["._rmo"]], allObjNames,
+                                            recoverMode,
+                                            thisSpadesCallRandomStr = thisSpadesCallRandomStr)
+
+  sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
+                 events = events, ...)  # process the next event
+
+  ## RecoverMode -- record events added during the event (was "Step 5" inline in the loop)
+  if (recoverMode > 0)
+    sim@.xData[["._rmo"]] <- recoverModePost(sim, sim@.xData[["._rmo"]], recoverMode)
+
+  sim
 }
 
 #' @keywords internal
@@ -2691,6 +2738,8 @@ saveSimOnExit <- function(recoverMode, sim, rmo) {
             cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
             cli::col_magenta("It will be deleted at next spades() call."))
   }
+  ## the raw accumulator has been consumed (into sim$.recoverableObjs et al.); drop it
+  if (!is.null(sim@.xData[["._rmo"]])) sim@.xData[["._rmo"]] <- NULL
   svdSimEnv <- savedSimEnv() # can't assign to a function
   svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
   .pkgEnv$.cleanEnd <- NULL
