@@ -3080,6 +3080,29 @@ inputOrOutputObjects <- function(type, module, path) {
   mm
 }
 
+#' Per-module input object names
+#'
+#' Internal counterpart of [outputObjectNames()], used by the `.inputObjects`
+#' recovery in `simInit` to know which objects each module's `.inputObjects` may
+#' create (i.e., the module's declared input objects). Returns a list, named by
+#' module, of the `objectName`s; `NULL` when there are no modules.
+#'
+#' @inheritParams P
+#' @keywords internal
+inputObjectNames <- function(sim) {
+  out <- if (NROW(modules(sim)) > 0) {
+    inObjs <- inputObjects(sim)
+    if (is(inObjs, "list")) {
+      lapply(inObjs, function(x) x$objectName)
+    } else {
+      list(inObjs$objectName)
+    }
+  } else {
+    NULL
+  }
+  return(out)
+}
+
 
 # outputObjects -------------------------------------------------------------------------------
 

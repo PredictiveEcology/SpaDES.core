@@ -150,6 +150,9 @@
 #'   Default is `TRUE`, i.e., it will keep the state of the `simList`
 #'   at the start of the current event. This can be recovered with `restartSpades`
 #'   and the differences can be seen in a hidden object in the stashed `simList`.
+#'   The same mechanism applies during `simInit`: a snapshot is taken before each
+#'   module's `.inputObjects` runs, so an interrupted `simInit` can be recovered
+#'   with `restartSimInit` (see `?restartSimInit`).
 #'   There is a message which describes how to find that.\cr
 #'
 #'   `spades.reqdPkgsDontLoad` \tab `"box"` \tab Specify any packages that should not

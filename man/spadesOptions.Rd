@@ -153,6 +153,9 @@ more than one event in the past, i.e., redo some of the "completed" events.
 Default is \code{TRUE}, i.e., it will keep the state of the \code{simList}
 at the start of the current event. This can be recovered with \code{restartSpades}
 and the differences can be seen in a hidden object in the stashed \code{simList}.
+The same mechanism applies during \code{simInit}: a snapshot is taken before each
+module's \code{.inputObjects} runs, so an interrupted \code{simInit} can be recovered
+with \code{restartSimInit} (see \code{?restartSimInit}).
 There is a message which describes how to find that.\cr
 
 \code{spades.reqdPkgsDontLoad} \tab \code{"box"} \tab Specify any packages that should not

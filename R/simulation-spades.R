@@ -169,168 +169,188 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       st[["current"]] <- cur[["eventTime"]]
       slot(sim, "simtimes", check = FALSE) <- st
 
-      # call the module responsible for processing this event
-      moduleCall <- paste("doEvent", curModuleName, sep = ".")
-      # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
-      if (!is.null(fnEnv)) {
-        if (!exists(moduleCall, envir = fnEnv)) {
-          moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur[["eventType"]])
-          if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
-            fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
-            moduleCall <- moduleCallSeparateEventFns
-          } else {
-            if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
-              moduleCall <- moduleCallSeparateEventFns
-            }
-          }
-        }
-      }
-
-      # if debug is TRUE
-      if (is.null(attr(sim, "needDebug"))) {
-        attr(sim, "needDebug") <- if (length(debug) > 1) {
-          !(all(unlist(lapply(debug, identical, FALSE))))
+      if (identical(cur[["eventType"]], ".inputObjects")) {
+        ## `.inputObjects` is dispatched specially: unlike a normal event, it is not a
+        ## `doEvent.<module>(sim, eventTime, eventType)` handler but a separate module
+        ## function (`.inputObjects(sim)`) with its own caching / user-object contract.
+        ## Handling it here lets the event queue -- and therefore the spades loop and
+        ## recoveryMode -- drive `.inputObjects` exactly like any other event.
+        ## The user-supplied `objects` (stashed by simInit on the simList) must be passed
+        ## through: .runModuleInputObjects() places the module's provided input objects
+        ## into the simList *before* calling .inputObjects(), which is what makes them
+        ## visible to suppliedElsewhere() (incl. via objectSynonyms).
+        ntot <- if (missing(notOlderThan)) NULL else notOlderThan
+        ioObjects <- sim@.xData[["._simInitContext"]][["objects"]]
+        sim <- if (is.null(ioObjects)) {
+          .runModuleInputObjects(sim, curModuleName, notOlderThan = ntot, debug = debug)
         } else {
-          !identical(debug, FALSE)
+          .runModuleInputObjects(sim, curModuleName, objects = ioObjects,
+                                 notOlderThan = ntot, debug = debug)
         }
-      }
-      if (attr(sim, "needDebug") + 1) {
-        debugHere <- if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug)
-        # debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
-        debugMessage(debugHere, sim, cur, fnEnv, curModuleName)
-      }
-
-      # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
-      moduleIsInSim <- curModuleName %in% sim@modules
-      if (!moduleIsInSim && !fnEnvIsSpaDES.core)
-        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
-      # if (curModuleName %in% sim@modules) {
-      if (curModuleName %in% core) {
-        sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
       } else {
-        # for future caching of modules
-        cacheIt <- FALSE
-        eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-        a <- sim@params[[curModuleName]][[._txtDotUseCache]]
-        if (!is.null(a)) {
-          #.useCache is a parameter
-          if (!identical(FALSE, a)) {
-            #.useCache is not FALSE
-            if (!isTRUE(a)) {
-              #.useCache is not TRUE
-              if (cur[["eventType"]] %in% a) {
-                cacheIt <- TRUE
-              } else if (inherits(a, "POSIXt")) {
-                cacheIt <- TRUE
-                notOlderThan <- a
-              }
+        # call the module responsible for processing this event
+        moduleCall <- paste("doEvent", curModuleName, sep = ".")
+        # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
+        if (!is.null(fnEnv)) {
+          if (!exists(moduleCall, envir = fnEnv)) {
+            moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur[["eventType"]])
+            if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
+              fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
+              moduleCall <- moduleCallSeparateEventFns
             } else {
-              cacheIt <- TRUE
+              if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
+                moduleCall <- moduleCallSeparateEventFns
+              }
             }
           }
         }
-
-
-        # browser(expr = exists("._doEvent_2"))
-        showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
-                           isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
-          isTRUE(getOption("reproducible.showSimilar", FALSE))
+        
+        # if debug is TRUE
+        if (is.null(attr(sim, "needDebug"))) {
+          attr(sim, "needDebug") <- if (length(debug) > 1) {
+            !(all(unlist(lapply(debug, identical, FALSE))))
+          } else {
+            !identical(debug, FALSE)
+          }
+        }
+        if (attr(sim, "needDebug") + 1) {
+          debugHere <- if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug)
+          # debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
+          debugMessage(debugHere, sim, cur, fnEnv, curModuleName)
+        }
+        
+        # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
+        moduleIsInSim <- curModuleName %in% sim@modules
+        if (!moduleIsInSim && !fnEnvIsSpaDES.core)
+          stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
+        # if (curModuleName %in% sim@modules) {
+        if (curModuleName %in% core) {
+          sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
         } else {
-          isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
-        }
-
-        # This is to create a namespaced module call
-        # if (!.pkgEnv[["skipNamespacing"]])
-        #   .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
-        #                     removeOthers = FALSE)
-
-        skipEvent <- FALSE
-        if (!is.null(eventSeed)) {
-          if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
-            initialRandomSeed <- .Random.seed
-          set.seed(eventSeed) # will create .Random.seed
-        }
-
-        .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
-        if (useFuture) {
-          # stop("using future for spades events is not yet fully implemented")
-          futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                        curModName = cur[["moduleName"]])
-
-          # In general... allow a spawning, unless it is literally next event
-          #   This is just a heuristic because other events could be inserted before
-          #    the next event ... but this is a decent guess
-          # don't use cur from above because it is "seconds" which mess with future
-
-          # by running scheduleEvents first, we can see what the "next" event will actually
-          #   be so we can determine what inputs will be needed.
-          simNext <- runScheduleEventsOnly(sim, currnt = cur) # run the scheduleEvents only
-          nextScheduledEvent <- simNext@events[[1]]$moduleName
-
-          objsNeeded <- NULL
-          if (nextScheduledEvent %in% "save") {
-            outs <- outputs(sim)
-            objsNeeded <- outs$objectName[outs$saveTime == events(sim)$eventTime[1]]
+          # for future caching of modules
+          cacheIt <- FALSE
+          eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
+          a <- sim@params[[curModuleName]][[._txtDotUseCache]]
+          if (!is.null(a)) {
+            #.useCache is a parameter
+            if (!identical(FALSE, a)) {
+              #.useCache is not FALSE
+              if (!isTRUE(a)) {
+                #.useCache is not TRUE
+                if (cur[["eventType"]] %in% a) {
+                  cacheIt <- TRUE
+                } else if (inherits(a, "POSIXt")) {
+                  cacheIt <- TRUE
+                  notOlderThan <- a
+                }
+              } else {
+                cacheIt <- TRUE
+              }
+            }
           }
-          objsNeededForNextMod <- futureNeeds$anyModInputs[[nextScheduledEvent]]
-          # selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
-          objsNeeded <- na.omit(unique(c(objsNeeded, objsNeededForNextMod)))#, selfObjects)))
-          if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
-            spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1] + 1), collapse = "")
-            messageVerbose(
-              cli::col_magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
-                                      "next module (", nextScheduledEvent, ")")),
-              verbose = 1 - (debug %in% FALSE))
-            simFuture <- sim$.simFuture
-            sim$.simFuture <- list()
-            cur2 <- unlist(current(sim))
-            cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
-            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur2, notOlderThan,
-                                   showSimilar = showSimilar, .pkgEnv, envir = environment(),
-                                   futureNeeds = futureNeeds)
-            sim$.simFuture <- append(simFuture, sim$.simFuture)
-            # sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
-            sim@events <- simNext@events
-            skipEvent <- TRUE
+          
+          
+          # browser(expr = exists("._doEvent_2"))
+          showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
+                             isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
+            isTRUE(getOption("reproducible.showSimilar", FALSE))
+          } else {
+            isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
           }
-        }
-
-        if (!skipEvent) {
-          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                           showSimilar = showSimilar, .pkgEnv)
-        }
-
-        if (!is.null(eventSeed)) {
-          if (exists("initialRandomSeed", inherits = FALSE))
-            .Random.seed <- initialRandomSeed
-        }
-
-        # browser(expr = exists("._doEvent_3"))
-        if (!fnEnvIsSpaDES.core) {
-          if (!exists(curModuleName, envir = sim@.xData[[dotMods]], inherits = FALSE))
-            stop("The module named ", curModuleName, " just corrupted the object with that ",
-                 "name from from the simList. ",
-                 "Please remove the section of code that does this in the event named: ",
-                 cur[["eventType"]])
-
-          if (!is.environment(get(curModuleName, envir = sim@.xData[[dotMods]])))
-            stop("The module named ", curModuleName, " just corrupted the object with that ",
-                 "name from from the simList. ",
-                 "Please remove the section of code that does this in the event named: ",
-                 cur[["eventType"]])
-
-          if (!exists("mod", envir = sim@.envir[[dotMods]][[curModuleName]], inherits = FALSE)) {
-            if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
-                                      silent = TRUE, error = function(x) FALSE)
-            ))
-              warning("The module named ", curModuleName, " just deleted the object named 'mod' from ",
-                   "sim$", curModuleName, ". ",
+          
+          # This is to create a namespaced module call
+          # if (!.pkgEnv[["skipNamespacing"]])
+          #   .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
+          #                     removeOthers = FALSE)
+          
+          skipEvent <- FALSE
+          if (!is.null(eventSeed)) {
+            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
+              initialRandomSeed <- .Random.seed
+            set.seed(eventSeed) # will create .Random.seed
+          }
+          
+          .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
+          if (useFuture) {
+            # stop("using future for spades events is not yet fully implemented")
+            futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                          curModName = cur[["moduleName"]])
+            
+            # In general... allow a spawning, unless it is literally next event
+            #   This is just a heuristic because other events could be inserted before
+            #    the next event ... but this is a decent guess
+            # don't use cur from above because it is "seconds" which mess with future
+            
+            # by running scheduleEvents first, we can see what the "next" event will actually
+            #   be so we can determine what inputs will be needed.
+            simNext <- runScheduleEventsOnly(sim, currnt = cur) # run the scheduleEvents only
+            nextScheduledEvent <- simNext@events[[1]]$moduleName
+            
+            objsNeeded <- NULL
+            if (nextScheduledEvent %in% "save") {
+              outs <- outputs(sim)
+              objsNeeded <- outs$objectName[outs$saveTime == events(sim)$eventTime[1]]
+            }
+            objsNeededForNextMod <- futureNeeds$anyModInputs[[nextScheduledEvent]]
+            # selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
+            objsNeeded <- na.omit(unique(c(objsNeeded, objsNeededForNextMod)))#, selfObjects)))
+            if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
+              spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1] + 1), collapse = "")
+              messageVerbose(
+                cli::col_magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
+                                        "next module (", nextScheduledEvent, ")")),
+                verbose = 1 - (debug %in% FALSE))
+              simFuture <- sim$.simFuture
+              sim$.simFuture <- list()
+              cur2 <- unlist(current(sim))
+              cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
+              sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur2, notOlderThan,
+                                     showSimilar = showSimilar, .pkgEnv, envir = environment(),
+                                     futureNeeds = futureNeeds)
+              sim$.simFuture <- append(simFuture, sim$.simFuture)
+              # sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
+              sim@events <- simNext@events
+              skipEvent <- TRUE
+            }
+          }
+          
+          if (!skipEvent) {
+            sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                             showSimilar = showSimilar, .pkgEnv)
+          }
+          
+          if (!is.null(eventSeed)) {
+            if (exists("initialRandomSeed", inherits = FALSE))
+              .Random.seed <- initialRandomSeed
+          }
+          
+          # browser(expr = exists("._doEvent_3"))
+          if (!fnEnvIsSpaDES.core) {
+            if (!exists(curModuleName, envir = sim@.xData[[dotMods]], inherits = FALSE))
+              stop("The module named ", curModuleName, " just corrupted the object with that ",
+                   "name from from the simList. ",
                    "Please remove the section of code that does this in the event named: ",
                    cur[["eventType"]])
+            
+            if (!is.environment(get(curModuleName, envir = sim@.xData[[dotMods]])))
+              stop("The module named ", curModuleName, " just corrupted the object with that ",
+                   "name from from the simList. ",
+                   "Please remove the section of code that does this in the event named: ",
+                   cur[["eventType"]])
+            
+            if (!exists("mod", envir = sim@.envir[[dotMods]][[curModuleName]], inherits = FALSE)) {
+              if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
+                                        silent = TRUE, error = function(x) FALSE)
+              ))
+                warning("The module named ", curModuleName, " just deleted the object named 'mod' from ",
+                        "sim$", curModuleName, ". ",
+                        "Please remove the section of code that does this in the event named: ",
+                        cur[["eventType"]])
+            }
           }
         }
-      }
-
+      } # end normal-event dispatch (`.inputObjects` is handled by the branch above)
+      
       # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         # cur[[._txtClockTime]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
@@ -1045,9 +1065,10 @@ setMethod(
         rm(".timeunits", envir = sim@.xData)
 
 
-        ## RecoverMode Step 2 -- on exit
+        ## RecoverMode Step 2 -- on exit (read the accumulator from sim@.xData so a
+        ##   snapshot taken before an erroring event is not lost)
         if (isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
-          sim <- saveSimOnExit(recoverMode, sim, rmo)
+          sim <- saveSimOnExit(recoverMode, sim, sim@.xData[["._rmo"]])
         }
         ## RecoverMode Step 2 -- End
 
@@ -1155,6 +1176,15 @@ setMethod(
       }
 
       ## RecoverMode Step 3 -- Initiate the RMO (recovery mode object)
+      ## The accumulator lives on sim@.xData[["._rmo"]] (an environment slot) so that the
+      ##   snapshot taken just before an event survives even if that event errors -- which
+      ##   is exactly when recovery is needed. (A return-value accumulator would be lost
+      ##   when an erroring `.stepEvent()` call never returns.) allObjNames and
+      ##   thisSpadesCallRandomStr are always defined so `.stepEvent()` can reference them
+      ##   even with recovery off.
+      sim@.xData[["._rmo"]] <- NULL ## the recovery mode object
+      allObjNames <- NULL
+      thisSpadesCallRandomStr <- NULL
       if (recoverMode > 0) {
         thisSpadesCallRandomStr <- basename(tempfile(pattern = "rmo"))
         on.exit({
@@ -1162,7 +1192,6 @@ setMethod(
           if (length(toDel) > 0)
             unlink(toDel)
                  }, add = TRUE) # for file-backed files)
-        rmo <- NULL ## the recovery mode object
         allObjNames <- outputObjectNames(sim)
         if (is.null(allObjNames)) recoverMode <- 0
       }
@@ -1195,18 +1224,15 @@ setMethod(
       on.exit(setDTthreads(origDTthreads), add = TRUE)
 
       while (sim@simtimes[["current"]] <= sim@simtimes[["end"]]) {
-        ## RecoverMode Step 4 -- Do Pre
-        if (recoverMode > 0) {
-          rmo <- recoverModePre(sim, rmo, allObjNames, recoverMode, thisSpadesCallRandomStr = thisSpadesCallRandomStr)
-        }
+        ## RecoverMode Steps 4 & 5 + the event itself, as one shared step
+        ##   (`.stepEvent()` = recoverModePre -> doEvent -> recoverModePost, with the
+        ##   accumulator on sim@.xData[["._rmo"]]). The same step is intended to drive
+        ##   simInit's `.inputObjects` phase.
+        sim <- .stepEvent(sim, recoverMode, allObjNames,
+                          thisSpadesCallRandomStr = thisSpadesCallRandomStr,
+                          debug = debug, notOlderThan = notOlderThan,
+                          events = events, ...)
 
-        sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
-                       events = events, ...)  # process the next event
-
-        ## RecoverMode Step 5 -- Do Post
-        if (recoverMode > 0) {
-          rmo <- recoverModePost(sim, rmo, recoverMode)
-        }
         ## Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
         if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
           condEventsToOmit <- integer()
@@ -1642,7 +1668,16 @@ calculateEventTimeInSeconds <- function(sim, eventTime, moduleName) {
 
 #' @keywords internal
 #' @importFrom stats runif
-recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thisSpadesCallRandomStr) {
+# `curMod`: optional character string naming the module whose state should be captured.
+#   If `NULL` (the default, used by the `spades` event loop), the module of the next
+#   event (`sim@events[[1]]`) is used. The `.inputObjects` recovery in `simInit` passes
+#   the current module explicitly because there is no event queue yet.
+# `events`: optional event list used only to build the file-backed scratch directory
+#   (see `dotRMOFilepath`). Defaults to `sim@events`; the `.inputObjects` recovery passes
+#   a synthetic one-element list describing the `.inputObjects` "event".
+recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode,
+                           thisSpadesCallRandomStr, curMod = NULL, events = NULL) {
+  if (is.null(events)) events <- sim@events
   if (is.null(allObjNames)) {
     allObjNames <- outputObjectNames(sim)
   }
@@ -1671,8 +1706,10 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
     rmo$recoverableModObjs <- rmo$recoverableModObjs[seq_len(recoverMode - 1)]
   }
 
-  if (length(sim@events) > 0) {
+  if (is.null(curMod) && length(sim@events) > 0)
     curMod <- sim@events[[1]][["moduleName"]]
+
+  if (!is.null(curMod)) {
     objsInSimListAndModule <- ls(sim) %in% allObjNames[[curMod]]
     # This makes a copy of the objects that are needed, and adds them to the list of rmo$recoverableObjs
 
@@ -1680,7 +1717,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
       newList <- list(if (any(objsInSimListAndModule)) {
         # files may disappear for one reason or another; this will fail, silently
         try(Copy(mget(ls(sim)[objsInSimListAndModule], envir = sim@.xData),
-             filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events)))
+             filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, events)))
       } else {
         list()
       })
@@ -1691,7 +1728,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
       rmo$recoverableObjs <- append(newList, rmo$recoverableObjs)
     })
 
-    if (exists(curMod, envir = sim[[dotObjs]])) {
+    if (!is.null(sim[[dotObjs]]) && exists(curMod, envir = sim[[dotObjs]])) {
       newList <- if (!is.null(sim[[dotObjs]][[curMod]])) {
           modObjEnv <- sim[[dotObjs]][[curMod]]# $.objects
           objsInModObjects <- ls(modObjEnv, all.names = TRUE)
@@ -1699,7 +1736,7 @@ recoverModePre <- function(sim, rmo = NULL, allObjNames = NULL, recoverMode, thi
             if (length(objsInModObjects)) {
               Copy(mget(objsInModObjects, envir = modObjEnv),
                    # filebackedDir = file.path(getOption("spades.scratchPath"), "._rmo"))
-                   filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, sim@events))
+                   filebackedDir = dotRMOFilepath(thisSpadesCallRandomStr, events))
             } else {
               list()
             })
@@ -1740,9 +1777,56 @@ recoverModePost <- function(sim, rmo, recoverMode) {
   rmo
 }
 
+#' Process one event with recovery wrapping
+#'
+#' The single-event step shared by the `spades` event loop and (later) the `simInit`
+#' `.inputObjects` phase: take a recovery snapshot (`recoverModePre`), run the next event
+#' via `doEvent()`, then record any events it added (`recoverModePost`). Both recovery
+#' calls are skipped when `recoverMode <= 0`.
+#'
+#' The recovery accumulator is kept on `sim@.xData[["._rmo"]]` (an environment slot)
+#' rather than threaded as a return value. This is deliberate: `recoverModePre` snapshots
+#' the state *before* the event, and if `doEvent()` then errors, this function never
+#' returns -- so a returned accumulator would be lost exactly when recovery is needed.
+#' Mutating the environment slot makes the pre-event snapshot visible to the caller's
+#' `on.exit` handler regardless of whether the event succeeds.
+#'
+#' @param sim A `simList`.
+#' @param recoverMode Numeric/logical; `> 0` enables the pre/post snapshots.
+#' @param allObjNames Per-module object-name list to snapshot (output objects for the
+#'   `spades` loop; input objects for the `.inputObjects` phase). Passed to
+#'   `recoverModePre()`.
+#' @param thisSpadesCallRandomStr Scratch-dir token for file-backed snapshots.
+#' @param debug,notOlderThan,events,... Passed through to `doEvent()`.
+#' @return The updated `simList` (with `sim@.xData[["._rmo"]]` advanced).
+#' @keywords internal
+.stepEvent <- function(sim, recoverMode, allObjNames, thisSpadesCallRandomStr,
+                       debug, notOlderThan, events = NULL, ...) {
+  ## RecoverMode -- snapshot state before the event (was "Step 4" inline in the loop)
+  if (recoverMode > 0)
+    sim@.xData[["._rmo"]] <- recoverModePre(sim, sim@.xData[["._rmo"]], allObjNames,
+                                            recoverMode,
+                                            thisSpadesCallRandomStr = thisSpadesCallRandomStr)
+
+  sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
+                 events = events, ...)  # process the next event
+
+  ## RecoverMode -- record events added during the event (was "Step 5" inline in the loop)
+  if (recoverMode > 0)
+    sim@.xData[["._rmo"]] <- recoverModePost(sim, sim@.xData[["._rmo"]], recoverMode)
+
+  sim
+}
+
 #' @keywords internal
 #' @importFrom cli cli_code cli_text col_magenta
-recoverModeOnExit <- function(sim, rmo, recoverMode) {
+# `unit`: length-2 character vector giving the singular and plural noun used in the
+#   recovery message (default `c("event", "events")`; `simInit` passes
+#   `c(".inputObjects", ".inputObjects")`).
+# `restartFn`: character string naming the function the user should call to recover
+#   (default `"restartSpades"`; `simInit` passes `"restartSimInit"`).
+recoverModeOnExit <- function(sim, rmo, recoverMode, unit = c("event", "events"),
+                              restartFn = "restartSpades") {
   sim@.xData$.recoverableObjs <- rmo$recoverableObjs
   sim@.xData$.recoverableModObjs <- rmo$recoverableModObjs
   recoverableObjsSize <- sum(unlist(objSize(rmo$recoverableObjs)))
@@ -1758,24 +1842,24 @@ recoverModeOnExit <- function(sim, rmo, recoverMode) {
   message(cli::cli_text(cli::col_magenta(
     paste(
       "The initial state of the last ", recmod,
-      singularPlural(c("event", "events"), v = recmod),
+      singularPlural(unit, v = recmod),
       isAre(v = recmod)," cached and saved",
       "in the {.var simList} located at {.code savedSimEnv()$.sim} as",
-      "{.code sim$.recoverableObjs} with the most recent event as the first element in the list,",
-      "second most recent event as the second element, etc.",
+      "{.code sim$.recoverableObjs} with the most recent ", unit[[1]], " as the first element in the list,",
+      "second most recent ", unit[[1]], " as the second element, etc.",
       "The objects contained in each of those are only the objects that may have",
       "changed, according to the metadata for each module.\n",
-      "To recover, use: {.code restartSpades()}"
+      paste0("To recover, use: {.code ", restartFn, "()}")
     )
   )))
   return(sim)
 }
 
 #' @keywords internal
-messageInterrupt1 <- function(recoverMode) {
+messageInterrupt1 <- function(recoverMode, call = "spades") {
   message(
     cli::col_magenta(
-      "Because of an interrupted spades call, the sim object ",
+      "Because of an interrupted ", call, " call, the sim object ",
       c("at the time of interruption ",
         "at the start of the interrupted event ")[(recoverMode > 0) + 1],
       "was saved in"
@@ -2661,9 +2745,37 @@ saveSimOnExit <- function(recoverMode, sim, rmo) {
             cli::col_blue("SpaDES.core:::savedSimEnv()$.sim"), "\n",
             cli::col_magenta("It will be deleted at next spades() call."))
   }
+  ## the raw accumulator has been consumed (into sim$.recoverableObjs et al.); drop it
+  if (!is.null(sim@.xData[["._rmo"]])) sim@.xData[["._rmo"]] <- NULL
   svdSimEnv <- savedSimEnv() # can't assign to a function
   svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
   .pkgEnv$.cleanEnd <- NULL
+  sim
+}
+
+#' Save the `simList` on exit from `simInit`, mirroring `saveSimOnExit()`
+#'
+#' Like its `spades` counterpart, this is registered via `on.exit` inside
+#' `simInit` so it fires whether `simInit` completes cleanly or is interrupted
+#' (e.g., an error in a module's `.inputObjects`). On a non-clean exit, and when
+#' `options('spades.recoveryMode') > 0`, the accumulated recovery object (`rmo`)
+#' is written into the `simList` so that [restartSimInit()] can rewind the state
+#' to the start of the interrupted `.inputObjects`. The clean/interrupted
+#' distinction uses a separate flag (`.pkgEnv$.cleanEndSimInit`) so it does not
+#' interfere with the `spades` event-recovery flag (`.pkgEnv$.cleanEnd`).
+#' @keywords internal
+saveSimOnExitSimInit <- function(recoverMode, sim, rmo) {
+  if (!isTRUE(.pkgEnv$.cleanEndSimInit)) {
+    if (recoverMode > 0 && !is.null(rmo)) {
+      sim <- recoverModeOnExit(sim, rmo, recoverMode,
+                               unit = c(".inputObjects", ".inputObjects"),
+                               restartFn = "restartSimInit")
+      messageInterrupt1(recoverMode, call = "simInit")
+    }
+    svdSimEnv <- savedSimEnv() # can't assign to a function
+    svdSimEnv$.sim <- sim # no copy of objects -- essentially 2 pointers throughout
+  }
+  .pkgEnv$.cleanEndSimInit <- NULL
   sim
 }
 
