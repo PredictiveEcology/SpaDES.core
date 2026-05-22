@@ -307,6 +307,93 @@ doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) { sim }
   expect_s4_class(done, "simList")
 })
 
+test_that("restartSimInit rewinds modified objects, supports restart = FALSE, and uses savedSimEnv", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE)
+
+  ## modP creates `shared`; modQ (which lists `shared` as an input) modifies it and then
+  ## errors. Because `shared` already exists when modQ's .inputObjects is snapshotted, the
+  ## recovery snapshot is non-empty -- exercising restartSimInit()'s object-restore path.
+  newModule("modP", tmpdir, open = FALSE)
+  newModule("modQ", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modP", "modP.R"), '
+defineModule(sim, list(name = "modP", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modP = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("trigP", "ANY", "")),
+  outputObjects = bindrows(createsOutput("shared", "numeric", ""))))
+doEvent.modP <- function(sim, eventTime, eventType, debug = FALSE) sim
+.inputObjects <- function(sim) { sim$shared <- 10L; sim }
+', fill = TRUE)
+  cat(file = file.path(tmpdir, "modQ", "modQ.R"), '
+defineModule(sim, list(name = "modQ", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modQ = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("shared", "numeric", ""), expectsInput("trigQ", "ANY", "")),
+  outputObjects = bindrows(createsOutput("qOut", "numeric", ""))))
+doEvent.modQ <- function(sim, eventTime, eventType, debug = FALSE) sim
+.inputObjects <- function(sim) { sim$shared <- sim$shared + 5L; if (isTRUE(!is.null(P(sim)$failIO))) stop("boom"); sim }
+', fill = TRUE)
+
+  doInterrupt <- function() {
+    try(simInit(times = list(start = 0, end = 0), paths = list(modulePath = tmpdir),
+                modules = c("modP", "modQ"), loadOrder = c("modP", "modQ"),
+                params = list(modQ = list(failIO = 1))), silent = TRUE)
+  }
+
+  ## --- interrupt #1: confirm the snapshot captured the pre-modification value ---
+  err <- doInterrupt()
+  expect_s3_class(err, "try-error")
+  saved <- savedSimEnv()$.sim
+  expect_equal(saved$shared, 15L)                              # modQ modified it before erroring
+  expect_equal(saved$.recoverableObjs[[1]]$shared, 10L)        # snapshot holds the pre-value
+
+  ## restart = FALSE: rewind only -> shared restored to its pre-.inputObjects value
+  rewound <- restartSimInit(saved, restart = FALSE)
+  expect_s4_class(rewound, "simList")
+  expect_equal(rewound$shared, 10L)
+
+  ## a fixed copy resumed fully reproduces shared = 10 + 5
+  fixed <- savedSimEnv()$.sim
+  fixed@params$modQ$failIO <- NULL
+  resumed <- restartSimInit(fixed)
+  expect_equal(resumed$shared, 15L)
+
+  ## --- interrupt #2: restartSimInit() with no `sim` arg pulls from savedSimEnv ---
+  err2 <- doInterrupt()
+  expect_s3_class(err2, "try-error")
+  svd <- SpaDES.core:::savedSimEnv()
+  svd$.sim@params$modQ$failIO <- NULL          # fix in place on the stashed sim
+  resumed2 <- restartSimInit()                 # no sim -> savedSimEnv()$.sim
+  expect_s4_class(resumed2, "simList")
+  expect_equal(resumed2$shared, 15L)
+})
+
+test_that("restartSimInit errors when there is no recovery context", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache)
+
+  newModule("modClean", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modClean", "modClean.R"), '
+defineModule(sim, list(name = "modClean", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modClean = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(), inputObjects = bindrows(), outputObjects = bindrows()))
+doEvent.modClean <- function(sim, eventTime, eventType, debug = FALSE) sim
+', fill = TRUE)
+  ## a cleanly-built simList carries no ._simInitContext, so restartSimInit must refuse
+  clean <- simInit(times = list(start = 0, end = 0), paths = list(modulePath = tmpdir),
+                   modules = "modClean")
+  expect_null(clean@.xData[["._simInitContext"]])
+  expect_error(restartSimInit(clean), "no saved simInit context")
+})
+
 test_that("restartSpades lazily delegates to restartSimInit after a .inputObjects interruption", {
   testInit(smcc = FALSE, debug = FALSE,
            opts = list(reproducible.useMemoise = FALSE))
