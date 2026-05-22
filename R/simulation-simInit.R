@@ -769,88 +769,14 @@ setMethod(
           sim <- saveSimOnExitSimInit(recoverMode, sim, sim@.xData[["._rmo"]])
       }, add = TRUE)
 
-      ## Modules whose init did not already run during simInit (via allowInitDuringSimInit)
-      ##   still need their .inputObjects and init run.
-      needIO <- !(loadOrder %in% sim@.xData$._ranInitDuringSimInit)
-
-      ## Pass A -- schedule each such module's `.inputObjects` as a real event, so it runs
-      ##   through the same doEvent()/.stepEvent() path as a spades event (this is what
-      ##   retires the old bespoke loop). Priorities are below the core init events
-      ##   (.first() - 1) and ordered by loadOrder, so the whole `.inputObjects` phase
-      ##   drains before any init. Caching of `.inputObjects` is unaffected: doEvent
-      ##   dispatches `.inputObjects` to .runModuleInputObjects (which digests the
-      ##   input-relevant objects), not through the generic event cache.
-      ##   Coverage measurement (spades.covr) cannot go through the queue, so it runs inline.
-      if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
-        for (idx in seq_along(loadOrder)) {
-          if (!needIO[idx]) next
-          m <- loadOrder[idx]
-          if (is.character(getOption("spades.covr", FALSE))) {
-            mod <- getOption("spades.covr")
-            tf <- tempfile()
-            ntot <- if (is.null(notOlderThan)) "NULL" else notOlderThan
-            cat(file = tf, paste0("simOut <- .runModuleInputObjects(sim, '", m,
-                                  "', notOlderThan = ", ntot, ")"))
-            if (length(objects))
-              list2env(objects, envir(sim))
-            sim[[dotMods]][[mod]]$sim <- sim
-            aa <- covr::environment_coverage(sim[[dotMods]][[mod]], test_files = tf)
-            sim <- sim[[dotMods]][[mod]]$sim
-            rm(list = "sim", envir = sim[[dotMods]][[mod]])
-            if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
-            .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-          } else {
-            sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, ".inputObjects",
-                                 .first() - 1 - (length(loadOrder) - idx + 1))
-          }
-        }
-      }
-
-      ## Drain the `.inputObjects` phase with the same single-event step as the spades
-      ##   loop. doEvent()'s completed-event bookkeeping is gated by this .pkgEnv flag
-      ##   (normally set by spades()); force it on so `.inputObjects` are recorded in
-      ##   completed() (restartSimInit() relies on this), then restore it.
-      oldKeepCompleted <- .pkgEnv[["spades.keepCompleted"]]
-      .pkgEnv[["spades.keepCompleted"]] <- TRUE
-      while (length(sim@events) && identical(sim@events[[1]][["eventType"]], ".inputObjects")) {
-        sim <- .stepEvent(sim, recoverMode, allInputObjNames,
-                          thisSpadesCallRandomStr = thisSimInitCallRandomStr,
-                          debug = debug, notOlderThan = notOlderThan)
-      }
-      .pkgEnv[["spades.keepCompleted"]] <- oldKeepCompleted
-
-      ## Pass B -- schedule each module's init event and do per-module bookkeeping
-      for (idx in seq_along(loadOrder)) {
-        m <- loadOrder[idx]
-        mFullPath <- loadOrderNames[match(m, loadOrder)]
-        ## schedule each module's init event:
-        if (needIO[idx])
-          sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
-
-        ### add module name to the loaded list
-        names(m) <- mFullPath
-        modulesLoaded <- append(modulesLoaded, m)
-
-        ## fill in any unspecified dotParams (shared with restartSimInit via .fillDotParams)
-        ### Currently, everything in dotParamsChar is being checked for NULL
-        ### values where used (i.e., in save.R).
-        sim <- .fillDotParams(sim, m, dotParamsReal)
-      }
-
-      ## All .inputObjects ran without interruption: mark this a clean .inputObjects
-      ##   phase (so the on.exit save below does not treat a later, unrelated error as
-      ##   a recoverable .inputObjects interruption).
-      .pkgEnv$.cleanEndSimInit <- TRUE
-
-      ## Finish initialization (store loaded modules, apply user objects/inputs/outputs,
-      ##   check params). This is shared verbatim with restartSimInit()'s resume path via
-      ##   .finishSimInit(); the resume context built above supplies the needed locals.
-      sim <- .finishSimInit(sim, sim@.xData[["._simInitContext"]], modulesLoaded)
-
-      ## a complete simList: drop the resume context and recovery accumulator so they do
-      ##   not bloat the result
-      sim@.xData[["._simInitContext"]] <- NULL
-      sim@.xData[["._rmo"]] <- NULL
+      ## Run the `.inputObjects` phase: schedule each module's `.inputObjects` as a real
+      ##   event, drain it through the same single-event step as the spades loop
+      ##   (.stepEvent), then schedule init events, fill dot-params, and finish. This is
+      ##   the shared continuation that restartSimInit() also re-enters after rewinding,
+      ##   so the normal and resumed paths cannot drift. (modulesLoaded already has the
+      ##   core modules appended; the phase appends the user modules.)
+      sim <- .runInputObjectsPhase(sim, recoverMode, allInputObjNames,
+                                   thisSimInitCallRandomStr, modulesLoaded)
       #sim <- elapsedTimeInSimInit(._startClockTime, sim)
       #._startClockTime <- Sys.time()
     },
@@ -1367,23 +1293,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(parentNames)
 }
 
-#' Run a module's `.inputObjects` and record it as completed
-#'
-#' Thin wrapper around [.runModuleInputObjects()] that also appends the `.inputObjects`
-#' "event" to `completed(sim)`. Shared by `simInit()`'s module loop and
-#' [restartSimInit()]'s resume loop so the two stay in lock-step.
-#'
-#' @inheritParams .runModuleInputObjects
-#' @return The updated `simList`.
-#' @keywords internal
-.runInputObjects <- function(sim, m, objects, notOlderThan, debug = getOption("spades.debug")) {
-  sim <- .runModuleInputObjects(sim, m, objects, notOlderThan, debug = debug)
-  cur <- list(eventTime = sim@simtimes$current, moduleName = m,
-              eventType = ".inputObjects", eventPriority = 0)
-  sim <- appendCompleted(sim, cur)
-  sim
-}
-
 #' Fill in unspecified `dotParams` for a module
 #'
 #' Ensures the per-module parameter sublist exists and that the numeric "dot" parameters
@@ -1411,6 +1320,116 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   }
   ## remove the tmp value from the module sublist
   sim@params[[m]]$.tmp <- NULL
+  sim
+}
+
+#' Run (or resume) a `simList`'s `.inputObjects` phase
+#'
+#' The continuation shared by [simInit()] and [restartSimInit()]: schedule each module's
+#' `.inputObjects` as a real event, drain that phase through the same single-event step as
+#' the `spades` loop ([.stepEvent()]), then schedule init events, fill dot-params, and
+#' finish initialization ([.finishSimInit()]). Having one implementation means the normal
+#' and resumed paths cannot drift.
+#'
+#' It is re-entrant: modules whose `.inputObjects` already completed (recorded in
+#' `completed(sim)`) are not re-scheduled, and init events that already exist are not
+#' duplicated. So `restartSimInit()` simply rewinds, removes the completed-marker of the
+#' module(s) to re-run, and calls this -- mirroring how `restartSpades()` hands back to
+#' `spades()`.
+#'
+#' The drain loop is kept inline here (rather than in a further nested helper) so that the
+#' queue updates from each processed event are retained in this frame. On an error mid-
+#' drain, recovery state lives in shared environments -- the objects and
+#' `sim@.xData[["._rmo"]]` in `sim@.xData`, and `sim@completed` -- so it is preserved for
+#' [restartSimInit()] even though this function's local `sim` is discarded.
+#'
+#' @param sim A `simList` whose `sim@.xData[["._simInitContext"]]` has been populated.
+#' @param recoverMode,allInputObjNames,thisSpadesCallRandomStr Recovery parameters passed
+#'   through to [.stepEvent()]. `simInit` passes its values; `restartSimInit` passes
+#'   `recoverMode = 0` (a resume does not re-arm recovery).
+#' @param modulesLoaded The loaded-modules list with the core modules already appended;
+#'   the user modules are appended here.
+#' @return A finished `simList`.
+#' @keywords internal
+.runInputObjectsPhase <- function(sim, recoverMode, allInputObjNames,
+                                  thisSpadesCallRandomStr, modulesLoaded) {
+  ctx <- sim@.xData[["._simInitContext"]]
+  loadOrder <- ctx$loadOrder
+  ## modules whose init did not already run during simInit (via allowInitDuringSimInit)
+  needIO <- !(loadOrder %in% sim@.xData$._ranInitDuringSimInit)
+  cc <- completed(sim)
+  completedIO <- if (NROW(cc))
+    cc[cc[["eventType"]] == ".inputObjects", ][["moduleName"]] else character()
+
+  ## Pass A -- schedule each module's `.inputObjects` as a real event (or, for coverage
+  ##   measurement, run it inline) for modules that need one and have not already completed
+  ##   it. Priorities are below the core init events (.first() - 1) and ordered by
+  ##   loadOrder, so the whole `.inputObjects` phase drains before any init. Caching of
+  ##   `.inputObjects` is unaffected: doEvent dispatches `.inputObjects` to
+  ##   .runModuleInputObjects (which digests the input-relevant objects), not the generic
+  ##   event cache.
+  if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
+    for (idx in seq_along(loadOrder)) {
+      m <- loadOrder[idx]
+      if (!needIO[idx] || m %in% completedIO) next
+      if (is.character(getOption("spades.covr", FALSE))) {
+        mod <- getOption("spades.covr")
+        tf <- tempfile()
+        ntot <- if (is.null(ctx$notOlderThan)) "NULL" else ctx$notOlderThan
+        cat(file = tf, paste0("simOut <- .runModuleInputObjects(sim, '", m,
+                              "', notOlderThan = ", ntot, ")"))
+        if (length(ctx$objects))
+          list2env(ctx$objects, envir(sim))
+        sim[[dotMods]][[mod]]$sim <- sim
+        aa <- covr::environment_coverage(sim[[dotMods]][[mod]], test_files = tf)
+        sim <- sim[[dotMods]][[mod]]$sim
+        rm(list = "sim", envir = sim[[dotMods]][[mod]])
+        if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+        .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+      } else {
+        sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, ".inputObjects",
+                             .first() - 1 - (length(loadOrder) - idx + 1))
+      }
+    }
+  }
+
+  ## Drain the `.inputObjects` phase with the same single-event step as the spades loop.
+  ##   doEvent()'s completed-event bookkeeping is gated by this .pkgEnv flag (normally set
+  ##   by spades()); force it on so `.inputObjects` are recorded in completed()
+  ##   (restartSimInit() relies on this), then restore it.
+  oldKeepCompleted <- .pkgEnv[["spades.keepCompleted"]]
+  .pkgEnv[["spades.keepCompleted"]] <- TRUE
+  while (length(sim@events) && identical(sim@events[[1]][["eventType"]], ".inputObjects")) {
+    sim <- .stepEvent(sim, recoverMode, allInputObjNames,
+                      thisSpadesCallRandomStr = thisSpadesCallRandomStr,
+                      debug = ctx$debug, notOlderThan = ctx$notOlderThan)
+  }
+  .pkgEnv[["spades.keepCompleted"]] <- oldKeepCompleted
+
+  ## the `.inputObjects` phase completed without interruption (so the simInit on.exit
+  ##   does not treat a later, unrelated error as a recoverable `.inputObjects` interrupt)
+  .pkgEnv$.cleanEndSimInit <- TRUE
+
+  ## Pass B -- schedule each module's init event + per-module bookkeeping. simInit
+  ##   schedules init only after the whole phase, so on a resume there are no user init
+  ##   events yet; (re)schedule for every module that needs one, skipping any already queued.
+  alreadyScheduledInit <- vapply(sim@events, function(e)
+    if (identical(e[["eventType"]], "init")) e[["moduleName"]] else NA_character_, character(1))
+  for (idx in seq_along(loadOrder)) {
+    m <- loadOrder[idx]
+    if (needIO[idx] && !(m %in% alreadyScheduledInit))
+      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+    mNamed <- m
+    names(mNamed) <- ctx$loadOrderNames[idx]
+    modulesLoaded <- append(modulesLoaded, mNamed)
+    sim <- .fillDotParams(sim, m, ctx$dotParamsReal)
+  }
+
+  ## Finish initialization (store loaded modules, apply user objects/inputs/outputs,
+  ##   check params), then drop the resume context + recovery accumulator.
+  sim <- .finishSimInit(sim, ctx, modulesLoaded)
+  sim@.xData[["._simInitContext"]] <- NULL
+  sim@.xData[["._rmo"]] <- NULL
   sim
 }
 

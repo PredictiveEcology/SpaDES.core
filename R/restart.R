@@ -475,13 +475,15 @@ restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = 
   sim@.xData[["._startClockTime"]] <- Sys.time()
   sim$._simInitElapsedTime <- 0
 
-  ## ---- resume: re-run the remaining .inputObjects, then finish simInit ----
+  ## ---- resume: drop the completed-marker of any module that must re-run, then re-enter
+  ##      the shared `.inputObjects` phase (the same continuation simInit uses) ----
+  ## A module re-runs its `.inputObjects` iff it is not marked completed. The interrupted
+  ##   module never completed, so it re-runs automatically; for rewound modules whose
+  ##   `.inputObjects` had completed (numEvents > 1), drop their completed marker so the
+  ##   phase re-runs them too.
   completedDT <- completed(sim)
   succeeded <- if (NROW(completedDT))
     completedDT[completedDT[["eventType"]] == ".inputObjects", ][["moduleName"]] else character()
-
-  ## rewound modules that had previously completed (numEvents > 1): drop their stale
-  ##   completed .inputObjects entry and their scheduled init event so they re-run cleanly
   rewoundCompleted <- intersect(modulesRewound, succeeded)
   if (length(rewoundCompleted)) {
     for (k in ls(sim@completed)) {
@@ -490,46 +492,14 @@ restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = 
           ev[["moduleName"]] %in% rewoundCompleted)
         rm(list = k, envir = sim@completed)
     }
-    sim@events <- Filter(
-      function(e) !(identical(e[["eventType"]], "init") && e[["moduleName"]] %in% rewoundCompleted),
-      sim@events)
-  }
-  ## modules still needing a (re)run, in load order
-  succeeded <- setdiff(succeeded, modulesRewound)
-  modulesToRun <- ctx$loadOrder[!ctx$loadOrder %in% succeeded]
-
-  debug <- ctx$debug
-  ## Pass A' -- re-run .inputObjects only for modules that have not completed it (the
-  ##   interrupted module + any not-yet-run, plus any rewound ones); succeeded modules
-  ##   keep their results.
-  for (m in modulesToRun) {
-    if (isTRUE(getOption("spades.dotInputObjects", TRUE)))
-      sim <- .runInputObjects(sim, m, ctx$objects, ctx$notOlderThan, debug = debug)
   }
 
-  ## Pass B' -- schedule each module's init + fill dotParams, mirroring simInit()'s Pass B.
-  ##   simInit schedules init only *after* the whole .inputObjects phase, so an interrupted
-  ##   simInit left no user init events; (re)schedule them here for every module that still
-  ##   needs one (i.e., whose init did not already run via allowInitDuringSimInit), skipping
-  ##   any that somehow already have one queued.
-  needIO <- !(ctx$loadOrder %in% sim@.xData$._ranInitDuringSimInit)
-  alreadyScheduledInit <- vapply(sim@events, function(e)
-    if (identical(e[["eventType"]], "init")) e[["moduleName"]] else NA_character_, character(1))
-  for (idx in seq_along(ctx$loadOrder)) {
-    m <- ctx$loadOrder[idx]
-    if (needIO[idx] && !(m %in% alreadyScheduledInit))
-      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
-    sim <- .fillDotParams(sim, m, ctx$dotParamsReal)
-  }
-
-  ## reconstruct the loaded-modules list the same shape simInit builds (core modules +
-  ##   user modules, named by full path), since the interrupted run never finished it
-  modulesLoaded <- as.list(c(ctx$core, ctx$loadOrderBase))
-  names(modulesLoaded) <- c(ctx$core, ctx$loadOrderNames)
-  sim <- .finishSimInit(sim, ctx, modulesLoaded)
-
-  ## this is now a complete simList; drop the recovery bookkeeping
-  sim@.xData[["._simInitContext"]] <- NULL
+  ## A resume does not re-arm recovery (recoverMode = 0); like restartSpades handing back
+  ##   to spades, restartSimInit just re-enters the shared phase on the rewound simList.
+  sim@.xData[["._rmo"]] <- NULL
+  modulesLoaded <- append(list(), ctx$core)
+  sim <- .runInputObjectsPhase(sim, recoverMode = 0L, allInputObjNames = NULL,
+                               thisSpadesCallRandomStr = NULL, modulesLoaded = modulesLoaded)
   return(sim)
 }
 
