@@ -28,7 +28,8 @@ this will take the \code{sim} from
 \item{module}{A character string length one naming the module that caused the error and
 whose source code was fixed. This module will be re-parsed and placed into the \code{simList}}
 
-\item{numEvents}{Numeric. Default is Inf (i.e., all available).
+\item{numEvents}{Numeric. Default is \code{1L} (rewind a single event). Use \code{Inf}
+to rewind all available events.
 The number of events to be rewound.
 In the \code{simList}, if \code{options('spades.recoveryMode')} is set to \code{TRUE} or a numeric,
 then there will be a list in the \code{simList} called \code{.recoverableObjs}.
@@ -41,7 +42,10 @@ with the module code parsed into the \code{simList}}
 
 \item{verbose}{Logical or Numeric, follows \code{reproducible.verbose} value by default.}
 
-\item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}}
+\item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}. If the
+interrupted \code{spades()} call used an \code{events} filter (to run only certain
+events), the same filter is reused automatically on restart; pass a new
+\code{events} argument here to override it.}
 
 \item{filename}{The filename to save the sim state.
 

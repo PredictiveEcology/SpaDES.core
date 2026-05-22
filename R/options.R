@@ -191,6 +191,13 @@
 #'     \tab  The default tolerance value used for floating
 #'     point number comparisons.\cr
 #'
+#'   `spades.urlLog` \tab `TRUE` \tab
+#'   If `TRUE` (the default), any files or web addresses (URLs) that modules
+#'   download through `prepInputs()` or `preProcess()` during `simInit()` or
+#'   `spades()` are recorded, and each one is tagged with the module and event
+#'   that asked for it. This makes it easy to see where a simulation's input
+#'   data came from. Set to `FALSE` to turn the recording off.\cr
+#'
 #'   `spades.useragent` \tab `"https://github.com/PredictiveEcology/SpaDES"`.
 #'     \tab The default user agent to use for downloading modules from GitHub.\cr
 #'
@@ -263,6 +270,7 @@ spadesOptions <- function() {
     spades.sessionInfo = TRUE,
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps^0.5,
+    spades.urlLog = TRUE,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
     # spades.useBox = FALSE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",

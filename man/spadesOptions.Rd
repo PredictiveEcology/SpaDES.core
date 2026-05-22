@@ -193,6 +193,13 @@ with a warning.\cr
 \tab  The default tolerance value used for floating
 point number comparisons.\cr
 
+\code{spades.urlLog} \tab \code{TRUE} \tab
+If \code{TRUE} (the default), any files or web addresses (URLs) that modules
+download through \code{prepInputs()} or \code{preProcess()} during \code{simInit()} or
+\code{spades()} are recorded, and each one is tagged with the module and event
+that asked for it. This makes it easy to see where a simulation's input
+data came from. Set to \code{FALSE} to turn the recording off.\cr
+
 \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
 \tab The default user agent to use for downloading modules from GitHub.\cr
 

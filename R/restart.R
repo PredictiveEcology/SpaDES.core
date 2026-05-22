@@ -61,14 +61,18 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
 #'   with the module code parsed into the `simList`
 #'
-#' @param numEvents Numeric. Default is Inf (i.e., all available).
+#' @param numEvents Numeric. Default is `1L` (rewind a single event). Use `Inf`
+#'   to rewind all available events.
 #'   The number of events to be rewound.
 #'   In the `simList`, if `options('spades.recoveryMode')` is set to `TRUE` or a numeric,
 #'   then there will be a list in the `simList` called `.recoverableObjs`.
 #'   These will be replayed backwards in time to reproduce the initial state of the `simList`
 #'   before the event that is `numEvents` prior to the first event in `events(sim)`.
 #'
-#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
+#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`. If the
+#'   interrupted `spades()` call used an `events` filter (to run only certain
+#'   events), the same filter is reused automatically on restart; pass a new
+#'   `events` argument here to override it.
 #'
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'

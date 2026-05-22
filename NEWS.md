@@ -1,49 +1,100 @@
-# SpaDES.core 3.1.2.9002
+# SpaDES.core 3.1.2.9003 (development version)
 
 ## New features
 
-* Code check findings can now be silenced: an inline `# nolint` (or `# nolint: <rule_id>`) comment in the module source (developers), `options(spades.codeChecksIgnore = list(<rule_id> = c("obj", ...)))` (users), and `options(spades.moduleCodeChecks = list(disable = ...))` (now actually wired). See `?codeCheckModule`.
-* Code check: new `reqdPkgs` rules — `reqd_pkg_duplicate` (a package declared 2+ times, especially with conflicting source/version), `reqd_pkg_undeclared` (a `pkg::fn` whose package is not in `reqdPkgs`), and `reqd_pkg_no_source` (best-effort, info: bare calls with no apparent source among the declared packages, only when all are installed).
-* Code check: `# nolint: vars a, b` asserts that objects `a`, `b` are produced at a dynamic bulk-assign line (e.g. `list2env(someList, envir(sim))`) whose names can't be seen statically, so they aren't reported as `out_declared_unused`.
-* Code check: `paramCheckOtherMods(sim, "x")` marks `"x"` as a used parameter.
+* During a simulation, SpaDES.core now keeps a record of every file or web
+  address (URL) that modules download (through `prepInputs()` or
+  `preProcess()`), and tags each one with the module and event that asked for
+  it. This makes it easy to see where a simulation's input data came from. It is
+  on by default; turn it off with `options(spades.urlLog = FALSE)`. See
+  `?spadesOptions`.
 
 ## Enhancements
 
-* Code check report: hits of the same issue (e.g. several `scale()`/`levels()` ambiguities, or several inputs with no default) are collapsed under one header with one line per location, instead of repeating the full message + suggestion per hit.
-* Code check report now tags each finding with its rule id (e.g. `[conflicting_fn_unqualified]`) so it can be copied into a `# nolint`/`codeChecksIgnore`; the group name (e.g. `globals`) is also accepted there. Rule catalogue documented in `?codeCheckModule`.
-* Code check: `unresolved_accessor` now explains that dynamic `get()`/`mget()`-family and `sim[[<var>]]` access cannot be checked statically and prompts the developer to add `# nolint: unresolved_accessor` if intentional.
-* Code check: every suggestion now ends with how to acknowledge the finding (`otherwise add # nolint: <rule_id>`) instead of a vague "otherwise ignore".
+* `restartSpades()` (which resumes a simulation that was interrupted) now
+  remembers the `events` filter from the original `spades()` call, so the
+  resumed run repeats the same subset of events instead of running everything.
+  Supply a new `events` argument to `restartSpades()` to override it. See
+  `?restartSpades`.
 
-## Bug fixes
+# SpaDES.core 3.1.2.9002 (development version)
 
-* Code check: `in_no_default` no longer fires for an input that is handled via a `suppliedElsewhere("x", sim)` guard (whether followed by a default assignment or a `stop()`), nor for one asserted with `# nolint: vars` at a dynamic `.inputObjects()` assignment.
-* Code check: `params(sim)[[currentModule(sim)]]$x` now resolves to the current module instead of being reported as an unresolved param accessor.
-* Code check: no longer a false `out_declared_unused` (or `in_declared_unused`) when the assignment lives in a function wrapped in `compiler::cmpfun()` / `Cache()` etc.; the enclosing function is now found through such wrapper calls. Anonymous callbacks (e.g. `lapply(x, function(i) sim[[i]])`) are not misattributed, so a dynamic `sim[[var]]` inside one is no longer reported as an unresolved accessor.
-
-# SpaDES.core 3.1.2.9001
-
-## Bug fixes
-
-* Code check `module_named_object`: reworded the `sim$<module> <- ...` finding to "collides with module name; should be changed because it can cause unwanted problems".
+These changes are all to the module code checker, which warns module authors
+about likely mistakes in their module's R code. See `?codeCheckModule`.
 
 ## New features
 
-* `codeCheckModules()` is a vectorized `codeCheckModule()`; with no arguments it checks every module under `getOption("spades.modulePath")`.
+* You can now tell the code checker to ignore a particular warning. A module
+  author can add a `# nolint` comment (or `# nolint: <rule_id>` for one specific
+  check) to a line of module code; a user can set
+  `options(spades.codeChecksIgnore = list(<rule_id> = c("objectName", ...)))`;
+  and `options(spades.moduleCodeChecks = list(disable = ...))` now also works.
+* New checks on a module's declared package list (`reqdPkgs`): a warning when a
+  package is listed more than once (especially with a conflicting source or
+  version), when a module calls `package::function()` for a package it never
+  declared, and (best-effort, informational) when a bare function call has no
+  obvious source among the declared packages.
+* `# nolint: vars a, b` lets an author promise that objects `a` and `b` are
+  created on a line where the names cannot be seen automatically (for example
+  `list2env(someList, envir(sim))`), so they are not wrongly flagged as
+  declared-but-unused outputs.
+* The checker now recognises `paramCheckOtherMods(sim, "x")` as a use of
+  parameter `"x"`.
 
-# SpaDES.core 3.1.2.9000
+## Enhancements
+
+* The code-check report now groups repeats of the same issue under one heading,
+  with one line per location, instead of repeating the full message every time.
+* Each finding is now tagged with its check name (e.g.
+  `[conflicting_fn_unqualified]`) so it can be pasted straight into a `# nolint`
+  comment or the `spades.codeChecksIgnore` option. The broader group name (e.g.
+  `globals`) is also accepted there.
+* Clearer guidance for the `unresolved_accessor` warning: it now explains that
+  some dynamic ways of reading objects (e.g. `get()`/`mget()` or
+  `sim[[<variable>]]`) cannot be checked automatically, and how to acknowledge
+  them with `# nolint`.
+* Every suggestion now ends by telling you exactly how to silence the finding
+  if it is intentional, instead of a vague "otherwise ignore".
 
 ## Bug fixes
 
-* `setPaths()` and `getPaths()`/`.paths()` no longer error with
-  "Invalid path: cannot be NULL" when `getOption("reproducible.cachePath")`
-  is `NULL`. Recent `reproducible` (development) leaves this option unset at
-  load time and resolves it lazily on first cache use; SpaDES.core read the
-  option directly and passed `NULL` to `reproducible::checkPath()`. This
-  surfaced at package attach (`.onAttach()` calls `setPaths()`), preventing
-  the package from loading. SpaDES.core now mirrors reproducible's lazy
-  fallback (`file.path(getOption("reproducible.tempPath"), "cache")`).
-  Compatible with both CRAN `reproducible` (>= 3.1.1, which still ships a
-  non-`NULL` default) and `reproducible` `@development`.
+* Fewer false alarms: the "input has no default" check no longer fires when the
+  input is handled with a `suppliedElsewhere("x", sim)` guard, nor when it is
+  asserted with `# nolint: vars`.
+* `params(sim)[[currentModule(sim)]]$x` is now correctly understood as a
+  parameter of the current module, instead of being flagged as unresolved.
+* No more false "declared but unused" warnings when an output is assigned inside
+  a function wrapped by `compiler::cmpfun()` or `Cache()`; the checker now looks
+  through such wrappers. Objects read inside anonymous callbacks (e.g.
+  `lapply(x, function(i) sim[[i]])`) are also no longer misattributed.
+
+# SpaDES.core 3.1.2.9001 (development version)
+
+## New features
+
+* New `codeCheckModules()` checks several modules for coding problems in one
+  call. With no arguments, it checks every module in your project's module
+  folder (the `spades.modulePath` option). It is the bulk version of
+  `codeCheckModule()`, which checks a single module. See `?codeCheckModule`.
+
+## Bug fixes
+
+* The code check that flags giving an object the same name as a module
+  (`sim$<moduleName> <- ...`) now gives a clearer message, explaining that this
+  name clash can cause hard-to-find problems.
+
+# SpaDES.core 3.1.2.9000 (development version)
+
+## Bug fixes
+
+* SpaDES.core again loads cleanly when no cache location has been set. Recent
+  development versions of `reproducible` leave the cache location (the
+  `reproducible.cachePath` option) empty until the cache is first used;
+  `setPaths()` and `getPaths()` previously stopped with an "Invalid path: cannot
+  be NULL" error in that case, which prevented the package from loading. They
+  now fall back to a temporary cache folder, the same way `reproducible` itself
+  does. This works with both the current CRAN `reproducible` (3.1.1) and the
+  development version. See `?setPaths`.
 
 # SpaDES.core 3.1.2
 
