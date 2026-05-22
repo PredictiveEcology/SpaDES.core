@@ -169,6 +169,18 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       st[["current"]] <- cur[["eventTime"]]
       slot(sim, "simtimes", check = FALSE) <- st
 
+      if (identical(cur[["eventType"]], ".inputObjects")) {
+        ## `.inputObjects` is dispatched specially: unlike a normal event, it is not a
+        ## `doEvent.<module>(sim, eventTime, eventType)` handler but a separate module
+        ## function (`.inputObjects(sim)`) with its own caching / user-object contract.
+        ## Handling it here lets the event queue -- and therefore the spades loop and
+        ## recoveryMode -- drive `.inputObjects` exactly like any other event. (Nothing
+        ## schedules `.inputObjects` events yet; this is the dispatch seam for that work.)
+        sim <- .runModuleInputObjects(
+          sim, curModuleName,
+          notOlderThan = if (missing(notOlderThan)) NULL else notOlderThan,
+          debug = debug)
+      } else {
       # call the module responsible for processing this event
       moduleCall <- paste("doEvent", curModuleName, sep = ".")
       # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
@@ -330,6 +342,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           }
         }
       }
+      } # end normal-event dispatch (`.inputObjects` is handled by the branch above)
 
       # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option

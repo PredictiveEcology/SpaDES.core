@@ -345,6 +345,54 @@ doEvent.modA <- function(sim, eventTime, eventType, debug = FALSE) { sim }
   expect_equal(resumed$obj_modA, 3L)
 })
 
+test_that("doEvent dispatches a queued .inputObjects event to .runModuleInputObjects", {
+  ## proof-of-seam: a `.inputObjects` event placed in the queue is run by doEvent (i.e.,
+  ## .inputObjects can be driven by the event queue / spades loop, like any other event)
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache)
+
+  newModule("modS", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modS", "modS.R"), sprintf('
+defineModule(sim, list(name = "modS", description = "", keywords = "",
+  authors = person("a", "b"), childModules = character(0),
+  version = list(modS = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("x", "numeric", "")),
+  outputObjects = bindrows(createsOutput("out", "numeric", ""))))
+doEvent.modS <- function(sim, eventTime, eventType, debug = FALSE) { sim$out <- 1; sim }
+.inputObjects <- function(sim) {
+  sim$ioDispatchProof <- if (is.null(sim$ioDispatchProof)) 1L else sim$ioDispatchProof + 1L
+  sim
+}
+'), fill = TRUE)
+
+  sim <- simInit(times = list(start = 0, end = 1), modules = list("modS"),
+                 paths = list(modulePath = tmpdir))
+  expect_equal(sim$ioDispatchProof, 1L)  # ran once during simInit
+
+  ## mimic the in-simInit session state that simInit's on.exit clears, and the
+  ## .pkgEnv flag that spades() normally sets (doEvent is being called directly here)
+  sim@.xData[["._startClockTime"]] <- Sys.time()
+  sim$._simInitElapsedTime <- 0
+  .pkgEnv[["spades.keepCompleted"]] <- TRUE
+
+  ## queue ONLY a .inputObjects event, then let doEvent drive it
+  sim@current <- list()
+  sim@events <- list()
+  sim <- scheduleEvent(sim, start(sim), "modS", ".inputObjects", -1)
+  expect_identical(sim@events[[1]]$eventType, ".inputObjects")
+  nBefore <- NROW(completed(sim))
+
+  sim <- doEvent(sim, debug = FALSE, notOlderThan = NULL)
+
+  expect_equal(sim$ioDispatchProof, 2L)               # dispatched -> .inputObjects re-ran
+  expect_length(sim@events, 0L)                       # event consumed from the queue
+  expect_equal(NROW(completed(sim)), nBefore + 1L)    # recorded as completed
+  expect_identical(tail(completed(sim)$eventType, 1L), ".inputObjects")
+})
+
 test_that("spades.recoveryMode = FALSE does not populate .recoverableObjs", {
   testInit(smcc = FALSE, debug = FALSE,
            opts = list(reproducible.useMemoise = FALSE))
