@@ -174,176 +174,183 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         ## `doEvent.<module>(sim, eventTime, eventType)` handler but a separate module
         ## function (`.inputObjects(sim)`) with its own caching / user-object contract.
         ## Handling it here lets the event queue -- and therefore the spades loop and
-        ## recoveryMode -- drive `.inputObjects` exactly like any other event. (Nothing
-        ## schedules `.inputObjects` events yet; this is the dispatch seam for that work.)
-        sim <- .runModuleInputObjects(
-          sim, curModuleName,
-          notOlderThan = if (missing(notOlderThan)) NULL else notOlderThan,
-          debug = debug)
+        ## recoveryMode -- drive `.inputObjects` exactly like any other event.
+        ## The user-supplied `objects` (stashed by simInit on the simList) must be passed
+        ## through: .runModuleInputObjects() places the module's provided input objects
+        ## into the simList *before* calling .inputObjects(), which is what makes them
+        ## visible to suppliedElsewhere() (incl. via objectSynonyms).
+        ntot <- if (missing(notOlderThan)) NULL else notOlderThan
+        ioObjects <- sim@.xData[["._simInitContext"]][["objects"]]
+        sim <- if (is.null(ioObjects)) {
+          .runModuleInputObjects(sim, curModuleName, notOlderThan = ntot, debug = debug)
+        } else {
+          .runModuleInputObjects(sim, curModuleName, objects = ioObjects,
+                                 notOlderThan = ntot, debug = debug)
+        }
       } else {
-      # call the module responsible for processing this event
-      moduleCall <- paste("doEvent", curModuleName, sep = ".")
-      # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
-      if (!is.null(fnEnv)) {
-        if (!exists(moduleCall, envir = fnEnv)) {
-          moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur[["eventType"]])
-          if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
-            fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
-            moduleCall <- moduleCallSeparateEventFns
-          } else {
-            if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
+        # call the module responsible for processing this event
+        moduleCall <- paste("doEvent", curModuleName, sep = ".")
+        # Modules can use either the doEvent approach or defineEvent approach, with doEvent taking priority
+        if (!is.null(fnEnv)) {
+          if (!exists(moduleCall, envir = fnEnv)) {
+            moduleCallSeparateEventFns <- makeEventFn(curModuleName, cur[["eventType"]])
+            if (!is.null(sim@.xData[[eventFnElementEnvir()]])) {
+              fnEnv <- sim@.xData[[eventFnElementEnvir()]][[moduleCallSeparateEventFns]]$envir
               moduleCall <- moduleCallSeparateEventFns
-            }
-          }
-        }
-      }
-
-      # if debug is TRUE
-      if (is.null(attr(sim, "needDebug"))) {
-        attr(sim, "needDebug") <- if (length(debug) > 1) {
-          !(all(unlist(lapply(debug, identical, FALSE))))
-        } else {
-          !identical(debug, FALSE)
-        }
-      }
-      if (attr(sim, "needDebug") + 1) {
-        debugHere <- if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug)
-        # debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
-        debugMessage(debugHere, sim, cur, fnEnv, curModuleName)
-      }
-
-      # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
-      moduleIsInSim <- curModuleName %in% sim@modules
-      if (!moduleIsInSim && !fnEnvIsSpaDES.core)
-        stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
-      # if (curModuleName %in% sim@modules) {
-      if (curModuleName %in% core) {
-        sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
-      } else {
-        # for future caching of modules
-        cacheIt <- FALSE
-        eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-        a <- sim@params[[curModuleName]][[._txtDotUseCache]]
-        if (!is.null(a)) {
-          #.useCache is a parameter
-          if (!identical(FALSE, a)) {
-            #.useCache is not FALSE
-            if (!isTRUE(a)) {
-              #.useCache is not TRUE
-              if (cur[["eventType"]] %in% a) {
-                cacheIt <- TRUE
-              } else if (inherits(a, "POSIXt")) {
-                cacheIt <- TRUE
-                notOlderThan <- a
-              }
             } else {
-              cacheIt <- TRUE
+              if (exists(moduleCallSeparateEventFns, envir = fnEnv)) { # don't specify inherits = FALSE because might be elsewhere
+                moduleCall <- moduleCallSeparateEventFns
+              }
             }
           }
         }
-
-
-        # browser(expr = exists("._doEvent_2"))
-        showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
-                           isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
-          isTRUE(getOption("reproducible.showSimilar", FALSE))
+        
+        # if debug is TRUE
+        if (is.null(attr(sim, "needDebug"))) {
+          attr(sim, "needDebug") <- if (length(debug) > 1) {
+            !(all(unlist(lapply(debug, identical, FALSE))))
+          } else {
+            !identical(debug, FALSE)
+          }
+        }
+        if (attr(sim, "needDebug") + 1) {
+          debugHere <- if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug)
+          # debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, fnEnv, curModuleName)
+          debugMessage(debugHere, sim, cur, fnEnv, curModuleName)
+        }
+        
+        # if the moduleName exists in the simList -- i.e,. go ahead with doEvent
+        moduleIsInSim <- curModuleName %in% sim@modules
+        if (!moduleIsInSim && !fnEnvIsSpaDES.core)
+          stop("Invalid module call. The module `", curModuleName, "` wasn't specified to be loaded.")
+        # if (curModuleName %in% sim@modules) {
+        if (curModuleName %in% core) {
+          sim <- get(moduleCall)(sim, cur[["eventTime"]], cur[["eventType"]])
         } else {
-          isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
-        }
-
-        # This is to create a namespaced module call
-        # if (!.pkgEnv[["skipNamespacing"]])
-        #   .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
-        #                     removeOthers = FALSE)
-
-        skipEvent <- FALSE
-        if (!is.null(eventSeed)) {
-          if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
-            initialRandomSeed <- .Random.seed
-          set.seed(eventSeed) # will create .Random.seed
-        }
-
-        .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
-        if (useFuture) {
-          # stop("using future for spades events is not yet fully implemented")
-          futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
-                                        curModName = cur[["moduleName"]])
-
-          # In general... allow a spawning, unless it is literally next event
-          #   This is just a heuristic because other events could be inserted before
-          #    the next event ... but this is a decent guess
-          # don't use cur from above because it is "seconds" which mess with future
-
-          # by running scheduleEvents first, we can see what the "next" event will actually
-          #   be so we can determine what inputs will be needed.
-          simNext <- runScheduleEventsOnly(sim, currnt = cur) # run the scheduleEvents only
-          nextScheduledEvent <- simNext@events[[1]]$moduleName
-
-          objsNeeded <- NULL
-          if (nextScheduledEvent %in% "save") {
-            outs <- outputs(sim)
-            objsNeeded <- outs$objectName[outs$saveTime == events(sim)$eventTime[1]]
+          # for future caching of modules
+          cacheIt <- FALSE
+          eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
+          a <- sim@params[[curModuleName]][[._txtDotUseCache]]
+          if (!is.null(a)) {
+            #.useCache is a parameter
+            if (!identical(FALSE, a)) {
+              #.useCache is not FALSE
+              if (!isTRUE(a)) {
+                #.useCache is not TRUE
+                if (cur[["eventType"]] %in% a) {
+                  cacheIt <- TRUE
+                } else if (inherits(a, "POSIXt")) {
+                  cacheIt <- TRUE
+                  notOlderThan <- a
+                }
+              } else {
+                cacheIt <- TRUE
+              }
+            }
           }
-          objsNeededForNextMod <- futureNeeds$anyModInputs[[nextScheduledEvent]]
-          # selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
-          objsNeeded <- na.omit(unique(c(objsNeeded, objsNeededForNextMod)))#, selfObjects)))
-          if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
-            spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1] + 1), collapse = "")
-            messageVerbose(
-              cli::col_magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
-                                      "next module (", nextScheduledEvent, ")")),
-              verbose = 1 - (debug %in% FALSE))
-            simFuture <- sim$.simFuture
-            sim$.simFuture <- list()
-            cur2 <- unlist(current(sim))
-            cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
-            sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur2, notOlderThan,
-                                   showSimilar = showSimilar, .pkgEnv, envir = environment(),
-                                   futureNeeds = futureNeeds)
-            sim$.simFuture <- append(simFuture, sim$.simFuture)
-            # sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
-            sim@events <- simNext@events
-            skipEvent <- TRUE
+          
+          
+          # browser(expr = exists("._doEvent_2"))
+          showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
+                             isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
+            isTRUE(getOption("reproducible.showSimilar", FALSE))
+          } else {
+            isTRUE(sim@params[[curModuleName]][[".showSimilar"]])
           }
-        }
-
-        if (!skipEvent) {
-          sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                           showSimilar = showSimilar, .pkgEnv)
-        }
-
-        if (!is.null(eventSeed)) {
-          if (exists("initialRandomSeed", inherits = FALSE))
-            .Random.seed <- initialRandomSeed
-        }
-
-        # browser(expr = exists("._doEvent_3"))
-        if (!fnEnvIsSpaDES.core) {
-          if (!exists(curModuleName, envir = sim@.xData[[dotMods]], inherits = FALSE))
-            stop("The module named ", curModuleName, " just corrupted the object with that ",
-                 "name from from the simList. ",
-                 "Please remove the section of code that does this in the event named: ",
-                 cur[["eventType"]])
-
-          if (!is.environment(get(curModuleName, envir = sim@.xData[[dotMods]])))
-            stop("The module named ", curModuleName, " just corrupted the object with that ",
-                 "name from from the simList. ",
-                 "Please remove the section of code that does this in the event named: ",
-                 cur[["eventType"]])
-
-          if (!exists("mod", envir = sim@.envir[[dotMods]][[curModuleName]], inherits = FALSE)) {
-            if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
-                                      silent = TRUE, error = function(x) FALSE)
-            ))
-              warning("The module named ", curModuleName, " just deleted the object named 'mod' from ",
-                   "sim$", curModuleName, ". ",
+          
+          # This is to create a namespaced module call
+          # if (!.pkgEnv[["skipNamespacing"]])
+          #   .modifySearchPath(sim@depends@dependencies[[curModuleName]]@reqdPkgs,
+          #                     removeOthers = FALSE)
+          
+          skipEvent <- FALSE
+          if (!is.null(eventSeed)) {
+            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
+              initialRandomSeed <- .Random.seed
+            set.seed(eventSeed) # will create .Random.seed
+          }
+          
+          .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
+          if (useFuture) {
+            # stop("using future for spades events is not yet fully implemented")
+            futureNeeds <- getFutureNeeds(deps = sim@depends@dependencies,
+                                          curModName = cur[["moduleName"]])
+            
+            # In general... allow a spawning, unless it is literally next event
+            #   This is just a heuristic because other events could be inserted before
+            #    the next event ... but this is a decent guess
+            # don't use cur from above because it is "seconds" which mess with future
+            
+            # by running scheduleEvents first, we can see what the "next" event will actually
+            #   be so we can determine what inputs will be needed.
+            simNext <- runScheduleEventsOnly(sim, currnt = cur) # run the scheduleEvents only
+            nextScheduledEvent <- simNext@events[[1]]$moduleName
+            
+            objsNeeded <- NULL
+            if (nextScheduledEvent %in% "save") {
+              outs <- outputs(sim)
+              objsNeeded <- outs$objectName[outs$saveTime == events(sim)$eventTime[1]]
+            }
+            objsNeededForNextMod <- futureNeeds$anyModInputs[[nextScheduledEvent]]
+            # selfObjects <- futureNeeds$thisModOutputs[futureNeeds$thisModOutputs %in% futureNeeds$thisModsInputs]
+            objsNeeded <- na.omit(unique(c(objsNeeded, objsNeededForNextMod)))#, selfObjects)))
+            if (!any(futureNeeds$thisModOutputs %in% objsNeeded)) {
+              spacing <- paste(rep(" ", sim[["._spadesDebugWidth"]][1] + 1), collapse = "")
+              messageVerbose(
+                cli::col_magenta(paste0(spacing, cur[["moduleName"]], " outputs not needed by ",
+                                        "next module (", nextScheduledEvent, ")")),
+                verbose = 1 - (debug %in% FALSE))
+              simFuture <- sim$.simFuture
+              sim$.simFuture <- list()
+              cur2 <- unlist(current(sim))
+              cur2[["eventTime"]] <- as.numeric(cur2[["eventTime"]])
+              sim <- .runEventFuture(sim, cacheIt, debug, moduleCall, fnEnv, cur2, notOlderThan,
+                                     showSimilar = showSimilar, .pkgEnv, envir = environment(),
+                                     futureNeeds = futureNeeds)
+              sim$.simFuture <- append(simFuture, sim$.simFuture)
+              # sim <- runScheduleEventsOnly(sim, currnt = cur2) # run the scheduleEvents only
+              sim@events <- simNext@events
+              skipEvent <- TRUE
+            }
+          }
+          
+          if (!skipEvent) {
+            sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
+                             showSimilar = showSimilar, .pkgEnv)
+          }
+          
+          if (!is.null(eventSeed)) {
+            if (exists("initialRandomSeed", inherits = FALSE))
+              .Random.seed <- initialRandomSeed
+          }
+          
+          # browser(expr = exists("._doEvent_3"))
+          if (!fnEnvIsSpaDES.core) {
+            if (!exists(curModuleName, envir = sim@.xData[[dotMods]], inherits = FALSE))
+              stop("The module named ", curModuleName, " just corrupted the object with that ",
+                   "name from from the simList. ",
                    "Please remove the section of code that does this in the event named: ",
                    cur[["eventType"]])
+            
+            if (!is.environment(get(curModuleName, envir = sim@.xData[[dotMods]])))
+              stop("The module named ", curModuleName, " just corrupted the object with that ",
+                   "name from from the simList. ",
+                   "Please remove the section of code that does this in the event named: ",
+                   cur[["eventType"]])
+            
+            if (!exists("mod", envir = sim@.envir[[dotMods]][[curModuleName]], inherits = FALSE)) {
+              if (!isNamespace(tryCatch(asNamespace(.moduleNameNoUnderscore(curModuleName)),
+                                        silent = TRUE, error = function(x) FALSE)
+              ))
+                warning("The module named ", curModuleName, " just deleted the object named 'mod' from ",
+                        "sim$", curModuleName, ". ",
+                        "Please remove the section of code that does this in the event named: ",
+                        cur[["eventType"]])
+            }
           }
         }
-      }
       } # end normal-event dispatch (`.inputObjects` is handled by the branch above)
-
+      
       # add to list of completed events
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         # cur[[._txtClockTime]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
