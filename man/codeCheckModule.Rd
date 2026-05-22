@@ -44,6 +44,66 @@ structured tibble of findings, optionally printed as grouped tables.
 This is the v2 implementation, selectable at \code{simInit()} time via
 \code{options(spades.codeCheckEngine = "v2")} (the default). The legacy v1
 checker is still available via \code{options(spades.codeCheckEngine = "v1")}.
+}
+\section{Silencing findings}{
+
+Each finding in the printed report is tagged with its \strong{rule id} in
+brackets, e.g. \verb{[conflicting_fn_unqualified]}; that id (or the \verb{• <group>}
+name it is printed under) is what you reference to silence it. Findings can
+be suppressed three ways (all honoured both here and during \code{simInit()}):
+\itemize{
+\item \strong{Inline \verb{# nolint} (module developer).} Put a \verb{# nolint} comment on
+the offending source line to silence every rule there, or
+\verb{# nolint: <rule_id>[, <rule_id>]} to silence only specific rules (a
+group name such as \code{globals} is accepted in place of a rule id). For a
+metadata finding such as \code{in_no_default}, place it anywhere within the
+\code{expectsInput()} / \code{createsOutput()} / \code{defineParameter()} declaration,
+e.g. \code{expectsInput("cloudFolderID", "character", desc = "...") # nolint: in_no_default}.
+This travels with the module and documents the intent.
+\item \strong{\code{options(spades.codeChecksIgnore = ...)} (module user).} A named
+list keyed by rule id (or group name) whose values are object names to
+ignore, e.g.
+\code{options(spades.codeChecksIgnore = list(in_no_default = c("cloudFolderID", "ecoregionRst")))}.
+Lets someone running another author's module quiet specific findings
+without editing its source.
+\item \strong{\code{options(spades.moduleCodeChecks = list(disable = ...))}.} Disable
+whole rules by id (or restrict with \code{enable = ...}).
+}
+
+A related developer hint is \verb{# nolint: vars a, b}: placed on a dynamic
+bulk-assign line whose names can't be seen statically (e.g.
+\code{list2env(someList, envir(sim))}), it asserts that objects \code{a}, \code{b} are
+produced there, so they aren't reported as \code{out_declared_unused}.
+}
+
+\section{Rule catalogue}{
+
+The rule ids (printed in brackets in the report), grouped by the bucket they
+appear under:
+\itemize{
+\item \strong{inputObjects} — \code{in_declared_unused} (declared input never used),
+\code{in_used_undeclared} (\code{sim$x} read but not in \code{inputObjects}),
+\code{in_no_default} (declared input has no default in \code{.inputObjects()}).
+\item \strong{outputObjects} — \code{out_declared_unused} (declared output never
+assigned), \code{out_used_undeclared} (\verb{sim$x <-} but not in \code{outputObjects}).
+\item \strong{parameters} — \code{param_declared_unused}, \code{param_used_undeclared},
+\code{param_used_other_module}.
+\item \strong{module functions} — \code{must_return_sim} (a \verb{doEvent.*} must return
+\code{sim}), \code{must_assign_to_sim}, \code{module_named_object} (\verb{sim$<module>}
+collides with the module name), \code{clashing_module_fn}.
+\item \strong{globals} — \code{conflicting_fn_unqualified} (a bare function name
+collides with a \verb{raster::} namesake; qualify it, e.g. \code{raster::scale}).
+\item \strong{unresolved} — \code{unresolved_accessor} (an accessor whose name could
+not be resolved statically).
+\item \strong{codetools} — \code{codetools} (findings relayed from
+\code{codetools::checkUsageEnv}).
+\item \strong{reqdPkgs} — \code{reqd_pkg_duplicate} (a package declared more than
+once in \code{reqdPkgs}, especially with conflicting source/version),
+\code{reqd_pkg_undeclared} (a \code{pkg::fn} whose \code{pkg} is not in \code{reqdPkgs}),
+\code{reqd_pkg_no_source} (best-effort, info: bare calls with no apparent
+source among the declared packages — only when all declared packages are
+installed).
+}
 
 \code{codeCheckModule()} checks a single module. \code{codeCheckModules()} is the
 vectorized form: it runs \code{codeCheckModule()} on each path in \code{paths} and
@@ -53,3 +113,4 @@ so \code{codeCheckModules()} with no arguments checks the whole project. It
 replaces the manual idiom
 \code{Map(codeCheckModule, dir(getOption("spades.modulePath"), full.names = TRUE))}.
 }
+

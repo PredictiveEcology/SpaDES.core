@@ -1,3 +1,25 @@
+# SpaDES.core 3.1.2.9002
+
+## New features
+
+* Code check findings can now be silenced: an inline `# nolint` (or `# nolint: <rule_id>`) comment in the module source (developers), `options(spades.codeChecksIgnore = list(<rule_id> = c("obj", ...)))` (users), and `options(spades.moduleCodeChecks = list(disable = ...))` (now actually wired). See `?codeCheckModule`.
+* Code check: new `reqdPkgs` rules — `reqd_pkg_duplicate` (a package declared 2+ times, especially with conflicting source/version), `reqd_pkg_undeclared` (a `pkg::fn` whose package is not in `reqdPkgs`), and `reqd_pkg_no_source` (best-effort, info: bare calls with no apparent source among the declared packages, only when all are installed).
+* Code check: `# nolint: vars a, b` asserts that objects `a`, `b` are produced at a dynamic bulk-assign line (e.g. `list2env(someList, envir(sim))`) whose names can't be seen statically, so they aren't reported as `out_declared_unused`.
+* Code check: `paramCheckOtherMods(sim, "x")` marks `"x"` as a used parameter.
+
+## Enhancements
+
+* Code check report: hits of the same issue (e.g. several `scale()`/`levels()` ambiguities, or several inputs with no default) are collapsed under one header with one line per location, instead of repeating the full message + suggestion per hit.
+* Code check report now tags each finding with its rule id (e.g. `[conflicting_fn_unqualified]`) so it can be copied into a `# nolint`/`codeChecksIgnore`; the group name (e.g. `globals`) is also accepted there. Rule catalogue documented in `?codeCheckModule`.
+* Code check: `unresolved_accessor` now explains that dynamic `get()`/`mget()`-family and `sim[[<var>]]` access cannot be checked statically and prompts the developer to add `# nolint: unresolved_accessor` if intentional.
+* Code check: every suggestion now ends with how to acknowledge the finding (`otherwise add # nolint: <rule_id>`) instead of a vague "otherwise ignore".
+
+## Bug fixes
+
+* Code check: `in_no_default` no longer fires for an input that is handled via a `suppliedElsewhere("x", sim)` guard (whether followed by a default assignment or a `stop()`), nor for one asserted with `# nolint: vars` at a dynamic `.inputObjects()` assignment.
+* Code check: `params(sim)[[currentModule(sim)]]$x` now resolves to the current module instead of being reported as an unresolved param accessor.
+* Code check: no longer a false `out_declared_unused` (or `in_declared_unused`) when the assignment lives in a function wrapped in `compiler::cmpfun()` / `Cache()` etc.; the enclosing function is now found through such wrapper calls. Anonymous callbacks (e.g. `lapply(x, function(i) sim[[i]])`) are not misattributed, so a dynamic `sim[[var]]` inside one is no longer reported as an unresolved accessor.
+
 # SpaDES.core 3.1.2.9001
 
 ## Bug fixes
