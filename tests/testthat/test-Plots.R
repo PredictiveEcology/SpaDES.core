@@ -69,7 +69,7 @@ test_that("Plots function 1", {
 
 
     ', fill = TRUE)
-    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                    times = list(start = 0, end = 10, timeunit = "year"))
     mess <- capture_messages({
       simOut <- spades(sim, debug = TRUE)
@@ -144,7 +144,7 @@ test_that("Plots function 2", {
       }
 ', fill = TRUE)
   expect_error({
-    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                    times = list(start = 0, end = 10, timeunit = "year"))
     }, "needs a newer version of SpaDES.core"
   )
@@ -237,7 +237,7 @@ test_that("Plots - base R fn (non-gg result)", {
     fnHist <- function(d, ...) hist(d$a, main = "test", ...)
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
@@ -279,7 +279,7 @@ test_that("Plots - terra SpatRaster and SpatVector", {
     }
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
@@ -325,7 +325,7 @@ test_that("Plots - named ... args without data argument", {
     }
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
@@ -363,7 +363,7 @@ test_that("Plots - ggplot object passed directly as data", {
     }
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
