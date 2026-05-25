@@ -1540,6 +1540,30 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(sim)
 }
 
+## Guard against a module event (or its cached return) replacing `sim` with a
+## non-`simList`. The most common offender is an event/.inputObjects that returns
+## NULL (forgot `return(sim)` / `invisible(sim)`): once that NULL is cached by
+## reproducible::Cache(), a subsequent cache hit returns the literal character
+## string `"NULL"`, which then propagates as `sim`. Without this guard, the
+## failure surfaces as an opaque secondary error in the function's on.exit
+## (e.g. "more elements supplied than there are to replace") that masks the real
+## culprit module.
+.checkEventReturn <- function(sim, moduleName, eventType, fromCache) {
+  if (inherits(sim, "simList")) return(invisible())
+  what <- paste0("`", eventType, "` for module `", moduleName, "`")
+  hint <- if (isTRUE(fromCache)) {
+    paste0("This typically means a previous run of ", what,
+           " returned NULL (e.g. missing `return(sim)`), which ",
+           "reproducible::Cache() stores and replays as the string \"NULL\". ",
+           "Fix ", what, " to return `sim`, then clear the cached entry.")
+  } else {
+    paste0("Fix ", what, " to return `sim` ",
+           "(e.g. add `return(sim)` or `invisible(sim)` at the end).")
+  }
+  stop(what, " did not return a simList (got an object of class \"",
+       paste(class(sim), collapse = "/"), "\"). ", hint, call. = FALSE)
+}
+
 #' Run module's `.inputObjects`
 #'
 #' Run `.inputObjects()` from each module file from each module, one at a time,
@@ -1754,6 +1778,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             }
 
             sim <- eval(fnCallAsExpr)
+            .checkEventReturn(sim, mBase, ".inputObjects", fromCache = TRUE)
 
             if (cacheChaining) {
               # attr(sim, lastEventDetails) <- paste(mBase, ".inputObjects", collapse = "_")
@@ -1781,6 +1806,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {
           sim <- .inputObjects(sim)
+          .checkEventReturn(sim, mBase, ".inputObjects", fromCache = FALSE)
         }
       }
       # if (allowSequentialCaching) {
