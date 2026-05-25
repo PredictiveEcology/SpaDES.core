@@ -1529,6 +1529,7 @@ setMethod(
   }
   if (.pkgEnv[["spades.browserOnError"]]) {
     sim <- .runEventWithBrowser(sim, fnCallAsExpr, moduleCall, fnEnv, cur)
+    .checkEventReturn(sim, cur[["moduleName"]], cur[["eventType"]], fromCache = isTRUE(cacheIt))
   } else {
     runFnCallAsExpr <- TRUE
 
@@ -1567,6 +1568,7 @@ setMethod(
                                moduleName = cur[["moduleName"]],
                                eventType = cur[["eventType"]])
     }
+    .checkEventReturn(sim, cur[["moduleName"]], cur[["eventType"]], fromCache = isTRUE(cacheIt))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
