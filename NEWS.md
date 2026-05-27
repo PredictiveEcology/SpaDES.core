@@ -1,3 +1,13 @@
+# SpaDES.core 3.1.2.9005 (development version)
+
+## Bug fixes
+
+* `simInit()` no longer errors when called with `params = list(.globals = ...)`
+  but no `modules`. Previously this failed with
+  `no applicable method for `@` applied to an object of class "NULL"`
+  because the default empty dependency list (`list(NULL)`) was iterated by
+  `updateParamsFromGlobals()`.
+
 # SpaDES.core 3.1.2.9004 (development version)
 
 ## New features

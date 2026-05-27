@@ -317,6 +317,22 @@ test_that("simInit with R subfolder scripts", {
   expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
 })
 
+test_that("simInit with .globals but no modules does not error (#empty-deps)", {
+  testInit()
+
+  # Regression: previously errored with
+  #   "no applicable method for `@` applied to an object of class \"NULL\""
+  # because sim@depends@dependencies defaults to list(NULL) and
+  # updateParamsFromGlobals() tried mod@parameters on the NULL element.
+  d <- 1
+  expect_error(
+    sim <- suppressMessages(simInit(params = list(.globals = list(d = d)))),
+    NA
+  )
+  expect_s4_class(sim, "simList")
+  expect_identical(sim@params$.globals$d, d)
+})
+
 test_that("simulation runs with simInit with duplicate modules named", {
   testInit(sampleModReqdPkgs, opts = list(spades.debug = 1))
 

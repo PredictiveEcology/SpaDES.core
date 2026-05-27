@@ -2110,7 +2110,9 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
 }
 
 updateParamsFromGlobals <- function(sim, dontUseGlobals = list(), verbose = getOption("reproducible.verbose")) {
-  modDefaultParams <- Map(mod = sim@depends@dependencies, function(mod) mod@parameters$paramName)
+  deps <- Filter(Negate(is.null), sim@depends@dependencies)
+  if (!length(deps)) return(sim)
+  modDefaultParams <- Map(mod = deps, function(mod) mod@parameters$paramName)
   sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals,
                                             modDefaultParams = modDefaultParams, verbose = verbose)
   sim
