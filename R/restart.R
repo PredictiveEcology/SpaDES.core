@@ -107,10 +107,8 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
                           restart = restart, verbose = verbose, ...))
   }
 
-  if (is.null(module)) {
-    # Source the file you changed, into the correct location in the simList
-    module <- events(sim)[["moduleName"]][1]
-  }
+  if (is.null(module))
+    module <- .restartModuleToReparse(sim)
 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
