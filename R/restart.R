@@ -455,13 +455,10 @@ restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = 
     ## Nothing to reparse means no module was identified -- usually a saved simList with no
     ##   recovery info (e.g. created before this session's code, or with recoveryMode off).
     ##   Warn loudly rather than silently resuming the *unchanged* (un-reparsed) code.
-    warning("restartSimInit(): could not identify which module to re-parse ",
-            "(`sim$.recoverableObjs` is empty and `sim@current` has no module). ",
-            "The resumed `.inputObjects` will run the EXISTING (un-reparsed) code, so source ",
-            "edits will NOT take effect. This usually means the stashed `savedSimEnv()$.sim` ",
-            "predates the running code or was created with `options(spades.recoveryMode)` off; ",
-            "re-run `simInit()` to produce a fresh recoverable state, or pass `module = ` ",
-            "explicitly to force a re-parse.", call. = FALSE)
+    warning("restartSimInit(): no module identified to re-parse, so the resume runs the ",
+            "EXISTING (un-reparsed) code -- source edits will not take effect. The stashed ",
+            "`savedSimEnv()$.sim` likely predates this code or had recoveryMode off; re-run ",
+            "`simInit()`, or pass `module=` to force a re-parse.", call. = FALSE)
   }
   .reparseModules(sim, modulesToReparse)
 
