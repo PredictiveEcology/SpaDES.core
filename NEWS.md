@@ -1,3 +1,23 @@
+# SpaDES.core 3.1.2.9007 (development version)
+
+## Bug fixes
+
+* A module's `.inputObjects` cache is now invalidated when you edit a *helper*
+  function it calls, not only when you edit `.inputObjects` itself. Previously the
+  cache digest covered only the `.inputObjects` function, so fixing a helper left
+  the cacheId unchanged and the stale cached result was returned -- most visibly
+  via `restartSimInit()`/`restartSpades()`, whose rewind recreates the exact state
+  the stale entry was keyed under (a fresh `simInitAndSpades()` could mask the
+  problem by computing a different state, hence a different cacheId). The digest
+  now covers the transitive call-graph closure of module-local functions reachable
+  from `.inputObjects` (via `codetools::findGlobals()`, including functions passed
+  as values and helpers reached through nested closures), so an edit to any
+  function it (transitively) calls busts the cache, while edits to unrelated module
+  functions (e.g. `doEvent`, `Init`, an unused helper) do not. String-based dynamic
+  dispatch (`do.call("helper", )`, `get("helper")()`) is followed too, by scanning
+  string literals against module function names. Package functions remain out of
+  scope; their changes are tracked via `reqdPkgs`.
+
 # SpaDES.core 3.1.2.9005 (development version)
 
 ## Bug fixes
