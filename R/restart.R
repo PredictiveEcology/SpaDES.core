@@ -498,8 +498,15 @@ restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = 
   ##   to spades, restartSimInit just re-enters the shared phase on the rewound simList.
   sim@.xData[["._rmo"]] <- NULL
   modulesLoaded <- append(list(), ctx$core)
-  sim <- .runInputObjectsPhase(sim, recoverMode = 0L, allInputObjNames = NULL,
-                               thisSpadesCallRandomStr = NULL, modulesLoaded = modulesLoaded)
+  ## resume under the same calling handlers simInit() uses, so resumed `.inputObjects`
+  ##   messages/warnings get the usual `simInit/<module>:<event>` prefix (issue: restart
+  ##   ran the phase outside simInit()'s withCallingHandlers and lost the prefix).
+  withCallingHandlers(
+    sim <- .runInputObjectsPhase(sim, recoverMode = 0L, allInputObjNames = NULL,
+                                 thisSpadesCallRandomStr = NULL, modulesLoaded = modulesLoaded),
+    message = .simInitMessageHandler,
+    warning = .simInitWarningHandler
+  )
   return(sim)
 }
 
