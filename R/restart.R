@@ -412,7 +412,23 @@ restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = 
   ##   element corresponds to the module whose .inputObjects was interrupted.
   recoverNames <- names(sim$.recoverableObjs)
   if (is.null(module)) {
-    module <- if (length(recoverNames)) recoverNames[[1]] else sim@current[["moduleName"]]
+    ## Identify the module to re-parse, most-reliable source first:
+    ##   1. the recovery snapshot (most-recent = the interrupted module),
+    ##   2. sim@current (set while a module's .inputObjects is running),
+    ##   3. the first still-queued `.inputObjects` event (mirrors restartSpades()'s use of
+    ##      events(sim)). (3) matters when `.recoverableObjs` is empty -- e.g. an earlier
+    ##      cached module swapped sim@.xData and orphaned the recovery accumulator.
+    curMod <- sim@current[["moduleName"]]
+    queuedIO <- if (length(sim@events)) {
+      mn <- vapply(sim@events, function(e)
+        if (identical(e[["eventType"]], ".inputObjects")) e[["moduleName"]] else NA_character_,
+        character(1))
+      mn[!is.na(mn)]
+    } else character()
+    module <- if (length(recoverNames)) recoverNames[[1]]
+              else if (length(curMod) && nzchar(curMod)) curMod
+              else if (length(queuedIO)) queuedIO[[1]]
+              else NULL
   }
 
   ## ---- rewind the simList objects to the start of the interrupted .inputObjects ----
@@ -457,6 +473,18 @@ restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = 
 
   ## ---- reparse the (fixed) module source(s) -- same approach as restartSpades ----
   modulesToReparse <- setdiff(unique(c(module, modulesRewound)), unlist(.coreModules()))
+  if (!length(modulesToReparse)) {
+    ## Nothing to reparse means no module was identified -- usually a saved simList with no
+    ##   recovery info (e.g. created before this session's code, or with recoveryMode off).
+    ##   Warn loudly rather than silently resuming the *unchanged* (un-reparsed) code.
+    warning("restartSimInit(): could not identify which module to re-parse ",
+            "(`sim$.recoverableObjs` is empty and `sim@current` has no module). ",
+            "The resumed `.inputObjects` will run the EXISTING (un-reparsed) code, so source ",
+            "edits will NOT take effect. This usually means the stashed `savedSimEnv()$.sim` ",
+            "predates the running code or was created with `options(spades.recoveryMode)` off; ",
+            "re-run `simInit()` to produce a fresh recoverable state, or pass `module = ` ",
+            "explicitly to force a re-parse.", call. = FALSE)
+  }
   .reparseModules(sim, modulesToReparse)
 
   sim$.recoverableObjs <- NULL
