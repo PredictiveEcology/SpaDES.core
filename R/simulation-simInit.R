@@ -762,12 +762,11 @@ setMethod(
         parentChildGraph = parentChildGraph, verbose = verbose
       )
 
-      ## RecoverMode on.exit -- saves the partial sim (with recovery objects) when
-      ##   simInit is interrupted during a module's .inputObjects (mirror of spades)
-      on.exit({
-        if (isTRUE(getOption("spades.saveSimOnExit", FALSE)))
-          sim <- saveSimOnExitSimInit(recoverMode, sim, sim@.xData[["._rmo"]])
-      }, add = TRUE)
+      ## RecoverMode on.exit lives inside .runInputObjectsPhase() (beside the drain loop,
+      ##   mirroring spades' inline loop) so it reads the *live* sim: a cached .inputObjects
+      ##   returns a sim with a fresh @.xData (Copy in .prepareOutput), so this frame's `sim`
+      ##   (and its ._rmo accumulator) would go stale -- causing the recorded "interrupted"
+      ##   module to be the one before the failure. See .runInputObjectsPhase().
 
       ## Run the `.inputObjects` phase: schedule each module's `.inputObjects` as a real
       ##   event, drain it through the same single-event step as the spades loop
@@ -780,52 +779,67 @@ setMethod(
       #sim <- elapsedTimeInSimInit(._startClockTime, sim)
       #._startClockTime <- Sys.time()
     },
-    message = function(m) {
-      msg <- m$message
-      # Detect cli progress ticks routed through message() by start_app(output="message").
-      # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
-      # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
-      # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
-      # are intentionally excluded so colored regular messages are not mistaken for ticks.
-      if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
-        clean <- trimws(cli::ansi_strip(msg))
-        if (nchar(clean) == 0L) {
-          tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-          return()
-        }
-        now <- Sys.time()
-        if (!isTRUE(.pkgEnv$.inProgressBar)) {
-          .pkgEnv$.inProgressBar <- TRUE
-          .pkgEnv$.progressLastShown <- now
-          message(loggingMessage(clean, prefix = prefixSimInit))
-        } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
-                   getOption("spades.progressInterval", 2)) {
-          message(loggingMessage(clean, prefix = prefixSimInit))
-          .pkgEnv$.progressLastShown <- now
-        }
-        tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-        return()
-      }
-      .pkgEnv$.inProgressBar <- FALSE
-      message(loggingMessage(msg, prefix = prefixSimInit))
-      # This will "muffle" the original message
-      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-    },
-    warning = function(w) {
-      if (grepl("In .+:", w$message)) {
-        warningSplitOnColon(w)
-        invokeRestart("muffleWarning")
-      }
-      # This is a box mishap
-      if (isTRUE(any(grepl("'package:stats' may not be available when loading",
-                           w$message)))) {
-        invokeRestart("muffleWarning")
-      }
-    }
+    message = .simInitMessageHandler,
+    warning = .simInitWarningHandler
     )
 
     return(invisible(sim))
 })
+
+#' Calling handlers that prefix `simInit`-phase messages/warnings
+#'
+#' Extracted from `simInit()`'s `withCallingHandlers()` so the same prefixing
+#' (`loggingMessage(..., prefix = prefixSimInit)`, plus cli-progress-tick
+#' throttling) can be reused by [restartSimInit()] when it resumes the
+#' `.inputObjects` phase outside the original `simInit()` call.
+#' @param m,w A condition (message / warning).
+#' @keywords internal
+#' @rdname simInitConditionHandlers
+.simInitMessageHandler <- function(m) {
+  msg <- m$message
+  # Detect cli progress ticks routed through message() by start_app(output="message").
+  # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
+  # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
+  # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
+  # are intentionally excluded so colored regular messages are not mistaken for ticks.
+  if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
+    clean <- trimws(cli::ansi_strip(msg))
+    if (nchar(clean) == 0L) {
+      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+      return()
+    }
+    now <- Sys.time()
+    if (!isTRUE(.pkgEnv$.inProgressBar)) {
+      .pkgEnv$.inProgressBar <- TRUE
+      .pkgEnv$.progressLastShown <- now
+      message(loggingMessage(clean, prefix = prefixSimInit))
+    } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
+               getOption("spades.progressInterval", 2)) {
+      message(loggingMessage(clean, prefix = prefixSimInit))
+      .pkgEnv$.progressLastShown <- now
+    }
+    tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+    return()
+  }
+  .pkgEnv$.inProgressBar <- FALSE
+  message(loggingMessage(msg, prefix = prefixSimInit))
+  # This will "muffle" the original message
+  tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+}
+
+#' @keywords internal
+#' @rdname simInitConditionHandlers
+.simInitWarningHandler <- function(w) {
+  if (grepl("In .+:", w$message)) {
+    warningSplitOnColon(w)
+    invokeRestart("muffleWarning")
+  }
+  # This is a box mishap
+  if (isTRUE(any(grepl("'package:stats' may not be available when loading",
+                       w$message)))) {
+    invokeRestart("muffleWarning")
+  }
+}
 
 ## Only deal with objects as character
 #' @rdname simInit
@@ -1353,6 +1367,18 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 #' @keywords internal
 .runInputObjectsPhase <- function(sim, recoverMode, allInputObjNames,
                                   thisSpadesCallRandomStr, modulesLoaded) {
+  ## RecoverMode on.exit -- registered here (beside the drain loop) rather than in simInit()
+  ##   so it reads this frame's *live* `sim`. A cached `.inputObjects` returns a sim with a
+  ##   fresh @.xData (Copy in .prepareOutput), so the drain advances onto a new environment;
+  ##   simInit()'s own frame `sim` (and its ._rmo accumulator) would be stale, making the
+  ##   recorded "interrupted" module the one *before* the failure. spades() does not hit this
+  ##   because its event loop is inline in its own frame. Gated to recoverMode > 0 (the
+  ##   simInit context); on the restartSimInit resume path recoverMode == 0, so a resume
+  ##   never re-saves and clobbers the stashed recovery context.
+  if (recoverMode > 0 && isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
+    on.exit(sim <- saveSimOnExitSimInit(recoverMode, sim, sim@.xData[["._rmo"]]), add = TRUE)
+  }
+
   ctx <- sim@.xData[["._simInitContext"]]
   loadOrder <- ctx$loadOrder
   ## modules whose init did not already run during simInit (via allowInitDuringSimInit)
@@ -1368,10 +1394,16 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   ##   `.inputObjects` is unaffected: doEvent dispatches `.inputObjects` to
   ##   .runModuleInputObjects (which digests the input-relevant objects), not the generic
   ##   event cache.
+  ## a resumed simList (restartSimInit) may carry a not-yet-popped `.inputObjects` event for
+  ##   the module that was interrupted; don't schedule a second one (mirrors Pass B's
+  ##   `alreadyScheduledInit` guard). Harmless on the normal path, where the queue is empty.
+  alreadyScheduledIO <- vapply(sim@events, function(e)
+    if (identical(e[["eventType"]], ".inputObjects")) e[["moduleName"]] else NA_character_,
+    character(1))
   if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
     for (idx in seq_along(loadOrder)) {
       m <- loadOrder[idx]
-      if (!needIO[idx] || m %in% completedIO) next
+      if (!needIO[idx] || m %in% completedIO || m %in% alreadyScheduledIO) next
       if (is.character(getOption("spades.covr", FALSE))) {
         mod <- getOption("spades.covr")
         tf <- tempfile()

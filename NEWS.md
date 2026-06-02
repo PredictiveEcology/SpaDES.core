@@ -2,6 +2,33 @@
 
 ## Bug fixes
 
+* `restartSimInit()` now rewinds state the same way `restartSpades()` does: it
+  removes objects the interrupted `.inputObjects` *created* (so a re-run starts
+  from a clean slate, not leftover partial outputs) and re-establishes each
+  re-parsed module's `mod`/`P` active bindings. These were previously done only on
+  the `spades()` recovery path. Both restart functions now share the same rewind
+  helpers (`.restartRestoreEventObjs()`, `.restartRefreshBindings()`), sim-resolution
+  (`.restartResolveSim()`), and module-identification (`.restartModuleToReparse()`),
+  so the two paths cannot drift.
+
+* `restartSimInit()` now restarts the module that actually failed, even when an
+  *earlier* module's `.inputObjects` was cached. A cache hit returns a `simList`
+  with a fresh `@.xData` environment (`.prepareOutput()` copies it), so the
+  `.inputObjects` drain advanced onto a new environment while `simInit()`'s own
+  frame `sim` -- the one its `on.exit` recovery handler read -- went stale,
+  recording the module *before* the failure as the interrupted one. The recovery
+  handler now lives beside the drain loop (in `.runInputObjectsPhase()`, mirroring
+  how `spades()`'s inline loop already worked), so it reads the live `sim`. The
+  correct module is therefore reparsed on resume, so edits to the failing module's
+  `.inputObjects` take effect. A companion guard stops a resumed phase from
+  scheduling a second `.inputObjects` event for a module that already has one
+  queued (which otherwise ran it twice).
+
+* `restartSimInit()`'s resumed `.inputObjects` messages and warnings now carry the
+  usual `simInit/<module>:<event>` logging prefix. The resume previously ran the
+  phase outside `simInit()`'s `withCallingHandlers()`, so its output was
+  unprefixed; the handlers are now shared between the two paths.
+
 * A module's `.inputObjects` cache is now invalidated when you edit a *helper*
   function it calls, not only when you edit `.inputObjects` itself. Previously the
   cache digest covered only the `.inputObjects` function, so fixing a helper left
