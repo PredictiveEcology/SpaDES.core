@@ -2,6 +2,15 @@
 
 ## Bug fixes
 
+* `restartSimInit()` now rewinds state the same way `restartSpades()` does: it
+  removes objects the interrupted `.inputObjects` *created* (so a re-run starts
+  from a clean slate, not leftover partial outputs) and re-establishes each
+  re-parsed module's `mod`/`P` active bindings. These were previously done only on
+  the `spades()` recovery path. Both restart functions now share the same rewind
+  helpers (`.restartRestoreEventObjs()`, `.restartRefreshBindings()`), sim-resolution
+  (`.restartResolveSim()`), and module-identification (`.restartModuleToReparse()`),
+  so the two paths cannot drift.
+
 * `restartSimInit()` now restarts the module that actually failed, even when an
   *earlier* module's `.inputObjects` was cached. A cache hit returns a `simList`
   with a fresh `@.xData` environment (`.prepareOutput()` copies it), so the
