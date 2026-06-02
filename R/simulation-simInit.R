@@ -1693,8 +1693,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
-          moduleSpecificObjs <- paste(mBase, ".inputObjects", sep = ":")
-          objectsToEvaluateForCaching <- c(moduleSpecificObjs)
+          ## Digest not just `.inputObjects` but the transitive closure of
+          ##   module-local functions it calls (helpers in the main file or in R/
+          ##   sub-files). Digesting `.inputObjects` alone leaves the cacheId blind
+          ##   to helper edits, so a (correct) fix is masked by a stale cache entry
+          ##   -- most visibly on restartSimInit(), whose rewind recreates the exact
+          ##   state the stale entry was keyed under. See `.fnsReachableFrom()`.
+          reachable <- .fnsReachableFrom(".inputObjects", sim@.xData[[dotMods]][[mBase]])
+          objectsToEvaluateForCaching <- paste(mBase, reachable, sep = ":")
         } else {
           objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
                                                 pattern = mBase, value = TRUE),
