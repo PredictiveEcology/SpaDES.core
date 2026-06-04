@@ -151,8 +151,16 @@ test_that("Plots function 2", {
 })
 
 test_that("Plots function 3 - use as Plot", {
-  testthat::skip_on_ci()
+  skip_on_cran()
     testInit("terra", opts = list(spades.PlotsUsePlot = TRUE))
+    # quickPlot::Plot (and Plots(types = "screen") routed through it via
+    # spades.PlotsUsePlot = TRUE) opens an interactive screen device. On a
+    # headless machine (CI, logged runs) there is none, so open an offscreen
+    # png device first: quickPlot's dev() reuses an existing device rather than
+    # calling dev.new(), so the screen path runs without a display. (Previously
+    # this whole test was skipped on CI for want of a device.)
+    grDevices::png(withr::local_tempfile(fileext = ".png"))
+    withr::defer(grDevices::dev.off())
     packages <- c("raster", "terra")
     functions <- cbind(c("raster", "extent", "stack", "nlayers"),
                        c("rast", "ext", "rast", "nlyr"))
@@ -197,6 +205,39 @@ test_that("Plots function 3 - use as Plot", {
       expect_no_error(Plots(data = stk1, types = "screen", usePlot = FALSE, fn = terra::plot))
     }
   # }
+})
+
+test_that("Plots - modern wrapper (usePlot = FALSE) screen path + dispatch", {
+  # The non-deprecated Plots path: usePlot = FALSE (the default) does not route
+  # through quickPlot::Plot; it dispatches to `fn` (terra::plot for spatial data,
+  # base plot otherwise). This used to be exercised only via the screen-bound
+  # test above; assert it here too, headless, so it runs on CI. See also
+  # "Plots - terra SpatRaster and SpatVector" for the file-saving (types = "png")
+  # branch of the same wrapper.
+  skip_on_cran()
+  skip_if_not_installed("terra")
+  testInit("terra") # usePlot defaults to FALSE
+
+  grDevices::png(withr::local_tempfile(fileext = ".png"))
+  withr::defer(grDevices::dev.off())
+
+  ras <- terra::rast(terra::ext(0, 10, 0, 10), vals = runif(100), res = 1)
+  vec <- terra::vect(cbind(1:5, 1:5))
+
+  # A custom fn lets us assert the wrapper actually dispatched to it on the
+  # screen path (not just that it ran without error).
+  callCount <- new.env(parent = emptyenv())
+  callCount$n <- 0L
+  myFn <- function(x, ...) {
+    callCount$n <- callCount$n + 1L
+    invisible()
+  }
+  expect_no_error(Plots(data = ras, types = "screen", fn = myFn))
+  expect_identical(callCount$n, 1L)
+
+  # Default dispatch: SpatRaster / SpatVector route to terra::plot without error.
+  expect_no_error(Plots(data = ras, types = "screen"))
+  expect_no_error(Plots(data = vec, types = "screen"))
 })
 
 test_that("Plots test .guessPkgFun", {
