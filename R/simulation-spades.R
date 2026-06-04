@@ -1328,12 +1328,10 @@ setMethod(
     },
     message = function(m) {
       msg <- m$message
-      # Detect cli progress ticks routed through message() by start_app(output="message").
-      # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
-      # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
-      # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
-      # are intentionally excluded so colored regular messages are not mistaken for ticks.
-      if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
+      # Detect cli progress ticks (e.g. archive extraction) routed through message()
+      # by start_app(output = "message"), in both dynamic and non-dynamic terminals;
+      # see .isCliProgressTick(). Throttle them instead of prefixing every frame.
+      if (.isCliProgressTick(m, msg)) {
         clean <- trimws(cli::ansi_strip(msg))
         if (nchar(clean) == 0L) {
           tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
@@ -2216,6 +2214,31 @@ updateParamSlotInAllModules <- function(paramsList, newParamValues, paramSlot,
 }
 
 loggingMessagePrefixLength <- 15
+
+# Is a captured message a cli progress-bar tick?
+#
+# Progress bars (e.g. from archive::archive_extract()) are routed through
+# message() by cli::start_app(output = "message"), so they reach our
+# withCallingHandlers() message handler. We must recognise them to throttle,
+# rather than prepend a Date-Time-Module-Event prefix to every animation frame.
+# There are two emission styles:
+#
+# 1. Dynamic terminals: each tick carries a carriage return (\r) or a
+#    cursor-movement/erase CSI sequence (\x1b[...[A-HJ-KST], or \x1b[?...[hl]
+#    cursor show/hide). Colour/SGR codes end in 'm' and are excluded so coloured
+#    regular messages are not mistaken for ticks.
+# 2. Non-dynamic terminals (non-interactive, logged, CI, RStudio jobs): cli
+#    emits each tick as a plain newline-terminated line with *no* control
+#    characters, so the case-1 regex cannot see it. Such a frame is a progress
+#    tick iff it is a cli message (class "cliMessage") AND cli reports at least
+#    one active progress bar. cli alerts are also "cliMessage" but report zero
+#    active bars, so they are not throttled.
+.isCliProgressTick <- function(m, msg) {
+  if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE)))
+    return(TRUE)
+  inherits(m, "cliMessage") &&
+    isTRUE(tryCatch(cli::cli_progress_num() >= 1L, error = function(e) FALSE))
+}
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
   if (!isTRUE(any(grepl(.message$NoPrefix, mess)))) {
