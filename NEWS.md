@@ -1,3 +1,50 @@
+# SpaDES.core 3.1.2.9007 (development version)
+
+## Bug fixes
+
+* `restartSimInit()` now rewinds state the same way `restartSpades()` does: it
+  removes objects the interrupted `.inputObjects` *created* (so a re-run starts
+  from a clean slate, not leftover partial outputs) and re-establishes each
+  re-parsed module's `mod`/`P` active bindings. These were previously done only on
+  the `spades()` recovery path. Both restart functions now share the same rewind
+  helpers (`.restartRestoreEventObjs()`, `.restartRefreshBindings()`), sim-resolution
+  (`.restartResolveSim()`), and module-identification (`.restartModuleToReparse()`),
+  so the two paths cannot drift.
+
+* `restartSimInit()` now restarts the module that actually failed, even when an
+  *earlier* module's `.inputObjects` was cached. A cache hit returns a `simList`
+  with a fresh `@.xData` environment (`.prepareOutput()` copies it), so the
+  `.inputObjects` drain advanced onto a new environment while `simInit()`'s own
+  frame `sim` -- the one its `on.exit` recovery handler read -- went stale,
+  recording the module *before* the failure as the interrupted one. The recovery
+  handler now lives beside the drain loop (in `.runInputObjectsPhase()`, mirroring
+  how `spades()`'s inline loop already worked), so it reads the live `sim`. The
+  correct module is therefore reparsed on resume, so edits to the failing module's
+  `.inputObjects` take effect. A companion guard stops a resumed phase from
+  scheduling a second `.inputObjects` event for a module that already has one
+  queued (which otherwise ran it twice).
+
+* `restartSimInit()`'s resumed `.inputObjects` messages and warnings now carry the
+  usual `simInit/<module>:<event>` logging prefix. The resume previously ran the
+  phase outside `simInit()`'s `withCallingHandlers()`, so its output was
+  unprefixed; the handlers are now shared between the two paths.
+
+* A module's `.inputObjects` cache is now invalidated when you edit a *helper*
+  function it calls, not only when you edit `.inputObjects` itself. Previously the
+  cache digest covered only the `.inputObjects` function, so fixing a helper left
+  the cacheId unchanged and the stale cached result was returned -- most visibly
+  via `restartSimInit()`/`restartSpades()`, whose rewind recreates the exact state
+  the stale entry was keyed under (a fresh `simInitAndSpades()` could mask the
+  problem by computing a different state, hence a different cacheId). The digest
+  now covers the transitive call-graph closure of module-local functions reachable
+  from `.inputObjects` (via `codetools::findGlobals()`, including functions passed
+  as values and helpers reached through nested closures), so an edit to any
+  function it (transitively) calls busts the cache, while edits to unrelated module
+  functions (e.g. `doEvent`, `Init`, an unused helper) do not. String-based dynamic
+  dispatch (`do.call("helper", )`, `get("helper")()`) is followed too, by scanning
+  string literals against module function names. Package functions remain out of
+  scope; their changes are tracked via `reqdPkgs`.
+
 # SpaDES.core 3.1.2.9005 (development version)
 
 ## Bug fixes
@@ -14,6 +61,12 @@
   combined with an active `cli` progress bar, so the existing throttle
   (`getOption("spades.progressInterval", 2)`) applies regardless of terminal
   mode. `cli` alerts are unaffected.
+
+* `simInit()` no longer errors when called with `params = list(.globals = ...)`
+  but no `modules`. Previously this failed with
+  `no applicable method for `@` applied to an object of class "NULL"`
+  because the default empty dependency list (`list(NULL)`) was iterated by
+  `updateParamsFromGlobals()`.
 
 # SpaDES.core 3.1.2.9004 (development version)
 

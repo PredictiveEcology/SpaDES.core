@@ -303,10 +303,21 @@ setMethod(
       x$outputObjects <- ._outputObjectsDF()
     } else {
       if (is(x$outputObjects, "data.frame")) {
-        if (!all(colnames(x$outputObjects) %in% colnames(._outputObjectsDF())) ||
-            !all(colnames(._outputObjectsDF()) %in% colnames(x$outputObjects))) {
+        cnTooMany <- colnames(x$outputObjects) %in% colnames(._outputObjectsDF())
+        cnTooFew <- colnames(._outputObjectsDF()) %in% colnames(x$outputObjects)
+        if (!all(cnTooMany) || !all(cnTooFew)) {
+          anExtra <- colnames(x$outputObjects)[!cnTooMany]
+          aMissing <- colnames(._outputObjectsDF())[!cnTooFew]
+          if (length(anExtra)) {
+            wh <- which(!sapply(x$outputObjects[[anExtra]], is.null))
+            if (length(wh)) {
+              stop("There is an incorrect argument in outputObject. Object: `",
+                   x$outputObjects$objectName[wh],"` should not have ",
+                   anExtra)    
+            }
+          }
           stop("invalid data.frame `outputObjects` in module `", x$name, "`:",
-               "provided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
+               "\nprovided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
                "expected: ", paste(colnames(._outputObjectsDF()), collapse = ", "))
         }
       } else {
