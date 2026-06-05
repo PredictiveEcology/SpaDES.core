@@ -1772,6 +1772,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             #                     modules = mBase)
             extraCacheArgs <- sim@params[[mBase]][[._txtDotUseCacheArgs]][[".inputObjects"]]
             if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+            # Evaluate any quoted entries (e.g. `quote(P(sim)$.useCloud)`) here, while
+            # `sim@current$moduleName` is `mBase` (set above), so module-context accessors
+            # like P(sim) resolve to this module. Otherwise they would reach Cache() as
+            # unevaluated language objects and be forced later in the wrong context. This
+            # mirrors the event path in `.runEvent()` (see simulation-spades.R).
+            isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
+            if (isTRUE(any(isCalls)))
+              extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())
 
             defaultCacheArgs <- list(
               FUN = quote(.inputObjects(sim)),

@@ -1,3 +1,17 @@
+# SpaDES.core 3.1.2.9008 (development version)
+
+## Bug fixes
+
+* `.useCacheArgs` entries on the `.inputObjects` path are now evaluated at the
+  splice site, in the module's context (`sim@current` is the module being
+  processed), matching the event path in `.runEvent()`. Previously a quoted
+  entry such as `useCloud = quote(P(sim)$.useCloud)` reached `reproducible::Cache()`
+  as an unevaluated call and was forced later, where the module context was no
+  longer available, so module-context accessors like `P(sim)` resolved to the
+  wrong module (or `NULL`). As a result, e.g. cloud caching of `.inputObjects`
+  keyed off `.useCloud` silently did not engage. Quoted entries now resolve to
+  this module's parameters before being merged into the `Cache()` call.
+
 # SpaDES.core 3.1.2.9007 (development version)
 
 ## Bug fixes
