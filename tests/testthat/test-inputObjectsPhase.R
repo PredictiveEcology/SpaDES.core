@@ -173,3 +173,21 @@ test_that("allowInitDuringSimInit = TRUE still produces an equivalent simList", 
   outT <- spades(simT, debug = FALSE)
   expect_equal(outF$y, outT$y)
 })
+
+test_that("simInit(objects=) loads ALL user objects when allowInitDuringSimInit = TRUE", {
+  ## Regression: with spades.allowInitDuringSimInit = TRUE, simInit used to load
+  ## only objects declared as a module `inputObject`, silently dropping arbitrary
+  ## user-supplied objects (and every object when no module declares them).
+  testInit(smcc = FALSE, opts = list(reproducible.useMemoise = FALSE))
+
+  withr::local_options(spades.allowInitDuringSimInit = TRUE)
+  s <- suppressMessages(simInit(objects = list(a = 1, b = "x")))
+  expect_identical(s[["a"]], 1)
+  expect_identical(s[["b"]], "x")
+
+  ## and unchanged when the option is FALSE
+  withr::local_options(spades.allowInitDuringSimInit = FALSE)
+  s2 <- suppressMessages(simInit(objects = list(a = 1, b = "x")))
+  expect_identical(s2[["a"]], 1)
+  expect_identical(s2[["b"]], "x")
+})

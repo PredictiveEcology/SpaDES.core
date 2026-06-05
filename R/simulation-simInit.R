@@ -1499,13 +1499,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
       if (length(objNames) == length(objects)) {
         if (isTRUE(getOption("spades.allowInitDuringSimInit") &&
                    getOption("spades.dotInputObjects", TRUE))) {
-          inputObjectsAllMods <- inputObjects(sim)
-          if (is(inputObjectsAllMods, "list"))
-            inputObjectsAllMods <- inputObjectsAllMods |> rbindlist()
-          inputObjectsAllMods <- unique(inputObjectsAllMods$objectName)
-          objectNamesToUse <- inputObjectsAllMods[inputObjectsAllMods %in% sim$.userSuppliedObjNames]
-          objectsToUse <- objects[objectNamesToUse]
-          objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
+          # Load *all* user-supplied objects, dropping only those an init that ran
+          # during simInit has already produced (so user inputs don't clobber init
+          # outputs -- handled by objectsToUseUpdatesFromPrevInits). Previously this
+          # also restricted to objects declared as a module `inputObject`, silently
+          # dropping arbitrary objects passed via `simInit(objects = ...)` (and all
+          # objects when no module declares them, e.g. no modules at all).
+          objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objects)
         } else {
           objectsToUse <- objects
         }

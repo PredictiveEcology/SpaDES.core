@@ -1,3 +1,16 @@
+# SpaDES.core 3.1.2.9008 (development version)
+
+## Bug fixes
+
+* `simInit(objects = ...)` again loads *all* user-supplied objects when
+  `options(spades.allowInitDuringSimInit = TRUE)` (as set by some
+  `SpaDES.project::setupProject()` configurations). A regression in the
+  `.runInputObjectsPhase()` refactor restricted the loaded objects to those
+  declared as a module `inputObject`, silently dropping arbitrary objects passed
+  via `objects = list(...)` -- and every object when no module declares them.
+  The intended behaviour (don't let user inputs clobber objects an init produced
+  during `simInit`) is preserved via `objectsToUseUpdatesFromPrevInits()`.
+
 # SpaDES.core 3.1.2.9007 (development version)
 
 ## Bug fixes
