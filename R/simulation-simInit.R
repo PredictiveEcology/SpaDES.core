@@ -797,12 +797,10 @@ setMethod(
 #' @rdname simInitConditionHandlers
 .simInitMessageHandler <- function(m) {
   msg <- m$message
-  # Detect cli progress ticks routed through message() by start_app(output="message").
-  # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
-  # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
-  # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
-  # are intentionally excluded so colored regular messages are not mistaken for ticks.
-  if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
+  # Detect cli progress ticks (e.g. archive extraction) routed through message()
+  # by start_app(output = "message"), in both dynamic and non-dynamic terminals;
+  # see .isCliProgressTick(). Throttle them instead of prefixing every frame.
+  if (.isCliProgressTick(m, msg)) {
     clean <- trimws(cli::ansi_strip(msg))
     if (nchar(clean) == 0L) {
       tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)

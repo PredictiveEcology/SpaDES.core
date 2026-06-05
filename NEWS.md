@@ -49,6 +49,19 @@
 
 ## Bug fixes
 
+* Progress bars routed through the message handler (e.g. from
+  `archive::archive_extract()` during `prepInputs()`) are now throttled in
+  non-interactive sessions too. Previously, progress ticks were only recognised
+  when `cli` ran in dynamic mode (where each frame carries a carriage return or
+  cursor-control sequence). In non-dynamic sessions (non-interactive, logged
+  runs, CI, RStudio jobs) `cli` emits each tick as a plain newline-terminated
+  line, so every frame slipped past detection and was re-printed with a full
+  `Date-Time-Module-Event` prefix — flooding logs with thousands of near-identical
+  lines. Detection now also recognises a tick by its `cli` condition class
+  combined with an active `cli` progress bar, so the existing throttle
+  (`getOption("spades.progressInterval", 2)`) applies regardless of terminal
+  mode. `cli` alerts are unaffected.
+
 * `simInit()` no longer errors when called with `params = list(.globals = ...)`
   but no `modules`. Previously this failed with
   `no applicable method for `@` applied to an object of class "NULL"`
