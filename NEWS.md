@@ -1,3 +1,25 @@
+# SpaDES.core 3.1.2.9008 (development version)
+
+## Bug fixes
+
+* Module caching (`.useCache` for `.inputObjects` and events) no longer folds the
+  module's *parameter-definition table* into the cacheId. Previously the digest
+  included `sim@depends@dependencies[[module]]@parameters` (the `defineParameter`
+  rows: defaults, descriptions, min/max) in addition to the resolved parameter
+  *values* in `sim@params`. The values are what affect the computation and are
+  already digested separately, so the definition table was redundant -- and it
+  caused two concrete problems: (1) a parameter whose **default** was derived from
+  the environment (e.g. `getOption(...)`, an eagerly-evaluated `P(sim)$...`) made
+  the cacheId differ across machines/OSs, so the same call never shared a (cloud)
+  cache; and (2) it silently re-introduced parameters that `.useCache`/
+  `.useCacheArgs` exclusion (`paramsDontCacheOn`) had removed from the value
+  digest, because the definition table is not filtered. The cacheId now depends on
+  the resolved parameter values only. **This changes existing cacheIds once**
+  (a one-time recompute), after which identical runs on different machines share a
+  cache as intended. `inputObjects`/`outputObjects` metadata (`sourceURL`,
+  `objectClass`, ...) is unchanged -- those are genuine read-inputs (e.g. via
+  `extractURL()`), not redundant definitions.
+
 # SpaDES.core 3.1.2.9007 (development version)
 
 ## Bug fixes

@@ -2453,7 +2453,18 @@ debugToVerbose <- function(debug) {
 }
 
 
-metadataToDigest <- c("inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
+# Module-metadata slots (of `sim@depends@dependencies[[module]]`) included in the
+# cache digest for `.inputObjects`/events. "parameters" is deliberately omitted:
+# that slot is the `defineParameter` table (defaults, descriptions, min/max), but
+# the behaviourally-relevant input is the *resolved parameter value* in
+# `sim@params`, which is digested separately via `classOptions$params`
+# (`paramsWoKnowns`). Digesting the definition table too was redundant and, worse,
+# made the cacheId depend on environment-derived defaults (e.g. a default of
+# `getOption(...)`), so the same module digested differently across machines/OSs
+# and never shared a (cloud) cache. It also re-introduced parameters that
+# `paramsDontCacheOn` had explicitly excluded from the value digest (e.g.
+# `.useCache`, `.useCacheArgs`), since the definition table is not filtered.
+metadataToDigest <- c("inputObjects", "outputObjects", "childModules", "loadOrder", "reqdPkgs",
                       "spatialExtent", "timeframe", "timeunit", "version")
 
 objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
