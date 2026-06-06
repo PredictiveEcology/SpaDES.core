@@ -167,6 +167,46 @@ test_that(".useCacheArgs evaluates quoted entries at the splice site", {
               info = "Quoted cacheId in .useCacheArgs should be eval'd to a string before reaching Cache()")
 })
 
+test_that(".useCacheArgs evaluates quoted entries on the .inputObjects path with module context", {
+  skip_on_cran()
+
+  ## A quoted .useCacheArgs entry on the .inputObjects path must resolve in this
+  ## module's context (sim@current == module), i.e. currentModule(sim)/P(sim)
+  ## return *this* module. (Note: this exercises an arg Cache forces early; the
+  ## subtler late-forced case -- e.g. useCloud during cloud I/O -- is what the
+  ## splice-time pre-evaluation in .runModuleInputObjects guards, validated in
+  ## real cloud use rather than here.)
+  testInit(opts = list(reproducible.useMemoise = FALSE,
+                       reproducible.verbose     = 0,
+                       spades.saveSimOnExit     = FALSE))
+
+  modName <- "testUseCacheArgsQuotedIO"
+  suppressMessages(newModule(modName, path = tmpdir, open = FALSE))
+
+  args <- list(
+    modules = list(modName),
+    paths   = list(modulePath = tmpdir, cachePath = tmpCache),
+    params  = stats::setNames(
+      list(list(
+        .useCache     = ".inputObjects",
+        ## Resolves to "io_<modName>" only if evaluated with module context;
+        ## an unevaluated language object reaching Cache() would not.
+        .useCacheArgs = list(.inputObjects = list(
+          cacheId = quote(paste0("io_", currentModule(sim)))))
+      )),
+      modName
+    )
+  )
+
+  try(reproducible::clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
+  ## .inputObjects runs during simInit(), so the cache entry exists afterwards.
+  mySim <- suppressMessages(do.call(simInit, args))
+
+  cache <- reproducible::showCache(tmpCache, cacheId = paste0("io_", modName), verbose = -1)
+  expect_true(NROW(cache) > 0,
+              info = "Quoted .useCacheArgs on .inputObjects must be eval'd with module context")
+})
+
 test_that(".useCacheArgs is excluded from the per-module cache digest", {
   ## The grep("useCache", .knownDotParams) at simulation-spades.R:2367 should
   ## auto-include .useCacheArgs in paramsDontCacheOn now that .useCacheArgs is
