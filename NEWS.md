@@ -2,6 +2,14 @@
 
 ## Bug fixes
 
+* `simInit(objects = ...)` again loads *all* user-supplied objects when
+  `options(spades.allowInitDuringSimInit = TRUE)` (as set by some
+  `SpaDES.project::setupProject()` configurations). A regression in the
+  `.runInputObjectsPhase()` refactor restricted the loaded objects to those
+  declared as a module `inputObject`, silently dropping arbitrary objects passed
+  via `objects = list(...)` -- and every object when no module declares them.
+  The intended behaviour (don't let user inputs clobber objects an init produced
+  during `simInit`) is preserved via `objectsToUseUpdatesFromPrevInits()`.
 * `.useCacheArgs` entries on the `.inputObjects` path are now evaluated at the
   splice site, in the module's context (`sim@current` is the module being
   processed), matching the event path in `.runEvent()`. Previously a quoted
@@ -11,10 +19,6 @@
   wrong module (or `NULL`). As a result, e.g. cloud caching of `.inputObjects`
   keyed off `.useCloud` silently did not engage. Quoted entries now resolve to
   this module's parameters before being merged into the `Cache()` call.
-
-# SpaDES.core 3.1.2.9007 (development version)
-
-## Bug fixes
 
 * `restartSimInit()` now rewinds state the same way `restartSpades()` does: it
   removes objects the interrupted `.inputObjects` *created* (so a re-run starts
