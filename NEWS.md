@@ -10,10 +10,15 @@
   via `objects = list(...)` -- and every object when no module declares them.
   The intended behaviour (don't let user inputs clobber objects an init produced
   during `simInit`) is preserved via `objectsToUseUpdatesFromPrevInits()`.
-
-# SpaDES.core 3.1.2.9007 (development version)
-
-## Bug fixes
+* `.useCacheArgs` entries on the `.inputObjects` path are now evaluated at the
+  splice site, in the module's context (`sim@current` is the module being
+  processed), matching the event path in `.runEvent()`. Previously a quoted
+  entry such as `useCloud = quote(P(sim)$.useCloud)` reached `reproducible::Cache()`
+  as an unevaluated call and was forced later, where the module context was no
+  longer available, so module-context accessors like `P(sim)` resolved to the
+  wrong module (or `NULL`). As a result, e.g. cloud caching of `.inputObjects`
+  keyed off `.useCloud` silently did not engage. Quoted entries now resolve to
+  this module's parameters before being merged into the `Cache()` call.
 
 * `restartSimInit()` now rewinds state the same way `restartSpades()` does: it
   removes objects the interrupted `.inputObjects` *created* (so a re-run starts
