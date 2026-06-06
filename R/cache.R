@@ -248,7 +248,16 @@ setMethod(
     })
     dependsFirst <- obj[["depends"]] <- list()
     if (!isTRUE(all(sapply(object@depends@dependencies, is.null)))) {
-      for (ii in c("inputObjects", "outputObjects", "parameters")) {
+      # NOTE: "parameters" is intentionally excluded. The parameter *definition*
+      # table (`defineParameter` defaults/min/max/class) is metadata, not a
+      # computation input -- the resolved parameter *values* are digested separately
+      # (the `@params` slot, via `classOptions$params`). Including the definition
+      # table made the cacheId depend on environment-derived defaults (e.g.
+      # `getOption(...)`) and on metadata representations that can differ across
+      # platforms/package versions, so identical runs on different machines/OSs
+      # produced different cacheIds and could not share a (cloud) cache. Same
+      # rationale as the earlier removal of the human-readable `desc` columns.
+      for (ii in c("inputObjects", "outputObjects")) {
         dependsFirst[[ii]] <-
           .robustDigest(lapply(object@depends@dependencies,
                                function(mo) {
