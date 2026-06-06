@@ -1,3 +1,19 @@
+# SpaDES.core 3.1.2.9009 (development version)
+
+## Bug fixes
+
+* The module **parameter-definition table** (`defineParameter` defaults/min/max/class)
+  is no longer included in the `.useCache` cacheId for `.inputObjects`/events. Only
+  the resolved parameter *values* (digested separately) affect caching now. Including
+  the definition table made the cacheId depend on metadata that can differ across
+  machines/OSs/package versions even when the run is identical -- e.g. an
+  environment-derived default (`getOption(...)`), or a platform-dependent attribute
+  on a table column -- so the same call produced different cacheIds on Linux vs
+  Windows and could not share a (cloud) cache. (Extends the earlier removal of the
+  human-readable `desc` columns from this digest.) **This changes existing cacheIds
+  once** (a one-time recompute), after which identical runs across machines share a
+  cache as intended.
+
 # SpaDES.core 3.1.2.9008 (development version)
 
 ## Bug fixes
