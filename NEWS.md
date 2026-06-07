@@ -1,3 +1,15 @@
+# SpaDES.core 3.1.2.9010 (development version)
+
+## Dependency changes
+
+* `simInit` no longer installs (or loads) the **`box`** package. `box` does not
+  work well within the `SpaDES` ecosystem, so the default for the
+  `spades.reqdPkgsDontLoad` option is now `NULL` (was `"box"`), and the unused,
+  unimplemented `spades.useBox` option and its associated (disabled) `box::use`
+  machinery have been removed. The generic `spades.reqdPkgsDontLoad` mechanism --
+  install a package but do not `library()`/`require()` it -- is retained for any
+  package a user explicitly lists.
+
 # SpaDES.core 3.1.2.9009 (development version)
 
 ## Bug fixes

@@ -1062,6 +1062,32 @@ paste0("    reqdPkgs = list(\'", dontLoad, "\'),"),'
 
 })
 
+test_that("box is not a dependency: not installed/loaded during simInit", {
+  testInit()
+
+  # The package must not ship any reference to `box`; previously the default of
+  # `spades.reqdPkgsDontLoad` was "box", which caused simInit to *install* box
+  # (via Require(..., require = FALSE)) even though it does not work within the
+  # SpaDES ecosystem. The default is now NULL, and the unimplemented
+  # `spades.useBox` option has been removed entirely.
+  opts <- spadesOptions()
+  expect_null(opts[["spades.reqdPkgsDontLoad"]])
+  expect_false("spades.useBox" %in% names(opts))
+  expect_null(getOption("spades.reqdPkgsDontLoad"))
+
+  # Regression: a basic simInit must neither install nor load the box namespace.
+  # If box happens to already be loaded in this session, we cannot make the
+  # assertion meaningfully, so skip.
+  skip_if(isNamespaceLoaded("box"),
+          "box already loaded in this session; cannot test that simInit avoids it")
+
+  newModule("testNoBox", tmpdir, open = FALSE)
+  sim <- simInit(modules = "testNoBox", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1, timeunit = "year"))
+  expect_is(sim, "simList")
+  expect_false(isNamespaceLoaded("box"))
+})
+
 test_that("cli progress bars are throttled and not flooded during spades()", {
   skip_if_not_installed("cli")
   testInit()

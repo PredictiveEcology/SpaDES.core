@@ -155,10 +155,9 @@
 #'   with `restartSimInit` (see `?restartSimInit`).
 #'   There is a message which describes how to find that.\cr
 #'
-#'   `spades.reqdPkgsDontLoad` \tab `"box"` \tab Specify any packages that should not
+#'   `spades.reqdPkgsDontLoad` \tab `NULL` \tab Specify any packages that should not
 #'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
-#'   listed. The default (`"box"`) is a package that returns a warning if it is
-#'   loaded, and so it is excluded from loading.\cr
+#'   listed in a module's `reqdPkgs`.\cr
 #'
 #'   `spades.saveFileExtensions` \tab `NULL` \tab
 #'   a `data.frame` with 3 columns, `exts`, `fun`, and `package` indicating which
@@ -204,17 +203,6 @@
 #'   `spades.useragent` \tab `"https://github.com/PredictiveEcology/SpaDES"`.
 #'     \tab The default user agent to use for downloading modules from GitHub.\cr
 #'
-#'   `spades.useBox` \tab FALSE
-#'     \tab Unimplemented while memory problems with `box` are resolved.
-#'     When it is turned on, this option determines
-#'     whether to manage which packages are loaded using the package `box`.
-#'     This will have as an effect that `reqdPkgs` will be strict; if a given
-#'     module is missing a `reqdPkgs`, then the module will fail to run, with
-#'     an error saying the package/function doesn't exist. Without `box`,
-#'     modules may run, even though `reqdPkgs` is incorrect, because other modules
-#'     may have specified their own packages, which cover the needs of another
-#'     package. `useBox = TRUE` will force modules to be accurate with their `reqdPkgs`.\cr
-#'
 #'   `spades.useRequire` \tab `!tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false"`
 #'     \tab The default for that environment variable is unset, so this returns
 #'     `TRUE`. If this is `TRUE`, then during the `simInit` call, when packages are
@@ -258,7 +246,7 @@ spadesOptions <- function() {
     spades.evalPostEvent = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
-    spades.reqdPkgsDontLoad = "box",
+    spades.reqdPkgsDontLoad = NULL,
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",
@@ -275,7 +263,6 @@ spadesOptions <- function() {
     spades.tolerance = .Machine$double.eps^0.5,
     spades.urlLog = TRUE,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
-    # spades.useBox = FALSE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",
     spades.keepCompleted = TRUE
   )

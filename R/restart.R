@@ -229,16 +229,15 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
 
       ## evaluate the rest of the parsed file
       sim <- currentModuleTemporary(sim, module)
-      pkgs = slot(slot(depends(sim), "dependencies")[[module]], "reqdPkgs")
       if (doesntUseNamespacing) {
-        evalWithActiveCode(pp[[1]], sim@.xData, sim = sim, pkgs = pkgs)
+        evalWithActiveCode(pp[[1]], sim@.xData, sim = sim)
       }
 
       if (length(subFiles)) {
         pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
       }
       lapply(pp, function(pp1)
-        evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim, pkgs = pkgs))
+        evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim))
       message(cli::col_blue("Reparsing ", module, " source code"))
     }
     invisible()
