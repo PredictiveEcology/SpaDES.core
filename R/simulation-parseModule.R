@@ -287,7 +287,7 @@ setMethod(
           sim@.xData$.mods[[mBase]]$.isPackage <- TRUE
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      asNamespace(.moduleNameNoUnderscore(mBase)),
-                                                     sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                                     sim = sim)
         } else {
           sim@.xData$.mods[[mBase]]$.isPackage <- FALSE
 
@@ -297,11 +297,10 @@ setMethod(
           # The simpler line commented below will not allow actual code to be put into module,
           #  e.g., startSim <- start(sim)
           #  The more complex one following will allow that.
-          reqdPkgsHere <- eval(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
           # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData$.mods[[mBase]])
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      sim@.xData$.mods[[mBase]],
-                                                     sim = sim, pkgs = reqdPkgsHere)
+                                                     sim = sim)
 
           # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
           doesntUseNamespacing <- !.isNamespaced(sim, mBase)
@@ -316,7 +315,7 @@ setMethod(
             #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
             out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                        sim@.xData$.mods,
-                                       sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                       sim = sim)
             #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
           }
 
@@ -337,13 +336,13 @@ setMethod(
               if (doesntUseNamespacing) {
                 #eval(parsedFile1, envir = sim@.xData)
                 evalWithActiveCode(parsedFile1, sim@.xData$.mods,
-                                   sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                   sim = sim)
               }
 
               # duplicate -- put in namespaces location
               #eval(parsedFile1, envir = sim@.xData$.mods[[mBase]])
               activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData$.mods[[mBase]],
-                                                         sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                                         sim = sim)
             }
           }
 
@@ -607,15 +606,13 @@ setMethod(
 
 #' @keywords internal
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
-                               sim, pkgs) {
+                               sim) {
 
   # browser(expr = exists("._evalWithActiveCode_1"))
   # Create a temporary environment to source into, adding the sim object so that
   #   code can be evaluated with the sim, e.g., currentModule(sim)
   #tmpEnvir <- new.env(parent = asNamespace("SpaDES.core"))
-  tmpEnvirForPkgs <- new.env(parent = envir)
-  # tmpEnvir <- new.env(parent = envir)
-  tmpEnvir <- new.env(parent = tmpEnvirForPkgs)
+  tmpEnvir <- new.env(parent = envir)
 
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
@@ -633,25 +630,6 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   #   it says, how big is the function, compared to how big is the environment that holds the function
   #   If it is 1, it means there are only functions in that environment, no objects
   # length(serialize(tmpEnvir$prepare_IgnitionFit, NULL))/object.size(mget(ls(tmpEnvir), tmpEnvir))
-
-  if (getOption("spades.useBox", FALSE) && FALSE) { # TURN THIS OFF AS THERE ARE MEMORY HOGGING ISSUES WITH BOX
-    pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
-    pkgs <- reqdPkgsDontLoad(pkgs) # some are explicitly not to be loaded
-    cm <- currentModule(tmpEnvir$sim)
-    if (length(cm))
-      if (!cm %in% unlist(.coreModules())) {
-        # pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
-        lapply(pkgs, function(p) {
-          allFns <- ls(envir = asNamespace(p))
-          val <- paste0("box::use(", p, "[...]", ")")
-          eval(as.call(parse(text = val))[[1]], envir = tmpEnvirForPkgs)
-          if (any("mod" == allFns)) {
-            rm(list = "mod", envir = parent.env(tmpEnvirForPkgs))
-            messageVerbose("mod will be masked from ", p)
-          }
-        })
-      }
-  }
 
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 

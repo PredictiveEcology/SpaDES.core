@@ -158,10 +158,9 @@ module's \code{.inputObjects} runs, so an interrupted \code{simInit} can be reco
 with \code{restartSimInit} (see \code{?restartSimInit}).
 There is a message which describes how to find that.\cr
 
-\code{spades.reqdPkgsDontLoad} \tab \code{"box"} \tab Specify any packages that should not
+\code{spades.reqdPkgsDontLoad} \tab \code{NULL} \tab Specify any packages that should not
 be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
-listed. The default (\code{"box"}) is a package that returns a warning if it is
-loaded, and so it is excluded from loading.\cr
+listed in a module's \code{reqdPkgs}.\cr
 
 \code{spades.saveFileExtensions} \tab \code{NULL} \tab
 a \code{data.frame} with 3 columns, \code{exts}, \code{fun}, and \code{package} indicating which
@@ -205,17 +204,6 @@ data came from. Set to \code{FALSE} to turn the recording off.\cr
 
 \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
 \tab The default user agent to use for downloading modules from GitHub.\cr
-
-\code{spades.useBox} \tab FALSE
-\tab Unimplemented while memory problems with \code{box} are resolved.
-When it is turned on, this option determines
-whether to manage which packages are loaded using the package \code{box}.
-This will have as an effect that \code{reqdPkgs} will be strict; if a given
-module is missing a \code{reqdPkgs}, then the module will fail to run, with
-an error saying the package/function doesn't exist. Without \code{box},
-modules may run, even though \code{reqdPkgs} is incorrect, because other modules
-may have specified their own packages, which cover the needs of another
-package. \code{useBox = TRUE} will force modules to be accurate with their \code{reqdPkgs}.\cr
 
 \code{spades.useRequire} \tab \code{!tolower(Sys.getenv("SPADES_USE_REQUIRE")) \%in\% "false"}
 \tab The default for that environment variable is unset, so this returns

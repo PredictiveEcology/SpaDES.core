@@ -832,11 +832,6 @@ setMethod(
     warningSplitOnColon(w)
     invokeRestart("muffleWarning")
   }
-  # This is a box mishap
-  if (isTRUE(any(grepl("'package:stats' may not be available when loading",
-                       w$message)))) {
-    invokeRestart("muffleWarning")
-  }
 }
 
 ## Only deal with objects as character
@@ -1748,10 +1743,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           #   runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
           # }
           if (runFnCallAsExpr) {
-            pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
-            pkgs <- c(pkgs, "stats")
-            # if (getOption("spades.useBox", FALSE) && FALSE)
-            #   do.call(box::use, lapply(pkgs, as.name))
             if (any(mBase %in% getOption("spades.debugModule"))) {
               browser()
             }
@@ -2041,7 +2032,7 @@ loadPkgs <- function(reqdPkgs) {
     pkgsDontLoad <- getOption("spades.reqdPkgsDontLoad", NULL)
     allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
 
-    if (getOption("spades.useRequire") && !getOption("spades.useBox", FALSE)) {
+    if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
       Require(allPkgs, require = TRUE, standAlone = FALSE, upgrade = FALSE)
       if (!is.null(pkgsDontLoad)) {
@@ -2051,10 +2042,8 @@ loadPkgs <- function(reqdPkgs) {
       }
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      if (!getOption("spades.useBox", FALSE)) {
-        allPkgs <- unique(Require::extractPkgName(allPkgs))
-        loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
-      }
+      allPkgs <- unique(Require::extractPkgName(allPkgs))
+      loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
     }
   }
 }
