@@ -16,6 +16,10 @@ concurrency:
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+    # Bound the job so a genuine hang fails fast and visibly, instead of the
+    # runner being silently reclaimed ~22 min in ("received a shutdown signal" /
+    # exit 143). Generous because the added swap (below) can slow covr down.
+    timeout-minutes: 75
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       GOOGLEDRIVE_AUTH: ${{ secrets.GOOGLEDRIVE_AUTH }}
@@ -26,6 +30,32 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      # Why this job (and only this job) needs extra memory:
+      # test-coverage is the *only* CI job that sets NOT_CRAN=true, so it is the
+      # only one that runs the ~18 skip_on_cran() tests -- several of which spin
+      # up parallel/future worker processes (e.g. test-1memory, test-futureEvents)
+      # and reproducible's own parallel paths fork additional workers that scale
+      # with the runner's core count. Under covr every one of those child
+      # processes carries a full copy of the *instrumented* package, so peak RSS
+      # is far higher here than during R CMD check (which runs --as-cran and skips
+      # those tests). R-CMD-check passing therefore tells us nothing about this
+      # path. Peak crept just over the ~16 GB runner around 2026-06-06 (an
+      # upstream dependency memory bump), and the VM started getting reclaimed
+      # mid-run -> "received a shutdown signal" / exit 143, with no R error.
+      #
+      # Add swap on the large /mnt volume so covr has headroom to finish. This
+      # fixes the OOM without dropping any tests or coverage, and is robust to
+      # further upstream memory growth.
+      - name: Add swap space
+        run: |
+          sudo fallocate -l 16G /mnt/swapfile || sudo fallocate -l 10G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+          echo "::group::memory after adding swap"
+          free -h
+          echo "::endgroup::"
 
       - uses: r-lib/actions/setup-pandoc@v2
 
