@@ -2525,7 +2525,7 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 ## don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
-paramsDontCacheOn <- grep(c("useCache"), .knownDotParams, value = TRUE)
+paramsDontCacheOn <- grep(c("useCache", "useCloud"), .knownDotParams, value = TRUE)
 
 #' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache
 #' @importFrom reproducible messageCache showCache
