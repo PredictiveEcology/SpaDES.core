@@ -82,7 +82,6 @@ Suggests:
     withr
 Remotes:
     PredictiveEcology/Require@development,
-    PredictiveEcology/quickPlot@development,
     PredictiveEcology/reproducible@development,
     PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
