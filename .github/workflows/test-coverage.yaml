@@ -49,12 +49,23 @@ jobs:
       # further upstream memory growth.
       - name: Add swap space
         run: |
-          sudo fallocate -l 16G /mnt/swapfile || sudo fallocate -l 10G /mnt/swapfile
-          sudo chmod 600 /mnt/swapfile
-          sudo mkswap /mnt/swapfile
-          sudo swapon /mnt/swapfile
-          echo "::group::memory after adding swap"
-          free -h
+          set -x
+          echo "::group::swap/memory before"
+          free -h; swapon --show || true
+          echo "::endgroup::"
+          # Use a dedicated file so we never clash with the runner image's own
+          # /mnt/swapfile (which is already active -- mkswap on it would fail).
+          # This ADDS to existing swap. /mnt is the large (~65 GB) volume.
+          SWAP=/mnt/covr-swapfile
+          sudo swapoff "$SWAP" 2>/dev/null || true
+          sudo rm -f "$SWAP"
+          sudo fallocate -l 16G "$SWAP" || sudo fallocate -l 10G "$SWAP" || \
+            sudo dd if=/dev/zero of="$SWAP" bs=1M count=10240
+          sudo chmod 600 "$SWAP"
+          sudo mkswap "$SWAP"
+          sudo swapon "$SWAP"
+          echo "::group::swap/memory after"
+          free -h; swapon --show
           echo "::endgroup::"
 
       - uses: r-lib/actions/setup-pandoc@v2
