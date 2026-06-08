@@ -2217,27 +2217,49 @@ loggingMessagePrefixLength <- 15
 
 # Is a captured message a cli progress-bar tick?
 #
-# Progress bars (e.g. from archive::archive_extract()) are routed through
+# Progress bars (e.g. from archive::archive_extract() or pak) are routed through
 # message() by cli::start_app(output = "message"), so they reach our
 # withCallingHandlers() message handler. We must recognise them to throttle,
 # rather than prepend a Date-Time-Module-Event prefix to every animation frame.
-# There are two emission styles:
+# There are several emission styles:
 #
 # 1. Dynamic terminals: each tick carries a carriage return (\r) or a
 #    cursor-movement/erase CSI sequence (\x1b[...[A-HJ-KST], or \x1b[?...[hl]
 #    cursor show/hide). Colour/SGR codes end in 'm' and are excluded so coloured
 #    regular messages are not mistaken for ticks.
-# 2. Non-dynamic terminals (non-interactive, logged, CI, RStudio jobs): cli
-#    emits each tick as a plain newline-terminated line with *no* control
-#    characters, so the case-1 regex cannot see it. Such a frame is a progress
-#    tick iff it is a cli message (class "cliMessage") AND cli reports at least
-#    one active progress bar. cli alerts are also "cliMessage" but report zero
-#    active bars, so they are not throttled.
+#
+# The remaining styles only apply to cli-emitted messages (class "cliMessage");
+# a plain base message() is never a progress tick.
+#
+# 2. Non-dynamic terminals (non-interactive, logged, CI, RStudio jobs) with an
+#    *R-level* cli progress bar (e.g. pak): cli emits each tick as a plain
+#    newline-terminated line with no control characters, so the case-1 regex
+#    cannot see it, but cli reports at least one active progress bar via
+#    cli_progress_num(). cli alerts are also "cliMessage" but report zero active
+#    bars, so they are not throttled.
+# 3. Non-dynamic terminals with a *C-level* progress bar (e.g.
+#    archive::archive_extract(), whose bar lives in compiled libarchive code):
+#    cli's R-level registry never sees the bar, so cli_progress_num() stays 0 and
+#    case 2 misses it. Such a frame still begins with a cli spinner glyph; match
+#    the Braille spinner family (U+2800-U+28FF), cli's default and the one
+#    archive/pak use. Braille glyphs never begin a normal message, so this stays
+#    high-precision while finally catching the archive-extraction flood on
+#    Windows (and other non-dynamic sessions).
+# 4. The blank frame cli emits to close out a C-level bar: an empty cliMessage
+#    arriving while a progress bar is already in progress. Treated as a tick so
+#    the existing empty-frame handling muffles it instead of printing a bare,
+#    prefixed, empty line.
 .isCliProgressTick <- function(m, msg) {
   if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE)))
     return(TRUE)
-  inherits(m, "cliMessage") &&
-    isTRUE(tryCatch(cli::cli_progress_num() >= 1L, error = function(e) FALSE))
+  if (!inherits(m, "cliMessage"))
+    return(FALSE)
+  if (isTRUE(tryCatch(cli::cli_progress_num() >= 1L, error = function(e) FALSE)))
+    return(TRUE)
+  clean <- trimws(cli::ansi_strip(msg))
+  if (isTRUE(grepl("^[\u2800-\u28FF]", clean, perl = TRUE)))
+    return(TRUE)
+  !nzchar(clean) && isTRUE(.pkgEnv$.inProgressBar)
 }
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {

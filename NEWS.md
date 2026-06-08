@@ -1,3 +1,23 @@
+# SpaDES.core 3.1.2.9011 (development version)
+
+## Bug fixes
+
+* **Progress-bar flood from `archive::archive_extract()`** (e.g. via
+  `prepInputs()`) inside a module is now throttled on Windows and other
+  non-dynamic sessions. The progress frames are routed through the
+  `spades()`/`simInit()` message handler by `cli::start_app(output = "message")`;
+  `.isCliProgressTick()` previously recognised a non-dynamic frame only when
+  `cli::cli_progress_num() >= 1`, but `archive`'s bar lives in compiled
+  `libarchive` code, so cli's R-level registry never sees it and the count stays
+  `0`. Every frame therefore fell through and was re-printed with a full
+  Date-Time-Module-Event prefix, flooding the log with thousands of near-identical
+  lines (and pushing earlier messages out of view). Such frames are now also
+  recognised by their leading cli **Braille spinner glyph** (`U+2800`-`U+28FF`,
+  cli's default spinner family, which never begins a normal message), plus the
+  trailing blank frame that closes the bar, so the flood collapses to one line per
+  `getOption("spades.progressInterval", 2)` seconds. The same path covers other
+  C-level cli progress bars routed through the handler.
+
 # SpaDES.core 3.1.2.9010 (development version)
 
 ## Dependency changes
