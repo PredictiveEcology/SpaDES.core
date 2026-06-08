@@ -2216,8 +2216,6 @@ objsAreNull <- function(sim) {
   areNULL <- mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
                          ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
                     envir = envir(sim)), function(obj) is.null(obj))
-  # browser()
-  # areAbsent <- inputObjects(sim, currentModule(sim))$objectName
   areNULL
 }
 

@@ -392,6 +392,7 @@ noEventWarning <- function(sim) {
 ._txtSimNesting <- "._simNesting"
 ._txtDotUseCache <- ".useCache"
 ._txtDotUseCacheArgs <- ".useCacheArgs"
+._txtDotUseCloud <- ".useCloud"
 
 #' Reserved module parameter names
 #'
@@ -414,6 +415,6 @@ noEventWarning <- function(sim) {
 .knownDotParams <- c(".plotInitialTime", ".plotInterval",
                      ".plots",
                      ".saveInitialTime", ".saveInterval",
-                     ._txtDotUseCache, ._txtDotUseCacheArgs,
+                     ._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
                      ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
 

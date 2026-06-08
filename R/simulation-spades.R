@@ -1488,7 +1488,7 @@ setMethod(
   fnCallAsExpr <- if (cacheIt) { # means that a module or event is to be cached
     modCall <- get(moduleCall, envir = fnEnv)
     # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
-
+    # if (isTRUE(cur$eventType %in% c(".inputObjects", "init"))) browser()
     extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
     if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
     isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
@@ -2525,7 +2525,7 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 ## don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
-paramsDontCacheOn <- grep(c("useCache"), .knownDotParams, value = TRUE)
+paramsDontCacheOn <- grep(c("useCache|useCloud"), .knownDotParams, value = TRUE)
 
 #' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache
 #' @importFrom reproducible messageCache showCache
