@@ -246,17 +246,20 @@ or no output at all.
 \section{9 Code checking}{
 
 
-When \code{simInit()} runs, it can statically check each module's code against
-the metadata: every \code{sim$x} and parameter access is checked to be sure it
-matches the declared inputs, outputs, and parameters.
+SpaDES.core can statically check each module's code against the metadata:
+every \code{sim$x} and parameter access is checked to be sure it matches the
+declared inputs, outputs, and parameters. \strong{As of \code{SpaDES.core} 3.1.2.9014
+these checks no longer run automatically during \code{simInit()}} (the default of
+\code{spades.moduleCodeChecks} is now \code{FALSE}); run them manually instead:
 
 \tabular{ll}{
-\code{\link[=codeCheckModule]{codeCheckModule()}} \tab Run the checks on a module on disk (no \code{simInit()} needed).\cr
+\code{\link[=codeCheckModule]{codeCheckModule()}}  \tab Run the checks on a single module on disk (no \code{simInit()} needed).\cr
+\code{\link[=codeCheckModules]{codeCheckModules()}} \tab Vectorized form: run on one or more modules (e.g. a whole project).\cr
 }
 
 Controlled by these options:
 \tabular{ll}{
-\code{spades.moduleCodeChecks} \tab Turn the in-\code{simInit()} checks on (\code{TRUE}) or off (\code{FALSE}).\cr
+\code{spades.moduleCodeChecks} \tab Default \code{FALSE} (off). Set to \code{TRUE} (or a named list of toggles) to re-enable the in-\code{simInit()} checks.\cr
 \code{spades.codeCheckEngine} \tab \code{"v1"} (default) or \code{"v2"} (new, structured output).\cr
 }
 }

@@ -108,10 +108,16 @@ has terminated.\cr
 line of the messaging during spades calls.\cr
 
 \code{spades.moduleCodeChecks}
-\tab \code{list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)}
-\tab Should the various code checks be run during \code{simInit}.
-These are passed to \code{codetools::checkUsage()}.
-Default is given by the function, plus these:\cr
+\tab \code{FALSE}
+\tab Should the various module code checks be run during \code{simInit}.
+\strong{As of \code{SpaDES.core} 3.1.2.9014 the default is \code{FALSE}} (checks no longer
+run automatically during \code{simInit}, which they previously slowed). To run the
+checks, call \code{\link[=codeCheckModule]{codeCheckModule()}} / \code{\link[=codeCheckModules]{codeCheckModules()}} manually (no
+\code{simInit()} needed). To restore in-\code{simInit} checking, set this option to a
+named list of toggles, e.g.
+\code{list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)}
+(or \code{TRUE} for the defaults); these are passed through to
+\code{codetools::checkUsage()}.\cr
 
 \code{spades.moduleDocument} \tab  \code{TRUE}
 \tab  When a module is an R package e.g., via \code{convertToPackage},

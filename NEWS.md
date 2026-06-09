@@ -1,5 +1,14 @@
 # SpaDES.core 3.1.2.9014 (development version)
 
+## Behaviour changes
+
+* **`spades.moduleCodeChecks` now defaults to `FALSE`** -- module code checks no
+  longer run automatically during every `simInit()` (they slowed it and are not
+  needed on every run). Run them manually instead with [codeCheckModule()] (one
+  module) or [codeCheckModules()] (one or more, e.g. a whole project) -- no
+  `simInit()` required. To restore the old in-`simInit()` checking, set
+  `options(spades.moduleCodeChecks = TRUE)` (or a named list of toggles). Docs in
+  `?spadesOptions` and the package overview updated accordingly.
 ## Bug fixes
 
 * **archive/pak progress flood still leaked through on Windows.** `.isCliProgressTick()`
@@ -11,8 +20,6 @@
   the Braille block (`useBytes = TRUE`) so it is also immune to the message's
   Encoding mark / a non-UTF-8 locale (where a code-point class can silently fail
   to match). (Follow-up to the earlier non-dynamic throttle fix.)
-
-# SpaDES.core 3.1.2.9013 (development version)
 
 ## Bug fixes
 

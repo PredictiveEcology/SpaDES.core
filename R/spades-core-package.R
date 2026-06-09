@@ -228,17 +228,20 @@
 #'
 #' @section 9 Code checking:
 #'
-#' When `simInit()` runs, it can statically check each module's code against
-#' the metadata: every `sim$x` and parameter access is checked to be sure it
-#' matches the declared inputs, outputs, and parameters.
+#' SpaDES.core can statically check each module's code against the metadata:
+#' every `sim$x` and parameter access is checked to be sure it matches the
+#' declared inputs, outputs, and parameters. **As of `SpaDES.core` 3.1.2.9014
+#' these checks no longer run automatically during `simInit()`** (the default of
+#' `spades.moduleCodeChecks` is now `FALSE`); run them manually instead:
 #'
 #' \tabular{ll}{
-#'   [codeCheckModule()] \tab Run the checks on a module on disk (no `simInit()` needed).\cr
+#'   [codeCheckModule()]  \tab Run the checks on a single module on disk (no `simInit()` needed).\cr
+#'   [codeCheckModules()] \tab Vectorized form: run on one or more modules (e.g. a whole project).\cr
 #' }
 #'
 #' Controlled by these options:
 #' \tabular{ll}{
-#'   `spades.moduleCodeChecks` \tab Turn the in-`simInit()` checks on (`TRUE`) or off (`FALSE`).\cr
+#'   `spades.moduleCodeChecks` \tab Default `FALSE` (off). Set to `TRUE` (or a named list of toggles) to re-enable the in-`simInit()` checks.\cr
 #'   `spades.codeCheckEngine` \tab `"v1"` (default) or `"v2"` (new, structured output).\cr
 #' }
 #'
