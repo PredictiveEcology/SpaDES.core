@@ -1,3 +1,17 @@
+# SpaDES.core 3.1.2.9014 (development version)
+
+## Bug fixes
+
+* **archive/pak progress flood still leaked through on Windows.** `.isCliProgressTick()`
+  recognised a C-level progress frame by its leading Braille spinner glyph, but
+  only *after* an `inherits(m, "cliMessage")` gate -- and on Windows these
+  `archive::archive_extract()` frames do not carry the `cliMessage` class, so every
+  animation frame got a full Date-Time-Module prefix again. The Braille test now
+  runs first and independent of that class, and matches the raw UTF-8 *bytes* of
+  the Braille block (`useBytes = TRUE`) so it is also immune to the message's
+  Encoding mark / a non-UTF-8 locale (where a code-point class can silently fail
+  to match). (Follow-up to the earlier non-dynamic throttle fix.)
+
 # SpaDES.core 3.1.2.9013 (development version)
 
 ## Bug fixes

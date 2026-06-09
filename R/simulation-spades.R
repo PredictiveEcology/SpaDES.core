@@ -2228,38 +2228,42 @@ loggingMessagePrefixLength <- 15
 #    cursor show/hide). Colour/SGR codes end in 'm' and are excluded so coloured
 #    regular messages are not mistaken for ticks.
 #
-# The remaining styles only apply to cli-emitted messages (class "cliMessage");
-# a plain base message() is never a progress tick.
-#
-# 2. Non-dynamic terminals (non-interactive, logged, CI, RStudio jobs) with an
-#    *R-level* cli progress bar (e.g. pak): cli emits each tick as a plain
-#    newline-terminated line with no control characters, so the case-1 regex
-#    cannot see it, but cli reports at least one active progress bar via
-#    cli_progress_num(). cli alerts are also "cliMessage" but report zero active
-#    bars, so they are not throttled.
-# 3. Non-dynamic terminals with a *C-level* progress bar (e.g.
-#    archive::archive_extract(), whose bar lives in compiled libarchive code):
-#    cli's R-level registry never sees the bar, so cli_progress_num() stays 0 and
-#    case 2 misses it. Such a frame still begins with a cli spinner glyph; match
-#    the Braille spinner family (U+2800-U+28FF), cli's default and the one
-#    archive/pak use. Braille glyphs never begin a normal message, so this stays
-#    high-precision while finally catching the archive-extraction flood on
-#    Windows (and other non-dynamic sessions).
-# 4. The blank frame cli emits to close out a C-level bar: an empty cliMessage
-#    arriving while a progress bar is already in progress. Treated as a tick so
-#    the existing empty-frame handling muffles it instead of printing a bare,
-#    prefixed, empty line.
+# 2. *C-level* progress bar (e.g. archive::archive_extract(), whose bar lives in
+#    compiled libarchive code): cli's R-level registry never sees the bar, so
+#    cli_progress_num() stays 0. Such a frame still begins with a cli spinner
+#    glyph; match the Braille spinner family (U+2800-U+28FF), cli's default and
+#    the one archive/pak use. Braille glyphs never begin a normal message, so this
+#    is high-precision. It is checked BEFORE, and independent of, the "cliMessage"
+#    class test below: on some platforms (observed: Windows) these archive frames
+#    do NOT carry the "cliMessage" class, so gating Braille behind that class let
+#    the flood through. Matched on raw UTF-8 *bytes* (useBytes = TRUE) so it is
+#    immune to the message's Encoding mark / a non-UTF-8 locale (Windows), where a
+#    code-point class can silently fail to match.
+# 3. The blank frame that closes such a bar: an empty message arriving while a
+#    progress bar is already in progress. Treated as a tick so the empty-frame
+#    handling muffles it instead of printing a bare, prefixed, empty line.
+# 4. *R-level* cli progress bar (e.g. pak): a "cliMessage" while cli reports at
+#    least one active progress bar via cli_progress_num(). cli alerts are also
+#    "cliMessage" but report zero active bars, so they are not throttled. (A plain
+#    base message() with no Braille glyph and no active bar is never a tick.)
 .isCliProgressTick <- function(m, msg) {
   if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE)))
     return(TRUE)
-  if (!inherits(m, "cliMessage"))
-    return(FALSE)
-  if (isTRUE(tryCatch(cli::cli_progress_num() >= 1L, error = function(e) FALSE)))
-    return(TRUE)
   clean <- trimws(cli::ansi_strip(msg))
-  if (isTRUE(grepl("^[\u2800-\u28FF]", clean, perl = TRUE)))
+  # Leading Braille spinner glyph (archive/pak C-level bars). Checked BEFORE and
+  # independent of the "cliMessage" class because on some platforms (Windows)
+  # these frames do not carry that class. Matched on the raw UTF-8 *bytes* of the
+  # Braille block (U+2800-U+28FF == 0xE2 0xA0..0xA3 ..) via useBytes = TRUE, so it
+  # is immune to the message's Encoding mark / a non-UTF-8 locale (Windows), where
+  # a code-point class like [\u2800-\u28FF] can silently fail to match.
+  if (isTRUE(grepl("^\xe2[\xa0-\xa3]", clean, useBytes = TRUE)))
     return(TRUE)
-  !nzchar(clean) && isTRUE(.pkgEnv$.inProgressBar)
+  # Blank frame that closes a bar already in progress.
+  if (!nzchar(clean) && isTRUE(.pkgEnv$.inProgressBar))
+    return(TRUE)
+  # R-level cli progress bar (e.g. pak): cliMessage while a bar is active.
+  inherits(m, "cliMessage") &&
+    isTRUE(tryCatch(cli::cli_progress_num() >= 1L, error = function(e) FALSE))
 }
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
