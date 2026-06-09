@@ -235,3 +235,31 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 
   return(invisible(originalPaths))
 }
+
+#' Make file-backed objects portable across machines/users
+#'
+#' Sets `options(reproducible.fileBackedAnchors = paths)` so that file-backed
+#' objects (e.g. a \pkg{terra} `SpatRaster`) cached during a `simInit()` /
+#' `spades()` run are stored *relative* to a named, machine-independent project
+#' anchor (`cachePath`, `inputPath`, `outputPath`, `modulePath`, ...) and can
+#' therefore be restored under the equivalent anchor on another machine or user
+#' account — for example when retrieved from a shared cloud cache. See the
+#' `reproducible.fileBackedAnchors` entry in `reproducible::reproducibleOptions()`.
+#'
+#' It is deliberately a no-op when the option is already set (by the user, or by
+#' an outer/enclosing run), so an explicit setting always wins. When it does set
+#' the option it returns `TRUE` invisibly; the caller is then responsible for
+#' restoring the previous (`NULL`) value, typically via `on.exit()`.
+#'
+#' @param paths A named list of project paths, e.g. `paths(sim)` / `getPaths()`.
+#' @return Invisibly, `TRUE` if this call set the option, otherwise `FALSE`.
+#' @keywords internal
+#' @noRd
+.useFileBackedAnchors <- function(paths) {
+  if (is.null(getOption("reproducible.fileBackedAnchors")) &&
+      length(paths) && !is.null(names(paths))) {
+    options(reproducible.fileBackedAnchors = paths)
+    return(invisible(TRUE))
+  }
+  invisible(FALSE)
+}

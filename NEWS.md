@@ -1,5 +1,21 @@
 # SpaDES.core 3.1.2.9014 (development version)
 
+## New features
+
+* **File-backed objects (e.g. `terra` `SpatRaster`) cached during a run are now
+  portable across machines/users.** `simInit()` and `spades()` advertise the
+  simulation's project paths to `reproducible` via
+  `options(reproducible.fileBackedAnchors = paths(sim))`, so a file-backed
+  object's backing file is stored *relative* to a named, machine-independent
+  anchor (`cachePath`, `inputPath`, `outputPath`, `modulePath`, ...) and restored
+  under the equivalent anchor on another machine or user account — for example
+  when retrieved from a shared cloud cache. Previously such an object embedded an
+  absolute path (e.g. `/home/<producer>/.../inputs/x.tif`) that did not exist for
+  the receiver, causing `Cache` retrieval to fail. The anchors are set during
+  both the `simInit()` `.inputObjects` phase and the `spades()` event loop, and an
+  explicit user-set `reproducible.fileBackedAnchors` is always respected.
+  Requires `reproducible` with `fileBackedAnchors` support.
+
 ## Behaviour changes
 
 * **`spades.moduleCodeChecks` now defaults to `FALSE`** -- module code checks no

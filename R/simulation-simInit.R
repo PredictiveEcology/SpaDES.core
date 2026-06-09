@@ -492,6 +492,13 @@ setMethod(
     }, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
+    # Let reproducible store/restore file-backed objects (e.g. SpatRaster) relative
+    #   to these project anchors, so they remain portable across machines/users
+    #   (e.g. a shared cloud cache). `.inputObjects` runs Cache() during simInit, so
+    #   the anchors must be in place here too. Skips if the user already set them.
+    if (isTRUE(.useFileBackedAnchors(paths(sim))))
+      on.exit(options(reproducible.fileBackedAnchors = NULL), add = TRUE)
+
     names(modules) <- unlist(modules)
     adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 

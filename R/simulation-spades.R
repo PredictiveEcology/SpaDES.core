@@ -991,6 +991,12 @@ setMethod(
         do.call(setPaths, append(list(silent = TRUE), oldGetPaths))
       }, add = TRUE)
 
+      # Make file-backed objects (e.g. SpatRaster) cached during this run portable
+      #   across machines/users by storing them relative to the sim's project
+      #   anchors (see reproducible.fileBackedAnchors). Skips if already set.
+      if (isTRUE(.useFileBackedAnchors(sim@paths)))
+        on.exit(options(reproducible.fileBackedAnchors = NULL), add = TRUE)
+
       if (!is.null(sim@.xData[["._randomSeed"]])) {
         message("Resetting .Random.seed of session to the pre-existing value \n",
                 "because sim$._randomSeed is not NULL. ",
