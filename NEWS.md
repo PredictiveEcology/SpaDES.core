@@ -1,3 +1,20 @@
+# SpaDES.core 3.1.2.9013 (development version)
+
+## Bug fixes
+
+* **Event (`init`, etc.) `cacheId` is now stable across machines/OSs**, so cloud
+  caching of events can be shared (e.g. Linux <-> Windows). The module's absolute
+  install path is carried as the *name* of its `sim@modules` entry and as the
+  *name* of each event's `moduleName` (a named character: name = full path, value
+  = module name). Those paths differ across machines, so `.robustDigest()` of the
+  `modules` and `events` slots produced different `cacheId`s for byte-identical
+  runs -- breaking shared/cloud cache reuse for the event path. The simList
+  `.robustDigest` method now strips those path names before digesting (only the
+  module *name*, not its location, is relevant). `.inputObjects` was already
+  unaffected (it uses the basename and excludes the event queue). One-time
+  `cacheId` shift for events. Same cross-OS rationale as the earlier
+  parameter-definition-table and `desc`-column removals.
+
 # SpaDES.core 3.1.2.9011 (development version)
 
 ## Bug fixes

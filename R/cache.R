@@ -184,6 +184,26 @@ setMethod(
       }
     }
 
+    # Strip absolute module paths before digesting. A module's path is carried as
+    # the *name* of its `object@modules` entry, and as the *name* of each event's
+    # `moduleName` (a named character: name = full path, value = module name).
+    # Those paths differ across machines/OSs, so they split the cacheId -- the
+    # same identical run on Linux vs Windows produced different `sim.modules` and
+    # `sim.events.moduleName` hashes (diagnosed via CacheDigest's preDigest), so
+    # `init`/event results could not be shared via a (cloud) cache, even though
+    # only the module *name* (not its install location) is relevant to caching.
+    # `.inputObjects` was unaffected because its classOptions use the basename and
+    # exclude the event queue. (Same cross-OS rationale as the parameters/desc
+    # removals above.)
+    object@modules <- lapply(object@modules, unname)
+    names(object@modules) <- NULL
+    if (length(object@events)) {
+      object@events <- lapply(object@events, function(e) {
+        if (!is.null(e[["moduleName"]])) e[["moduleName"]] <- unname(e[["moduleName"]])
+        e
+      })
+    }
+
     # Inputs
     # if (curMod %in% "fireSense_dataPrepPredict") browser()
     if (NROW(object@inputs)) { # this is the argument for simInit --> this shouldn't matter/ should be ignored
