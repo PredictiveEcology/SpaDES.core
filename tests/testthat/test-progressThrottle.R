@@ -58,11 +58,21 @@ test_that(".isCliProgressTick detects progress in dynamic and non-dynamic cli mo
   expect_false(grepl("\r", brailleTick))                  # truly no control chars
   expect_true(.isCliProgressTick(cliCond(brailleTick), brailleTick))
 
-  # 5b. The same content as a *base* message (not cli) is not a tick: only cli
-  #     output is routed through start_app(output = "message").
-  expect_false(.isCliProgressTick(baseCond(brailleTick), brailleTick))
+  # 5b. A leading Braille glyph marks a tick even on a *base* (non-"cliMessage")
+  #     condition: on Windows the archive frames do NOT carry the "cliMessage"
+  #     class, so the Braille test must NOT be gated behind that class (else the
+  #     flood gets through). Braille never begins a normal message, so safe.
+  expect_true(.isCliProgressTick(baseCond(brailleTick), brailleTick))
 
-  # 5c. A cli alert whose symbol is not a spinner is not a tick, even with no bar.
+  # 5c. Encoding-robustness: the same UTF-8 bytes with an "unknown" Encoding mark
+  #     (as commonly produced, incl. on non-UTF-8 Windows locales) are still
+  #     recognised, because the test matches the raw Braille UTF-8 bytes
+  #     (useBytes = TRUE) rather than a code-point class that depends on the mark.
+  brailleUnknown <- brailleTick
+  Encoding(brailleUnknown) <- "unknown"
+  expect_true(.isCliProgressTick(baseCond(brailleUnknown), brailleUnknown))
+
+  # 5d. A cli alert whose symbol is not a spinner is not a tick, even with no bar.
   tickAlert <- "\u2714 finished extracting\n"             # heavy check mark
   expect_false(.isCliProgressTick(cliCond(tickAlert), tickAlert))
 
