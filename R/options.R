@@ -103,12 +103,17 @@
 #'     line of the messaging during spades calls.\cr
 #'
 #'   `spades.moduleCodeChecks`
-#'     \tab `list(suppressParamUnused = FALSE,
-#'   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
-#'   skipWith = TRUE)`
-#'     \tab Should the various code checks be run during `simInit`.
-#'   These are passed to `codetools::checkUsage()`.
-#'   Default is given by the function, plus these:\cr
+#'     \tab `FALSE`
+#'     \tab Should the various module code checks be run during `simInit`.
+#'   **As of `SpaDES.core` 3.1.2.9014 the default is `FALSE`** (checks no longer
+#'   run automatically during `simInit`, which they previously slowed). To run the
+#'   checks, call [codeCheckModule()] / [codeCheckModules()] manually (no
+#'   `simInit()` needed). To restore in-`simInit` checking, set this option to a
+#'   named list of toggles, e.g.
+#'   `list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
+#'   suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)`
+#'   (or `TRUE` for the defaults); these are passed through to
+#'   `codetools::checkUsage()`.\cr
 #'
 #'   `spades.moduleDocument` \tab  `TRUE`
 #'     \tab  When a module is an R package e.g., via `convertToPackage`,
@@ -229,13 +234,11 @@ spadesOptions <- function() {
     spades.lowMemory = FALSE,
     spades.memoryUseInterval = 0,
     spades.messagingNumCharsModule = 21,
-    spades.moduleCodeChecks = list(
-      skipWith = TRUE,
-      suppressNoLocalFun = TRUE,
-      suppressParamUnused = FALSE,
-      suppressPartialMatchArgs = FALSE,
-      suppressUndefined = TRUE
-    ),
+    # Module code checks are OFF by default as of SpaDES.core 3.1.2.9014. They
+    # slowed every simInit() and most users do not need them on every run. Run
+    # them manually instead with codeCheckModule()/codeCheckModules(). Set this to
+    # the named list of toggles (see ?spadesOptions) to re-enable in-simInit checks.
+    spades.moduleCodeChecks = FALSE,
     spades.codeCheckEngine = "v1",
     spades.modulePath = file.path(.spadesTempDir(), "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
