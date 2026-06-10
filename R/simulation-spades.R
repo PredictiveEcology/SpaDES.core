@@ -965,6 +965,7 @@ setMethod(
     sim <- withCallingHandlers({
       cli::start_app(output = "message", .auto_close = TRUE, .envir = environment())
       .pkgEnv$.inProgressBar <- FALSE
+      .pkgEnv$.progressInPlace <- FALSE
       .pkgEnv$.progressLastShown <- NULL
 
       ## RecoverMode Step 1 -- set up
@@ -1334,29 +1335,10 @@ setMethod(
     },
     message = function(m) {
       msg <- m$message
-      # Detect cli progress ticks (e.g. archive extraction) routed through message()
-      # by start_app(output = "message"), in both dynamic and non-dynamic terminals;
-      # see .isCliProgressTick(). Throttle them instead of prefixing every frame.
-      if (.isCliProgressTick(m, msg)) {
-        clean <- trimws(cli::ansi_strip(msg))
-        if (nchar(clean) == 0L) {
-          tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-          return()
-        }
-        now <- Sys.time()
-        if (!isTRUE(.pkgEnv$.inProgressBar)) {
-          .pkgEnv$.inProgressBar <- TRUE
-          .pkgEnv$.progressLastShown <- now
-          message(loggingMessage(clean))
-        } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
-                   getOption("spades.progressInterval", 2)) {
-          message(loggingMessage(clean))
-          .pkgEnv$.progressLastShown <- now
-        }
-        tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-        return()
-      }
-      .pkgEnv$.inProgressBar <- FALSE
+      # cli progress ticks: dynamic TTY -> single in-place line; otherwise
+      # throttle. See .handleProgressTick().
+      if (.handleProgressTick(m, msg)) return()
+      .endProgressTick()
       if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(msg)
       } else {
@@ -2234,17 +2216,13 @@ loggingMessagePrefixLength <- 15
 #    cursor show/hide). Colour/SGR codes end in 'm' and are excluded so coloured
 #    regular messages are not mistaken for ticks.
 #
-# 2. *C-level* progress bar (e.g. archive::archive_extract(), whose bar lives in
-#    compiled libarchive code): cli's R-level registry never sees the bar, so
-#    cli_progress_num() stays 0. Such a frame still begins with a cli spinner
-#    glyph; match the Braille spinner family (U+2800-U+28FF), cli's default and
-#    the one archive/pak use. Braille glyphs never begin a normal message, so this
-#    is high-precision. It is checked BEFORE, and independent of, the "cliMessage"
-#    class test below: on some platforms (observed: Windows) these archive frames
-#    do NOT carry the "cliMessage" class, so gating Braille behind that class let
-#    the flood through. Matched on raw UTF-8 *bytes* (useBytes = TRUE) so it is
-#    immune to the message's Encoding mark / a non-UTF-8 locale (Windows), where a
-#    code-point class can silently fail to match.
+# 2. *C-level* progress bar (e.g. archive::archive_extract()): the bar lives in
+#    compiled libarchive code, so cli_progress_num() stays 0. Match the Braille
+#    spinner family (U+2800-U+28FF) anywhere in the frame -- not anchored to "^",
+#    since under nested handlers the spinner arrives after a prefixed
+#    Date-Time-Module-Event stamp. Checked before the "cliMessage" test because on
+#    Windows these frames lack that class. Matched on raw UTF-8 bytes
+#    (useBytes = TRUE) for locale/Encoding immunity.
 # 3. The blank frame that closes such a bar: an empty message arriving while a
 #    progress bar is already in progress. Treated as a tick so the empty-frame
 #    handling muffles it instead of printing a bare, prefixed, empty line.
@@ -2256,13 +2234,9 @@ loggingMessagePrefixLength <- 15
   if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE)))
     return(TRUE)
   clean <- trimws(cli::ansi_strip(msg))
-  # Leading Braille spinner glyph (archive/pak C-level bars). Checked BEFORE and
-  # independent of the "cliMessage" class because on some platforms (Windows)
-  # these frames do not carry that class. Matched on the raw UTF-8 *bytes* of the
-  # Braille block (U+2800-U+28FF == 0xE2 0xA0..0xA3 ..) via useBytes = TRUE, so it
-  # is immune to the message's Encoding mark / a non-UTF-8 locale (Windows), where
-  # a code-point class like [\u2800-\u28FF] can silently fail to match.
-  if (isTRUE(grepl("^\xe2[\xa0-\xa3]", clean, useBytes = TRUE)))
+  # Braille spinner anywhere (see note 2): unanchored so prefixed frames match;
+  # raw-byte match (U+2800-U+28FF) for locale immunity.
+  if (isTRUE(grepl("\xe2[\xa0-\xa3]", clean, useBytes = TRUE)))
     return(TRUE)
   # Blank frame that closes a bar already in progress.
   if (!nzchar(clean) && isTRUE(.pkgEnv$.inProgressBar))
@@ -2270,6 +2244,46 @@ loggingMessagePrefixLength <- 15
   # R-level cli progress bar (e.g. pak): cliMessage while a bar is active.
   inherits(m, "cliMessage") &&
     isTRUE(tryCatch(cli::cli_progress_num() >= 1L, error = function(e) FALSE))
+}
+
+# Emit one progress-bar frame and muffle the original. The frame's own carriage
+# return is the signal: cli only emits `\r`-framed ticks when the terminal is
+# dynamic, so a `\r` means overwrite the (prefixed) line in place; without one
+# (non-dynamic sink, where a line can't be overwritten) throttle to one line per
+# `spades.progressInterval`. Used by both the simInit and spades handlers.
+.handleProgressTick <- function(m, msg, prefix = NULL) {
+  if (!.isCliProgressTick(m, msg)) return(FALSE)
+  clean <- trimws(cli::ansi_strip(msg))
+  if (nzchar(clean)) {
+    line <- if (is.null(prefix)) loggingMessage(clean) else loggingMessage(clean, prefix = prefix)
+    if (grepl("\r", msg, fixed = TRUE)) {
+      cat("\r", cli::ansi_strtrim(line, cli::console_width()), "\033[K", sep = "", file = stderr())
+      .pkgEnv$.progressInPlace <- TRUE
+      .pkgEnv$.inProgressBar <- TRUE
+    } else {
+      now <- Sys.time()
+      if (!isTRUE(.pkgEnv$.inProgressBar)) {
+        .pkgEnv$.inProgressBar <- TRUE
+        .pkgEnv$.progressLastShown <- now
+        message(line)
+      } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
+                 getOption("spades.progressInterval", 2)) {
+        message(line)
+        .pkgEnv$.progressLastShown <- now
+      }
+    }
+  }
+  tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+  TRUE
+}
+
+# Close an in-place progress line (one newline) before a normal message prints.
+.endProgressTick <- function() {
+  if (isTRUE(.pkgEnv$.progressInPlace)) {
+    cat("\n", file = stderr())
+    .pkgEnv$.progressInPlace <- FALSE
+  }
+  .pkgEnv$.inProgressBar <- FALSE
 }
 
 loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
