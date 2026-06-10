@@ -76,6 +76,15 @@ test_that(".isCliProgressTick detects progress in dynamic and non-dynamic cli mo
   tickAlert <- "\u2714 finished extracting\n"             # heavy check mark
   expect_false(.isCliProgressTick(cliCond(tickAlert), tickAlert))
 
+  # 5e. Prefixed C-level frame (nested handlers): the spinner arrives after a
+  #     Date-Time-Module-Event prefix, so detection must be unanchored.
+  prefixedTick <- paste0(
+    "Jun10 14:43:51 simInit/simInit/Bmss_b:.inputObjects ",
+    "\u2827 5 extracted | 1.2 GB (308 MB/s) | 4s\n")
+  expect_false(grepl("\r", prefixedTick))                 # truly no control chars
+  expect_true(.isCliProgressTick(cliCond(prefixedTick), prefixedTick))
+  expect_true(.isCliProgressTick(baseCond(prefixedTick), prefixedTick))
+
   # 6. The blank frame cli emits to close out a C-level bar: an empty cliMessage
   #    is a tick only while a progress bar is already in progress, so the handler
   #    can muffle it instead of printing a bare, prefixed, empty line.

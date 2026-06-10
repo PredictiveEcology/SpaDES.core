@@ -555,6 +555,7 @@ setMethod(
     withCallingHandlers({
       cli::start_app(output = "message", .auto_close = TRUE, .envir = environment())
       .pkgEnv$.inProgressBar <- FALSE
+      .pkgEnv$.progressInPlace <- FALSE
       .pkgEnv$.progressLastShown <- NULL
       simDTthreads <- getOption("spades.DTthreads", 1L)
       messageVerbose("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.", verbose = verbose)
@@ -804,29 +805,11 @@ setMethod(
 #' @rdname simInitConditionHandlers
 .simInitMessageHandler <- function(m) {
   msg <- m$message
-  # Detect cli progress ticks (e.g. archive extraction) routed through message()
-  # by start_app(output = "message"), in both dynamic and non-dynamic terminals;
-  # see .isCliProgressTick(). Throttle them instead of prefixing every frame.
-  if (.isCliProgressTick(m, msg)) {
-    clean <- trimws(cli::ansi_strip(msg))
-    if (nchar(clean) == 0L) {
-      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-      return()
-    }
-    now <- Sys.time()
-    if (!isTRUE(.pkgEnv$.inProgressBar)) {
-      .pkgEnv$.inProgressBar <- TRUE
-      .pkgEnv$.progressLastShown <- now
-      message(loggingMessage(clean, prefix = prefixSimInit))
-    } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
-               getOption("spades.progressInterval", 2)) {
-      message(loggingMessage(clean, prefix = prefixSimInit))
-      .pkgEnv$.progressLastShown <- now
-    }
-    tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-    return()
-  }
-  .pkgEnv$.inProgressBar <- FALSE
+  # cli progress ticks (e.g. archive extraction) routed through message() by
+  # start_app(output = "message"): dynamic TTY -> single in-place line; otherwise
+  # throttle. See .handleProgressTick().
+  if (.handleProgressTick(m, msg, prefix = prefixSimInit)) return()
+  .endProgressTick()
   message(loggingMessage(msg, prefix = prefixSimInit))
   # This will "muffle" the original message
   tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)

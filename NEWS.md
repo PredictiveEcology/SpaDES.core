@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9015 (development version)
+
+## Bug fixes
+
+* Archive-extraction (and other cli C-level) progress bars no longer flood the log during `simInit()`/`spades()`. On a dynamic terminal the bar stays on a single in-place line (prefix included); on a non-dynamic sink it is throttled to one line per `spades.progressInterval`. Detection is unanchored so frames already carrying a Date-Time-Module prefix (nested handlers) are caught.
+
 # SpaDES.core 3.1.2.9014 (development version)
 
 ## New features
