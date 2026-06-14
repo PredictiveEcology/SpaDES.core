@@ -231,7 +231,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       otherFns <- c()
       if (isTRUE(outputs)) {
         os <- outputs(sim)
-        if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE]$file)
+        if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE, ]$file)
       }
       if (isTRUE(inputs)) {
         ins <- inputs(sim)
@@ -304,7 +304,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       if (isTRUE(outputs)) {
         os <- outputs(sim)
         if (NROW(os)) {
-          outputFNs <- os[os$saved %in% TRUE]$file
+          outputFNs <- os[os$saved %in% TRUE, ]$file
           otherFns <- c(otherFns, outputFNs)
         }
       }

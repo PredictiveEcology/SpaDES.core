@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9016 (development version)
+
+## Bug fixes
+
+* `saveSimList()` no longer errors with "undefined columns selected" when `outputs(sim)` has rows. The saved-outputs filter was indexing the `outputs` `data.frame` by column instead of row (missing comma).
+
 # SpaDES.core 3.1.2.9015 (development version)
 
 ## Bug fixes
