@@ -1,6 +1,8 @@
-# SpaDES.core 3.1.2.9016 (development version)
+# SpaDES.core 3.1.2.9017 (development version)
 
 ## Bug fixes
+
+* `simInit()` / `spades()` no longer error "the condition has length > 1" when `debug` is passed as a multi-element list (e.g. `list(file = list(...), debug = 1)`). `debugToVerbose()` was returning a per-element vector, but `verbose` is consumed as a scalar downstream -- notably `simInit()` does `setPaths(silent = verbose <= 0)`, plus six other scalar-`verbose` call sites -- so `if (!silent)` errored on a length-2 condition. `debugToVerbose()` now reduces to a single verbosity level (the highest requested). Added a regression test that exercises the `simInit()` -> `setPaths()` path; the existing `debug = list` tests only used `spades()` on a pre-initialised sim, so never hit it. (#322)
 
 * `saveSimList()` no longer errors with "undefined columns selected" when `outputs(sim)` has rows. The saved-outputs filter was indexing the `outputs` `data.frame` by column instead of row (missing comma).
 

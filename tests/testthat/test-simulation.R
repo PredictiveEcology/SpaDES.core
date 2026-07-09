@@ -1002,6 +1002,33 @@ test_that("debug using logging", {
   expect_true(length(mess1) == 0)
 })
 
+test_that("simInit() handles a multi-element `debug` list (regression: #322)", {
+  # `verbose <- debugToVerbose(debug)` is used as a SCALAR downstream (e.g. simInit() does
+  # `setPaths(silent = verbose <= 0)`), so a multi-element `debug` list must NOT yield a vector
+  # `verbose`, else `if (!silent)` errors "the condition has length > 1". The other `debug = list`
+  # tests only exercise `spades()` on a pre-init'd sim, so they never reach the simInit()->setPaths()
+  # path where this regresses. Do not let `debugToVerbose()` return the raw per-element vector again.
+  skip_on_cran()
+
+  # unit-level guard on the reducer (tight: catches a silent revert of the scalar reduction)
+  expect_length(debugToVerbose(list(file = list(file = "x", append = TRUE), debug = 1)), 1L)
+  expect_length(debugToVerbose(list("console" = list(level = 10), debug = 1)), 1L)
+  expect_length(debugToVerbose(1), 1L)
+  expect_length(debugToVerbose(FALSE), 1L)
+
+  # integration-level guard: simInit() with a >1-element debug list must not error
+  tmpdir <- checkPath(file.path(tempdir(), "test-simInit-debug322"), create = TRUE)
+  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+  paths <- list(modulePath = getSampleModules(tmpdir))
+  logging::logReset()
+  expect_error(
+    simInit(times = list(start = 0, end = 1), modules = list("randomLandscapes"), paths = paths,
+            debug = list(file = list(file = file.path(tmpdir, "s.log")), debug = 1)),
+    regexp = NA
+  )
+  logging::logReset()
+})
+
 test_that("options('reproducible.reqdPkgsDontLoad", {
   dontLoad <- "logging" # ggplot2 has many rev deps; can't be sp, raster because already loaded
 

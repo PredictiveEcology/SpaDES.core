@@ -2433,8 +2433,13 @@ debugToVerbose <- function(debug) {
     if (is.numeric(de) || is.logical(de)) de else !is.null(de)
   )
   debugOut[is.na(debugOut)] <- FALSE
-  # any(as.logical(debugOut))
-  debugOut
+  ## #322: `verbose` is consumed downstream as a SCALAR (e.g. `setPaths(silent = verbose <= 0)`,
+  ## `messageVerbose(verbose = verbose)`, `.identifyChildModules(verbose = )`), so a multi-element
+  ## `debug` list MUST reduce to one value here -- returning the per-element vector makes
+  ## `if (!silent)` (and similar) error "the condition has length > 1". Keep the highest requested
+  ## level; 0 (silent) when nothing is set. Regression-tested in test-simulation.R (do not revert
+  ## to the bare `debugOut` vector without a scalar reduction).
+  if (length(debugOut) == 0L) 0 else max(as.numeric(debugOut))
 }
 
 
