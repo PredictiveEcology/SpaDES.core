@@ -1661,7 +1661,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         .pkgEnv[[".spadesDebugFirst"]] <- TRUE
         # sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
       }
-      debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam)
+      ## #322: `debug` may be a list (file/console/debug logging spec), not numeric; guard the
+      ## numeric bump exactly as spades.R does (`if (!is.numeric(debug)) debug else ifelse(...)`),
+      ## else `ifelse(debug < 1, ...)` errors "'list' object cannot be coerced to type 'double'".
+      debugMessage(
+        if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug),
+        sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam
+      )
 
       if (verbose) {
         objsIsNullBefore <- objsAreNull(sim)

@@ -1026,6 +1026,22 @@ test_that("simInit() handles a multi-element `debug` list (regression: #322)", {
             debug = list(file = list(file = file.path(tmpdir, "s.log")), debug = 1)),
     regexp = NA
   )
+
+  # the per-event `debugMessage(ifelse(debug < 1, ...))` must handle a list `debug` too. simInit()
+  # above runs no events, so exercise a stage WITH events -- this crashed with
+  # "'list' object cannot be coerced to type 'double'" before the guard (mirroring spades.R).
+  logging::logReset()
+  expect_error(
+    simInitAndSpades(
+      times = list(start = 0, end = 2),
+      modules = list("randomLandscapes", "fireSpread"),
+      params = list(randomLandscapes = list(.plotInitialTime = NA),
+                    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)),
+      paths = paths,
+      debug = list(file = list(file = file.path(tmpdir, "s2.log")), debug = 1)
+    ),
+    regexp = NA
+  )
   logging::logReset()
 })
 
