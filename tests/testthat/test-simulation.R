@@ -1016,10 +1016,13 @@ test_that("simInit() handles a multi-element `debug` list (regression: #322)", {
   expect_length(debugToVerbose(1), 1L)
   expect_length(debugToVerbose(FALSE), 1L)
 
-  # integration-level guard: simInit() with a >1-element debug list must not error
-  tmpdir <- checkPath(file.path(tempdir(), "test-simInit-debug322"), create = TRUE)
-  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+  # integration-level guards need the sample modules + `logging` (a Suggests dep). `testInit()`
+  # skips the block when any are unavailable (e.g. the `nosuggests` CI builds, where `logging` is
+  # absent) and provides a managed `tmpdir` (auto-cleaned via withr).
+  testInit(c(sampleModReqdPkgs, "logging"))
   paths <- list(modulePath = getSampleModules(tmpdir))
+
+  # simInit() with a >1-element debug list must not error (exercises debugToVerbose() -> setPaths())
   logging::logReset()
   expect_error(
     simInit(times = list(start = 0, end = 1), modules = list("randomLandscapes"), paths = paths,
@@ -1027,9 +1030,13 @@ test_that("simInit() handles a multi-element `debug` list (regression: #322)", {
     regexp = NA
   )
 
-  # the per-event `debugMessage(ifelse(debug < 1, ...))` must handle a list `debug` too. simInit()
-  # above runs no events, so exercise a stage WITH events -- this crashed with
-  # "'list' object cannot be coerced to type 'double'" before the guard (mirroring spades.R).
+  # a list `debug` must also survive a full run: `.runModuleInputObjects()` builds the per-module
+  # debug level via `ifelse(debug < 1, ...)`, which crashed "'list' object cannot be coerced to
+  # type 'double'" before the guard. Drive simInit() + spades() together via simInitAndSpades().
+  # NB: the log-file path here must be self-resolving (`tempdir()`), NOT a test-local variable:
+  # simInitAndSpades() re-evaluates its `spades`-only args (like `debug`) via `do.call()` in its
+  # OWN frame, so a caller-local `tmpdir` would error "object 'tmpdir' not found" (unlike the
+  # direct simInit() call above, whose args evaluate in the test frame).
   logging::logReset()
   expect_error(
     simInitAndSpades(
@@ -1038,7 +1045,7 @@ test_that("simInit() handles a multi-element `debug` list (regression: #322)", {
       params = list(randomLandscapes = list(.plotInitialTime = NA),
                     fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)),
       paths = paths,
-      debug = list(file = list(file = file.path(tmpdir, "s2.log")), debug = 1)
+      debug = list(file = list(file = file.path(tempdir(), "s2.log")), debug = 1)
     ),
     regexp = NA
   )

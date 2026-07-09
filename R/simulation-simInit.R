@@ -1661,11 +1661,16 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         .pkgEnv[[".spadesDebugFirst"]] <- TRUE
         # sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
       }
-      ## #322: `debug` may be a list (file/console/debug logging spec), not numeric; guard the
-      ## numeric bump exactly as spades.R does (`if (!is.numeric(debug)) debug else ifelse(...)`),
-      ## else `ifelse(debug < 1, ...)` errors "'list' object cannot be coerced to type 'double'".
+      ## #322: a list/character `debug` (e.g. a file/console logging spec) must NOT reach
+      ## `ifelse(debug < 1, debug + 1, debug)` -- `debug < 1` errors "'list' object cannot be
+      ## coerced to type 'double'" for a list, and `ifelse` eagerly evaluates `debug + 1` (a
+      ## non-numeric-operator error) for character. But a *logical* `debug` MUST keep the historical
+      ## numeric bump `FALSE -> 1` (via `ifelse`), which is what enables the `.inputObjects` /
+      ## module-code-check messages this runner emits at the default `debug = FALSE` -- dropping it
+      ## (as a bare `!is.numeric` guard would) silently suppresses them. So bump numeric AND logical,
+      ## pass everything else through. (Regression-tested: test-timeunits.R, test-userSuppliedObjs.R.)
       debugMessage(
-        if (!is.numeric(debug)) debug else ifelse(debug < 1, debug + 1, debug),
+        if (is.numeric(debug) || is.logical(debug)) ifelse(debug < 1, debug + 1, debug) else debug,
         sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam
       )
 
