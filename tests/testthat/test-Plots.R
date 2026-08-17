@@ -412,3 +412,32 @@ test_that("Plots - ggplot object passed directly as data", {
   expect_true(any(grepl("ggobj_test", files) & grepl("_gg\\.qs2$", files)))
   expect_equal(NROW(outputs(simOut)), 2L)
 })
+
+test_that("canonicalize_ggplot captures facets, coord limits and inherited layer data", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+
+  d <- data.frame(x = 1:8, y = (1:8)^2, g = rep(c("a", "b"), 4), h = rep(c("p", "q"), each = 4))
+  base <- ggplot2::ggplot(d, ggplot2::aes(x, y)) + ggplot2::geom_point()
+  dig <- function(p) .robustDigest(canonicalize_ggplot(p))
+
+  # facet_grid keeps its variables in `rows`/`cols`, not in `facets`
+  expect_false(identical(dig(base + ggplot2::facet_grid(g ~ h)),
+                         dig(base + ggplot2::facet_grid(h ~ g))))
+
+  # coord limits are lists holding NULLs, so must not be dropped wholesale
+  expect_false(identical(dig(base + ggplot2::coord_cartesian(xlim = c(1, 3))),
+                         dig(base + ggplot2::coord_cartesian(xlim = c(1, 4)))))
+
+  # a layer inheriting the plot data holds waiver(), not NULL
+  md <- canonicalize_ggplot(base)
+  expect_identical(md$layers[[1]]$data_digest$source, "plot")
+  expect_identical(md$layers[[1]]$data_digest$digest, md$data_digest)
+
+  # scale transformation is still captured
+  expect_identical(canonicalize_ggplot(base + ggplot2::scale_y_log10())$scales[[1]]$trans, "log-10")
+
+  # and the whole thing is stable across rebuilds from different enclosing environments
+  mk <- function() local(ggplot2::ggplot(d, ggplot2::aes(x, y)) + ggplot2::geom_point())
+  expect_identical(dig(mk()), dig(mk()))
+})

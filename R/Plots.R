@@ -676,7 +676,7 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
       v <- x[[nm]]
       if (is.atomic(v) && !is.object(v)) {
         y[[nm]] <- v
-      } else if (is.list(v) && all(vapply(v, function(i) is.atomic(i) && !is.object(i), logical(1)))) {
+      } else if (is.list(v) && all(vapply(v, function(i) is.null(i) || (is.atomic(i) && !is.object(i)), logical(1)))) {
         y[[nm]] <- v
       }
     }
@@ -687,7 +687,8 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
   raw_plot_data_digest <- if (is.data.frame(p$data)) .robustDigest(p$data) else NULL
   
   raw_layer_data <- lapply(p$layers, function(l) {
-    if (is.null(l$data)) {
+    # a layer that inherits the plot data holds waiver(), not NULL
+    if (is.null(l$data) || inherits(l$data, "waiver")) {
       list(source = "plot", digest = raw_plot_data_digest)
     } else if (is.data.frame(l$data)) {
       list(source = "layer", digest = .robustDigest(l$data))
@@ -722,7 +723,10 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
     fp <- p$facet$params
     facet <- list(
       facet_class = class(p$facet)[1],
+      # facet_wrap keeps its vars in `facets`; facet_grid splits them into `rows`/`cols`
       vars        = if (!is.null(fp$facets)) sort(names(fp$facets)) else NULL,
+      rows        = if (!is.null(fp$rows)) sort(names(fp$rows)) else NULL,
+      cols        = if (!is.null(fp$cols)) sort(names(fp$cols)) else NULL,
       nrow        = fp$nrow %||% NULL,
       ncol        = fp$ncol %||% NULL,
       free        = fp$free   %||% NULL,
@@ -735,7 +739,11 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
       scale_class = class(s)[1],
       aesthetics  = sort(unique(s$aesthetics %||% character(0))),
       limits      = s$limits,
-      trans       = tryCatch(s$trans$name, error = function(e) NULL),
+      # ggplot2 >= 3.5.0 has get_transformation(); older versions only have the `trans` field
+      trans       = tryCatch({
+        tr <- if (is.function(s$get_transformation)) s$get_transformation() else s$trans
+        tr$name
+      }, error = function(e) NULL),
       position    = s$position %||% NULL,
       guide       = if (!is.null(s$guide) && !is.logical(s$guide)) as.character(s$guide) else s$guide
     )

@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9019 (development version)
+
+## Bug fixes
+
+* `canonicalize_ggplot()` (a.k.a. `strip_ggplot_metadata()`), which builds the data-free digest used by `Plots(useCache = TRUE)`, missed three things, so plots that differed only in those ways could hash identically and skip a needed replot: `facet_grid()` variables (stored in `params$rows`/`params$cols`, not `params$facets`), `coord_*(xlim=/ylim=)` limits (a list holding `NULL`s, which the simple-field filter rejected wholesale), and layer data inherited from the plot (held as `waiver()`, not `NULL`, so it was hashed as a constant instead of as the plot data). Scale transformations are now read via `get_transformation()` where available (ggplot2 >= 3.5.0), falling back to the `trans` field.
+
 # SpaDES.core 3.1.2.9018 (development version)
 
 ## Bug fixes
