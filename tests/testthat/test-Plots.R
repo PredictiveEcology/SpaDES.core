@@ -413,31 +413,85 @@ test_that("Plots - ggplot object passed directly as data", {
   expect_equal(NROW(outputs(simOut)), 2L)
 })
 
-test_that("canonicalize_ggplot captures facets, coord limits and inherited layer data", {
-  skip_on_cran()
+test_that("canonicalize_ggplot digest distinguishes plot differences", {
   skip_if_not_installed("ggplot2")
+  testInit("ggplot2")
 
-  d <- data.frame(x = 1:8, y = (1:8)^2, g = rep(c("a", "b"), 4), h = rep(c("p", "q"), each = 4))
-  base <- ggplot2::ggplot(d, ggplot2::aes(x, y)) + ggplot2::geom_point()
+  d <- data.frame(x = 1:12, y = (1:12)^2, g = rep(c("a", "b"), 6), h = rep(c("p", "q"), each = 6))
+  d2 <- d
+  d2$y <- d2$y * 2
+  B <- function() ggplot(d, aes(x, y)) + geom_point()
   dig <- function(p) .robustDigest(canonicalize_ggplot(p))
 
-  # facet_grid keeps its variables in `rows`/`cols`, not in `facets`
-  expect_false(identical(dig(base + ggplot2::facet_grid(g ~ h)),
-                         dig(base + ggplot2::facet_grid(h ~ g))))
+  # each pair differs in exactly one way; the digest must see all of them, because a
+  # collision here means Plots(useCache = TRUE) keeps a stale figure
+  pairs <- list(
+    "geom type"          = list(B(), ggplot(d, aes(x, y)) + geom_line()),
+    "geom param"         = list(B() + geom_point(size = 3), B() + geom_point(size = 5)),
+    "alpha"              = list(ggplot(d, aes(x, y)) + geom_point(alpha = 0.3),
+                                ggplot(d, aes(x, y)) + geom_point(alpha = 0.9)),
+    "constant colour"    = list(ggplot(d, aes(x, y)) + geom_point(colour = "red"),
+                                ggplot(d, aes(x, y)) + geom_point(colour = "blue")),
+    "stat param"         = list(ggplot(d, aes(x)) + geom_histogram(bins = 5),
+                                ggplot(d, aes(x)) + geom_histogram(bins = 30)),
+    "aes mapping"        = list(B(), ggplot(d, aes(x, y, colour = g)) + geom_point()),
+    "plot data values"   = list(B(), ggplot(d2, aes(x, y)) + geom_point()),
+    "layer-specific data" = list(B() + geom_line(data = d[1:3, ]), B() + geom_line(data = d[1:6, ])),
+    "layer order"        = list(ggplot(d, aes(x, y)) + geom_point() + geom_line(),
+                                ggplot(d, aes(x, y)) + geom_line() + geom_point()),
+    "facet_wrap var"     = list(B() + facet_wrap("g"), B() + facet_wrap("h")),
+    "facet_wrap ncol"    = list(B() + facet_wrap("g", ncol = 2), B() + facet_wrap("g", ncol = 3)),
+    "facet_grid vars"    = list(B() + facet_grid(g ~ h), B() + facet_grid(h ~ g)),
+    "scale transform"    = list(B() + scale_y_log10(), B() + scale_y_sqrt()),
+    "scale limits"       = list(B() + scale_y_continuous(limits = c(0, 100)),
+                                B() + scale_y_continuous(limits = c(0, 200))),
+    "coord limits"       = list(B() + coord_cartesian(xlim = c(1, 3)), B() + coord_cartesian(xlim = c(1, 4))),
+    "coord type"         = list(B() + coord_cartesian(), B() + coord_flip()),
+    "labels"             = list(B() + labs(title = "A"), B() + labs(title = "B")),
+    "theme preset"       = list(B() + theme_bw(), B() + theme_classic()),
+    "theme element"      = list(B() + theme(legend.position = "right"), B() + theme(legend.position = "none")),
+    "theme unit element" = list(B() + theme(plot.margin = grid::unit(rep(1, 4), "cm")),
+                                B() + theme(plot.margin = grid::unit(rep(4, 4), "cm"))),
+    "position adjustment" = list(ggplot(d, aes(g, y)) + geom_point(position = position_jitter(width = 0.1)),
+                                 ggplot(d, aes(g, y)) + geom_point(position = position_jitter(width = 0.5)))
+  )
+  for (nm in names(pairs))
+    expect_false(identical(dig(pairs[[nm]][[1]]), dig(pairs[[nm]][[2]])), info = nm)
+})
 
-  # coord limits are lists holding NULLs, so must not be dropped wholesale
-  expect_false(identical(dig(base + ggplot2::coord_cartesian(xlim = c(1, 3))),
-                         dig(base + ggplot2::coord_cartesian(xlim = c(1, 4)))))
+test_that("canonicalize_ggplot digest is stable for identical plots", {
+  skip_if_not_installed("ggplot2")
+  testInit("ggplot2")
 
-  # a layer inheriting the plot data holds waiver(), not NULL
-  md <- canonicalize_ggplot(base)
+  d <- data.frame(x = 1:12, y = (1:12)^2, g = rep(c("a", "b"), 6), h = rep(c("p", "q"), each = 6))
+  dig <- function(p) .robustDigest(canonicalize_ggplot(p))
+
+  # the point of dropping the data and environments: rebuilding the same plot -- notably
+  # from a different enclosing environment, as each module event does -- must not change it
+  same <- list(
+    "different enclosing envs" = list(local({zz <- runif(1e4); ggplot(d, aes(x, y)) + geom_point()}),
+                                      local({ww <- "unused"; ggplot(d, aes(x, y)) + geom_point()})),
+    "rebuilt twice"            = list(ggplot(d, aes(x, y)) + geom_point() + facet_grid(g ~ h) + scale_y_log10(),
+                                      ggplot(d, aes(x, y)) + geom_point() + facet_grid(g ~ h) + scale_y_log10()),
+    "equal but separate data"  = list(ggplot(d, aes(x, y)) + geom_point(),
+                                      ggplot(data.frame(x = 1:12, y = (1:12)^2, g = rep(c("a", "b"), 6),
+                                                        h = rep(c("p", "q"), each = 6)),
+                                             aes(x, y)) + geom_point()),
+    "pipe vs direct"           = list(d |> ggplot(aes(x, y)) + geom_point(),
+                                      ggplot(d, aes(x, y)) + geom_point())
+  )
+  for (nm in names(same))
+    expect_identical(dig(same[[nm]][[1]]), dig(same[[nm]][[2]]), info = nm)
+
+  # a layer inheriting the plot data holds waiver(), not NULL, so it must resolve to the
+  # plot data digest rather than to a constant
+  md <- canonicalize_ggplot(ggplot(d, aes(x, y)) + geom_point())
   expect_identical(md$layers[[1]]$data_digest$source, "plot")
   expect_identical(md$layers[[1]]$data_digest$digest, md$data_digest)
 
-  # scale transformation is still captured
-  expect_identical(canonicalize_ggplot(base + ggplot2::scale_y_log10())$scales[[1]]$trans, "log-10")
-
-  # and the whole thing is stable across rebuilds from different enclosing environments
-  mk <- function() local(ggplot2::ggplot(d, ggplot2::aes(x, y)) + ggplot2::geom_point())
-  expect_identical(dig(mk()), dig(mk()))
+  # scale transformation is read via get_transformation() on ggplot2 >= 3.5.0; the name
+  # itself is ggplot2's to choose, so assert only that one was found (log10 vs sqrt is
+  # covered by the pairs above)
+  trans <- canonicalize_ggplot(ggplot(d, aes(x, y)) + geom_point() + scale_y_log10())$scales[[1]]$trans
+  expect_true(is.character(trans) && nzchar(trans))
 })

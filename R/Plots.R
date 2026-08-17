@@ -668,16 +668,29 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
     lapply(x, function(v) if (is.list(v)) sort_list_recursive(v) else v)
   }
   
+  # classed atomics (unit(), factor, ...) are hashable as their printed form
+  as_simple <- function(v) if (is.object(v)) as.character(v) else v
+
+  # ggproto objects and plain lists expose their fields via names(); a ggplot2 >= 4.0
+  # theme element is S7, so its properties are attributes instead
+  field_names <- function(x) {
+    nms <- names(x)
+    if (is.null(nms)) nms <- setdiff(names(attributes(x)), c("class", "names", "S7_class"))
+    nms
+  }
+
   keep_simple_fields <- function(x) {
     if (is.null(x)) return(NULL)
+    # a bare value (e.g. theme(legend.position = "none")) is already simple
+    if (is.atomic(x)) return(as_simple(x))
+    byName <- !is.null(names(x))
     y <- list()
-    nms <- names(x)
-    for (nm in nms) {
-      v <- x[[nm]]
-      if (is.atomic(v) && !is.object(v)) {
-        y[[nm]] <- v
-      } else if (is.list(v) && all(vapply(v, function(i) is.null(i) || (is.atomic(i) && !is.object(i)), logical(1)))) {
-        y[[nm]] <- v
+    for (nm in field_names(x)) {
+      v <- tryCatch(if (byName) x[[nm]] else attr(x, nm), error = function(e) NULL)
+      if (is.atomic(v)) {
+        y[[nm]] <- as_simple(v)
+      } else if (is.list(v) && all(vapply(v, function(i) is.null(i) || is.atomic(i), logical(1)))) {
+        y[[nm]] <- lapply(v, function(i) if (is.null(i)) NULL else as_simple(i))
       }
     }
     drop_nulls(y)
@@ -708,6 +721,7 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
       geom_class     = class(l$geom)[1],
       stat_class     = class(l$stat)[1],
       position_class = class(l$position)[1],
+      position_params = keep_simple_fields(l$position),
       inherit_aes    = isTRUE(l$inherit.aes),
       mapping        = map_labels(l$mapping),
       aes_params     = keep_simple_fields(l$aes_params),
