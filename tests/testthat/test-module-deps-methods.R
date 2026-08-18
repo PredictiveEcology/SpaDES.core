@@ -275,3 +275,25 @@ test_that("Test cleaning up of desc in createsOutputs, expectsInputs, definePara
                  expect_false(grepl("\n", desc))
                })
 })
+
+test_that("spatialExtent of a module dependency is a live SpatExtent", {
+  ## the `.moduleDeps` prototype extent is created at package *build* time, so its external
+  ## pointer is dead in the installed package; `defineModule()` must supply its own.
+  ## terra >= 1.9-34 errors "external pointer is not valid" on such an object
+  testInit(sampleModReqdPkgs, smcc = FALSE)
+
+  mySim <- simInit(times = list(start = 0.0, end = 1.0, timeunit = "year"),
+                   modules = list("caribouMovement"),
+                   paths = list(modulePath = getSampleModules(tmpdir)))
+  ex <- mySim@depends@dependencies$caribouMovement@spatialExtent
+  expect_true(isExtents(ex))
+  expect_false(identical(format(ex@pntr$.pointer), "<pointer: (nil)>"))
+  expect_equal(as.numeric(terra::xmin(ex)), 0)
+
+  ## a module that supplies no extent still gets a live default
+  expect_false(isExtents(getClassDef(".moduleDeps", package = "SpaDES.core")@prototype@spatialExtent))
+  x <- suppressWarnings(defineModule(simInit(), list(name = "noExtent")))
+  ex0 <- x@depends@dependencies[[1]]@spatialExtent
+  expect_true(isExtents(ex0))
+  expect_false(identical(format(ex0@pntr$.pointer), "<pointer: (nil)>"))
+})

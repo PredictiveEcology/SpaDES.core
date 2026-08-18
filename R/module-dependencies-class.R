@@ -143,7 +143,10 @@ setClass(
   prototype = list(
     name = character(0), description = character(0), keywords = character(0),
     childModules = character(0), authors = person(), version = numeric_version("0.0.0"),
-    spatialExtent = terra::ext(rep(0L, 4L)), timeframe = as.POSIXlt(c(NA, NA)),
+    ## NOTE: must NOT be a `terra::ext()`: a prototype is created at package *build* time and
+    ## its external pointer is dead in the installed package. `defineModule()` always supplies
+    ## a live `SpatExtent` (`moduleDefaults$extent`), so `NULL` here is only ever a placeholder.
+    spatialExtent = NULL, timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = NA_real_, citation = list(), documentation = list(),
     loadOrder = list(after = NULL, before = NULL), reqdPkgs = list(),
     parameters = data.frame(
@@ -155,7 +158,7 @@ setClass(
     outputObjects = ._outputObjectsDF()
   ),
   validity = function(object) {
-    if (!(isExtents(object@spatialExtent)))
+    if (!is.null(object@spatialExtent) && !(isExtents(object@spatialExtent)))
       stop("spatialExtent must be an Extent object or SpatExtent")
     if (length(object@name) != 1L) stop("name must be a single character string.")
     if (length(object@description) != 1L) stop("description must be a single character string.")
