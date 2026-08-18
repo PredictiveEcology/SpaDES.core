@@ -148,6 +148,27 @@ jobs:
             pak::local_install_dev_deps(ask = FALSE, dependencies = TRUE)
             pak::pkg_install(c("any::rcmdcheck"), ask = FALSE)
 
+      # Transient workaround; delete once CRAN ships rebuilt binaries.
+      # RcppParallel 6.0.0 (2026-07-23) bundles oneTBB 2022.0.0 and changed the
+      # TBB ABI -- upstream NEWS: "packages which depend on RcppParallel may need
+      # to be rebuilt". CRAN's macOS-arm64 `qs2`/`stringfish` binaries predate it
+      # and fail to `dlopen` (`qs2.so`: missing `tbb::task::note_affinity`;
+      # `stringfish.so`: missing `tbb::internal::concurrent_vector_base_v3::
+      # internal_grow_by`). `qs2` is in Imports, so this kills `R CMD build` at
+      # the "install the package to build vignettes" stage, before any check runs.
+      # Probe rather than version-check: we cannot know which release fixes this,
+      # but we can ask whether it loads, so the step self-retires. `stringfish`
+      # must be rebuilt first -- rebuilding `qs2` alone leaves it broken.
+      - name: Rebuild RcppParallel-linked deps from source if their binaries can't load
+        shell: Rscript {0}
+        run: |
+          if (!requireNamespace("qs2", quietly = TRUE)) {
+            message("qs2 failed to load; rebuilding against installed RcppParallel ",
+                    packageVersion("RcppParallel"))
+            install.packages(c("stringfish", "qs2"), type = "source")
+            loadNamespace("qs2") # fail loudly if the rebuild did not fix it
+          }
+
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
