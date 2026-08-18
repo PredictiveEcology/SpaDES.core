@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9020 (development version)
+
+## Bug fixes
+
+* `canonicalize_ggplot()` (a.k.a. `strip_ggplot_metadata()`), which builds the data-free digest used by `Plots(useCache = TRUE)`, ignored several parts of a plot, so plots differing only in those ways hashed identically and a needed replot was skipped: `facet_grid()` variables (stored in `params$rows`/`params$cols`, not `params$facets`); `coord_*(xlim=/ylim=)` limits (a list holding `NULL`s, which the simple-field filter rejected wholesale); the entire theme (`theme_bw()` vs `theme_classic()`, `theme(legend.position=)`, `unit()`-valued elements -- theme values are bare scalars, classed vectors, or, as of ggplot2 4.0, S7 objects holding their properties in attributes, none of which have `names()`); `position_*()` parameters such as `position_jitter(width=)`; and layer data inherited from the plot (held as `waiver()`, not `NULL`, so it was hashed as a constant rather than as the plot data). Scale transformations are now read via `get_transformation()` where available (ggplot2 >= 3.5.0), falling back to the `trans` field. A test matrix in `test-Plots.R` covers 21 single-difference plot pairs and 4 identical-plot pairs. Because the digest now covers more of the plot, cached figures from earlier versions will be redrawn once.
+
 # SpaDES.core 3.1.2.9019 (development version)
 
 ## Bug fixes
