@@ -1,132 +1,17 @@
+# Thin caller — shared logic lives in PredictiveEcology/actions (reusable workflow).
 on:
   push:
-    branches:
-      - main
-      - development
+    branches: [main, development]
   pull_request:
-    branches:
-      - main
-      - development
+    branches: [main, development]
 
 name: test-coverage
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
 jobs:
   test-coverage:
-    runs-on: ubuntu-latest
-    # Bound the job so a genuine hang fails fast and visibly, instead of the
-    # runner being silently reclaimed ~22 min in ("received a shutdown signal" /
-    # exit 143). Generous because the added swap (below) can slow covr down.
-    timeout-minutes: 75
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      GOOGLEDRIVE_AUTH: ${{ secrets.GOOGLEDRIVE_AUTH }}
-      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-      USING_COVR: true
-      NOT_CRAN: true
-      R_PKG_INSTALL_RETRIES: 3
-
-    steps:
-      - uses: actions/checkout@v4
-
-      # Why this job (and only this job) needs extra memory:
-      # test-coverage is the *only* CI job that sets NOT_CRAN=true, so it is the
-      # only one that runs the ~18 skip_on_cran() tests -- several of which spin
-      # up parallel/future worker processes (e.g. test-1memory, test-futureEvents)
-      # and reproducible's own parallel paths fork additional workers that scale
-      # with the runner's core count. Under covr every one of those child
-      # processes carries a full copy of the *instrumented* package, so peak RSS
-      # is far higher here than during R CMD check (which runs --as-cran and skips
-      # those tests). R-CMD-check passing therefore tells us nothing about this
-      # path. Peak crept just over the ~16 GB runner around 2026-06-06 (an
-      # upstream dependency memory bump), and the VM started getting reclaimed
-      # mid-run -> "received a shutdown signal" / exit 143, with no R error.
-      #
-      # Add swap on the large /mnt volume so covr has headroom to finish. This
-      # fixes the OOM without dropping any tests or coverage, and is robust to
-      # further upstream memory growth.
-      - name: Add swap space
-        run: |
-          set -x
-          echo "::group::swap/memory before"
-          free -h; swapon --show || true
-          echo "::endgroup::"
-          # Use a dedicated file so we never clash with the runner image's own
-          # /mnt/swapfile (which is already active -- mkswap on it would fail).
-          # This ADDS to existing swap. /mnt is the large (~65 GB) volume.
-          SWAP=/mnt/covr-swapfile
-          sudo swapoff "$SWAP" 2>/dev/null || true
-          sudo rm -f "$SWAP"
-          sudo fallocate -l 16G "$SWAP" || sudo fallocate -l 10G "$SWAP" || \
-            sudo dd if=/dev/zero of="$SWAP" bs=1M count=10240
-          sudo chmod 600 "$SWAP"
-          sudo mkswap "$SWAP"
-          sudo swapon "$SWAP"
-          echo "::group::swap/memory after"
-          free -h; swapon --show
-          echo "::endgroup::"
-
-      - uses: r-lib/actions/setup-pandoc@v2
-
-      # Stock Noble apt; ubuntugis-unstable PPA dropped — see the rationale
-      # in R-CMD-check.yaml.
-      - name: Install spatial deps (Linux, stock Noble)
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -f -y || true
-          sudo apt-get install -y --fix-missing \
-            libudunits2-dev libgdal-dev libgeos-dev libproj-dev libsqlite3-dev
-
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          extra-repositories: 'https://predictiveecology.r-universe.dev/'
-          Ncpus: 2
-          use-public-rspm: false
-
-      - uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          pak-version: stable
-          # Bump when the stock-Noble libgdal/proj soversion changes (or when
-          # a stale binary cache otherwise refuses to load). Previous cache
-          # (cache-version: 1) had a `terra` binary built against
-          # libgdal.so.37 from the old ubuntugis-unstable PPA; runners now
-          # ship libgdal.so.34 from stock Noble, so the cache must be
-          # invalidated to force a fresh source build.
-          cache-version: 2
-          extra-packages: |
-            any::covr
-
-      - id: covr
-        name: Test coverage
-        continue-on-error: true
-        # Wrap covr in tryCatch so the per-session tempdir's
-        # `test-all.Rout.fail` is dumped to the GHA log _before_ R exits and
-        # the tempdir is cleaned up. Without this, a covr failure surfaces
-        # only as an opaque "Failure in <path>/test-all.Rout.fail" with the
-        # actual failing test names and tracebacks lost.
-        run: |
-          res <- tryCatch(
-            covr::codecov(token = Sys.getenv("CODECOV_TOKEN")),
-            error = function(e) e
-          )
-          if (inherits(res, "error")) {
-            files <- list.files(
-              tempdir(), pattern = "test-all\\.Rout\\.fail$",
-              recursive = TRUE, full.names = TRUE
-            )
-            for (f in files) {
-              cat("==========================================\n")
-              cat("=== ", f, " ===\n", sep = "")
-              cat("==========================================\n")
-              cat(readLines(f, warn = FALSE), sep = "\n")
-              cat("\n")
-            }
-            stop(res)
-          }
-        shell: Rscript {0}
-
-      - if: steps.covr.outcome == 'failure'
-        name: Re-fail the job
-        run: exit 1
+    uses: PredictiveEcology/actions/.github/workflows/test-coverage.yaml@main
+    secrets: inherit
