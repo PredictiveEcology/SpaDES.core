@@ -1,3 +1,9 @@
+# SpaDES.core 3.1.2.9019 (development version)
+
+## Bug fixes
+
+* Module metadata no longer errors "external pointer is not valid" (`moduleMetadata()`, printing `depends(sim)`, etc.) under `terra` >= 1.9-34. `defineModule()` dropped a module-supplied `spatialExtent` (an `if` with no `else`), so every `.moduleDeps` fell back to the class prototype -- a `SpatExtent` built at package-*build* time, whose external pointer is dead in the installed package. `defineModule()` now keeps the module's own extent, `eval()`s the quoted default when the extent is `NA`, and the prototype no longer holds a `terra` object.
+
 # SpaDES.core 3.1.2.9018 (development version)
 
 ## Bug fixes
