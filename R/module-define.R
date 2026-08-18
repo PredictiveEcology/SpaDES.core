@@ -233,16 +233,16 @@ setMethod(
     }
     x$version <- as.numeric_version(x$version)
 
-    x$spatialExtent <- if (!isExtents(x$spatialExtent)) {
-      if (is.null(x$spatialExtent)) {
-        eval(moduleDefaults$extent)
-      } else {
-        if (is.na(x$spatialExtent)) {
-          moduleDefaults$extent
-        } else {
-          ext(x$spatialExtent)
-        }
-      }
+    ## NOTE: the missing `else` here used to drop a module-supplied extent (assigning NULL),
+    ## so `new(".moduleDeps")` fell back to the class prototype -- a `SpatExtent` created at
+    ## package *build* time, whose external pointer is dead once the package is loaded
+    ## (terra >= 1.9-34 errors "external pointer is not valid"). Always keep a live extent.
+    x$spatialExtent <- if (isExtents(x$spatialExtent)) {
+      x$spatialExtent
+    } else if (is.null(x$spatialExtent) || all(is.na(x$spatialExtent))) {
+      eval(moduleDefaults$extent) ## a `quote()`; must be eval'ed to give a `SpatExtent`
+    } else {
+      ext(x$spatialExtent)
     }
 
     x$timeframe <- if (is.null(x$timeframe) || any(is.na(x$timeframe))) {
