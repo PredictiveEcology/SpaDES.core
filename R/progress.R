@@ -2,8 +2,10 @@
 doEvent.progress <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
     ids <- na.omit(match(names(P(sim, module = ".progress")), c("type", "interval")))
+    ## `tu` is used again below, outside this if/else -- bind it here so that
+    ## block cannot reference an unbound variable if the branches change
+    tu <- sim@simtimes[["timeunit"]]
     if (interactive()) {
-      tu <- sim@simtimes[["timeunit"]]
       defaults <- list(type = "text", interval = (end(sim, tu) - start(sim, tu)) / (end(sim, tu) - start(sim, tu)))
 
       # Check whether a .progress is specified in the simList

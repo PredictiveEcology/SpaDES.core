@@ -263,7 +263,12 @@ convertTimeunit <- function(time, unit, envir, skipChecks = FALSE) {
         if (isTRUE(time %% 1 == 0)) {
           if (time[1] < .pkgEnv[["nUnitConversions"]]) {
             if (unit %in% .spadesTimes) {
+              ## the lookup table gives the time in SECONDS; keep the unit
+              ## attribute so the conversion below still runs -- dropping it
+              ## (as.numeric) skipped that block and mislabelled seconds as
+              ## the target unit for any non-second target
               time <- as.numeric(.pkgEnv[["unitConversions"]][time[1] + 1L, attr(time, "unit")])
+              attr(time, "unit") <- timeUnit <- "second"
             }
           }
         }

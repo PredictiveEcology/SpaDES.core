@@ -17,26 +17,26 @@
 #' @param ... Unused.
 #' @rdname deprecated
 experiment <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.project"))
 }
 
 
 #' @export
 #' @rdname deprecated
 experiment2 <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.experiment"))
 }
 
 #' @export
 #' @rdname deprecated
 POM <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.experiment"))
 }
 
 #' @export
 #' @rdname deprecated
 simInitAndExperiment <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.experiment"))
 }
 
 #' @rdname deprecated

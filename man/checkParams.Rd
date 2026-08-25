@@ -17,7 +17,10 @@ checkParams(sim, coreParams, ...)
 \item{...}{Additional arguments. Not implemented.}
 }
 \value{
-Invisibly return \code{TRUE} indicating object exists; \code{FALSE} if not.
+Invisibly returns \code{TRUE} if every parameter supplied is used by a
+module and every parameter a module uses was supplied; \code{FALSE} if
+any are unmatched; and \code{NA} if the simulation has no user modules,
+in which case there is nothing to check.
 Sensible messages are produced identifying missing parameters.
 }
 \description{
