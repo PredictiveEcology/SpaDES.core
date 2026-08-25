@@ -101,6 +101,72 @@ values should be project-relative paths.
 E.g., \code{list(cachePath = "cache", inputPath = "inputs", outputPath = "outputs")}.
 }
 }
+\section{Two ways to use this}{
+
+
+\describe{
+\item{1. Portable -- take the simulation with you}{
+Save everything: the objects, the metadata, and the files behind any
+file-backed objects. Use this to move a simulation to another machine
+or hand it to someone else.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{`saveSimList(sim, "mySim.rds", projectPath = projectPath)`
+
+`projectPath` is the root that everything is stored relative to, so the
+whole thing can be unpacked somewhere else and still resolve. A
+file-backed object is re-rooted on load if it lives under `projectPath`
+or under one of the sim's own paths (`outputPath`, `inputPath`,
+`cachePath`, ...).
+}\if{html}{\out{</div>}}
+
+}
+\item{2. In place -- keep the metadata, leave the files alone}{
+Save the information but not the file bundle, on the assumption you
+still have the paths the run used -- above all \code{outputPath(sim)}.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{`saveSimList(sim, "mySim.rds", projectPath = projectPath, files = FALSE)`
+
+Reload it and use `outputs(sim)` to see what the run wrote, then read
+back whatever you actually need. This is usually the practical choice:
+a real run writes far too many objects to bundle into an archive.
+}\if{html}{\out{</div>}}
+
+}
+}
+}
+
+\examples{
+## ---- 1. Portable: take everything with you ----
+projectPath <- file.path(tempdir(), "myProject")
+outPath <- file.path(projectPath, "outputs")
+dir.create(outPath, recursive = TRUE, showWarnings = FALSE)
+
+sim <- simInit(times = list(start = 0, end = 1, timeunit = "year"),
+               paths = list(outputPath = outPath))
+sim$anObject <- 1:10
+
+saveSimList(sim, file.path(projectPath, "portable.rds"),
+            projectPath = projectPath)
+
+## unpack it anywhere -- pass the new location as projectPath
+sim2 <- loadSimList(file.path(projectPath, "portable.rds"),
+                    projectPath = projectPath)
+sim2$anObject
+
+## ---- 2. In place: metadata only, files stay put ----
+## `files = FALSE` skips bundling; the run's own files are left where
+## they are, and the reloaded simList tells you where to find them
+saveSimList(sim, file.path(projectPath, "inPlace.rds"),
+            projectPath = projectPath, files = FALSE)
+
+sim3 <- loadSimList(file.path(projectPath, "inPlace.rds"),
+                    projectPath = projectPath)
+outputPath(sim3)   # where the run wrote its outputs
+outputs(sim3)      # the manifest of what it wrote
+
+unlink(projectPath, recursive = TRUE)
+
+}
 \seealso{
 \code{\link[=loadSimList]{loadSimList()}}
 }

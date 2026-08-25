@@ -754,7 +754,9 @@ setMethod(
   "copyModule",
   signature = c(from = "character", to = "character", path = "character"),
   definition = function(from, to, path, ...) {
-    if (!dir.exists(to)) {
+    ## test the directory actually being created, not a bare relative name
+    ## resolved against the working directory
+    if (!dir.exists(file.path(path, to))) {
       dir.create(file.path(path, to))
       dir.create(file.path(path, to, "data"))
       dir.create(file.path(path, to, "tests"))
@@ -783,8 +785,10 @@ setMethod(
                         to = file.path(path, to, "data"), ...))
     }
 
-    ## files in "tests" dir
-    ids <- which(basename(dirname(files)) == "test")
+    ## files in "tests" dir -- the directory is `tests`, plural (see the
+    ## dir.create above and the destination below); matching "test" meant a
+    ## file sitting directly in tests/ (e.g. unitTests.R) was never copied
+    ids <- which(basename(dirname(files)) == "tests")
     if (length(ids) > 0) {
       result <- c(result, file.copy(from = files[ids],
                                     to = file.path(path, to, "tests"), ...))

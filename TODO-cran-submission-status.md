@@ -23,11 +23,13 @@ reproducible repo but **not yet submitted**. It does not block SpaDES.core.
 
 ## State of this repo
 
-Branch `development`, last commit `ec079809` (7 days old).
+Branch `development`, last commit `94d4ec86`, pushed 2026-08-25.
 `DESCRIPTION`: **Version 3.2.0, Date 2026-08-24**.
 
-There is **substantial uncommitted release prep**, written 2026-08-24 16:12–16:15.
-It has been reviewed — findings below — and is sound. It is **not committed**.
+The release prep is now **committed and pushed** as `52b83515` ("Prepare 3.2.0
+CRAN release") plus `94d4ec86` (these TODO notes). NAMESPACE equivalence was
+re-verified by parsing both files: 512 directives each, zero differences.
+The table below records what that commit contains.
 
 | file | change | verdict |
 |---|---|---|
@@ -37,7 +39,7 @@ It has been reviewed — findings below — and is sound. It is **not committed*
 | `.Rbuildignore` | `+^TODO.*\.md$` | pairs with the untracked `TODO-defineEvent.md` |
 | `inst/WORDLIST` | +28 | the spell-check step |
 | `NEWS.md` | −250 lines, 3.2.0 section | condensed |
-| `cran-comments.md` | rewritten, **plus my edits** (below) | see below |
+| `cran-comments.md` | rewritten for the post-archival resubmission | see below |
 | untracked `man/dot-restart*.Rd` ×4 | roxygen output for `R/restart.R` | expected |
 | untracked `TODO-defineEvent.md` | design note | build-ignored |
 
@@ -46,7 +48,7 @@ Also verified: all 21 active `getFromNamespace()` re-exports resolve (against
 reproducible 3.2.0**, which is installed in the personal library from the
 `v3.2.0` tag.
 
-### Edits I made to `cran-comments.md` (uncommitted, on top of the above)
+### `cran-comments.md` edits folded into that commit
 
 1. Opening now states `reproducible` **is** back on CRAN as of 2026-08-25 with
    the link, instead of "should be processed after it is back on CRAN".
@@ -79,24 +81,46 @@ The single NOTE has five parts:
   dev installs of the whole ecosystem, since those three entries point at the
   `@development` branches.
 
-## Open question — submission order
+## Submission order — decided
 
-SpaDES.core `Suggests: SpaDES.tools (>= 2.1.1)`, and **SpaDES.tools is still
-archived** (2026-07-13, same cause). That produces the "not in mainstream
-repositories" NOTE.
+**Wait for SpaDES.tools.** Dependency order is
+reproducible → SpaDES.tools → SpaDES.core → SpaDES; submitting SpaDES.tools
+first makes SpaDES.core's "not in mainstream repositories" NOTE disappear.
+(Maintainer's call, 2026-08-25.)
 
-Dependency order is **reproducible → SpaDES.tools → SpaDES.core → SpaDES**.
+⚠️ **You are not SpaDES.tools' maintainer** — `cre` is Alex M Chubaty
+(`achubaty@for-cast.ca`), reasserted deliberately at `7f06f55`. CRAN only
+accepts submissions from the maintainer's address, so the final click is his.
 
-* Submitting SpaDES.tools first makes the NOTE disappear.
-* Submitting SpaDES.core now means explaining the NOTE to a reviewer.
+### SpaDES.tools prep done for him (2026-08-25)
 
-SpaDES.tools is at `2.1.2` on `development` with a **clean working tree**, so it
-may be closer to ready. **This has not been decided.**
+Local branch `release/2.1.3` in `~/GitHub/SpaDES.tools`, commit `1fb61ff`.
+**Not pushed.**
+
+* `CRAN-SUBMISSION` records 2.1.1 as the last submission — **2.1.2 was prepped
+  (`b5f7abb`) but never submitted**, so the last CRAN version is 2.1.1.
+* Version set to **2.1.3**, not 2.1.2. `origin/development` is already public
+  at `2.1.2.9000`, and `2.1.2.9000 > 2.1.2`, so releasing as 2.1.2 would leave
+  everyone tracking `@development` refusing to upgrade.
+* Stripped `Remotes: PredictiveEcology/reproducible@development` (added
+  `1beaaa9` on 2026-08-21 only because reproducible was off CRAN).
+* NEWS `(development version)` → `SpaDES.tools 2.1.3`.
+* `cran-comments.md` rewritten for the post-archival resubmission.
+* Local `R CMD check --as-cran` on the 2.1.3 tarball: **2 NOTEs, both benign**
+  — New submission/archived, and `V8 unavailable` for math rendering (local
+  environment only). No `Remotes` NOTE, and no "Suggests not in mainstream
+  repositories" NOTE: its own deps are all on CRAN.
+
+Still outstanding there: push the branch, CI green, win-builder ×3, and the
+**R-hub sanitizer/valgrind runs** the Rcpp changes warrant (this is not a
+pure-R package, unlike `reproducible`). revdepcheck is a no-op against CRAN —
+both CRAN revdeps (SpaDES.core, SpaDES) are archived — and was last run
+2026-05-16 over the 10 ecosystem packages with 0 new problems.
 
 ## Next steps
 
-1. Decide the order above.
-2. Commit the reviewed prep (it is all sound; nothing is known to be wrong).
+1. ~~Decide the order~~ / ~~commit the prep~~ — both done 2026-08-25.
+2. Get SpaDES.tools submitted (see above) — that gates this package.
 3. Checklist steps 1–3: local `--as-cran` (clean apart from the NOTE), CI green,
    then win-builder ×3. Mac builder is **dead** — `submit.html` serves 200 but
    `/macbuilder/v1/submit` returns 502 on every attempt. R-hub was skipped for
@@ -117,6 +141,16 @@ may be closer to ready. **This has not been decided.**
 
 ## Gotchas worth carrying over
 
+* **A `getFromNamespace()` re-export can import a package you never declared.**
+  `R/reexports.R` assigns at build time, so the *function object* from the other
+  package lands in this namespace, and `R CMD check` attributes its `::` calls
+  to us. `.updateTagsRepo` pulled in `glue::`, which is why CI was red on
+  `ec079809` with `'::' or ':::' import not declared from: 'glue'` — a
+  **WARNING**, so CRAN-blocking. It reproduces only against the *installed*
+  package: `tools:::.check_packages_used(dir = ".")` on the source tree is
+  clean, `tools:::.check_packages_used(package = "SpaDES.core")` is not.
+  Dropping the re-export fixed it; the other 21 were scanned and are clean.
+  Re-scan after adding any re-export.
 * **`gh` is a snap here.** It cannot read files under `/tmp` *or* under hidden
   directories in `$HOME`. Use `--body "$(cat …)"` or stage in a non-hidden dir.
 * **win-builder**: FTP is broken; use the HTTP form. Slot mapping is *not* in

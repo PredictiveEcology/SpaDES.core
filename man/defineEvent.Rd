@@ -24,11 +24,12 @@ remaining unevaluated until that new function is called.}
 \item{moduleName}{Character string of the name of the module. If this function is
 used within a module, then it will try to find the module name.}
 
-\item{envir}{An optional environment to specify where to put the resulting function.
-The default will place a function called \code{doEvent.moduleName.eventName} in the
-module function location, i.e., \code{sim[[dotMods]][[moduleName]]}. However, if this
-location does not exist, then it will place it in the \code{parent.frame()}, with a message.
-Normally, especially, if used within SpaDES module code, this should be left missing.}
+\item{envir}{An optional environment specifying where to put the resulting
+function. The default is the \code{parent.frame()}, i.e. the calling environment,
+which for an interactive user is the global environment. Placing the function
+directly in the module environment (\code{sim[[dotMods]][[moduleName]]}) is not yet
+implemented; it requires \code{defineEvent()} to be integrated into the module
+parsing steps. Until then, \code{defineEvent()} is intended for standalone use.}
 }
 \description{
 There are two ways to define what occurs during an event: defining a function

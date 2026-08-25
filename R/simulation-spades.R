@@ -616,7 +616,9 @@ scheduleConditionalEvent <- function(sim,
         needSort <- FALSE
       }
       if (needSort) {
-        ord <- order(unlist(lapply(sim$._conditionalEvents, function(x) x$eventTime)),
+        ## conditional events carry minEventTime/maxEventTime, not eventTime;
+        ## sorting on a field that does not exist yields NULL and errors
+        ord <- order(unlist(lapply(sim$._conditionalEvents, function(x) x$minEventTime)),
                      unlist(lapply(sim$._conditionalEvents, function(x) x$eventPriority)))
         sim$._conditionalEvents <- sim$._conditionalEvents[ord]
       }
@@ -1235,6 +1237,10 @@ setMethod(
         ##   (`.stepEvent()` = recoverModePre -> doEvent -> recoverModePost, with the
         ##   accumulator on sim@.xData[["._rmo"]]). The same step is intended to drive
         ##   simInit's `.inputObjects` phase.
+        ## the event about to run; a conditional event must not re-fire
+        ## immediately after itself
+        justRan <- if (length(sim@events)) sim@events[[1]]
+
         sim <- .stepEvent(sim, recoverMode, allObjNames,
                           thisSpadesCallRandomStr = thisSpadesCallRandomStr,
                           debug = debug, notOlderThan = notOlderThan,
@@ -1243,13 +1249,34 @@ setMethod(
         ## Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
         if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
           condEventsToOmit <- integer()
+          ## `sim@simtimes[["current"]]` and cond$min/maxEventTime are both in
+          ## seconds. `time(sim)` is in the sim's timeunit, so comparing against
+          ## it never matched for a non-zero minEventTime.
+          curTime <- as.numeric(sim@simtimes[["current"]])
           for (condNum in seq(sim$._conditionalEvents)) {
             cond <- sim$._conditionalEvents[[condNum]]
+            ## never run a conditional event twice in a row: a different event
+            ## must always come between two runs of the same one
+            if (!is.null(justRan) &&
+                identical(cond$moduleName, justRan[["moduleName"]]) &&
+                identical(cond$eventType, justRan[["eventType"]]))
+              next
             if (isTRUE(eval(cond$condition))) {
-              curTime <- time(sim)
-              if (curTime >= cond$minEventTime && curTime <= cond$maxEventTime) {
-                message("  Conditional Event -- ", cond$condition, " is true. Scheduling for now")
-                sim <- scheduleEvent(sim, eventTime = curTime, moduleName = cond$moduleName,
+              if (curTime <= as.numeric(cond$maxEventTime)) {
+                ## a conditional event jumps the queue: scheduling at the
+                ## current time puts it at the head, so it can run immediately
+                ## on becoming true. The `justRan` skip above is what stops it
+                ## doing that twice in a row.
+                schedTime <- if (curTime < as.numeric(cond$minEventTime)) {
+                  ## not into the window yet -- run at the start of it
+                  as.numeric(cond$minEventTime)
+                } else {
+                  curTime
+                }
+                attr(schedTime, "unit") <- "second"
+                message("  Conditional Event -- ", cond$condition,
+                        " is true. Scheduling.")
+                sim <- scheduleEvent(sim, eventTime = schedTime, moduleName = cond$moduleName,
                                      eventType = cond$eventType, eventPriority = cond$eventPriority)
                 condEventsToOmit <- c(condEventsToOmit, condNum)
               }
@@ -2367,11 +2394,12 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #' @param code An expression that defines the code to execute during the event. This will
 #'    be captured, and pasted into a new function (`doEvent.moduleName.eventName`),
 #'    remaining unevaluated until that new function is called.
-#' @param envir An optional environment to specify where to put the resulting function.
-#'     The default will place a function called `doEvent.moduleName.eventName` in the
-#'     module function location, i.e., `sim[[dotMods]][[moduleName]]`. However, if this
-#'     location does not exist, then it will place it in the `parent.frame()`, with a message.
-#'     Normally, especially, if used within SpaDES module code, this should be left missing.
+#' @param envir An optional environment specifying where to put the resulting
+#'     function. The default is the `parent.frame()`, i.e. the calling environment,
+#'     which for an interactive user is the global environment. Placing the function
+#'     directly in the module environment (`sim[[dotMods]][[moduleName]]`) is not yet
+#'     implemented; it requires `defineEvent()` to be integrated into the module
+#'     parsing steps. Until then, `defineEvent()` is intended for standalone use.
 #' @export
 #' @seealso [defineModule()], [simInit()], [scheduleEvent()]
 #' @examples
@@ -2416,22 +2444,15 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
                         envir = parent.frame()) {
   code <- substitute(code)
-  curMod <- currentModule(sim)
   if (is.null(moduleName))
     moduleName <- currentModule(sim)
 
-  useSimModsEnv <- FALSE
-  if (missing(envir)) {
-    if (is.null(moduleName)) {
-      if (length(curMod) > 0) {
-        useSimModsEnv <- TRUE
-      }
-    } else {
-      if (exists(moduleName, sim[[dotMods]], inherits = FALSE))
-        useSimModsEnv <- TRUE
-    }
-    # envir <- if (useSimModsEnv) sim[[dotMods]][[moduleName]] else parent.frame()
-  }
+  ## TODO: placing the event function in `sim[[dotMods]][[moduleName]]` is not
+  ##   implemented yet -- it needs `defineEvent()` woven into `.parseModule()` and
+  ##   the rest of the `.parse*` family, which is where the module environment is
+  ##   actually available. Until then this is standalone-only: the function is
+  ##   always assigned into `envir` (`parent.frame()` by default) and always
+  ##   recorded in the registry below, so the event loop can find it.
 
   eventFnName <-  makeEventFn(moduleName, eventName)
   fn <- defineEventFnMaker(substitute(code), eventFnName)
@@ -2445,13 +2466,11 @@ defineEvent <- function(sim, eventName = "init", code, moduleName = NULL,
   # ")
 
   parsedFn <- parse(text = fn)
-  if (!useSimModsEnv) {
-    if (is.null(sim@.xData[[eventFnElementEnvir()]])) {
-      sim@.xData[[eventFnElementEnvir()]] <- new.env(parent = asNamespace("SpaDES.core"))
-    }
-    sim@.xData[[eventFnElementEnvir()]][[eventFnName]] <- list(envir = envir,
-                                                               digest = .robustDigest(parsedFn))
+  if (is.null(sim@.xData[[eventFnElementEnvir()]])) {
+    sim@.xData[[eventFnElementEnvir()]] <- new.env(parent = asNamespace("SpaDES.core"))
   }
+  sim@.xData[[eventFnElementEnvir()]][[eventFnName]] <- list(envir = envir,
+                                                             digest = .robustDigest(parsedFn))
 
   assign(eventFnName, eval(parsedFn, envir = new.env(parent = asNamespace("SpaDES.core"))),
          envir = envir)

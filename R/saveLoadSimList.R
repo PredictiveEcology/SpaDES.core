@@ -15,6 +15,34 @@
 #' The user does not need to specify the filename any differently,
 #' as the code will search based on the filename without the file extension.
 #'
+#' @section Two ways to use this:
+#'
+#' \describe{
+#'   \item{1. Portable -- take the simulation with you}{
+#'     Save everything: the objects, the metadata, and the files behind any
+#'     file-backed objects. Use this to move a simulation to another machine
+#'     or hand it to someone else.
+#'
+#'     `saveSimList(sim, "mySim.rds", projectPath = projectPath)`
+#'
+#'     `projectPath` is the root that everything is stored relative to, so the
+#'     whole thing can be unpacked somewhere else and still resolve. A
+#'     file-backed object is re-rooted on load if it lives under `projectPath`
+#'     or under one of the sim's own paths (`outputPath`, `inputPath`,
+#'     `cachePath`, ...).
+#'   }
+#'   \item{2. In place -- keep the metadata, leave the files alone}{
+#'     Save the information but not the file bundle, on the assumption you
+#'     still have the paths the run used -- above all `outputPath(sim)`.
+#'
+#'     `saveSimList(sim, "mySim.rds", projectPath = projectPath, files = FALSE)`
+#'
+#'     Reload it and use `outputs(sim)` to see what the run wrote, then read
+#'     back whatever you actually need. This is usually the practical choice:
+#'     a real run writes far too many objects to bundle into an archive.
+#'   }
+#' }
+#'
 #' @details
 #' There is a family of 2 functions that are mutually useful for saving and
 #' loading `simList` objects and their associated files (e.g., file-backed
@@ -77,6 +105,37 @@
 #' Invoked for side effects of saving both a `.qs2` (or `.rds`) file,
 #' and a compressed archive (one of `.tar.gz` if using non-Windows OS or `.zip` on Windows).
 #'
+#' @examples
+#' ## ---- 1. Portable: take everything with you ----
+#' projectPath <- file.path(tempdir(), "myProject")
+#' outPath <- file.path(projectPath, "outputs")
+#' dir.create(outPath, recursive = TRUE, showWarnings = FALSE)
+#'
+#' sim <- simInit(times = list(start = 0, end = 1, timeunit = "year"),
+#'                paths = list(outputPath = outPath))
+#' sim$anObject <- 1:10
+#'
+#' saveSimList(sim, file.path(projectPath, "portable.rds"),
+#'             projectPath = projectPath)
+#'
+#' ## unpack it anywhere -- pass the new location as projectPath
+#' sim2 <- loadSimList(file.path(projectPath, "portable.rds"),
+#'                     projectPath = projectPath)
+#' sim2$anObject
+#'
+#' ## ---- 2. In place: metadata only, files stay put ----
+#' ## `files = FALSE` skips bundling; the run's own files are left where
+#' ## they are, and the reloaded simList tells you where to find them
+#' saveSimList(sim, file.path(projectPath, "inPlace.rds"),
+#'             projectPath = projectPath, files = FALSE)
+#'
+#' sim3 <- loadSimList(file.path(projectPath, "inPlace.rds"),
+#'                     projectPath = projectPath)
+#' outputPath(sim3)   # where the run wrote its outputs
+#' outputs(sim3)      # the manifest of what it wrote
+#'
+#' unlink(projectPath, recursive = TRUE)
+#'
 #' @aliases saveSim
 #' @export
 #' @importFrom fs path_common
@@ -116,8 +175,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
   # clean up misnamed arguments
   if (!is.null(dots$fileBackedDir)) {
-    if (is.null(filebackedDir)) {
-      filebackedDir <- dots$fileBackedDir
+    ## `filebackedDir` is not a formal of this function; referring to it bare
+    ## errored with "object 'filebackedDir' not found" instead of normalising
+    ## the misspelling. Mirror the filebackend/fileBackend block below.
+    if (is.null(dots$filebackedDir)) {
+      dots$filebackedDir <- dots$fileBackedDir
       dots$fileBackedDir <- NULL
     }
   }
@@ -170,8 +232,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
   ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
   ## does not abort the entire save; failed objects are saved as NULL with a warning.
-  sim <- .wrapResiliently(sim)
-  sim <- .wrap(sim, cachePath = NULL, paths = paths(sim)) # wrap remaining / non-file-backed
+  sim <- .wrapResiliently(sim, projectPath = projectPath)
+  ## wrap remaining / non-file-backed; `projectPath` is offered as an anchor so a
+  ## file-backed object that sits under it -- but under none of the sim's named
+  ## paths -- can still be re-rooted on load instead of silently becoming NULL
+  sim <- .wrap(sim, cachePath = NULL, paths = .wrapAnchors(sim, projectPath))
   sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
@@ -263,7 +328,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       allFns <- na.omit(allFns)
 
       relFns <- makeRelative(c(fileToDelete, lazyDbExisting, allFns), projectPath) |> unname()
-      archiveWrite(filename, relFns, verbose)
+      archiveWrite(filename, relFns, verbose, projectPath = projectPath)
       unlink(fileToDelete)
       unlink(lazyDbExisting)
     }
@@ -327,7 +392,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
       relFns <- makeRelative(c(fileToDelete, allFns), projectPath) |> unname()
 
-      archiveWrite(filename, relFns, verbose)
+      archiveWrite(filename, relFns, verbose, projectPath = projectPath)
 
       unlink(fileToDelete)
     }
@@ -457,7 +522,9 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
       if (identical(projectPath, getwd())) {
         pths <- paths(tmpsim)
       } else {
-        pths <- list(projectPath = projectPath)
+        ## include the sim's own paths too, so an object anchored to a named
+        ## path (e.g. outputPath) still resolves, not just projectPath ones
+        pths <- c(paths(tmpsim), list(projectPath = projectPath))
       }
 
       newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
@@ -718,13 +785,31 @@ recoverDataTableFromQs <- function(sim) {
   out
 }
 
+## Anchors offered to .wrap()/.unwrap() when deciding what a file-backed
+## object's location should be recorded relative to. reproducible's
+## relativeToWhat() sorts anchors longest-path-first and takes the first that is
+## a prefix, so adding the (usually outermost) projectPath never displaces a
+## more specific anchor such as outputPath -- it only catches files that would
+## otherwise have no anchor at all.
+.wrapAnchors <- function(sim, projectPath = NULL) {
+  anchors <- paths(sim)
+  ## reproducible already appends `getwd = getwd()` as a final anchor, so only
+  ## add projectPath when it is a DIFFERENT directory. Adding it when they are
+  ## the same creates two anchors for one directory and which name wins becomes
+  ## order-dependent, changing the paths recorded for file-backed objects.
+  if (!is.null(projectPath) && nzchar(projectPath) &&
+      !identical(normPath(projectPath), normPath(getwd())))
+    anchors <- c(anchors, list(projectPath = projectPath))
+  anchors
+}
+
 ## Pre-wrap each file-backed object in sim@.xData individually so that one
 ## inaccessible backing file does not abort saveSimList. Failed objects are
 ## replaced with NULL and a warning is issued; the subsequent monolithic
 ## .wrap(sim, ...) then succeeds on the remaining objects.
-.wrapResiliently <- function(sim) {
+.wrapResiliently <- function(sim, projectPath = NULL) {
   nms <- ls(sim@.xData, all.names = FALSE)
-  simPaths <- paths(sim)
+  simPaths <- .wrapAnchors(sim, projectPath)
   for (nm in nms) {
     obj <- sim@.xData[[nm]]
     fns <- tryCatch(Filenames(obj), error = function(e) character(0))
@@ -834,8 +919,20 @@ archiveExtract <- function(archiveName, exdir) {
   filename
 }
 
-archiveWrite <- function(archiveName, relFns, verbose) {
+archiveWrite <- function(archiveName, relFns, verbose, projectPath = getwd()) {
   relFns <- unname(relFns)
+
+  ## `relFns` are relative to `projectPath`. Both archive::archive_write_files()
+  ## and zip() resolve relative paths against the working directory, and store
+  ## them in the archive as given -- so we have to be sitting in `projectPath`
+  ## while writing, or the paths neither resolve nor land in the archive with
+  ## the right internal structure. `archiveName` is made absolute first so it
+  ## still points at the same file once we have moved.
+  archiveName <- fs::path_abs(archiveName) |> as.character()
+  if (!identical(fs::path_norm(projectPath), fs::path_norm(getwd()))) {
+    owd <- setwd(projectPath)
+    on.exit(setwd(owd), add = TRUE)
+  }
 
   if (requireNamespace("archive") && !isWindows()) {
     archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
