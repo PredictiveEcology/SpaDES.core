@@ -73,6 +73,7 @@ Suggests:
     raster (>= 2.5-8),
     rmarkdown,
     roxygen2,
+    rprojroot,
     RSQLite,
     rstudioapi,
     sp,
