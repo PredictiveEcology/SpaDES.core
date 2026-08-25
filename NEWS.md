@@ -1,32 +1,4 @@
-# SpaDES.core 3.1.2.9020 (development version)
-
-## Bug fixes
-
-* `canonicalize_ggplot()` (a.k.a. `strip_ggplot_metadata()`), which builds the data-free digest used by `Plots(useCache = TRUE)`, ignored several parts of a plot, so plots differing only in those ways hashed identically and a needed replot was skipped: `facet_grid()` variables (stored in `params$rows`/`params$cols`, not `params$facets`); `coord_*(xlim=/ylim=)` limits (a list holding `NULL`s, which the simple-field filter rejected wholesale); the entire theme (`theme_bw()` vs `theme_classic()`, `theme(legend.position=)`, `unit()`-valued elements -- theme values are bare scalars, classed vectors, or, as of ggplot2 4.0, S7 objects holding their properties in attributes, none of which have `names()`); `position_*()` parameters such as `position_jitter(width=)`; and layer data inherited from the plot (held as `waiver()`, not `NULL`, so it was hashed as a constant rather than as the plot data). Scale transformations are now read via `get_transformation()` where available (ggplot2 >= 3.5.0), falling back to the `trans` field. A test matrix in `test-Plots.R` covers 21 single-difference plot pairs and 4 identical-plot pairs. Because the digest now covers more of the plot, cached figures from earlier versions will be redrawn once.
-
-# SpaDES.core 3.1.2.9019 (development version)
-
-## Bug fixes
-
-* Module metadata no longer errors "external pointer is not valid" (`moduleMetadata()`, printing `depends(sim)`, etc.) under `terra` >= 1.9-34. `defineModule()` dropped a module-supplied `spatialExtent` (an `if` with no `else`), so every `.moduleDeps` fell back to the class prototype -- a `SpatExtent` built at package-*build* time, whose external pointer is dead in the installed package. `defineModule()` now keeps the module's own extent, `eval()`s the quoted default when the extent is `NA`, and the prototype no longer holds a `terra` object.
-
-# SpaDES.core 3.1.2.9018 (development version)
-
-## Bug fixes
-
-* `simInit()` / `spades()` no longer error "the condition has length > 1" when `debug` is passed as a multi-element list (e.g. `list(file = list(...), debug = 1)`). `debugToVerbose()` was returning a per-element vector, but `verbose` is consumed as a scalar downstream -- notably `simInit()` does `setPaths(silent = verbose <= 0)`, plus six other scalar-`verbose` call sites -- so `if (!silent)` errored on a length-2 condition. `debugToVerbose()` now reduces to a single verbosity level (the highest requested). Added a regression test that exercises the `simInit()` -> `setPaths()` path; the existing `debug = list` tests only used `spades()` on a pre-initialised sim, so never hit it. (#322)
-
-* The `.inputObjects` runner (`.runModuleInputObjects()`) no longer errors "'list' object cannot be coerced to type 'double'" during `simInit()` when `debug` is a list, and no longer suppresses the default `.inputObjects` / module-code-check messages. Its message-level expression `ifelse(debug < 1, debug + 1, debug)` cannot coerce a list; it now bumps only *numeric and logical* `debug` -- preserving the historical `FALSE -> 1` bump that enables those messages under the default `debug = FALSE` -- and passes list/character `debug` through untouched. (A bare `!is.numeric()` guard would fix the list crash but silently drop the logical case, which regressed `test-timeunits.R` / `test-userSuppliedObjs.R`.) The #322 regression test now also drives `simInitAndSpades()` under a list `debug`. (#322)
-
-* `saveSimList()` no longer errors with "undefined columns selected" when `outputs(sim)` has rows. The saved-outputs filter was indexing the `outputs` `data.frame` by column instead of row (missing comma).
-
-# SpaDES.core 3.1.2.9015 (development version)
-
-## Bug fixes
-
-* Archive-extraction (and other cli C-level) progress bars no longer flood the log during `simInit()`/`spades()`. On a dynamic terminal the bar stays on a single in-place line (prefix included); on a non-dynamic sink it is throttled to one line per `spades.progressInterval`. Detection is unanchored so frames already carrying a Date-Time-Module prefix (nested handlers) are caught.
-
-# SpaDES.core 3.1.2.9014 (development version)
+# SpaDES.core 3.2.0
 
 ## New features
 
@@ -44,6 +16,77 @@
   explicit user-set `reproducible.fileBackedAnchors` is always respected.
   Requires `reproducible` with `fileBackedAnchors` support.
 
+* If setting up a simulation fails partway through, you no longer have to start
+  over. After fixing the module that caused the error, call `restartSpades()` (or
+  the new `restartSimInit()`) and it picks up where it left off instead of redoing
+  everything. This is on by default. See `?restartSimInit`.
+
+  To add this, rather than building a separate restart mechanism for setup, we
+  reworked setting up a simulation so its steps run as events, the same way a
+  running simulation does. That let recovery reuse the same mechanism
+  `restartSpades()` already uses. `restartSimInit()` remains as the entry point
+  for the setup case (and `restartSpades()` hands off to it automatically),
+  because, unlike a running simulation, setup cannot simply be resumed in place.
+
+* During a simulation, SpaDES.core now keeps a record of every file or web
+  address (URL) that modules download (through `prepInputs()` or
+  `preProcess()`), and tags each one with the module and event that asked for
+  it. This makes it easy to see where a simulation's input data came from. It is
+  on by default; turn it off with `options(spades.urlLog = FALSE)`. See
+  `?spadesOptions`.
+
+The following changes are all to the module code checker, which warns module
+authors about likely mistakes in their module's R code. See `?codeCheckModule`.
+
+* You can now tell the code checker to ignore a particular warning. A module
+  author can add a `# nolint` comment (or `# nolint: <rule_id>` for one specific
+  check) to a line of module code; a user can set
+  `options(spades.codeChecksIgnore = list(<rule_id> = c("objectName", ...)))`;
+  and `options(spades.moduleCodeChecks = list(disable = ...))` now also works.
+
+* New checks on a module's declared package list (`reqdPkgs`): a warning when a
+  package is listed more than once (especially with a conflicting source or
+  version), when a module calls `package::function()` for a package it never
+  declared, and (best-effort, informational) when a bare function call has no
+  obvious source among the declared packages.
+
+* `# nolint: vars a, b` lets an author promise that objects `a` and `b` are
+  created on a line where the names cannot be seen automatically (for example
+  `list2env(someList, envir(sim))`), so they are not wrongly flagged as
+  declared-but-unused outputs.
+
+* The checker now recognises `paramCheckOtherMods(sim, "x")` as a use of
+  parameter `"x"`.
+
+* New `codeCheckModules()` checks several modules for coding problems in one
+  call. With no arguments, it checks every module in your project's module
+  folder (the `spades.modulePath` option). It is the bulk version of
+  `codeCheckModule()`, which checks a single module. See `?codeCheckModule`.
+
+## Enhancements
+
+* `restartSpades()` (which resumes a simulation that was interrupted) now
+  remembers the `events` filter from the original `spades()` call, so the
+  resumed run repeats the same subset of events instead of running everything.
+  Supply a new `events` argument to `restartSpades()` to override it. See
+  `?restartSpades`.
+
+* The code-check report now groups repeats of the same issue under one heading,
+  with one line per location, instead of repeating the full message every time.
+
+* Each finding is now tagged with its check name (e.g.
+  `[conflicting_fn_unqualified]`) so it can be pasted straight into a `# nolint`
+  comment or the `spades.codeChecksIgnore` option. The broader group name (e.g.
+  `globals`) is also accepted there.
+
+* Clearer guidance for the `unresolved_accessor` warning: it now explains that
+  some dynamic ways of reading objects (e.g. `get()`/`mget()` or
+  `sim[[<variable>]]`) cannot be checked automatically, and how to acknowledge
+  them with `# nolint`.
+
+* Every suggestion now ends by telling you exactly how to silence the finding
+  if it is intentional, instead of a vague "otherwise ignore".
+
 ## Behaviour changes
 
 * **`spades.moduleCodeChecks` now defaults to `FALSE`** -- module code checks no
@@ -53,7 +96,30 @@
   `simInit()` required. To restore the old in-`simInit()` checking, set
   `options(spades.moduleCodeChecks = TRUE)` (or a named list of toggles). Docs in
   `?spadesOptions` and the package overview updated accordingly.
+
+## Dependency changes
+
+* `simInit` no longer installs (or loads) the **`box`** package. `box` does not
+  work well within the `SpaDES` ecosystem, so the default for the
+  `spades.reqdPkgsDontLoad` option is now `NULL` (was `"box"`), and the unused,
+  unimplemented `spades.useBox` option and its associated (disabled) `box::use`
+  machinery have been removed. The generic `spades.reqdPkgsDontLoad` mechanism --
+  install a package but do not `library()`/`require()` it -- is retained for any
+  package a user explicitly lists.
+
 ## Bug fixes
+
+* `canonicalize_ggplot()` (a.k.a. `strip_ggplot_metadata()`), which builds the data-free digest used by `Plots(useCache = TRUE)`, ignored several parts of a plot, so plots differing only in those ways hashed identically and a needed replot was skipped: `facet_grid()` variables (stored in `params$rows`/`params$cols`, not `params$facets`); `coord_*(xlim=/ylim=)` limits (a list holding `NULL`s, which the simple-field filter rejected wholesale); the entire theme (`theme_bw()` vs `theme_classic()`, `theme(legend.position=)`, `unit()`-valued elements -- theme values are bare scalars, classed vectors, or, as of ggplot2 4.0, S7 objects holding their properties in attributes, none of which have `names()`); `position_*()` parameters such as `position_jitter(width=)`; and layer data inherited from the plot (held as `waiver()`, not `NULL`, so it was hashed as a constant rather than as the plot data). Scale transformations are now read via `get_transformation()` where available (ggplot2 >= 3.5.0), falling back to the `trans` field. A test matrix in `test-Plots.R` covers 21 single-difference plot pairs and 4 identical-plot pairs. Because the digest now covers more of the plot, cached figures from earlier versions will be redrawn once.
+
+* Module metadata no longer errors "external pointer is not valid" (`moduleMetadata()`, printing `depends(sim)`, etc.) under `terra` >= 1.9-34. `defineModule()` dropped a module-supplied `spatialExtent` (an `if` with no `else`), so every `.moduleDeps` fell back to the class prototype -- a `SpatExtent` built at package-*build* time, whose external pointer is dead in the installed package. `defineModule()` now keeps the module's own extent, `eval()`s the quoted default when the extent is `NA`, and the prototype no longer holds a `terra` object.
+
+* `simInit()` / `spades()` no longer error "the condition has length > 1" when `debug` is passed as a multi-element list (e.g. `list(file = list(...), debug = 1)`). `debugToVerbose()` was returning a per-element vector, but `verbose` is consumed as a scalar downstream -- notably `simInit()` does `setPaths(silent = verbose <= 0)`, plus six other scalar-`verbose` call sites -- so `if (!silent)` errored on a length-2 condition. `debugToVerbose()` now reduces to a single verbosity level (the highest requested). Added a regression test that exercises the `simInit()` -> `setPaths()` path; the existing `debug = list` tests only used `spades()` on a pre-initialised sim, so never hit it. (#322)
+
+* The `.inputObjects` runner (`.runModuleInputObjects()`) no longer errors "'list' object cannot be coerced to type 'double'" during `simInit()` when `debug` is a list, and no longer suppresses the default `.inputObjects` / module-code-check messages. Its message-level expression `ifelse(debug < 1, debug + 1, debug)` cannot coerce a list; it now bumps only *numeric and logical* `debug` -- preserving the historical `FALSE -> 1` bump that enables those messages under the default `debug = FALSE` -- and passes list/character `debug` through untouched. (A bare `!is.numeric()` guard would fix the list crash but silently drop the logical case, which regressed `test-timeunits.R` / `test-userSuppliedObjs.R`.) The #322 regression test now also drives `simInitAndSpades()` under a list `debug`. (#322)
+
+* `saveSimList()` no longer errors with "undefined columns selected" when `outputs(sim)` has rows. The saved-outputs filter was indexing the `outputs` `data.frame` by column instead of row (missing comma).
+
+* Archive-extraction (and other cli C-level) progress bars no longer flood the log during `simInit()`/`spades()`. On a dynamic terminal the bar stays on a single in-place line (prefix included); on a non-dynamic sink it is throttled to one line per `spades.progressInterval`. Detection is unanchored so frames already carrying a Date-Time-Module prefix (nested handlers) are caught.
 
 * **archive/pak progress flood still leaked through on Windows.** `.isCliProgressTick()`
   recognised a C-level progress frame by its leading Braille spinner glyph, but
@@ -64,8 +130,6 @@
   the Braille block (`useBytes = TRUE`) so it is also immune to the message's
   Encoding mark / a non-UTF-8 locale (where a code-point class can silently fail
   to match). (Follow-up to the earlier non-dynamic throttle fix.)
-
-## Bug fixes
 
 * **Event (`init`, etc.) `cacheId` is now stable across machines/OSs**, so cloud
   caching of events can be shared (e.g. Linux <-> Windows). The module's absolute
@@ -79,10 +143,6 @@
   unaffected (it uses the basename and excludes the event queue). One-time
   `cacheId` shift for events. Same cross-OS rationale as the earlier
   parameter-definition-table and `desc`-column removals.
-
-# SpaDES.core 3.1.2.9011 (development version)
-
-## Bug fixes
 
 * **Progress-bar flood from `archive::archive_extract()`** (e.g. via
   `prepInputs()`) inside a module is now throttled on Windows and other
@@ -100,22 +160,6 @@
   `getOption("spades.progressInterval", 2)` seconds. The same path covers other
   C-level cli progress bars routed through the handler.
 
-# SpaDES.core 3.1.2.9010 (development version)
-
-## Dependency changes
-
-* `simInit` no longer installs (or loads) the **`box`** package. `box` does not
-  work well within the `SpaDES` ecosystem, so the default for the
-  `spades.reqdPkgsDontLoad` option is now `NULL` (was `"box"`), and the unused,
-  unimplemented `spades.useBox` option and its associated (disabled) `box::use`
-  machinery have been removed. The generic `spades.reqdPkgsDontLoad` mechanism --
-  install a package but do not `library()`/`require()` it -- is retained for any
-  package a user explicitly lists.
-
-# SpaDES.core 3.1.2.9009 (development version)
-
-## Bug fixes
-
 * The module **parameter-definition table** (`defineParameter` defaults/min/max/class)
   is no longer included in the `.useCache` cacheId for `.inputObjects`/events. Only
   the resolved parameter *values* (digested separately) affect caching now. Including
@@ -128,10 +172,6 @@
   once** (a one-time recompute), after which identical runs across machines share a
   cache as intended.
 
-# SpaDES.core 3.1.2.9008 (development version)
-
-## Bug fixes
-
 * `simInit(objects = ...)` again loads *all* user-supplied objects when
   `options(spades.allowInitDuringSimInit = TRUE)` (as set by some
   `SpaDES.project::setupProject()` configurations). A regression in the
@@ -140,6 +180,7 @@
   via `objects = list(...)` -- and every object when no module declares them.
   The intended behaviour (don't let user inputs clobber objects an init produced
   during `simInit`) is preserved via `objectsToUseUpdatesFromPrevInits()`.
+
 * `.useCacheArgs` entries on the `.inputObjects` path are now evaluated at the
   splice site, in the module's context (`sim@current` is the module being
   processed), matching the event path in `.runEvent()`. Previously a quoted
@@ -193,10 +234,6 @@
   string literals against module function names. Package functions remain out of
   scope; their changes are tracked via `reqdPkgs`.
 
-# SpaDES.core 3.1.2.9005 (development version)
-
-## Bug fixes
-
 * Progress bars routed through the message handler (e.g. from
   `archive::archive_extract()` during `prepInputs()`) are now throttled in
   non-interactive sessions too. Previously, progress ticks were only recognised
@@ -216,118 +253,27 @@
   because the default empty dependency list (`list(NULL)`) was iterated by
   `updateParamsFromGlobals()`.
 
-# SpaDES.core 3.1.2.9004 (development version)
-
-## New features
-
-* If setting up a simulation fails partway through, you no longer have to start
-  over. After fixing the module that caused the error, call `restartSpades()` (or
-  the new `restartSimInit()`) and it picks up where it left off instead of redoing
-  everything. This is on by default. See `?restartSimInit`.
-
-  To add this, rather than building a separate restart mechanism for setup, we
-  reworked setting up a simulation so its steps run as events, the same way a
-  running simulation does. That let recovery reuse the same mechanism
-  `restartSpades()` already uses. `restartSimInit()` remains as the entry point
-  for the setup case (and `restartSpades()` hands off to it automatically),
-  because, unlike a running simulation, setup cannot simply be resumed in place.
-
-# SpaDES.core 3.1.2.9003 (development version)
-
-## New features
-
-* During a simulation, SpaDES.core now keeps a record of every file or web
-  address (URL) that modules download (through `prepInputs()` or
-  `preProcess()`), and tags each one with the module and event that asked for
-  it. This makes it easy to see where a simulation's input data came from. It is
-  on by default; turn it off with `options(spades.urlLog = FALSE)`. See
-  `?spadesOptions`.
-
-## Enhancements
-
-* `restartSpades()` (which resumes a simulation that was interrupted) now
-  remembers the `events` filter from the original `spades()` call, so the
-  resumed run repeats the same subset of events instead of running everything.
-  Supply a new `events` argument to `restartSpades()` to override it. See
-  `?restartSpades`.
-
-## Bug fixes
-
 * Fixed a plotting test that could fail when the test suite was run more than
   once in the same R session: the tests had been writing their figures to one
   shared folder, so leftover files from one test could be mistaken for
   another's. Each test now writes to its own folder. (Test-only change; no
   effect on the package itself.)
 
-# SpaDES.core 3.1.2.9002 (development version)
-
-These changes are all to the module code checker, which warns module authors
-about likely mistakes in their module's R code. See `?codeCheckModule`.
-
-## New features
-
-* You can now tell the code checker to ignore a particular warning. A module
-  author can add a `# nolint` comment (or `# nolint: <rule_id>` for one specific
-  check) to a line of module code; a user can set
-  `options(spades.codeChecksIgnore = list(<rule_id> = c("objectName", ...)))`;
-  and `options(spades.moduleCodeChecks = list(disable = ...))` now also works.
-* New checks on a module's declared package list (`reqdPkgs`): a warning when a
-  package is listed more than once (especially with a conflicting source or
-  version), when a module calls `package::function()` for a package it never
-  declared, and (best-effort, informational) when a bare function call has no
-  obvious source among the declared packages.
-* `# nolint: vars a, b` lets an author promise that objects `a` and `b` are
-  created on a line where the names cannot be seen automatically (for example
-  `list2env(someList, envir(sim))`), so they are not wrongly flagged as
-  declared-but-unused outputs.
-* The checker now recognises `paramCheckOtherMods(sim, "x")` as a use of
-  parameter `"x"`.
-
-## Enhancements
-
-* The code-check report now groups repeats of the same issue under one heading,
-  with one line per location, instead of repeating the full message every time.
-* Each finding is now tagged with its check name (e.g.
-  `[conflicting_fn_unqualified]`) so it can be pasted straight into a `# nolint`
-  comment or the `spades.codeChecksIgnore` option. The broader group name (e.g.
-  `globals`) is also accepted there.
-* Clearer guidance for the `unresolved_accessor` warning: it now explains that
-  some dynamic ways of reading objects (e.g. `get()`/`mget()` or
-  `sim[[<variable>]]`) cannot be checked automatically, and how to acknowledge
-  them with `# nolint`.
-* Every suggestion now ends by telling you exactly how to silence the finding
-  if it is intentional, instead of a vague "otherwise ignore".
-
-## Bug fixes
-
 * Fewer false alarms: the "input has no default" check no longer fires when the
   input is handled with a `suppliedElsewhere("x", sim)` guard, nor when it is
   asserted with `# nolint: vars`.
+
 * `params(sim)[[currentModule(sim)]]$x` is now correctly understood as a
   parameter of the current module, instead of being flagged as unresolved.
+
 * No more false "declared but unused" warnings when an output is assigned inside
   a function wrapped by `compiler::cmpfun()` or `Cache()`; the checker now looks
   through such wrappers. Objects read inside anonymous callbacks (e.g.
   `lapply(x, function(i) sim[[i]])`) are also no longer misattributed.
 
-# SpaDES.core 3.1.2.9001 (development version)
-
-## New features
-
-* New `codeCheckModules()` checks several modules for coding problems in one
-  call. With no arguments, it checks every module in your project's module
-  folder (the `spades.modulePath` option). It is the bulk version of
-  `codeCheckModule()`, which checks a single module. See `?codeCheckModule`.
-
-## Bug fixes
-
 * The code check that flags giving an object the same name as a module
   (`sim$<moduleName> <- ...`) now gives a clearer message, explaining that this
   name clash can cause hard-to-find problems.
-
-# SpaDES.core 3.1.2.9000 (development version)
-
-## Bug fixes
 
 * SpaDES.core again loads cleanly when no cache location has been set. Recent
   development versions of `reproducible` leave the cache location (the
