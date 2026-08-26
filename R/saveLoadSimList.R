@@ -505,7 +505,13 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
 
   ## TODO: figure out what is inserting 'NA' into some paths during saveSimList
-  paths(tmpsim) <- paths(tmpsim) |>
+  ## Assign the slot directly: at this point the sim still carries the *relative*
+  ## paths it was serialized with ("cache", "inputs", ...), and `paths<-` ends
+  ## with checkPath(sim@paths$cachePath, create = TRUE), which would create a
+  ## stray `cache/` in the caller's working directory. The very next assignment
+  ## absolutizes them and goes through `paths<-`, so the directories that should
+  ## exist are still created -- under projectPath, where they belong.
+  tmpsim@paths <- paths(tmpsim) |>
     # sapply(function(pth) {
     #   if (fs::path_has_parent(pth, "NA")) {
     #     gsub("NA/", "./", pth) |> fs::path_norm() |> as.character()
