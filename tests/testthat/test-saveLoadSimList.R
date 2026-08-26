@@ -353,3 +353,89 @@ test_that("mode 1 (portable): a sim moved to a new location keeps its file-backe
   expect_true(inherits(out$r, "SpatRaster"))
   expect_equal(as.numeric(terra::values(out$r)), as.numeric(seq_len(400)))
 })
+
+## Anchoring of file-backed objects: which directories a backing file can be
+## re-rooted against on load, and saying so at save time when there are none.
+## See #389.
+
+simWithFileBacked <- function(base, objDir, pathsList) {
+  dir.create(objDir, recursive = TRUE, showWarnings = FALSE)
+  f <- file.path(objDir, "r.tif")
+  terra::writeRaster(terra::rast(nrows = 8, ncols = 8, vals = 1:64), f, overwrite = TRUE)
+  sim <- simInit(times = list(start = 0, end = 1, timeunit = "year"), paths = pathsList)
+  sim$r <- terra::rast(f)
+  sim
+}
+
+test_that("saveSimList warns when a file-backed object cannot be anchored", {
+  skip_on_cran()
+  skip_if_not_installed("terra")
+  testInit("terra")
+
+  proj <- file.path(tmpdir, "proj")
+  dir.create(proj, recursive = TRUE, showWarnings = FALSE)
+  pths <- list(outputPath = proj, cachePath = proj, inputPath = proj, modulePath = proj)
+
+  ## Under none of the named paths, nor projectPath, nor the working directory
+  ## -- nothing to re-root against. It has to sit outside `tmpdir`, because
+  ## testInit() makes `tmpdir` the working directory and getwd() is an anchor.
+  outside <- tempfile("unanchored")
+  on.exit(unlink(outside, recursive = TRUE), add = TRUE)
+  sim <- suppressMessages(simWithFileBacked(tmpdir, outside, pths))
+  expect_warning(suppressMessages(saveSimList(sim, file.path(proj, "s.rds"), projectPath = proj)),
+                 "cannot be re-rooted")
+})
+
+test_that("saveSimList does not warn for objects under projectPath", {
+  skip_on_cran()
+  skip_if_not_installed("terra")
+  testInit("terra")
+
+  proj <- file.path(tmpdir, "proj")
+  dir.create(proj, recursive = TRUE, showWarnings = FALSE)
+  pths <- list(outputPath = proj, cachePath = proj, inputPath = proj, modulePath = proj)
+
+  ## projectPath is itself an anchor, so anything beneath it re-roots
+  sim <- suppressMessages(simWithFileBacked(tmpdir, file.path(proj, "data"), pths))
+  expect_no_warning(suppressMessages(
+    saveSimList(sim, file.path(proj, "s.rds"), projectPath = proj)))
+})
+
+test_that("saveSimList(files = FALSE) does not warn about anchoring", {
+  skip_on_cran()
+  skip_if_not_installed("terra")
+  testInit("terra")
+
+  proj <- file.path(tmpdir, "proj")
+  dir.create(proj, recursive = TRUE, showWarnings = FALSE)
+  pths <- list(outputPath = proj, cachePath = proj, inputPath = proj, modulePath = proj)
+
+  ## metadata-only save: the user has opted out of bundling, so portability
+  ## is not being promised and the warning would be noise
+  outside <- tempfile("unanchored")
+  on.exit(unlink(outside, recursive = TRUE), add = TRUE)
+  sim <- suppressMessages(simWithFileBacked(tmpdir, outside, pths))
+  expect_no_warning(suppressMessages(
+    saveSimList(sim, file.path(proj, "s.rds"), projectPath = proj, files = FALSE)))
+})
+
+test_that("an object under a named path survives a save from another projectPath", {
+  skip_on_cran()
+  skip_if_not_installed("terra")
+  testInit("terra")
+
+  ## outputPath deliberately sits OUTSIDE projectPath, so the object can only
+  ## be re-rooted via the sim's named paths -- not via projectPath.
+  proj <- file.path(tmpdir, "proj")
+  outs <- file.path(tmpdir, "outs")
+  dir.create(proj, recursive = TRUE, showWarnings = FALSE)
+  pths <- list(outputPath = outs, cachePath = proj, inputPath = proj, modulePath = proj)
+
+  sim <- suppressMessages(simWithFileBacked(tmpdir, outs, pths))
+  f <- file.path(proj, "s.rds")
+  suppressWarnings(suppressMessages(saveSimList(sim, f, projectPath = proj)))
+
+  out <- suppressWarnings(suppressMessages(loadSimList(f, projectPath = proj)))
+  expect_false(is.null(out$r))
+  expect_identical(sum(terra::values(out$r)), sum(terra::values(sim$r)))
+})
