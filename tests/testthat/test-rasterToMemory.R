@@ -110,3 +110,50 @@ test_that("rasterCreate returns an empty raster with the same geometry", {
   expect_identical(as.vector(terra::ext(out)), as.vector(terra::ext(r)))
   expect_false(terra::hasValues(out))
 })
+
+## ---- the raster (as opposed to terra) branches ---------------------------
+
+test_that("rasterToMemory brings a file-backed RasterLayer into memory", {
+  skip_on_cran()
+  skip_if_not_installed("raster")
+  testInit()
+
+  f <- file.path(tmpdir, "rl.tif")
+  terra::writeRaster(terra::rast(nrows = 4, ncols = 4, vals = 1:16), f)
+  r <- raster::raster(f)
+  expect_false(raster::inMemory(r))
+
+  m <- rasterToMemory(r)
+
+  expect_s4_class(m, "RasterLayer")
+  expect_true(raster::inMemory(m))
+})
+
+test_that("rasterToMemory keeps a RasterStack a RasterStack", {
+  skip_on_cran()
+  skip_if_not_installed("raster")
+  testInit()
+
+  f <- file.path(tmpdir, "rs.tif")
+  terra::writeRaster(terra::rast(nrows = 4, ncols = 4, vals = 1:16), f)
+
+  m <- rasterToMemory(raster::stack(f))
+
+  expect_s4_class(m, "RasterStack")
+})
+
+test_that("rasterCreate rebuilds each Raster* subclass as itself", {
+  skip_on_cran()
+  skip_if_not_installed("raster")
+  testInit()
+
+  f <- file.path(tmpdir, "rc.tif")
+  terra::writeRaster(terra::rast(nrows = 4, ncols = 4, vals = 1:16), f)
+
+  expect_s4_class(rasterCreate(raster::raster(f)), "RasterLayer")
+  expect_s4_class(rasterCreate(raster::stack(f)), "RasterStack")
+
+  fb <- file.path(tmpdir, "rb.tif")
+  terra::writeRaster(c(terra::rast(f), terra::rast(f)), fb)
+  expect_s4_class(rasterCreate(raster::brick(fb)), "RasterBrick")
+})
