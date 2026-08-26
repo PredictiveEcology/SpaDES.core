@@ -219,7 +219,12 @@ test_that("saveSimList works correctly", {
   pthsOrig <- paths(mySim)
   rm(mySim)
   unlink(fnsOrig)
-  sim <- loadSimList(file = tmpfile[8], projectPath = tmpCache, paths = pthsOrig)
+  ## `paths = pthsOrig` points the sim back at tmpdir, so the backing files that
+  ## `unlink(fnsOrig)` just removed have to be restored there too -- i.e.
+  ## projectPath must agree with the paths being supplied. This used to pass with
+  ## projectPath = tmpCache only because archiveExtract() ignored its `exdir` and
+  ## extracted into the working directory, which happened to be tmpdir.
+  sim <- loadSimList(file = tmpfile[8], projectPath = tmpdir, paths = pthsOrig)
   expect_true(is.numeric(sim$landscape$DEM[]))
   expect_true(all(Filenames(sim) %in% fnsOrig))
   sim$landscape[] <- sim$landscape[]

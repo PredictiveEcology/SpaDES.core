@@ -259,16 +259,22 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   }
 
   origPaths <- paths(sim)
-  if (is.null(symlinks)) {
-    paths(sim) <- origPaths |>
+  relPaths <- if (is.null(symlinks)) {
+    origPaths |>
       relativizePaths(projectPath) |>
       as.list()
   } else {
-    paths(sim) <- origPaths |>
+    origPaths |>
       modifyList(symlinks) |>
       relativizePaths(projectPath) |>
       as.list()
   }
+  ## Assign the slot directly rather than through `paths<-`: that setter ends
+  ## with checkPath(sim@paths$cachePath, create = TRUE), which would take the
+  ## now-*relative* "cache" and create a stray directory in whatever directory
+  ## the caller happens to be in. These paths are being relativized only so they
+  ## serialize portably; nothing here wants directories created.
+  sim@paths <- relPaths
 
   if (isTRUE(lazy)) {
     ext <- tools::file_ext(filename)
@@ -504,7 +510,13 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
 
   ## TODO: figure out what is inserting 'NA' into some paths during saveSimList
-  paths(tmpsim) <- paths(tmpsim) |>
+  ## Assign the slot directly: at this point the sim still carries the *relative*
+  ## paths it was serialized with ("cache", "inputs", ...), and `paths<-` ends
+  ## with checkPath(sim@paths$cachePath, create = TRUE), which would create a
+  ## stray `cache/` in the caller's working directory. The very next assignment
+  ## absolutizes them and goes through `paths<-`, so the directories that should
+  ## exist are still created -- under projectPath, where they belong.
+  tmpsim@paths <- paths(tmpsim) |>
     # sapply(function(pth) {
     #   if (fs::path_has_parent(pth, "NA")) {
     #     gsub("NA/", "./", pth) |> fs::path_norm() |> as.character()
@@ -963,7 +975,14 @@ warnDeprecFileBacked <- function(arg) {
 archiveExtract <- function(archiveName, exdir) {
   if (requireNamespace("archive") && !isWindows()) {
     archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
-    filename <- archive::archive_extract(archiveName)
+    ## `dir` defaults to "."; without it this extracts into the working
+    ## directory and ignores `exdir`, diverging from the unzip() branch below
+    ## and scattering the archive's own directory names (cache/, outputs/,
+    ## modules/) into whatever directory the caller happened to be in.
+    filename <- archive::archive_extract(archiveName, dir = exdir)
+    ## archive_extract() returns paths relative to `dir`; unzip() returns them
+    ## rooted at `exdir`. Make the two branches agree.
+    filename <- file.path(exdir, filename)
   } else {
     filename <- unzip(archiveName, exdir = exdir)
   }
