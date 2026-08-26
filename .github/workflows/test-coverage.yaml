@@ -15,3 +15,23 @@ jobs:
   test-coverage:
     uses: PredictiveEcology/actions/.github/workflows/test-coverage.yaml@main
     secrets: inherit
+    with:
+      # Suggests that tests gate on with skip_if_not_installed(). Without them
+      # the tests silently SKIP and the reported coverage understates what the
+      # suite actually exercises: the full suite is ~1760 assertions, CI was
+      # running ~1040, and files whose tests need these read near 0% (e.g.
+      # progress.R 9.7%, checkpoint.R 11.4%) despite being well covered.
+      # `dependencies: "all"` alone did not pull these in.
+      extra-packages: |
+        any::CircStats
+        any::DiagrammeR
+        any::archive
+        any::future.callr
+        any::httr
+        any::httr2
+        any::logging
+        any::qs2
+        any::raster
+        any::roxygen2
+        any::sf
+        any::xmlparsedata
