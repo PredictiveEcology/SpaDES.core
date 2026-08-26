@@ -254,16 +254,22 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   }
 
   origPaths <- paths(sim)
-  if (is.null(symlinks)) {
-    paths(sim) <- origPaths |>
+  relPaths <- if (is.null(symlinks)) {
+    origPaths |>
       relativizePaths(projectPath) |>
       as.list()
   } else {
-    paths(sim) <- origPaths |>
+    origPaths |>
       modifyList(symlinks) |>
       relativizePaths(projectPath) |>
       as.list()
   }
+  ## Assign the slot directly rather than through `paths<-`: that setter ends
+  ## with checkPath(sim@paths$cachePath, create = TRUE), which would take the
+  ## now-*relative* "cache" and create a stray directory in whatever directory
+  ## the caller happens to be in. These paths are being relativized only so they
+  ## serialize portably; nothing here wants directories created.
+  sim@paths <- relPaths
 
   if (isTRUE(lazy)) {
     ext <- tools::file_ext(filename)
