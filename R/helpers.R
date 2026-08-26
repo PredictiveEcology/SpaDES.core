@@ -418,3 +418,30 @@ noEventWarning <- function(sim) {
                      ._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
                      ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
 
+
+## Singular/plural message grammar ---------------------------------------------
+##
+## Vendored from Require rather than borrowed with getFromNamespace(): these are
+## two lines each, and copying them costs less than a cross-package dependency
+## on a private binding. Kept behaviourally identical to Require's, so messages
+## read the same across the SpaDES packages.
+
+#' Pick the singular or plural form for a message
+#'
+#' @param singPlur Length-2 character vector: the singular form, then the plural.
+#' @param l An object whose length is the count.
+#' @param v The count itself. Takes precedence over `l` when both are supplied.
+#'
+#' @return One element of `singPlur`.
+#'
+#' @keywords internal
+#' @rdname singularPlural
+singularPlural <- function(singPlur, l, v) {
+  singPlur[(if (!missing(v)) v > 1 else length(l) > 1) + 1]
+}
+
+#' @keywords internal
+#' @rdname singularPlural
+isAre <- function(l, v) {
+  singularPlural(c("is", "are"), l, v)
+}
