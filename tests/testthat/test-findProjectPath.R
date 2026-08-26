@@ -86,9 +86,10 @@ test_that("findProjectPath works without rprojroot installed", {
   writeLines("Version: 1.0", file.path(proj, "nopkg.Rproj"))
   sub <- checkPath(file.path(proj, "sub"), create = TRUE)
 
+  ## mock the package's own seam rather than base::requireNamespace(), which
+  ## would be replaced process-wide and can take unrelated code with it
   testthat::with_mocked_bindings(
-    requireNamespace = function(...) FALSE,
-    .package = "base",
+    .hasRprojroot = function() FALSE,
     {
       expect_identical(normPath(findProjectPath(sub)), normPath(sub))
     }

@@ -287,13 +287,18 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 #' @examples
 #' findProjectPath()                 # the project the session is working in
 #' findProjectPath(tempdir())        # no markers above tempdir(); returns it
+## Whether rprojroot is available. A seam so the Suggests-absent path can be
+## tested without mocking base::requireNamespace(), which would replace it
+## process-wide for the duration of the block.
+.hasRprojroot <- function() requireNamespace("rprojroot", quietly = TRUE)
+
 findProjectPath <- function(path = getwd()) {
   ## NOTE: deliberately NOT using rprojroot::from_wd as one of the OR'd
   ## criteria. Its test function is `function(path) TRUE`, so it matches the
   ## starting directory immediately and short-circuits the search, making this
   ## return `path` unconditionally. The starting directory is the *fallback*,
   ## which the tryCatch below provides.
-  if (!requireNamespace("rprojroot", quietly = TRUE))
+  if (!.hasRprojroot())
     return(path)
 
   tryCatch(
