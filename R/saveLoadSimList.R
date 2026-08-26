@@ -230,6 +230,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     sim <- get(simName, envir = tmpEnv)
   }
 
+  ## Say so now if any file-backed object cannot be anchored. Only when we are
+  ## actually bundling files -- with `files = FALSE` the user has opted into a
+  ## metadata-only save and is not expecting portability.
+  if (isTRUE(files)) .warnUnanchoredFiles(sim, projectPath = projectPath)
+
   ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
   ## does not abort the entire save; failed objects are saved as NULL with a warning.
   sim <- .wrapResiliently(sim, projectPath = projectPath)
@@ -254,16 +259,22 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   }
 
   origPaths <- paths(sim)
-  if (is.null(symlinks)) {
-    paths(sim) <- origPaths |>
+  relPaths <- if (is.null(symlinks)) {
+    origPaths |>
       relativizePaths(projectPath) |>
       as.list()
   } else {
-    paths(sim) <- origPaths |>
+    origPaths |>
       modifyList(symlinks) |>
       relativizePaths(projectPath) |>
       as.list()
   }
+  ## Assign the slot directly rather than through `paths<-`: that setter ends
+  ## with checkPath(sim@paths$cachePath, create = TRUE), which would take the
+  ## now-*relative* "cache" and create a stray directory in whatever directory
+  ## the caller happens to be in. These paths are being relativized only so they
+  ## serialize portably; nothing here wants directories created.
+  sim@paths <- relPaths
 
   if (isTRUE(lazy)) {
     ext <- tools::file_ext(filename)
@@ -499,7 +510,13 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
 
   ## TODO: figure out what is inserting 'NA' into some paths during saveSimList
-  paths(tmpsim) <- paths(tmpsim) |>
+  ## Assign the slot directly: at this point the sim still carries the *relative*
+  ## paths it was serialized with ("cache", "inputs", ...), and `paths<-` ends
+  ## with checkPath(sim@paths$cachePath, create = TRUE), which would create a
+  ## stray `cache/` in the caller's working directory. The very next assignment
+  ## absolutizes them and goes through `paths<-`, so the directories that should
+  ## exist are still created -- under projectPath, where they belong.
+  tmpsim@paths <- paths(tmpsim) |>
     # sapply(function(pth) {
     #   if (fs::path_has_parent(pth, "NA")) {
     #     gsub("NA/", "./", pth) |> fs::path_norm() |> as.character()
@@ -808,6 +825,44 @@ recoverDataTableFromQs <- function(sim) {
   anchors
 }
 
+## Warn, at save time, about file-backed objects that cannot be re-rooted on
+## load. A backing file that lies under none of the sim's named paths, nor
+## under `projectPath`, nor under the working directory, has no anchor: .wrap()
+## records its absolute path, nothing puts it into the archive, and
+## loadSimList() elsewhere gets either NULL or a path that exists only on the
+## machine that saved it. The failure otherwise surfaces far from its cause --
+## at load, on another machine, as a silent NULL. See #389.
+.warnUnanchoredFiles <- function(sim, projectPath = NULL) {
+  anchors <- unlist(c(.wrapAnchors(sim, projectPath), list(getwd = getwd())),
+                    use.names = FALSE)
+  anchors <- unique(normPath(anchors[nzchar(anchors) & !is.na(anchors)]))
+  if (!length(anchors)) return(invisible(NULL))
+
+  isAnchored <- function(f) any(vapply(anchors, function(a) fs::path_has_parent(f, a),
+                                       logical(1)))
+
+  unanchored <- list()
+  for (nm in ls(sim@.xData, all.names = FALSE)) {
+    fns <- tryCatch(Filenames(sim@.xData[[nm]]), error = function(e) character(0))
+    fns <- unique(fns[nzchar(fns) & !is.na(fns)])
+    if (!length(fns)) next
+    bad <- fns[!vapply(normPath(fns), isAnchored, logical(1))]
+    if (length(bad)) unanchored[[nm]] <- bad
+  }
+  if (!length(unanchored)) return(invisible(NULL))
+
+  warning("saveSimList: ", length(unanchored), " file-backed object(s) lie outside ",
+          "`projectPath` and every path in `paths(sim)`, so they cannot be ",
+          "re-rooted when this simList is loaded elsewhere:\n",
+          paste0("  ", names(unanchored), ": ",
+                 vapply(unanchored, function(x) paste(x, collapse = ", "), character(1)),
+                 collapse = "\n"),
+          "\n  They are saved by absolute path and are not bundled. Move them under ",
+          "`projectPath`, or add their directory to `paths(sim)`, to make this ",
+          "simList portable.", call. = FALSE)
+  invisible(names(unanchored))
+}
+
 ## Pre-wrap each file-backed object in sim@.xData individually so that one
 ## inaccessible backing file does not abort saveSimList. Failed objects are
 ## replaced with NULL and a warning is issued; the subsequent monolithic
@@ -870,7 +925,15 @@ recoverDataTableFromQs <- function(sim) {
   ## the non-lazy remap loop — wrapped non-file objects have tags but no filenames).
   fns <- tryCatch(Filenames(obj), error = function(e) character(0))
   if (!length(fns) || all(nchar(fns) == 0L)) return(obj)
-  pths <- if (identical(projectPath, getwd())) simPaths else list(projectPath = projectPath)
+  ## Same anchor set as the non-lazy remap loop in loadSimList(): when
+  ## `projectPath` is not the working directory it is an ADDITIONAL anchor, not
+  ## a replacement. Using it alone dropped the sim's named paths, so a lazily
+  ## saved object anchored to e.g. outputPath had nothing to resolve against.
+  pths <- if (identical(projectPath, getwd())) {
+    simPaths
+  } else {
+    c(simPaths, list(projectPath = projectPath))
+  }
   newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
   if (is(obj, "list")) {
     newNames <- unique(newFiles$newName)
@@ -917,7 +980,14 @@ warnDeprecFileBacked <- function(arg) {
 archiveExtract <- function(archiveName, exdir) {
   if (requireNamespace("archive") && !isWindows()) {
     archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
-    filename <- archive::archive_extract(archiveName)
+    ## `dir` defaults to "."; without it this extracts into the working
+    ## directory and ignores `exdir`, diverging from the unzip() branch below
+    ## and scattering the archive's own directory names (cache/, outputs/,
+    ## modules/) into whatever directory the caller happened to be in.
+    filename <- archive::archive_extract(archiveName, dir = exdir)
+    ## archive_extract() returns paths relative to `dir`; unzip() returns them
+    ## rooted at `exdir`. Make the two branches agree.
+    filename <- file.path(exdir, filename)
   } else {
     filename <- unzip(archiveName, exdir = exdir)
   }
@@ -977,7 +1047,16 @@ relativizePaths <- function(paths, projectPath = NULL) {
   if (is.null(projectPath)) {
     projectPath <- fs::path_common(p[["modulePath"]]) |> unique() |> dirname()
   }
-  p[corePaths] <- getRelative(p[corePaths], projectPath)
+  ## fs::path_rel, not getRelative: absolutizePaths() inverts this with
+  ## fs::path_abs(start = projectPath), and only path_rel is its true inverse.
+  ## getRelative("<base>/outs", "<base>/proj") returns "outs" -- dropping the
+  ## fact that it is a SIBLING of projectPath -- which re-absolutizes to
+  ## "<base>/proj/outs". Any named path outside projectPath (an outputPath
+  ## elsewhere, say) therefore came back pointing at a directory that never
+  ## existed, and its file-backed objects loaded as NULL. path_rel gives
+  ## "../outs", which round-trips. For paths under projectPath the two agree.
+  p[corePaths] <- sapply(p[corePaths], function(x)
+    as.character(fs::path_rel(x, start = projectPath)))
   p[tmpPaths] <- makeRelative(p[tmpPaths], p[["scratchPath"]])
 
   ## TODO: recombine paths, e.g. modulePath1, modulePath2 into modulePath
