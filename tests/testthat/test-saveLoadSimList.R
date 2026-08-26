@@ -354,6 +354,92 @@ test_that("mode 1 (portable): a sim moved to a new location keeps its file-backe
   expect_equal(as.numeric(terra::values(out$r)), as.numeric(seq_len(400)))
 })
 
+## Module code does not survive saveSimList(): Copy(objects = 2) -- the path
+## .wrap.simList() takes -- rebuilds each .mods[[module]] env and copies only
+## .modObjs back into it. loadSimList() re-parses the source to restore it.
+## See #388.
+
+simWithModule <- function(tmpdir, end = 1) {
+  mp <- getSampleModules(tmpdir)
+  simInit(times = list(start = 0, end = end, timeunit = "year"),
+          modules = list("randomLandscapes"),
+          paths = list(modulePath = mp, outputPath = tmpdir,
+                       cachePath = tmpdir, inputPath = tmpdir))
+}
+
+test_that("loadSimList restores module functions so the simList can be run", {
+  skip_on_cran()
+  testInit(sampleModReqdPkgs)
+
+  sim <- suppressMessages(simWithModule(tmpdir))
+  expect_true("doEvent.randomLandscapes" %in% ls(sim$.mods$randomLandscapes))
+
+  f <- file.path(tmpdir, "sim.rds")
+  suppressMessages(saveSimList(sim, f))
+  out <- suppressMessages(loadSimList(f))
+
+  expect_true("doEvent.randomLandscapes" %in% ls(out$.mods$randomLandscapes))
+  expect_true(is.function(out$.mods$randomLandscapes$doEvent.randomLandscapes))
+  ## the module's own helpers come back too, not just the dispatcher
+  expect_true(all(c("Init", "makeNLM") %in% ls(out$.mods$randomLandscapes)))
+
+  ## the point of the exercise: a reloaded simList runs
+  expect_s4_class(suppressMessages(spades(out, .plotInitialTime = NA)), "simList")
+})
+
+test_that("loadSimList's re-parse leaves `mod` state alone", {
+  skip_on_cran()
+  testInit()
+
+  sim <- suppressMessages(simWithModule(tmpdir))
+  ## .modObjs is what the `mod` active binding reads through; re-parsing must
+  ## not call newEnvsByModule(), which would replace it with an empty env.
+  sim$.modObjs$randomLandscapes$carriedOver <- "keep me"
+
+  f <- file.path(tmpdir, "sim.rds")
+  suppressMessages(saveSimList(sim, f))
+  out <- suppressMessages(loadSimList(f))
+
+  expect_identical(out$.modObjs$randomLandscapes$carriedOver, "keep me")
+})
+
+test_that("loadSimList's re-parse does not overwrite end-state metadata", {
+  skip_on_cran()
+  testInit()
+
+  sim <- suppressMessages(simWithModule(tmpdir))
+  ## end-state that differs from what the module's defineModule() declares
+  end(sim) <- 7
+  sim <- scheduleEvent(sim, 3, "randomLandscapes", "someLaterEvent")
+  nEvents <- NROW(sim@events)
+
+  f <- file.path(tmpdir, "sim.rds")
+  suppressMessages(saveSimList(sim, f))
+  out <- suppressMessages(loadSimList(f))
+
+  expect_identical(as.numeric(end(out)), 7)
+  expect_identical(NROW(out@events), nEvents)
+  expect_identical(unlist(modules(out), use.names = FALSE), "randomLandscapes")
+})
+
+test_that("loadSimList warns, rather than errors, when module source is gone", {
+  skip_on_cran()
+  testInit()
+
+  sim <- suppressMessages(simWithModule(tmpdir))
+  f <- file.path(tmpdir, "sim.rds")
+  suppressMessages(saveSimList(sim, f))
+
+  ## the metadata-only use case: the module path no longer exists
+  unlink(file.path(modulePath(sim), "randomLandscapes"), recursive = TRUE)
+
+  expect_warning(out <- suppressMessages(loadSimList(f)), "Could not find source code")
+  expect_s4_class(out, "simList")
+  ## loaded and inspectable, just not runnable
+  expect_identical(unlist(modules(out), use.names = FALSE), "randomLandscapes")
+  expect_false("doEvent.randomLandscapes" %in% ls(out$.mods$randomLandscapes))
+})
+
 ## Anchoring of file-backed objects: which directories a backing file can be
 ## re-rooted against on load, and saying so at save time when there are none.
 ## See #389.

@@ -202,46 +202,100 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
   return(sim)
 }
 
-#' Re-parse (fixed) module source into a `simList`
+#' Re-parse module source into a `simList`
 #'
-#' Shared by [restartSpades()] and [restartSimInit()]: re-`parse()`s the named modules'
-#' source files and evaluates them into the `simList`'s module environments (picking up
-#' any fixes the developer made). Operates by side effect on `sim@.xData` (an
-#' environment), so the input `sim` is mutated in place.
+#' Re-`parse()`s the named modules' source files and evaluates them into the
+#' `simList`'s module environments. Shared by three callers, for two different
+#' reasons:
+#'
+#' * [restartSpades()] and [restartSimInit()] use it to pick up any fixes the
+#'   developer made to a module after an interrupted run;
+#' * [loadSimList()] uses it because `saveSimList()` does not carry the module
+#'   functions at all. `Copy(objects = 2)` -- the path `.wrap.simList()` takes
+#'   -- rebuilds each `.mods[[module]]` environment from scratch and copies
+#'   only `.modObjs` back into it, so without this a reloaded `simList` fails
+#'   with `object 'doEvent.<module>' not found`.
+#'
+#' Only the module's code is evaluated: the `defineModule()` item is skipped.
+#' Its metadata is already in the `simList` -- and for a loaded `simList` that
+#' metadata is *end-state*, so re-evaluating `defineModule()` would risk
+#' replacing it with the module's declared defaults. That is exactly why
+#' "just call `simInit()` again" is not an answer for [loadSimList()].
+#'
+#' Operates by side effect on `sim@.xData` (an environment), so the input
+#' `sim` is mutated in place.
 #'
 #' @param sim A `simList`.
 #' @param modules Character vector of (non-core) module names to re-parse.
+#' @param verbose Numeric verbosity. At `verbose > 0` each re-parsed module is
+#'   announced; a module whose source cannot be found always warns.
 #' @return `sim`, invisibly.
 #' @keywords internal
 #' @importFrom cli col_blue
-.reparseModules <- function(sim, modules) {
+.reparseModules <- function(sim, modules, verbose = getOption("reproducible.verbose")) {
+  modules <- unique(unlist(modules, use.names = FALSE))
+  if (!length(modules)) return(invisible(sim))
   names(modules) <- modules
   opt <- options("spades.moduleCodeChecks" = FALSE)
   on.exit(options(opt), add = TRUE)
-  lapply(modules, function(module) {
-    pp <- list()
+
+  notFound <- character()
+
+  for (module in modules) {
     moduleFolder <- file.path(modulePath(sim, module = module), module)
-    if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
-      pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
-      subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
-
-      doesntUseNamespacing <- !.isNamespaced(sim, module)
-
-      ## evaluate the rest of the parsed file
-      sim <- currentModuleTemporary(sim, module)
-      if (doesntUseNamespacing) {
-        evalWithActiveCode(pp[[1]], sim@.xData, sim = sim)
-      }
-
-      if (length(subFiles)) {
-        pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
-      }
-      lapply(pp, function(pp1)
-        evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim))
-      message(cli::col_blue("Reparsing ", module, " source code"))
+    mainFile <- file.path(moduleFolder, paste0(module, ".R"))
+    mainFile <- mainFile[file.exists(mainFile)]
+    if (!length(mainFile)) {
+      notFound <- c(notFound, module)
+      next
     }
-    invisible()
-  })
+    mainFile <- mainFile[1L]
+
+    ## Reuse the module environment as it stands. Deliberately NOT
+    ## newEnvsByModule(), which calls setupModObjsEnv() and would replace
+    ## .modObjs[[module]] with a fresh empty env -- wiping the `mod` state that
+    ## a restart is rewinding, and that saveSimList() exists to preserve.
+    if (!is.environment(sim@.xData[[dotMods]][[module]])) {
+      sim@.xData[[dotMods]][[module]] <- new.env(parent = asNamespace("SpaDES.core"))
+      attr(sim@.xData[[dotMods]][[module]], "name") <- module
+    }
+    modEnv <- sim@.xData[[dotMods]][[module]]
+
+    parsed <- .parseConditional(envir = NULL, filename = mainFile)
+    pp <- list(parsed[["parsedFile"]][!parsed[["defineModuleItem"]]])
+
+    doesntUseNamespacing <- !.isNamespaced(sim, module)
+
+    sim <- currentModuleTemporary(sim, module)
+    if (doesntUseNamespacing) {
+      evalWithActiveCode(pp[[1]], sim@.xData, sim = sim)
+    }
+
+    subFiles <- dir(file.path(moduleFolder, "R"), pattern = "([.]R$|[.]r$)",
+                    full.names = TRUE)
+    if (length(subFiles)) {
+      pp[seq_along(subFiles) + 1] <- lapply(subFiles, function(ff) parse(ff))
+    }
+    lapply(pp, function(pp1) evalWithActiveCode(pp1, modEnv, sim = sim))
+
+    ## These live in the module env too, so they go missing along with the
+    ## functions; the code-checking machinery expects them back.
+    if (!is.null(parsed[["._parsedData"]]))
+      modEnv[["._parsedData"]] <- parsed[["._parsedData"]]
+    modEnv[["._sourceFilename"]] <- basename(mainFile)
+
+    messageVerbose(cli::col_blue("Reparsing ", module, " source code"), verbose = verbose)
+  }
+
+  if (length(notFound)) {
+    warning("Could not find source code for module(s): ",
+            paste(notFound, collapse = ", "), ".\n",
+            "  The simList is loaded and can be inspected, but cannot be run. ",
+            "Supply the correct `modulePath` via `paths`, or save and load in ",
+            "an archive format, which bundles the module source.",
+            call. = FALSE)
+  }
+
   invisible(sim)
 }
 

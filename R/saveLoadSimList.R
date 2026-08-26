@@ -600,6 +600,11 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   }
   makeSimListActiveBindings(tmpsim)
 
+  ## Restore the module functions. `saveSimList()` carries objects, metadata,
+  ## paths and the event queue, but not the module code -- see .reparseModules()
+  ## -- so without this a reloaded simList cannot be run.
+  tmpsim <- .reparseModules(tmpsim, modules(tmpsim), verbose = verbose)
+
   ## Lazy loading: if a sibling .rdx/.rdb pair exists, restore the user objects
   ## via lazyLoad() into a holding env, then bind delayedAssign wrappers on the
   ## simList so each access triggers the underlying lazy promise plus our
