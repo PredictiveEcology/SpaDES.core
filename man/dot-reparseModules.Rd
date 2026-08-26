@@ -2,22 +2,44 @@
 % Please edit documentation in R/restart.R
 \name{.reparseModules}
 \alias{.reparseModules}
-\title{Re-parse (fixed) module source into a \code{simList}}
+\title{Re-parse module source into a \code{simList}}
 \usage{
-.reparseModules(sim, modules)
+.reparseModules(sim, modules, verbose = getOption("reproducible.verbose"))
 }
 \arguments{
 \item{sim}{A \code{simList}.}
 
 \item{modules}{Character vector of (non-core) module names to re-parse.}
+
+\item{verbose}{Numeric verbosity. At \code{verbose > 0} each re-parsed module is
+announced; a module whose source cannot be found always warns.}
 }
 \value{
 \code{sim}, invisibly.
 }
 \description{
-Shared by \code{\link[=restartSpades]{restartSpades()}} and \code{\link[=restartSimInit]{restartSimInit()}}: re-\code{parse()}s the named modules'
-source files and evaluates them into the \code{simList}'s module environments (picking up
-any fixes the developer made). Operates by side effect on \code{sim@.xData} (an
-environment), so the input \code{sim} is mutated in place.
+Re-\code{parse()}s the named modules' source files and evaluates them into the
+\code{simList}'s module environments. Shared by three callers, for two different
+reasons:
+}
+\details{
+\itemize{
+\item \code{\link[=restartSpades]{restartSpades()}} and \code{\link[=restartSimInit]{restartSimInit()}} use it to pick up any fixes the
+developer made to a module after an interrupted run;
+\item \code{\link[=loadSimList]{loadSimList()}} uses it because \code{saveSimList()} does not carry the module
+functions at all. \code{Copy(objects = 2)} -- the path \code{.wrap.simList()} takes
+-- rebuilds each \code{.mods[[module]]} environment from scratch and copies
+only \code{.modObjs} back into it, so without this a reloaded \code{simList} fails
+with \verb{object 'doEvent.<module>' not found}.
+}
+
+Only the module's code is evaluated: the \code{defineModule()} item is skipped.
+Its metadata is already in the \code{simList} -- and for a loaded \code{simList} that
+metadata is \emph{end-state}, so re-evaluating \code{defineModule()} would risk
+replacing it with the module's declared defaults. That is exactly why
+"just call \code{simInit()} again" is not an answer for \code{\link[=loadSimList]{loadSimList()}}.
+
+Operates by side effect on \code{sim@.xData} (an environment), so the input
+\code{sim} is mutated in place.
 }
 \keyword{internal}
