@@ -84,7 +84,7 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
 }
 
 sampleModReqdPkgs <- c("terra", "SpaDES.tools", "RColorBrewer", # randomLandscapes & fireSpread
-                       "sf", "CircStats") # caribouMovement
+                       "CircStats") # caribouMovement
 
 testCode <- '
       defineModule(sim, list(
