@@ -55,6 +55,18 @@ Filed as **#397**. Your call:
 
 I did not choose for you.
 
+## CI on #398
+
+One test of mine broke CI on the first push — the `archiveWrite`/`archiveExtract`
+round trip assumed the `archive::` branch, which is not taken when `archive` is
+missing or on Windows. Fixed in 98b657d5.
+
+Everything failing since is `test-downloadModule.R:95` returning HTTP 403, filed
+as **#399**. It rotates between matrix legs run to run, and every leg has now
+passed on at least one run. The reusable workflow does set `GITHUB_PAT`, but the
+test took its no-token branch, so the request is going out unauthenticated and
+hitting the shared 60/hr IP quota across ~12 concurrent legs.
+
 ## Verified bug, deliberately not fixed
 
 **`clearCacheEventsOnly(x = )` clears the wrong cache.** It reads the entries
