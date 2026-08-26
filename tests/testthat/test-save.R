@@ -174,6 +174,13 @@ test_that("saveSimList works correctly", {
   outputPath <- checkPath(file.path(tmpdir, "outputs"), create = TRUE)
   cachePath <- checkPath(file.path(tmpdir, "cache"), create = TRUE)
 
+  ## DIAGNOSTIC (#397): tmpfile[] lands at tmpdir root, which is outside every
+  ## named sim path, so the .grd backing files have no anchor to be recorded
+  ## against. Move them inside outputPath -- a supported location -- to find out
+  ## whether the Windows failure is that unsupported scenario or something else.
+  tmpfile[1] <- file.path(outputPath, basename(tmpfile[1]))
+  tmpfile[7] <- file.path(outputPath, basename(tmpfile[7]))
+
   linkOrCopy(dir(mapPath, full.names = TRUE), file.path(modulePath, dir(mapPath)))
   linkOrCopy(dir(modules, recursive = TRUE, full.names = TRUE),
              file.path(modulePath, dir(modules, recursive = TRUE)))
