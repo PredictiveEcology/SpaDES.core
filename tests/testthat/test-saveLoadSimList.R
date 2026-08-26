@@ -369,7 +369,7 @@ simWithModule <- function(tmpdir, end = 1) {
 
 test_that("loadSimList restores module functions so the simList can be run", {
   skip_on_cran()
-  testInit()
+  testInit(sampleModReqdPkgs)
 
   sim <- suppressMessages(simWithModule(tmpdir))
   expect_true("doEvent.randomLandscapes" %in% ls(sim$.mods$randomLandscapes))
