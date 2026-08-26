@@ -912,7 +912,14 @@ warnDeprecFileBacked <- function(arg) {
 archiveExtract <- function(archiveName, exdir) {
   if (requireNamespace("archive") && !isWindows()) {
     archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
-    filename <- archive::archive_extract(archiveName)
+    ## `dir` defaults to "."; without it this extracts into the working
+    ## directory and ignores `exdir`, diverging from the unzip() branch below
+    ## and scattering the archive's own directory names (cache/, outputs/,
+    ## modules/) into whatever directory the caller happened to be in.
+    filename <- archive::archive_extract(archiveName, dir = exdir)
+    ## archive_extract() returns paths relative to `dir`; unzip() returns them
+    ## rooted at `exdir`. Make the two branches agree.
+    filename <- file.path(exdir, filename)
   } else {
     filename <- unzip(archiveName, exdir = exdir)
   }
