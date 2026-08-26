@@ -66,6 +66,12 @@ test_that("checkSimListExts accepts the supported extensions and rejects others"
 
 test_that("archiveWrite and archiveExtract round-trip files relative to projectPath", {
   skip_on_cran()
+  ## archiveWrite()/archiveExtract() only take the archive:: path when that
+  ## package is available and we are not on Windows; otherwise they shell out to
+  ## zip()/unzip(), which needs an external zip binary and writes a differently
+  ## named file. Only the archive:: path is exercised here.
+  skip_if_not_installed("archive")
+  skip_on_os("windows")
   testInit()
 
   proj <- withr::local_tempdir()
