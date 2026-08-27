@@ -24,7 +24,7 @@ experiment <- function(...) {
 #' @export
 #' @rdname deprecated
 experiment2 <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.experiment"))
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.project"))
 }
 
 #' @export
@@ -36,7 +36,7 @@ POM <- function(...) {
 #' @export
 #' @rdname deprecated
 simInitAndExperiment <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.experiment"))
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.project"))
 }
 
 #' @rdname deprecated

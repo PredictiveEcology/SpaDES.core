@@ -1,11 +1,11 @@
 test_that("deprecated functions warn and point at their new package", {
   testInit()
 
-  ## `experiment` moved to SpaDES.project; the rest to SpaDES.experiment
-  expect_warning(experiment(), "SpaDES\\.project")
-  for (fn in list(experiment2, POM, simInitAndExperiment)) {
-    expect_warning(fn(), "SpaDES\\.experiment")
+  ## the `experiment` family moved to SpaDES.project; `POM` to SpaDES.experiment
+  for (fn in list(experiment, experiment2, simInitAndExperiment)) {
+    expect_warning(fn(), "SpaDES\\.project")
   }
+  expect_warning(POM(), "SpaDES\\.experiment")
 })
 
 test_that("the deprecation message names the function and how to install it", {
