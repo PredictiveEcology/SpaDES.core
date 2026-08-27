@@ -2,287 +2,160 @@
 
 ## New features
 
-* **File-backed objects (e.g. `terra` `SpatRaster`) cached during a run are now
-  portable across machines/users.** `simInit()` and `spades()` advertise the
-  simulation's project paths to `reproducible` via
-  `options(reproducible.fileBackedAnchors = paths(sim))`, so a file-backed
-  object's backing file is stored *relative* to a named, machine-independent
-  anchor (`cachePath`, `inputPath`, `outputPath`, `modulePath`, ...) and restored
-  under the equivalent anchor on another machine or user account — for example
-  when retrieved from a shared cloud cache. Previously such an object embedded an
-  absolute path (e.g. `/home/<producer>/.../inputs/x.tif`) that did not exist for
-  the receiver, causing `Cache` retrieval to fail. The anchors are set during
-  both the `simInit()` `.inputObjects` phase and the `spades()` event loop, and an
-  explicit user-set `reproducible.fileBackedAnchors` is always respected.
-  Requires `reproducible` with `fileBackedAnchors` support.
+* Cached file-backed objects (e.g. `terra` `SpatRaster`) are now portable across
+  machines and user accounts. Backing files are recorded relative to the
+  simulation's paths instead of as absolute locations, so a cache written on one
+  machine can be reused on another. If you set `reproducible.fileBackedAnchors`
+  yourself, your setting is respected.
 
 * If setting up a simulation fails partway through, you no longer have to start
-  over. After fixing the module that caused the error, call `restartSpades()` (or
-  the new `restartSimInit()`) and it picks up where it left off instead of redoing
-  everything. This is on by default. See `?restartSimInit`.
+  over. Fix the module that failed, then call `restartSimInit()` to pick up where
+  it left off. On by default. See `?restartSimInit`.
 
-  To add this, rather than building a separate restart mechanism for setup, we
-  reworked setting up a simulation so its steps run as events, the same way a
-  running simulation does. That let recovery reuse the same mechanism
-  `restartSpades()` already uses. `restartSimInit()` remains as the entry point
-  for the setup case (and `restartSpades()` hands off to it automatically),
-  because, unlike a running simulation, setup cannot simply be resumed in place.
+* SpaDES.core now records every file and URL that modules download during a
+  simulation, tagged with the module and event that asked for it, so you can see
+  where a simulation's inputs came from. Turn it off with
+  `options(spades.urlLog = FALSE)`. See `?spadesOptions`.
 
-* During a simulation, SpaDES.core now keeps a record of every file or web
-  address (URL) that modules download (through `prepInputs()` or
-  `preProcess()`), and tags each one with the module and event that asked for
-  it. This makes it easy to see where a simulation's input data came from. It is
-  on by default; turn it off with `options(spades.urlLog = FALSE)`. See
-  `?spadesOptions`.
+* New `findProjectPath()` finds a project's root directory by looking for an
+  RStudio project file or a git repository. See `?findProjectPath`.
 
-The following changes are all to the module code checker, which warns module
-authors about likely mistakes in their module's R code. See `?codeCheckModule`.
+* New `codeCheckModules()` checks several modules in one call, or every module in
+  your module folder when called with no arguments. See `?codeCheckModule`.
 
-* You can now tell the code checker to ignore a particular warning. A module
-  author can add a `# nolint` comment (or `# nolint: <rule_id>` for one specific
-  check) to a line of module code; a user can set
-  `options(spades.codeChecksIgnore = list(<rule_id> = c("objectName", ...)))`;
-  and `options(spades.moduleCodeChecks = list(disable = ...))` now also works.
+* You can now tell the module code checker to ignore a finding: add a `# nolint`
+  comment to a line of module code, or set `options(spades.codeChecksIgnore = ...)`.
+  Use `# nolint: vars a, b` to declare objects the checker cannot see being
+  created. See `?codeCheckModule`.
 
-* New checks on a module's declared package list (`reqdPkgs`): a warning when a
-  package is listed more than once (especially with a conflicting source or
-  version), when a module calls `package::function()` for a package it never
-  declared, and (best-effort, informational) when a bare function call has no
-  obvious source among the declared packages.
-
-* `# nolint: vars a, b` lets an author promise that objects `a` and `b` are
-  created on a line where the names cannot be seen automatically (for example
-  `list2env(someList, envir(sim))`), so they are not wrongly flagged as
-  declared-but-unused outputs.
-
-* The checker now recognises `paramCheckOtherMods(sim, "x")` as a use of
-  parameter `"x"`.
-
-* New `codeCheckModules()` checks several modules for coding problems in one
-  call. With no arguments, it checks every module in your project's module
-  folder (the `spades.modulePath` option). It is the bulk version of
-  `codeCheckModule()`, which checks a single module. See `?codeCheckModule`.
+* The code checker gained checks on a module's `reqdPkgs`: packages listed more
+  than once, and `package::function()` calls for packages the module never
+  declared. See `?codeCheckModule`.
 
 ## Enhancements
 
-* `restartSpades()` (which resumes a simulation that was interrupted) now
-  remembers the `events` filter from the original `spades()` call, so the
-  resumed run repeats the same subset of events instead of running everything.
-  Supply a new `events` argument to `restartSpades()` to override it. See
-  `?restartSpades`.
+* Code-check reports group repeats of an issue under one heading, tag each finding
+  with its check name so it can be pasted into a `# nolint` comment, and say how to
+  silence the finding.
 
-* The code-check report now groups repeats of the same issue under one heading,
-  with one line per location, instead of repeating the full message every time.
+* `restartSpades()` remembers the `events` filter from the original `spades()`
+  call. Pass `events` to override it. See `?restartSpades`.
 
-* Each finding is now tagged with its check name (e.g.
-  `[conflicting_fn_unqualified]`) so it can be pasted straight into a `# nolint`
-  comment or the `spades.codeChecksIgnore` option. The broader group name (e.g.
-  `globals`) is also accepted there.
-
-* Clearer guidance for the `unresolved_accessor` warning: it now explains that
-  some dynamic ways of reading objects (e.g. `get()`/`mget()` or
-  `sim[[<variable>]]`) cannot be checked automatically, and how to acknowledge
-  them with `# nolint`.
-
-* Every suggestion now ends by telling you exactly how to silence the finding
-  if it is intentional, instead of a vague "otherwise ignore".
+* `saveSimList()` documentation now describes its two modes -- portable (bundle
+  everything) and in place (metadata only) -- with worked examples. See
+  `?saveSimList`.
 
 ## Behaviour changes
 
-* **`spades.moduleCodeChecks` now defaults to `FALSE`** -- module code checks no
-  longer run automatically during every `simInit()` (they slowed it and are not
-  needed on every run). Run them manually instead with [codeCheckModule()] (one
-  module) or [codeCheckModules()] (one or more, e.g. a whole project) -- no
-  `simInit()` required. To restore the old in-`simInit()` checking, set
-  `options(spades.moduleCodeChecks = TRUE)` (or a named list of toggles). Docs in
-  `?spadesOptions` and the package overview updated accordingly.
+* `spades.moduleCodeChecks` now defaults to `FALSE`, so module code checks no
+  longer run on every `simInit()`. Run them with `codeCheckModule()` or
+  `codeCheckModules()` instead, or set the option to `TRUE` to restore the old
+  behaviour. See `?spadesOptions`.
+
+* Event and `.inputObjects` `cacheId`s change once with this release, because
+  module paths and the parameter-definition table no longer contribute to them.
+  After the one-time recompute, identical runs on different machines share a cache
+  as intended.
+
+* Figures cached by `Plots(useCache = TRUE)` are redrawn once, because the check
+  for whether a plot has changed now covers more of the plot.
 
 ## Dependency changes
 
-* `simInit` no longer installs (or loads) the **`box`** package. `box` does not
-  work well within the `SpaDES` ecosystem, so the default for the
-  `spades.reqdPkgsDontLoad` option is now `NULL` (was `"box"`), and the unused,
-  unimplemented `spades.useBox` option and its associated (disabled) `box::use`
-  machinery have been removed. The generic `spades.reqdPkgsDontLoad` mechanism --
-  install a package but do not `library()`/`require()` it -- is retained for any
-  package a user explicitly lists.
+* `simInit()` no longer installs or loads the `box` package. The
+  `spades.reqdPkgsDontLoad` option now defaults to `NULL`, and the unused
+  `spades.useBox` option has been removed.
+
+* The `caribouMovement` sample module no longer requires `sf`, which it never
+  used.
 
 ## Bug fixes
 
-* `canonicalize_ggplot()` (a.k.a. `strip_ggplot_metadata()`), which builds the data-free digest used by `Plots(useCache = TRUE)`, ignored several parts of a plot, so plots differing only in those ways hashed identically and a needed replot was skipped: `facet_grid()` variables (stored in `params$rows`/`params$cols`, not `params$facets`); `coord_*(xlim=/ylim=)` limits (a list holding `NULL`s, which the simple-field filter rejected wholesale); the entire theme (`theme_bw()` vs `theme_classic()`, `theme(legend.position=)`, `unit()`-valued elements -- theme values are bare scalars, classed vectors, or, as of ggplot2 4.0, S7 objects holding their properties in attributes, none of which have `names()`); `position_*()` parameters such as `position_jitter(width=)`; and layer data inherited from the plot (held as `waiver()`, not `NULL`, so it was hashed as a constant rather than as the plot data). Scale transformations are now read via `get_transformation()` where available (ggplot2 >= 3.5.0), falling back to the `trans` field. A test matrix in `test-Plots.R` covers 21 single-difference plot pairs and 4 identical-plot pairs. Because the digest now covers more of the plot, cached figures from earlier versions will be redrawn once.
+* A `simList` saved with `saveSimList()` can now be run after `loadSimList()`.
+  Module functions were lost in the round trip, so a reloaded simulation could be
+  inspected but not run. If the module source cannot be found, loading now warns
+  instead of failing. (#388)
 
-* Module metadata no longer errors "external pointer is not valid" (`moduleMetadata()`, printing `depends(sim)`, etc.) under `terra` >= 1.9-34. `defineModule()` dropped a module-supplied `spatialExtent` (an `if` with no `else`), so every `.moduleDeps` fell back to the class prototype -- a `SpatExtent` built at package-*build* time, whose external pointer is dead in the installed package. `defineModule()` now keeps the module's own extent, `eval()`s the quoted default when the extent is `NA`, and the prototype no longer holds a `terra` object.
+* `saveSimList(projectPath = )` no longer fails for a simulation holding
+  file-backed objects. Such objects are also re-rooted correctly on load when they
+  live under `projectPath`, and saving now warns when a backing file sits
+  somewhere it cannot be re-rooted from, instead of producing an archive that
+  fails to reload. (#389)
 
-* `simInit()` / `spades()` no longer error "the condition has length > 1" when `debug` is passed as a multi-element list (e.g. `list(file = list(...), debug = 1)`). `debugToVerbose()` was returning a per-element vector, but `verbose` is consumed as a scalar downstream -- notably `simInit()` does `setPaths(silent = verbose <= 0)`, plus six other scalar-`verbose` call sites -- so `if (!silent)` errored on a length-2 condition. `debugToVerbose()` now reduces to a single verbosity level (the highest requested). Added a regression test that exercises the `simInit()` -> `setPaths()` path; the existing `debug = list` tests only used `spades()` on a pre-initialised sim, so never hit it. (#322)
+* `saveSimList()` and `loadSimList()` no longer create a stray `cache/` directory
+  in the caller's working directory, and archive extraction uses the directory
+  it was given instead of extracting into the working directory.
 
-* The `.inputObjects` runner (`.runModuleInputObjects()`) no longer errors "'list' object cannot be coerced to type 'double'" during `simInit()` when `debug` is a list, and no longer suppresses the default `.inputObjects` / module-code-check messages. Its message-level expression `ifelse(debug < 1, debug + 1, debug)` cannot coerce a list; it now bumps only *numeric and logical* `debug` -- preserving the historical `FALSE -> 1` bump that enables those messages under the default `debug = FALSE` -- and passes list/character `debug` through untouched. (A bare `!is.numeric()` guard would fix the list crash but silently drop the logical case, which regressed `test-timeunits.R` / `test-userSuppliedObjs.R`.) The #322 regression test now also drives `simInitAndSpades()` under a list `debug`. (#322)
+* `saveSimList(fileBackedDir = )` is accepted instead of causing an error.
 
-* `saveSimList()` no longer errors with "undefined columns selected" when `outputs(sim)` has rows. The saved-outputs filter was indexing the `outputs` `data.frame` by column instead of row (missing comma).
+* `saveSimList()` no longer errors when `outputs(sim)` has rows.
 
-* Archive-extraction (and other cli C-level) progress bars no longer flood the log during `simInit()`/`spades()`. On a dynamic terminal the bar stays on a single in-place line (prefix included); on a non-dynamic sink it is throttled to one line per `spades.progressInterval`. Detection is unanchored so frames already carrying a Date-Time-Module prefix (nested handlers) are caught.
+* `Plots(useCache = TRUE)` now redraws when a plot's facets, coordinate limits,
+  theme, or position adjustments change. Such plots were previously treated as
+  identical and the redraw was skipped.
 
-* **archive/pak progress flood still leaked through on Windows.** `.isCliProgressTick()`
-  recognised a C-level progress frame by its leading Braille spinner glyph, but
-  only *after* an `inherits(m, "cliMessage")` gate -- and on Windows these
-  `archive::archive_extract()` frames do not carry the `cliMessage` class, so every
-  animation frame got a full Date-Time-Module prefix again. The Braille test now
-  runs first and independent of that class, and matches the raw UTF-8 *bytes* of
-  the Braille block (`useBytes = TRUE`) so it is also immune to the message's
-  Encoding mark / a non-UTF-8 locale (where a code-point class can silently fail
-  to match). (Follow-up to the earlier non-dynamic throttle fix.)
+* `scheduleConditionalEvent()` works with a non-zero `minEventTime`. Such events
+  previously never fired, one that re-armed itself could loop forever at a single
+  timestep, and adding one could error.
 
-* **Event (`init`, etc.) `cacheId` is now stable across machines/OSs**, so cloud
-  caching of events can be shared (e.g. Linux <-> Windows). The module's absolute
-  install path is carried as the *name* of its `sim@modules` entry and as the
-  *name* of each event's `moduleName` (a named character: name = full path, value
-  = module name). Those paths differ across machines, so `.robustDigest()` of the
-  `modules` and `events` slots produced different `cacheId`s for byte-identical
-  runs -- breaking shared/cloud cache reuse for the event path. The simList
-  `.robustDigest` method now strips those path names before digesting (only the
-  module *name*, not its location, is relevant). `.inputObjects` was already
-  unaffected (it uses the basename and excludes the event queue). One-time
-  `cacheId` shift for events. Same cross-OS rationale as the earlier
-  parameter-definition-table and `desc`-column removals.
+* `defineEvent()` now always registers the event function, which could previously
+  be defined where nothing could find it. See `?defineEvent`.
 
-* **Progress-bar flood from `archive::archive_extract()`** (e.g. via
-  `prepInputs()`) inside a module is now throttled on Windows and other
-  non-dynamic sessions. The progress frames are routed through the
-  `spades()`/`simInit()` message handler by `cli::start_app(output = "message")`;
-  `.isCliProgressTick()` previously recognised a non-dynamic frame only when
-  `cli::cli_progress_num() >= 1`, but `archive`'s bar lives in compiled
-  `libarchive` code, so cli's R-level registry never sees it and the count stays
-  `0`. Every frame therefore fell through and was re-printed with a full
-  Date-Time-Module-Event prefix, flooding the log with thousands of near-identical
-  lines (and pushing earlier messages out of view). Such frames are now also
-  recognised by their leading cli **Braille spinner glyph** (`U+2800`-`U+28FF`,
-  cli's default spinner family, which never begins a normal message), plus the
-  trailing blank frame that closes the bar, so the flood collapses to one line per
-  `getOption("spades.progressInterval", 2)` seconds. The same path covers other
-  C-level cli progress bars routed through the handler.
+* Module metadata no longer errors with "external pointer is not valid" under
+  `terra` >= 1.9-34.
 
-* The module **parameter-definition table** (`defineParameter` defaults/min/max/class)
-  is no longer included in the `.useCache` cacheId for `.inputObjects`/events. Only
-  the resolved parameter *values* (digested separately) affect caching now. Including
-  the definition table made the cacheId depend on metadata that can differ across
-  machines/OSs/package versions even when the run is identical -- e.g. an
-  environment-derived default (`getOption(...)`), or a platform-dependent attribute
-  on a table column -- so the same call produced different cacheIds on Linux vs
-  Windows and could not share a (cloud) cache. (Extends the earlier removal of the
-  human-readable `desc` columns from this digest.) **This changes existing cacheIds
-  once** (a one-time recompute), after which identical runs across machines share a
-  cache as intended.
+* `simInit()` and `spades()` no longer error when `debug` is given as a
+  multi-element list, and the usual `.inputObjects` and code-check messages are no
+  longer suppressed in that case. (#322)
 
-* `simInit(objects = ...)` again loads *all* user-supplied objects when
-  `options(spades.allowInitDuringSimInit = TRUE)` (as set by some
-  `SpaDES.project::setupProject()` configurations). A regression in the
-  `.runInputObjectsPhase()` refactor restricted the loaded objects to those
-  declared as a module `inputObject`, silently dropping arbitrary objects passed
-  via `objects = list(...)` -- and every object when no module declares them.
-  The intended behaviour (don't let user inputs clobber objects an init produced
-  during `simInit`) is preserved via `objectsToUseUpdatesFromPrevInits()`.
+* `simInit(objects = )` again loads all user-supplied objects when
+  `options(spades.allowInitDuringSimInit = TRUE)`.
 
-* `.useCacheArgs` entries on the `.inputObjects` path are now evaluated at the
-  splice site, in the module's context (`sim@current` is the module being
-  processed), matching the event path in `.runEvent()`. Previously a quoted
-  entry such as `useCloud = quote(P(sim)$.useCloud)` reached `reproducible::Cache()`
-  as an unevaluated call and was forced later, where the module context was no
-  longer available, so module-context accessors like `P(sim)` resolved to the
-  wrong module (or `NULL`). As a result, e.g. cloud caching of `.inputObjects`
-  keyed off `.useCloud` silently did not engage. Quoted entries now resolve to
-  this module's parameters before being merged into the `Cache()` call.
+* `simInit()` no longer errors when given `params = list(.globals = ...)` but no
+  modules.
 
-* `restartSimInit()` now rewinds state the same way `restartSpades()` does: it
-  removes objects the interrupted `.inputObjects` *created* (so a re-run starts
-  from a clean slate, not leftover partial outputs) and re-establishes each
-  re-parsed module's `mod`/`P` active bindings. These were previously done only on
-  the `spades()` recovery path. Both restart functions now share the same rewind
-  helpers (`.restartRestoreEventObjs()`, `.restartRefreshBindings()`), sim-resolution
-  (`.restartResolveSim()`), and module-identification (`.restartModuleToReparse()`),
-  so the two paths cannot drift.
+* A module's `.inputObjects` cache is invalidated when you edit a helper function
+  it calls, not only when you edit `.inputObjects` itself.
 
-* `restartSimInit()` now restarts the module that actually failed, even when an
-  *earlier* module's `.inputObjects` was cached. A cache hit returns a `simList`
-  with a fresh `@.xData` environment (`.prepareOutput()` copies it), so the
-  `.inputObjects` drain advanced onto a new environment while `simInit()`'s own
-  frame `sim` -- the one its `on.exit` recovery handler read -- went stale,
-  recording the module *before* the failure as the interrupted one. The recovery
-  handler now lives beside the drain loop (in `.runInputObjectsPhase()`, mirroring
-  how `spades()`'s inline loop already worked), so it reads the live `sim`. The
-  correct module is therefore reparsed on resume, so edits to the failing module's
-  `.inputObjects` take effect. A companion guard stops a resumed phase from
-  scheduling a second `.inputObjects` event for a module that already has one
-  queued (which otherwise ran it twice).
+* Quoted `.useCacheArgs` entries such as `useCloud = quote(P(sim)$.useCloud)` are
+  evaluated in the module's own context on the `.inputObjects` path, so they now
+  resolve to the right module's parameters.
 
-* `restartSimInit()`'s resumed `.inputObjects` messages and warnings now carry the
-  usual `simInit/<module>:<event>` logging prefix. The resume previously ran the
-  phase outside `simInit()`'s `withCallingHandlers()`, so its output was
-  unprefixed; the handlers are now shared between the two paths.
+* `restartSimInit()` restarts the module that actually failed, even when an
+  earlier module's `.inputObjects` was cached. It also clears objects the
+  interrupted run created, so a resume starts clean, and prefixes its messages the
+  way `simInit()` does.
 
-* A module's `.inputObjects` cache is now invalidated when you edit a *helper*
-  function it calls, not only when you edit `.inputObjects` itself. Previously the
-  cache digest covered only the `.inputObjects` function, so fixing a helper left
-  the cacheId unchanged and the stale cached result was returned -- most visibly
-  via `restartSimInit()`/`restartSpades()`, whose rewind recreates the exact state
-  the stale entry was keyed under (a fresh `simInitAndSpades()` could mask the
-  problem by computing a different state, hence a different cacheId). The digest
-  now covers the transitive call-graph closure of module-local functions reachable
-  from `.inputObjects` (via `codetools::findGlobals()`, including functions passed
-  as values and helpers reached through nested closures), so an edit to any
-  function it (transitively) calls busts the cache, while edits to unrelated module
-  functions (e.g. `doEvent`, `Init`, an unused helper) do not. String-based dynamic
-  dispatch (`do.call("helper", )`, `get("helper")()`) is followed too, by scanning
-  string literals against module function names. Package functions remain out of
-  scope; their changes are tracked via `reqdPkgs`.
+* Progress bars from `archive::archive_extract()` (e.g. via `prepInputs()`) no
+  longer flood the log. They are throttled to one line per
+  `getOption("spades.progressInterval", 2)` seconds on Windows, on non-dynamic
+  terminals, and in logged or non-interactive runs.
 
-* Progress bars routed through the message handler (e.g. from
-  `archive::archive_extract()` during `prepInputs()`) are now throttled in
-  non-interactive sessions too. Previously, progress ticks were only recognised
-  when `cli` ran in dynamic mode (where each frame carries a carriage return or
-  cursor-control sequence). In non-dynamic sessions (non-interactive, logged
-  runs, CI, RStudio jobs) `cli` emits each tick as a plain newline-terminated
-  line, so every frame slipped past detection and was re-printed with a full
-  `Date-Time-Module-Event` prefix — flooding logs with thousands of near-identical
-  lines. Detection now also recognises a tick by its `cli` condition class
-  combined with an active `cli` progress bar, so the existing throttle
-  (`getOption("spades.progressInterval", 2)`) applies regardless of terminal
-  mode. `cli` alerts are unaffected.
+* `writeRNGInfo()` records the RNG state instead of writing only `"."`, and
+  `writeEventInfo()` writes to the full path it computed.
 
-* `simInit()` no longer errors when called with `params = list(.globals = ...)`
-  but no `modules`. Previously this failed with
-  `no applicable method for `@` applied to an object of class "NULL"`
-  because the default empty dependency list (`list(NULL)`) was iterated by
-  `updateParamsFromGlobals()`.
+* Deprecation messages name the package to install, instead of reading "has been
+  moved to .".
 
-* Fixed a plotting test that could fail when the test suite was run more than
-  once in the same R session: the tests had been writing their figures to one
-  shared folder, so leftover files from one test could be mistaken for
-  another's. Each test now writes to its own folder. (Test-only change; no
-  effect on the package itself.)
+* `convertTimeunit()` returns the right value for whole-number conversions between
+  units other than seconds.
 
-* Fewer false alarms: the "input has no default" check no longer fires when the
-  input is handled with a `suppliedElsewhere("x", sim)` guard, nor when it is
-  asserted with `# nolint: vars`.
+* `checkParams()` returns `NA` when a simulation has no user modules, since
+  nothing was checked.
 
-* `params(sim)[[currentModule(sim)]]$x` is now correctly understood as a
-  parameter of the current module, instead of being flagged as unresolved.
+* `copyModule()` creates its destination correctly and copies files sitting
+  directly in the module's `tests/` folder.
 
-* No more false "declared but unused" warnings when an output is assigned inside
-  a function wrapped by `compiler::cmpfun()` or `Cache()`; the checker now looks
-  through such wrappers. Objects read inside anonymous callbacks (e.g.
-  `lapply(x, function(i) sim[[i]])`) are also no longer misattributed.
+* The code checker no longer warns that an input has no default when it is guarded
+  by `suppliedElsewhere()`, understands `params(sim)[[currentModule(sim)]]$x` as
+  the current module's parameter, and no longer reports outputs assigned inside
+  `Cache()` or `compiler::cmpfun()` wrappers as unused.
 
-* The code check that flags giving an object the same name as a module
-  (`sim$<moduleName> <- ...`) now gives a clearer message, explaining that this
-  name clash can cause hard-to-find problems.
+* The warning about giving an object the same name as a module explains why the
+  clash matters.
 
-* SpaDES.core again loads cleanly when no cache location has been set. Recent
-  development versions of `reproducible` leave the cache location (the
-  `reproducible.cachePath` option) empty until the cache is first used;
-  `setPaths()` and `getPaths()` previously stopped with an "Invalid path: cannot
-  be NULL" error in that case, which prevented the package from loading. They
-  now fall back to a temporary cache folder, the same way `reproducible` itself
-  does. This works with both the current CRAN `reproducible` (3.1.1) and the
-  development version. See `?setPaths`.
+* SpaDES.core loads cleanly when no cache location has been set, falling back to a
+  temporary folder the way `reproducible` does. See `?setPaths`.
 
 # SpaDES.core 3.1.2
 
