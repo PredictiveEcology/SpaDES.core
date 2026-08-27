@@ -217,7 +217,7 @@
 * Documentation: rewrite of the categorized package overview (`?SpaDES.core`).
   Restructured into 14 sections, simpler language, every user-facing export
   is now linked, and the inlined options table is replaced with a pointer to
-  [spadesOptions()] (which is the single source of truth). New sections cover
+  `?spadesOptions` (which is the single source of truth). New sections cover
   code checking, persistence/recovery, memory monitoring, and conditional
   events.
 * New code-checking engine v2 (opt-in; `options(spades.codeCheckEngine = "v2")`),
