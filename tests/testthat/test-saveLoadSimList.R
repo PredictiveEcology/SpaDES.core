@@ -440,6 +440,24 @@ test_that("loadSimList warns, rather than errors, when module source is gone", {
   expect_false("doEvent.randomLandscapes" %in% ls(out$.mods$randomLandscapes))
 })
 
+test_that("loadSimList warns, rather than errors, when module code needs a missing package", {
+  skip_on_cran()
+  testInit()
+
+  sim <- suppressMessages(simWithModule(tmpdir))
+  f <- file.path(tmpdir, "sim.rds")
+  suppressMessages(saveSimList(sim, f))
+
+  ## e.g., a simList saved on a machine that had this package installed
+  cat("\nlibrary(notAPackageSpaDES)\n",
+      file = file.path(modulePath(sim), "randomLandscapes", "randomLandscapes.R"),
+      append = TRUE)
+
+  expect_warning(out <- suppressMessages(loadSimList(f)), "Could not re-parse")
+  expect_s4_class(out, "simList")
+  expect_identical(unlist(modules(out), use.names = FALSE), "randomLandscapes")
+})
+
 ## Anchoring of file-backed objects: which directories a backing file can be
 ## re-rooted against on load, and saying so at save time when there are none.
 ## See #389.
