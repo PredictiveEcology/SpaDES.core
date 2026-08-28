@@ -81,10 +81,6 @@ Suggests:
     tcltk,
     testthat (>= 1.0.2),
     withr
-Remotes:
-    PredictiveEcology/Require@development,
-    PredictiveEcology/reproducible@development,
-    PredictiveEcology/SpaDES.tools@development
 Encoding: UTF-8
 Language: en-CA
 License: GPL-3
