@@ -1,11 +1,14 @@
 ## Release information
 
-This is a new submission: SpaDES.core was archived from CRAN when its
-`Depends:` package `reproducible` was archived (2026-07-13). The archival
-was not caused by a problem in SpaDES.core itself. `reproducible` has since
-been fixed and is back on CRAN as of 2026-08-25
-(<https://cran.r-project.org/web/packages/reproducible/index.html>), so this
-package's dependencies are all available again.
+This is a new submission: SpaDES.core was archived from CRAN on 2026-07-13
+when its `Depends:` package `reproducible` was archived. The archival was not
+caused by a problem in SpaDES.core itself, as CRAN's own comment records
+("as requires archived package 'reproducible'").
+
+Both of the dependencies involved are back on CRAN:
+
+* `reproducible` 3.2.1, restored 2026-08-25
+* `SpaDES.tools` 2.1.3, restored 2026-08-28
 
 Version 3.2.0 is a minor release accumulated since 3.1.2. Highlights:
 
@@ -26,42 +29,45 @@ See NEWS.md for the full list.
 
 ## Test environments
 
-### Previous R versions
-* Ubuntu 24.04                 (GitHub), R 4.3.3, 4.4.3
-* Windows                      (GitHub), R 4.3.3, 4.4.3
+### win-builder
+* Windows, R 4.5.3 (oldrelease)
+* Windows, R 4.6.1 (release)
+* Windows, R-devel (2026-08-27 r90452)
 
-### Current R versions
-* macOS 14.7.6                 (GitHub), R 4.5.2
-* Ubuntu 24.04                 (GitHub), R 4.5.2
-* Ubuntu 24.04                  (local), R 4.5.3
-* Windows                      (GitHub), R 4.5.2
+### GitHub Actions
+* macOS,        R release
+* Windows,      R devel, release, oldrel-1, oldrel-2
+* Ubuntu 24.04, R devel, release, oldrel-1, oldrel-2
+* Ubuntu 24.04, R release with `_R_CHECK_DEPENDS_ONLY_=true`
+* Windows,      R release with `_R_CHECK_DEPENDS_ONLY_=true`
 
-### Development R version
-* Ubuntu 24.04                 (GitHub), R-devel
-
-<!-- TODO: add win-builder (oldrelease/release/devel) and macOS builder rows
-     once those checks are run; they are deferred until `reproducible` is
-     back on CRAN, since win-builder cannot install it otherwise. -->
+### Local
+* Ubuntu 24.04, R 4.6.1
 
 ## R CMD check results
 
 There were no ERRORs or WARNINGs.
 
-There is one NOTE, from the incoming feasibility check:
+One NOTE is expected and unavoidable:
 
-* `New submission` and `Package was archived on CRAN`. Both are expected: this
-  package was archived on 2026-07-13 solely because `reproducible` was, as
-  CRAN's own comment records ("as requires archived package 'reproducible'").
-* Two possibly-invalid URLs, cited in `man/tryCatch.Rd` and
-  `man/getModuleVersion.Rd`. Both load in a browser; Stack Overflow returns
-  HTTP 403 to automated requests.
-* `Suggests or Enhances not in mainstream repositories: SpaDES.tools`.
-  SpaDES.tools was archived on 2026-07-13 for the same reason as this package,
-  and is being resubmitted; it is used only conditionally, in examples and
-  tests guarded by `requireNamespace()`.
+* `New submission` / `Package was archived on CRAN`. As above, the 2026-07-13
+  archival was solely a consequence of `reproducible` being archived, which has
+  since been resolved.
+
+A second NOTE appears on some platforms:
+
+* `checking for detritus in the temp directory`. This is a directory left under
+  the session temporary directory by the test suite. It is inside `tempdir()`
+  and is reclaimed with it, so it does not persist beyond the R session.
 
 ## Downstream dependencies
 
-The only reverse dependency, `SpaDES`, is currently archived on CRAN (it was
-archived alongside this package). There are therefore no reverse dependencies
-on CRAN to check against at this time.
+There is one reverse dependency on CRAN, `NetLogoR` 1.0.6, which lists
+SpaDES.core under `Suggests:`. It was checked against this version of
+SpaDES.core and the result was `Status: OK` (no ERRORs, WARNINGs or NOTEs).
+
+`NetLogoR` refers to SpaDES.core only in files under `inst/examples/`, which
+R CMD check does not execute, so its checks do not load SpaDES.core at all.
+
+The other reverse dependency, `SpaDES`, remains archived on CRAN (it was
+archived alongside this package) and so could not be checked.
