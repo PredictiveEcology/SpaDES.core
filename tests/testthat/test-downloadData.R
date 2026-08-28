@@ -21,10 +21,10 @@ test_that("downloadData downloads and unzips module data", {
     # write checksums
     chksums <- structure(
       list(
-        file = structure(1:2, .Label = c("DEM.tif", "habitatQuality.tif"), class = "factor"),
-        checksum = structure(1:2, .Label = c("77c56d42fecac5b1", "f21251dcdf23dde0"), class = "factor")
+        file = structure(1:2, levels = c("DEM.tif", "habitatQuality.tif"), class = "factor"),
+        checksum = structure(1:2, levels = c("77c56d42fecac5b1", "f21251dcdf23dde0"), class = "factor")
       ),
-      .Names = c("file", "checksum"),
+      names = c("file", "checksum"),
       class = "data.frame", row.names = c(NA, -2L)
     )
     write.table(chksums[order(chksums$file), ], file = file.path(datadir, "CHECKSUMS.txt"))
