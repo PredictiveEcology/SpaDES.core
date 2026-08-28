@@ -3,9 +3,11 @@
 4x
 Amongst
 Bugfixes
+CRAN's
 Checksums
 Codecov
 DES
+ERRORs
 Etienne
 GDAL
 GLPK
@@ -13,8 +15,11 @@ Gantt
 GoogleDrive
 IBMs
 Landis
+M1mac
 Matloff
 MiB
+NLMR
+NLMR's
 Namespacing
 NetLogo
 ORCID
@@ -24,6 +29,7 @@ PredictiveEcology
 README
 RStudio
 RStudio's
+Recurses
 Rstudio
 S3
 S4
@@ -36,6 +42,7 @@ autocomplete
 automata
 bugfix
 bugfixes
+cacheId
 cachePath
 checkpointing
 checksums
@@ -44,14 +51,17 @@ classOptions
 cli
 codeCheckModule
 codecov
+codetools
 compat
 downsampling
 edgelist
+env
 env's
 errored
 et
 feedbacks
 franca
+gcc
 getters
 ggplot
 github
@@ -82,6 +92,7 @@ nulled
 objSize
 oldrel
 optimised
+outputObjects
 outputPath
 overplot
 params
@@ -91,11 +102,12 @@ pre
 prepareOutput
 recache
 reparse
+reqdPkgs
 se
 sim2gantt
 simInit
 simList
-spadesOptions
+snapshotted
 stochasticity
 subfolder
 submodules
@@ -109,3 +121,4 @@ unparsed
 unsetting
 v1
 v2
+worktrees

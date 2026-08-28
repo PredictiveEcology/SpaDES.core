@@ -103,12 +103,17 @@
 #'     line of the messaging during spades calls.\cr
 #'
 #'   `spades.moduleCodeChecks`
-#'     \tab `list(suppressParamUnused = FALSE,
-#'   suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE,
-#'   skipWith = TRUE)`
-#'     \tab Should the various code checks be run during `simInit`.
-#'   These are passed to `codetools::checkUsage()`.
-#'   Default is given by the function, plus these:\cr
+#'     \tab `FALSE`
+#'     \tab Should the various module code checks be run during `simInit`.
+#'   **As of `SpaDES.core` 3.1.2.9014 the default is `FALSE`** (checks no longer
+#'   run automatically during `simInit`, which they previously slowed). To run the
+#'   checks, call [codeCheckModule()] / [codeCheckModules()] manually (no
+#'   `simInit()` needed). To restore in-`simInit` checking, set this option to a
+#'   named list of toggles, e.g.
+#'   `list(suppressParamUnused = FALSE, suppressUndefined = TRUE,
+#'   suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)`
+#'   (or `TRUE` for the defaults); these are passed through to
+#'   `codetools::checkUsage()`.\cr
 #'
 #'   `spades.moduleDocument` \tab  `TRUE`
 #'     \tab  When a module is an R package e.g., via `convertToPackage`,
@@ -150,12 +155,14 @@
 #'   Default is `TRUE`, i.e., it will keep the state of the `simList`
 #'   at the start of the current event. This can be recovered with `restartSpades`
 #'   and the differences can be seen in a hidden object in the stashed `simList`.
+#'   The same mechanism applies during `simInit`: a snapshot is taken before each
+#'   module's `.inputObjects` runs, so an interrupted `simInit` can be recovered
+#'   with `restartSimInit` (see `?restartSimInit`).
 #'   There is a message which describes how to find that.\cr
 #'
-#'   `spades.reqdPkgsDontLoad` \tab `"box"` \tab Specify any packages that should not
+#'   `spades.reqdPkgsDontLoad` \tab `NULL` \tab Specify any packages that should not
 #'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
-#'   listed. The default (`"box"`) is a package that returns a warning if it is
-#'   loaded, and so it is excluded from loading.\cr
+#'   listed in a module's `reqdPkgs`.\cr
 #'
 #'   `spades.saveFileExtensions` \tab `NULL` \tab
 #'   a `data.frame` with 3 columns, `exts`, `fun`, and `package` indicating which
@@ -191,19 +198,15 @@
 #'     \tab  The default tolerance value used for floating
 #'     point number comparisons.\cr
 #'
+#'   `spades.urlLog` \tab `TRUE` \tab
+#'   If `TRUE` (the default), any files or web addresses (URLs) that modules
+#'   download through `prepInputs()` or `preProcess()` during `simInit()` or
+#'   `spades()` are recorded, and each one is tagged with the module and event
+#'   that asked for it. This makes it easy to see where a simulation's input
+#'   data came from. Set to `FALSE` to turn the recording off.\cr
+#'
 #'   `spades.useragent` \tab `"https://github.com/PredictiveEcology/SpaDES"`.
 #'     \tab The default user agent to use for downloading modules from GitHub.\cr
-#'
-#'   `spades.useBox` \tab FALSE
-#'     \tab Unimplemented while memory problems with `box` are resolved.
-#'     When it is turned on, this option determines
-#'     whether to manage which packages are loaded using the package `box`.
-#'     This will have as an effect that `reqdPkgs` will be strict; if a given
-#'     module is missing a `reqdPkgs`, then the module will fail to run, with
-#'     an error saying the package/function doesn't exist. Without `box`,
-#'     modules may run, even though `reqdPkgs` is incorrect, because other modules
-#'     may have specified their own packages, which cover the needs of another
-#'     package. `useBox = TRUE` will force modules to be accurate with their `reqdPkgs`.\cr
 #'
 #'   `spades.useRequire` \tab `!tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false"`
 #'     \tab The default for that environment variable is unset, so this returns
@@ -231,13 +234,11 @@ spadesOptions <- function() {
     spades.lowMemory = FALSE,
     spades.memoryUseInterval = 0,
     spades.messagingNumCharsModule = 21,
-    spades.moduleCodeChecks = list(
-      skipWith = TRUE,
-      suppressNoLocalFun = TRUE,
-      suppressParamUnused = FALSE,
-      suppressPartialMatchArgs = FALSE,
-      suppressUndefined = TRUE
-    ),
+    # Module code checks are OFF by default as of SpaDES.core 3.1.2.9014. They
+    # slowed every simInit() and most users do not need them on every run. Run
+    # them manually instead with codeCheckModule()/codeCheckModules(). Set this to
+    # the named list of toggles (see ?spadesOptions) to re-enable in-simInit checks.
+    spades.moduleCodeChecks = FALSE,
     spades.codeCheckEngine = "v1",
     spades.modulePath = file.path(.spadesTempDir(), "modules"),
     spades.moduleRepo = "PredictiveEcology/SpaDES-modules",
@@ -248,7 +249,7 @@ spadesOptions <- function() {
     spades.evalPostEvent = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
-    spades.reqdPkgsDontLoad = "box",
+    spades.reqdPkgsDontLoad = NULL,
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,
     spades.restartR.RDataFilename = "sim_restartR.RData",
@@ -263,8 +264,8 @@ spadesOptions <- function() {
     spades.sessionInfo = TRUE,
     spades.testMemoryLeaks = TRUE,
     spades.tolerance = .Machine$double.eps^0.5,
+    spades.urlLog = TRUE,
     spades.useragent = "https://github.com/PredictiveEcology/SpaDES",
-    # spades.useBox = FALSE,
     spades.useRequire = !tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false",
     spades.keepCompleted = TRUE
   )

@@ -1,3 +1,165 @@
+# SpaDES.core 3.2.0
+
+## New features
+
+* Cached file-backed objects (e.g. `terra` `SpatRaster`) are now portable across
+  machines and user accounts. Backing files are recorded relative to the
+  simulation's paths instead of as absolute locations, so a cache written on one
+  machine can be reused on another. If you set `reproducible.fileBackedAnchors`
+  yourself, your setting is respected.
+
+* If setting up a simulation fails partway through, you no longer have to start
+  over. Fix the module that failed, then call `restartSimInit()` to pick up where
+  it left off. On by default. See `?restartSimInit`.
+
+* SpaDES.core now records every file and URL that modules download during a
+  simulation, tagged with the module and event that asked for it, so you can see
+  where a simulation's inputs came from. Turn it off with
+  `options(spades.urlLog = FALSE)`. See `?spadesOptions`.
+
+* New `findProjectPath()` finds a project's root directory by looking for an
+  RStudio project file or a git repository. See `?findProjectPath`.
+
+* New `codeCheckModules()` checks several modules in one call, or every module in
+  your module folder when called with no arguments. See `?codeCheckModule`.
+
+* You can now tell the module code checker to ignore a finding: add a `# nolint`
+  comment to a line of module code, or set `options(spades.codeChecksIgnore = ...)`.
+  Use `# nolint: vars a, b` to declare objects the checker cannot see being
+  created. See `?codeCheckModule`.
+
+* The code checker gained checks on a module's `reqdPkgs`: packages listed more
+  than once, and `package::function()` calls for packages the module never
+  declared. See `?codeCheckModule`.
+
+## Enhancements
+
+* Code-check reports group repeats of an issue under one heading, tag each finding
+  with its check name so it can be pasted into a `# nolint` comment, and say how to
+  silence the finding.
+
+* `restartSpades()` remembers the `events` filter from the original `spades()`
+  call. Pass `events` to override it. See `?restartSpades`.
+
+* `saveSimList()` documentation now describes its two modes -- portable (bundle
+  everything) and in place (metadata only) -- with worked examples. See
+  `?saveSimList`.
+
+## Behaviour changes
+
+* `spades.moduleCodeChecks` now defaults to `FALSE`, so module code checks no
+  longer run on every `simInit()`. Run them with `codeCheckModule()` or
+  `codeCheckModules()` instead, or set the option to `TRUE` to restore the old
+  behaviour. See `?spadesOptions`.
+
+* Event and `.inputObjects` `cacheId`s change once with this release, because
+  module paths and the parameter-definition table no longer contribute to them.
+  After the one-time recompute, identical runs on different machines share a cache
+  as intended.
+
+* Figures cached by `Plots(useCache = TRUE)` are redrawn once, because the check
+  for whether a plot has changed now covers more of the plot.
+
+## Dependency changes
+
+* `simInit()` no longer installs or loads the `box` package. The
+  `spades.reqdPkgsDontLoad` option now defaults to `NULL`, and the unused
+  `spades.useBox` option has been removed.
+
+* The `caribouMovement` sample module no longer requires `sf`, which it never
+  used.
+
+* `Require` now needs to be at least version 2.0.0. The previous minimum
+  (1.0.1) was long out of date with the functions actually used.
+
+## Bug fixes
+
+* A `simList` saved with `saveSimList()` can now be run after `loadSimList()`.
+  Module functions were lost in the round trip, so a reloaded simulation could be
+  inspected but not run. If the module source cannot be found, or needs a package
+  that is not installed, loading now warns instead of failing. (#388)
+
+* `saveSimList(projectPath = )` no longer fails for a simulation holding
+  file-backed objects. Such objects are also re-rooted correctly on load when they
+  live under `projectPath`, and saving now warns when a backing file sits
+  somewhere it cannot be re-rooted from, instead of producing an archive that
+  fails to reload. (#389)
+
+* `saveSimList()` and `loadSimList()` no longer create a stray `cache/` directory
+  in the caller's working directory, and archive extraction uses the directory
+  it was given instead of extracting into the working directory.
+
+* `saveSimList(fileBackedDir = )` is accepted instead of causing an error.
+
+* `saveSimList()` no longer errors when `outputs(sim)` has rows.
+
+* `Plots(useCache = TRUE)` now redraws when a plot's facets, coordinate limits,
+  theme, or position adjustments change. Such plots were previously treated as
+  identical and the redraw was skipped.
+
+* `scheduleConditionalEvent()` works with a non-zero `minEventTime`. Such events
+  previously never fired, one that re-armed itself could loop forever at a single
+  timestep, and adding one could error.
+
+* `defineEvent()` now always registers the event function, which could previously
+  be defined where nothing could find it. See `?defineEvent`.
+
+* Module metadata no longer errors with "external pointer is not valid" under
+  `terra` >= 1.9-34.
+
+* `simInit()` and `spades()` no longer error when `debug` is given as a
+  multi-element list, and the usual `.inputObjects` and code-check messages are no
+  longer suppressed in that case. (#322)
+
+* `simInit(objects = )` again loads all user-supplied objects when
+  `options(spades.allowInitDuringSimInit = TRUE)`.
+
+* `simInit()` no longer errors when given `params = list(.globals = ...)` but no
+  modules.
+
+* A module's `.inputObjects` cache is invalidated when you edit a helper function
+  it calls, not only when you edit `.inputObjects` itself.
+
+* Quoted `.useCacheArgs` entries such as `useCloud = quote(P(sim)$.useCloud)` are
+  evaluated in the module's own context on the `.inputObjects` path, so they now
+  resolve to the right module's parameters.
+
+* `restartSimInit()` restarts the module that actually failed, even when an
+  earlier module's `.inputObjects` was cached. It also clears objects the
+  interrupted run created, so a resume starts clean, and prefixes its messages the
+  way `simInit()` does.
+
+* Progress bars from `archive::archive_extract()` (e.g. via `prepInputs()`) no
+  longer flood the log. They are throttled to one line per
+  `getOption("spades.progressInterval", 2)` seconds on Windows, on non-dynamic
+  terminals, and in logged or non-interactive runs.
+
+* `writeRNGInfo()` records the RNG state instead of writing only `"."`, and
+  `writeEventInfo()` writes to the full path it computed.
+
+* Deprecation messages name the package to install, instead of reading "has been
+  moved to .".
+
+* `convertTimeunit()` returns the right value for whole-number conversions between
+  units other than seconds.
+
+* `checkParams()` returns `NA` when a simulation has no user modules, since
+  nothing was checked.
+
+* `copyModule()` creates its destination correctly and copies files sitting
+  directly in the module's `tests/` folder.
+
+* The code checker no longer warns that an input has no default when it is guarded
+  by `suppliedElsewhere()`, understands `params(sim)[[currentModule(sim)]]$x` as
+  the current module's parameter, and no longer reports outputs assigned inside
+  `Cache()` or `compiler::cmpfun()` wrappers as unused.
+
+* The warning about giving an object the same name as a module explains why the
+  clash matters.
+
+* SpaDES.core loads cleanly when no cache location has been set, falling back to a
+  temporary folder the way `reproducible` does. See `?setPaths`.
+
 # SpaDES.core 3.1.2
 
 ## Bug fixes
@@ -58,7 +220,7 @@
 * Documentation: rewrite of the categorized package overview (`?SpaDES.core`).
   Restructured into 14 sections, simpler language, every user-facing export
   is now linked, and the inlined options table is replaced with a pointer to
-  [spadesOptions()] (which is the single source of truth). New sections cover
+  `?spadesOptions` (which is the single source of truth). New sections cover
   code checking, persistence/recovery, memory monitoring, and conditional
   events.
 * New code-checking engine v2 (opt-in; `options(spades.codeCheckEngine = "v2")`),

@@ -287,7 +287,7 @@ setMethod(
           sim@.xData$.mods[[mBase]]$.isPackage <- TRUE
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      asNamespace(.moduleNameNoUnderscore(mBase)),
-                                                     sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                                     sim = sim)
         } else {
           sim@.xData$.mods[[mBase]]$.isPackage <- FALSE
 
@@ -297,11 +297,10 @@ setMethod(
           # The simpler line commented below will not allow actual code to be put into module,
           #  e.g., startSim <- start(sim)
           #  The more complex one following will allow that.
-          reqdPkgsHere <- eval(tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
           # eval(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]], envir = sim@.xData$.mods[[mBase]])
           activeCode[["main"]] <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                                      sim@.xData$.mods[[mBase]],
-                                                     sim = sim, pkgs = reqdPkgsHere)
+                                                     sim = sim)
 
           # doesntUseNamespacing <- parseOldStyleFnNames(sim, mBase, )
           doesntUseNamespacing <- !.isNamespaced(sim, mBase)
@@ -316,7 +315,7 @@ setMethod(
             #lockBinding(mBase, sim@.envir) ## guard against clobbering from module code (#80)
             out1 <- evalWithActiveCode(tmp[["parsedFile"]][!tmp[["defineModuleItem"]]],
                                        sim@.xData$.mods,
-                                       sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                       sim = sim)
             #unlockBinding(mBase, sim@.envir) ## will be re-locked later on
           }
 
@@ -337,13 +336,13 @@ setMethod(
               if (doesntUseNamespacing) {
                 #eval(parsedFile1, envir = sim@.xData)
                 evalWithActiveCode(parsedFile1, sim@.xData$.mods,
-                                   sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                   sim = sim)
               }
 
               # duplicate -- put in namespaces location
               #eval(parsedFile1, envir = sim@.xData$.mods[[mBase]])
               activeCode[[Rfiles]] <- evalWithActiveCode(parsedFile1, sim@.xData$.mods[[mBase]],
-                                                         sim = sim, pkgs = tmp[["parsedFile"]][tmp[["defineModuleItem"]]][[1]][[3]]$reqdPkgs)
+                                                         sim = sim)
             }
           }
 
@@ -607,15 +606,13 @@ setMethod(
 
 #' @keywords internal
 evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = parent.frame(),
-                               sim, pkgs) {
+                               sim) {
 
   # browser(expr = exists("._evalWithActiveCode_1"))
   # Create a temporary environment to source into, adding the sim object so that
   #   code can be evaluated with the sim, e.g., currentModule(sim)
   #tmpEnvir <- new.env(parent = asNamespace("SpaDES.core"))
-  tmpEnvirForPkgs <- new.env(parent = envir)
-  # tmpEnvir <- new.env(parent = envir)
-  tmpEnvir <- new.env(parent = tmpEnvirForPkgs)
+  tmpEnvir <- new.env(parent = envir)
 
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
@@ -633,25 +630,6 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   #   it says, how big is the function, compared to how big is the environment that holds the function
   #   If it is 1, it means there are only functions in that environment, no objects
   # length(serialize(tmpEnvir$prepare_IgnitionFit, NULL))/object.size(mget(ls(tmpEnvir), tmpEnvir))
-
-  if (getOption("spades.useBox", FALSE) && FALSE) { # TURN THIS OFF AS THERE ARE MEMORY HOGGING ISSUES WITH BOX
-    pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
-    pkgs <- reqdPkgsDontLoad(pkgs) # some are explicitly not to be loaded
-    cm <- currentModule(tmpEnvir$sim)
-    if (length(cm))
-      if (!cm %in% unlist(.coreModules())) {
-        # pkgs <- Require::extractPkgName(unlist(eval(pkgs)))
-        lapply(pkgs, function(p) {
-          allFns <- ls(envir = asNamespace(p))
-          val <- paste0("box::use(", p, "[...]", ")")
-          eval(as.call(parse(text = val))[[1]], envir = tmpEnvirForPkgs)
-          if (any("mod" == allFns)) {
-            rm(list = "mod", envir = parent.env(tmpEnvirForPkgs))
-            messageVerbose("mod will be masked from ", p)
-          }
-        })
-      }
-  }
 
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 
@@ -683,6 +661,77 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   } else {
     sim@.xData$.mods[[basename(m)]][[".inputObjects"]]
   }
+}
+
+#' Transitive closure of module-local functions reachable from a starting function
+#'
+#' Walks the call graph of `startName` within a single module's namespace
+#' environment, following references to other functions defined in that same
+#' environment (helpers in the main module file or in `R/` sub-files), to any
+#' depth. Used to scope the `.inputObjects` cache digest: the cacheId must change
+#' when any function that `.inputObjects` actually calls is edited, but not when
+#' unrelated module functions (e.g., `doEvent`, `Init`) change. Digesting only
+#' `.inputObjects` lets a helper fix be silently masked by a stale cache entry
+#' (most visibly on [restartSimInit()], whose rewind reproduces the exact state the
+#' stale entry was keyed under); digesting the whole module env over-invalidates.
+#'
+#' Only module-local functions are followed; package functions are out of scope
+#' (handled via `reqdPkgs`, which is already part of the digested metadata, not by
+#' walking package bodies). String-based dynamic dispatch (`do.call("helperA", )`,
+#' `get("helperA")()`) is invisible to [codetools::findGlobals()], so as a
+#' supplement any string literal in a reached function that matches a module
+#' function name is also followed. This is precise (a benign `do.call(rbind, )`
+#' with a function *symbol* is already caught by `findGlobals`, and triggers no
+#' extra invalidation) rather than a blanket whole-module fallback.
+#'
+#' @param startName Character. Name(s) of the function(s) to start the walk from.
+#' @param env The module's namespace environment (`sim@.xData$.mods[[module]]`).
+#' @return Character vector of function names (always including any of `startName`
+#'   that exist in `env`); cycle-safe.
+#' @keywords internal
+#' @importFrom codetools findGlobals
+.fnsReachableFrom <- function(startName, env) {
+  if (is.null(env)) return(startName)
+  modFns <- ls(env, all.names = TRUE)
+  isFn <- vapply(modFns, function(n) is.function(get0(n, envir = env, inherits = FALSE)),
+                 logical(1))
+  modFns <- modFns[isFn]
+  seen <- character(0)
+  toVisit <- intersect(startName, modFns)
+  while (length(toVisit)) {
+    nm <- toVisit[[1L]]
+    toVisit <- toVisit[-1L]
+    if (nm %in% seen) next
+    seen <- c(seen, nm)
+    fn <- get0(nm, envir = env, inherits = FALSE)
+    if (!is.function(fn)) next
+    ## merge = TRUE so a module function referenced as a *value* (e.g. passed as a
+    ##   callback: `lapply(x, helperA)`) is caught too, not only call-position uses
+    ##   (`helperA()`); locally-shadowed names are not reported as globals.
+    refs <- tryCatch(codetools::findGlobals(fn, merge = TRUE),
+                     error = function(e) character(0))
+    ## supplement with string literals matching a module function name, to catch
+    ##   string-based dynamic dispatch that findGlobals cannot resolve.
+    refs <- c(refs, .charLiteralsIn(body(fn)))
+    toVisit <- c(toVisit, setdiff(intersect(refs, modFns), seen))
+  }
+  seen
+}
+
+#' Collect character-string literals appearing in a parsed expression
+#'
+#' Recurses through a language object (e.g., a function body) and returns every
+#' character constant it contains. Used by [.fnsReachableFrom()] to detect
+#' string-based dynamic dispatch (e.g., `do.call("helperA", ...)`).
+#'
+#' @param expr A language object, atomic value, or list.
+#' @return Character vector of the string literals found (possibly empty).
+#' @keywords internal
+.charLiteralsIn <- function(expr) {
+  if (is.character(expr)) return(as.character(expr))
+  if (is.call(expr) || is.pairlist(expr) || is.expression(expr) || is.list(expr))
+    return(unlist(lapply(as.list(expr), .charLiteralsIn), use.names = FALSE))
+  character(0)
 }
 
 #' Check is module uses module namespacing

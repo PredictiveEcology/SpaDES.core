@@ -21,3 +21,4 @@ timings.rds
 ^[.]?air[.]toml$
 ^\.vscode$
 ^\.claude$
+^TODO.*\.md$

@@ -21,10 +21,10 @@ test_that("downloadData downloads and unzips module data", {
     # write checksums
     chksums <- structure(
       list(
-        file = structure(1:2, .Label = c("DEM.tif", "habitatQuality.tif"), class = "factor"),
-        checksum = structure(1:2, .Label = c("77c56d42fecac5b1", "f21251dcdf23dde0"), class = "factor")
+        file = structure(1:2, levels = c("DEM.tif", "habitatQuality.tif"), class = "factor"),
+        checksum = structure(1:2, levels = c("77c56d42fecac5b1", "f21251dcdf23dde0"), class = "factor")
       ),
-      .Names = c("file", "checksum"),
+      names = c("file", "checksum"),
       class = "data.frame", row.names = c(NA, -2L)
     )
     write.table(chksums[order(chksums$file), ], file = file.path(datadir, "CHECKSUMS.txt"))
@@ -40,20 +40,24 @@ test_that("downloadData downloads and unzips module data", {
     )
 
     a <- capture.output({
-      t1 <- system.time(downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
-                                     files = c("DEM.tif", "habitatQuality.tif")))
+      downloadData(m, tmpdir, quiet = FALSE, urls = expectsInputs$sourceURL,
+                   files = c("DEM.tif", "habitatQuality.tif"))
     })
 
     result <- checksums(m, tmpdir)$result
     expect_true(all(file.exists(file.path(datadir, filenames))))
     expect_true(all(result == "OK"))
 
-    # shouldn't need a redownload because file exists
+    # shouldn't need a redownload because the files already exist. Assert that
+    # nothing was rewritten, rather than that the second call was faster: the
+    # "cached" call still makes an HTTP request per file, so the margin is small
+    # and inverts on a fast runner with a warm CDN.
+    mtimeBefore <- file.mtime(file.path(datadir, filenames))
     a <- capture.output({
-      t2 <- system.time(downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
-                                     files = c("DEM.tif", "habitatQuality.tif")))
+      downloadData(m, tmpdir, quiet = TRUE, urls = expectsInputs$sourceURL,
+                   files = c("DEM.tif", "habitatQuality.tif"))
     })
-    expect_true(t1[3] > t2[3]) # compare elapsed times
+    expect_identical(file.mtime(file.path(datadir, filenames)), mtimeBefore)
 
     # if one file is missing, will fill in correctly
     unlink(file.path(datadir, filenames)[1])

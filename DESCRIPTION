@@ -12,8 +12,8 @@ Description: Provides the core framework for a discrete event system to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2026-05-20
-Version: 3.1.2
+Date: 2026-08-28
+Version: 3.2.0
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -32,13 +32,14 @@ Depends:
     reproducible (>= 3.0.0)
 Imports:
     cli,
+    codetools,
     data.table (>= 1.11.0),
     fs,
     igraph (>= 1.0.1),
     lobstr,
     methods,
     qs2,
-    Require (>= 1.0.1),
+    Require (>= 2.0.0),
     rlang,
     stats,
     terra (>= 1.7-46),
@@ -48,7 +49,6 @@ Imports:
 Suggests:
     archive,
     CircStats,
-    codetools,
     xml2,
     xmlparsedata,
     covr,
@@ -73,6 +73,7 @@ Suggests:
     raster (>= 2.5-8),
     rmarkdown,
     roxygen2,
+    rprojroot,
     RSQLite,
     rstudioapi,
     sp,
@@ -138,6 +139,7 @@ Collate:
     'spades-core-deprecated.R'
     'spades-core-package.R'
     'suppliedElsewhere.R'
+    'urlLog.R'
     'zzz.R'
 Roxygen: list(markdown = TRUE)
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

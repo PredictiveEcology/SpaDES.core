@@ -61,6 +61,13 @@ Only relevant if \code{sim} not supplied.}
 using \code{setPaths}, it will use that. This will be ignored if \code{sim}
 is supplied and is required if \code{sim} not supplied}
 }
+\value{
+The requested metadata: for a single module, the metadata itself
+(\code{inputObjects()} and \code{outputObjects()} give a \code{data.frame}, \code{reqdPkgs()} a
+character vector); for several modules, a list with one such element per
+module, named by module. \code{outputObjectNames()} and \code{documentation()} return a
+list. \code{sessInfo()} returns the \code{sessionInfo()} recorded in the \code{simList}.
+}
 \description{
 These accessors extract the metadata for a module (if specified) or all modules
 in a \code{simList} if not specified.

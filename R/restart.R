@@ -61,14 +61,18 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   restarting the simulation. If `FALSE`, then it will return a new `simList`
 #'   with the module code parsed into the `simList`
 #'
-#' @param numEvents Numeric. Default is Inf (i.e., all available).
+#' @param numEvents Numeric. Default is `1L` (rewind a single event). Use `Inf`
+#'   to rewind all available events.
 #'   The number of events to be rewound.
 #'   In the `simList`, if `options('spades.recoveryMode')` is set to `TRUE` or a numeric,
 #'   then there will be a list in the `simList` called `.recoverableObjs`.
 #'   These will be replayed backwards in time to reproduce the initial state of the `simList`
 #'   before the event that is `numEvents` prior to the first event in `events(sim)`.
 #'
-#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`
+#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`. If the
+#'   interrupted `spades()` call used an `events` filter (to run only certain
+#'   events), the same filter is reused automatically on restart; pass a new
+#'   `events` argument here to override it.
 #'
 #' @return A `simList` as if `spades` had been called on a `simList`.
 #'
@@ -91,25 +95,20 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #' }
 restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = TRUE,
                           verbose = getOption("reproducible.verbose", 1L), ...) {
-  message("This is experimental and should be used with caution.")
+  sim <- .restartResolveSim(sim, verbose)
 
-  # browser(expr = exists("._restartSpades_1"))
-  if (is.null(sim)) {
-    sim <- savedSimEnv()$.sim
-    messageVerbose("sim not supplied, using \n",
-                   "sim <- savedSimEnv()$.sim", verbose = verbose)
-  }
-  if (is.character(sim)) {
-    sim <- SpaDES.core::loadSimList(sim)
+  ## A simList interrupted during simInit()'s .inputObjects (rather than during a
+  ##   spades() event) carries a saved simInit context. Let a user "lazily" call
+  ##   restartSpades() in that case -- delegate to restartSimInit().
+  if (!is.null(sim@.xData[["._simInitContext"]])) {
+    message("This simList was interrupted during simInit()'s .inputObjects, not during ",
+            "a spades() event; delegating to restartSimInit().")
+    return(restartSimInit(sim = sim, module = module, numEvents = numEvents,
+                          restart = restart, verbose = verbose, ...))
   }
 
-  if (!is(sim, "simList"))
-    stop("The simList does not exist or is corrupt; please pass a simList")
-
-  if (is.null(module)) {
-    # Source the file you changed, into the correct location in the simList
-    module <- events(sim)[["moduleName"]][1]
-  }
+  if (is.null(module))
+    module <- .restartModuleToReparse(sim)
 
   # move "completed" back into event queue
   numMods <- min(length(sim$.recoverableObjs), numEvents)
@@ -158,101 +157,18 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     ## move objects back in place
     # browser(expr = exists("._restartSpades_2"))
     out <- lapply(eventIndices, function(event) {
-      objNames <- names(sim$.recoverableObjs[[event]])
-      notYetCreated <- setdiff(outputObjects(sim)[[modules[event]]]$objectName, objNames)
-      names(notYetCreated) <- notYetCreated
-      notYetCreatedList <- lapply(notYetCreated, function(x) NULL)
-
-      ## need to overwrite with NULL if the object was not yet created
-      sim$.recoverableObjs[[event]] <- append(sim$.recoverableObjs[[event]], notYetCreatedList)
-      # sim$.recoverableObjs[[event]]
-      objsToCopy <- sim$.recoverableObjs[[event]]
-
-      objNames <- names(objsToCopy)
-      # objNames <- setdiff(objNames, notYetCreated)
-      if (!is.null(objNames)) {
-        ## only take objects that changed -- determine which ones are changed
-        whNULLs <- sapply(objsToCopy, is.null)
-        objsWONULLSs <- objsToCopy[!whNULLs]
-        if (any(whNULLs)) {
-          NULLed <- names(whNULLs)[whNULLs]
-          keeps <- names(whNULLs)[!whNULLs]
-          a <- suppressWarnings(rm(list = NULLed, envir = sim@.xData))
-          objsToCopy <- objsToCopy[keeps]
-        }
-
-        # Turns out it is much slower in most cases to digest, then "only copy changed"
-        if (FALSE) {
-          # fd1 is the current state of the objects in the recoveryObjs, i.e., the ones to get
-          # fd2 is the state of the objects in the sim
-          # Don't use `digest::digest` (of course) because it fails on SpatRaster, for example
-          # fd1 <- lapply(objsToCopy, function(obj) obj2 <- digest::digest(obj, algo = "xxhash64"))
-          fd1 <- lapply(objsToCopy, function(obj) .robustDigest(obj))
-          # the dots in the sim include e.g., .recoverableObjs now; so no ls(all.names = TRUE)
-          objNames <- objNames[objNames %in% ls(sim@.xData)]
-          fd2 <- lapply(mget(objNames, envir = sim@.xData), function(obj) .robustDigest(obj))
-          # fd2 <- lapply(mget(objNames, envir = sim@.xData), function(obj) obj2 <- digest::digest(obj, algo = "xxhash64"))
-          if (!is.null(fd2)) {
-            changed <- setdiffNamed(fd1, fd2)
-            fd1 <- changed
-          }
-          ## move the changed ones to the simList
-          if (NROW(fd1)) {
-            # list2env(objsToCopy[names(fd1)], envir = sim@.xData)
-            list2env(Copy(objsToCopy[names(fd1)]), envir = sim@.xData)
-          }
-        }
-        if (NROW(objsToCopy)) {
-          message(cli::col_blue("Setting all changed objects to their values at the start of ", modules[event]))
-          list2env(Copy(objsToCopy), envir = sim@.xData)
-        } else {
-          message(cli::col_blue("no objects to reset/recover in ", modules[event], ":",
-                                rev(tail(completed(sim), max(eventIndices))$eventType)[event]))
-        }
-
-
-      }
-
-      if (length(sim$.recoverableModObjs)) {
-        if (FALSE) {
-          modObjNames <- names(sim$.recoverableModObjs[[event]])
-          modObjsToCopy <- sim$.recoverableModObjs[[event]]
-          modObjEnv <- sim[[dotObjs]][[modules[event]]] # $.objects
-          modObjLs <- ls(modObjEnv)
-          fd1 <- lapply(modObjsToCopy, function(obj) .robustDigest(obj))
-          modObjNames <- modObjNames[modObjNames %in% modObjLs]
-          fd2 <- lapply(mget(modObjNames, envir = modObjEnv), function(obj) .robustDigest(obj))
-          if (!is.null(fd2)) {
-            changed <- setdiffNamed(fd1, fd2)
-            fd1 <- changed
-          }
-
-          if (NROW(fd1)) {
-            # list2env(objsToCopy[names(fd1)], envir = sim@.xData)
-            list2env(Copy(modObjsToCopy[names(fd1)]), envir = modObjEnv)
-          }
-        }
-        modObjEnv <- sim[[dotObjs]][[modules[event]]] # $.objects
-        modObjsToCopy <- sim$.recoverableModObjs[[event]]
-        list2env(Copy(modObjsToCopy), envir = modObjEnv)
-
-      }
-
+      .restartRestoreEventObjs(
+        sim, snapshot = sim$.recoverableObjs[[event]],
+        modSnapshot = if (length(sim$.recoverableModObjs)) sim$.recoverableModObjs[[event]] else NULL,
+        module = modules[event])
       message(cli::col_blue("Reversing event: ",
                             paste(collapse = " ",
                                   paste(unname(eventsToReplayDT[eventIndicesRev[event]])))))
       invisible()
     })
 
-    # modules <- if (!is.list(module)) as.list(module) else module
-
-    ## reset activeBinding mod
-    out <- lapply(modules, function(mod) {
-      makeModActiveBinding(sim = sim, mod = mod)
-    })
-    out <- lapply(modules, function(mod) {
-      makeParActiveBinding(sim = sim, mod = mod)
-    })
+    ## reset the `mod`/`P` active bindings for the rewound modules
+    .restartRefreshBindings(sim, modules)
 
     ## Remove all added events that occurred during the events, i.e., via scheduleEvent
     sim@events <- setdiff(sim@events, unlist(sim$.addedEvents[seq_len(numMods)], recursive = FALSE))
@@ -262,41 +178,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     modules <- modules(sim)
   }
 
-  opt <- options("spades.moduleCodeChecks" = FALSE)
-
-  out <- lapply(modules, function(module) {
-    pp <- list()
-    moduleFolder <- file.path(modulePath(sim, module = module), module)
-    if (file.exists(file.path(moduleFolder, paste0(module, ".R")))) {
-      # pp[[1]] <- .parseConditional(sim, file.path(moduleFolder, paste0(module, ".R")))
-      pp[[1]] <- parse(file.path(moduleFolder, paste0(module, ".R")))
-      subFiles <- dir(file.path(moduleFolder, "R"), full.names = TRUE)
-
-      doesntUseNamespacing <- !.isNamespaced(sim, module)
-
-      ## evaluate the rest of the parsed file
-      sim <- currentModuleTemporary(sim, module)
-      pkgs = slot(slot(depends(sim), "dependencies")[[module]], "reqdPkgs")
-      if (doesntUseNamespacing) {
-        out1 <- evalWithActiveCode(pp[[1]], sim@.xData, sim = sim, pkgs = pkgs)
-      }
-
-
-      if (length(subFiles)) {
-        pp[seq_len(length(subFiles)) + 1] <- lapply(subFiles, function(ff) parse(ff))
-      }
-      # ee <- new.env()
-      # ee$sim <- sim
-      # sim@.xData[[module]]$sim <- sim
-      lapply(pp, function(pp1)
-        evalWithActiveCode(pp1, sim@.xData[[dotMods]][[module]], sim = sim, pkgs = pkgs))
-      message(cli::col_blue("Reparsing ", module, " source code"))
-    }
-    # rm(list = "sim", envir = ee)
-    # list2env(as.list(ee, all.names = TRUE), envir = sim@.xData[[module]])
-    invisible()
-  })
-  options(opt)
+  .reparseModules(sim, modules)
 
   ## Once reversed, remove the .recoverableObjs
   sim$.recoverableObjs <- NULL
@@ -307,12 +189,251 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     # an NFS-backed .so) when packages are touched again unnecessarily.
     opts <- options(spades.loadReqdPkgs = FALSE)
     on.exit(options(opts), add = TRUE)
-    sim <- spades(sim, ...)
+    ## reuse the `events` filter from the interrupted spades call (issue #354),
+    ## unless the user supplied a new one to restartSpades(...)
+    dots <- list(...)
+    if (!"events" %in% ...names() && !is.null(sim@.xData[["._spadesEvents"]]))
+      dots$events <- sim@.xData[["._spadesEvents"]]
+    sim <- do.call(spades, append(list(sim), dots))
   }
   # } else {
   #   message("There was no interrupted spades call; returning sim as is")
   # }
   return(sim)
+}
+
+#' Re-parse module source into a `simList`
+#'
+#' Re-`parse()`s the named modules' source files and evaluates them into the
+#' `simList`'s module environments. Shared by three callers, for two different
+#' reasons:
+#'
+#' * [restartSpades()] and [restartSimInit()] use it to pick up any fixes the
+#'   developer made to a module after an interrupted run;
+#' * [loadSimList()] uses it because `saveSimList()` does not carry the module
+#'   functions at all. `Copy(objects = 2)` -- the path `.wrap.simList()` takes
+#'   -- rebuilds each `.mods[[module]]` environment from scratch and copies
+#'   only `.modObjs` back into it, so without this a reloaded `simList` fails
+#'   with `object 'doEvent.<module>' not found`.
+#'
+#' Only the module's code is evaluated: the `defineModule()` item is skipped.
+#' Its metadata is already in the `simList` -- and for a loaded `simList` that
+#' metadata is *end-state*, so re-evaluating `defineModule()` would risk
+#' replacing it with the module's declared defaults. That is exactly why
+#' "just call `simInit()` again" is not an answer for [loadSimList()].
+#'
+#' Operates by side effect on `sim@.xData` (an environment), so the input
+#' `sim` is mutated in place.
+#'
+#' @param sim A `simList`.
+#' @param modules Character vector of (non-core) module names to re-parse.
+#' @param verbose Numeric verbosity. At `verbose > 0` each re-parsed module is
+#'   announced; a module whose source cannot be found, or whose code cannot be
+#'   evaluated (e.g., a package it loads is not installed), always warns.
+#' @return `sim`, invisibly.
+#' @keywords internal
+#' @importFrom cli col_blue
+.reparseModules <- function(sim, modules, verbose = getOption("reproducible.verbose")) {
+  modules <- unique(unlist(modules, use.names = FALSE))
+  if (!length(modules)) return(invisible(sim))
+  names(modules) <- modules
+  opt <- options("spades.moduleCodeChecks" = FALSE)
+  on.exit(options(opt), add = TRUE)
+
+  notFound <- character()
+  failed <- character()
+
+  for (module in modules) {
+    moduleFolder <- file.path(modulePath(sim, module = module), module)
+    mainFile <- file.path(moduleFolder, paste0(module, ".R"))
+    mainFile <- mainFile[file.exists(mainFile)]
+    if (!length(mainFile)) {
+      notFound <- c(notFound, module)
+      next
+    }
+    mainFile <- mainFile[1L]
+
+    ## Reuse the module environment as it stands. Deliberately NOT
+    ## newEnvsByModule(), which calls setupModObjsEnv() and would replace
+    ## .modObjs[[module]] with a fresh empty env -- wiping the `mod` state that
+    ## a restart is rewinding, and that saveSimList() exists to preserve.
+    if (!is.environment(sim@.xData[[dotMods]][[module]])) {
+      sim@.xData[[dotMods]][[module]] <- new.env(parent = asNamespace("SpaDES.core"))
+      attr(sim@.xData[[dotMods]][[module]], "name") <- module
+    }
+    modEnv <- sim@.xData[[dotMods]][[module]]
+
+    parsed <- .parseConditional(envir = NULL, filename = mainFile)
+    pp <- list(parsed[["parsedFile"]][!parsed[["defineModuleItem"]]])
+
+    doesntUseNamespacing <- !.isNamespaced(sim, module)
+
+    sim <- currentModuleTemporary(sim, module)
+
+    subFiles <- dir(file.path(moduleFolder, "R"), pattern = "([.]R$|[.]r$)",
+                    full.names = TRUE)
+    if (length(subFiles)) {
+      pp[seq_along(subFiles) + 1] <- lapply(subFiles, function(ff) parse(ff))
+    }
+
+    ## Top-level module code may need packages that are not installed here,
+    ## e.g., a simList saved on another machine; that must not abort the load.
+    err <- tryCatch({
+      if (doesntUseNamespacing) {
+        evalWithActiveCode(pp[[1]], sim@.xData, sim = sim)
+      }
+      lapply(pp, function(pp1) evalWithActiveCode(pp1, modEnv, sim = sim))
+      NULL
+    }, error = function(e) conditionMessage(e))
+    if (!is.null(err)) {
+      failed[module] <- err
+      next
+    }
+
+    ## These live in the module env too, so they go missing along with the
+    ## functions; the code-checking machinery expects them back.
+    if (!is.null(parsed[["._parsedData"]]))
+      modEnv[["._parsedData"]] <- parsed[["._parsedData"]]
+    modEnv[["._sourceFilename"]] <- basename(mainFile)
+
+    messageVerbose(cli::col_blue("Reparsing ", module, " source code"), verbose = verbose)
+  }
+
+  if (length(notFound)) {
+    warning("Could not find source code for module(s): ",
+            paste(notFound, collapse = ", "), ".\n",
+            "  The simList is loaded and can be inspected, but cannot be run. ",
+            "Supply the correct `modulePath` via `paths`, or save and load in ",
+            "an archive format, which bundles the module source.",
+            call. = FALSE)
+  }
+  if (length(failed)) {
+    warning("Could not re-parse module(s): ",
+            paste0(names(failed), " (", failed, ")", collapse = "; "), ".\n",
+            "  The simList is loaded and can be inspected, but cannot be run ",
+            "until this is resolved, e.g., by installing the missing package(s).",
+            call. = FALSE)
+  }
+
+  invisible(sim)
+}
+
+#' Resolve the `sim` argument for the restart functions
+#'
+#' Shared preamble of [restartSpades()] and [restartSimInit()]: announce the
+#' experimental status, default a missing `sim` to the stashed `savedSimEnv()$.sim`,
+#' load it from disk if a filename was given, and assert it is a `simList`.
+#'
+#' @param sim `NULL`, a filename, or a `simList` (as passed to the restart functions).
+#' @param verbose Numeric verbosity, passed to [messageVerbose()].
+#' @return A `simList`.
+#' @keywords internal
+.restartResolveSim <- function(sim, verbose) {
+  message("This is experimental and should be used with caution.")
+  if (is.null(sim)) {
+    sim <- savedSimEnv()$.sim
+    messageVerbose("sim not supplied, using \n",
+                   "sim <- savedSimEnv()$.sim", verbose = verbose)
+  }
+  if (is.character(sim))
+    sim <- SpaDES.core::loadSimList(sim)
+  if (!is(sim, "simList"))
+    stop("The simList does not exist or is corrupt; please pass a simList")
+  sim
+}
+
+#' Identify the module whose source should be re-parsed on restart
+#'
+#' Picks the module to re-`parse()`, most-reliable source first: (1) the most-recent
+#' recovery snapshot in `sim$.recoverableObjs` (the interrupted module), (2) `sim@current`
+#' (set while a module event is running), then (3) the first still-queued event's module
+#' (optionally restricted to `eventType`, e.g. `".inputObjects"`) -- mirroring
+#' [restartSpades()]'s use of `events(sim)`. (3) is the fallback when `.recoverableObjs`
+#' is empty, e.g. a cached earlier `.inputObjects` swapped `sim@.xData` and orphaned the
+#' recovery accumulator.
+#'
+#' @param sim A `simList`.
+#' @param recoverNames Character names of `sim$.recoverableObjs` (most-recent first).
+#' @param eventType Optional event type to which the queued-event fallback is restricted.
+#' @return A single module name, or `NULL` if none can be identified.
+#' @keywords internal
+.restartModuleToReparse <- function(sim, recoverNames = names(sim$.recoverableObjs),
+                                    eventType = NULL) {
+  if (length(recoverNames)) return(recoverNames[[1]])
+  curMod <- sim@current[["moduleName"]]
+  if (length(curMod) && nzchar(curMod)) return(curMod)
+  if (length(sim@events)) {
+    mn <- vapply(sim@events, function(e)
+      if (is.null(eventType) || identical(e[["eventType"]], eventType))
+        e[["moduleName"]] else NA_character_, character(1))
+    mn <- mn[!is.na(mn)]
+    if (length(mn)) return(mn[[1]])
+  }
+  NULL
+}
+
+#' Restore one recovered event's object state on restart (shared rewind core)
+#'
+#' Shared by [restartSpades()] and [restartSimInit()]. For a single recovered event,
+#' rewinds the `simList`'s objects to their pre-event state: (a) any object the event
+#' *creates* (its `outputObjects`) that is absent from the snapshot did not exist when the
+#' event began, so it is removed; (b) the snapshotted objects are copied back into
+#' `sim@.xData`; (c) the module's `mod` objects are restored. Mutates `sim@.xData` by side
+#' effect. The two restart paths previously each had their own (slightly divergent) copy of
+#' this; sharing it means a fix in one benefits both.
+#'
+#' @param sim A `simList`.
+#' @param snapshot Named list of the event's objects at its start (`sim$.recoverableObjs[[i]]`).
+#' @param modSnapshot Named list of the module's `mod` objects at the event's start, or `NULL`.
+#' @param module The module name whose objects are being rewound.
+#' @param label Text used in the "Setting all changed objects ..." message (defaults to `module`).
+#' @return `sim`, invisibly.
+#' @keywords internal
+#' @importFrom cli col_blue
+#' @importFrom reproducible Copy
+.restartRestoreEventObjs <- function(sim, snapshot, modSnapshot, module, label = module) {
+  ## objects the event creates (its outputObjects) that are absent from the snapshot did not
+  ##   exist at the event's start -- mark them NULL so they are removed, not kept
+  notYetCreated <- setdiff(outputObjects(sim)[[module]]$objectName, names(snapshot))
+  if (length(notYetCreated)) {
+    nulls <- vector("list", length(notYetCreated))
+    names(nulls) <- notYetCreated
+    snapshot <- append(snapshot, nulls)
+  }
+  objNames <- names(snapshot)
+  if (!is.null(objNames)) {
+    whNULLs <- vapply(snapshot, is.null, logical(1))
+    if (any(whNULLs)) {
+      suppressWarnings(rm(list = objNames[whNULLs], envir = sim@.xData))
+      snapshot <- snapshot[!whNULLs]
+    }
+    if (NROW(snapshot)) {
+      message(cli::col_blue("Setting all changed objects to their values at the start of ", label))
+      list2env(Copy(snapshot), envir = sim@.xData)
+    }
+  }
+  if (length(modSnapshot)) {
+    modObjEnv <- sim[[dotObjs]][[module]]
+    if (!is.null(modObjEnv))
+      list2env(Copy(modSnapshot), envir = modObjEnv)
+  }
+  invisible(sim)
+}
+
+#' Re-establish the `mod`/`P` active bindings for re-parsed modules (shared)
+#'
+#' After rewinding/re-parsing, the per-module `mod` and `Par`/`P` active bindings must point
+#' at the (possibly fresh) `simList`. Shared by [restartSpades()] and [restartSimInit()].
+#' @param sim A `simList`.
+#' @param modules Character vector of (non-core) module names.
+#' @return `sim`, invisibly.
+#' @keywords internal
+.restartRefreshBindings <- function(sim, modules) {
+  for (mod in modules) {
+    makeModActiveBinding(sim = sim, mod = mod)
+    makeParActiveBinding(sim = sim, mod = mod)
+  }
+  invisible(sim)
 }
 
 #' @export
@@ -326,6 +447,142 @@ saveState <- function(filename, ...){
   sim <- restartSpades(restart = FALSE)
   saveSimList(sim, filename, ...)
   message("Saved! ", filename)
+}
+
+#' Restart an interrupted `simInit`
+#'
+#' **This is experimental and has not been thoroughly tested. Use with caution.**
+#' This is the `simInit`/`.inputObjects` analogue of [restartSpades()]. If a module's
+#' `.inputObjects` errors during [simInit()] and `options('spades.recoveryMode')` was
+#' set to `TRUE` or a numeric (the default, `1`), the interrupted `simList` is saved to
+#' `savedSimEnv()$.sim` with a list `.recoverableObjs` recording the state of each
+#' module's input objects at the start of its `.inputObjects`. `restartSimInit()` rewinds
+#' the `simList` to the start of the interrupted `.inputObjects` (i.e., `numEvents` prior),
+#' re-parses the (presumably fixed) module source, then resumes `simInit` by running the
+#' remaining modules' `.inputObjects` and completing the initialization.
+#'
+#' @details
+#' The random number seed is reset to its state at the start of the earliest recovered
+#' `.inputObjects`, so that any stochastic defaults are reproduced exactly.
+#'
+#' @inheritParams restartSpades
+#' @param module A character string naming the module whose `.inputObjects` caused the
+#'   error and whose source code was fixed. This module will be re-parsed into the
+#'   `simList`. If `NULL` (default), it is taken from the most recent recovery snapshot.
+#' @param numEvents Numeric. Default `1L` (rewind only the interrupted module's
+#'   `.inputObjects`). Use `Inf` to rewind all recoverable `.inputObjects`.
+#'
+#' @return A `simList` as if [simInit()] had completed (when `restart = TRUE`), or the
+#'   rewound `simList` with the fixed module re-parsed (when `restart = FALSE`).
+#'
+#' @export
+#' @rdname restartSpades
+#' @importFrom reproducible Copy
+#' @importFrom cli col_blue
+restartSimInit <- function(sim = NULL, module = NULL, numEvents = 1L, restart = TRUE,
+                           verbose = getOption("reproducible.verbose", 1L), ...) {
+  sim <- .restartResolveSim(sim, verbose)
+
+  ctx <- sim@.xData[["._simInitContext"]]
+  if (is.null(ctx))
+    stop("This simList has no saved simInit context to restart from. ",
+         "restartSimInit() only works after a simInit() call that was interrupted ",
+         "during a module's .inputObjects, with options('spades.recoveryMode') > 0.")
+
+  ## recoverModePre names each snapshot by its module, most-recent first, so the first
+  ##   element corresponds to the module whose .inputObjects was interrupted.
+  recoverNames <- names(sim$.recoverableObjs)
+  if (is.null(module))
+    module <- .restartModuleToReparse(sim, recoverNames, eventType = ".inputObjects")
+
+  ## ---- rewind the simList objects to the start of the interrupted .inputObjects ----
+  numMods <- min(length(sim$.recoverableObjs), numEvents)
+  modulesRewound <- character()
+  if (numMods > 0) {
+    modulesRewound <- recoverNames[seq_len(numMods)]
+    if (numMods < length(sim$.recoverableObjs)) {
+      sim$.recoverableObjs <- sim$.recoverableObjs[seq_len(numMods)]
+      if (length(sim$.recoverableModObjs))
+        sim$.recoverableModObjs <- sim$.recoverableModObjs[seq_len(numMods)]
+    }
+    out <- lapply(seq_len(numMods), function(event) {
+      mod <- modulesRewound[event]
+      .restartRestoreEventObjs(
+        sim, snapshot = sim$.recoverableObjs[[event]],
+        modSnapshot = if (length(sim$.recoverableModObjs) >= event)
+          sim$.recoverableModObjs[[event]] else NULL,
+        module = mod, label = paste0(mod, "'s .inputObjects"))
+      invisible()
+    })
+    ## re-establish the `mod`/`P` active bindings for the rewound modules (parity with
+    ##   restartSpades) and reset the RNG seed to the earliest recovered .inputObjects
+    .restartRefreshBindings(sim, setdiff(modulesRewound, unlist(.coreModules())))
+    if (!is.null(sim@.xData[["._randomSeed"]]))
+      assign(".Random.seed", sim@.xData[["._randomSeed"]][[numMods]], envir = .GlobalEnv)
+  }
+
+  ## ---- reparse the (fixed) module source(s) -- same approach as restartSpades ----
+  modulesToReparse <- setdiff(unique(c(module, modulesRewound)), unlist(.coreModules()))
+  if (!length(modulesToReparse)) {
+    ## Nothing to reparse means no module was identified -- usually a saved simList with no
+    ##   recovery info (e.g. created before this session's code, or with recoveryMode off).
+    ##   Warn loudly rather than silently resuming the *unchanged* (un-reparsed) code.
+    warning("restartSimInit(): no module identified to re-parse, so the resume runs the ",
+            "EXISTING (un-reparsed) code -- source edits will not take effect. The stashed ",
+            "`savedSimEnv()$.sim` likely predates this code or had recoveryMode off; re-run ",
+            "`simInit()`, or pass `module=` to force a re-parse.", call. = FALSE)
+  }
+  .reparseModules(sim, modulesToReparse)
+
+  sim$.recoverableObjs <- NULL
+  sim$.recoverableModObjs <- NULL
+
+  if (!isTRUE(restart))
+    return(sim)
+
+  ## restore the simInit-time session state that simInit's on.exit cleared, so the
+  ##   resumed .inputObjects run in the same environment as the original simInit:
+  ##   the options('spades.*Path') (from sim@paths) and the timing bookkeeping that
+  ##   debugMessage() relies on.
+  oldGetPaths <- getPaths()
+  do.call(setPaths, append(sim@paths, list(silent = TRUE)))
+  on.exit(do.call(setPaths, append(list(silent = TRUE), oldGetPaths)), add = TRUE)
+  sim@.xData[["._startClockTime"]] <- Sys.time()
+  sim$._simInitElapsedTime <- 0
+
+  ## ---- resume: drop the completed-marker of any module that must re-run, then re-enter
+  ##      the shared `.inputObjects` phase (the same continuation simInit uses) ----
+  ## A module re-runs its `.inputObjects` iff it is not marked completed. The interrupted
+  ##   module never completed, so it re-runs automatically; for rewound modules whose
+  ##   `.inputObjects` had completed (numEvents > 1), drop their completed marker so the
+  ##   phase re-runs them too.
+  completedDT <- completed(sim)
+  succeeded <- if (NROW(completedDT))
+    completedDT[completedDT[["eventType"]] == ".inputObjects", ][["moduleName"]] else character()
+  rewoundCompleted <- intersect(modulesRewound, succeeded)
+  if (length(rewoundCompleted)) {
+    for (k in ls(sim@completed)) {
+      ev <- get(k, envir = sim@completed)
+      if (identical(ev[["eventType"]], ".inputObjects") &&
+          ev[["moduleName"]] %in% rewoundCompleted)
+        rm(list = k, envir = sim@completed)
+    }
+  }
+
+  ## A resume does not re-arm recovery (recoverMode = 0); like restartSpades handing back
+  ##   to spades, restartSimInit just re-enters the shared phase on the rewound simList.
+  sim@.xData[["._rmo"]] <- NULL
+  modulesLoaded <- append(list(), ctx$core)
+  ## resume under the same calling handlers simInit() uses, so resumed `.inputObjects`
+  ##   messages/warnings get the usual `simInit/<module>:<event>` prefix (issue: restart
+  ##   ran the phase outside simInit()'s withCallingHandlers and lost the prefix).
+  withCallingHandlers(
+    sim <- .runInputObjectsPhase(sim, recoverMode = 0L, allInputObjNames = NULL,
+                                 thisSpadesCallRandomStr = NULL, modulesLoaded = modulesLoaded),
+    message = .simInitMessageHandler,
+    warning = .simInitWarningHandler
+  )
+  return(sim)
 }
 
 #' Restart R programmatically

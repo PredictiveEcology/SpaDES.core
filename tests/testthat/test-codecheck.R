@@ -84,6 +84,52 @@ Init <- function(sim) {
   expect_equal(sum(uses$kind == "sim_get" & !uses$resolved), 1L)
 })
 
+test_that("enclosing fn is found through wrapper calls (e.g. cmpfun)", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+SummaryBGM <- compiler::cmpfun(function(sim) {
+  sim$ANPPMap <- rasterizeReduced(x, sim$pixelGroupMap, "uniqueSumANPP")
+  sim
+})
+anon <- function(sim) {
+  lapply(1:2, function(z) sim$inner <- z)   # anonymous: not attributed
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  ## the assign wrapped in cmpfun() is attributed to its binding name
+  anpp <- uses[uses$name == "ANPPMap" & uses$kind == "sim_assign", , drop = FALSE]
+  expect_equal(anpp$fn, "SummaryBGM")
+  ## an assign declared as an output is therefore seen as "used"
+  meta <- list(module = "m", inputs = character(), outputs = "ANPPMap",
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("ANPPMap" %in% f$name[f$id == "out_declared_unused"])
+  ## the anonymous lapply callback is not misattributed to the outer function
+  inner <- uses[uses$name == "inner" & uses$kind == "sim_assign", , drop = FALSE]
+  expect_true(is.na(inner$fn))
+})
+
+test_that("sim[[var]] in an anonymous lapply callback is not flagged unresolved", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  ## a dynamic accessor inside an anonymous callback (fn = NA) must not surface
+  ## as an unresolved_accessor finding (which requires a known enclosing fn)
+  src <- '
+Init <- function(sim) {
+  haveAllRasters <- all(!unlist(lapply(rasterNamesToCompare,
+                                       function(rn) is.null(sim[[rn]]))))
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("unresolved_accessor" %in% f$id)
+})
+
 test_that("collector recognizes all parameter accessor forms", {
   skip_if_not_installed("xmlparsedata")
   skip_if_not_installed("xml2")
@@ -107,6 +153,392 @@ Init <- function(sim) {
   expect_equal(modByName[["gamma"]],   "other")
   expect_equal(modByName[["delta"]],   "thisMod")
   expect_equal(modByName[["epsilon"]], "other")
+})
+
+test_that("params(sim)[[currentModule(sim)]]$x resolves to the current module", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  params(sim)[[currentModule(sim)]]$pixelGroupAgeClass <- P(sim)$successionTimestep
+  z <- params(sim)[[someVar]]$bar   # genuinely unresolved
+  return(invisible(sim))
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "thisMod")
+  pUses <- uses[uses$kind == "param", , drop = FALSE]
+  ## the currentModule(sim) key resolves to the current module
+  pgac <- pUses[pUses$name == "pixelGroupAgeClass", , drop = FALSE]
+  expect_equal(nrow(pgac), 1L)
+  expect_true(pgac$resolved)
+  expect_equal(pgac$module, "thisMod")
+  ## a non-literal, non-currentModule key is still unresolved
+  expect_true(any(uses$kind == "param" & !uses$resolved))
+})
+
+test_that("inline # nolint suppresses findings (line and declaration span)", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+defineModule(sim, list(
+  name = "nolintMod",
+  inputObjects = bindrows(
+    expectsInput("cloudFolderID", "character", desc = "x"), # nolint: in_no_default
+    expectsInput("ecoregionRst", "RasterLayer",
+                 desc = "multi-line"), # nolint
+    expectsInput("needsIt", "character", desc = "still flagged")
+  ),
+  outputObjects = bindrows()
+))
+.inputObjects <- function(sim) sim
+Init <- function(sim) {
+  a <- scale(1)            # nolint: conflicting_fn_unqualified
+  b <- levels(2)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  inNoDef <- f$name[f$id == "in_no_default"]
+  ## rule-specific nolint on the line, and blanket nolint within the
+  ## (multi-line) declaration span, both silence in_no_default
+  expect_false("cloudFolderID" %in% inNoDef)
+  expect_false("ecoregionRst" %in% inNoDef)
+  expect_true("needsIt" %in% inNoDef)
+  ## rule-specific nolint silences only that rule on that line
+  conf <- f$name[f$id == "conflicting_fn_unqualified"]
+  expect_false("scale" %in% conf)
+  expect_true("levels" %in% conf)
+})
+
+test_that("# nolint accepts a group name as well as a rule id", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- scale(1)                            # nolint: globals
+  b <- levels(2)                           # nolint: conflicting_fn_unqualified
+  d <- scale(3)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  conf <- f[f$id == "conflicting_fn_unqualified", , drop = FALSE]
+  ## the group-name and rule-id markers each silence their own line; the
+  ## un-marked scale(3) remains
+  expect_equal(nrow(conf), 1L)
+  expect_equal(conf$name, "scale")
+})
+
+test_that("options(spades.codeChecksIgnore) suppresses by rule + object name", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+defineModule(sim, list(
+  name = "ignoreMod",
+  inputObjects = bindrows(
+    expectsInput("a", "character", desc = "x"),
+    expectsInput("b", "character", desc = "y")
+  ),
+  outputObjects = bindrows()
+))
+.inputObjects <- function(sim) sim
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  withr::local_options(spades.codeChecksIgnore = list(in_no_default = "a"))
+  f <- codeCheckModule(tf, print = FALSE)
+  inNoDef <- f$name[f$id == "in_no_default"]
+  expect_false("a" %in% inNoDef)
+  expect_true("b" %in% inNoDef)
+})
+
+test_that("options(spades.moduleCodeChecks=list(disable=)) disables a whole rule", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- scale(1)
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  withr::local_options(spades.moduleCodeChecks = list(disable = "conflicting_fn_unqualified"))
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("conflicting_fn_unqualified" %in% f$id)
+})
+
+test_that("suggestions end with a `# nolint: <rule_id>` acknowledgement", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- scale(1)
+  sim$undeclared <- 1
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  withSug <- f[!is.na(f$suggestion), , drop = FALSE]
+  expect_true(nrow(withSug) > 0)
+  ## each suggestion references nolint with the finding's own rule id
+  expect_true(all(mapply(function(s, id) grepl(paste0("# nolint: ", id), s, fixed = TRUE),
+                         withSug$suggestion, withSug$id)))
+  ## the old vague wording is gone
+  expect_false(any(grepl("otherwise ignore", f$suggestion, fixed = TRUE)))
+})
+
+test_that("list2env(..., envir(sim)) bulk write counts local assigns as outputs", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  studyArea <- makeSA()
+  rasterToMatch <- makeRTM()
+  objsHere <- depends(sim)@dependencies[[currentModule(sim)]]@outputObjects$objectName
+  list2env(mget(objsHere, envir = environment()), envir = envir(sim))
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m",
+               inputs = character(),
+               outputs = c("studyArea", "rasterToMatch", "neverProduced"),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  unused <- f$name[f$id == "out_declared_unused"]
+  ## locally-assigned outputs are treated as produced via the bulk write
+  expect_false("studyArea" %in% unused)
+  expect_false("rasterToMatch" %in% unused)
+  ## an output that is neither sim$-assigned nor a local assignment is still flagged
+  expect_true("neverProduced" %in% unused)
+})
+
+test_that("paramCheckOtherMods(sim, 'x') marks x a used parameter", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  a <- SpaDES.core::paramCheckOtherMods(sim, "spreadFitFilename")
+  b <- paramCheckOtherMods(sim, "otherParam")
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  pc <- uses[uses$kind == "param" & uses$extra == "paramCheckOtherMods()", , drop = FALSE]
+  expect_setequal(pc$name, c("spreadFitFilename", "otherParam"))
+  ## a declared param read only via paramCheckOtherMods is "used"
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = "spreadFitFilename", otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  expect_false("spreadFitFilename" %in% f$name[f$id == "param_declared_unused"])
+  ## and is exempt from used-but-not-declared (it belongs to other modules)
+  expect_false("param_used_undeclared" %in% f$id)
+})
+
+test_that("reqd_pkg_duplicate flags a package declared twice (conflict)", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("Require")
+  src <- '
+defineModule(sim, list(
+  name = "m",
+  reqdPkgs = list("terra",
+                  "SpaDES.core (>= 3.0.1)",
+                  "PredictiveEcology/SpaDES.core@branch (>= 3.0.4)",
+                  "deldir"),
+  inputObjects = bindrows(),
+  outputObjects = bindrows()
+))
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  dup <- f[f$id == "reqd_pkg_duplicate", , drop = FALSE]
+  expect_equal(dup$name, "SpaDES.core")
+  expect_equal(dup$severity, "warning")          # differing source/version -> conflict
+  expect_false(any(c("terra", "deldir") %in% dup$name))
+})
+
+test_that("reqd_pkg_undeclared flags pkg::fn whose pkg is not in reqdPkgs", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("Require")
+  src <- '
+defineModule(sim, list(
+  name = "m",
+  reqdPkgs = list("terra", "PredictiveEcology/reproducible@dev (>= 3.0.0)"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+Init <- function(sim) {
+  a <- terra::rast(1)
+  b <- reproducible::Cache(f)
+  d <- data.table::data.table()
+  e <- stats::lm(y ~ x)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  missing <- f$name[f$id == "reqd_pkg_undeclared"]
+  expect_true("data.table" %in% missing)        # used via :: but not declared
+  expect_false("terra" %in% missing)             # declared
+  expect_false("reproducible" %in% missing)      # declared via GitHub spec
+  expect_false("stats" %in% missing)             # base package
+})
+
+test_that("# nolint: vars asserts produced outputs for a dynamic bulk assign", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init <- function(sim) {
+  sppOuts <- sppHarmonize(sim$sppEquiv, P(sim)$sppEquivCol)
+  list2env(sppOuts, envir = envir(sim))  # nolint: vars sppEquiv, sppColorVect
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  expect_setequal(uses$name[uses$kind == "declared_var"], c("sppEquiv", "sppColorVect"))
+  meta <- list(module = "m", inputs = character(),
+               outputs = c("sppEquiv", "sppColorVect", "notProduced"),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  unused <- f$name[f$id == "out_declared_unused"]
+  expect_false("sppEquiv" %in% unused)
+  expect_false("sppColorVect" %in% unused)
+  expect_true("notProduced" %in% unused)         # no assertion -> still flagged
+})
+
+test_that("unresolved accessors share a generic message so the report collapses them", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+.inputObjects <- function(sim) {
+  d <- mget(names, envir(sim))
+  sim
+}
+helper <- function(sim) {
+  e <- get(nm, envir(sim))
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  gf <- f[f$id == "unresolved_accessor", , drop = FALSE]
+  ## two get-family occurrences in different functions, one finding each, but
+  ## with an identical (location-free) message so the report groups them
+  expect_equal(nrow(gf), 2L)
+  expect_equal(length(unique(gf$message)), 1L)
+  expect_false(any(grepl("inputObjects|helper|lines", gf$message)))
+})
+
+test_that("reqd_pkg_no_source reports bare calls with no apparent source", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("terra")
+  src <- '
+defineModule(sim, list(
+  name = "m", reqdPkgs = list("terra"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+myHelper <- function(x) x + 1
+Init <- function(sim) {
+  a <- rast(2)                # terra export -> sourced
+  b <- myHelper(3)            # local -> sourced
+  d <- paste("x")             # base -> sourced
+  e <- totallyMadeUpFn(4)     # no apparent source
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  ns <- f[f$id == "reqd_pkg_no_source", , drop = FALSE]
+  ## one finding per no-source function, carrying its name + source line
+  expect_equal(ns$name, "totallyMadeUpFn")
+  expect_true(all(!is.na(ns$line)))
+  expect_false(any(c("rast", "myHelper", "paste") %in% ns$name))
+})
+
+test_that("reqd_pkg_no_source ignores data.table `.` syntax", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  skip_if_not_installed("data.table")
+  src <- '
+defineModule(sim, list(
+  name = "m", reqdPkgs = list("data.table"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+Init <- function(sim) {
+  DT[, .(s = sum(x))]
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  expect_false("." %in% f$name[f$id == "reqd_pkg_no_source"])
+})
+
+test_that("reqd_pkg_no_source stays quiet if a declared package is not installed", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+defineModule(sim, list(
+  name = "m", reqdPkgs = list("aPackageThatIsNotInstalled12345"),
+  inputObjects = bindrows(), outputObjects = bindrows()
+))
+Init <- function(sim) {
+  e <- totallyMadeUpFn(4)
+  sim
+}
+'
+  tf <- withr::local_tempfile(fileext = ".R")
+  writeLines(src, tf)
+  f <- codeCheckModule(tf, print = FALSE)
+  expect_false("reqd_pkg_no_source" %in% f$id)   # incomplete export info -> quiet
+})
+
+test_that("in_no_default honours # nolint: vars and suppliedElsewhere guards", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+.inputObjects <- function(sim) {
+  for (nam in objsHere) {
+    sim[[paste0(nam, "s")]] <- mget(x, envir(sim)) # nolint: vars cohortDatas
+  }
+  if (!suppliedElsewhere("historicalClimateRasters", sim)) {
+    stop("please supply it")
+  }
+  if (!suppliedElsewhere(standAgeMap, sim)) {
+    sim$standAgeMap <- makeDefault()
+  }
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m",
+               inputs = c("cohortDatas", "historicalClimateRasters",
+                          "standAgeMap", "propFlammables"),
+               outputs = character(), params = character(),
+               otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  flagged <- f$name[f$id == "in_no_default"]
+  expect_false("cohortDatas" %in% flagged)                # # nolint: vars
+  expect_false("historicalClimateRasters" %in% flagged)   # suppliedElsewhere + stop
+  expect_false("standAgeMap" %in% flagged)                # suppliedElsewhere + default
+  expect_true("propFlammables" %in% flagged)              # genuinely no default
 })
 
 test_that("LHS vs RHS distinction is correct", {

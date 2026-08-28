@@ -317,6 +317,22 @@ test_that("simInit with R subfolder scripts", {
   expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
 })
 
+test_that("simInit with .globals but no modules does not error (#empty-deps)", {
+  testInit()
+
+  # Regression: previously errored with
+  #   "no applicable method for `@` applied to an object of class \"NULL\""
+  # because sim@depends@dependencies defaults to list(NULL) and
+  # updateParamsFromGlobals() tried mod@parameters on the NULL element.
+  d <- 1
+  expect_error(
+    sim <- suppressMessages(simInit(params = list(.globals = list(d = d)))),
+    NA
+  )
+  expect_s4_class(sim, "simList")
+  expect_identical(sim@params$.globals$d, d)
+})
+
 test_that("simulation runs with simInit with duplicate modules named", {
   testInit(sampleModReqdPkgs, opts = list(spades.debug = 1))
 
@@ -986,6 +1002,56 @@ test_that("debug using logging", {
   expect_true(length(mess1) == 0)
 })
 
+test_that("simInit() handles a multi-element `debug` list (regression: #322)", {
+  # `verbose <- debugToVerbose(debug)` is used as a SCALAR downstream (e.g. simInit() does
+  # `setPaths(silent = verbose <= 0)`), so a multi-element `debug` list must NOT yield a vector
+  # `verbose`, else `if (!silent)` errors "the condition has length > 1". The other `debug = list`
+  # tests only exercise `spades()` on a pre-init'd sim, so they never reach the simInit()->setPaths()
+  # path where this regresses. Do not let `debugToVerbose()` return the raw per-element vector again.
+  skip_on_cran()
+
+  # unit-level guard on the reducer (tight: catches a silent revert of the scalar reduction)
+  expect_length(debugToVerbose(list(file = list(file = "x", append = TRUE), debug = 1)), 1L)
+  expect_length(debugToVerbose(list("console" = list(level = 10), debug = 1)), 1L)
+  expect_length(debugToVerbose(1), 1L)
+  expect_length(debugToVerbose(FALSE), 1L)
+
+  # integration-level guards need the sample modules + `logging` (a Suggests dep). `testInit()`
+  # skips the block when any are unavailable (e.g. the `nosuggests` CI builds, where `logging` is
+  # absent) and provides a managed `tmpdir` (auto-cleaned via withr).
+  testInit(c(sampleModReqdPkgs, "logging"))
+  paths <- list(modulePath = getSampleModules(tmpdir))
+
+  # simInit() with a >1-element debug list must not error (exercises debugToVerbose() -> setPaths())
+  logging::logReset()
+  expect_error(
+    simInit(times = list(start = 0, end = 1), modules = list("randomLandscapes"), paths = paths,
+            debug = list(file = list(file = file.path(tmpdir, "s.log")), debug = 1)),
+    regexp = NA
+  )
+
+  # a list `debug` must also survive a full run: `.runModuleInputObjects()` builds the per-module
+  # debug level via `ifelse(debug < 1, ...)`, which crashed "'list' object cannot be coerced to
+  # type 'double'" before the guard. Drive simInit() + spades() together via simInitAndSpades().
+  # NB: the log-file path here must be self-resolving (`tempdir()`), NOT a test-local variable:
+  # simInitAndSpades() re-evaluates its `spades`-only args (like `debug`) via `do.call()` in its
+  # OWN frame, so a caller-local `tmpdir` would error "object 'tmpdir' not found" (unlike the
+  # direct simInit() call above, whose args evaluate in the test frame).
+  logging::logReset()
+  expect_error(
+    simInitAndSpades(
+      times = list(start = 0, end = 2),
+      modules = list("randomLandscapes", "fireSpread"),
+      params = list(randomLandscapes = list(.plotInitialTime = NA),
+                    fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)),
+      paths = paths,
+      debug = list(file = list(file = file.path(tempdir(), "s2.log")), debug = 1)
+    ),
+    regexp = NA
+  )
+  logging::logReset()
+})
+
 test_that("options('reproducible.reqdPkgsDontLoad", {
   dontLoad <- "logging" # ggplot2 has many rev deps; can't be sp, raster because already loaded
 
@@ -1044,6 +1110,32 @@ paste0("    reqdPkgs = list(\'", dontLoad, "\'),"),'
   expect_true(isNamespaceLoaded(dontLoad))
   unloadNamespace(dontLoad)
 
+})
+
+test_that("box is not a dependency: not installed/loaded during simInit", {
+  testInit()
+
+  # The package must not ship any reference to `box`; previously the default of
+  # `spades.reqdPkgsDontLoad` was "box", which caused simInit to *install* box
+  # (via Require(..., require = FALSE)) even though it does not work within the
+  # SpaDES ecosystem. The default is now NULL, and the unimplemented
+  # `spades.useBox` option has been removed entirely.
+  opts <- spadesOptions()
+  expect_null(opts[["spades.reqdPkgsDontLoad"]])
+  expect_false("spades.useBox" %in% names(opts))
+  expect_null(getOption("spades.reqdPkgsDontLoad"))
+
+  # Regression: a basic simInit must neither install nor load the box namespace.
+  # If box happens to already be loaded in this session, we cannot make the
+  # assertion meaningfully, so skip.
+  skip_if(isNamespaceLoaded("box"),
+          "box already loaded in this session; cannot test that simInit avoids it")
+
+  newModule("testNoBox", tmpdir, open = FALSE)
+  sim <- simInit(modules = "testNoBox", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1, timeunit = "year"))
+  expect_is(sim, "simList")
+  expect_false(isNamespaceLoaded("box"))
 })
 
 test_that("cli progress bars are throttled and not flooded during spades()", {

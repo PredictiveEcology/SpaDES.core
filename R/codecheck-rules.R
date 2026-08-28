@@ -11,7 +11,10 @@
 ##               files = chr)
 ##
 ## Rules are dispatched by .cc_runRules(); each is enabled unless disabled via
-## options(spades.moduleCodeChecks = list(disable = c("rule_id", ...))).
+## options(spades.moduleCodeChecks = list(disable = c("rule_id", ...))). Per
+## finding, output is further filtered by .cc_applySuppression(): inline
+## `# nolint` markers in the module source, and
+## options(spades.codeChecksIgnore = list(<rule_id> = c("obj", ...))).
 
 ## Rule catalogue ------------------------------------------------------------
 
@@ -30,14 +33,58 @@
   module_named_object      = function(uses, meta) .ccr_module_named_object(uses, meta),
   conflicting_fn_unqualified = function(uses, meta) .ccr_conflicting_fn(uses, meta),
   clashing_module_fn       = function(uses, meta) .ccr_clashing_fn(uses, meta),
-  codetools                = function(uses, meta) .ccr_codetools(uses, meta)
+  codetools                = function(uses, meta) .ccr_codetools(uses, meta),
+  reqd_pkg_duplicate       = function(uses, meta) .ccr_reqd_pkg_duplicate(uses, meta),
+  reqd_pkg_undeclared      = function(uses, meta) .ccr_reqd_pkg_undeclared(uses, meta),
+  reqd_pkg_no_source       = function(uses, meta) .ccr_reqd_pkg_no_source(uses, meta)
+)
+
+## Base-priority packages that are always available and never declared in
+## reqdPkgs.
+.CC_BASE_PKGS <- c("base", "compiler", "datasets", "graphics", "grDevices",
+                   "grid", "methods", "parallel", "splines", "stats", "stats4",
+                   "tcltk", "tools", "utils")
+
+## "Call" tokens that are special syntax rather than package functions, so the
+## no-source check must never report them. `.` is data.table's `DT[, .(...)]`.
+.CC_NONFUNCTION_CALLS <- c(".")
+
+## Display bucket each rule id is reported under (the `• <group>` headers).
+## Shared by the reporter and by `# nolint` / codeChecksIgnore suppression, so
+## either the rule id or its group name can be used to silence a finding.
+.CC_RULE_GROUPS <- c(
+  out_declared_unused        = "outputObjects",
+  out_used_undeclared        = "outputObjects",
+  in_declared_unused         = "inputObjects",
+  in_used_undeclared         = "inputObjects",
+  in_no_default              = "inputObjects",
+  param_declared_unused      = "parameters",
+  param_used_undeclared      = "parameters",
+  param_used_other_module    = "parameters",
+  unresolved_accessor        = "unresolved",
+  must_return_sim            = "module functions",
+  must_assign_to_sim         = "module functions",
+  module_named_object        = "module functions",
+  conflicting_fn_unqualified = "globals",
+  clashing_module_fn         = "module functions",
+  codetools                  = "codetools",
+  reqd_pkg_duplicate         = "reqdPkgs",
+  reqd_pkg_undeclared        = "reqdPkgs",
+  reqd_pkg_no_source         = "reqdPkgs"
 )
 
 ## Public entry: returns a Findings data.frame
 .cc_runRules <- function(uses, meta, enable = NULL, disable = NULL) {
   ids <- names(.CC_RULES)
-  if (!is.null(enable)) ids <- intersect(ids, enable)
-  if (!is.null(disable)) ids <- setdiff(ids, disable)
+  ## Honour rule enable/disable supplied via the option, in addition to the
+  ## function arguments: options(spades.moduleCodeChecks = list(disable = ...)).
+  opt <- getOption("spades.moduleCodeChecks")
+  if (is.list(opt)) {
+    enable  <- c(enable,  opt[["enable"]])
+    disable <- c(disable, opt[["disable"]])
+  }
+  if (length(enable))  ids <- intersect(ids, enable)
+  if (length(disable)) ids <- setdiff(ids, disable)
   out <- lapply(ids, function(id) {
     fn <- .CC_RULES[[id]]
     tryCatch(fn(uses, meta),
@@ -48,7 +95,78 @@
   })
   out <- out[lengths(out) > 0]
   if (length(out) == 0) return(.cc_emptyFindings())
-  do.call(rbind, out)
+  findings <- do.call(rbind, out)
+  findings <- .cc_appendNolintHint(findings)
+  .cc_applySuppression(findings, uses)
+}
+
+## Every suggestion ends by telling the developer how to acknowledge the
+## finding: `otherwise add # nolint: <rule_id>`. Replaces the vaguer
+## "otherwise ignore" and is appended to suggestions that don't already mention
+## `nolint`, using each finding's own rule id.
+.cc_appendNolintHint <- function(findings) {
+  if (nrow(findings) == 0) return(findings)
+  findings$suggestion <- vapply(seq_len(nrow(findings)), function(i) {
+    s <- findings$suggestion[i]
+    if (is.na(s)) return(NA_character_)
+    if (grepl("nolint", s, fixed = TRUE)) return(s)   # already mentions it
+    s <- sub("[[:space:];,]*otherwise ignore\\.?[[:space:]]*$", "", s)
+    paste0(s, "; otherwise add `# nolint: ", findings$id[i], "`")
+  }, character(1))
+  findings
+}
+
+## Drop findings silenced either by an inline `# nolint` marker (carried on
+## `uses` as the "nolint"/"declLines" attributes) or by the user option
+## options(spades.codeChecksIgnore = list(<rule_id> = c("obj1", "obj2"))).
+.cc_applySuppression <- function(findings, uses) {
+  if (nrow(findings) == 0) return(findings)
+  nolint    <- attr(uses, "nolint")
+  declLines <- attr(uses, "declLines")
+  ignore    <- getOption("spades.codeChecksIgnore")
+
+  ## candidate (file, line) locations a `# nolint` could sit on to silence
+  ## finding `i`: its own source line, or — for metadata-only findings with no
+  ## line — every line of the matching declaration's span.
+  candLines <- function(i) {
+    if (!is.na(findings$line[i])) {
+      return(data.frame(file = findings$file[i], line = findings$line[i],
+                        stringsAsFactors = FALSE))
+    }
+    if (is.null(declLines) || is.na(findings$name[i])) return(NULL)
+    dl <- declLines[declLines$name == findings$name[i], , drop = FALSE]
+    if (nrow(dl) == 0) return(NULL)
+    do.call(rbind, Map(function(f, a, b)
+      data.frame(file = f, line = seq.int(a, b), stringsAsFactors = FALSE),
+      dl$file, dl$line1, dl$line2))
+  }
+
+  keep <- vapply(seq_len(nrow(findings)), function(i) {
+    fid <- findings$id[i]; fname <- findings$name[i]
+    ## a finding can be referenced by its rule id or by its group name
+    fkeys <- c(fid, .CC_RULE_GROUPS[[fid]])
+    ## user option: ignore named objects for a given rule (or group)
+    if (is.list(ignore) && !is.na(fname) &&
+        any(vapply(fkeys, function(k) fname %in% ignore[[k]], logical(1)))) {
+      return(FALSE)
+    }
+    ## inline `# nolint`
+    if (!is.null(nolint) && nrow(nolint)) {
+      cand <- candLines(i)
+      if (!is.null(cand) && nrow(cand)) {
+        for (j in seq_len(nrow(nolint))) {
+          sameFile <- (is.na(nolint$file[j]) & is.na(cand$file)) |
+            (!is.na(nolint$file[j]) & nolint$file[j] == cand$file)
+          if (any(sameFile & nolint$line[j] == cand$line)) {
+            r <- nolint$rules[[j]]
+            if (all(is.na(r)) || any(fkeys %in% r)) return(FALSE)
+          }
+        }
+      }
+    }
+    TRUE
+  }, logical(1))
+  findings[keep, , drop = FALSE]
 }
 
 ## Helpers -------------------------------------------------------------------
@@ -75,8 +193,12 @@
   uses[!is.na(uses$fn) & uses$fn == ".inputObjects", , drop = FALSE]
 }
 
+## Everything that is not provably inside .inputObjects(). A use whose
+## enclosing function could not be identified (fn = NA, e.g. a function wrapped
+## in compiler::cmpfun()/Cache()) is treated as outside, so an unrecognised
+## wrapper never produces a false "declared but unused" finding.
 .cc_outsideDotInputObjects <- function(uses) {
-  uses[!is.na(uses$fn) & uses$fn != ".inputObjects", , drop = FALSE]
+  uses[is.na(uses$fn) | uses$fn != ".inputObjects", , drop = FALSE]
 }
 
 ## Build a generic finding for a "declared but unused" object (no source pos).
@@ -100,7 +222,7 @@
                                                 name, name),
                 param_declared_unused = sprintf("either remove `defineParameter('%s', ...)` or add `Par$%s` (or P(sim)$%s) in module code",
                                                 name, name, name),
-                in_no_default         = sprintf("if a default is appropriate, add `if (!suppliedElsewhere('%s', sim)) sim$%s <- <default>` to .inputObjects(); otherwise ignore",
+                in_no_default         = sprintf("if a default is appropriate, add `if (!suppliedElsewhere('%s', sim)) sim$%s <- <default>` to .inputObjects()",
                                                 name, name),
                 NA_character_
               ))
@@ -122,7 +244,21 @@
   if (length(meta$outputs) == 0) return(.cc_emptyFindings())
   outsideInit <- .cc_outsideDotInputObjects(uses)
   assigns <- outsideInit[outsideInit$kind == "sim_assign" & !is.na(outsideInit$name), , drop = FALSE]
-  missing <- setdiff(meta$outputs, assigns$name)
+  assignedNames <- assigns$name
+  ## A bulk write into envir(sim) -- e.g. list2env(mget(outputNames,
+  ## environment()), envir(sim)) -- assigns outputs by run-time name. In that
+  ## case treat an output that is computed as a same-named local variable as
+  ## produced. (mget() would error at run time if such a local were missing, so
+  ## this is reliable; outputs with no local assignment are still flagged.)
+  if (any(uses$kind == "sim_bulk_assign")) {
+    assignedNames <- c(assignedNames,
+                       uses$name[uses$kind == "local_assign" & !is.na(uses$name)])
+  }
+  ## developer assertions via `# nolint: vars a, b` (e.g. on a list2env line
+  ## whose list element names can't be seen statically) -- treat as produced
+  assignedNames <- c(assignedNames,
+                     uses$name[uses$kind == "declared_var" & !is.na(uses$name)])
+  missing <- setdiff(meta$outputs, assignedNames)
   if (length(missing) == 0) return(.cc_emptyFindings())
   do.call(rbind, lapply(missing, function(n)
     .cc_declaredUnused("out_declared_unused", "warning", meta$module, n, "outputObjects")))
@@ -179,7 +315,14 @@
   if (length(meta$inputs) == 0) return(.cc_emptyFindings())
   initAssigns <- .cc_inDotInputObjects(uses)
   initAssigns <- initAssigns[initAssigns$kind == "sim_assign" & !is.na(initAssigns$name), , drop = FALSE]
-  missing <- setdiff(meta$inputs, initAssigns$name)
+  ## `# nolint: vars a, b` asserts a, b are assigned (e.g. a dynamic
+  ## sim[[namPlural]] <- ... in .inputObjects whose name can't be seen
+  ## statically); treat them as having a default.
+  declaredVars <- uses$name[uses$kind == "declared_var" & !is.na(uses$name)]
+  ## an input guarded by `suppliedElsewhere("x", sim)` (then assigned a default
+  ## OR stop()ped if absent) is intentionally handled -- not a missing default.
+  suppliedElsewhere <- uses$name[uses$kind == "supplied_elsewhere" & !is.na(uses$name)]
+  missing <- setdiff(meta$inputs, c(initAssigns$name, declaredVars, suppliedElsewhere))
   if (length(missing) == 0) return(.cc_emptyFindings())
   do.call(rbind, lapply(missing, function(n)
     .cc_declaredUnused("in_no_default", "note", meta$module, n, "inputObjects")))
@@ -210,6 +353,9 @@
   ## core machinery defines these implicitly; modules legitimately reference
   ## them without declaring in defineParameter()
   pUses <- pUses[!.cc_isInternalParam(pUses$name), , drop = FALSE]
+  ## paramCheckOtherMods(sim, "x") deliberately reads parameters owned by other
+  ## modules, so such uses must not be reported as "used but not declared here"
+  pUses <- pUses[is.na(pUses$extra) | pUses$extra != "paramCheckOtherMods()", , drop = FALSE]
   bad <- pUses[!(pUses$name %in% meta$params), , drop = FALSE]
   if (nrow(bad) == 0) return(.cc_emptyFindings())
   do.call(rbind, lapply(seq_len(nrow(bad)), function(i) {
@@ -243,17 +389,34 @@
 .ccr_unresolved_accessor <- function(uses, meta) {
   bad <- uses[!uses$resolved & !is.na(uses$fn), , drop = FALSE]
   if (nrow(bad) == 0) return(.cc_emptyFindings())
-  ## Aggregate: one finding per (fn, kind) showing all line numbers, so the
-  ## report doesn't spew one row per occurrence. Tests can still see the raw
-  ## Uses on .codeCheck if they want.
-  by <- split(bad, list(bad$fn, bad$kind), drop = TRUE)
-  do.call(rbind, lapply(by, function(g) {
-    lines <- paste(g$line, collapse = ", ")
-    u <- g[1, ]
+  ## Classify the kind of dynamic access so the message can be specific. The
+  ## get-family (get/mget/exists/assign with a computed name) and `sim[[var]]`
+  ## are inherently un-checkable statically -- the developer must decide whether
+  ## the access is intentional (add `# nolint: unresolved_accessor`) or a bug.
+  getFamily <- c("get()", "mget()", "exists()", "assign()")
+  access <- ifelse(bad$extra %in% getFamily, "getfam",
+                   ifelse(bad$kind %in% c("sim_get", "sim_assign"),
+                          "bracket", "other"))
+  nolintHint <- paste0("cannot be checked statically (the object name is ",
+                       "computed at run time); if intentional, add ",
+                       "`# nolint: unresolved_accessor` on the line(s), ",
+                       "otherwise use a literal name (`sim$x`) or declare ",
+                       "the object in inputObjects/outputObjects")
+  ## One finding per occurrence with a generic, location-free message, so the
+  ## report collapses same-kind accesses (across functions) into a single info
+  ## with one line per location.
+  do.call(rbind, lapply(seq_len(nrow(bad)), function(i) {
+    u <- bad[i, ]
+    msgSug <- switch(
+      access[i],
+      getfam  = list(msg = "dynamic `get()`/`mget()`-family access of `sim`",
+                     sug = nolintHint),
+      bracket = list(msg = "dynamic `sim[[<var>]]` access",
+                     sug = nolintHint),
+      list(msg = sprintf("unresolved %s accessor", u$kind),
+           sug = "if these objects should be checked, declare them explicitly in inputObjects/outputObjects"))
     .cc_findingFromUse("unresolved_accessor", "info", meta$module, u,
-                       message = sprintf("%d unresolved %s accessor(s) in %s (lines %s) \u2014 skipped",
-                                         nrow(g), u$kind, u$fn, lines),
-                       suggestion = "if these objects should be checked, declare them explicitly in inputObjects/outputObjects")
+                       message = msgSug$msg, suggestion = msgSug$sug)
   }))
 }
 
@@ -293,7 +456,7 @@
   do.call(rbind, lapply(seq_len(nrow(bad)), function(i) {
     u <- bad[i, ]
     .cc_findingFromUse("module_named_object", "error", meta$module, u,
-                       message = sprintf("`sim$%s <- ...` collides with the module name; not allowed",
+                       message = sprintf("`sim$%s <- ...` collides with module name; should be changed because it can cause unwanted problems",
                                          u$name),
                        suggestion = "rename the object")
   }))
@@ -350,5 +513,89 @@
   do.call(rbind, lapply(msgs, function(m) {
     .cc_finding("codetools", "note", meta$module,
                 message = m, suggestion = NA_character_)
+  }))
+}
+
+## reqdPkgs rules ------------------------------------------------------------
+
+## A package declared more than once in reqdPkgs. Different source/version
+## specs for the same package (e.g. CRAN `SpaDES.core (>= 3.0.1)` plus
+## `PredictiveEcology/SpaDES.core@branch (>= 3.0.4)`) are a real conflict
+## (warning); exact repeats are a note.
+.ccr_reqd_pkg_duplicate <- function(uses, meta) {
+  rp <- meta$reqdPkgs
+  if (is.null(rp) || NROW(rp) == 0) return(.cc_emptyFindings())
+  dups <- unique(rp$pkg[duplicated(rp$pkg)])
+  if (length(dups) == 0) return(.cc_emptyFindings())
+  do.call(rbind, lapply(dups, function(p) {
+    entries <- rp[rp$pkg == p, , drop = FALSE]
+    specs <- unique(entries$spec)
+    conflict <- length(specs) > 1
+    .cc_finding(
+      "reqd_pkg_duplicate", if (conflict) "warning" else "note", meta$module,
+      where = "reqdPkgs", name = p,
+      file = entries$file[1], line = entries$line[1],
+      message = sprintf("package '%s' is declared %d times in reqdPkgs%s: %s",
+                        p, nrow(entries),
+                        if (conflict) " with differing source/version" else "",
+                        paste(specs, collapse = " | ")),
+      suggestion = "keep a single declaration (the most specific source/version) and remove the rest")
+  }))
+}
+
+## A package referenced via `pkg::fn` but not present in reqdPkgs (and not a
+## base package). Likely a missing declaration.
+.ccr_reqd_pkg_undeclared <- function(uses, meta) {
+  ns <- uses[uses$kind == "ns_call" & !is.na(uses$name), , drop = FALSE]
+  if (nrow(ns) == 0) return(.cc_emptyFindings())
+  declared <- if (is.null(meta$reqdPkgs)) character() else unique(meta$reqdPkgs$pkg)
+  missing <- setdiff(unique(ns$name), c(declared, .CC_BASE_PKGS))
+  if (length(missing) == 0) return(.cc_emptyFindings())
+  do.call(rbind, lapply(missing, function(p) {
+    fns <- unique(stats::na.omit(ns$extra[ns$name == p]))
+    eg <- paste0(p, "::", utils::head(fns, 3), "()", collapse = ", ")
+    u <- ns[ns$name == p, , drop = FALSE][1, ]
+    .cc_findingFromUse(
+      "reqd_pkg_undeclared", "warning", meta$module, u,
+      message = sprintf("package '%s' is used via `::` (e.g. %s) but not declared in reqdPkgs",
+                        p, eg),
+      suggestion = sprintf("add '%s' to reqdPkgs", p))
+  }))
+}
+
+## Quiet, best-effort: bare function calls that have no apparent source among
+## the declared reqdPkgs (their installed namespace exports), base packages,
+## SpaDES.core, or functions defined locally in the module. Only runs when
+## every declared (non-base) package is installed -- otherwise we can't tell
+## where bare calls come from, so we stay silent. Info-level.
+.ccr_reqd_pkg_no_source <- function(uses, meta) {
+  bareUses <- uses[uses$kind == "bare_call" & !is.na(uses$name), , drop = FALSE]
+  ## `.` is data.table syntax (DT[, .(...)]) and similar non-functions, not a
+  ## package export -- never report it
+  bareUses <- bareUses[!bareUses$name %in% .CC_NONFUNCTION_CALLS, , drop = FALSE]
+  if (nrow(bareUses) == 0) return(.cc_emptyFindings())
+  declared <- if (is.null(meta$reqdPkgs)) character() else unique(meta$reqdPkgs$pkg)
+  declared <- setdiff(declared, .CC_BASE_PKGS)
+  if (length(declared) &&
+      !all(vapply(declared, requireNamespace, logical(1), quietly = TRUE))) {
+    return(.cc_emptyFindings())   # incomplete export info -> stay quiet
+  }
+  ## exclude tcltk -- loading its namespace warns when there is no DISPLAY
+  exportPkgs <- setdiff(unique(c("SpaDES.core", .CC_BASE_PKGS, declared)), "tcltk")
+  exports <- suppressWarnings(unlist(lapply(exportPkgs, function(p)
+    tryCatch(getNamespaceExports(p), error = function(e) character()))))
+  ## locally-defined names (functions and other locals) and enclosing fn names
+  localNames <- unique(c(uses$name[uses$kind == "local_assign"], uses$fn))
+  localNames <- localNames[!is.na(localNames)]
+  noSource <- bareUses[!(bareUses$name %in% c(exports, localNames)), , drop = FALSE]
+  if (nrow(noSource) == 0) return(.cc_emptyFindings())
+  ## one finding per function (carrying its first source position) with a
+  ## generic message, so the report collapses them under one header with a
+  ## `fn (file:line)` line apiece.
+  do.call(rbind, lapply(seq_len(nrow(noSource)), function(i) {
+    .cc_findingFromUse(
+      "reqd_pkg_no_source", "info", meta$module, noSource[i, ],
+      message = "no apparent source among the packages named in reqdPkgs",
+      suggestion = "declare the providing package in reqdPkgs, qualify the call as pkg::fn, or ignore if defined elsewhere")
   }))
 }

@@ -15,7 +15,7 @@ writeEventInfo <- function(sim, file = "events.txt", append = FALSE) {
   f <- normPath(file)
   curr <- current(sim)
   cat(paste(curr$moduleName, curr$eventType, curr$eventTime), ":\n",
-      file = file, append = append)
+      file = f, append = append)
 }
 
 #' Write RNG state info to file
@@ -34,6 +34,7 @@ writeRNGInfo <- function(file = "seed.txt", append = FALSE) {
   fseed <- normPath(file)
   cat("\tStart of new RNG stream: ", file = fseed, append = append)
   ## NOTE: the first element of .Random.seed specifies the RNG type, so omit it
-  cat(.Random.seed[2:11], file = fseed, sep = ", ", append = append)
-  cat(".", file = fseed, sep = "\n", append = append)
+  ## the remaining writes must always append, or they truncate what came above
+  cat(.Random.seed[2:11], file = fseed, sep = ", ", append = TRUE)
+  cat(".", file = fseed, sep = "\n", append = TRUE)
 }

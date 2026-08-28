@@ -13,30 +13,34 @@
 #'
 #' These functions have been moved to other packages.
 #'
+#' @return These functions are defunct here and are called for their side effect of
+#'   signalling a deprecation message pointing at the package that now provides them.
+#'   They return `NULL`, invisibly.
+#'
 #' @export
 #' @param ... Unused.
 #' @rdname deprecated
 experiment <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.project"))
 }
 
 
 #' @export
 #' @rdname deprecated
 experiment2 <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.project"))
 }
 
 #' @export
 #' @rdname deprecated
 POM <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.experiment"))
 }
 
 #' @export
 #' @rdname deprecated
 simInitAndExperiment <- function(...) {
-  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]]), "SpaDES.experiment")
+  .Deprecated(msg = .messageDeprecatedFn(match.call()[[1]], "SpaDES.project"))
 }
 
 #' @rdname deprecated

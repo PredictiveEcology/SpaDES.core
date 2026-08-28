@@ -391,6 +391,11 @@ setMethod(
     # loggingMessage helpers
     sim[[._txtSimNesting]] <- ._simNestingLocal
 
+    # URL access log: route prepInputs/preProcess calls during simInit into
+    # envir(sim)$._urlLog. See R/urlLog.R.
+    .urlLogToken <- .installUrlLog(sim)
+    on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
+
     opt <- options("encoding" = "UTF-8")
     # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
     #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
@@ -487,6 +492,13 @@ setMethod(
     }, add = TRUE)
     paths(sim) <- paths #paths accessor does important stuff
 
+    # Let reproducible store/restore file-backed objects (e.g. SpatRaster) relative
+    #   to these project anchors, so they remain portable across machines/users
+    #   (e.g. a shared cloud cache). `.inputObjects` runs Cache() during simInit, so
+    #   the anchors must be in place here too. Skips if the user already set them.
+    if (isTRUE(.useFileBackedAnchors(paths(sim))))
+      on.exit(options(reproducible.fileBackedAnchors = NULL), add = TRUE)
+
     names(modules) <- unlist(modules)
     adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 
@@ -543,6 +555,7 @@ setMethod(
     withCallingHandlers({
       cli::start_app(output = "message", .auto_close = TRUE, .envir = environment())
       .pkgEnv$.inProgressBar <- FALSE
+      .pkgEnv$.progressInPlace <- FALSE
       .pkgEnv$.progressLastShown <- NULL
       simDTthreads <- getOption("spades.DTthreads", 1L)
       messageVerbose("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.", verbose = verbose)
@@ -716,209 +729,100 @@ setMethod(
         sim[["._spadesDebugWidth"]] <- spadesDebugWidthDefault
       }
 
-      for (m in loadOrder) {
-        mFullPath <- loadOrderNames[match(m, loadOrder)]
+      ## RecoverMode for .inputObjects -- mirror of the spades event recovery (see
+      ##   simulation-spades.R). When options('spades.recoveryMode') > 0, the state of
+      ##   each module's input objects is captured just before its .inputObjects runs,
+      ##   so that an interrupted .inputObjects can be rewound by restartSimInit().
+      recoverModeTypo()
+      recoverMode <- getOption("spades.recoveryMode", FALSE)
+      ## clear any stale file-backed recovery objects left in the saved sim, then set
+      ##   up the pointer so an interrupted simInit is recoverable from savedSimEnv()$.sim
+      clearFileBackedObjs(savedSimEnv()$.sim$.recoverableObjs, recoverMode)
+      svdSimEnv <- savedSimEnv() # can't assign to a function
+      svdSimEnv$.sim <- NULL
+      svdSimEnv$.sim <- sim
+      .pkgEnv$.cleanEndSimInit <- NULL
 
-        needInitAndInputObjects <- TRUE
-        if (length(sim@.xData$._ranInitDuringSimInit)) {
-          if (m %in% sim@.xData$._ranInitDuringSimInit)
-            needInitAndInputObjects <- FALSE
-        }
-
-        ## run .inputObjects() for each module
-        if (needInitAndInputObjects)
-          if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
-            if (is.character(getOption("spades.covr", FALSE))) {
-              mod <- getOption("spades.covr")
-              tf <- tempfile()
-              if (is.null(notOlderThan)) notOlderThan <- "NULL"
-              cat(file = tf, paste0("simOut <- .runModuleInputObjects(sim, '", m,
-                                    "', notOlderThan = ", notOlderThan, ")"))
-              # cat(file = tf, paste('spades(sim, events = ',capture.output(dput(events)),', .plotInitialTime = ', .plotInitialTime, ')', collapse = "\n"))
-              # unlockBinding(mod, sim$.mods)
-              if (length(objects))
-                list2env(objects, envir(sim))
-              sim[[dotMods]][[mod]]$sim <- sim
-              aa <- covr::environment_coverage(sim[[dotMods]][[mod]], test_files = tf)
-              sim <- sim[[dotMods]][[mod]]$sim
-              rm(list = "sim", envir = sim[[dotMods]][[mod]])
-              if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
-              .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
-            } else {
-              sim <- .runModuleInputObjects(sim, m, objects, notOlderThan, debug = debug)
-              cur <- list(eventTime = sim@simtimes$current, moduleName = m, eventType = ".inputObjects", eventPriority = 0)
-              sim <- appendCompleted(sim, cur)
-            }
-          }
-
-        ## schedule each module's init event:
-        if (needInitAndInputObjects)
-          sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
-
-        ### add module name to the loaded list
-        names(m) <- mFullPath
-        modulesLoaded <- append(modulesLoaded, m)
-
-        ### add NAs to any of the dotParams that are not specified by user
-        # ensure the modules sublist exists by creating a tmp value in it
-        if (is.null(sim@params[[m]])) {
-          sim@params[[m]] <- list(.tmp = NA_real_)
-        }
-
-        ## add the necessary values to the sublist
-        for (x in dotParamsReal) {
-          if (is.null(sim@params[[m]][[x]])) {
-            sim@params[[m]][[x]] <- NA_real_
-          } else if (isTRUE(all(is.na(sim@params[[m]][[x]])))) {
-            if (length(sim@params[[m]][[x]]) > 1)
-              sim@params[[m]][[x]] <- NA_real_
-          }
-        }
-
-        ## remove the tmp value from the module sublist
-        sim@params[[m]]$.tmp <- NULL
-
-        ### Currently, everything in dotParamsChar is being checked for NULL
-        ### values where used (i.e., in save.R).
+      ## recovery accumulator lives on sim@.xData (see .stepEvent) so a snapshot taken
+      ##   just before an erroring .inputObjects survives the error
+      sim@.xData[["._rmo"]] <- NULL
+      thisSimInitCallRandomStr <- basename(tempfile(pattern = "rmo"))
+      allInputObjNames <- NULL
+      if (recoverMode > 0) {
+        on.exit({
+          toDel <- dir(dotRMOFilepath(thisSimInitCallRandomStr), full.names = TRUE)
+          if (length(toDel) > 0)
+            unlink(toDel)
+        }, add = TRUE) # remove file-backed recovery files
+        allInputObjNames <- inputObjectNames(sim)
+        if (is.null(allInputObjNames)) recoverMode <- 0
       }
 
-      ## check that modules all loaded correctly and store result
-      if (all(append(core, loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
-        modules(sim) <- modulesLoaded
-      } else {
-        stop("There was a problem loading some modules.")
-      }
+      ## store the context needed to resume an interrupted simInit via restartSimInit().
+      ##   Removed below on a clean exit so it does not bloat the returned simList.
+      sim@.xData[["._simInitContext"]] <- list(
+        loadOrder = loadOrder, loadOrderNames = loadOrderNames,
+        loadOrderBase = loadOrderBase, core = core,
+        objects = objects, objNames = objNames,
+        inputs = inputs, outputs = outputs,
+        notOlderThan = notOlderThan, debug = debug,
+        dotParams = dotParams, dotParamsReal = dotParamsReal,
+        parentChildGraph = parentChildGraph, verbose = verbose
+      )
 
-      ## Add the data.frame as an attribute
-      attr(sim@modules, "modulesGraph") <- parentChildGraph
+      ## RecoverMode on.exit lives inside .runInputObjectsPhase() (beside the drain loop,
+      ##   mirroring spades' inline loop) so it reads the *live* sim: a cached .inputObjects
+      ##   returns a sim with a fresh @.xData (Copy in .prepareOutput), so this frame's `sim`
+      ##   (and its ._rmo accumulator) would go stale -- causing the recorded "interrupted"
+      ##   module to be the one before the failure. See .runInputObjectsPhase().
 
-      ## END OF MODULE PARSING AND LOADING
-      if (length(objects)) {
-        if (is.list(objects)) {
-          if (length(objNames) == length(objects)) {
-            # don't override all objects with user supplied objects if the init events have
-            #   been run
-            if (isTRUE(getOption("spades.allowInitDuringSimInit") &&
-                       getOption("spades.dotInputObjects", TRUE))) {
-              inputObjectsAllMods <- inputObjects(sim)
-              if (is(inputObjectsAllMods, "list"))
-                inputObjectsAllMods <- inputObjectsAllMods |> rbindlist() #@depends@dependencies[names()]@inputObjects[["objectName"]]
-              inputObjectsAllMods <- unique(inputObjectsAllMods$objectName)
-              objectNamesToUse <- inputObjectsAllMods[inputObjectsAllMods %in% sim$.userSuppliedObjNames]
-              objectsToUse <- objects[objectNamesToUse]
-              objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objectsToUse)
-            } else {
-              objectsToUse <- objects
-            }
-
-            if (length(objectsToUse) && verbose) {
-              messageNewObjects(
-                objectsToUse[order(names(objectsToUse))], verbose = verbose,
-                prefix = "User-supplied objects passed into sim for spades call:")
-            }
-
-            if (NROW(objectsToUse))
-              objs(sim) <- objectsToUse
-          } else {
-            stop(
-              paste(
-                "objects must be a character vector of object names",
-                "to retrieve from the .GlobalEnv, or a named list of",
-                "objects"
-              )
-            )
-          }
-        } else {
-          newInputs <- data.frame(
-            objectName = objNames,
-            loadTime = as.numeric(sim@simtimes[["current"]]),
-            stringsAsFactors = FALSE
-          ) |>
-            .fillInputRows(startTime = start(sim))
-          inputs(sim) <- newInputs
-        }
-      }
-
-      ## load files in the filelist
-      if (NROW(inputs) | NROW(inputs(sim))) {
-        inputs(sim) <- rbind(inputs(sim), inputs)
-        if (NROW(events(sim)[moduleName == "load" &
-                             eventType == "inputs" &
-                             eventTime == start(sim)]) > 0) {
-          sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
-          events(sim) <- events(sim)[!(eventTime == time(sim) &
-                                         moduleName == "load" &
-                                         eventType == "inputs"), ]
-        }
-        if (any(events(sim)[["eventTime"]] < start(sim))) {
-          warning(
-            paste0(
-              "One or more objects in the inputs filelist was ",
-              "scheduled to load before start(sim). ",
-              "It is being be removed and not loaded. To ensure loading, loadTime ",
-              "must be start(sim) or later. See examples using ",
-              "loadTime in ?simInit"
-            )
-          )
-          events(sim) <- events(sim)[eventTime >= start(sim)]
-        }
-      }
-
-      if (length(outputs)) {
-        outputs(sim) <- outputs
-      }
-
-      ## check the parameters supplied by the user
-      checkParams(sim, dotParams, unlist(sim@paths[["modulePath"]]))
+      ## Run the `.inputObjects` phase: schedule each module's `.inputObjects` as a real
+      ##   event, drain it through the same single-event step as the spades loop
+      ##   (.stepEvent), then schedule init events, fill dot-params, and finish. This is
+      ##   the shared continuation that restartSimInit() also re-enters after rewinding,
+      ##   so the normal and resumed paths cannot drift. (modulesLoaded already has the
+      ##   core modules appended; the phase appends the user modules.)
+      sim <- .runInputObjectsPhase(sim, recoverMode, allInputObjNames,
+                                   thisSimInitCallRandomStr, modulesLoaded)
       #sim <- elapsedTimeInSimInit(._startClockTime, sim)
       #._startClockTime <- Sys.time()
     },
-    message = function(m) {
-      msg <- m$message
-      # Detect cli progress ticks routed through message() by start_app(output="message").
-      # \r = carriage return (in-place overwrite); \x1b[...[A-HJ-KST] = cursor-movement/erase
-      # CSI sequences (A=up, B=down, J=erase display, K=erase line, S/T=scroll);
-      # \x1b[?...[hl] = cursor show/hide. Color/SGR codes (\x1b[31m etc.) end in 'm' and
-      # are intentionally excluded so colored regular messages are not mistaken for ticks.
-      if (isTRUE(grepl("\r|\x1b\\[[0-9;]*[A-HJ-KST]|\x1b\\[\\?[0-9;]+[hl]", msg, perl = TRUE))) {
-        clean <- trimws(cli::ansi_strip(msg))
-        if (nchar(clean) == 0L) {
-          tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-          return()
-        }
-        now <- Sys.time()
-        if (!isTRUE(.pkgEnv$.inProgressBar)) {
-          .pkgEnv$.inProgressBar <- TRUE
-          .pkgEnv$.progressLastShown <- now
-          message(loggingMessage(clean, prefix = prefixSimInit))
-        } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
-                   getOption("spades.progressInterval", 2)) {
-          message(loggingMessage(clean, prefix = prefixSimInit))
-          .pkgEnv$.progressLastShown <- now
-        }
-        tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-        return()
-      }
-      .pkgEnv$.inProgressBar <- FALSE
-      message(loggingMessage(msg, prefix = prefixSimInit))
-      # This will "muffle" the original message
-      tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
-    },
-    warning = function(w) {
-      if (grepl("In .+:", w$message)) {
-        warningSplitOnColon(w)
-        invokeRestart("muffleWarning")
-      }
-      # This is a box mishap
-      if (isTRUE(any(grepl("'package:stats' may not be available when loading",
-                           w$message)))) {
-        invokeRestart("muffleWarning")
-      }
-    }
+    message = .simInitMessageHandler,
+    warning = .simInitWarningHandler
     )
 
     return(invisible(sim))
 })
+
+#' Calling handlers that prefix `simInit`-phase messages/warnings
+#'
+#' Extracted from `simInit()`'s `withCallingHandlers()` so the same prefixing
+#' (`loggingMessage(..., prefix = prefixSimInit)`, plus cli-progress-tick
+#' throttling) can be reused by [restartSimInit()] when it resumes the
+#' `.inputObjects` phase outside the original `simInit()` call.
+#' @param m,w A condition (message / warning).
+#' @keywords internal
+#' @rdname simInitConditionHandlers
+.simInitMessageHandler <- function(m) {
+  msg <- m$message
+  # cli progress ticks (e.g. archive extraction) routed through message() by
+  # start_app(output = "message"): dynamic TTY -> single in-place line; otherwise
+  # throttle. See .handleProgressTick().
+  if (.handleProgressTick(m, msg, prefix = prefixSimInit)) return()
+  .endProgressTick()
+  message(loggingMessage(msg, prefix = prefixSimInit))
+  # This will "muffle" the original message
+  tryCatch(invokeRestart("muffleMessage"), error = function(e) NULL)
+}
+
+#' @keywords internal
+#' @rdname simInitConditionHandlers
+.simInitWarningHandler <- function(w) {
+  if (grepl("In .+:", w$message)) {
+    warningSplitOnColon(w)
+    invokeRestart("muffleWarning")
+  }
+}
 
 ## Only deal with objects as character
 #' @rdname simInit
@@ -1386,6 +1290,295 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   return(parentNames)
 }
 
+#' Fill in unspecified `dotParams` for a module
+#'
+#' Ensures the per-module parameter sublist exists and that the numeric "dot" parameters
+#' (e.g., `.saveInterval`) default to `NA_real_` when unset. Shared by `simInit()`'s
+#' module loop and [restartSimInit()]'s resume loop.
+#'
+#' @param sim A `simList`.
+#' @param m Character. The (base) module name.
+#' @param dotParamsReal A list of the numeric dot-parameter names to fill.
+#' @return The updated `simList`.
+#' @keywords internal
+.fillDotParams <- function(sim, m, dotParamsReal) {
+  # ensure the module sublist exists by creating a tmp value in it
+  if (is.null(sim@params[[m]])) {
+    sim@params[[m]] <- list(.tmp = NA_real_)
+  }
+  ## add the necessary values to the sublist
+  for (x in dotParamsReal) {
+    if (is.null(sim@params[[m]][[x]])) {
+      sim@params[[m]][[x]] <- NA_real_
+    } else if (isTRUE(all(is.na(sim@params[[m]][[x]])))) {
+      if (length(sim@params[[m]][[x]]) > 1)
+        sim@params[[m]][[x]] <- NA_real_
+    }
+  }
+  ## remove the tmp value from the module sublist
+  sim@params[[m]]$.tmp <- NULL
+  sim
+}
+
+#' Run (or resume) a `simList`'s `.inputObjects` phase
+#'
+#' The continuation shared by [simInit()] and [restartSimInit()]: schedule each module's
+#' `.inputObjects` as a real event, drain that phase through the same single-event step as
+#' the `spades` loop ([.stepEvent()]), then schedule init events, fill dot-params, and
+#' finish initialization ([.finishSimInit()]). Having one implementation means the normal
+#' and resumed paths cannot drift.
+#'
+#' It is re-entrant: modules whose `.inputObjects` already completed (recorded in
+#' `completed(sim)`) are not re-scheduled, and init events that already exist are not
+#' duplicated. So `restartSimInit()` simply rewinds, removes the completed-marker of the
+#' module(s) to re-run, and calls this -- mirroring how `restartSpades()` hands back to
+#' `spades()`.
+#'
+#' The drain loop is kept inline here (rather than in a further nested helper) so that the
+#' queue updates from each processed event are retained in this frame. On an error mid-
+#' drain, recovery state lives in shared environments -- the objects and
+#' `sim@.xData[["._rmo"]]` in `sim@.xData`, and `sim@completed` -- so it is preserved for
+#' [restartSimInit()] even though this function's local `sim` is discarded.
+#'
+#' @param sim A `simList` whose `sim@.xData[["._simInitContext"]]` has been populated.
+#' @param recoverMode,allInputObjNames,thisSpadesCallRandomStr Recovery parameters passed
+#'   through to [.stepEvent()]. `simInit` passes its values; `restartSimInit` passes
+#'   `recoverMode = 0` (a resume does not re-arm recovery).
+#' @param modulesLoaded The loaded-modules list with the core modules already appended;
+#'   the user modules are appended here.
+#' @return A finished `simList`.
+#' @keywords internal
+.runInputObjectsPhase <- function(sim, recoverMode, allInputObjNames,
+                                  thisSpadesCallRandomStr, modulesLoaded) {
+  ## RecoverMode on.exit -- registered here (beside the drain loop) rather than in simInit()
+  ##   so it reads this frame's *live* `sim`. A cached `.inputObjects` returns a sim with a
+  ##   fresh @.xData (Copy in .prepareOutput), so the drain advances onto a new environment;
+  ##   simInit()'s own frame `sim` (and its ._rmo accumulator) would be stale, making the
+  ##   recorded "interrupted" module the one *before* the failure. spades() does not hit this
+  ##   because its event loop is inline in its own frame. Gated to recoverMode > 0 (the
+  ##   simInit context); on the restartSimInit resume path recoverMode == 0, so a resume
+  ##   never re-saves and clobbers the stashed recovery context.
+  if (recoverMode > 0 && isTRUE(getOption("spades.saveSimOnExit", FALSE))) {
+    on.exit(sim <- saveSimOnExitSimInit(recoverMode, sim, sim@.xData[["._rmo"]]), add = TRUE)
+  }
+
+  ctx <- sim@.xData[["._simInitContext"]]
+  loadOrder <- ctx$loadOrder
+  ## modules whose init did not already run during simInit (via allowInitDuringSimInit)
+  needIO <- !(loadOrder %in% sim@.xData$._ranInitDuringSimInit)
+  cc <- completed(sim)
+  completedIO <- if (NROW(cc))
+    cc[cc[["eventType"]] == ".inputObjects", ][["moduleName"]] else character()
+
+  ## Pass A -- schedule each module's `.inputObjects` as a real event (or, for coverage
+  ##   measurement, run it inline) for modules that need one and have not already completed
+  ##   it. Priorities are below the core init events (.first() - 1) and ordered by
+  ##   loadOrder, so the whole `.inputObjects` phase drains before any init. Caching of
+  ##   `.inputObjects` is unaffected: doEvent dispatches `.inputObjects` to
+  ##   .runModuleInputObjects (which digests the input-relevant objects), not the generic
+  ##   event cache.
+  ## a resumed simList (restartSimInit) may carry a not-yet-popped `.inputObjects` event for
+  ##   the module that was interrupted; don't schedule a second one (mirrors Pass B's
+  ##   `alreadyScheduledInit` guard). Harmless on the normal path, where the queue is empty.
+  alreadyScheduledIO <- vapply(sim@events, function(e)
+    if (identical(e[["eventType"]], ".inputObjects")) e[["moduleName"]] else NA_character_,
+    character(1))
+  if (isTRUE(getOption("spades.dotInputObjects", TRUE))) {
+    for (idx in seq_along(loadOrder)) {
+      m <- loadOrder[idx]
+      if (!needIO[idx] || m %in% completedIO || m %in% alreadyScheduledIO) next
+      if (is.character(getOption("spades.covr", FALSE))) {
+        mod <- getOption("spades.covr")
+        tf <- tempfile()
+        ntot <- if (is.null(ctx$notOlderThan)) "NULL" else ctx$notOlderThan
+        cat(file = tf, paste0("simOut <- .runModuleInputObjects(sim, '", m,
+                              "', notOlderThan = ", ntot, ")"))
+        if (length(ctx$objects))
+          list2env(ctx$objects, envir(sim))
+        sim[[dotMods]][[mod]]$sim <- sim
+        aa <- covr::environment_coverage(sim[[dotMods]][[mod]], test_files = tf)
+        sim <- sim[[dotMods]][[mod]]$sim
+        rm(list = "sim", envir = sim[[dotMods]][[mod]])
+        if (is.null(.pkgEnv$._covr)) .pkgEnv$._covr <- list()
+        .pkgEnv$._covr <- append(.pkgEnv$._covr, list(aa))
+      } else {
+        sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, ".inputObjects",
+                             .first() - 1 - (length(loadOrder) - idx + 1))
+      }
+    }
+  }
+
+  ## Drain the `.inputObjects` phase with the same single-event step as the spades loop.
+  ##   doEvent()'s completed-event bookkeeping is gated by this .pkgEnv flag (normally set
+  ##   by spades()); force it on so `.inputObjects` are recorded in completed()
+  ##   (restartSimInit() relies on this), then restore it.
+  oldKeepCompleted <- .pkgEnv[["spades.keepCompleted"]]
+  .pkgEnv[["spades.keepCompleted"]] <- TRUE
+  while (length(sim@events) && identical(sim@events[[1]][["eventType"]], ".inputObjects")) {
+    sim <- .stepEvent(sim, recoverMode, allInputObjNames,
+                      thisSpadesCallRandomStr = thisSpadesCallRandomStr,
+                      debug = ctx$debug, notOlderThan = ctx$notOlderThan)
+  }
+  .pkgEnv[["spades.keepCompleted"]] <- oldKeepCompleted
+
+  ## the `.inputObjects` phase completed without interruption (so the simInit on.exit
+  ##   does not treat a later, unrelated error as a recoverable `.inputObjects` interrupt)
+  .pkgEnv$.cleanEndSimInit <- TRUE
+
+  ## Pass B -- schedule each module's init event + per-module bookkeeping. simInit
+  ##   schedules init only after the whole phase, so on a resume there are no user init
+  ##   events yet; (re)schedule for every module that needs one, skipping any already queued.
+  alreadyScheduledInit <- vapply(sim@events, function(e)
+    if (identical(e[["eventType"]], "init")) e[["moduleName"]] else NA_character_, character(1))
+  for (idx in seq_along(loadOrder)) {
+    m <- loadOrder[idx]
+    if (needIO[idx] && !(m %in% alreadyScheduledInit))
+      sim <- scheduleEvent(sim, sim@simtimes[["start"]], m, "init", .first())
+    mNamed <- m
+    names(mNamed) <- ctx$loadOrderNames[idx]
+    modulesLoaded <- append(modulesLoaded, mNamed)
+    sim <- .fillDotParams(sim, m, ctx$dotParamsReal)
+  }
+
+  ## Finish initialization (store loaded modules, apply user objects/inputs/outputs,
+  ##   check params), then drop the resume context + recovery accumulator.
+  sim <- .finishSimInit(sim, ctx, modulesLoaded)
+  sim@.xData[["._simInitContext"]] <- NULL
+  sim@.xData[["._rmo"]] <- NULL
+  sim
+}
+
+#' Finish initialization of a `simList` after the `.inputObjects` phase
+#'
+#' The final part of [.runInputObjectsPhase()]: store the loaded modules, apply the
+#' user-supplied `objects`, `inputs`, and `outputs`, and check parameters. Split out for
+#' readability; it is reached on both the normal (`simInit`) and resumed
+#' (`restartSimInit`) paths, since both go through [.runInputObjectsPhase()].
+#'
+#' @param sim A `simList`.
+#' @param ctx The context list stored at `sim@.xData[["._simInitContext"]]` during
+#'   `simInit` (supplies `core`, `loadOrderBase`, `objects`, `objNames`, `inputs`,
+#'   `outputs`, `verbose`, `dotParams`, and `parentChildGraph`).
+#' @param modulesLoaded The named list of loaded modules (core + user), as assembled by
+#'   [.runInputObjectsPhase()].
+#' @return A finished `simList`.
+#' @keywords internal
+.finishSimInit <- function(sim, ctx, modulesLoaded) {
+  ## check that modules all loaded correctly and store result
+  if (all(append(ctx$core, ctx$loadOrderBase) %in% basename2(unlist(modulesLoaded)))) {
+    modules(sim) <- modulesLoaded
+  } else {
+    stop("There was a problem loading some modules.")
+  }
+  attr(sim@modules, "modulesGraph") <- ctx$parentChildGraph
+
+  objects <- ctx$objects
+  objNames <- ctx$objNames
+  inputs <- ctx$inputs
+  outputs <- ctx$outputs
+  verbose <- ctx$verbose
+
+  ## END OF MODULE PARSING AND LOADING
+  if (length(objects)) {
+    if (is.list(objects)) {
+      if (length(objNames) == length(objects)) {
+        if (isTRUE(getOption("spades.allowInitDuringSimInit") &&
+                   getOption("spades.dotInputObjects", TRUE))) {
+          # Load *all* user-supplied objects, dropping only those an init that ran
+          # during simInit has already produced (so user inputs don't clobber init
+          # outputs -- handled by objectsToUseUpdatesFromPrevInits). Previously this
+          # also restricted to objects declared as a module `inputObject`, silently
+          # dropping arbitrary objects passed via `simInit(objects = ...)` (and all
+          # objects when no module declares them, e.g. no modules at all).
+          objectsToUse <- objectsToUseUpdatesFromPrevInits(sim, objects)
+        } else {
+          objectsToUse <- objects
+        }
+        if (length(objectsToUse) && verbose) {
+          messageNewObjects(
+            objectsToUse[order(names(objectsToUse))], verbose = verbose,
+            prefix = "User-supplied objects passed into sim for spades call:")
+        }
+        if (NROW(objectsToUse))
+          objs(sim) <- objectsToUse
+      } else {
+        stop(
+          paste(
+            "objects must be a character vector of object names",
+            "to retrieve from the .GlobalEnv, or a named list of",
+            "objects"
+          )
+        )
+      }
+    } else {
+      newInputs <- data.frame(
+        objectName = objNames,
+        loadTime = as.numeric(sim@simtimes[["current"]]),
+        stringsAsFactors = FALSE
+      ) |>
+        .fillInputRows(startTime = start(sim))
+      inputs(sim) <- newInputs
+    }
+  }
+
+  ## load files in the filelist
+  if (NROW(inputs) | NROW(inputs(sim))) {
+    inputs(sim) <- rbind(inputs(sim), inputs)
+    if (NROW(events(sim)[moduleName == "load" &
+                         eventType == "inputs" &
+                         eventTime == start(sim)]) > 0) {
+      sim <- doEvent.load(sim, sim@simtimes[["current"]], "inputs")
+      events(sim) <- events(sim)[!(eventTime == time(sim) &
+                                     moduleName == "load" &
+                                     eventType == "inputs"), ]
+    }
+    if (any(events(sim)[["eventTime"]] < start(sim))) {
+      warning(
+        paste0(
+          "One or more objects in the inputs filelist was ",
+          "scheduled to load before start(sim). ",
+          "It is being be removed and not loaded. To ensure loading, loadTime ",
+          "must be start(sim) or later. See examples using ",
+          "loadTime in ?simInit"
+        )
+      )
+      events(sim) <- events(sim)[eventTime >= start(sim)]
+    }
+  }
+
+  if (length(outputs)) {
+    outputs(sim) <- outputs
+  }
+
+  ## check the parameters supplied by the user
+  checkParams(sim, ctx$dotParams, unlist(sim@paths[["modulePath"]]))
+  return(sim)
+}
+
+## Guard against a module event (or its cached return) replacing `sim` with a
+## non-`simList`. The most common offender is an event/.inputObjects that returns
+## NULL (forgot `return(sim)` / `invisible(sim)`): once that NULL is cached by
+## reproducible::Cache(), a subsequent cache hit returns the literal character
+## string `"NULL"`, which then propagates as `sim`. Without this guard, the
+## failure surfaces as an opaque secondary error in the function's on.exit
+## (e.g. "more elements supplied than there are to replace") that masks the real
+## culprit module.
+.checkEventReturn <- function(sim, moduleName, eventType, fromCache) {
+  if (inherits(sim, "simList")) return(invisible())
+  what <- paste0("`", eventType, "` for module `", moduleName, "`")
+  hint <- if (isTRUE(fromCache)) {
+    paste0("This typically means a previous run of ", what,
+           " returned NULL (e.g. missing `return(sim)`), which ",
+           "reproducible::Cache() stores and replays as the string \"NULL\". ",
+           "Fix ", what, " to return `sim`, then clear the cached entry.")
+  } else {
+    paste0("Fix ", what, " to return `sim` ",
+           "(e.g. add `return(sim)` or `invisible(sim)` at the end).")
+  }
+  stop(what, " did not return a simList (got an object of class \"",
+       paste(class(sim), collapse = "/"), "\"). ", hint, call. = FALSE)
+}
+
 #' Run module's `.inputObjects`
 #'
 #' Run `.inputObjects()` from each module file from each module, one at a time,
@@ -1415,6 +1608,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     eventType = ".inputObjects",
     eventPriority = .normal()
   )
+  .updateUrlLogExtra(sim)
 
   # loggingMessage helpers
   simNestingRevert <- sim[[._txtSimNesting]]
@@ -1467,7 +1661,18 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         .pkgEnv[[".spadesDebugFirst"]] <- TRUE
         # sim[["._spadesDebugWidth"]] <- c(9, 10, 9, 13)
       }
-      debugMessage(ifelse(debug < 1, debug + 1, debug), sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam)
+      ## #322: a list/character `debug` (e.g. a file/console logging spec) must NOT reach
+      ## `ifelse(debug < 1, debug + 1, debug)` -- `debug < 1` errors "'list' object cannot be
+      ## coerced to type 'double'" for a list, and `ifelse` eagerly evaluates `debug + 1` (a
+      ## non-numeric-operator error) for character. But a *logical* `debug` MUST keep the historical
+      ## numeric bump `FALSE -> 1` (via `ifelse`), which is what enables the `.inputObjects` /
+      ## module-code-check messages this runner emits at the default `debug = FALSE` -- dropping it
+      ## (as a bare `!is.numeric` guard would) silently suppresses them. So bump numeric AND logical,
+      ## pass everything else through. (Regression-tested: test-timeunits.R, test-userSuppliedObjs.R.)
+      debugMessage(
+        if (is.numeric(debug) || is.logical(debug)) ifelse(debug < 1, debug + 1, debug) else debug,
+        sim, cur, sim@.xData[[dotMods]][[curModNam]], curModNam
+      )
 
       if (verbose) {
         objsIsNullBefore <- objsAreNull(sim)
@@ -1482,8 +1687,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
-          moduleSpecificObjs <- paste(mBase, ".inputObjects", sep = ":")
-          objectsToEvaluateForCaching <- c(moduleSpecificObjs)
+          ## Digest not just `.inputObjects` but the transitive closure of
+          ##   module-local functions it calls (helpers in the main file or in R/
+          ##   sub-files). Digesting `.inputObjects` alone leaves the cacheId blind
+          ##   to helper edits, so a (correct) fix is masked by a stale cache entry
+          ##   -- most visibly on restartSimInit(), whose rewind recreates the exact
+          ##   state the stale entry was keyed under. See `.fnsReachableFrom()`.
+          reachable <- .fnsReachableFrom(".inputObjects", sim@.xData[[dotMods]][[mBase]])
+          objectsToEvaluateForCaching <- paste(mBase, reachable, sep = ":")
         } else {
           objectsToEvaluateForCaching <- c(grep(ls(sim@.xData, all.names = TRUE),
                                                 pattern = mBase, value = TRUE),
@@ -1533,10 +1744,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           #   runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
           # }
           if (runFnCallAsExpr) {
-            pkgs <- Require::extractPkgName(unlist(moduleMetadata(sim, currentModule(sim))$reqdPkgs))
-            pkgs <- c(pkgs, "stats")
-            # if (getOption("spades.useBox", FALSE) && FALSE)
-            #   do.call(box::use, lapply(pkgs, as.name))
             if (any(mBase %in% getOption("spades.debugModule"))) {
               browser()
             }
@@ -1557,6 +1764,14 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             #                     modules = mBase)
             extraCacheArgs <- sim@params[[mBase]][[._txtDotUseCacheArgs]][[".inputObjects"]]
             if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+            # Evaluate any quoted entries (e.g. `quote(P(sim)$.useCloud)`) here, while
+            # `sim@current$moduleName` is `mBase` (set above), so module-context accessors
+            # like P(sim) resolve to this module. Otherwise they would reach Cache() as
+            # unevaluated language objects and be forced later in the wrong context. This
+            # mirrors the event path in `.runEvent()` (see simulation-spades.R).
+            isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
+            if (isTRUE(any(isCalls)))
+              extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())
 
             defaultCacheArgs <- list(
               FUN = quote(.inputObjects(sim)),
@@ -1599,6 +1814,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             }
 
             sim <- eval(fnCallAsExpr)
+            .checkEventReturn(sim, mBase, ".inputObjects", fromCache = TRUE)
 
             if (cacheChaining) {
               # attr(sim, lastEventDetails) <- paste(mBase, ".inputObjects", collapse = "_")
@@ -1626,6 +1842,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         .inputObjects <- .getModuleInputObjects(sim, mBase)
         if (!is.null(.inputObjects)) {
           sim <- .inputObjects(sim)
+          .checkEventReturn(sim, mBase, ".inputObjects", fromCache = FALSE)
         }
       }
       # if (allowSequentialCaching) {
@@ -1816,7 +2033,7 @@ loadPkgs <- function(reqdPkgs) {
     pkgsDontLoad <- getOption("spades.reqdPkgsDontLoad", NULL)
     allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
 
-    if (getOption("spades.useRequire") && !getOption("spades.useBox", FALSE)) {
+    if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
       Require(allPkgs, require = TRUE, standAlone = FALSE, upgrade = FALSE)
       if (!is.null(pkgsDontLoad)) {
@@ -1826,10 +2043,8 @@ loadPkgs <- function(reqdPkgs) {
       }
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
-      if (!getOption("spades.useBox", FALSE)) {
-        allPkgs <- unique(Require::extractPkgName(allPkgs))
-        loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
-      }
+      allPkgs <- unique(Require::extractPkgName(allPkgs))
+      loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
     }
   }
 }
@@ -1929,7 +2144,9 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
 }
 
 updateParamsFromGlobals <- function(sim, dontUseGlobals = list(), verbose = getOption("reproducible.verbose")) {
-  modDefaultParams <- Map(mod = sim@depends@dependencies, function(mod) mod@parameters$paramName)
+  deps <- Filter(Negate(is.null), sim@depends@dependencies)
+  if (!length(deps)) return(sim)
+  modDefaultParams <- Map(mod = deps, function(mod) mod@parameters$paramName)
   sim@params <- updateParamsSlotFromGlobals(sim@params, dontUseGlobals = dontUseGlobals,
                                             modDefaultParams = modDefaultParams, verbose = verbose)
   sim
@@ -2000,8 +2217,6 @@ objsAreNull <- function(sim) {
   areNULL <- mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
                          ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
                     envir = envir(sim)), function(obj) is.null(obj))
-  # browser()
-  # areAbsent <- inputObjects(sim, currentModule(sim))$objectName
   areNULL
 }
 
@@ -2229,8 +2444,13 @@ debugToVerbose <- function(debug) {
     if (is.numeric(de) || is.logical(de)) de else !is.null(de)
   )
   debugOut[is.na(debugOut)] <- FALSE
-  # any(as.logical(debugOut))
-  debugOut
+  ## #322: `verbose` is consumed downstream as a SCALAR (e.g. `setPaths(silent = verbose <= 0)`,
+  ## `messageVerbose(verbose = verbose)`, `.identifyChildModules(verbose = )`), so a multi-element
+  ## `debug` list MUST reduce to one value here -- returning the per-element vector makes
+  ## `if (!silent)` (and similar) error "the condition has length > 1". Keep the highest requested
+  ## level; 0 (silent) when nothing is set. Regression-tested in test-simulation.R (do not revert
+  ## to the bare `debugOut` vector without a scalar reduction).
+  if (length(debugOut) == 0L) 0 else max(as.numeric(debugOut))
 }
 
 

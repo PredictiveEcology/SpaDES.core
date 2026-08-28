@@ -108,10 +108,16 @@ has terminated.\cr
 line of the messaging during spades calls.\cr
 
 \code{spades.moduleCodeChecks}
-\tab \code{list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)}
-\tab Should the various code checks be run during \code{simInit}.
-These are passed to \code{codetools::checkUsage()}.
-Default is given by the function, plus these:\cr
+\tab \code{FALSE}
+\tab Should the various module code checks be run during \code{simInit}.
+\strong{As of \code{SpaDES.core} 3.1.2.9014 the default is \code{FALSE}} (checks no longer
+run automatically during \code{simInit}, which they previously slowed). To run the
+checks, call \code{\link[=codeCheckModule]{codeCheckModule()}} / \code{\link[=codeCheckModules]{codeCheckModules()}} manually (no
+\code{simInit()} needed). To restore in-\code{simInit} checking, set this option to a
+named list of toggles, e.g.
+\code{list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)}
+(or \code{TRUE} for the defaults); these are passed through to
+\code{codetools::checkUsage()}.\cr
 
 \code{spades.moduleDocument} \tab  \code{TRUE}
 \tab  When a module is an R package e.g., via \code{convertToPackage},
@@ -153,12 +159,14 @@ more than one event in the past, i.e., redo some of the "completed" events.
 Default is \code{TRUE}, i.e., it will keep the state of the \code{simList}
 at the start of the current event. This can be recovered with \code{restartSpades}
 and the differences can be seen in a hidden object in the stashed \code{simList}.
+The same mechanism applies during \code{simInit}: a snapshot is taken before each
+module's \code{.inputObjects} runs, so an interrupted \code{simInit} can be recovered
+with \code{restartSimInit} (see \code{?restartSimInit}).
 There is a message which describes how to find that.\cr
 
-\code{spades.reqdPkgsDontLoad} \tab \code{"box"} \tab Specify any packages that should not
+\code{spades.reqdPkgsDontLoad} \tab \code{NULL} \tab Specify any packages that should not
 be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
-listed. The default (\code{"box"}) is a package that returns a warning if it is
-loaded, and so it is excluded from loading.\cr
+listed in a module's \code{reqdPkgs}.\cr
 
 \code{spades.saveFileExtensions} \tab \code{NULL} \tab
 a \code{data.frame} with 3 columns, \code{exts}, \code{fun}, and \code{package} indicating which
@@ -193,19 +201,15 @@ with a warning.\cr
 \tab  The default tolerance value used for floating
 point number comparisons.\cr
 
+\code{spades.urlLog} \tab \code{TRUE} \tab
+If \code{TRUE} (the default), any files or web addresses (URLs) that modules
+download through \code{prepInputs()} or \code{preProcess()} during \code{simInit()} or
+\code{spades()} are recorded, and each one is tagged with the module and event
+that asked for it. This makes it easy to see where a simulation's input
+data came from. Set to \code{FALSE} to turn the recording off.\cr
+
 \code{spades.useragent} \tab \code{"https://github.com/PredictiveEcology/SpaDES"}.
 \tab The default user agent to use for downloading modules from GitHub.\cr
-
-\code{spades.useBox} \tab FALSE
-\tab Unimplemented while memory problems with \code{box} are resolved.
-When it is turned on, this option determines
-whether to manage which packages are loaded using the package \code{box}.
-This will have as an effect that \code{reqdPkgs} will be strict; if a given
-module is missing a \code{reqdPkgs}, then the module will fail to run, with
-an error saying the package/function doesn't exist. Without \code{box},
-modules may run, even though \code{reqdPkgs} is incorrect, because other modules
-may have specified their own packages, which cover the needs of another
-package. \code{useBox = TRUE} will force modules to be accurate with their \code{reqdPkgs}.\cr
 
 \code{spades.useRequire} \tab \code{!tolower(Sys.getenv("SPADES_USE_REQUIRE")) \%in\% "false"}
 \tab The default for that environment variable is unset, so this returns

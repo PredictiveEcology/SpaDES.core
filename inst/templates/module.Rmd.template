@@ -29,7 +29,7 @@ dir.create("figures", showWarnings = FALSE)
 
 download.file(url = "https://img.shields.io/badge/Made%20with-Markdown-1f425f.png",
               destfile = "figures/markdownBadge.png",
-              mode = "wb")
+              mode = "wb", quiet = TRUE)
 ```
 
 [![made-with-Markdown](figures/markdownBadge.png)](https://commonmark.org)

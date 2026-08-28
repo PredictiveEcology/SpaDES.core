@@ -233,18 +233,16 @@ setMethod(
     }
     x$version <- as.numeric_version(x$version)
 
-    x$spatialExtent <- if (!isExtents(x$spatialExtent)) {
-      if (is.null(x$spatialExtent)) {
-        eval(moduleDefaults$extent)
-      } else {
-        if (is.na(x$spatialExtent)) {
-          moduleDefaults$extent
-        } else {
-          ext(x$spatialExtent)
-        }
-      }
-    } else {
+    ## NOTE: the missing `else` here used to drop a module-supplied extent (assigning NULL),
+    ## so `new(".moduleDeps")` fell back to the class prototype -- a `SpatExtent` created at
+    ## package *build* time, whose external pointer is dead once the package is loaded
+    ## (terra >= 1.9-34 errors "external pointer is not valid"). Always keep a live extent.
+    x$spatialExtent <- if (isExtents(x$spatialExtent)) {
       x$spatialExtent
+    } else if (is.null(x$spatialExtent) || all(is.na(x$spatialExtent))) {
+      eval(moduleDefaults$extent) ## a `quote()`; must be eval'ed to give a `SpatExtent`
+    } else {
+      ext(x$spatialExtent)
     }
 
     x$timeframe <- if (is.null(x$timeframe) || any(is.na(x$timeframe))) {
@@ -305,10 +303,21 @@ setMethod(
       x$outputObjects <- ._outputObjectsDF()
     } else {
       if (is(x$outputObjects, "data.frame")) {
-        if (!all(colnames(x$outputObjects) %in% colnames(._outputObjectsDF())) ||
-            !all(colnames(._outputObjectsDF()) %in% colnames(x$outputObjects))) {
+        cnTooMany <- colnames(x$outputObjects) %in% colnames(._outputObjectsDF())
+        cnTooFew <- colnames(._outputObjectsDF()) %in% colnames(x$outputObjects)
+        if (!all(cnTooMany) || !all(cnTooFew)) {
+          anExtra <- colnames(x$outputObjects)[!cnTooMany]
+          aMissing <- colnames(._outputObjectsDF())[!cnTooFew]
+          if (length(anExtra)) {
+            wh <- which(!sapply(x$outputObjects[[anExtra]], is.null))
+            if (length(wh)) {
+              stop("There is an incorrect argument in outputObject. Object: `",
+                   x$outputObjects$objectName[wh],"` should not have ",
+                   anExtra)    
+            }
+          }
           stop("invalid data.frame `outputObjects` in module `", x$name, "`:",
-               "provided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
+               "\nprovided: ", paste(colnames(x$outputObjects), collapse = ", "), "\n",
                "expected: ", paste(colnames(._outputObjectsDF()), collapse = ", "))
         }
       } else {

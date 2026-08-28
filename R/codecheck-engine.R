@@ -114,14 +114,45 @@
     "ancestor::expr[FUNCTION][1]")
   if (length(ancs) == 0) return(NA_character_)
   fnExpr <- ancs[[length(ancs)]]
-  ## The function definition expr is typically the RHS of a top-level
-  ## `name <- function(...) {...}` assignment. The LHS SYMBOL is two siblings
-  ## back: <expr><SYMBOL>name</SYMBOL></expr><LEFT_ASSIGN>...<expr>function...
-  parent <- xml2::xml_parent(fnExpr)
-  if (xml2::xml_name(parent) != "expr") return(NA_character_)
-  lhs <- xml2::xml_find_first(parent, "expr[1]/SYMBOL")
-  if (length(lhs) == 0 || is.na(xml2::xml_text(lhs))) return(NA_character_)
-  xml2::xml_text(lhs)
+  ## The function-def expr is usually the RHS of a `name <- function(...) {...}`
+  ## assignment, but it may be wrapped in one or more calls, e.g.
+  ## `name <- compiler::cmpfun(function(...) {...})` or `Cache(function(...))`.
+  ## Walk up through such wrappers to the binding assignment. Stop (returning
+  ## NA) if we reach another function boundary first -- an anonymous function in
+  ## an outer function body must not be misattributed to that outer function.
+  cur <- fnExpr
+  repeat {
+    parent <- xml2::xml_parent(cur)
+    if (length(parent) == 0 || xml2::xml_name(parent) != "expr") {
+      return(NA_character_)
+    }
+    kids <- xml2::xml_children(parent)
+    knames <- xml2::xml_name(kids)
+    if (any(knames %in% c("LEFT_ASSIGN", "EQ_ASSIGN"))) {
+      lhs <- xml2::xml_find_first(parent, "expr[1]/SYMBOL")
+      if (length(lhs) > 0 && !is.na(xml2::xml_text(lhs))) return(xml2::xml_text(lhs))
+      return(NA_character_)
+    }
+    if (any(knames == "RIGHT_ASSIGN")) {
+      rhs <- xml2::xml_find_first(parent, "expr[last()]/SYMBOL")
+      if (length(rhs) > 0 && !is.na(xml2::xml_text(rhs))) return(xml2::xml_text(rhs))
+      return(NA_character_)
+    }
+    ## Don't ascend into a function's formals, and only ascend through a
+    ## call/grouping that wraps `cur` as the *first* thing inside its parens
+    ## (e.g. cmpfun(function(){}) or Cache(function(){})). A function that is a
+    ## later argument (e.g. lapply(x, function(){})) is an anonymous callback
+    ## and must not be attributed to whatever the surrounding expression binds.
+    if (any(knames == "FUNCTION")) return(NA_character_)
+    parenIdx <- which(knames == "OP-LEFT-PAREN")
+    if (length(parenIdx) == 0) return(NA_character_)
+    afterParen <- which(knames == "expr" & seq_along(knames) > parenIdx[1])
+    if (length(afterParen) == 0 ||
+        !identical(xml2::xml_path(kids[[afterParen[1]]]), xml2::xml_path(cur))) {
+      return(NA_character_)
+    }
+    cur <- parent
+  }
 }
 
 ## Is `node` (an expr) the LHS of an assignment? An expr is an LHS iff its
@@ -315,6 +346,25 @@
     )
   }
 
+  ## paramCheckOtherMods(sim, "x") -- treats "x" as a used parameter. The
+  ## function deliberately reads a parameter that may be defined in other
+  ## modules, so it is recorded as a use (no module attribution) and exempted
+  ## from the "used but not declared here" rule via its extra tag.
+  pcomNodes <- xml2::xml_find_all(
+    doc, "//expr[expr/SYMBOL_FUNCTION_CALL[text()='paramCheckOtherMods']]"
+  )
+  for (n in pcomNodes) {
+    nameNode <- xml2::xml_find_first(n, ".//STR_CONST[1]")
+    if (length(nameNode) == 0 || is.na(xml2::xml_text(nameNode))) next
+    pos <- .cc_pos(n)
+    out[[length(out) + 1]] <- .cc_use(
+      "param", name = gsub('^["\']|["\']$', "", xml2::xml_text(nameNode)),
+      fn = .cc_enclosingFn(n), file = file,
+      line = pos$line, col = pos$col, resolved = TRUE,
+      module = currentModule, extra = "paramCheckOtherMods()"
+    )
+  }
+
   if (length(out) == 0) return(.cc_emptyUses())
   do.call(rbind, out)
 }
@@ -333,6 +383,12 @@
     inner, "OP-DOLLAR | LBB")) > 0
   if (innerHasAccessor) {
     modName <- .cc_chainTail(inner)
+    if (!is.null(modName) && isTRUE(modName$current)) {
+      ## params(sim)[[currentModule(sim)]]$x -- the key resolves to the
+      ## current module, so treat it like the no-module form below
+      return(list(module = NULL, param = outerName$name,
+                  resolved = outerName$resolved))
+    }
     list(module = modName$name,
          param = outerName$name,
          resolved = outerName$resolved && (is.null(modName) || modName$resolved))
@@ -354,10 +410,17 @@
     if (length(sym) == 0) return(NULL)
     return(list(name = xml2::xml_text(sym), resolved = TRUE))
   } else if (opName == "LBB") {
-    str <- xml2::xml_find_first(expr, "expr[2]/STR_CONST")
+    key <- xml2::xml_find_first(expr, "expr[2]")
+    str <- xml2::xml_find_first(key, "STR_CONST")
     if (length(str) > 0 && !is.na(xml2::xml_text(str))) {
       return(list(name = gsub('^["\']|["\']$', "", xml2::xml_text(str)),
                   resolved = TRUE))
+    }
+    ## params(sim)[[currentModule(sim)]] -- key is a call to currentModule(),
+    ## i.e. the current module; resolvable even though it isn't a literal
+    fnCall <- xml2::xml_find_first(key, ".//SYMBOL_FUNCTION_CALL")
+    if (length(fnCall) > 0 && identical(xml2::xml_text(fnCall), "currentModule")) {
+      return(list(name = NA_character_, resolved = TRUE, current = TRUE))
     }
     return(list(name = NA_character_, resolved = FALSE))
   }
@@ -499,6 +562,79 @@
   do.call(rbind, out)
 }
 
+## Namespaced references: every `pkg::name` / `pkg:::name`. Emits one
+## use per occurrence with name = pkg (the SYMBOL_PACKAGE token) and
+## extra = the referenced symbol, so reqd_pkg_undeclared can see which
+## packages are used via `::`.
+.cc_collect_nsCalls <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  pkgNodes <- xml2::xml_find_all(doc, "//SYMBOL_PACKAGE")
+  if (length(pkgNodes) == 0) return(.cc_emptyUses())
+  out <- lapply(pkgNodes, function(p) {
+    parent <- xml2::xml_parent(p)
+    fnNode <- xml2::xml_find_first(parent, "SYMBOL_FUNCTION_CALL | SYMBOL")
+    pos <- .cc_pos(p)
+    .cc_use("ns_call", name = xml2::xml_text(p), fn = .cc_enclosingFn(p),
+            file = file, line = pos$line, col = pos$col, resolved = TRUE,
+            extra = if (length(fnNode) > 0) xml2::xml_text(fnNode) else NA_character_)
+  })
+  do.call(rbind, out)
+}
+
+## `suppliedElsewhere("x", sim)` references. Captures the first argument when
+## it is a string literal or a bare symbol (the object name). Used by
+## in_no_default: requiring an input via suppliedElsewhere (e.g. then stop()ing
+## if absent) is a legitimate alternative to providing a default.
+.cc_collect_suppliedElsewhere <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  calls <- xml2::xml_find_all(
+    doc, "//expr[expr/SYMBOL_FUNCTION_CALL[text()='suppliedElsewhere']]")
+  if (length(calls) == 0) return(.cc_emptyUses())
+  out <- list()
+  for (cal in calls) {
+    arg <- xml2::xml_find_first(cal, "expr[2]")     # first argument
+    if (length(arg) == 0) next
+    sc <- xml2::xml_find_first(arg, ".//STR_CONST")
+    name <- if (length(sc) > 0 && !is.na(xml2::xml_text(sc))) {
+      gsub('^["\']|["\']$', "", xml2::xml_text(sc))
+    } else {
+      sy <- xml2::xml_find_first(arg, ".//SYMBOL")
+      if (length(sy) > 0) xml2::xml_text(sy) else NA_character_
+    }
+    if (is.na(name)) next
+    pos <- .cc_pos(cal)
+    out[[length(out) + 1]] <- .cc_use("supplied_elsewhere", name = name,
+                                      fn = .cc_enclosingFn(cal), file = file,
+                                      line = pos$line, col = pos$col, resolved = TRUE)
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
+}
+
+## Bare (unqualified) function calls -- every `fn(...)` that is not `pkg::fn`.
+## Deduplicated by name (first occurrence keeps a position), since the
+## consumer (reqd_pkg_no_source) only needs the set of called names.
+.cc_collect_bareCalls <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  calls <- xml2::xml_find_all(doc, "//SYMBOL_FUNCTION_CALL")
+  if (length(calls) == 0) return(.cc_emptyUses())
+  out <- list(); seen <- character()
+  for (cal in calls) {
+    ## skip namespaced calls (pkg::fn / pkg:::fn)
+    if (length(xml2::xml_find_first(
+      cal, "preceding-sibling::NS_GET | preceding-sibling::NS_GET_INT")) > 0) next
+    nm <- xml2::xml_text(cal)
+    if (nm %in% seen) next
+    seen <- c(seen, nm)
+    pos <- .cc_pos(cal)
+    out[[length(out) + 1]] <- .cc_use("bare_call", name = nm,
+                                      fn = .cc_enclosingFn(cal), file = file,
+                                      line = pos$line, col = pos$col, resolved = TRUE)
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
+}
+
 ## Conflicting/clashing function uses (raster::levels, quickPlot::Plot, etc.).
 ## These are flagged by name only -- we don't care about positions for the
 ## clashing-defined-fn check (handled via env name listing, not parsing).
@@ -547,6 +683,134 @@
     uses[[length(uses) + 1]] <- .cc_collect_returnSim(p)
     uses[[length(uses) + 1]] <- .cc_collect_assignToSim(p)
     uses[[length(uses) + 1]] <- .cc_collect_globalsConflicts(p)
+    uses[[length(uses) + 1]] <- .cc_collect_localAndBulk(p)
+    uses[[length(uses) + 1]] <- .cc_collect_nsCalls(p)
+    uses[[length(uses) + 1]] <- .cc_collect_declaredVars(p)
+    uses[[length(uses) + 1]] <- .cc_collect_bareCalls(p)
+    uses[[length(uses) + 1]] <- .cc_collect_suppliedElsewhere(p)
   }
-  do.call(rbind, uses)
+  out <- do.call(rbind, uses)
+  ## Attach suppression context so rules can honour inline `# nolint` markers.
+  ## (Carried as attributes; read by .cc_runRules before `out` is subset.)
+  attr(out, "nolint")    <- do.call(rbind, lapply(parses, .cc_collectNolint))
+  attr(out, "declLines") <- do.call(rbind, lapply(parses, .cc_collectDeclLines))
+  out
+}
+
+## Collect bare-symbol local assignments (`name <- ...`, `name = ...`,
+## `... -> name`) and detect a bulk write into `envir(sim)` via
+## `list2env(<x>, envir(sim))`. The local assignments let `out_declared_unused`
+## recognise outputs that are computed as a same-named local and then pushed to
+## the sim env in bulk (a common idiom). The bulk-write marker (kind
+## "sim_bulk_assign") gates that behaviour. Both are `resolved = TRUE` so they
+## are ignored by the unresolved-accessor rule.
+.cc_collect_localAndBulk <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  out <- list()
+  emit <- function(kind, name, node, extra = NA_character_) {
+    pos <- .cc_pos(node)
+    .cc_use(kind, name = name, fn = .cc_enclosingFn(node), file = file,
+            line = pos$line, col = pos$col, resolved = TRUE, extra = extra)
+  }
+  ## `name <- ...` / `name = ...` (LHS is a single bare SYMBOL)
+  for (n in xml2::xml_find_all(
+    doc, "//expr[(LEFT_ASSIGN or EQ_ASSIGN) and expr[1][SYMBOL and count(*)=1]]")) {
+    sym <- xml2::xml_find_first(n, "expr[1]/SYMBOL")
+    if (length(sym) > 0) out[[length(out) + 1]] <- emit("local_assign", xml2::xml_text(sym), n)
+  }
+  ## `... -> name` (RHS is a single bare SYMBOL)
+  for (n in xml2::xml_find_all(
+    doc, "//expr[RIGHT_ASSIGN and expr[last()][SYMBOL and count(*)=1]]")) {
+    sym <- xml2::xml_find_first(n, "expr[last()]/SYMBOL")
+    if (length(sym) > 0) out[[length(out) + 1]] <- emit("local_assign", xml2::xml_text(sym), n)
+  }
+  ## `list2env(<x>, envir(sim))` -- a bulk write into the sim environment
+  for (n in xml2::xml_find_all(
+    doc,
+    paste0("//expr[expr/SYMBOL_FUNCTION_CALL[text()='list2env'] and ",
+           ".//expr[expr/SYMBOL_FUNCTION_CALL[text()='envir'] and expr/SYMBOL[text()='sim']]]"))) {
+    out[[length(out) + 1]] <- emit("sim_bulk_assign", NA_character_, n, extra = "list2env()")
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
+}
+
+## Collect developer assertions of the form `# nolint: vars a, b, c`, used on a
+## dynamic bulk-assign line (e.g. list2env(<computedList>, envir(sim))) whose
+## element names cannot be seen statically. Each named object is recorded as a
+## "declared_var" use so out_declared_unused treats it as produced.
+.cc_collect_declaredVars <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  out <- list()
+  for (cm in xml2::xml_find_all(doc, "//COMMENT")) {
+    m <- regmatches(xml2::xml_text(cm),
+                    regexec("#+\\s*nolint\\s*:\\s*vars\\b\\s*(.*)$",
+                            xml2::xml_text(cm), ignore.case = TRUE))[[1]]
+    if (length(m) < 2 || !nzchar(trimws(m[2]))) next
+    vars <- trimws(strsplit(trimws(m[2]), "[,[:space:]]+")[[1]])
+    vars <- vars[nzchar(vars)]
+    pos <- .cc_pos(cm)
+    for (v in vars) {
+      out[[length(out) + 1]] <- .cc_use(
+        "declared_var", name = v, fn = NA_character_, file = file,
+        line = pos$line, col = NA_integer_, resolved = TRUE, extra = "nolint:vars")
+    }
+  }
+  if (length(out) == 0) return(.cc_emptyUses())
+  do.call(rbind, out)
+}
+
+## Collect inline `# nolint` directives from the source comments. A bare
+## `# nolint` suppresses every rule on that line; `# nolint: id1, id2`
+## suppresses only the listed rule ids. Returns a data.frame(file, line,
+## rules) where `rules` is a list-column (NA = blanket), or NULL if none.
+.cc_collectNolint <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  comments <- xml2::xml_find_all(doc, "//COMMENT")
+  out <- list()
+  for (cm in comments) {
+    txt <- xml2::xml_text(cm)
+    m <- regmatches(txt, regexec("#+\\s*nolint\\b\\s*(?::\\s*(.*))?$", txt,
+                                 ignore.case = TRUE))[[1]]
+    if (length(m) == 0) next
+    rulesStr <- if (length(m) >= 2) trimws(m[2]) else ""
+    rules <- if (nzchar(rulesStr)) {
+      trimws(strsplit(rulesStr, "[,[:space:]]+")[[1]])
+    } else NA_character_
+    ## `# nolint: vars a, b` is a declared-vars assertion, not a rule
+    ## suppression (handled by .cc_collect_declaredVars); skip it here
+    if (!all(is.na(rules)) && identical(tolower(rules[1]), "vars")) next
+    out[[length(out) + 1]] <- data.frame(
+      file = file %||% NA_character_,
+      line = as.integer(xml2::xml_attr(cm, "line1")),
+      rules = I(list(rules)), stringsAsFactors = FALSE)
+  }
+  if (length(out) == 0) return(NULL)
+  do.call(rbind, out)
+}
+
+## Record the source line span of each metadata declaration
+## (expectsInput/createsOutput/defineParameter), keyed by object name, so a
+## `# nolint` placed anywhere within a (possibly multi-line) declaration can
+## suppress the corresponding metadata-only finding. Returns NULL if none.
+.cc_collectDeclLines <- function(parsed) {
+  doc <- parsed$doc; file <- parsed$file
+  spec <- list(expectsInput = "objectName", createsOutput = "objectName",
+               defineParameter = "name")
+  out <- list()
+  for (fnName in names(spec)) {
+    calls <- xml2::xml_find_all(
+      doc, sprintf("//expr[expr/SYMBOL_FUNCTION_CALL[text()='%s']]", fnName))
+    for (cal in calls) {
+      val <- .cc_argValueStr(cal, spec[[fnName]])
+      if (is.na(val)) next
+      out[[length(out) + 1]] <- data.frame(
+        name = val, file = file %||% NA_character_,
+        line1 = as.integer(xml2::xml_attr(cal, "line1")),
+        line2 = as.integer(xml2::xml_attr(cal, "line2")),
+        stringsAsFactors = FALSE)
+    }
+  }
+  if (length(out) == 0) return(NULL)
+  do.call(rbind, out)
 }

@@ -1,3 +1,15 @@
+## TRUE when the tests are running under coverage instrumentation.
+##
+## covr sets R_COVR itself, which `covr::in_covr()` reads, so this detects a
+## bare local `covr::package_coverage()` run as well as CI. The previous
+## `Sys.getenv("USING_COVR")` check only caught CI, because USING_COVR is set
+## by the GitHub workflow rather than by covr -- so covr-sensitive assertions
+## fired (and failed) on a local coverage run.
+inCovr <- function() {
+  identical(Sys.getenv("USING_COVR"), "true") ||
+    (requireNamespace("covr", quietly = TRUE) && isTRUE(covr::in_covr()))
+}
+
 cleanMessage <- function(mm) {
   mm1 <- gsub(".{1}\\[.{1,2}m", "", mm)
   mm1 <- gsub("\\n", "", mm1)
@@ -72,7 +84,7 @@ testInit <- function(libraries = character(), ask = FALSE, verbose,
 }
 
 sampleModReqdPkgs <- c("terra", "SpaDES.tools", "RColorBrewer", # randomLandscapes & fireSpread
-                       "sf", "CircStats") # caribouMovement
+                       "CircStats") # caribouMovement
 
 testCode <- '
       defineModule(sim, list(

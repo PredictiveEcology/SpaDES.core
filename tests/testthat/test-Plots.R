@@ -69,7 +69,7 @@ test_that("Plots function 1", {
 
 
     ', fill = TRUE)
-    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                    times = list(start = 0, end = 10, timeunit = "year"))
     mess <- capture_messages({
       simOut <- spades(sim, debug = TRUE)
@@ -144,15 +144,23 @@ test_that("Plots function 2", {
       }
 ', fill = TRUE)
   expect_error({
-    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+    sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                    times = list(start = 0, end = 10, timeunit = "year"))
     }, "needs a newer version of SpaDES.core"
   )
 })
 
 test_that("Plots function 3 - use as Plot", {
-  testthat::skip_on_ci()
+  skip_on_cran()
     testInit("terra", opts = list(spades.PlotsUsePlot = TRUE))
+    # quickPlot::Plot (and Plots(types = "screen") routed through it via
+    # spades.PlotsUsePlot = TRUE) opens an interactive screen device. On a
+    # headless machine (CI, logged runs) there is none, so open an offscreen
+    # png device first: quickPlot's dev() reuses an existing device rather than
+    # calling dev.new(), so the screen path runs without a display. (Previously
+    # this whole test was skipped on CI for want of a device.)
+    grDevices::png(withr::local_tempfile(fileext = ".png"))
+    withr::defer(grDevices::dev.off())
     packages <- c("raster", "terra")
     functions <- cbind(c("raster", "extent", "stack", "nlayers"),
                        c("rast", "ext", "rast", "nlyr"))
@@ -199,6 +207,39 @@ test_that("Plots function 3 - use as Plot", {
   # }
 })
 
+test_that("Plots - modern wrapper (usePlot = FALSE) screen path + dispatch", {
+  # The non-deprecated Plots path: usePlot = FALSE (the default) does not route
+  # through quickPlot::Plot; it dispatches to `fn` (terra::plot for spatial data,
+  # base plot otherwise). This used to be exercised only via the screen-bound
+  # test above; assert it here too, headless, so it runs on CI. See also
+  # "Plots - terra SpatRaster and SpatVector" for the file-saving (types = "png")
+  # branch of the same wrapper.
+  skip_on_cran()
+  skip_if_not_installed("terra")
+  testInit("terra") # usePlot defaults to FALSE
+
+  grDevices::png(withr::local_tempfile(fileext = ".png"))
+  withr::defer(grDevices::dev.off())
+
+  ras <- terra::rast(terra::ext(0, 10, 0, 10), vals = runif(100), res = 1)
+  vec <- terra::vect(cbind(1:5, 1:5))
+
+  # A custom fn lets us assert the wrapper actually dispatched to it on the
+  # screen path (not just that it ran without error).
+  callCount <- new.env(parent = emptyenv())
+  callCount$n <- 0L
+  myFn <- function(x, ...) {
+    callCount$n <- callCount$n + 1L
+    invisible()
+  }
+  expect_no_error(Plots(data = ras, types = "screen", fn = myFn))
+  expect_identical(callCount$n, 1L)
+
+  # Default dispatch: SpatRaster / SpatVector route to terra::plot without error.
+  expect_no_error(Plots(data = ras, types = "screen"))
+  expect_no_error(Plots(data = vec, types = "screen"))
+})
+
 test_that("Plots test .guessPkgFun", {
   testInit("raster")
 
@@ -237,7 +278,7 @@ test_that("Plots - base R fn (non-gg result)", {
     fnHist <- function(d, ...) hist(d$a, main = "test", ...)
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
@@ -279,7 +320,7 @@ test_that("Plots - terra SpatRaster and SpatVector", {
     }
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
@@ -325,7 +366,7 @@ test_that("Plots - named ... args without data argument", {
     }
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
@@ -363,11 +404,94 @@ test_that("Plots - ggplot object passed directly as data", {
     }
   ', fill = TRUE)
 
-  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir),
+  sim <- simInit(modules = "test", paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs")),
                  times = list(start = 0, end = 1, timeunit = "year"))
   suppressMessages(simOut <- spades(sim, debug = FALSE))
   files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
   expect_true(any(grepl("ggobj_test", files) & endsWith(files, ".png")))
   expect_true(any(grepl("ggobj_test", files) & grepl("_gg\\.qs2$", files)))
   expect_equal(NROW(outputs(simOut)), 2L)
+})
+
+test_that("canonicalize_ggplot digest distinguishes plot differences", {
+  skip_if_not_installed("ggplot2")
+  testInit("ggplot2")
+
+  d <- data.frame(x = 1:12, y = (1:12)^2, g = rep(c("a", "b"), 6), h = rep(c("p", "q"), each = 6))
+  d2 <- d
+  d2$y <- d2$y * 2
+  B <- function() ggplot(d, aes(x, y)) + geom_point()
+  dig <- function(p) .robustDigest(canonicalize_ggplot(p))
+
+  # each pair differs in exactly one way; the digest must see all of them, because a
+  # collision here means Plots(useCache = TRUE) keeps a stale figure
+  pairs <- list(
+    "geom type"          = list(B(), ggplot(d, aes(x, y)) + geom_line()),
+    "geom param"         = list(B() + geom_point(size = 3), B() + geom_point(size = 5)),
+    "alpha"              = list(ggplot(d, aes(x, y)) + geom_point(alpha = 0.3),
+                                ggplot(d, aes(x, y)) + geom_point(alpha = 0.9)),
+    "constant colour"    = list(ggplot(d, aes(x, y)) + geom_point(colour = "red"),
+                                ggplot(d, aes(x, y)) + geom_point(colour = "blue")),
+    "stat param"         = list(ggplot(d, aes(x)) + geom_histogram(bins = 5),
+                                ggplot(d, aes(x)) + geom_histogram(bins = 30)),
+    "aes mapping"        = list(B(), ggplot(d, aes(x, y, colour = g)) + geom_point()),
+    "plot data values"   = list(B(), ggplot(d2, aes(x, y)) + geom_point()),
+    "layer-specific data" = list(B() + geom_line(data = d[1:3, ]), B() + geom_line(data = d[1:6, ])),
+    "layer order"        = list(ggplot(d, aes(x, y)) + geom_point() + geom_line(),
+                                ggplot(d, aes(x, y)) + geom_line() + geom_point()),
+    "facet_wrap var"     = list(B() + facet_wrap("g"), B() + facet_wrap("h")),
+    "facet_wrap ncol"    = list(B() + facet_wrap("g", ncol = 2), B() + facet_wrap("g", ncol = 3)),
+    "facet_grid vars"    = list(B() + facet_grid(g ~ h), B() + facet_grid(h ~ g)),
+    "scale transform"    = list(B() + scale_y_log10(), B() + scale_y_sqrt()),
+    "scale limits"       = list(B() + scale_y_continuous(limits = c(0, 100)),
+                                B() + scale_y_continuous(limits = c(0, 200))),
+    "coord limits"       = list(B() + coord_cartesian(xlim = c(1, 3)), B() + coord_cartesian(xlim = c(1, 4))),
+    "coord type"         = list(B() + coord_cartesian(), B() + coord_flip()),
+    "labels"             = list(B() + labs(title = "A"), B() + labs(title = "B")),
+    "theme preset"       = list(B() + theme_bw(), B() + theme_classic()),
+    "theme element"      = list(B() + theme(legend.position = "right"), B() + theme(legend.position = "none")),
+    "theme unit element" = list(B() + theme(plot.margin = grid::unit(rep(1, 4), "cm")),
+                                B() + theme(plot.margin = grid::unit(rep(4, 4), "cm"))),
+    "position adjustment" = list(ggplot(d, aes(g, y)) + geom_point(position = position_jitter(width = 0.1)),
+                                 ggplot(d, aes(g, y)) + geom_point(position = position_jitter(width = 0.5)))
+  )
+  for (nm in names(pairs))
+    expect_false(identical(dig(pairs[[nm]][[1]]), dig(pairs[[nm]][[2]])), info = nm)
+})
+
+test_that("canonicalize_ggplot digest is stable for identical plots", {
+  skip_if_not_installed("ggplot2")
+  testInit("ggplot2")
+
+  d <- data.frame(x = 1:12, y = (1:12)^2, g = rep(c("a", "b"), 6), h = rep(c("p", "q"), each = 6))
+  dig <- function(p) .robustDigest(canonicalize_ggplot(p))
+
+  # the point of dropping the data and environments: rebuilding the same plot -- notably
+  # from a different enclosing environment, as each module event does -- must not change it
+  same <- list(
+    "different enclosing envs" = list(local({zz <- runif(1e4); ggplot(d, aes(x, y)) + geom_point()}),
+                                      local({ww <- "unused"; ggplot(d, aes(x, y)) + geom_point()})),
+    "rebuilt twice"            = list(ggplot(d, aes(x, y)) + geom_point() + facet_grid(g ~ h) + scale_y_log10(),
+                                      ggplot(d, aes(x, y)) + geom_point() + facet_grid(g ~ h) + scale_y_log10()),
+    "equal but separate data"  = list(ggplot(d, aes(x, y)) + geom_point(),
+                                      ggplot(data.frame(x = 1:12, y = (1:12)^2, g = rep(c("a", "b"), 6),
+                                                        h = rep(c("p", "q"), each = 6)),
+                                             aes(x, y)) + geom_point()),
+    "pipe vs direct"           = list(d |> ggplot(aes(x, y)) + geom_point(),
+                                      ggplot(d, aes(x, y)) + geom_point())
+  )
+  for (nm in names(same))
+    expect_identical(dig(same[[nm]][[1]]), dig(same[[nm]][[2]]), info = nm)
+
+  # a layer inheriting the plot data holds waiver(), not NULL, so it must resolve to the
+  # plot data digest rather than to a constant
+  md <- canonicalize_ggplot(ggplot(d, aes(x, y)) + geom_point())
+  expect_identical(md$layers[[1]]$data_digest$source, "plot")
+  expect_identical(md$layers[[1]]$data_digest$digest, md$data_digest)
+
+  # scale transformation is read via get_transformation() on ggplot2 >= 3.5.0; the name
+  # itself is ggplot2's to choose, so assert only that one was found (log10 vs sqrt is
+  # covered by the pairs above)
+  trans <- canonicalize_ggplot(ggplot(d, aes(x, y)) + geom_point() + scale_y_log10())$scales[[1]]$trans
+  expect_true(is.character(trans) && nzchar(trans))
 })

@@ -28,7 +28,7 @@ test_that("testing memoryUse", {
   mySim2 <- simInit(times = times, params = params,
                     modules = modules, objects = list(), paths = paths)
 
-  if (!identical(Sys.getenv("USING_COVR"), "true")) {
+  if (!inCovr()) {
 
     mySim3 <- spades(mySim2, debug = FALSE)
     suppressWarnings({

@@ -3,6 +3,7 @@
 ## Two entry points:
 ##   * codeCheckModule(path = ...) -- standalone, runs against a module
 ##     directory on disk. No simInit required. Useful while authoring.
+##     codeCheckModules() is the vectorized form (one or more modules).
 ##   * .runCodeChecks2(sim, m, k) -- internal entry called from
 ##     simulation-parseModule.R when getOption("spades.codeCheckEngine")
 ##     is "v2" (the default once wired in). v1 (.runCodeChecks) remains
@@ -24,14 +25,83 @@
 #' `options(spades.codeCheckEngine = "v2")` (the default). The legacy v1
 #' checker is still available via `options(spades.codeCheckEngine = "v1")`.
 #'
+#' @section Silencing findings:
+#' Each finding in the printed report is tagged with its **rule id** in
+#' brackets, e.g. `[conflicting_fn_unqualified]`; that id (or the `• <group>`
+#' name it is printed under) is what you reference to silence it. Findings can
+#' be suppressed three ways (all honoured both here and during `simInit()`):
+#' \itemize{
+#'   \item **Inline `# nolint` (module developer).** Put a `# nolint` comment on
+#'     the offending source line to silence every rule there, or
+#'     `# nolint: <rule_id>[, <rule_id>]` to silence only specific rules (a
+#'     group name such as `globals` is accepted in place of a rule id). For a
+#'     metadata finding such as `in_no_default`, place it anywhere within the
+#'     `expectsInput()` / `createsOutput()` / `defineParameter()` declaration,
+#'     e.g. `expectsInput("cloudFolderID", "character", desc = "...") # nolint: in_no_default`.
+#'     This travels with the module and documents the intent.
+#'   \item **`options(spades.codeChecksIgnore = ...)` (module user).** A named
+#'     list keyed by rule id (or group name) whose values are object names to
+#'     ignore, e.g.
+#'     `options(spades.codeChecksIgnore = list(in_no_default = c("cloudFolderID", "ecoregionRst")))`.
+#'     Lets someone running another author's module quiet specific findings
+#'     without editing its source.
+#'   \item **`options(spades.moduleCodeChecks = list(disable = ...))`.** Disable
+#'     whole rules by id (or restrict with `enable = ...`).
+#' }
+#'
+#' A related developer hint is `# nolint: vars a, b`: placed on a dynamic
+#' bulk-assign line whose names can't be seen statically (e.g.
+#' `list2env(someList, envir(sim))`), it asserts that objects `a`, `b` are
+#' produced there, so they aren't reported as `out_declared_unused`.
+#'
+#' @section Rule catalogue:
+#' The rule ids (printed in brackets in the report), grouped by the bucket they
+#' appear under:
+#' \itemize{
+#'   \item **inputObjects** — `in_declared_unused` (declared input never used),
+#'     `in_used_undeclared` (`sim$x` read but not in `inputObjects`),
+#'     `in_no_default` (declared input has no default in `.inputObjects()`).
+#'   \item **outputObjects** — `out_declared_unused` (declared output never
+#'     assigned), `out_used_undeclared` (`sim$x <-` but not in `outputObjects`).
+#'   \item **parameters** — `param_declared_unused`, `param_used_undeclared`,
+#'     `param_used_other_module`.
+#'   \item **module functions** — `must_return_sim` (a `doEvent.*` must return
+#'     `sim`), `must_assign_to_sim`, `module_named_object` (`sim$<module>`
+#'     collides with the module name), `clashing_module_fn`.
+#'   \item **globals** — `conflicting_fn_unqualified` (a bare function name
+#'     collides with a `raster::` namesake; qualify it, e.g. `raster::scale`).
+#'   \item **unresolved** — `unresolved_accessor` (an accessor whose name could
+#'     not be resolved statically).
+#'   \item **codetools** — `codetools` (findings relayed from
+#'     `codetools::checkUsageEnv`).
+#'   \item **reqdPkgs** — `reqd_pkg_duplicate` (a package declared more than
+#'     once in `reqdPkgs`, especially with conflicting source/version),
+#'     `reqd_pkg_undeclared` (a `pkg::fn` whose `pkg` is not in `reqdPkgs`),
+#'     `reqd_pkg_no_source` (best-effort, info: bare calls with no apparent
+#'     source among the declared packages — only when all declared packages are
+#'     installed).
+#' }
+#'
+#' `codeCheckModule()` checks a single module. `codeCheckModules()` is the
+#' vectorized form: it runs `codeCheckModule()` on each path in `paths` and
+#' returns a list of findings named by module. When `paths` is not supplied it
+#' defaults to every module directory under `getOption("spades.modulePath")`,
+#' so `codeCheckModules()` with no arguments checks the whole project. It
+#' replaces the manual idiom
+#' `Map(codeCheckModule, dir(getOption("spades.modulePath"), full.names = TRUE))`.
+#'
 #' @param path Path to a module directory (containing `<modName>/<modName>.R`,
 #'   and optionally an `R/` subfolder of helper scripts) or to a single `.R`
 #'   file. If a directory, the module name is the directory's basename.
+#' @param paths A character vector of module directories (or `.R` files), as
+#'   accepted by `path`. Defaults to
+#'   `dir(getOption("spades.modulePath"), full.names = TRUE)`.
 #' @param print Logical; print the grouped report. Default `TRUE`.
 #' @param enable,disable Optional character vectors of rule IDs to restrict
 #'   the run. See `names(SpaDES.core:::.CC_RULES)` for the catalogue.
-#' @return A `data.frame` of findings (one row per problem). Returned
-#'   invisibly. Empty if the module is clean.
+#' @return `codeCheckModule()` returns a `data.frame` of findings (one row per
+#'   problem), invisibly; empty if the module is clean. `codeCheckModules()`
+#'   returns, invisibly, a named list of such `data.frame`s (named by module).
 #' @export
 #' @rdname codeCheckModule
 codeCheckModule <- function(path, print = TRUE, enable = NULL, disable = NULL) {
@@ -42,6 +112,16 @@ codeCheckModule <- function(path, print = TRUE, enable = NULL, disable = NULL) {
                                               moduleEnv = NULL)),
                            enable = enable, disable = disable)
   if (isTRUE(print)) .cc_report(findings, module = info$module)
+  invisible(findings)
+}
+
+#' @export
+#' @rdname codeCheckModule
+codeCheckModules <- function(paths = dir(getOption("spades.modulePath"), full.names = TRUE),
+                             print = TRUE, enable = NULL, disable = NULL) {
+  names(paths) <- basename(paths)
+  findings <- lapply(paths, codeCheckModule, print = print,
+                     enable = enable, disable = disable)
   invisible(findings)
 }
 
@@ -82,6 +162,8 @@ codeCheckModule <- function(path, print = TRUE, enable = NULL, disable = NULL) {
     otherModuleParams = .cc_otherModuleParams(sim, m),
     moduleEnv = modEnv,
     codetoolsOpts = .cc_codetoolsOpts(),
+    reqdPkgs = .cc_reqdPkgsFromDep(dep, file = if (file.exists(mainFile)) mainFile else NA_character_),
+    mainFile = if (file.exists(mainFile)) mainFile else NA_character_,
     files = files
   )
 
@@ -156,8 +238,45 @@ codeCheckModule <- function(path, print = TRUE, enable = NULL, disable = NULL) {
     inputs  = .cc_namesOfArg(doc, "expectsInput", "objectName"),
     outputs = .cc_namesOfArg(doc, "createsOutput", "objectName"),
     params  = .cc_namesOfArg(doc, "defineParameter", "name"),
-    otherModuleParams = list()
+    otherModuleParams = list(),
+    reqdPkgs = .cc_reqdPkgsFromSource(doc, file = mainFile),
+    mainFile = mainFile
   )
+}
+
+## Harvest the `reqdPkgs` list from a `defineModule()` block. Returns a
+## data.frame(spec, pkg, file, line): `spec` is the raw entry (e.g.
+## "PredictiveEcology/SpaDES.core@branch (>= 3.0.4)"), `pkg` the bare package
+## name via Require::extractPkgName(). Empty data.frame if none found.
+.cc_reqdPkgsFromSource <- function(doc, file = NA_character_) {
+  empty <- data.frame(spec = character(), pkg = character(),
+                      file = character(), line = integer(),
+                      stringsAsFactors = FALSE)
+  valExpr <- xml2::xml_find_first(
+    doc, "//SYMBOL_SUB[text()='reqdPkgs']/following-sibling::expr[1]")
+  if (length(valExpr) == 0) return(empty)
+  strs <- xml2::xml_find_all(valExpr, ".//STR_CONST")
+  if (length(strs) == 0) return(empty)
+  spec <- gsub('^["\']|["\']$', "", xml2::xml_text(strs))
+  pkg <- tryCatch(Require::extractPkgName(spec), error = function(e) spec)
+  data.frame(spec = spec, pkg = pkg, file = file %||% NA_character_,
+             line = as.integer(xml2::xml_attr(strs, "line1")),
+             stringsAsFactors = FALSE)
+}
+
+## Same as .cc_reqdPkgsFromSource() but from an already-parsed module
+## dependency object (simInit path). `dep@reqdPkgs` is an unevaluated list of
+## strings; line numbers aren't available, so `line` is NA.
+.cc_reqdPkgsFromDep <- function(dep, file = NA_character_) {
+  empty <- data.frame(spec = character(), pkg = character(),
+                      file = character(), line = integer(),
+                      stringsAsFactors = FALSE)
+  spec <- tryCatch(unlist(eval(dep@reqdPkgs)), error = function(e) NULL)
+  spec <- spec[nzchar(spec)]
+  if (length(spec) == 0) return(empty)
+  pkg <- tryCatch(Require::extractPkgName(spec), error = function(e) spec)
+  data.frame(spec = spec, pkg = pkg, file = file %||% NA_character_,
+             line = NA_integer_, stringsAsFactors = FALSE)
 }
 
 ## Find first positional or named arg `argName` of every `fnName(...)` call

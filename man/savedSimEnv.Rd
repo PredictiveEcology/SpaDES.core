@@ -10,6 +10,10 @@ savedSimEnv(envir = .GlobalEnv)
 \item{envir}{an environment to use to store the \code{.sim} (\code{simList}) object.
 default is to use the user's global environment (\code{.GlobalEnv}).}
 }
+\value{
+An environment: \code{envir} if \code{options(reproducible.memoisePersist = TRUE)},
+otherwise the \code{SpaDES.core} package environment used to hold the saved \code{simList}.
+}
 \description{
 If the user sets \code{options(reproducible.memoisePersist = TRUE)},
 the global environment will be used, otherwise, a package environment.

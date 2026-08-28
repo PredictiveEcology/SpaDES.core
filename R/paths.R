@@ -81,7 +81,7 @@ spPaths <- c(corePaths, tmpPaths)
   }
 
   list(
-    cachePath = .getOption("reproducible.cachePath"), # nolint
+    cachePath = .cachePathDefault(), # nolint
     inputPath = getOption("spades.inputPath"), # nolint
     modulePath = getOption("spades.modulePath"), # nolint
     outputPath = getOption("spades.outputPath"), # nolint
@@ -89,6 +89,22 @@ spPaths <- c(corePaths, tmpPaths)
     scratchPath = getOption("spades.scratchPath"), # nolint
     terraPath = file.path(getOption("spades.scratchPath"), "terra") # nolint
   )
+}
+
+# Resolve the cache path, falling back to a session-temp default.
+# As of reproducible >= 3.1.1.9xxx (development), `reproducible.cachePath`
+# defaults to NULL at load time and is resolved lazily by
+# reproducible:::.checkCacheRepo() on first use. SpaDES.core reads the option
+# directly (in setPaths() and .paths()) and passes it to checkPath(), which
+# errors on NULL. This mirrors reproducible's lazy fallback so a NULL option
+# still yields a usable path.
+.cachePathDefault <- function() {
+  cp <- .getOption("reproducible.cachePath") # nolint
+  if (is.null(cp) || !nzchar(cp[1])) {
+    tempPath <- getOption("reproducible.tempPath", file.path(tempdir(), "reproducible"))
+    cp <- file.path(tempPath, "cache")
+  }
+  cp
 }
 
 #' @export
@@ -118,7 +134,7 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
     TP = FALSE
   )
   if (missing(cachePath)) {
-    cachePath <- .getOption("reproducible.cachePath") # nolint
+    cachePath <- .cachePathDefault() # nolint
     defaults$CP <- TRUE
   }
   if (missing(inputPath)) {
@@ -219,3 +235,75 @@ setPaths <- function(cachePath, inputPath, modulePath, outputPath, rasterPath, s
 
   return(invisible(originalPaths))
 }
+
+#' Make file-backed objects portable across machines/users
+#'
+#' Sets `options(reproducible.fileBackedAnchors = paths)` so that file-backed
+#' objects (e.g. a \pkg{terra} `SpatRaster`) cached during a `simInit()` /
+#' `spades()` run are stored *relative* to a named, machine-independent project
+#' anchor (`cachePath`, `inputPath`, `outputPath`, `modulePath`, ...) and can
+#' therefore be restored under the equivalent anchor on another machine or user
+#' account — for example when retrieved from a shared cloud cache. See the
+#' `reproducible.fileBackedAnchors` entry in `reproducible::reproducibleOptions()`.
+#'
+#' It is deliberately a no-op when the option is already set (by the user, or by
+#' an outer/enclosing run), so an explicit setting always wins. When it does set
+#' the option it returns `TRUE` invisibly; the caller is then responsible for
+#' restoring the previous (`NULL`) value, typically via `on.exit()`.
+#'
+#' @param paths A named list of project paths, e.g. `paths(sim)` / `getPaths()`.
+#' @return Invisibly, `TRUE` if this call set the option, otherwise `FALSE`.
+#' @keywords internal
+#' @noRd
+.useFileBackedAnchors <- function(paths) {
+  if (is.null(getOption("reproducible.fileBackedAnchors")) &&
+      length(paths) && !is.null(names(paths))) {
+    options(reproducible.fileBackedAnchors = paths)
+    return(invisible(TRUE))
+  }
+  invisible(FALSE)
+}
+
+#' Find the project root directory
+#'
+#' Searches upward from `path` for an RStudio project file (a `.Rproj` whose
+#' first line is `Version: `) or a git repository (a `.git` directory, or a
+#' `.git` file pointing elsewhere, as used by worktrees and submodules),
+#' falling back on `path` itself when neither is found.
+#'
+#' @details
+#' This uses \pkg{rprojroot} when it is available. \pkg{rprojroot} is in
+#' `Suggests`, so when it is not installed this simply returns `path`, which is
+#' the same answer the fallback gives.
+#'
+#' @param path The directory to search upward from. Defaults to [getwd()].
+#'
+#' @return An absolute path to the project root, or `path` if no project marker
+#'   is found above it.
+#'
+#' @export
+#' @rdname findProjectPath
+#'
+#' @examples
+#' findProjectPath()                 # the project the session is working in
+#' findProjectPath(tempdir())        # no markers above tempdir(); returns it
+findProjectPath <- function(path = getwd()) {
+  ## NOTE: deliberately NOT using rprojroot::from_wd as one of the OR'd
+  ## criteria. Its test function is `function(path) TRUE`, so it matches the
+  ## starting directory immediately and short-circuits the search, making this
+  ## return `path` unconditionally. The starting directory is the *fallback*,
+  ## which the tryCatch below provides.
+  if (!.hasRprojroot())
+    return(path)
+
+  tryCatch(
+    rprojroot::find_root(rprojroot::is_rstudio_project | rprojroot::is_git_root,
+                         path = path),
+    error = function(e) path
+  )
+}
+
+## Whether rprojroot is available. A seam so the Suggests-absent path can be
+## tested without mocking base::requireNamespace(), which would replace it
+## process-wide for the duration of the block.
+.hasRprojroot <- function() requireNamespace("rprojroot", quietly = TRUE)

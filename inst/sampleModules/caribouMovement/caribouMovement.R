@@ -20,7 +20,7 @@ defineModule(sim, list(
   timeunit = "month",
   citation = list(),
   documentation = list(),
-  reqdPkgs = list("grid", "terra", "sf", "stats", "SpaDES.tools (>= 2.0.0)"),
+  reqdPkgs = list("grid", "terra", "stats", "SpaDES.tools (>= 2.0.0)"),
   parameters = rbind(
     defineParameter("stackName", "character", "landscape", NA, NA, "name of the RasterStack"),
     defineParameter("moveInitialTime", "numeric", start(sim) + 1, start(sim) + 1, end(sim),

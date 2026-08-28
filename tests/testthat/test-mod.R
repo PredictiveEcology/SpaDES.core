@@ -235,6 +235,393 @@ test_that("spades.recoveryMode = 2L retains two events of state", {
                  1L)
 })
 
+test_that("spades.recoveryMode + restartSimInit round-trip (.inputObjects)", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE)
+
+  ## a module whose .inputObjects errors when its `failIO` param is set
+  modCode <- function(nm, fails) {
+    body <- if (fails) 'if (isTRUE(!is.null(P(sim)$failIO))) stop("testing restartSimInit")'
+            else ""
+    sprintf('
+defineModule(sim, list(name = "%s", description = "", keywords = "",
+  authors = person("a", "b"), childModules = character(0),
+  version = list(%s = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("obj_%s", "numeric", "")),
+  outputObjects = bindrows(createsOutput("out_%s", "numeric", ""))))
+doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) { sim }
+.inputObjects <- function(sim) { %s; sim$obj_%s <- 7L; sim }
+', nm, nm, nm, nm, nm, body, nm)
+  }
+
+  newModule("modA", tmpdir, open = FALSE)
+  newModule("modB", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modA", "modA.R"), modCode("modA", FALSE), fill = TRUE)
+  cat(file = file.path(tmpdir, "modB", "modB.R"), modCode("modB", TRUE), fill = TRUE)
+
+  ## simInit must fail during modB's .inputObjects
+  err <- try(simInit(times = list(start = 0, end = 0),
+                     paths = list(modulePath = tmpdir),
+                     modules = c("modA", "modB"),
+                     loadOrder = c("modA", "modB"),
+                     params = list(modB = list(failIO = 1))),
+             silent = TRUE)
+  expect_s3_class(err, "try-error")
+  expect_match(attr(err, "condition")$message, "testing restartSimInit")
+
+  ## the interrupted simList must be stashed, with recovery + resume context
+  saved <- savedSimEnv()$.sim
+  expect_s4_class(saved, "simList")
+  expect_true(!is.null(saved$.recoverableObjs))
+  expect_equal(length(saved$.recoverableObjs), 1L)
+  expect_equal(names(saved$.recoverableObjs)[1], "modB")     # most recent = failing module
+  expect_false(is.null(saved@.xData[["._simInitContext"]]))  # resume context present
+  ## modA's .inputObjects completed; modB's did not
+  io <- completed(saved)[completed(saved)$eventType == ".inputObjects", ]$moduleName
+  expect_true("modA" %in% io)
+  expect_false("modB" %in% io)
+
+  ## restartSimInit with the offending param still set must re-throw
+  err2 <- try(restartSimInit(saved), silent = TRUE)
+  expect_s3_class(err2, "try-error")
+  expect_match(attr(err2, "condition")$message, "testing restartSimInit")
+
+  ## clear the param; restartSimInit must finish a complete simList
+  fixed <- savedSimEnv()$.sim
+  fixed@params$modB$failIO <- NULL
+  resumed <- restartSimInit(fixed)
+  expect_s4_class(resumed, "simList")
+  expect_setequal(basename2(unlist(modules(resumed))), c("modA", "modB"))
+  expect_equal(resumed$obj_modB, 7L)                          # modB's .inputObjects re-ran
+  expect_null(resumed@.xData[["._simInitContext"]])           # context cleared on success
+  ## both module init events scheduled
+  expect_true(all(c("modA", "modB") %in% events(resumed)$moduleName))
+
+  ## the resumed simList must run through spades without error
+  done <- spades(resumed, debug = FALSE)
+  expect_s4_class(done, "simList")
+})
+
+test_that("restartSimInit records the failed module when an earlier module's .inputObjects is cached", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache, spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE)
+
+  ## modA caches its .inputObjects (so a re-run is a cache hit -> .prepareOutput Copy swaps
+  ## sim@.xData); modB (later) fails on demand. The interrupted module must be recorded as
+  ## modB, not the earlier (cache-swapped) modA -- otherwise restart reparses the wrong module.
+  mk <- function(nm, useCache, fails) {
+    body <- if (fails) 'if (isTRUE(getOption("RSI_failMod", FALSE))) stop("boom in modB")' else ""
+    sprintf('
+defineModule(sim, list(name = "%s", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(%s = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", "%s", NA, NA, "")),
+  inputObjects = bindrows(expectsInput("in_%s", "numeric", "")),
+  outputObjects = bindrows(createsOutput("out_%s", "numeric", ""))))
+doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) sim
+.inputObjects <- function(sim) { %s; sim$out_%s <- 1L; sim }
+', nm, nm, useCache, nm, nm, nm, body, nm)
+  }
+  newModule("modCacheA", tmpdir, open = FALSE); newModule("modFailB", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modCacheA", "modCacheA.R"), mk("modCacheA", ".inputObjects", FALSE), fill = TRUE)
+  cat(file = file.path(tmpdir, "modFailB", "modFailB.R"),  mk("modFailB", "none", TRUE), fill = TRUE)
+  doIt <- function() simInit(times = list(start = 0, end = 0), paths = list(modulePath = tmpdir),
+                             modules = c("modCacheA", "modFailB"),
+                             loadOrder = c("modCacheA", "modFailB"))
+
+  withr::local_options(RSI_failMod = FALSE)
+  doIt()                                   # run 1: both succeed, modCacheA's .inputObjects cached
+
+  withr::local_options(RSI_failMod = TRUE) # run 2: modCacheA cache-hits (xData swap), modFailB fails
+  err <- try(doIt(), silent = TRUE)
+  expect_s3_class(err, "try-error")
+  saved <- savedSimEnv()$.sim
+  expect_equal(names(saved$.recoverableObjs)[[1]], "modFailB")   # the module that actually failed
+  io <- completed(saved)[completed(saved)$eventType == ".inputObjects", ]$moduleName
+  expect_true("modCacheA" %in% io)                               # earlier module recorded completed
+
+  ## fix modFailB and resume: the *correct* module is reparsed and its edit takes effect
+  cat(file = file.path(tmpdir, "modFailB", "modFailB.R"), sprintf('
+defineModule(sim, list(name = "modFailB", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modFailB = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", "none", NA, NA, "")),
+  inputObjects = bindrows(expectsInput("in_modFailB", "numeric", "")),
+  outputObjects = bindrows(createsOutput("out_modFailB", "numeric", ""))))
+doEvent.modFailB <- function(sim, eventTime, eventType, debug = FALSE) sim
+.inputObjects <- function(sim) { sim$out_modFailB <- 808L; sim }
+'), fill = TRUE)
+  withr::local_options(RSI_failMod = FALSE)
+  resumed <- restartSimInit(saved)
+  expect_equal(resumed$out_modFailB, 808L)                       # correct module reparsed + edit applied
+})
+
+test_that("restartSimInit rewinds modified objects, supports restart = FALSE, and uses savedSimEnv", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE)
+
+  ## modP creates `shared`; modQ (which lists `shared` as an input) modifies it and then
+  ## errors. Because `shared` already exists when modQ's .inputObjects is snapshotted, the
+  ## recovery snapshot is non-empty -- exercising restartSimInit()'s object-restore path.
+  newModule("modP", tmpdir, open = FALSE)
+  newModule("modQ", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modP", "modP.R"), '
+defineModule(sim, list(name = "modP", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modP = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("trigP", "ANY", "")),
+  outputObjects = bindrows(createsOutput("shared", "numeric", ""))))
+doEvent.modP <- function(sim, eventTime, eventType, debug = FALSE) sim
+.inputObjects <- function(sim) { sim$shared <- 10L; sim }
+', fill = TRUE)
+  cat(file = file.path(tmpdir, "modQ", "modQ.R"), '
+defineModule(sim, list(name = "modQ", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modQ = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("shared", "numeric", ""), expectsInput("trigQ", "ANY", "")),
+  outputObjects = bindrows(createsOutput("qOut", "numeric", ""))))
+doEvent.modQ <- function(sim, eventTime, eventType, debug = FALSE) sim
+.inputObjects <- function(sim) { sim$shared <- sim$shared + 5L; if (isTRUE(!is.null(P(sim)$failIO))) stop("boom"); sim }
+', fill = TRUE)
+
+  doInterrupt <- function() {
+    try(simInit(times = list(start = 0, end = 0), paths = list(modulePath = tmpdir),
+                modules = c("modP", "modQ"), loadOrder = c("modP", "modQ"),
+                params = list(modQ = list(failIO = 1))), silent = TRUE)
+  }
+
+  ## --- interrupt #1: confirm the snapshot captured the pre-modification value ---
+  err <- doInterrupt()
+  expect_s3_class(err, "try-error")
+  saved <- savedSimEnv()$.sim
+  expect_equal(saved$shared, 15L)                              # modQ modified it before erroring
+  expect_equal(saved$.recoverableObjs[[1]]$shared, 10L)        # snapshot holds the pre-value
+
+  ## restart = FALSE: rewind only -> shared restored to its pre-.inputObjects value
+  rewound <- restartSimInit(saved, restart = FALSE)
+  expect_s4_class(rewound, "simList")
+  expect_equal(rewound$shared, 10L)
+
+  ## a fixed copy resumed fully reproduces shared = 10 + 5
+  fixed <- savedSimEnv()$.sim
+  fixed@params$modQ$failIO <- NULL
+  resumed <- restartSimInit(fixed)
+  expect_equal(resumed$shared, 15L)
+
+  ## --- interrupt #2: restartSimInit() with no `sim` arg pulls from savedSimEnv ---
+  err2 <- doInterrupt()
+  expect_s3_class(err2, "try-error")
+  svd <- SpaDES.core:::savedSimEnv()
+  svd$.sim@params$modQ$failIO <- NULL          # fix in place on the stashed sim
+  resumed2 <- restartSimInit()                 # no sim -> savedSimEnv()$.sim
+  expect_s4_class(resumed2, "simList")
+  expect_equal(resumed2$shared, 15L)
+})
+
+test_that("restartSimInit errors when there is no recovery context", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache)
+
+  newModule("modClean", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modClean", "modClean.R"), '
+defineModule(sim, list(name = "modClean", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modClean = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(), inputObjects = bindrows(), outputObjects = bindrows()))
+doEvent.modClean <- function(sim, eventTime, eventType, debug = FALSE) sim
+', fill = TRUE)
+  ## a cleanly-built simList carries no ._simInitContext, so restartSimInit must refuse
+  clean <- simInit(times = list(start = 0, end = 0), paths = list(modulePath = tmpdir),
+                   modules = "modClean")
+  expect_null(clean@.xData[["._simInitContext"]])
+  expect_error(restartSimInit(clean), "no saved simInit context")
+})
+
+test_that(".fnsReachableFrom returns the transitive, cycle-safe call closure", {
+  testInit(smcc = FALSE, debug = FALSE)
+  e <- new.env(parent = emptyenv())
+  e$.inputObjects <- function(sim) f1()
+  e$f1 <- function() { f2(); f2b() }
+  e$f2 <- function() f3()
+  e$f3 <- function() 42                 # leaf
+  e$f2b <- function() f3b()
+  e$f3b <- function() f2b()             # f2b <-> f3b cycle must terminate
+  e$unused <- function() stop("nope")   # not reachable
+  e$doEvent.mod <- function(sim, ...) unused()  # not reachable from .inputObjects
+
+  reached <- SpaDES.core:::.fnsReachableFrom(".inputObjects", e)
+  expect_setequal(reached, c(".inputObjects", "f1", "f2", "f3", "f2b", "f3b"))
+  expect_false(any(c("unused", "doEvent.mod") %in% reached))
+
+  ## nested/anonymous closures are walked too (helperDeep reached only via a lambda)
+  e2 <- new.env(parent = emptyenv())
+  e2$.inputObjects <- function(sim) lapply(1, function(i) wrap(i))
+  e2$wrap <- function(i) { inner <- function() helperDeep(); inner() }
+  e2$helperDeep <- function() 99
+  expect_setequal(SpaDES.core:::.fnsReachableFrom(".inputObjects", e2),
+                  c(".inputObjects", "wrap", "helperDeep"))
+
+  ## string-based dynamic dispatch -> the string-named helper is followed precisely,
+  ## without dragging in unrelated functions
+  e3 <- new.env(parent = emptyenv())
+  e3$.inputObjects <- function(sim) do.call("h", list())
+  e3$h <- function() 1
+  e3$alsoHere <- function() 2
+  expect_setequal(SpaDES.core:::.fnsReachableFrom(".inputObjects", e3),
+                  c(".inputObjects", "h"))
+
+  ## NULL env (e.g., core module) is a no-op
+  expect_identical(SpaDES.core:::.fnsReachableFrom(".inputObjects", NULL), ".inputObjects")
+})
+
+test_that(".inputObjects cache is invalidated by a reachable helper edit, not an unrelated one", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache)
+
+  ## .inputObjects calls usedHelper(); unusedHelper + doEvent are NOT reachable from it.
+  ## A run-counter (bumped only when the cached body actually executes) distinguishes a
+  ## genuine re-run from a cache hit -- the output value alone cannot.
+  modCode <- function(usedVal, unusedVal, doEventTag) {
+    sprintf('
+defineModule(sim, list(name = "modH", description = "", keywords = "", authors = person("a","b"),
+  childModules = character(0), version = list(modH = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")),
+  inputObjects = bindrows(expectsInput("in_modH", "numeric", "")),
+  outputObjects = bindrows(createsOutput("out_modH", "numeric", ""))))
+doEvent.modH <- function(sim, eventTime, eventType, debug = FALSE) { tag <- "%s"; sim }
+usedHelper   <- function() { %d }
+unusedHelper <- function() { %d }
+.inputObjects <- function(sim) {
+  options(.spadesCoreTestRuns = getOption(".spadesCoreTestRuns", 0L) + 1L)
+  sim$out_modH <- usedHelper(); sim
+}
+', doEventTag, usedVal, unusedVal)
+  }
+  newModule("modH", tmpdir, open = FALSE)
+  writeMod <- function(...) cat(file = file.path(tmpdir, "modH", "modH.R"), modCode(...), fill = TRUE)
+  doInit <- function() simInit(times = list(start = 0, end = 0),
+                               paths = list(modulePath = tmpdir), modules = "modH")
+
+  withr::local_options(.spadesCoreTestRuns = 0L)
+
+  writeMod(usedVal = 1L, unusedVal = 1L, doEventTag = "v1")
+  s1 <- doInit()
+  expect_equal(s1$out_modH, 1L)
+  expect_equal(getOption(".spadesCoreTestRuns"), 1L)   # ran + cached
+
+  ## edit ONLY unrelated functions -> must be a cache HIT (counter unchanged)
+  writeMod(usedVal = 1L, unusedVal = 99999L, doEventTag = "v2-CHANGED")
+  doInit()
+  expect_equal(getOption(".spadesCoreTestRuns"), 1L)   # no false cache miss
+
+  ## edit the reachable helper -> must re-run (counter bumps, output reflects fix)
+  writeMod(usedVal = 7L, unusedVal = 99999L, doEventTag = "v2-CHANGED")
+  s3 <- doInit()
+  expect_equal(getOption(".spadesCoreTestRuns"), 2L)   # re-ran
+  expect_equal(s3$out_modH, 7L)                         # fix took effect, not stale 1
+})
+
+test_that("restartSpades lazily delegates to restartSimInit after a .inputObjects interruption", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE)
+
+  newModule("modA", tmpdir, open = FALSE)
+  modBcode <- sprintf('
+defineModule(sim, list(name = "modA", description = "", keywords = "",
+  authors = person("a", "b"), childModules = character(0),
+  version = list(modA = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("obj_modA", "numeric", "")),
+  outputObjects = bindrows(createsOutput("out_modA", "numeric", ""))))
+doEvent.modA <- function(sim, eventTime, eventType, debug = FALSE) { sim }
+.inputObjects <- function(sim) { if (isTRUE(!is.null(P(sim)$failIO))) stop("boom in .inputObjects"); sim$obj_modA <- 3L; sim }
+')
+  cat(file = file.path(tmpdir, "modA", "modA.R"), modBcode, fill = TRUE)
+
+  err <- try(simInit(times = list(start = 0, end = 0),
+                     paths = list(modulePath = tmpdir), modules = c("modA"),
+                     params = list(modA = list(failIO = 1))),
+             silent = TRUE)
+  expect_s3_class(err, "try-error")
+
+  fixed <- savedSimEnv()$.sim
+  fixed@params$modA$failIO <- NULL
+  ## user "lazily" calls restartSpades; it should delegate (with a message)
+  mess <- capture_messages({
+    resumed <- restartSpades(fixed)
+  })
+  expect_true(any(grepl("delegating to restartSimInit", mess)))
+  expect_s4_class(resumed, "simList")
+  expect_equal(resumed$obj_modA, 3L)
+})
+
+test_that("doEvent dispatches a queued .inputObjects event to .runModuleInputObjects", {
+  ## proof-of-seam: a `.inputObjects` event placed in the queue is run by doEvent (i.e.,
+  ## .inputObjects can be driven by the event queue / spades loop, like any other event)
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache)
+
+  newModule("modS", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "modS", "modS.R"), sprintf('
+defineModule(sim, list(name = "modS", description = "", keywords = "",
+  authors = person("a", "b"), childModules = character(0),
+  version = list(modS = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "logical", FALSE, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("x", "numeric", "")),
+  outputObjects = bindrows(createsOutput("out", "numeric", ""))))
+doEvent.modS <- function(sim, eventTime, eventType, debug = FALSE) { sim$out <- 1; sim }
+.inputObjects <- function(sim) {
+  sim$ioDispatchProof <- if (is.null(sim$ioDispatchProof)) 1L else sim$ioDispatchProof + 1L
+  sim
+}
+'), fill = TRUE)
+
+  sim <- simInit(times = list(start = 0, end = 1), modules = list("modS"),
+                 paths = list(modulePath = tmpdir))
+  expect_equal(sim$ioDispatchProof, 1L)  # ran once during simInit
+
+  ## mimic the in-simInit session state that simInit's on.exit clears, and the
+  ## .pkgEnv flag that spades() normally sets (doEvent is being called directly here)
+  sim@.xData[["._startClockTime"]] <- Sys.time()
+  sim$._simInitElapsedTime <- 0
+  .pkgEnv[["spades.keepCompleted"]] <- TRUE
+
+  ## queue ONLY a .inputObjects event, then let doEvent drive it
+  sim@current <- list()
+  sim@events <- list()
+  sim <- scheduleEvent(sim, start(sim), "modS", ".inputObjects", -1)
+  expect_identical(sim@events[[1]]$eventType, ".inputObjects")
+  nBefore <- NROW(completed(sim))
+
+  sim <- doEvent(sim, debug = FALSE, notOlderThan = NULL)
+
+  expect_equal(sim$ioDispatchProof, 2L)               # dispatched -> .inputObjects re-ran
+  expect_length(sim@events, 0L)                       # event consumed from the queue
+  expect_equal(NROW(completed(sim)), nBefore + 1L)    # recorded as completed
+  expect_identical(tail(completed(sim)$eventType, 1L), ".inputObjects")
+})
+
 test_that("spades.recoveryMode = FALSE does not populate .recoverableObjs", {
   testInit(smcc = FALSE, debug = FALSE,
            opts = list(reproducible.useMemoise = FALSE))
@@ -259,6 +646,113 @@ test_that("spades.recoveryMode = FALSE does not populate .recoverableObjs", {
   saved <- savedSimEnv()$.sim
   expect_s4_class(saved, "simList")  # still stashed by saveSimOnExit
   expect_null(saved$.recoverableObjs)
+})
+
+test_that("restartSpades reuses the `events` filter from the interrupted spades call (#354)", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE,
+                       ## boom crashes while this is TRUE; we flip it before restart
+                       spades.test354.crash = TRUE)
+
+  ## A one-module workflow with an extra `final` event that the `events` filter
+  ## deliberately excludes. The bug: restartSpades dropped the filter and ran it.
+  newModule(
+    name = "m354", path = tmpdir, open = FALSE, useGitHub = FALSE, unitTests = FALSE,
+    events = list(
+      init = {
+        sim$steps <- "init"
+        sim <- scheduleEvent(sim, start(sim), "m354", "advance")
+        sim <- scheduleEvent(sim, start(sim), "m354", "boom")
+        sim <- scheduleEvent(sim, start(sim), "m354", "final")
+      },
+      advance = {
+        sim$steps <- c(sim$steps, "advance")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354", "advance")
+      },
+      boom = {
+        if (isTRUE(getOption("spades.test354.crash"))) stop("intentional crash #354")
+        sim$steps <- c(sim$steps, "boom-fixed")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354", "boom")
+      },
+      final = {
+        sim$steps <- c(sim$steps, "final")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354", "final")
+      }
+    )
+  )
+
+  mySim <- simInit(modules = "m354", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 3))
+
+  ## first run: filter to init/advance/boom (no `final`); boom crashes
+  err <- try(spades(mySim, events = list(m354 = c("init", "advance", "boom")),
+                    debug = FALSE), silent = TRUE)
+  expect_s3_class(err, "try-error")
+  expect_match(attr(err, "condition")$message, "intentional crash #354")
+
+  ## the filter must have been stashed on the saved sim
+  saved <- savedSimEnv()$.sim
+  expect_identical(saved@.xData[["._spadesEvents"]], list(m354 = c("init", "advance", "boom")))
+
+  ## fix the crash and restart WITHOUT re-passing `events`
+  withr::local_options(spades.test354.crash = FALSE)
+  resumed <- restartSpades(debug = FALSE)
+  expect_s4_class(resumed, "simList")
+
+  ## the excluded `final` event must never have run; advance/boom did
+  expect_false("final" %in% resumed$steps)
+  expect_true("boom-fixed" %in% resumed$steps)
+  expect_true("advance" %in% resumed$steps)
+})
+
+test_that("restartSpades(events=) overrides the stashed filter (#354)", {
+  testInit(smcc = FALSE, debug = FALSE,
+           opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache,
+                       spades.recoveryMode = TRUE,
+                       spades.saveSimOnExit = TRUE,
+                       spades.test354.crash = TRUE)
+
+  newModule(
+    name = "m354b", path = tmpdir, open = FALSE, useGitHub = FALSE, unitTests = FALSE,
+    events = list(
+      init = {
+        sim$steps <- "init"
+        sim <- scheduleEvent(sim, start(sim), "m354b", "advance")
+        sim <- scheduleEvent(sim, start(sim), "m354b", "boom")
+        sim <- scheduleEvent(sim, start(sim), "m354b", "final")
+      },
+      advance = {
+        sim$steps <- c(sim$steps, "advance")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354b", "advance")
+      },
+      boom = {
+        if (isTRUE(getOption("spades.test354.crash"))) stop("intentional crash #354")
+        sim$steps <- c(sim$steps, "boom-fixed")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354b", "boom")
+      },
+      final = {
+        sim$steps <- c(sim$steps, "final")
+        sim <- scheduleEvent(sim, time(sim) + 1, "m354b", "final")
+      }
+    )
+  )
+
+  mySim <- simInit(modules = "m354b", paths = list(modulePath = tmpdir),
+                   times = list(start = 0, end = 3))
+
+  err <- try(spades(mySim, events = list(m354b = c("init", "advance", "boom")),
+                    debug = FALSE), silent = TRUE)
+  expect_s3_class(err, "try-error")
+
+  ## a fresh filter passed to restartSpades wins over the stashed one
+  withr::local_options(spades.test354.crash = FALSE)
+  resumed <- restartSpades(events = list(m354b = c("init", "advance", "boom", "final")),
+                           debug = FALSE)
+  expect_true("final" %in% resumed$steps)
 })
 
 test_that("convertToPackage testing", {

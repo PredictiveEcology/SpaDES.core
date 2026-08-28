@@ -88,7 +88,7 @@ test_that("test event-level cache & memory leaks", {
   # On covr::package_coverage -- this shows a HUGE difference ... about 130x. I don't know exactly why,
   #   but I feel like it is due to capturing of each call, which is unique to covr
   #   So this should be skipped on covr
-  if (!identical(Sys.getenv("USING_COVR"), "true")) {
+  if (!inCovr()) {
     expect_identical(length(grep("causing a memory leak", warnsFunction)), 0L)
   }
 

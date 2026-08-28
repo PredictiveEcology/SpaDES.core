@@ -1,80 +1,72 @@
 ## Release information
 
-This release is in response to a CRAN-flagged check failure on the 3.1.1
-submission. Uwe Ligges noted that, on individual Linux configurations of
-CRAN's extra checks (without `_R_CHECK_SUGGESTS_ONLY_=true`), one
-testthat assertion still failed:
+This is a new submission: SpaDES.core was archived from CRAN on 2026-07-13
+when its `Depends:` package `reproducible` was archived. The archival was not
+caused by a problem in SpaDES.core itself, as CRAN's own comment records
+("as requires archived package 'reproducible'").
 
-    ── Failure ('test-module-deps-methods.R:231:7'): 3 levels of parent
-       and child modules load and show correctly ──────────
-    Expected `length(unique(mg$communities$member)) == 3` to be TRUE.
+Both of the dependencies involved are back on CRAN:
 
-We apologise for the rapid resubmission cadence (the "Days since last
-update" NOTE that will appear in CRAN incoming feasibility); 3.1.2 fixes
-the remaining defect from the 3.1.1 review so the package can clear the
-extra-checks queue.
+* `reproducible` 3.2.1, restored 2026-08-25
+* `SpaDES.tools` 2.1.3, restored 2026-08-28
 
-Cause: the test asserts an exact count of `igraph::cluster_optimal()`
-communities for a constructed module dependency graph. That count is
-sensitive to the installed `igraph` version and to whether the local
-`igraph` build links GLPK. The test already guards against this with
-platform-specific `skip()`s for Windows and Linux, but those guards
-evidently do not fire on the specific CRAN Linux configurations that
-flagged the failure. We have not been able to reproduce the assertion
-failure on any of our own Linux machines (24.04 GitHub runner, 24.04
-local, R 4.5.2 / 4.5.3 / R-devel), so we cannot be sure why the
-existing skip is bypassed there.
+Version 3.2.0 is a minor release accumulated since 3.1.2. Highlights:
 
-Fix: the test now calls `skip_on_cran()` unconditionally at its top,
-so the assertion is never evaluated under CRAN's check matrix (where
-`NOT_CRAN` is unset). The pre-existing platform `skip()`s are kept for
-local/CI runs. No user-visible API or behavioural changes.
+* Cached file-backed objects (e.g. `terra` `SpatRaster`) are now handled
+  correctly across runs and machines.
+* `simInit()` can resume after a partway failure; `restartSimInit()` rewinds
+  and restarts the module that actually failed.
+* New `codeCheckModules()` checks several modules at once; the module code
+  checker gained `# nolint` support, `reqdPkgs` checks, and clearer reports.
+* `spades.moduleCodeChecks` now defaults to `FALSE` (behaviour change).
+* Event `cacheId` is now stable across machines and operating systems.
+* `simInit()` no longer installs or loads the `box` package.
+* Numerous bug fixes: progress-bar flooding, `debug` passed as a list,
+  `saveSimList()` with non-empty `outputs()`, module metadata under
+  `terra` >= 1.9-34, and the `Plots(useCache = TRUE)` ggplot digest.
 
-This release also carries the 3.1.1 fix for the prior CRAN ERRORs in
-3.1.0 on r-devel-linux-x86_64-fedora-gcc, the macOS builders, and M1mac
-(the `randomLandscapes` sample module no longer requires `NLMR`).
-
-Other highlights (carried from 3.1.0):
-
-* New opt-in v2 static code-checking engine (`options(spades.codeCheckEngine = "v2")`),
-  plus standalone `codeCheckModule()` / `checkModuleMetadata()` APIs.
-* `Plots()` refactor: deterministic filenames, optional caching, and direct
-  `ggplot` input.
-* Per-event cache key change and a changed `restartSpades()` default
-  (both documented in NEWS.md).
-* Requires `reproducible` >= 3.0.0.
-* Numerous documentation/vignette accuracy fixes and minor bugfixes.
+See NEWS.md for the full list.
 
 ## Test environments
 
-### Previous R versions
-* Ubuntu 24.04                 (GitHub), R 4.3.3, 4.4.3
-* Windows                      (GitHub), R 4.3.3, 4.4.3
-* Windows                 (win-builder), R 4.4.3
+### win-builder
+* Windows, R 4.6.1 (release)
+* Windows, R-devel (2026-08-27 r90452)
 
-### Current R versions
-* macOS 14.7.6                 (GitHub), R 4.5.2
-* Ubuntu 24.04                 (GitHub), R 4.5.2
-* Ubuntu 24.04                  (local), R 4.5.3
-* Windows                      (GitHub), R 4.5.2
-* Windows                       (local), R 4.5.3
-* Windows                 (win-builder), R 4.5.x
+### GitHub Actions
+* macOS,        R release
+* Windows,      R devel, release, oldrel-1, oldrel-2
+* Ubuntu 24.04, R devel, release, oldrel-1, oldrel-2
+* Ubuntu 24.04, R release with `_R_CHECK_DEPENDS_ONLY_=true`
+* Windows,      R release with `_R_CHECK_DEPENDS_ONLY_=true`
 
-### Development R version
-* Ubuntu 24.04                 (GitHub), R-devel
-* Ubuntu 24.04                  (local), R-devel
-* Windows                 (win-builder), R-devel
+### Local
+* Ubuntu 24.04, R 4.6.1
 
 ## R CMD check results
 
-There were no ERRORs, WARNINGs, or NOTEs. (`NLMR` is no longer declared, so
-the previous `Additional_repositories` / non-mainstream-Suggests NOTE no
-longer applies.)
+There were no ERRORs or WARNINGs.
+
+One NOTE is expected and unavoidable:
+
+* `New submission` / `Package was archived on CRAN`. As above, the 2026-07-13
+  archival was solely a consequence of `reproducible` being archived, which has
+  since been resolved.
+
+A second NOTE appears on some platforms:
+
+* `checking for detritus in the temp directory`. This is a directory left under
+  the session temporary directory by the test suite. It is inside `tempdir()`
+  and is reclaimed with it, so it does not persist beyond the R session.
 
 ## Downstream dependencies
 
-We checked 1 reverse dependency (`SpaDES`) from CRAN, comparing R CMD check results 
-across CRAN and dev versions of this package.
+There is one reverse dependency on CRAN, `NetLogoR` 1.0.6, which lists
+SpaDES.core under `Suggests:`. It was checked against this version of
+SpaDES.core and the result was `Status: OK` (no ERRORs, WARNINGs or NOTEs).
 
- * We saw 0 new problems
- * We failed to check 0 packages
+`NetLogoR` refers to SpaDES.core only in files under `inst/examples/`, which
+R CMD check does not execute, so its checks do not load SpaDES.core at all.
+
+The other reverse dependency, `SpaDES`, remains archived on CRAN (it was
+archived alongside this package) and so could not be checked.

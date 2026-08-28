@@ -82,6 +82,7 @@ export(checkpointLoad)
 export(classFilter)
 export(clearCacheEventsOnly)
 export(codeCheckModule)
+export(codeCheckModules)
 export(completed)
 export(conditionalEvents)
 export(convertTimeunit)
@@ -125,6 +126,7 @@ export(experiment2)
 export(extractURL)
 export(figurePath)
 export(findObjects)
+export(findProjectPath)
 export(getMapPath)
 export(getModuleVersion)
 export(getPaths)
@@ -188,6 +190,7 @@ export(remoteFileSize)
 export(reqdPkgs)
 export(restartOrSimInitAndSpades)
 export(restartR)
+export(restartSimInit)
 export(restartSpades)
 export(rndstr)
 export(saveFiles)
@@ -344,142 +347,169 @@ exportMethods(timeunits)
 exportMethods(zipModule)
 import(igraph)
 import(methods)
-importFrom(Require,Require)
-importFrom(Require,extractVersionNumber)
-importFrom(Require,getCRANrepos)
-importFrom(Require,invertList)
-importFrom(Require,messageVerbose)
-importFrom(Require,modifyList2)
-importFrom(Require,setdiffNamed)
-importFrom(Require,trimVersionNumber)
-importFrom(cli,ansi_strip)
-importFrom(cli,bg_blue)
-importFrom(cli,bg_yellow)
-importFrom(cli,cli)
-importFrom(cli,cli_code)
-importFrom(cli,cli_text)
-importFrom(cli,col_blue)
-importFrom(cli,col_green)
-importFrom(cli,col_magenta)
-importFrom(cli,col_white)
-importFrom(cli,col_yellow)
-importFrom(cli,format_message)
-importFrom(cli,start_app)
-importFrom(cli,style_bold)
-importFrom(data.table,":=")
-importFrom(data.table,as.data.table)
-importFrom(data.table,copy)
-importFrom(data.table,data.table)
-importFrom(data.table,fread)
-importFrom(data.table,fwrite)
-importFrom(data.table,is.data.table)
-importFrom(data.table,rbindlist)
-importFrom(data.table,set)
-importFrom(data.table,setDF)
-importFrom(data.table,setDT)
-importFrom(data.table,setDTthreads)
-importFrom(data.table,setattr)
-importFrom(data.table,setcolorder)
-importFrom(data.table,setkeyv)
-importFrom(data.table,setnames)
-importFrom(data.table,setorder)
-importFrom(data.table,setorderv)
-importFrom(data.table,shift)
-importFrom(fs,path_abs)
-importFrom(fs,path_common)
-importFrom(fs,path_norm)
-importFrom(grDevices,dev.cur)
-importFrom(grDevices,dev.off)
+importFrom(Require,
+  Require,
+  extractVersionNumber,
+  getCRANrepos,
+  invertList,
+  messageVerbose,
+  modifyList2,
+  setdiffNamed,
+  trimVersionNumber
+)
+importFrom(cli,
+  ansi_strip,
+  bg_blue,
+  bg_yellow,
+  cli,
+  cli_code,
+  cli_text,
+  col_blue,
+  col_green,
+  col_magenta,
+  col_white,
+  col_yellow,
+  format_message,
+  start_app,
+  style_bold
+)
+importFrom(codetools,findGlobals)
+importFrom(data.table,
+  ":=",
+  as.data.table,
+  copy,
+  data.table,
+  fread,
+  fwrite,
+  is.data.table,
+  rbindlist,
+  set,
+  setDF,
+  setDT,
+  setDTthreads,
+  setattr,
+  setcolorder,
+  setkeyv,
+  setnames,
+  setorder,
+  setorderv,
+  shift
+)
+importFrom(fs,
+  path_abs,
+  path_common,
+  path_norm
+)
+importFrom(grDevices,
+  dev.cur,
+  dev.off
+)
 importFrom(lobstr,obj_size)
-importFrom(qs2,qs_read)
-importFrom(qs2,qs_save)
-importFrom(quickPlot,.objectNames)
-importFrom(quickPlot,.parseElems)
-importFrom(quickPlot,Plot)
-importFrom(quickPlot,clearPlot)
-importFrom(quickPlot,gpar)
-importFrom(reproducible,.addChangedAttr)
-importFrom(reproducible,.addTagsToOutput)
-importFrom(reproducible,.cacheMessage)
-importFrom(reproducible,.cacheMessageObjectToRetrieve)
-importFrom(reproducible,.checkCacheRepo)
-importFrom(reproducible,.file.move)
-importFrom(reproducible,.grepSysCalls)
-importFrom(reproducible,.objSizeWithTry)
-importFrom(reproducible,.orderDotsUnderscoreFirst)
-importFrom(reproducible,.preDigestByClass)
-importFrom(reproducible,.prepareOutput)
-importFrom(reproducible,.robustDigest)
-importFrom(reproducible,.setSubAttrInList)
-importFrom(reproducible,.sortDotsUnderscoreFirst)
-importFrom(reproducible,.tagsByClass)
-importFrom(reproducible,.unwrap)
-importFrom(reproducible,.whereInStack)
-importFrom(reproducible,.wrap)
-importFrom(reproducible,Cache)
-importFrom(reproducible,CacheStorageDir)
-importFrom(reproducible,Checksums)
-importFrom(reproducible,Copy)
-importFrom(reproducible,Filenames)
-importFrom(reproducible,asPath)
-importFrom(reproducible,basename2)
-importFrom(reproducible,checkPath)
-importFrom(reproducible,clearCache)
-importFrom(reproducible,compareNA)
-importFrom(reproducible,extractFromCache)
-importFrom(reproducible,getRelative)
-importFrom(reproducible,keepCache)
-importFrom(reproducible,linkOrCopy)
-importFrom(reproducible,loadFromCache)
-importFrom(reproducible,makeMemoisable)
-importFrom(reproducible,makeRelative)
-importFrom(reproducible,messageCache)
-importFrom(reproducible,messageColoured)
-importFrom(reproducible,messageDF)
-importFrom(reproducible,normPath)
-importFrom(reproducible,objSize)
-importFrom(reproducible,paddedFloatToChar)
-importFrom(reproducible,remapFilenames)
-importFrom(reproducible,showCache)
-importFrom(reproducible,tempdir2)
-importFrom(reproducible,tempfile2)
-importFrom(reproducible,unmakeMemoisable)
-importFrom(reproducible,updateFilenameSlots)
-importFrom(rlang,as_label)
-importFrom(rlang,env_binding_are_lazy)
-importFrom(rlang,is_quosure)
-importFrom(stats,end)
-importFrom(stats,na.omit)
-importFrom(stats,runif)
-importFrom(stats,setNames)
-importFrom(stats,start)
-importFrom(stats,time)
-importFrom(terra,ext)
-importFrom(terra,inMemory)
-importFrom(terra,rast)
-importFrom(terra,values)
-importFrom(terra,writeRaster)
-importFrom(tools,file_ext)
-importFrom(tools,file_path_sans_ext)
-importFrom(utils,as.person)
-importFrom(utils,capture.output)
-importFrom(utils,compareVersion)
-importFrom(utils,download.file)
-importFrom(utils,file.edit)
-importFrom(utils,getFromNamespace)
-importFrom(utils,getParseData)
-importFrom(utils,getSrcFilename)
-importFrom(utils,globalVariables)
-importFrom(utils,ls.str)
-importFrom(utils,modifyList)
-importFrom(utils,object.size)
-importFrom(utils,packageVersion)
-importFrom(utils,person)
-importFrom(utils,sessionInfo)
-importFrom(utils,tail)
-importFrom(utils,unzip)
-importFrom(utils,write.table)
-importFrom(utils,zip)
+importFrom(qs2,
+  qs_read,
+  qs_save
+)
+importFrom(quickPlot,
+  .objectNames,
+  .parseElems,
+  Plot,
+  clearPlot,
+  gpar
+)
+importFrom(reproducible,
+  .addChangedAttr,
+  .addTagsToOutput,
+  .cacheMessage,
+  .cacheMessageObjectToRetrieve,
+  .checkCacheRepo,
+  .file.move,
+  .grepSysCalls,
+  .objSizeWithTry,
+  .orderDotsUnderscoreFirst,
+  .preDigestByClass,
+  .prepareOutput,
+  .robustDigest,
+  .setSubAttrInList,
+  .sortDotsUnderscoreFirst,
+  .tagsByClass,
+  .unwrap,
+  .whereInStack,
+  .wrap,
+  Cache,
+  CacheStorageDir,
+  Checksums,
+  Copy,
+  Filenames,
+  asPath,
+  basename2,
+  checkPath,
+  clearCache,
+  compareNA,
+  extractFromCache,
+  getRelative,
+  keepCache,
+  linkOrCopy,
+  loadFromCache,
+  makeMemoisable,
+  makeRelative,
+  messageCache,
+  messageColoured,
+  messageDF,
+  normPath,
+  objSize,
+  paddedFloatToChar,
+  remapFilenames,
+  showCache,
+  tempdir2,
+  tempfile2,
+  unmakeMemoisable,
+  updateFilenameSlots
+)
+importFrom(rlang,
+  as_label,
+  env_binding_are_lazy,
+  is_quosure
+)
+importFrom(stats,
+  end,
+  na.omit,
+  runif,
+  setNames,
+  start,
+  time
+)
+importFrom(terra,
+  ext,
+  inMemory,
+  rast,
+  values,
+  writeRaster
+)
+importFrom(tools,
+  file_ext,
+  file_path_sans_ext
+)
+importFrom(utils,
+  as.person,
+  capture.output,
+  compareVersion,
+  download.file,
+  file.edit,
+  getFromNamespace,
+  getParseData,
+  getSrcFilename,
+  globalVariables,
+  ls.str,
+  modifyList,
+  object.size,
+  packageVersion,
+  person,
+  sessionInfo,
+  tail,
+  unzip,
+  write.table,
+  zip
+)
 importFrom(whisker,whisker.render)
 importMethodsFrom(quickPlot,.parseElems)
 importMethodsFrom(quickPlot,Plot)
