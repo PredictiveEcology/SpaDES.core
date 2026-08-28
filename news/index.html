@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.2.0</span>
       </span>
     </div>
 
@@ -76,7 +76,65 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="3.1.2" id="spadescore-312">SpaDES.core 3.1.2<a class="anchor" aria-label="anchor" href="#spadescore-312"></a></h2>
+<h2 class="page-header" data-toc-text="3.2.0" id="spadescore-320">SpaDES.core 3.2.0<a class="anchor" aria-label="anchor" href="#spadescore-320"></a></h2>
+<div class="section level3">
+<h3 id="new-features-3-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-2-0"></a></h3>
+<ul><li><p>Cached file-backed objects (e.g. <code>terra</code> <code>SpatRaster</code>) are now portable across machines and user accounts. Backing files are recorded relative to the simulation’s paths instead of as absolute locations, so a cache written on one machine can be reused on another. If you set <code>reproducible.fileBackedAnchors</code> yourself, your setting is respected.</p></li>
+<li><p>If setting up a simulation fails partway through, you no longer have to start over. Fix the module that failed, then call <code><a href="../reference/restartSpades.html">restartSimInit()</a></code> to pick up where it left off. On by default. See <code><a href="../reference/restartSpades.html">?restartSimInit</a></code>.</p></li>
+<li><p>SpaDES.core now records every file and URL that modules download during a simulation, tagged with the module and event that asked for it, so you can see where a simulation’s inputs came from. Turn it off with <code>options(spades.urlLog = FALSE)</code>. See <code><a href="../reference/spadesOptions.html">?spadesOptions</a></code>.</p></li>
+<li><p>New <code><a href="../reference/findProjectPath.html">findProjectPath()</a></code> finds a project’s root directory by looking for an RStudio project file or a git repository. See <code><a href="../reference/findProjectPath.html">?findProjectPath</a></code>.</p></li>
+<li><p>New <code><a href="../reference/codeCheckModule.html">codeCheckModules()</a></code> checks several modules in one call, or every module in your module folder when called with no arguments. See <code><a href="../reference/codeCheckModule.html">?codeCheckModule</a></code>.</p></li>
+<li><p>You can now tell the module code checker to ignore a finding: add a <code># nolint</code> comment to a line of module code, or set <code>options(spades.codeChecksIgnore = ...)</code>. Use <code># nolint: vars a, b</code> to declare objects the checker cannot see being created. See <code><a href="../reference/codeCheckModule.html">?codeCheckModule</a></code>.</p></li>
+<li><p>The code checker gained checks on a module’s <code>reqdPkgs</code>: packages listed more than once, and <code>package::function()</code> calls for packages the module never declared. See <code><a href="../reference/codeCheckModule.html">?codeCheckModule</a></code>.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="enhancements-3-2-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-3-2-0"></a></h3>
+<ul><li><p>Code-check reports group repeats of an issue under one heading, tag each finding with its check name so it can be pasted into a <code># nolint</code> comment, and say how to silence the finding.</p></li>
+<li><p><code><a href="../reference/restartSpades.html">restartSpades()</a></code> remembers the <code>events</code> filter from the original <code><a href="../reference/spades.html">spades()</a></code> call. Pass <code>events</code> to override it. See <code><a href="../reference/restartSpades.html">?restartSpades</a></code>.</p></li>
+<li><p><code><a href="../reference/saveSimList.html">saveSimList()</a></code> documentation now describes its two modes – portable (bundle everything) and in place (metadata only) – with worked examples. See <code><a href="../reference/saveSimList.html">?saveSimList</a></code>.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="behaviour-changes-3-2-0">Behaviour changes<a class="anchor" aria-label="anchor" href="#behaviour-changes-3-2-0"></a></h3>
+<ul><li><p><code>spades.moduleCodeChecks</code> now defaults to <code>FALSE</code>, so module code checks no longer run on every <code><a href="../reference/simInit.html">simInit()</a></code>. Run them with <code><a href="../reference/codeCheckModule.html">codeCheckModule()</a></code> or <code><a href="../reference/codeCheckModule.html">codeCheckModules()</a></code> instead, or set the option to <code>TRUE</code> to restore the old behaviour. See <code><a href="../reference/spadesOptions.html">?spadesOptions</a></code>.</p></li>
+<li><p>Event and <code>.inputObjects</code> <code>cacheId</code>s change once with this release, because module paths and the parameter-definition table no longer contribute to them. After the one-time recompute, identical runs on different machines share a cache as intended.</p></li>
+<li><p>Figures cached by <code>Plots(useCache = TRUE)</code> are redrawn once, because the check for whether a plot has changed now covers more of the plot.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="dependency-changes-3-2-0">Dependency changes<a class="anchor" aria-label="anchor" href="#dependency-changes-3-2-0"></a></h3>
+<ul><li><p><code><a href="../reference/simInit.html">simInit()</a></code> no longer installs or loads the <code>box</code> package. The <code>spades.reqdPkgsDontLoad</code> option now defaults to <code>NULL</code>, and the unused <code>spades.useBox</code> option has been removed.</p></li>
+<li><p>The <code>caribouMovement</code> sample module no longer requires <code>sf</code>, which it never used.</p></li>
+<li><p><code>Require</code> now needs to be at least version 2.0.0. The previous minimum (1.0.1) was long out of date with the functions actually used.</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-3-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-2-0"></a></h3>
+<ul><li><p>A <code>simList</code> saved with <code><a href="../reference/saveSimList.html">saveSimList()</a></code> can now be run after <code><a href="../reference/loadSimList.html">loadSimList()</a></code>. Module functions were lost in the round trip, so a reloaded simulation could be inspected but not run. If the module source cannot be found, or needs a package that is not installed, loading now warns instead of failing. (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/388" class="external-link">#388</a>)</p></li>
+<li><p><code>saveSimList(projectPath = )</code> no longer fails for a simulation holding file-backed objects. Such objects are also re-rooted correctly on load when they live under <code>projectPath</code>, and saving now warns when a backing file sits somewhere it cannot be re-rooted from, instead of producing an archive that fails to reload. (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/389" class="external-link">#389</a>)</p></li>
+<li><p><code><a href="../reference/saveSimList.html">saveSimList()</a></code> and <code><a href="../reference/loadSimList.html">loadSimList()</a></code> no longer create a stray <code>cache/</code> directory in the caller’s working directory, and archive extraction uses the directory it was given instead of extracting into the working directory.</p></li>
+<li><p><code>saveSimList(fileBackedDir = )</code> is accepted instead of causing an error.</p></li>
+<li><p><code><a href="../reference/saveSimList.html">saveSimList()</a></code> no longer errors when <code>outputs(sim)</code> has rows.</p></li>
+<li><p><code>Plots(useCache = TRUE)</code> now redraws when a plot’s facets, coordinate limits, theme, or position adjustments change. Such plots were previously treated as identical and the redraw was skipped.</p></li>
+<li><p><code><a href="../reference/scheduleConditionalEvent.html">scheduleConditionalEvent()</a></code> works with a non-zero <code>minEventTime</code>. Such events previously never fired, one that re-armed itself could loop forever at a single timestep, and adding one could error.</p></li>
+<li><p><code><a href="../reference/defineEvent.html">defineEvent()</a></code> now always registers the event function, which could previously be defined where nothing could find it. See <code><a href="../reference/defineEvent.html">?defineEvent</a></code>.</p></li>
+<li><p>Module metadata no longer errors with “external pointer is not valid” under <code>terra</code> &gt;= 1.9-34.</p></li>
+<li><p><code><a href="../reference/simInit.html">simInit()</a></code> and <code><a href="../reference/spades.html">spades()</a></code> no longer error when <code>debug</code> is given as a multi-element list, and the usual <code>.inputObjects</code> and code-check messages are no longer suppressed in that case. (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/322" class="external-link">#322</a>)</p></li>
+<li><p><code>simInit(objects = )</code> again loads all user-supplied objects when <code>options(spades.allowInitDuringSimInit = TRUE)</code>.</p></li>
+<li><p><code><a href="../reference/simInit.html">simInit()</a></code> no longer errors when given <code>params = list(.globals = ...)</code> but no modules.</p></li>
+<li><p>A module’s <code>.inputObjects</code> cache is invalidated when you edit a helper function it calls, not only when you edit <code>.inputObjects</code> itself.</p></li>
+<li><p>Quoted <code>.useCacheArgs</code> entries such as <code>useCloud = quote(P(sim)$.useCloud)</code> are evaluated in the module’s own context on the <code>.inputObjects</code> path, so they now resolve to the right module’s parameters.</p></li>
+<li><p><code><a href="../reference/restartSpades.html">restartSimInit()</a></code> restarts the module that actually failed, even when an earlier module’s <code>.inputObjects</code> was cached. It also clears objects the interrupted run created, so a resume starts clean, and prefixes its messages the way <code><a href="../reference/simInit.html">simInit()</a></code> does.</p></li>
+<li><p>Progress bars from <code><a href="https://archive.r-lib.org/reference/archive_extract.html" class="external-link">archive::archive_extract()</a></code> (e.g. via <code><a href="https://reproducible.predictiveecology.org/reference/prepInputs.html" class="external-link">prepInputs()</a></code>) no longer flood the log. They are throttled to one line per <code>getOption("spades.progressInterval", 2)</code> seconds on Windows, on non-dynamic terminals, and in logged or non-interactive runs.</p></li>
+<li><p><code><a href="../reference/writeRNGInfo.html">writeRNGInfo()</a></code> records the RNG state instead of writing only <code>"."</code>, and <code><a href="../reference/writeEventInfo.html">writeEventInfo()</a></code> writes to the full path it computed.</p></li>
+<li><p>Deprecation messages name the package to install, instead of reading “has been moved to .”.</p></li>
+<li><p><code><a href="../reference/timeConversion.html">convertTimeunit()</a></code> returns the right value for whole-number conversions between units other than seconds.</p></li>
+<li><p><code><a href="../reference/checkParams.html">checkParams()</a></code> returns <code>NA</code> when a simulation has no user modules, since nothing was checked.</p></li>
+<li><p><code><a href="../reference/copyModule.html">copyModule()</a></code> creates its destination correctly and copies files sitting directly in the module’s <code>tests/</code> folder.</p></li>
+<li><p>The code checker no longer warns that an input has no default when it is guarded by <code><a href="../reference/suppliedElsewhere.html">suppliedElsewhere()</a></code>, understands <code>params(sim)[[currentModule(sim)]]$x</code> as the current module’s parameter, and no longer reports outputs assigned inside <code><a href="../reference/robustDigest.html">Cache()</a></code> or <code><a href="https://rdrr.io/r/compiler/compile.html" class="external-link">compiler::cmpfun()</a></code> wrappers as unused.</p></li>
+<li><p>The warning about giving an object the same name as a module explains why the clash matters.</p></li>
+<li><p>SpaDES.core loads cleanly when no cache location has been set, falling back to a temporary folder the way <code>reproducible</code> does. See <code><a href="../reference/setPaths.html">?setPaths</a></code>.</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="3.1.2" id="spadescore-312">SpaDES.core 3.1.2<small>2026-05-23</small><a class="anchor" aria-label="anchor" href="#spadescore-312"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-3-1-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-1-2"></a></h3>
 <ul><li>Test fix only (no user-visible changes). The 3-level parent/child module community-count assertion in <code>test-module-deps-methods.R</code> (using <code><a href="https://r.igraph.org/reference/cluster_optimal.html" class="external-link">igraph::cluster_optimal()</a></code>) is fragile across <code>igraph</code> versions and GLPK link configurations. Despite existing platform-specific skips, individual Linux configurations on the CRAN check farm still triggered the assertion. The test now unconditionally <code>skip_on_cran()</code>, while retaining the existing platform skips for local/CI runs.</li>
@@ -105,7 +163,7 @@
 </ul></div>
 <div class="section level3">
 <h3 id="enhancements-and-fixes-3-1-0">Enhancements and fixes<a class="anchor" aria-label="anchor" href="#enhancements-and-fixes-3-1-0"></a></h3>
-<ul><li>Documentation: rewrite of the categorized package overview (<code><a href="../reference/SpaDES.core-package.html">?SpaDES.core</a></code>). Restructured into 14 sections, simpler language, every user-facing export is now linked, and the inlined options table is replaced with a pointer to [spadesOptions()] (which is the single source of truth). New sections cover code checking, persistence/recovery, memory monitoring, and conditional events.</li>
+<ul><li>Documentation: rewrite of the categorized package overview (<code><a href="../reference/SpaDES.core-package.html">?SpaDES.core</a></code>). Restructured into 14 sections, simpler language, every user-facing export is now linked, and the inlined options table is replaced with a pointer to <code><a href="../reference/spadesOptions.html">?spadesOptions</a></code> (which is the single source of truth). New sections cover code checking, persistence/recovery, memory monitoring, and conditional events.</li>
 <li>New code-checking engine v2 (opt-in; <code>options(spades.codeCheckEngine = "v2")</code>), built on <code>xmlparsedata</code> + <code>xml2</code>. Adds: parameter-use checks (<code>Par$x</code>, <code>P(sim)$x</code>, <code>P(sim, module = "other")$x</code>, <code>params(sim)$mod$x</code>, <code>params(sim)[["m"]][["x"]]</code>), broader <code>sim</code> accessor coverage (<code>get</code>/<code>assign</code>/<code>exists</code>/<code>mget</code> against <code>envir(sim)</code>), accurate source-position reporting (<code>file:line:col</code>), structured <code>data.frame</code> of findings (stashed on <code>sim@.xData$.codeCheck</code>), one suggestion per finding, and grouped <code>cli</code> table output. v1 (<code>code-checking.R</code>) remains the default and is selectable via <code>options(spades.codeCheckEngine = "v1")</code>. New standalone API <code>codeCheckModule(path)</code> runs the checks against a module directory without requiring <code><a href="../reference/simInit.html">simInit()</a></code>.</li>
 <li>New module parameter <code>.useCacheArgs</code>: optional named list (keyed by event name) of extra arguments spliced into the per-event <code><a href="https://reproducible.predictiveecology.org/reference/Cache.html" class="external-link">reproducible::Cache()</a></code> call. Lets a developer pin a fixed <code>cacheId</code> so a pre-seeded cloud folder (<code>useCloud = TRUE</code>, <code>cloudFolderID = ...</code>) can short-circuit a deterministic event to a download. Falls through to existing defaults when absent. The <code><a href="../reference/newModule.html">newModule()</a></code> template emits a commented-out opt-in example.</li>
 <li>
@@ -1006,7 +1064,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

@@ -32,7 +32,7 @@ Wiki: https://github.com/PredictiveEcology/SpaDES/wiki"><!-- mathjax --><script 
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.2.0</span>
       </span>
     </div>
 
@@ -230,10 +230,12 @@ or no output at all.</p>
 
 
 
-<p>When <code><a href="simInit.html">simInit()</a></code> runs, it can statically check each module's code against
-the metadata: every <code>sim$x</code> and parameter access is checked to be sure it
-matches the declared inputs, outputs, and parameters.</p>
-<table class="table table"><tr><td><code><a href="codeCheckModule.html">codeCheckModule()</a></code></td><td>Run the checks on a module on disk (no <code><a href="simInit.html">simInit()</a></code> needed).</td></tr></table><p>Controlled by these options:</p><table class="table table"><tr><td><code>spades.moduleCodeChecks</code></td><td>Turn the in-<code><a href="simInit.html">simInit()</a></code> checks on (<code>TRUE</code>) or off (<code>FALSE</code>).</td></tr><tr><td><code>spades.codeCheckEngine</code></td><td><code>"v1"</code> (default) or <code>"v2"</code> (new, structured output).</td></tr></table></div>
+<p>SpaDES.core can statically check each module's code against the metadata:
+every <code>sim$x</code> and parameter access is checked to be sure it matches the
+declared inputs, outputs, and parameters. <strong>As of <code>SpaDES.core</code> 3.1.2.9014
+these checks no longer run automatically during <code><a href="simInit.html">simInit()</a></code></strong> (the default of
+<code>spades.moduleCodeChecks</code> is now <code>FALSE</code>); run them manually instead:</p>
+<table class="table table"><tr><td><code><a href="codeCheckModule.html">codeCheckModule()</a></code></td><td>Run the checks on a single module on disk (no <code><a href="simInit.html">simInit()</a></code> needed).</td></tr><tr><td><code><a href="codeCheckModule.html">codeCheckModules()</a></code></td><td>Vectorized form: run on one or more modules (e.g. a whole project).</td></tr></table><p>Controlled by these options:</p><table class="table table"><tr><td><code>spades.moduleCodeChecks</code></td><td>Default <code>FALSE</code> (off). Set to <code>TRUE</code> (or a named list of toggles) to re-enable the in-<code><a href="simInit.html">simInit()</a></code> checks.</td></tr><tr><td><code>spades.codeCheckEngine</code></td><td><code>"v1"</code> (default) or <code>"v2"</code> (new, structured output).</td></tr></table></div>
     <div id="-persistence-and-recovery">
     <h2>10 Persistence and recovery</h2>
 
@@ -300,7 +302,7 @@ returned as a named list by calling <code><a href="spadesOptions.html">spadesOpt
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

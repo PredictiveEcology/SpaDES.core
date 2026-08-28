@@ -27,7 +27,7 @@ structured tibble of findings, optionally printed as grouped tables."><!-- mathj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.2.0</span>
       </span>
     </div>
 
@@ -89,7 +89,14 @@ structured tibble of findings, optionally printed as grouped tables.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">codeCheckModule</span><span class="op">(</span><span class="va">path</span>, print <span class="op">=</span> <span class="cn">TRUE</span>, enable <span class="op">=</span> <span class="cn">NULL</span>, disable <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">codeCheckModule</span><span class="op">(</span><span class="va">path</span>, print <span class="op">=</span> <span class="cn">TRUE</span>, enable <span class="op">=</span> <span class="cn">NULL</span>, disable <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">codeCheckModules</span><span class="op">(</span></span>
+<span>  paths <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">dir</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"spades.modulePath"</span><span class="op">)</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  print <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  enable <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  disable <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -110,17 +117,87 @@ file. If a directory, the module name is the directory's basename.</p></dd>
 <dd><p>Optional character vectors of rule IDs to restrict
 the run. See <code>names(SpaDES.core:::.CC_RULES)</code> for the catalogue.</p></dd>
 
+
+<dt id="arg-paths">paths<a class="anchor" aria-label="anchor" href="#arg-paths"></a></dt>
+<dd><p>A character vector of module directories (or <code>.R</code> files), as
+accepted by <code>path</code>. Defaults to
+<code>dir(getOption("spades.modulePath"), full.names = TRUE)</code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A <code>data.frame</code> of findings (one row per problem). Returned
-invisibly. Empty if the module is clean.</p>
+    <p><code>codeCheckModule()</code> returns a <code>data.frame</code> of findings (one row per
+problem), invisibly; empty if the module is clean. <code>codeCheckModules()</code>
+returns, invisibly, a named list of such <code>data.frame</code>s (named by module).</p>
     </div>
     <div id="details">
     <h2>Details</h2>
     <p>This is the v2 implementation, selectable at <code><a href="simInit.html">simInit()</a></code> time via
 <code>options(spades.codeCheckEngine = "v2")</code> (the default). The legacy v1
 checker is still available via <code>options(spades.codeCheckEngine = "v1")</code>.</p>
+    </div>
+    <div id="silencing-findings">
+    <h2>Silencing findings</h2>
+
+
+<p>Each finding in the printed report is tagged with its <strong>rule id</strong> in
+brackets, e.g. <code>[conflicting_fn_unqualified]</code>; that id (or the <code>• &lt;group&gt;</code>
+name it is printed under) is what you reference to silence it. Findings can
+be suppressed three ways (all honoured both here and during <code><a href="simInit.html">simInit()</a></code>):</p><ul><li><p><strong>Inline <code># nolint</code> (module developer).</strong> Put a <code># nolint</code> comment on
+the offending source line to silence every rule there, or
+<code># nolint: &lt;rule_id&gt;[, &lt;rule_id&gt;]</code> to silence only specific rules (a
+group name such as <code>globals</code> is accepted in place of a rule id). For a
+metadata finding such as <code>in_no_default</code>, place it anywhere within the
+<code><a href="expectsInput.html">expectsInput()</a></code> / <code><a href="createsOutput.html">createsOutput()</a></code> / <code><a href="defineParameter.html">defineParameter()</a></code> declaration,
+e.g. <code>expectsInput("cloudFolderID", "character", desc = "...") # nolint: in_no_default</code>.
+This travels with the module and documents the intent.</p></li>
+<li><p><strong><code>options(spades.codeChecksIgnore = ...)</code> (module user).</strong> A named
+list keyed by rule id (or group name) whose values are object names to
+ignore, e.g.
+<code>options(spades.codeChecksIgnore = list(in_no_default = c("cloudFolderID", "ecoregionRst")))</code>.
+Lets someone running another author's module quiet specific findings
+without editing its source.</p></li>
+<li><p><strong><code>options(spades.moduleCodeChecks = list(disable = ...))</code>.</strong> Disable
+whole rules by id (or restrict with <code>enable = ...</code>).</p></li>
+</ul><p>A related developer hint is <code># nolint: vars a, b</code>: placed on a dynamic
+bulk-assign line whose names can't be seen statically (e.g.
+<code>list2env(someList, envir(sim))</code>), it asserts that objects <code>a</code>, <code>b</code> are
+produced there, so they aren't reported as <code>out_declared_unused</code>.</p>
+    </div>
+    <div id="rule-catalogue">
+    <h2>Rule catalogue</h2>
+
+
+<p>The rule ids (printed in brackets in the report), grouped by the bucket they
+appear under:</p><ul><li><p><strong>inputObjects</strong> — <code>in_declared_unused</code> (declared input never used),
+<code>in_used_undeclared</code> (<code>sim$x</code> read but not in <code>inputObjects</code>),
+<code>in_no_default</code> (declared input has no default in <code>.inputObjects()</code>).</p></li>
+<li><p><strong>outputObjects</strong> — <code>out_declared_unused</code> (declared output never
+assigned), <code>out_used_undeclared</code> (<code>sim$x &lt;-</code> but not in <code>outputObjects</code>).</p></li>
+<li><p><strong>parameters</strong> — <code>param_declared_unused</code>, <code>param_used_undeclared</code>,
+<code>param_used_other_module</code>.</p></li>
+<li><p><strong>module functions</strong> — <code>must_return_sim</code> (a <code>doEvent.*</code> must return
+<code>sim</code>), <code>must_assign_to_sim</code>, <code>module_named_object</code> (<code>sim$&lt;module&gt;</code>
+collides with the module name), <code>clashing_module_fn</code>.</p></li>
+<li><p><strong>globals</strong> — <code>conflicting_fn_unqualified</code> (a bare function name
+collides with a <code>raster::</code> namesake; qualify it, e.g. <code><a href="https://rdrr.io/r/base/scale.html" class="external-link">raster::scale</a></code>).</p></li>
+<li><p><strong>unresolved</strong> — <code>unresolved_accessor</code> (an accessor whose name could
+not be resolved statically).</p></li>
+<li><p><strong>codetools</strong> — <code>codetools</code> (findings relayed from
+<code><a href="https://rdrr.io/pkg/codetools/man/checkUsage.html" class="external-link">codetools::checkUsageEnv</a></code>).</p></li>
+<li><p><strong>reqdPkgs</strong> — <code>reqd_pkg_duplicate</code> (a package declared more than
+once in <code>reqdPkgs</code>, especially with conflicting source/version),
+<code>reqd_pkg_undeclared</code> (a <code>pkg::fn</code> whose <code>pkg</code> is not in <code>reqdPkgs</code>),
+<code>reqd_pkg_no_source</code> (best-effort, info: bare calls with no apparent
+source among the declared packages — only when all declared packages are
+installed).</p></li>
+</ul><p><code>codeCheckModule()</code> checks a single module. <code>codeCheckModules()</code> is the
+vectorized form: it runs <code>codeCheckModule()</code> on each path in <code>paths</code> and
+returns a list of findings named by module. When <code>paths</code> is not supplied it
+defaults to every module directory under <code>getOption("spades.modulePath")</code>,
+so <code>codeCheckModules()</code> with no arguments checks the whole project. It
+replaces the manual idiom
+<code>Map(codeCheckModule, dir(getOption("spades.modulePath"), full.names = TRUE))</code>.</p>
     </div>
 
   </div>
@@ -135,7 +212,7 @@ checker is still available via <code>options(spades.codeCheckEngine = "v1")</cod
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>

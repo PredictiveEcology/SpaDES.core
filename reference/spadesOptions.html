@@ -25,7 +25,7 @@ See Details below."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.1.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.2.0</span>
       </span>
     </div>
 
@@ -132,9 +132,15 @@ with double colon (<code>::</code>).</td></tr><tr><td><code>spades.lowMemory</co
 be run in a separate <code>future</code> process so it can monitor the main process.
 To access the resulting memory use table, use <code>memoryUse(sim)</code> after the simulation
 has terminated.</td></tr><tr><td><code>spades.messagingNumCharsModule</code></td><td><code>21</code></td><td>The number of characters to use for the messaging preamble on each
-line of the messaging during spades calls.</td></tr><tr><td><code>spades.moduleCodeChecks</code></td><td><code>list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)</code></td><td>Should the various code checks be run during <code>simInit</code>.
-These are passed to <code><a href="https://rdrr.io/pkg/codetools/man/checkUsage.html" class="external-link">codetools::checkUsage()</a></code>.
-Default is given by the function, plus these:</td></tr><tr><td><code>spades.moduleDocument</code></td><td><code>TRUE</code></td><td>When a module is an R package e.g., via <code>convertToPackage</code>,
+line of the messaging during spades calls.</td></tr><tr><td><code>spades.moduleCodeChecks</code></td><td><code>FALSE</code></td><td>Should the various module code checks be run during <code>simInit</code>.
+<strong>As of <code>SpaDES.core</code> 3.1.2.9014 the default is <code>FALSE</code></strong> (checks no longer
+run automatically during <code>simInit</code>, which they previously slowed). To run the
+checks, call <code><a href="codeCheckModule.html">codeCheckModule()</a></code> / <code><a href="codeCheckModule.html">codeCheckModules()</a></code> manually (no
+<code><a href="simInit.html">simInit()</a></code> needed). To restore in-<code>simInit</code> checking, set this option to a
+named list of toggles, e.g.
+<code>list(suppressParamUnused = FALSE, suppressUndefined = TRUE, suppressPartialMatchArgs = FALSE, suppressNoLocalFun = TRUE, skipWith = TRUE)</code>
+(or <code>TRUE</code> for the defaults); these are passed through to
+<code><a href="https://rdrr.io/pkg/codetools/man/checkUsage.html" class="external-link">codetools::checkUsage()</a></code>.</td></tr><tr><td><code>spades.moduleDocument</code></td><td><code>TRUE</code></td><td>When a module is an R package e.g., via <code>convertToPackage</code>,
 it will, by default, rebuild documentation and reparse during <code>simInit</code>.
 Since rebuilding documentation (from the <code>roxygen2</code> tags) can be time consuming,
 a user may wish to prevent this from happening each <code>simInit</code> call.
@@ -154,10 +160,12 @@ more than one event in the past, i.e., redo some of the "completed" events.
 Default is <code>TRUE</code>, i.e., it will keep the state of the <code>simList</code>
 at the start of the current event. This can be recovered with <code>restartSpades</code>
 and the differences can be seen in a hidden object in the stashed <code>simList</code>.
-There is a message which describes how to find that.</td></tr><tr><td><code>spades.reqdPkgsDontLoad</code></td><td><code>"box"</code></td><td>Specify any packages that should not
+The same mechanism applies during <code>simInit</code>: a snapshot is taken before each
+module's <code>.inputObjects</code> runs, so an interrupted <code>simInit</code> can be recovered
+with <code>restartSimInit</code> (see <code><a href="restartSpades.html">?restartSimInit</a></code>).
+There is a message which describes how to find that.</td></tr><tr><td><code>spades.reqdPkgsDontLoad</code></td><td><code>NULL</code></td><td>Specify any packages that should not
 be <em>loaded</em> i.e., no <code>library</code> or <code>require</code>, but they should be installed if
-listed. The default (<code>"box"</code>) is a package that returns a warning if it is
-loaded, and so it is excluded from loading.</td></tr><tr><td><code>spades.saveFileExtensions</code></td><td><code>NULL</code></td><td>a <code>data.frame</code> with 3 columns, <code>exts</code>, <code>fun</code>, and <code>package</code> indicating which
+listed in a module's <code>reqdPkgs</code>.</td></tr><tr><td><code>spades.saveFileExtensions</code></td><td><code>NULL</code></td><td>a <code>data.frame</code> with 3 columns, <code>exts</code>, <code>fun</code>, and <code>package</code> indicating which
 file extension, and which function from which package will be used when
 using the <code>outputs</code> mechanism for saving files during a <code>spades</code> call. e.g.,
 <code>options(spades.saveFileExtensions = data.frame(exts = "shp", fun = "st_write", package = "sf")</code>.
@@ -172,15 +180,11 @@ by adding formulas or functions to <code>sim$</code> when the enclosing environm
 formula or function contained a large object, most relevant here is the <code>sim</code> object.
 <code>SpaDES.core</code> now tests for likely culprits for this and suggests alternatives
 with a warning.</td></tr><tr><td><code>spades.tolerance</code></td><td><code>.Machine$double.eps^0.5</code>.</td><td>The default tolerance value used for floating
-point number comparisons.</td></tr><tr><td><code>spades.useragent</code></td><td><code>"https://github.com/PredictiveEcology/SpaDES"</code>.</td><td>The default user agent to use for downloading modules from GitHub.</td></tr><tr><td><code>spades.useBox</code></td><td>FALSE</td><td>Unimplemented while memory problems with <code>box</code> are resolved.
-When it is turned on, this option determines
-whether to manage which packages are loaded using the package <code>box</code>.
-This will have as an effect that <code>reqdPkgs</code> will be strict; if a given
-module is missing a <code>reqdPkgs</code>, then the module will fail to run, with
-an error saying the package/function doesn't exist. Without <code>box</code>,
-modules may run, even though <code>reqdPkgs</code> is incorrect, because other modules
-may have specified their own packages, which cover the needs of another
-package. <code>useBox = TRUE</code> will force modules to be accurate with their <code>reqdPkgs</code>.</td></tr><tr><td><code>spades.useRequire</code></td><td><code>!tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false"</code></td><td>The default for that environment variable is unset, so this returns
+point number comparisons.</td></tr><tr><td><code>spades.urlLog</code></td><td><code>TRUE</code></td><td>If <code>TRUE</code> (the default), any files or web addresses (URLs) that modules
+download through <code><a href="https://reproducible.predictiveecology.org/reference/prepInputs.html" class="external-link">prepInputs()</a></code> or <code><a href="https://reproducible.predictiveecology.org/reference/preProcess.html" class="external-link">preProcess()</a></code> during <code><a href="simInit.html">simInit()</a></code> or
+<code><a href="spades.html">spades()</a></code> are recorded, and each one is tagged with the module and event
+that asked for it. This makes it easy to see where a simulation's input
+data came from. Set to <code>FALSE</code> to turn the recording off.</td></tr><tr><td><code>spades.useragent</code></td><td><code>"https://github.com/PredictiveEcology/SpaDES"</code>.</td><td>The default user agent to use for downloading modules from GitHub.</td></tr><tr><td><code>spades.useRequire</code></td><td><code>!tolower(Sys.getenv("SPADES_USE_REQUIRE")) %in% "false"</code></td><td>The default for that environment variable is unset, so this returns
 <code>TRUE</code>. If this is <code>TRUE</code>, then during the <code>simInit</code> call, when packages are
 identified as being required, these will be installed if missing, only if
 <code>spades.useRequire</code> option is <code>TRUE</code>, otherwise, <code>simInit</code> will fail because
@@ -198,7 +202,7 @@ packages are not available.</td></tr></table></div>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>
