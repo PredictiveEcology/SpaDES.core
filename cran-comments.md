@@ -30,7 +30,6 @@ See NEWS.md for the full list.
 ## Test environments
 
 ### win-builder
-* Windows, R 4.5.3 (oldrelease)
 * Windows, R 4.6.1 (release)
 * Windows, R-devel (2026-08-27 r90452)
 
