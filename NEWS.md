@@ -69,6 +69,9 @@
 * The `caribouMovement` sample module no longer requires `sf`, which it never
   used.
 
+* `Require` now needs to be at least version 2.0.0. The previous minimum
+  (1.0.1) was long out of date with the functions actually used.
+
 ## Bug fixes
 
 * A `simList` saved with `saveSimList()` can now be run after `loadSimList()`.
