@@ -31,6 +31,11 @@ directly in the module environment (\code{sim[[dotMods]][[moduleName]]}) is not 
 implemented; it requires \code{defineEvent()} to be integrated into the module
 parsing steps. Until then, \code{defineEvent()} is intended for standalone use.}
 }
+\value{
+Invisibly, the \code{simList} supplied as \code{sim}. Called for its side effect of
+creating the event function \verb{doEvent.<moduleName>.<eventName>} in \code{envir} and
+recording its digest in the \code{simList}.
+}
 \description{
 There are two ways to define what occurs during an event: defining a function
 called \code{doEvent.moduleName}, where \code{moduleName} is the actual module name.

@@ -12,6 +12,9 @@ utils::globalVariables(c(".", ".I", "tagKey", "whi"))
 #' @param envir an environment to use to store the `.sim` (`simList`) object.
 #'              default is to use the user's global environment (`.GlobalEnv`).
 #'
+#' @return An environment: `envir` if `options(reproducible.memoisePersist = TRUE)`,
+#'   otherwise the `SpaDES.core` package environment used to hold the saved `simList`.
+#'
 #' @export
 #' @rdname savedSimEnv
 savedSimEnv <- function(envir = .GlobalEnv) {
@@ -2400,6 +2403,11 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'     directly in the module environment (`sim[[dotMods]][[moduleName]]`) is not yet
 #'     implemented; it requires `defineEvent()` to be integrated into the module
 #'     parsing steps. Until then, `defineEvent()` is intended for standalone use.
+#'
+#' @return Invisibly, the `simList` supplied as `sim`. Called for its side effect of
+#'   creating the event function `doEvent.<moduleName>.<eventName>` in `envir` and
+#'   recording its digest in the `simList`.
+#'
 #' @export
 #' @seealso [defineModule()], [simInit()], [scheduleEvent()]
 #' @examples

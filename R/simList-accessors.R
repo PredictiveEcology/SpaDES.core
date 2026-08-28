@@ -646,6 +646,11 @@ P.simList <- function(sim, param, module) {
 #'
 #' @inheritParams params
 #'
+#' @return For `globals()` and `G()`, a named list of the global parameters, i.e., the
+#'   `.globals` element of the `params` slot. For the replacement methods
+#'   `globals<-` and `G<-`, the updated `simList`, with any module parameters that
+#'   take their value from a global re-synchronised.
+#'
 #' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
 #'
@@ -3026,6 +3031,13 @@ setMethod(
 #' @inheritParams P
 #' @param path The path to the module., i.e., the `modulePath`.
 #'    Only relevant if `sim` not supplied.
+#'
+#' @return The requested metadata: for a single module, the metadata itself
+#'   (`inputObjects()` and `outputObjects()` give a `data.frame`, `reqdPkgs()` a
+#'   character vector); for several modules, a list with one such element per
+#'   module, named by module. `outputObjectNames()` and `documentation()` return a
+#'   list. `sessInfo()` returns the `sessionInfo()` recorded in the `simList`.
+#'
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata
