@@ -12,7 +12,8 @@
 \item{modules}{Character vector of (non-core) module names to re-parse.}
 
 \item{verbose}{Numeric verbosity. At \code{verbose > 0} each re-parsed module is
-announced; a module whose source cannot be found always warns.}
+announced; a module whose source cannot be found, or whose code cannot be
+evaluated (e.g., a package it loads is not installed), always warns.}
 }
 \value{
 \code{sim}, invisibly.

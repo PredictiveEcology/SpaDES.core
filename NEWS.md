@@ -73,8 +73,8 @@
 
 * A `simList` saved with `saveSimList()` can now be run after `loadSimList()`.
   Module functions were lost in the round trip, so a reloaded simulation could be
-  inspected but not run. If the module source cannot be found, loading now warns
-  instead of failing. (#388)
+  inspected but not run. If the module source cannot be found, or needs a package
+  that is not installed, loading now warns instead of failing. (#388)
 
 * `saveSimList(projectPath = )` no longer fails for a simulation holding
   file-backed objects. Such objects are also re-rooted correctly on load when they

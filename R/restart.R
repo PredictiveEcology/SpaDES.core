@@ -228,7 +228,8 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
 #' @param sim A `simList`.
 #' @param modules Character vector of (non-core) module names to re-parse.
 #' @param verbose Numeric verbosity. At `verbose > 0` each re-parsed module is
-#'   announced; a module whose source cannot be found always warns.
+#'   announced; a module whose source cannot be found, or whose code cannot be
+#'   evaluated (e.g., a package it loads is not installed), always warns.
 #' @return `sim`, invisibly.
 #' @keywords internal
 #' @importFrom cli col_blue
@@ -240,6 +241,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
   on.exit(options(opt), add = TRUE)
 
   notFound <- character()
+  failed <- character()
 
   for (module in modules) {
     moduleFolder <- file.path(modulePath(sim, module = module), module)
@@ -267,16 +269,26 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     doesntUseNamespacing <- !.isNamespaced(sim, module)
 
     sim <- currentModuleTemporary(sim, module)
-    if (doesntUseNamespacing) {
-      evalWithActiveCode(pp[[1]], sim@.xData, sim = sim)
-    }
 
     subFiles <- dir(file.path(moduleFolder, "R"), pattern = "([.]R$|[.]r$)",
                     full.names = TRUE)
     if (length(subFiles)) {
       pp[seq_along(subFiles) + 1] <- lapply(subFiles, function(ff) parse(ff))
     }
-    lapply(pp, function(pp1) evalWithActiveCode(pp1, modEnv, sim = sim))
+
+    ## Top-level module code may need packages that are not installed here,
+    ## e.g., a simList saved on another machine; that must not abort the load.
+    err <- tryCatch({
+      if (doesntUseNamespacing) {
+        evalWithActiveCode(pp[[1]], sim@.xData, sim = sim)
+      }
+      lapply(pp, function(pp1) evalWithActiveCode(pp1, modEnv, sim = sim))
+      NULL
+    }, error = function(e) conditionMessage(e))
+    if (!is.null(err)) {
+      failed[module] <- err
+      next
+    }
 
     ## These live in the module env too, so they go missing along with the
     ## functions; the code-checking machinery expects them back.
@@ -293,6 +305,13 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
             "  The simList is loaded and can be inspected, but cannot be run. ",
             "Supply the correct `modulePath` via `paths`, or save and load in ",
             "an archive format, which bundles the module source.",
+            call. = FALSE)
+  }
+  if (length(failed)) {
+    warning("Could not re-parse module(s): ",
+            paste0(names(failed), " (", failed, ")", collapse = "; "), ".\n",
+            "  The simList is loaded and can be inspected, but cannot be run ",
+            "until this is resolved, e.g., by installing the missing package(s).",
             call. = FALSE)
   }
 
