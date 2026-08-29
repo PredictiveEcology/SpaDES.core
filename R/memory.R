@@ -50,6 +50,13 @@ ongoingMemoryThisPid <- function(
 #'
 #' @export
 #' @rdname memoryUse
+## Pull the leading numeric field out of a `ps` line. `ps` right-aligns its
+## columns, so the line may begin with spaces; trim before splitting or the
+## first field is "" and the value parses to NA.
+.rssField <- function(x) {
+  strsplit(trimws(x[1]), split = " +")[[1]][1]
+}
+
 memoryUseThisSession <- function(thisPid) {
   ps <- Sys.which("ps")
   if (missing(thisPid)) {
@@ -57,13 +64,20 @@ memoryUseThisSession <- function(thisPid) {
   }
   needTasklist <- isWindows()
   if (nzchar(ps) && !needTasklist) {
+    ## `-p` asks ps for this process directly and `rss=` drops the header, so
+    ## there is exactly one field to read. The previous
+    ## `ps -eo rss,pid | grep <pid>` had two failure modes: `grep` matched the
+    ## pid anywhere in the line (so pid 2 matched every line containing a "2"),
+    ## and ps right-aligns rss in a fixed-width column, so a value narrower than
+    ## the column left the line starting with spaces -- `strsplit(x, " +")[[1]][1]`
+    ## was then "" and the memory reading came back NA.
     aa <- try(
-      suppressWarnings(system(paste(ps, "-eo rss,pid | grep", thisPid), intern = TRUE)),
+      suppressWarnings(system2(ps, c("-o", "rss=", "-p", thisPid), stdout = TRUE, stderr = FALSE)),
       silent = TRUE
     )
-    needTasklist <- !is.null(attr(aa, "status"))
+    needTasklist <- inherits(aa, "try-error") || !is.null(attr(aa, "status")) || !length(aa)
     if (!needTasklist) {
-      aa2 <- try(strsplit(aa, split = " +")[[1]][1], silent = TRUE)
+      aa2 <- try(.rssField(aa), silent = TRUE)
     }
   }
 
