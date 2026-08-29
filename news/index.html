@@ -23,7 +23,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">SpaDES.core</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">3.2.1</span>
       </span>
     </div>
 
@@ -76,9 +76,9 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="3.2.0" id="spadescore-320">SpaDES.core 3.2.0<a class="anchor" aria-label="anchor" href="#spadescore-320"></a></h2>
+<h2 class="page-header" data-toc-text="3.2.1" id="spadescore-321">SpaDES.core 3.2.1<a class="anchor" aria-label="anchor" href="#spadescore-321"></a></h2>
 <div class="section level3">
-<h3 id="new-features-3-2-0">New features<a class="anchor" aria-label="anchor" href="#new-features-3-2-0"></a></h3>
+<h3 id="new-features-3-2-1">New features<a class="anchor" aria-label="anchor" href="#new-features-3-2-1"></a></h3>
 <ul><li><p>Cached file-backed objects (e.g. <code>terra</code> <code>SpatRaster</code>) are now portable across machines and user accounts. Backing files are recorded relative to the simulation’s paths instead of as absolute locations, so a cache written on one machine can be reused on another. If you set <code>reproducible.fileBackedAnchors</code> yourself, your setting is respected.</p></li>
 <li><p>If setting up a simulation fails partway through, you no longer have to start over. Fix the module that failed, then call <code><a href="../reference/restartSpades.html">restartSimInit()</a></code> to pick up where it left off. On by default. See <code><a href="../reference/restartSpades.html">?restartSimInit</a></code>.</p></li>
 <li><p>SpaDES.core now records every file and URL that modules download during a simulation, tagged with the module and event that asked for it, so you can see where a simulation’s inputs came from. Turn it off with <code>options(spades.urlLog = FALSE)</code>. See <code><a href="../reference/spadesOptions.html">?spadesOptions</a></code>.</p></li>
@@ -88,25 +88,25 @@
 <li><p>The code checker gained checks on a module’s <code>reqdPkgs</code>: packages listed more than once, and <code>package::function()</code> calls for packages the module never declared. See <code><a href="../reference/codeCheckModule.html">?codeCheckModule</a></code>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="enhancements-3-2-0">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-3-2-0"></a></h3>
+<h3 id="enhancements-3-2-1">Enhancements<a class="anchor" aria-label="anchor" href="#enhancements-3-2-1"></a></h3>
 <ul><li><p>Code-check reports group repeats of an issue under one heading, tag each finding with its check name so it can be pasted into a <code># nolint</code> comment, and say how to silence the finding.</p></li>
 <li><p><code><a href="../reference/restartSpades.html">restartSpades()</a></code> remembers the <code>events</code> filter from the original <code><a href="../reference/spades.html">spades()</a></code> call. Pass <code>events</code> to override it. See <code><a href="../reference/restartSpades.html">?restartSpades</a></code>.</p></li>
 <li><p><code><a href="../reference/saveSimList.html">saveSimList()</a></code> documentation now describes its two modes – portable (bundle everything) and in place (metadata only) – with worked examples. See <code><a href="../reference/saveSimList.html">?saveSimList</a></code>.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="behaviour-changes-3-2-0">Behaviour changes<a class="anchor" aria-label="anchor" href="#behaviour-changes-3-2-0"></a></h3>
+<h3 id="behaviour-changes-3-2-1">Behaviour changes<a class="anchor" aria-label="anchor" href="#behaviour-changes-3-2-1"></a></h3>
 <ul><li><p><code>spades.moduleCodeChecks</code> now defaults to <code>FALSE</code>, so module code checks no longer run on every <code><a href="../reference/simInit.html">simInit()</a></code>. Run them with <code><a href="../reference/codeCheckModule.html">codeCheckModule()</a></code> or <code><a href="../reference/codeCheckModule.html">codeCheckModules()</a></code> instead, or set the option to <code>TRUE</code> to restore the old behaviour. See <code><a href="../reference/spadesOptions.html">?spadesOptions</a></code>.</p></li>
 <li><p>Event and <code>.inputObjects</code> <code>cacheId</code>s change once with this release, because module paths and the parameter-definition table no longer contribute to them. After the one-time recompute, identical runs on different machines share a cache as intended.</p></li>
 <li><p>Figures cached by <code>Plots(useCache = TRUE)</code> are redrawn once, because the check for whether a plot has changed now covers more of the plot.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="dependency-changes-3-2-0">Dependency changes<a class="anchor" aria-label="anchor" href="#dependency-changes-3-2-0"></a></h3>
+<h3 id="dependency-changes-3-2-1">Dependency changes<a class="anchor" aria-label="anchor" href="#dependency-changes-3-2-1"></a></h3>
 <ul><li><p><code><a href="../reference/simInit.html">simInit()</a></code> no longer installs or loads the <code>box</code> package. The <code>spades.reqdPkgsDontLoad</code> option now defaults to <code>NULL</code>, and the unused <code>spades.useBox</code> option has been removed.</p></li>
 <li><p>The <code>caribouMovement</code> sample module no longer requires <code>sf</code>, which it never used.</p></li>
 <li><p><code>Require</code> now needs to be at least version 2.0.0. The previous minimum (1.0.1) was long out of date with the functions actually used.</p></li>
 </ul></div>
 <div class="section level3">
-<h3 id="bug-fixes-3-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-2-0"></a></h3>
+<h3 id="bug-fixes-3-2-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-3-2-1"></a></h3>
 <ul><li><p>A <code>simList</code> saved with <code><a href="../reference/saveSimList.html">saveSimList()</a></code> can now be run after <code><a href="../reference/loadSimList.html">loadSimList()</a></code>. Module functions were lost in the round trip, so a reloaded simulation could be inspected but not run. If the module source cannot be found, or needs a package that is not installed, loading now warns instead of failing. (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/388" class="external-link">#388</a>)</p></li>
 <li><p><code>saveSimList(projectPath = )</code> no longer fails for a simulation holding file-backed objects. Such objects are also re-rooted correctly on load when they live under <code>projectPath</code>, and saving now warns when a backing file sits somewhere it cannot be re-rooted from, instead of producing an archive that fails to reload. (<a href="https://github.com/PredictiveEcology/SpaDES.core/issues/389" class="external-link">#389</a>)</p></li>
 <li><p><code><a href="../reference/saveSimList.html">saveSimList()</a></code> and <code><a href="../reference/loadSimList.html">loadSimList()</a></code> no longer create a stray <code>cache/</code> directory in the caller’s working directory, and archive extraction uses the directory it was given instead of extracting into the working directory.</p></li>
