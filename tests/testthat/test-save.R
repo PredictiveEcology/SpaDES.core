@@ -323,7 +323,14 @@ test_that("saveSimList with file backed objs", {
   )
 
   modules <- list("randomLandscapes", "caribouMovement")
+  ## Set cachePath explicitly, inside tmpdir. Without it the `simList` inherits
+  ## the global `reproducible.cachePath`, which points outside `projectPath`
+  ## (at another test's temp dir). saveSimList() then stores it as "../../..",
+  ## and because this test reloads under a *different* projectPath (newTmpdir),
+  ## that walks back out and loadSimList() creates a stray directory there --
+  ## which R CMD check reports as "detritus in the temp directory".
   paths <- list(
+    cachePath = checkPath(file.path(tmpdir, "cache"), create = TRUE),
     modulePath = modulePath,
     inputPath = inputPath,
     outputPath = outputPath

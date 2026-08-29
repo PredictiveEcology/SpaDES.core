@@ -1,6 +1,19 @@
+## Resubmission
+
+This is a resubmission. Version 3.2.0 was rejected by the automated incoming
+pre-test, which reported a second NOTE on Debian:
+
+* `checking for detritus in the temp directory`
+
+That NOTE has been fixed: one test reloaded a saved `simList` under a different
+`projectPath` than it was saved with, which caused a stray directory to be
+created under the session temporary directory. The test now keeps all of its
+paths inside `projectPath`. Local `R CMD check --as-cran` is now clean of it
+(`checking for detritus in the temp directory ... OK`).
+
 ## Release information
 
-This is a new submission: SpaDES.core was archived from CRAN on 2026-07-13
+SpaDES.core was archived from CRAN on 2026-07-13
 when its `Depends:` package `reproducible` was archived. The archival was not
 caused by a problem in SpaDES.core itself, as CRAN's own comment records
 ("as requires archived package 'reproducible'").
@@ -10,7 +23,7 @@ Both of the dependencies involved are back on CRAN:
 * `reproducible` 3.2.1, restored 2026-08-25
 * `SpaDES.tools` 2.1.3, restored 2026-08-28
 
-Version 3.2.0 is a minor release accumulated since 3.1.2. Highlights:
+Version 3.2.1 is a minor release accumulated since 3.1.2. Highlights:
 
 * Cached file-backed objects (e.g. `terra` `SpatRaster`) are now handled
   correctly across runs and machines.
@@ -52,12 +65,6 @@ One NOTE is expected and unavoidable:
 * `New submission` / `Package was archived on CRAN`. As above, the 2026-07-13
   archival was solely a consequence of `reproducible` being archived, which has
   since been resolved.
-
-A second NOTE appears on some platforms:
-
-* `checking for detritus in the temp directory`. This is a directory left under
-  the session temporary directory by the test suite. It is inside `tempdir()`
-  and is reclaimed with it, so it does not persist beyond the R session.
 
 ## Downstream dependencies
 

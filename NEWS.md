@@ -1,4 +1,4 @@
-# SpaDES.core 3.2.0
+# SpaDES.core 3.2.1
 
 ## New features
 
