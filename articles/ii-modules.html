@@ -1218,7 +1218,7 @@ objects have been saved.</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/simList-accessors-outputs.html">outputs</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>   <span class="co"># shows all files and objects that are "outputs"</span></span></code></pre></div>
 <pre><code><span><span class="co">##   objectName                                           file     fun package saveTime saved arguments</span></span>
-<span><span class="co">## 1  landscape /tmp/RtmpK7gAev/simOutputs/landscape_year5.rds saveRDS    base        5    NA        NA</span></span></code></pre>
+<span><span class="co">## 1  landscape /tmp/Rtmp82sniW/simOutputs/landscape_year5.rds saveRDS    base        5    NA        NA</span></span></code></pre>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.saveInitialTime</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] 0</span></span></code></pre>
@@ -1230,7 +1230,7 @@ objects have been saved.</p>
 <pre><code><span><span class="co">## [1] "landscape"</span></span></code></pre>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/params.html">params</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span><span class="op">$</span><span class="va">randomLandscapes</span><span class="op">$</span><span class="va">.savePath</span></span></code></pre></div>
-<pre><code><span><span class="co">## [1] "/tmp/RtmpK7gAev/simOutputs/randomLandscapes"</span></span></code></pre>
+<pre><code><span><span class="co">## [1] "/tmp/Rtmp82sniW/simOutputs/randomLandscapes"</span></span></code></pre>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ftmp</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span>pattern <span class="op">=</span> <span class="st">"spades_vignetteOutputs"</span>, fileext <span class="op">=</span> <span class="st">".pdf"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/grDevices/pdf.html" class="external-link">pdf</a></span><span class="op">(</span><span class="va">ftmp</span><span class="op">)</span></span>
