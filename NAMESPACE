@@ -154,6 +154,7 @@ export(moduleObjects)
 export(moduleOutputs)
 export(moduleParams)
 export(modulePath)
+export(moduleReqdPkgs)
 export(moduleVersion)
 export(modules)
 export(newModule)
@@ -314,6 +315,7 @@ exportMethods(moduleMetadata)
 exportMethods(moduleOutputs)
 exportMethods(moduleParams)
 exportMethods(modulePath)
+exportMethods(moduleReqdPkgs)
 exportMethods(moduleVersion)
 exportMethods(newModule)
 exportMethods(newModuleCode)
@@ -350,6 +352,7 @@ import(igraph)
 import(methods)
 importFrom(Require,
   Require,
+  extractPkgName,
   extractVersionNumber,
   getCRANrepos,
   invertList,

@@ -73,6 +73,15 @@ knitr::kable(df_params, caption = "List of (ref:{{{name2}}}) parameters and thei
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
 
+Table \@ref(tab:moduleReqdPkgs-{{{name2}}}) lists the R packages this module
+requires. These are installed and loaded automatically by `simInit()`.
+
+```{r moduleReqdPkgs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
+df_pkgs <- SpaDES.core::moduleReqdPkgs("{{{name}}}", "{{{path}}}")
+knitr::kable(df_pkgs, caption = "List of (ref:{{{name2}}}) required packages.") |>
+  kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
+```
+
 ### Events
 
 Describe what happens for each event type.

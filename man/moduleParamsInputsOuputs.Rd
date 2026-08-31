@@ -7,7 +7,9 @@
 \alias{moduleInputs,character,character-method}
 \alias{moduleOutputs}
 \alias{moduleOutputs,character,character-method}
-\title{Extract a module's parameters, inputs, or outputs}
+\alias{moduleReqdPkgs}
+\alias{moduleReqdPkgs,character,character-method}
+\title{Extract a module's parameters, inputs, outputs, or required packages}
 \usage{
 moduleParams(module, path)
 
@@ -20,6 +22,10 @@ moduleInputs(module, path)
 moduleOutputs(module, path)
 
 \S4method{moduleOutputs}{character,character}(module, path)
+
+moduleReqdPkgs(module, path)
+
+\S4method{moduleReqdPkgs}{character,character}(module, path)
 }
 \arguments{
 \item{module}{Character string. Your module's name.}
@@ -45,10 +51,12 @@ sampleModules <- dir(path)
 p <- moduleParams(sampleModules[3], path = path)
 i <- moduleInputs(sampleModules[3], path = path)
 o <- moduleOutputs(sampleModules[3], path = path)
+r <- moduleReqdPkgs(sampleModules[3], path = path)
 
 knitr::kable(p)
 knitr::kable(i)
 knitr::kable(o)
+knitr::kable(r)
 }
 }
 \seealso{
