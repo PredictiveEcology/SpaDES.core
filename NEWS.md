@@ -12,6 +12,36 @@
   a 9.5 GB `mod` object, a single `.mods` copy went from 174 s to under 0.01 s,
   and the whole `loadSimList()` call from 627 s to 152 s.
 
+* `saveSimList(lazy = TRUE)` no longer loses module (`mod`) objects.
+  `loadSimList()` deleted every `.modObjs` binding when it detected a lazy save,
+  on the assumption that they were per-module copies of file-backed objects that
+  `spades()` would rebuild. Any `mod` state a module was keeping was therefore
+  silently dropped on a lazy round trip.
+
+## New features
+
+* `saveSimList(lazy = TRUE)` now defers module (`mod`) objects as well as user
+  objects, and writes each object to its own file under a sibling
+  `<filename>_lazy/` directory instead of to a lazy-load database.
+  [loadSimList()] binds each as a promise, into `sim@.xData` or into
+  `.modObjs[[module]]` as appropriate, so a module reaches its `mod` objects
+  exactly as before but pays for them only on first access.
+
+  A lazy-load database cannot hold a value larger than 2 GB at all (`long
+  vectors not supported yet`), which ruled it out for `mod` objects; one file per
+  object also lets a reader take only what it touches. On a real 2.7 GB
+  simulation whose `mod` held an 8.7 GB `data.table`, the `simList` file itself
+  drops to a few MB, and reading `outputs()` and parameters from a reloaded run
+  no longer materializes any object.
+
+  Note that promises are forced by whole-environment operations -- `as.list()`,
+  `get()`, `mget()`, `eapply()`, and therefore anything that deep copies a
+  `simList`, such as `Copy()` -- but not by `ls()`, `exists()`, or reading
+  metadata such as `outputs()`.
+
+  The previous `<filename>_xData.rdx`/`.rdb` layout is gone; `lazy = TRUE` was
+  never released, so nothing on disk depends on it.
+
 # SpaDES.core 3.2.0
 
 ## New features

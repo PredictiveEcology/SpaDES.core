@@ -93,12 +93,23 @@
 #'   `inputs` or `cache` are `TRUE`. Setting this to `FALSE` will turn off the
 #'   saving of files specified in `inputs(sim)`, `outputs(sim)` or the cache.
 #'
-#' @param lazy Logical. If `TRUE`, the user objects in `sim@.xData` are saved
-#'   into a sibling lazy-load DB (a `<filename>_xData.rdx`/`.rdb` pair built
-#'   by `tools:::makeLazyLoadDB()`) alongside the shell `simList` file,
-#'   rather than monolithically. [loadSimList()] detects this layout
-#'   automatically and restores the objects via [lazyLoad()], materializing
-#'   each one only on first access. Defaults to `FALSE`.
+#' @param lazy Logical. If `TRUE`, the objects are written one per file into a
+#'   sibling `<filename>_lazy/` directory instead of into the `simList` file
+#'   itself, and [loadSimList()] binds each as a promise that reads its file on
+#'   first access. This covers both the user objects in `sim@.xData` and every
+#'   module's `mod` objects (`sim@.xData$.modObjs`); `.mods` and the internal
+#'   dot-prefixed bindings stay in the file, being small and always needed. The
+#'   result is a `simList` file of a few MB that opens in seconds, from which
+#'   you pay only for the objects you actually touch.
+#'
+#'   One file per object rather than a single lazy-load database because a value
+#'   larger than 2 GB cannot be put in one at all (`long vectors not supported
+#'   yet`), and `mod` objects are routinely larger than that.
+#'
+#'   Note that promises are forced by whole-environment operations -- `as.list()`,
+#'   `get()`, `mget()`, `eapply()`, and so anything that deep-copies the
+#'   `simList`, such as [Copy()] -- but not by `ls()`, `exists()`, or reading
+#'   metadata such as [outputs()]. Defaults to `FALSE`.
 #' @param ... Additional arguments. See Details.
 #'
 #' @return
@@ -278,23 +289,11 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
 
   if (isTRUE(lazy)) {
     ext <- tools::file_ext(filename)
-    lazyBase <- paste0(tools::file_path_sans_ext(filename), "_xData")
-    lazyDbFiles <- paste0(lazyBase, c(".rdx", ".rdb"))
-
-    userObjNames <- ls(sim@.xData, all.names = FALSE)
-    if (length(userObjNames)) {
-      ## makeLazyLoadDB is internal to tools but stable; use getFromNamespace
-      ## to avoid the R CMD check NOTE for ::: usage.
-      ## Restrict to user objects: dot-prefixed internals (.mods, .modObjs, ...)
-      ## stay in @.xData and ride along in saveRDS(). Without `variables`,
-      ## makeLazyLoadDB defaults to all.names = TRUE and bundles each nested
-      ## env's bindings into a single serialized blob via its envhook --
-      ## .mods alone can exceed the 2 GB single-value lazyLoadDB limit.
-      utils::getFromNamespace("makeLazyLoadDB", "tools")(
-        sim@.xData, lazyBase, variables = userObjNames
-      )
-      rm(list = userObjNames, envir = sim@.xData)
-    }
+    ## Defer the user objects AND every module's `mod` objects to sidecar files;
+    ## see .writeLazyObjs(). What is left in `sim` is the shell: slots, `.mods`
+    ## and the dot-prefixed internals.
+    lazyDir <- .lazyDirName(filename)
+    lazyFiles <- .writeLazyObjs(sim, lazyDir, ext = ext)
 
     if (ext == "rds") {
       saveRDS(sim, file = filename)
@@ -329,7 +328,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
         srcFiles <- tmpSrcFiles
       }
 
-      lazyDbExisting <- lazyDbFiles[file.exists(lazyDbFiles)]
+      lazyExisting <- lazyFiles[file.exists(lazyFiles)]
       allFns <- c(fns, otherFns, srcFilesRel)
       if (!is.null(symlinks)) {
         for (p in names(symlinks)) {
@@ -338,10 +337,10 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       }
       allFns <- na.omit(allFns)
 
-      relFns <- makeRelative(c(fileToDelete, lazyDbExisting, allFns), projectPath) |> unname()
+      relFns <- makeRelative(c(fileToDelete, lazyExisting, allFns), projectPath) |> unname()
       archiveWrite(filename, relFns, verbose, projectPath = projectPath)
       unlink(fileToDelete)
-      unlink(lazyDbExisting)
+      unlink(lazyDir, recursive = TRUE)
     }
 
     messageVerbose("    ... saved!", verbose = verbose)
@@ -473,29 +472,27 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     on.exit(unlink(td, recursive = TRUE), add = TRUE)
 
     baseNameNoExt <- tools::file_path_sans_ext(basename(filename[1]))
-    lazyBaseName <- paste0(baseNameNoExt, "_xData")
-    lazyDbBasenames <- paste0(lazyBaseName, c(".rdx", ".rdb"))
-    isLazyDb <- basename(filename[-1]) %in% lazyDbBasenames
+    lazyDirName <- paste0(baseNameNoExt, "_lazy")
+    isLazy <- grepl(paste0("(^|/)", lazyDirName, "/"), filename[-1])
 
-    filenameRel <- gsub(paste0(td, "/"), "", filename[-1][!isLazyDb])  ## TODO: WRONG!
+    filenameRel <- gsub(paste0(td, "/"), "", filename[-1][!isLazy])  ## TODO: WRONG!
     ## This will put the files to relative path of projectPath
     newFns <- file.path(projectPath, filenameRel)
-    linkOrCopy(filename[-1][!isLazyDb], newFns, verbose = verbose - 1)
+    linkOrCopy(filename[-1][!isLazy], newFns, verbose = verbose - 1)
 
-    ## Persist .rdb/.rdx beyond tempdir cleanup so lazy promises can resolve
-    lazyBase <- file.path(tempPath, lazyBaseName)
-    for (ex in c(".rdx", ".rdb")) {
-      srcs <- filename[-1][isLazyDb & basename(filename[-1]) == paste0(lazyBaseName, ex)]
-      if (length(srcs)) {
-        dst <- paste0(lazyBase, ex)
-        if (file.exists(dst)) unlink(dst)
-        file.copy(srcs[[1L]], dst)
-      }
+    ## Persist the sidecar objects beyond tempdir cleanup: the promises bound
+    ## below resolve long after this call returns, and `td` is unlinked on exit.
+    lazyDir <- file.path(tempPath, lazyDirName)
+    srcs <- filename[-1][isLazy]
+    if (length(srcs)) {
+      unlink(lazyDir, recursive = TRUE)
+      dir.create(lazyDir, recursive = TRUE, showWarnings = FALSE)
+      file.copy(srcs, file.path(lazyDir, basename(srcs)))
     }
   } else {
     # filenameRel <- gsub(paste0(projectPath, "/"), "", filename) ## TODO: WRONG!
     filenameRel <- getRelative(filename, projectPath)
-    lazyBase <- paste0(tools::file_path_sans_ext(filename[1]), "_xData")
+    lazyDir <- .lazyDirName(filename[1])
   }
 
   if (tolower(tools::file_ext(filename[1])) == "rds") {
@@ -572,21 +569,13 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
     }
   }
 
-  ## Detect lazy load before .unwrap so we can clear .modObjs (which holds per-module
-  ## copies of file-backed objects) from the shell simList. Those objects were NOT saved
-  ## as part of the shell — their backing files may not exist — and .unwrap would fail on
-  ## them. They are rebuilt by spades() on the next run, so it is safe to clear them here.
-  isLazyLoad <- file.exists(paste0(lazyBase, ".rdx"))
-
-  if (isLazyLoad) {
-    modObjsEnv <- tmpsim@.xData[[".modObjs"]]
-    if (is.environment(modObjsEnv)) {
-      nms <- ls(modObjsEnv, all.names = TRUE)
-      if (length(nms)) rm(list = nms, envir = modObjsEnv)
-    } else if (!is.null(modObjsEnv)) {
-      tmpsim@.xData[[".modObjs"]] <- NULL
-    }
-  }
+  ## A lazily saved simList carries its objects -- user objects and every module's
+  ## `mod` objects alike -- as sidecar files rather than in the shell. Nothing to
+  ## strip here: the shell has none of them, and each is bound as a promise below,
+  ## after the module environments exist. `.unwrap` therefore never runs eagerly
+  ## over them, so a `mod` object whose backing file is missing now fails on
+  ## access, in its own tryCatch, instead of aborting the load.
+  isLazyLoad <- file.exists(file.path(lazyDir, .lazyManifestName))
 
   tmpsim <- .unwrapResiliently(tmpsim, paths(tmpsim))
   tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim))
@@ -605,32 +594,13 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   ## -- so without this a reloaded simList cannot be run.
   tmpsim <- .reparseModules(tmpsim, modules(tmpsim), verbose = verbose)
 
-  ## Lazy loading: if a sibling .rdx/.rdb pair exists, restore the user objects
-  ## via lazyLoad() into a holding env, then bind delayedAssign wrappers on the
-  ## simList so each access triggers the underlying lazy promise plus our
-  ## remap/unwrap pass.
+  ## Lazy loading: bind a promise per sidecar object, into @.xData for user
+  ## objects and into .modObjs[[module]] for `mod` objects. Done after
+  ## .reparseModules() so the module environments and their `mod` active
+  ## bindings are already in place -- a module then reaches its `mod` object
+  ## exactly as it would have before, and pays for it only on first access.
   if (isLazyLoad) {
-    lazyEnv <- new.env(parent = emptyenv())
-    tryCatch(lazyLoad(lazyBase, envir = lazyEnv),
-             error = function(e) warning("Could not attach lazy DB '", lazyBase,
-                                         "': ", conditionMessage(e), call. = FALSE))
-    simPaths <- paths(tmpsim)
-    for (nm in ls(lazyEnv, all.names = TRUE)) {
-      local({
-        .nm <- nm
-        .lazyEnv     <- lazyEnv
-        .projectPath <- projectPath
-        .simPaths    <- simPaths
-        delayedAssign(.nm, tryCatch({
-          obj <- get(.nm, envir = .lazyEnv)
-          obj <- .remapFileBackedObj(obj, .projectPath, .simPaths)
-          .unwrap(obj, cachePath = NULL, paths = .simPaths)
-        }, error = function(e) {
-          warning("Could not load lazy object '", .nm, "': ", conditionMessage(e), call. = FALSE)
-          NULL
-        }), eval.env = environment(), assign.env = envir(tmpsim))
-      })
-    }
+    tmpsim <- .attachLazyObjs(tmpsim, lazyDir, projectPath)
   }
 
   return(tmpsim)
@@ -805,6 +775,133 @@ recoverDataTableFromQs <- function(sim) {
   }
   attributes(out) <- attributes(env)
   out
+}
+
+## ---- lazy sidecar objects ------------------------------------------------
+##
+## `lazy = TRUE` defers the big objects: each is written to its own file under
+## `<filename sans ext>_lazy/`, and loadSimList() binds a promise (delayedAssign)
+## for it instead of reading it. Two reasons this is one-file-per-object rather
+## than tools::makeLazyLoadDB(): a single value larger than 2 GB cannot go into a
+## lazy load DB at all ("long vectors not supported yet: connections.c"), and
+## `mod` objects routinely are that large; and a file per object lets a reader
+## pay for exactly what it touches.
+##
+## Deferred: the user objects in `sim@.xData` (undotted) and every `mod` object
+## in `sim@.xData$.modObjs[[module]]`. `.mods` and the dot-prefixed internals
+## stay in the shell -- together a few MB, and always needed.
+##
+## NOTE: promises are forced by bulk environment operations -- `as.list()`,
+## `get()`, `mget()`, `eapply()` -- but not by `ls()` or `exists()`. So a whole
+## simList `Copy()` materializes everything, while reading metadata or touching
+## one object does not.
+
+.lazyDirName <- function(filename) paste0(tools::file_path_sans_ext(filename), "_lazy")
+
+.lazyManifestName <- "_manifest.rds"
+
+.saveOneLazy <- function(obj, file, ext) {
+  if (identical(tolower(ext), "qs2")) {
+    qs2::qs_save(obj, file = file, nthreads = getOption("spades.qsThreads", 1))
+  } else {
+    saveRDS(obj, file = file)
+  }
+}
+
+.readOneLazy <- function(file) {
+  if (identical(tolower(tools::file_ext(file)), "qs2")) {
+    qs2::qs_read(file, nthreads = getOption("spades.qsThreads", 1))
+  } else {
+    readRDS(file)
+  }
+}
+
+## The environment a manifest row belongs to. `where` is "" for objects that live
+## directly in sim@.xData, otherwise the module name whose .modObjs env holds it.
+## Creates the .modObjs env if it is not there (loading into a fresh shell).
+.lazyEnvFor <- function(sim, where) {
+  if (!nzchar(where)) return(sim@.xData)
+  if (!is.environment(sim@.xData[[dotObjs]]))
+    sim@.xData[[dotObjs]] <- new.env(parent = emptyenv())
+  if (!is.environment(sim@.xData[[dotObjs]][[where]]))
+    sim@.xData[[dotObjs]][[where]] <- new.env(parent = emptyenv())
+  sim@.xData[[dotObjs]][[where]]
+}
+
+## Everything that gets deferred, as a manifest.
+.lazyEntries <- function(sim) {
+  ents <- list()
+  userObjNames <- ls(sim@.xData, all.names = FALSE)
+  if (length(userObjNames))
+    ents[[length(ents) + 1]] <- data.frame(where = "", name = userObjNames)
+
+  modObjsEnv <- sim@.xData[[dotObjs]]
+  if (is.environment(modObjsEnv)) {
+    for (m in ls(modObjsEnv, all.names = TRUE)) {
+      e <- modObjsEnv[[m]]
+      if (!is.environment(e)) next
+      nms <- ls(e, all.names = TRUE)
+      if (length(nms))
+        ents[[length(ents) + 1]] <- data.frame(where = m, name = nms)
+    }
+  }
+  if (!length(ents)) return(data.frame(where = character(), name = character()))
+  do.call(rbind, ents)
+}
+
+## Write each deferred object to its own file and remove it from the simList, so
+## the shell that gets serialized carries only metadata. Returns the files
+## written (manifest included), for the archive.
+.writeLazyObjs <- function(sim, dir, ext = "rds") {
+  ents <- .lazyEntries(sim)
+  unlink(dir, recursive = TRUE)
+  if (!NROW(ents)) return(character())
+
+  dir.create(dir, recursive = TRUE, showWarnings = FALSE)
+  ## index keeps the name unique; the readable part is only for humans browsing
+  ## the directory -- the manifest is what load reads.
+  ents$file <- sprintf("%04d-%s.%s", seq_len(NROW(ents)),
+                       gsub("[^A-Za-z0-9._-]", "_", ents$name), ext)
+
+  for (i in seq_len(NROW(ents))) {
+    env <- .lazyEnvFor(sim, ents$where[i])
+    .saveOneLazy(get(ents$name[i], envir = env, inherits = FALSE),
+                 file.path(dir, ents$file[i]), ext)
+    rm(list = ents$name[i], envir = env)
+  }
+  saveRDS(ents, file.path(dir, .lazyManifestName))
+
+  file.path(dir, c(ents$file, .lazyManifestName))
+}
+
+## Bind a promise per manifest row. The body matches what loadSimList() does for
+## an eagerly loaded object -- remap file-backed paths, then unwrap -- so a lazy
+## object is indistinguishable from an eager one once touched.
+.attachLazyObjs <- function(sim, dir, projectPath) {
+  mf <- file.path(dir, .lazyManifestName)
+  if (!file.exists(mf)) return(sim)
+
+  ents <- readRDS(mf)
+  simPaths <- paths(sim)
+  for (i in seq_len(NROW(ents))) {
+    env <- .lazyEnvFor(sim, ents$where[i])
+    local({
+      .f  <- file.path(dir, ents$file[i])
+      .nm <- ents$name[i]
+      .pp <- projectPath
+      .sp <- simPaths
+      delayedAssign(.nm, tryCatch({
+        obj <- .readOneLazy(.f)
+        obj <- .remapFileBackedObj(obj, .pp, .sp)
+        .unwrap(obj, cachePath = NULL, paths = .sp)
+      }, error = function(e) {
+        warning("Could not load lazy object '", .nm, "' from '", .f, "': ",
+                conditionMessage(e), call. = FALSE)
+        NULL
+      }), eval.env = environment(), assign.env = env)
+    })
+  }
+  sim
 }
 
 ## Anchors offered to .wrap()/.unwrap() when deciding what a file-backed
