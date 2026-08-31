@@ -28,6 +28,18 @@ test_that("outputFilename embeds the pid", {
   expect_match(basename(f), "memAvail_4242\\.txt$")
 })
 
+test_that(".rssField tolerates ps's right-aligned columns", {
+  testInit()
+
+  ## `ps` pads rss into a fixed-width column, so a value narrower than the
+  ## column leaves the line starting with spaces. Splitting on " +" without
+  ## trimming first returned "" and every reading parsed to NA -- which is why
+  ## memoryUse() silently produced NA on macOS, and for any small process.
+  expect_identical(SpaDES.core:::.rssField("    0       2"), "0")
+  expect_identical(SpaDES.core:::.rssField(" 3884 3597561"), "3884")
+  expect_identical(SpaDES.core:::.rssField("62064 3597570"), "62064")
+})
+
 ## ---- memoryUseThisSession ----------------------------------------------
 
 test_that("memoryUseThisSession reports this session's memory as an object_size", {
