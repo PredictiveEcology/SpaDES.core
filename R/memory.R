@@ -37,6 +37,13 @@ ongoingMemoryThisPid <- function(
   invisible(outputFile)
 }
 
+## Pull the leading numeric field out of a `ps` line. `ps` right-aligns its
+## columns, so the line may begin with spaces; trim before splitting or the
+## first field is "" and the value parses to NA.
+.rssField <- function(x) {
+  strsplit(trimws(x[1]), split = " +")[[1]][1]
+}
+
 #' Estimate memory used with `system("ps")`
 #'
 #' This will give a slightly different estimate than `pryr::mem_used`, which uses `gc()` internally.
@@ -50,13 +57,6 @@ ongoingMemoryThisPid <- function(
 #'
 #' @export
 #' @rdname memoryUse
-## Pull the leading numeric field out of a `ps` line. `ps` right-aligns its
-## columns, so the line may begin with spaces; trim before splitting or the
-## first field is "" and the value parses to NA.
-.rssField <- function(x) {
-  strsplit(trimws(x[1]), split = " +")[[1]][1]
-}
-
 memoryUseThisSession <- function(thisPid) {
   ps <- Sys.which("ps")
   if (missing(thisPid)) {
