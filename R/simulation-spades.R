@@ -660,21 +660,18 @@ scheduleConditionalEvent <- function(sim,
 #'              of that exact same `simList`. Default `FALSE`. See Details.
 #'              See also the vignette on caching for examples.
 #'
-#' @param .plotInitialTime Numeric. Temporarily override the `.plotInitialTime`
-#'                                  parameter for all modules. See Details.
-#'
-#' @param .saveInitialTime Numeric. Temporarily override the `.plotInitialTime`
+#' @param .saveInitialTime Numeric. Temporarily override the `.saveInitialTime`
 #'                                  parameter for all modules. See Details.
 #'
 #' @param .plots Character. Sets the parameter of this name in all modules.
-#'   See [Plots()] for possible values. The parameter is intended to slowly
-#'   take over from `.plotInitialTime` as a mechanism to turn on or off plotting.
-#'   For backwards compatibility, if `.plotInitialTime` is not set in this `spades` call,
-#'   but this `.plots` is used, two things will happen: setting this without `"screen"`
-#'   will turn off all plotting; setting this with `"screen"` will trigger
-#'   plotting for any modules that use this parameter but will have no effect on
-#'   other modules. To get plotting, therefore, it may be necessary to also set
-#'   `.plotInitialTime = start(sim)`.
+#'   See [Plots()] for possible values. Setting this without `"screen"` turns
+#'   off all plotting; setting it with `"screen"` triggers plotting for any
+#'   module that uses this parameter, and has no effect on modules that do not.
+#'
+#'   This replaces the `.plotInitialTime` argument, which was removed. Use
+#'   `.plots = NA` where you previously used `.plotInitialTime = NA`. The
+#'   `.plotInitialTime` *module parameter* is unaffected and can still be set
+#'   per module through `params`.
 #'
 #' @param notOlderThan Date or time. Passed to `reproducible::Cache` to update the cache.
 #'                     Default is `NULL`, meaning don't update the cache.
@@ -707,14 +704,13 @@ scheduleConditionalEvent <- function(sim,
 #' The is the workhorse function in the SpaDES package. It runs simulations by
 #' implementing the rules outlined in the `simList`.
 #'
-#' This function gives simple access to two sets of module parameters:
-#' `.plotInitialTime` and with `.plotInitialTime`. The primary use of
-#' these arguments is to temporarily turn off plotting and saving. "Temporary"
-#' means that the `simList` is not changed, so it can be used again with
-#' the `simList` values reinstated. To turn off plotting and saving, use
-#' `.plotInitialTime = NA` or `.saveInitialTime = NA`. NOTE: if a
-#' module did not use `.plotInitialTime` or `.saveInitialTime`, then
-#' these arguments will not do anything.
+#' This function gives simple access to module plotting and saving: `.plots`
+#' and `.saveInitialTime`. The primary use of these arguments is to temporarily
+#' turn off plotting and saving. "Temporary" means that the `simList` is not
+#' changed, so it can be used again with the `simList` values reinstated. To
+#' turn off plotting and saving, use `.plots = NA` or `.saveInitialTime = NA`.
+#' NOTE: if a module did not use these parameters, then these arguments will
+#' not do anything.
 #'
 #' @section Caching with SpaDES:
 #'
@@ -868,7 +864,7 @@ scheduleConditionalEvent <- function(sim,
 setGeneric(
   "spades",
   function(sim, debug = getOption("spades.debug"), progress = NA, cache,
-           .plotInitialTime = NULL, .saveInitialTime = NULL, notOlderThan = NULL,
+           .saveInitialTime = NULL, notOlderThan = NULL,
            events = NULL, .plots = getOption("spades.plots", NULL), ...) {
     standardGeneric("spades")
   })
@@ -877,8 +873,10 @@ setGeneric(
 setMethod(
   "spades",
   signature(sim = "simList", cache = "missing"),
-  definition = function(sim, debug, progress, cache, .plotInitialTime, .saveInitialTime,
+  definition = function(sim, debug, progress, cache, .saveInitialTime,
                         notOlderThan, events, .plots, ...) {
+    .warnPlotInitialTimeArg(...names())
+
     ## set the options; then set them back on exit
     optsFromDots <- dealWithOptions(sim = sim, dotNames = ...names())
     if (!is.null(optsFromDots$optsPrev)) {
@@ -920,7 +918,7 @@ setMethod(
       tf <- tempfile();
       on.exit(unlink(tf))
       cat(file = tf, paste("spades(sim, events = ", capture.output(dput(events)),
-                           ", .plotInitialTime = ", .plotInitialTime, ")", collapse = "\n"))
+                           ")", collapse = "\n"))
       sim[[dotMods]][[modNam]]$sim <- sim
       opts <- options("spades.covr2" = FALSE) ## turn off this chunk 2nd time through
       on.exit(options(opts), add = TRUE)
@@ -1108,26 +1106,12 @@ setMethod(
           needValuesMess = paste0("It must be one or more of 'screen', ",
                                   "'object', 'raw' and any of the classes that ggplot2::ggsave ",
                                   "can handle, e.g., 'png'"))
-        if (is.null(.plotInitialTime) && !any(.plots %in% "screen"))
+        if (!any(.plots %in% "screen"))
           sim@params <- updateParamSlotInAllModules(
             sim@params, NA_integer_, ".plotInitialTime",
             needClass = "integer")
-        if (!is.null(.plotInitialTime) && !is.na(.plotInitialTime)) {
-          message("Both .plots and .plotInitialTime are supplied; using .plots")
-          if (!is.numeric(.plotInitialTime) && is.na(.plotInitialTime))
-            .plotInitialTime <- start(sim)
-        }
       }
 
-      if (!is.null(.plotInitialTime)) {
-        sim@params <- updateParamSlotInAllModules(
-          sim@params, .plotInitialTime, ".plotInitialTime",
-          needClass = "numeric")
-        if (is.na(.plotInitialTime))
-          sim@params <- updateParamSlotInAllModules(
-            sim@params, NA_character_, ".plots",
-            needClass = "character")
-      }
       if (!is.null(.saveInitialTime)) {
         sim@params <- updateParamSlotInAllModules(
           sim@params, .saveInitialTime, ".saveInitialTime",
@@ -1387,7 +1371,6 @@ setMethod(
                         debug,
                         progress,
                         cache,
-                        .plotInitialTime,
                         .saveInitialTime,
                         notOlderThan = NULL,
                         events,
@@ -1411,7 +1394,6 @@ setMethod(
         Cache(spades(sim = sim,
                      debug = debug,
                      progress = progress,
-                     .plotInitialTime = .plotInitialTime,
                      .saveInitialTime = .saveInitialTime,
                      omitArgs = omitArgs,
                      notOlderThan = notOlderThan,
@@ -1444,7 +1426,6 @@ setMethod(
           sim,
           debug = debug,
           progress = progress,
-          .plotInitialTime = .plotInitialTime,
           .saveInitialTime = .saveInitialTime,
           events = events,
           .plots = .plots

@@ -22,7 +22,6 @@ simInitAndSpades(
   progress,
   cache,
   .plots,
-  .plotInitialTime,
   .saveInitialTime,
   events,
   ...
@@ -108,19 +107,16 @@ of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
 \item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link[=Plots]{Plots()}} for possible values. The parameter is intended to slowly
-take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-For backwards compatibility, if \code{.plotInitialTime} is not set in this \code{spades} call,
-but this \code{.plots} is used, two things will happen: setting this without \code{"screen"}
-will turn off all plotting; setting this with \code{"screen"} will trigger
-plotting for any modules that use this parameter but will have no effect on
-other modules. To get plotting, therefore, it may be necessary to also set
-\code{.plotInitialTime = start(sim)}.}
+See \code{\link[=Plots]{Plots()}} for possible values. Setting this without \code{"screen"} turns
+off all plotting; setting it with \code{"screen"} triggers plotting for any
+module that uses this parameter, and has no effect on modules that do not.
 
-\item{.plotInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
-parameter for all modules. See Details.}
+This replaces the \code{.plotInitialTime} argument, which was removed. Use
+\code{.plots = NA} where you previously used \code{.plotInitialTime = NA}. The
+\code{.plotInitialTime} \emph{module parameter} is unaffected and can still be set
+per module through \code{params}.}
 
-\item{.saveInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
+\item{.saveInitialTime}{Numeric. Temporarily override the \code{.saveInitialTime}
 parameter for all modules. See Details.}
 
 \item{events}{A character vector or a named list of character vectors. If specified,

@@ -340,10 +340,10 @@ test_that("test .robustDigest for simLists", {
   bbb <- do.call(simInit, args)
   opts <- withr::local_options(spades.saveSimOnExit = FALSE)
   expect_silent({
-    aaMess <- capture_messages(spades(bbb, debug = FALSE, .plotInitialTime = NA))
+    aaMess <- capture_messages(spades(bbb, debug = FALSE, .plots = NA))
   })
   options(opts)
-  mess31 <- capture_messages(spades(bbb, debug = TRUE, .plotInitialTime = NA))
+  mess31 <- capture_messages(spades(bbb, debug = TRUE, .plots = NA))
   expect_true(LoadedMgsCheck(mess31, "init"))
   # expect_true(sum(grepl("Loaded!|for init event", mess31)) == 2)
 
@@ -360,12 +360,12 @@ test_that("test .robustDigest for simLists", {
 
   # should NOT use Cached copy, so no message
   opts <- withr::local_options(spades.saveSimOnExit = FALSE)
-  bbbbb <- capture_messages(spades(bbb, debug = TRUE, .plotInitialTime = NA))
+  bbbbb <- capture_messages(spades(bbb, debug = TRUE, .plots = NA))
   expect_false(LoadedMgsCheck(bbbbb, "init"))
   # aa <- sum(grepl("Loaded! Cached", bbbbb))
   # expect_true(aa == 0) # seems to vary stochastically; either is OK
   options(opts)
-  mess111 <- capture_messages(spades(bbb, debug = TRUE, .plotInitialTime = NA))
+  mess111 <- capture_messages(spades(bbb, debug = TRUE, .plots = NA))
   expect_true(LoadedMgsCheck(mess111, "init"))
   # expect_true(sum(grepl("Loaded! Cached|for init event", mess111)) == 2)
 })
@@ -466,7 +466,7 @@ test_that("Cache sim objs via .Cache attr", {
                    params = list(test = list(.useCache = "init")))
   mySim$co4 <- 5
   mySim$co5 <- 6
-  mySim2 <- spades(Copy(mySim), .plotInitialTime = NA)
+  mySim2 <- spades(Copy(mySim), .plots = NA)
   expect_true(mySim2$co1 == 1)
   expect_true(mySim2$co2 == 1)
   expect_true(mySim2$co3 == 1)
@@ -484,7 +484,7 @@ test_that("Cache sim objs via .Cache attr", {
   expect_true(mySim$co3 == 2) # will be changed by init
   expect_true(mySim$co1 == 4)# will be changed by init
   # expect_true(is.null(mySim$.mods$test$hi)) # hi was removed from module
-  mySim2 <- spades(Copy(mySim), .plotInitialTime = NA)
+  mySim2 <- spades(Copy(mySim), .plots = NA)
   # expect_true(mySim2$.mods$test$hi == 1) # hi was removed from module
   expect_true(mySim2$co1 == 1) # was affected
   expect_true(mySim2$co2 == 1)# was affected
@@ -497,7 +497,7 @@ test_that("Cache sim objs via .Cache attr", {
   # expect_true(is.null(mySim$.mods$test$hi)) # is not in the
   # ._prepareOutput_5 <<- ._addChangedAttr_5  <<- ._addTagsToOutput_2 <<-  1
   mess1 <- capture_messages({
-    mySim2 <- spades(Copy(mySim), debug = TRUE, .plotInitialTime = NA)
+    mySim2 <- spades(Copy(mySim), debug = TRUE, .plots = NA)
   })
   # expect_true(mySim2$.mods$test$hi == 1) # recovered in Cache
   # Test mod
@@ -590,10 +590,10 @@ test_that("test showSimilar", {
     outputs = data.frame(objectName = c("landscape", "caribou"), stringsAsFactors = FALSE)
   )
 
-  out1 <- spades(Copy(mySim), .plotInitialTime = NA)#, showSimilar = TRUE)
+  out1 <- spades(Copy(mySim), .plots = NA)#, showSimilar = TRUE)
   params(mySim)$randomLandscapes$nx <- 101
   mess <- capture_messages({
-    out2 <- spades(Copy(mySim), .plotInitialTime = NA)#, showSimilar = TRUE)
+    out2 <- spades(Copy(mySim), .plots = NA)#, showSimilar = TRUE)
   })
   mySim$a <- 1
   mess <- capture_messages({
@@ -638,11 +638,11 @@ test_that("test multipart cache file", {
   )
 
   expect_no_error({
-    out1 <- Cache(spades(Copy(mySim), .plotInitialTime = NA))
+    out1 <- Cache(spades(Copy(mySim), .plots = NA))
   })
   end(out1) <- 2
   expect_no_error({
-    out2 <- Cache(spades(Copy(out1), .plotInitialTime = NA))
+    out2 <- Cache(spades(Copy(out1), .plots = NA))
   })
 })
 
@@ -666,7 +666,7 @@ test_that("multifile cache saving", {
   }
   s <- simInit()
   s$ras <- randomPolyToDisk2(tmpfile)
-  s2 <- Cache(spades(s, .plotInitialTime = NA))
+  s2 <- Cache(spades(s, .plots = NA))
   expect_true(identical(Filenames(s2), Filenames(s)))
 })
 

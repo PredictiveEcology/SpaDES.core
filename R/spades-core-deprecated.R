@@ -43,3 +43,20 @@ simInitAndExperiment <- function(...) {
 loadPackages <- function(...) {
   .Deprecated("Require", "Require")
 }
+
+## `.plotInitialTime` was removed as an argument to `spades()` (#231); `.plots`
+## does the job instead. Warn when a caller still passes it, and ignore it.
+## The *module parameter* of the same name is unaffected.
+.warnPlotInitialTimeArg <- function(dotNames) {
+  if (".plotInitialTime" %in% dotNames) {
+    warning(
+      "The `.plotInitialTime` argument to spades() is deprecated and is being ",
+      "ignored. Use `.plots` instead: `.plots = NA` where you previously used ",
+      "`.plotInitialTime = NA`. To set the `.plotInitialTime` module parameter, ",
+      "pass it through `params`, e.g. ",
+      "`params = list(<module> = list(.plotInitialTime = 0))`.",
+      call. = FALSE
+    )
+  }
+  invisible(NULL)
+}
