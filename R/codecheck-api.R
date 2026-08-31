@@ -22,8 +22,8 @@
 #' structured tibble of findings, optionally printed as grouped tables.
 #'
 #' This is the v2 implementation, selectable at `simInit()` time via
-#' `options(spades.codeCheckEngine = "v2")` (the default). The legacy v1
-#' checker is still available via `options(spades.codeCheckEngine = "v1")`.
+#' `options(spades.codeCheckEngine = "v2")`. The legacy v1 checker is the
+#' default; set the option to opt in to v2.
 #'
 #' @section Silencing findings:
 #' Each finding in the printed report is tagged with its **rule id** in

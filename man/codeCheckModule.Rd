@@ -42,8 +42,8 @@ structured tibble of findings, optionally printed as grouped tables.
 }
 \details{
 This is the v2 implementation, selectable at \code{simInit()} time via
-\code{options(spades.codeCheckEngine = "v2")} (the default). The legacy v1
-checker is still available via \code{options(spades.codeCheckEngine = "v1")}.
+\code{options(spades.codeCheckEngine = "v2")}. The legacy v1 checker is the
+default; set the option to opt in to v2.
 }
 \section{Silencing findings}{
 
