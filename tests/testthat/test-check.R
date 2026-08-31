@@ -124,3 +124,65 @@ test_that("checkParams returns NA when there are no user modules to check", {
   sim <- simInit()
   expect_true(is.na(suppressMessages(checkParams(sim, coreParamsList()))))
 })
+
+## suggestModules() -----------------------------------------------------------
+
+## fireSpread declares `landscape` and `nPixelsBurned` as inputObjects but is
+## run here without the module that supplies them.
+simWithMissingInputs <- function() {
+  mp <- getSampleModules(tempdir())
+  suppressMessages(simInit(
+    times = list(start = 0, end = 1), modules = list("fireSpread"),
+    paths = list(modulePath = mp),
+    params = list(.globals = list(stackName = "landscape", burnStats = "nBurned"))
+  ))
+}
+
+test_that("suggestModules names every missing input object", {
+  testInit(sampleModReqdPkgs)
+
+  sim <- simWithMissingInputs()
+
+  expect_error(suggestModules(sim, module = "fireSpread"),
+               "These are missing: landscape, nPixelsBurned")
+})
+
+test_that("suggestModules names the suggested modules when given them", {
+  testInit(sampleModReqdPkgs)
+
+  sim <- simWithMissingInputs()
+
+  expect_error(suggestModules(sim, "randomLandscapes", module = "fireSpread"),
+               "Have you run randomLandscapes\\?")
+  ## with none suggested, no dangling question
+  expect_error(suggestModules(sim, module = "fireSpread"), "^(?!.*Have you run).*$",
+               perl = TRUE)
+})
+
+test_that("suggestModules uses singular wording for a single missing object", {
+  testInit(sampleModReqdPkgs)
+
+  sim <- simWithMissingInputs()
+  sim$landscape <- 1
+
+  expect_error(suggestModules(sim, module = "fireSpread"),
+               "This is missing: nPixelsBurned")
+})
+
+test_that("suggestModules is silent, and returns character(0), when all inputs are present", {
+  testInit(sampleModReqdPkgs)
+
+  sim <- simWithMissingInputs()
+  sim$landscape <- 1
+  sim$nPixelsBurned <- 1
+
+  expect_no_error(res <- suggestModules(sim, module = "fireSpread"))
+  expect_identical(res, character(0))
+})
+
+test_that("suggestModules is a no-op when there is no module to check", {
+  testInit()
+
+  expect_no_error(res <- suggestModules(simInit()))
+  expect_identical(res, character(0))
+})

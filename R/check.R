@@ -269,3 +269,56 @@ setMethod(
     }
     return(invisible(allFound))
 })
+
+################################################################################
+#' Check that a module's declared inputs are present, and suggest modules
+#'
+#' Call this inside an event (typically `init`) to fail early, and with a
+#' useful message, when the objects a module declares in its metadata
+#' `inputObjects` have not been supplied. Without it, the module runs on and
+#' fails later at whichever line first touches a missing object, which is
+#' usually a long way from the real cause: a module that should have run first
+#' was not included in the `simInit()` call.
+#'
+#' @param sim A [simList()] object.
+#'
+#' @param suggestedModules Optional character vector of module names to name in
+#'   the error message as the likely providers of the missing objects.
+#'
+#' @param module Character string naming the module whose `inputObjects` to
+#'   check. Defaults to the currently running module.
+#'
+#' @return Invisibly, a character vector of the missing object names -- which is
+#'   `character(0)` unless the function stops first.
+#'
+#' @author Eliot McIntire and Alex Chubaty
+#' @export
+#' @rdname suggestModules
+#' @seealso [checkObject()], [suppliedElsewhere()]
+#'
+#' @examples
+#' sim <- simInit()
+#' ## nothing is declared, so nothing is missing
+#' suggestModules(sim)
+#'
+suggestModules <- function(sim, suggestedModules = NULL, module = currentModule(sim)) {
+  if (length(module) == 0)
+    return(invisible(character()))
+
+  io <- inputObjects(sim, module = module)
+  ## with several modules, inputObjects() returns one data.frame per module
+  expected <- if (is.data.frame(io)) io[["objectName"]] else
+    unlist(lapply(io, `[[`, "objectName"), use.names = FALSE)
+  expected <- unique(expected[!is.na(expected)])
+
+  notFound <- setdiff(expected, ls(sim))
+  if (length(notFound) == 0)
+    return(invisible(character()))
+
+  stop("The inputObjects for ", paste(module, collapse = ", "), " are not all ",
+       "available. ", singularPlural(c("This is", "These are"), l = notFound),
+       " missing: ", paste(notFound, collapse = ", "), ".",
+       if (length(suggestedModules))
+         paste0("\n\nHave you run ", paste(suggestedModules, collapse = ", "), "?"),
+       call. = FALSE)
+}

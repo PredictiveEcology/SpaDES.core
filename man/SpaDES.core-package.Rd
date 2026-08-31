@@ -176,6 +176,8 @@ these constructors, called inside \code{\link[=defineModule]{defineModule()}}.
 \code{\link[=currentModule]{currentModule()}} \tab The name of the running module.\cr
 \code{\link[=suppliedElsewhere]{suppliedElsewhere()}} \tab \code{TRUE} if another module already provides an object.\cr
 \code{\link[=checkObject]{checkObject()}} \tab Confirm a required object exists in \code{sim}.\cr
+\code{\link[=suggestModules]{suggestModules()}} \tab Confirm a module's declared inputs are present,
+and name the modules that supply any that are missing.\cr
 \code{\link[=findObjects]{findObjects()}} \tab Look up objects across modules.\cr
 }
 }
