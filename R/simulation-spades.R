@@ -913,9 +913,6 @@ setMethod(
     }
 
     opt <- options("encoding" = "UTF-8")
-    # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
-    #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
-    # }
     on.exit(options(opt), add = TRUE)
 
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
@@ -1586,14 +1583,7 @@ setMethod(
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
     }
-    # if (allowSequentialCaching) {
-    #     sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
-    # }
   }
-
-  # if (allowSequentialCaching) {
-  #   sim <- allowSequentialCachingFinal(sim)
-  # }
 
   ## put back the current values of params that were not cached on
   if (exists("modParams", inherits = FALSE)) {
@@ -2569,141 +2559,6 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 ## don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
 paramsDontCacheOn <- grep(c("useCache|useCloud"), .knownDotParams, value = TRUE)
-
-#' @importFrom reproducible .cacheMessageObjectToRetrieve extractFromCache loadFromCache
-#' @importFrom reproducible messageCache showCache
-allowSequentialCaching1 <- function(sim, cacheIt, moduleCall, verbose) {
-  .message$IndentUpdate()
-  attr(sim, "runFnCallAsExpr") <- NULL
-  if (!is.null(sim[["._prevCache"]]) && isTRUE(cacheIt)) {
-    sc <- showCache(cacheId = sim[["._prevCache"]], x = cachePath(sim), verbose = -1)
-    # sc <- showCache(userTags = sim[["._prevCache"]], verbose = FALSE)[cacheId %in% sim[["._prevCache"]]]
-    nextEvent <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextEventCacheId")))
-    cur <- current(sim)
-    if (length(nextEvent) > 1) {
-      nextEventName <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextEvent")))
-      nextModuleName <- unique(extractFromCache(sc, paste0(sequentialCacheText, "NextModule")))
-      keep <- which(nextEventName %in% cur[["eventType"]] & nextModuleName %in% cur[["moduleName"]])
-      if (length(keep))
-        nextEvent <- nextEvent[keep]
-      if (length(keep) == 0)
-        nextEvent <- NULL
-    }
-    if (length(nextEvent != sim[["._prevCache"]]) > 1) browser()
-    if (!is.null(nextEvent) && nextEvent != sim[["._prevCache"]]) {
-      # The user can't have modified the function being run
-      scNe <- showCache(cacheId = nextEvent, x = cachePath(sim), verbose = -1)
-      # d <- .robustDigest(Copy(sim, objects = FALSE))
-
-      # need to check for non-object (e.g., function, params, depends) that could have changed
-      # checkParams
-      sPoss <- .robustDigest(Copy(sim, objects = FALSE))
-      # outputs are not necessary in this evaluation; just like in .robustDigest
-      sPossNames <- names(sPoss[["depends"]][[cur[["moduleName"]]]])
-      sPoss[["depends"]][[cur[["moduleName"]]]] <-
-        sPoss[["depends"]][[cur[["moduleName"]]]][outputsRmDontNeedForCache(sPossNames, "outputObjects")]
-
-      scNePreDigests <- scNe$tagValue["preDigest" == scNe$tagKey]
-
-      wh <- c("params", "depends")
-      wh2 <- paste0("sim.", wh)
-      noChanges <- logical(length(wh) + 1)
-      for (iii in seq(wh)) {
-        paramCIs <- gsub(".+:(.+)", "\\1", scNePreDigests[startsWith(scNePreDigests, wh2[iii])])
-        noChanges[iii] <- all(unlist(sPoss[[wh[iii]]][[cur[["moduleName"]]]]) %in% paramCIs)
-      }
-
-      # preModCall <- if (moduleCall == ".inputObjects") "\\.\\" else "\\."
-      # grepVal <- paste0("sim\\.\\.list\\.", cur[["moduleName"]], preModCall, moduleCall)
-      # Check that function itself (.inputObject or doEvent.XXX) has not changed
-      grepVal <- paste0("sim..list.", cur[["moduleName"]], ".", .moduleFunctionsNam, ".", moduleCall)
-      scFn <- startsWith(scNePreDigests, grepVal) # grepl(scNePreDigests, pattern = grepVal)
-      a <- .robustDigest(sim[[dotMods]][[cur[["moduleName"]]]][[moduleCall]])
-      b <- gsub(".+:(.+)", "\\1", scNePreDigests[scFn])
-      noChanges[length(noChanges)] <- (a %in% b)
-      noChange <- all(noChanges)
-
-      if (isTRUE(noChange)) {
-        isMemoised <- reproducible::.isMemoised(cacheId = nextEvent, cachePath = cachePath(sim))
-        simSkip <- try(loadFromCache(cachePath(sim), cacheId = nextEvent, verbose = FALSE), silent = TRUE)
-        if (!inherits(simSkip, "try-error")) {
-          if (all(current(simSkip) == current(sim))) {
-            attr(sim, "runFnCallAsExpr") <- FALSE # the trigger to NOT pull the next event
-            sim <- .prepareOutput(simSkip, cachePath(sim), sim)
-            .cacheMessageObjectToRetrieve(functionName = moduleCall, fullCacheTableForObj = sc,
-                                          cachePath = cachePath(sim),
-                                          cacheId = sim[["._prevCache"]], verbose = verbose)
-            messageCache("Skipped digest of simList because sequential Cache calls of events",
-                         verbose = verbose)
-            .cacheMessage(sim, functionName = moduleCall, fromMemoise = isMemoised, verbose = verbose)
-            attr(sim, "tags") <- paste0("cacheId:", nextEvent)
-          }
-        }
-      }
-    }
-  }
-  sim
-}
-
-allowSequentialCachingUpdateTags <- function(sim, cacheIt) {
-  if (!isTRUE(cacheIt)) {
-    attr(sim, "tags") <- NULL
-    attr(sim, ".Cache") <- NULL
-    sim[["._prevCache"]] <- NULL
-    attr(sim, "runFnCallAsExpr") <- NULL
-  }
-
-  sim
-}
-
-#' @importFrom utils getFromNamespace
-allowSequentialCachingFinal <- function(sim) {
-  wasFromCache <- !is.null(attr(sim, "tags"))
-  if (wasFromCache) {
-    thisCacheId <- gsub("cacheId:", "", attr(sim, "tags"))
-    if (!is.null(sim[["._prevCache"]])) {
-      sc <- showCache(cacheId = sim[["._prevCache"]], x = cachePath(sim), verbose = -1)
-      cp <- cachePath(sim)
-      cur <- current(sim)
-      seqCache <- sc[startsWith(sc$tagKey, sequentialCacheText)]
-      # This is multiple tags for the NextEvent stuff
-      if (length(thisCacheId) > 1) browser()
-      args <- data.frame(cacheId = sim[["._prevCache"]],
-                   tagKey = paste0(sequentialCacheText, "Next", c("EventCacheId", "Module", "Event")),
-                   tagValue = c(thisCacheId, cur[["moduleName"]], cur[["eventType"]]),
-                   cachePath = cp)
-      if (all(c(cur[["moduleName"]], cur[["eventType"]]) %in% seqCache$tagValue) || NROW(seqCache) == 0) {
-        fn <- utils::getFromNamespace(".updateTagsRepo", "reproducible")
-        args$add = TRUE
-      } else {
-        fn <- utils::getFromNamespace(".addTagsRepo", "reproducible")
-      }
-
-      # put all tags in
-      by(args, INDICES = seq_len(NROW(args)), FUN = function(a) do.call(fn, a))
-    }
-    sim[["._prevCache"]] <- thisCacheId
-  }
-  sim
-}
-
-#' @importFrom reproducible CacheStorageDir
-clearNextEventInCache <- function(cachePath = getOption("reproducible.cachePath"),
-                                  key = paste0(sequentialCacheText, "Next")) {
-  onesWithNextEvent <- character()
-  a <- lapply(dir(CacheStorageDir(cachePath), pattern = "dbFile", full.names = TRUE), function(x) {
-    y <- readRDS(x)
-    if (any(grep(key, y$tagKey))) {
-      y <- y[grep(paste0("^", key), tagKey, invert = TRUE)]
-      message("resaving ", x)
-      onesWithNextEvent <<- c(onesWithNextEvent, x)
-      saveRDS(y, file = x)
-    }
-  })
-  return(onesWithNextEvent)
-}
-
-sequentialCacheText <- "SequentialCache_"
 
 appendCompleted <- function(sim, cur) {
 

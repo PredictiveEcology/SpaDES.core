@@ -89,17 +89,14 @@ broken path.
    converting to zip yields `sim.tar.zip`. The `gsub` is also unanchored and
    applied to the whole path, so a directory named `gz` gets rewritten too.
    Neither is pinned by a test until it is decided what is right.
-3. **Leftover `browser()`** at `simulation-spades.R:2592`, inside
-   `allowSequentialCaching1()`. The condition also reads as though it meant
-   `length(nextEvent) > 1` rather than `length(nextEvent != ...) > 1`.
-4. **`moduleCoverage()`** opens with
+3. **`moduleCoverage()`** opens with
    `stop("This is a stub that is not intended for use")` — 32 lines of
    unreachable code behind it, and it is not exported. Finish it or delete it.
-5. **`ongoingMemoryThisPid(interval = )`** takes an `interval` argument but the
+4. **`ongoingMemoryThisPid(interval = )`** takes an `interval` argument but the
    loop sleeps by `getOption("spades.memoryUseInterval")`, ignoring it. Only the
    loop bound uses the argument. The tests set the option rather than assert
    this.
-6. **`saveSimList()` with module sources outside `projectPath`** — I could not
+5. **`saveSimList()` with module sources outside `projectPath`** — I could not
    get a test to reach that branch reliably, and one attempt failed inside
    `archive::archive_write_files()` with "`files` must be one or more readable
    file paths" that I could not reproduce standalone. Dropped the test rather

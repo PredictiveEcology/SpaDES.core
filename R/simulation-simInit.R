@@ -397,9 +397,6 @@ setMethod(
     on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
 
     opt <- options("encoding" = "UTF-8")
-    # if (isTRUE(getOption("spades.allowSequentialCaching"))) {
-    #   opt <- append(opt, options(reproducible.showSimilarDepth = 6))
-    # }
 
     # rcae <- get(reproducible.CacheAddressEnv)
     # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
@@ -1678,7 +1675,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         objsIsNullBefore <- objsAreNull(sim)
       }
 
-      # allowSequentialCaching <- getOption("spades.allowSequentialCaching", FALSE)
       if (isTRUE(cacheIt)) {
         moduleSpecificInputObjects <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
@@ -1737,12 +1733,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             paramsDontCacheOn
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
-          # nextEvent <- NULL
           runFnCallAsExpr <- TRUE
-          # if (allowSequentialCaching) {
-          #   sim <- allowSequentialCaching1(sim, cacheIt, moduleCall = ".inputObjects", verbose = verbose)
-          #   runFnCallAsExpr <- is.null(attr(sim, "runFnCallAsExpr"))
-          # }
           if (runFnCallAsExpr) {
             if (any(mBase %in% getOption("spades.debugModule"))) {
               browser()
@@ -1826,9 +1817,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             }
 
           }
-          # if (allowSequentialCaching) {
-          #   sim <- allowSequentialCachingUpdateTags(sim, cacheIt)
-          # }
 
           # put back the current values of params that were not cached on
           if (sum(paramsDontCacheOnActual))
@@ -1845,9 +1833,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           .checkEventReturn(sim, mBase, ".inputObjects", fromCache = FALSE)
         }
       }
-      # if (allowSequentialCaching) {
-      #   sim <- allowSequentialCachingFinal(sim)
-      # }
 
       if (verbose) {
         sim <- objectsCreatedPost(sim, objsIsNullBefore, verbose = verbose)
