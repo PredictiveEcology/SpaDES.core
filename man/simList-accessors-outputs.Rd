@@ -61,15 +61,18 @@ it can be useful to register that saved file. \code{registerOutputs} offers an a
 mechanism to do this. See examples.
 }
 \details{
-These functions are one of three mechanisms to add information about which output files to save.
+These functions are one of the mechanisms for saving objects to disk. The
+\code{outputs} table itself can be set two ways:
 \enumerate{
-\item As arguments to a \code{simInit} call. Specifically, \code{inputs} or \code{outputs}.
-See \code{?simInit}.
-\item With the \code{outputs(simList)} function call.
-\item By adding a function called \code{.inputObjects} inside a module, which will be executed
-during the \code{simInit} call. This last way is the most "modular" way to create
-default data sets for your model.
+\item As the \code{outputs} argument to a \code{simInit} call. See \code{?simInit}.
+\item With the \verb{outputs(simList) <- } replacement function, before calling
+\code{\link[=spades]{spades()}}.
 }
+
+Either way, the core \code{save} event reads this table and writes each object at
+its \code{saveTime}. A module developer can instead offer saving through
+\code{\link[=saveFiles]{saveFiles()}} and the \code{.saveObjects} parameter. See \code{\link[=saving]{saving()}} for how the
+\code{save} event, this table and \code{\link[=saveFiles]{saveFiles()}} fit together.
 
 See below for more details.
 
@@ -206,10 +209,13 @@ outputs(sim) # has object --> saved = TRUE
 
 }
 \seealso{
-\code{\link[=registerOutputs]{registerOutputs()}} which enables files that are saved to be added to
-the \code{simList} using the \code{outputs(sim)} mechanism, so the files that are saved
-during a module event can be tracked at the \code{simList} level. \code{\link[=saveSimList]{saveSimList()}}
-which will optionally add all the outputs that are tracked into an archive.
+\code{\link[=saving]{saving()}} for an overview of how the \code{save} event, this table and
+\code{\link[=saveFiles]{saveFiles()}} work together. \code{\link[=saveFiles]{saveFiles()}} for the module-level saving
+mechanism. \code{\link[=registerOutputs]{registerOutputs()}} which enables files that are saved to be added
+to the \code{simList} using the \code{outputs(sim)} mechanism, so the files that are
+saved during a module event can be tracked at the \code{simList} level.
+\code{\link[=saveSimList]{saveSimList()}} which will optionally add all the outputs that are tracked
+into an archive.
 
 \code{\link[=Plots]{Plots()}}, \code{\link[=outputs]{outputs()}}
 }

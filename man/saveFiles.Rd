@@ -101,6 +101,11 @@ if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
   options(opts) # clean up
 }}
 }
+\seealso{
+\code{\link[=saving]{saving()}} for how this fits together with the \code{outputs} table and
+the \code{save} event, \code{\link[=outputs]{outputs()}} for the user-facing saving mechanism, and
+\code{\link[=registerOutputs]{registerOutputs()}} to track a file a module saved on its own.
+}
 \author{
 Eliot McIntire and Alex Chubaty
 }

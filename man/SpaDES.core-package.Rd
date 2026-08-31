@@ -268,6 +268,9 @@ Controlled by these options:
 
 
 \tabular{ll}{
+\code{\link[=saving]{saving()}} \tab How the \code{save} event, the \code{outputs} table and
+\code{\link[=saveFiles]{saveFiles()}} fit together.\cr
+\code{\link[=saveFiles]{saveFiles()}} \tab Module-level saving via the \code{.saveObjects} parameter.\cr
 \code{\link[=saveSimList]{saveSimList()}} \tab Save a \code{simList} to disk.\cr
 \code{\link[=loadSimList]{loadSimList()}} \tab Load one back.\cr
 \code{\link[=zipSimList]{zipSimList()}}, \code{\link[=unzipSimList]{unzipSimList()}} \tab Save/load a \code{simList} together with its files.\cr
