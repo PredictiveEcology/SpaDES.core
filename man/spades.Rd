@@ -15,7 +15,6 @@ spades(
   debug = getOption("spades.debug"),
   progress = NA,
   cache,
-  .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
@@ -28,7 +27,6 @@ spades(
   debug = getOption("spades.debug"),
   progress = NA,
   cache,
-  .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
@@ -41,7 +39,6 @@ spades(
   debug = getOption("spades.debug"),
   progress = NA,
   cache,
-  .plotInitialTime = NULL,
   .saveInitialTime = NULL,
   notOlderThan = NULL,
   events = NULL,
@@ -68,10 +65,7 @@ then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
-\item{.plotInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
-parameter for all modules. See Details.}
-
-\item{.saveInitialTime}{Numeric. Temporarily override the \code{.plotInitialTime}
+\item{.saveInitialTime}{Numeric. Temporarily override the \code{.saveInitialTime}
 parameter for all modules. See Details.}
 
 \item{notOlderThan}{Date or time. Passed to \code{reproducible::Cache} to update the cache.
@@ -90,14 +84,14 @@ internal spades modules' events will not run, if not listed in the character vec
 See example.}
 
 \item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link[=Plots]{Plots()}} for possible values. The parameter is intended to slowly
-take over from \code{.plotInitialTime} as a mechanism to turn on or off plotting.
-For backwards compatibility, if \code{.plotInitialTime} is not set in this \code{spades} call,
-but this \code{.plots} is used, two things will happen: setting this without \code{"screen"}
-will turn off all plotting; setting this with \code{"screen"} will trigger
-plotting for any modules that use this parameter but will have no effect on
-other modules. To get plotting, therefore, it may be necessary to also set
-\code{.plotInitialTime = start(sim)}.}
+See \code{\link[=Plots]{Plots()}} for possible values. Setting this without \code{"screen"} turns
+off all plotting; setting it with \code{"screen"} triggers plotting for any
+module that uses this parameter, and has no effect on modules that do not.
+
+This replaces the \code{.plotInitialTime} argument, which was removed. Use
+\code{.plots = NA} where you previously used \code{.plotInitialTime = NA}. The
+\code{.plotInitialTime} \emph{module parameter} is unaffected and can still be set
+per module through \code{params}.}
 
 \item{...}{Any. Can be used to make a unique cache identity, such as "replicate = 1".
 This will be included in the \code{Cache} call, so will be unique
@@ -116,14 +110,13 @@ instead of \code{data.frame} to implement the event queue (because it is much fa
 The is the workhorse function in the SpaDES package. It runs simulations by
 implementing the rules outlined in the \code{simList}.
 
-This function gives simple access to two sets of module parameters:
-\code{.plotInitialTime} and with \code{.plotInitialTime}. The primary use of
-these arguments is to temporarily turn off plotting and saving. "Temporary"
-means that the \code{simList} is not changed, so it can be used again with
-the \code{simList} values reinstated. To turn off plotting and saving, use
-\code{.plotInitialTime = NA} or \code{.saveInitialTime = NA}. NOTE: if a
-module did not use \code{.plotInitialTime} or \code{.saveInitialTime}, then
-these arguments will not do anything.
+This function gives simple access to module plotting and saving: \code{.plots}
+and \code{.saveInitialTime}. The primary use of these arguments is to temporarily
+turn off plotting and saving. "Temporary" means that the \code{simList} is not
+changed, so it can be used again with the \code{simList} values reinstated. To
+turn off plotting and saving, use \code{.plots = NA} or \code{.saveInitialTime = NA}.
+NOTE: if a module did not use these parameters, then these arguments will
+not do anything.
 }
 \note{
 The debug option is primarily intended to facilitate building simulation

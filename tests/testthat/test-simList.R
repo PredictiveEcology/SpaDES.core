@@ -427,7 +427,7 @@ test_that("test sped-up Caching of sequentially cached events", {
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
   et <- elapsedTime(mySimOut)
   mins <- "mins"
@@ -443,7 +443,7 @@ test_that("test sped-up Caching of sequentially cached events", {
     mySim <- simInit(times, params, modules, objects = list(), paths)
   )
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
   expect_true(sum(grepl(oa, mess)) == 2) # does not continue from .inputObjects to init
 
@@ -466,13 +466,13 @@ test_that("test sped-up Caching of sequentially cached events", {
   )
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
   expect_false(any(grepl(oa, mess)))
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
   expect_true(sum(grepl(oa, mess)) == 0) # because .inputObjects of caribou leads to init of randomLandscapes
 
@@ -485,13 +485,13 @@ test_that("test sped-up Caching of sequentially cached events", {
   )
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
   expect_false(sum(grepl(oa, mess)) == 1)
 
   mySim <- simInit(times, params, modules, objects = list(), paths)
   mess <- capture_messages({
-    mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+    mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
   expect_true(sum(grepl(oa, mess)) == 1)
 })
@@ -535,7 +535,7 @@ test_that("test sped-up Caching of sequentially cached events 2", {
       mySim <- simInit(times, params, modules, objects = list(), paths, debug = 1)
     })
     mess <- capture_messages({
-      mySimOut <- spades(mySim, debug = 1, .plotInitialTime = NA)
+      mySimOut <- spades(mySim, debug = 1, .plots = NA)
     })
     oa <- "override automatic"
     if (i == 1) {

@@ -61,7 +61,7 @@ test_that(".useCacheArgs splices a fixed cacheId into the per-event Cache call",
   try(reproducible::clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   mySim <- suppressMessages(do.call(simInit, args))
 
-  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plotInitialTime = NA))
+  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plots = NA))
 
   cache <- reproducible::showCache(tmpCache, cacheId = fixedKey, verbose = -1)
   expect_true(NROW(cache) > 0,
@@ -90,7 +90,7 @@ test_that(".useCacheArgs absent falls through to default per-event Cache args", 
   try(reproducible::clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   mySim <- suppressMessages(do.call(simInit, args))
 
-  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plotInitialTime = NA))
+  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plots = NA))
 
   cache <- reproducible::showCache(tmpCache,
                                    userTags = "eventType:init",
@@ -124,7 +124,7 @@ test_that(".useCacheArgs splices arbitrary Cache args (userTags) per event", {
   try(reproducible::clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   mySim <- suppressMessages(do.call(simInit, args))
 
-  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plotInitialTime = NA))
+  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plots = NA))
 
   cache <- reproducible::showCache(tmpCache, userTags = customTag, verbose = -1)
   expect_true(NROW(cache) > 0,
@@ -160,7 +160,7 @@ test_that(".useCacheArgs evaluates quoted entries at the splice site", {
 
   try(reproducible::clearCache(x = tmpCache, ask = FALSE), silent = TRUE)
   mySim <- suppressMessages(do.call(simInit, args))
-  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plotInitialTime = NA))
+  .expectNoUnknownMessages(spades(mySim, debug = FALSE, .plots = NA))
 
   cache <- reproducible::showCache(tmpCache, cacheId = "quoted_v1", verbose = -1)
   expect_true(NROW(cache) > 0,

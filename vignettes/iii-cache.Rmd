@@ -119,13 +119,13 @@ This would be useful when only one random landscape is needed simply for trying 
 # Module-level
 params(mySim)$randomLandscapes$.useCache <- TRUE
 system.time({
-  randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
+  randomSim <- spades(Copy(mySim), .plots = NA,
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
 # faster the second time
 system.time({
-  randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
+  randomSimCached <- spades(Copy(mySim), .plots = NA, debug = TRUE)
 })
 ```
 
@@ -153,13 +153,13 @@ Here, we don't change the module-level caching for `randomLandscapes`, but we ad
 ```{r event-level, echo=TRUE}
 params(mySim)$fireSpread$.useCache <- "init"
 system.time({
-  randomSim <- spades(Copy(mySim), .plotInitialTime = NA,
+  randomSim <- spades(Copy(mySim), .plots = NA,
                       notOlderThan = Sys.time(), debug = TRUE)
 })
 
 # faster the second time
 system.time({
-  randomSimCached <- spades(Copy(mySim), .plotInitialTime = NA, debug = TRUE)
+  randomSimCached <- spades(Copy(mySim), .plots = NA, debug = TRUE)
 })
 ```
 

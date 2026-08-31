@@ -1166,7 +1166,10 @@ doCallSafe <- function (what, args, quote = FALSE, envir = parent.frame()) {
 #' @rdname simInitAndSpades
 simInitAndSpades <- function(times, params, modules, objects, paths, inputs, outputs, loadOrder,
                              notOlderThan, debug = getOption("spades.debug"), progress, cache, .plots,
-                             .plotInitialTime, .saveInitialTime, events, ...) {
+                             .saveInitialTime, events, ...) {
+  ## spades() no longer takes .plotInitialTime, and this function forwards to it
+  ## by matching spades()'s formals, so catch it here rather than dropping it
+  .warnPlotInitialTimeArg(...names())
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
   lsAllNames <- ls(all.names = TRUE)

@@ -113,7 +113,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   mySim <- simInit(times = times, params = parameters, modules = modules,
 #'                  paths = paths)
 #'
-#'   spades(mySim, .plotInitialTime = NA) # plotting not relevant for this example
+#'   spades(mySim, .plots = NA) # plotting not relevant for this example
 #'   dir(outputPath)
 #'   # remove the files
 #'   file.remove(dir(outputPath, full.names = TRUE))

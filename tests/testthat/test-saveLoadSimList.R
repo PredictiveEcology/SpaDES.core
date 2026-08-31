@@ -384,7 +384,7 @@ test_that("loadSimList restores module functions so the simList can be run", {
   expect_true(all(c("Init", "makeNLM") %in% ls(out$.mods$randomLandscapes)))
 
   ## the point of the exercise: a reloaded simList runs
-  expect_s4_class(suppressMessages(spades(out, .plotInitialTime = NA)), "simList")
+  expect_s4_class(suppressMessages(spades(out, .plots = NA)), "simList")
 })
 
 test_that("loadSimList's re-parse leaves `mod` state alone", {
