@@ -456,6 +456,27 @@ setMethod(
       )
     }
 
+    if (length(objects)) {
+      ## a partially named list reaches list2env() with an empty name and fails
+      ## there with "attempt to use zero-length variable name", far from the cause
+      unnamed <- which(!nzchar(objNames))
+      if (length(unnamed)) {
+        stop("`objects` element", if (length(unnamed) > 1) "s" else "", " ",
+             paste(unnamed, collapse = ", "), " ", if (length(unnamed) > 1) "have" else "has",
+             " no name. Every object must be named, e.g. `objects = list(myObj = myObj)`.",
+             call. = FALSE)
+      }
+      ## a duplicated name is silently last-one-wins, so the earlier object
+      ## vanishes with no message at all
+      dups <- unique(objNames[duplicated(objNames)])
+      if (length(dups)) {
+        stop("`objects` has more than one element named ",
+             paste0("`", dups, "`", collapse = ", "),
+             ". Supply each object once; otherwise only the last value would be used.",
+             call. = FALSE)
+      }
+    }
+
     # user modules
     modulesLoaded <- list()
 
