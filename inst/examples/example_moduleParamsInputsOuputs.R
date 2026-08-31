@@ -6,8 +6,10 @@ sampleModules <- dir(path)
 p <- moduleParams(sampleModules[3], path = path)
 i <- moduleInputs(sampleModules[3], path = path)
 o <- moduleOutputs(sampleModules[3], path = path)
+r <- moduleReqdPkgs(sampleModules[3], path = path)
 
 knitr::kable(p)
 knitr::kable(i)
 knitr::kable(o)
+knitr::kable(r)
 }

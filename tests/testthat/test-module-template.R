@@ -186,3 +186,33 @@ test_that("newModule without path specified as arg", {
   newModule(nm, open = FALSE)
   expect_true(file.exists(file.path(getPaths()$modulePath, nm, paste0(nm, ".R"))))
 })
+
+test_that("moduleReqdPkgs returns a module's declared packages, with versions split out", {
+  testInit()
+
+  path <- getSampleModules(tempdir())
+  pkgs <- moduleReqdPkgs("caribouMovement", path)
+
+  expect_s3_class(pkgs, "data.frame")
+  expect_identical(names(pkgs), c("packageName", "minVersion"))
+  expect_true(all(c("grid", "terra", "stats", "SpaDES.tools") %in% pkgs$packageName))
+  ## a version constraint is split off its package name ...
+  expect_identical(pkgs$minVersion[pkgs$packageName == "SpaDES.tools"], "2.0.0")
+  ## ... and a package declared without one gets an empty string, not NA
+  expect_identical(pkgs$minVersion[pkgs$packageName == "grid"], "")
+})
+
+test_that("moduleReqdPkgs returns an empty data.frame for a module with no reqdPkgs", {
+  testInit()
+
+  mp <- file.path(tempdir(), "noPkgsMod")
+  newModule("noPkgs", path = mp, open = FALSE, unitTests = FALSE)
+  f <- file.path(mp, "noPkgs", "noPkgs.R")
+  writeLines(sub("reqdPkgs = list(.*)", "reqdPkgs = list(),", readLines(f)), f)
+
+  pkgs <- moduleReqdPkgs("noPkgs", mp)
+
+  expect_s3_class(pkgs, "data.frame")
+  expect_identical(nrow(pkgs), 0L)
+  expect_identical(names(pkgs), c("packageName", "minVersion"))
+})

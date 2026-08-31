@@ -220,7 +220,7 @@ setMethod(
 })
 
 ################################################################################
-#' Extract a module's parameters, inputs, or outputs
+#' Extract a module's parameters, inputs, outputs, or required packages
 #'
 #' These are more or less wrappers around `moduleMetadata`, with the exception
 #' that extraneous spaces and End-Of-Line characters will be removed from the
@@ -293,6 +293,35 @@ setMethod(
     md[["outputObjects"]][["desc"]] <- rmExtraSpacesEOL(md[["outputObjects"]][["desc"]])
     md[["outputObjects"]]
 })
+
+#' @export
+#' @rdname moduleParamsInputsOuputs
+setGeneric("moduleReqdPkgs", function(module, path) {
+  standardGeneric("moduleReqdPkgs")
+})
+
+#' @export
+#' @importFrom Require extractPkgName extractVersionNumber
+#' @rdname moduleParamsInputsOuputs
+setMethod(
+  "moduleReqdPkgs",
+  signature = c(module = "character", path = "character"),
+  definition = function(module, path) {
+    md <- suppressWarnings(moduleMetadata(module = module, path = path))
+    pkgs <- unique(unlist(md[["reqdPkgs"]], use.names = FALSE))
+    if (length(pkgs) == 0)
+      return(data.frame(packageName = character(), minVersion = character()))
+
+    data.frame(packageName = extractPkgName(pkgs),
+               minVersion = replaceNAwithEmpty(extractVersionNumber(pkgs)))
+})
+
+## extractVersionNumber() gives NA when a package is declared without one; an
+## empty string reads better in a rendered table.
+replaceNAwithEmpty <- function(x) {
+  x[is.na(x)] <- ""
+  x
+}
 
 rmExtraSpacesEOL <- function(x) gsub(" +|[ *\n]+", " ", x)
 
