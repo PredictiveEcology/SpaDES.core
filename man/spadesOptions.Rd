@@ -53,6 +53,16 @@ parameters, but not objects. Every event will add a tag or remove that tag
 if it is cached or not cached, so this will not mistakenly \code{cacheChain} when
 it isn't appropriate.\cr
 
+\code{spades.codeCheckEngine} \tab \code{"v1"}
+\tab Which module code checker \code{simInit()} uses when
+\code{spades.moduleCodeChecks} is on. \code{"v1"} is the legacy checker; \code{"v2"} is
+the structured checker behind \code{\link[=codeCheckModule]{codeCheckModule()}}, which reports findings
+as a table and honours \verb{# nolint} comments. \code{"v2"} needs \pkg{xmlparsedata}.\cr
+
+\code{spades.compressionLevel} \tab \code{1L}
+\tab The compression level \code{saveSimList()} passes to \pkg{archive} when it
+writes a \code{.tar.gz} bundle. Higher is smaller but slower.\cr
+
 \code{spades.debug} \tab \code{TRUE}
 \tab  The default debugging value \code{debug} argument in \code{spades()}.\cr
 
@@ -76,13 +86,26 @@ whose outputs are not needed (by other events in the \code{simList}) into a futu
 In some cases, this will speed up simulations, by running some events in parallel.
 Still VERY experimental. Use cautiously.\cr
 
+\code{spades.futurePlan} \tab \code{"callr"}
+\tab The \code{\link[future:plan]{future::plan()}} used to run the memory-use monitor started by
+\code{spades.memoryUseInterval}. Must be something other than \code{"sequential"},
+otherwise \code{spades()} errors when memory monitoring is requested. If a
+\code{future::plan()} is already set, that plan wins and this option is
+updated to match.\cr
+
 \code{spades.logPath}
-\tab Defaults to a subdirectory (\verb{logs/}) of the simulation output directory.
+\tab Defaults to a subdirectory (\verb{log/}) of the simulation output directory.
 \tab The default local directory to write simulation log files.\cr
 
 \code{spades.inputPath}
 \tab Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/inputs})
 \tab The default local directory in which to look for simulation inputs.\cr
+
+\code{spades.keepCompleted} \tab \code{TRUE}
+\tab Whether \code{spades()} records each event in the completed-event list.
+Set to \code{FALSE} for very long simulations where the bookkeeping itself
+becomes a measurable cost; \code{completed()} is then empty. See also
+\code{spades.nCompleted}.\cr
 
 \code{spades.loadReqdPkgs}
 \tab Default is \code{TRUE}
@@ -147,6 +170,10 @@ override all module parameter values for \code{.plots}. This can, e.g., be used
 to turn off all plotting.
 \tab The default is \code{NULL}, meaning accept the module-level parameter.\cr
 
+\code{spades.qsThreads} \tab \code{1L}
+\tab The number of threads \code{saveSimList()}/\code{loadSimList()} pass to
+\pkg{qs2} when reading or writing a \code{.qs} file.\cr
+
 \code{spades.recoveryMode} \tab \code{1L} \tab
 If this is a numeric greater than 0 or TRUE, then the
 discrete event simulator will take a snapshot of the objects in the \code{simList}
@@ -168,6 +195,22 @@ There is a message which describes how to find that.\cr
 be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
 listed in a module's \code{reqdPkgs}.\cr
 
+\code{spades.restartRInterval} \tab \code{0}
+\tab How often, in simulation time units, \code{spades()} restarts R to
+reclaim leaked memory. \code{0}, the default, never restarts. See
+\code{\link[=restartR]{restartR()}}.\cr
+
+\code{spades.restartR.clearFiles} \tab \code{TRUE}
+\tab Whether \code{\link[=restartR]{restartR()}} deletes the temporary files it wrote to carry
+state across the restart. Set to \code{FALSE} to keep them for debugging.\cr
+
+\code{spades.restartR.RDataFilename} \tab \code{"sim_restartR.RData"}
+\tab The filename \code{\link[=restartR]{restartR()}} saves the \code{simList} to before restarting.\cr
+
+\code{spades.restartR.restartDir} \tab \code{file.path(tempdir(), "SpaDES", "outputs")}
+\tab The directory \code{\link[=restartR]{restartR()}} writes that file into. See
+\code{?restartR} for how this interacts with \code{outputPath}.\cr
+
 \code{spades.saveFileExtensions} \tab \code{NULL} \tab
 a \code{data.frame} with 3 columns, \code{exts}, \code{fun}, and \code{package} indicating which
 file extension, and which function from which package will be used when
@@ -176,6 +219,11 @@ using the \code{outputs} mechanism for saving files during a \code{spades} call.
 Then specify e.g.,
 \code{simInit(outputs = data.frame(objectName = "caribou", fun = "st_write", package = "sf"))}
 \cr
+
+\code{spades.saveSimOnExit} \tab \code{TRUE}
+\tab Whether, when an event throws an error, \code{simInit()}/\code{spades()} save
+the \code{simList} so it can be recovered instead of lost. Works together with
+\code{spades.recoveryMode}.\cr
 
 \code{spades.scratchPath} \tab \code{file.path(tempdir(), "SpaDES", "scratch")})
 \tab The default local directory where transient files from modules and data will written.

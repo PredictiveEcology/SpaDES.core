@@ -48,6 +48,16 @@
 #'      if it is cached or not cached, so this will not mistakenly `cacheChain` when
 #'      it isn't appropriate.\cr
 #'
+#'   `spades.codeCheckEngine` \tab `"v1"`
+#'     \tab Which module code checker `simInit()` uses when
+#'     `spades.moduleCodeChecks` is on. `"v1"` is the legacy checker; `"v2"` is
+#'     the structured checker behind [codeCheckModule()], which reports findings
+#'     as a table and honours `# nolint` comments. `"v2"` needs \pkg{xmlparsedata}.\cr
+#'
+#'   `spades.compressionLevel` \tab `1L`
+#'     \tab The compression level `saveSimList()` passes to \pkg{archive} when it
+#'     writes a `.tar.gz` bundle. Higher is smaller but slower.\cr
+#'
 #'   `spades.debug` \tab `TRUE`
 #'     \tab  The default debugging value `debug` argument in `spades()`.\cr
 #'
@@ -71,13 +81,26 @@
 #'     In some cases, this will speed up simulations, by running some events in parallel.
 #'     Still VERY experimental. Use cautiously.\cr
 #'
+#'   `spades.futurePlan` \tab `"callr"`
+#'     \tab The [future::plan()] used to run the memory-use monitor started by
+#'     `spades.memoryUseInterval`. Must be something other than `"sequential"`,
+#'     otherwise `spades()` errors when memory monitoring is requested. If a
+#'     `future::plan()` is already set, that plan wins and this option is
+#'     updated to match.\cr
+#'
 #'   `spades.logPath`
-#'      \tab Defaults to a subdirectory (`logs/`) of the simulation output directory.
+#'      \tab Defaults to a subdirectory (`log/`) of the simulation output directory.
 #'      \tab The default local directory to write simulation log files.\cr
 #'
 #'   `spades.inputPath`
 #'      \tab Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/inputs`)
 #'      \tab The default local directory in which to look for simulation inputs.\cr
+#'
+#'   `spades.keepCompleted` \tab `TRUE`
+#'     \tab Whether `spades()` records each event in the completed-event list.
+#'     Set to `FALSE` for very long simulations where the bookkeeping itself
+#'     becomes a measurable cost; `completed()` is then empty. See also
+#'     `spades.nCompleted`.\cr
 #'
 #'   `spades.loadReqdPkgs`
 #'      \tab Default is `TRUE`
@@ -143,6 +166,10 @@
 #'     to turn off all plotting.
 #'     \tab The default is `NULL`, meaning accept the module-level parameter.\cr
 #'
+#'   `spades.qsThreads` \tab `1L`
+#'     \tab The number of threads `saveSimList()`/`loadSimList()` pass to
+#'     \pkg{qs2} when reading or writing a `.qs` file.\cr
+#'
 #'   `spades.recoveryMode` \tab `1L` \tab
 #'   If this is a numeric greater than 0 or TRUE, then the
 #'   discrete event simulator will take a snapshot of the objects in the `simList`
@@ -164,6 +191,22 @@
 #'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
 #'   listed in a module's `reqdPkgs`.\cr
 #'
+#'   `spades.restartRInterval` \tab `0`
+#'     \tab How often, in simulation time units, `spades()` restarts R to
+#'     reclaim leaked memory. `0`, the default, never restarts. See
+#'     [restartR()].\cr
+#'
+#'   `spades.restartR.clearFiles` \tab `TRUE`
+#'     \tab Whether [restartR()] deletes the temporary files it wrote to carry
+#'     state across the restart. Set to `FALSE` to keep them for debugging.\cr
+#'
+#'   `spades.restartR.RDataFilename` \tab `"sim_restartR.RData"`
+#'     \tab The filename [restartR()] saves the `simList` to before restarting.\cr
+#'
+#'   `spades.restartR.restartDir` \tab `file.path(tempdir(), "SpaDES", "outputs")`
+#'     \tab The directory [restartR()] writes that file into. See
+#'     `?restartR` for how this interacts with `outputPath`.\cr
+#'
 #'   `spades.saveFileExtensions` \tab `NULL` \tab
 #'   a `data.frame` with 3 columns, `exts`, `fun`, and `package` indicating which
 #'   file extension, and which function from which package will be used when
@@ -173,6 +216,11 @@
 #'   Then specify e.g.,
 #'   `simInit(outputs = data.frame(objectName = "caribou", fun = "st_write", package = "sf"))`
 #'   \cr
+#'
+#'   `spades.saveSimOnExit` \tab `TRUE`
+#'     \tab Whether, when an event throws an error, `simInit()`/`spades()` save
+#'     the `simList` so it can be recovered instead of lost. Works together with
+#'     `spades.recoveryMode`.\cr
 #'
 #'   `spades.scratchPath` \tab `file.path(tempdir(), "SpaDES", "scratch")`)
 #'     \tab The default local directory where transient files from modules and data will written.
