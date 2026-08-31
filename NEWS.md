@@ -1,3 +1,17 @@
+# SpaDES.core 3.2.1.9000 (development version)
+
+## Bug fixes
+
+* `loadSimList()` is now much faster for simulations that carry large module
+  objects (`mod`). Reparsing module source code copied the `.mods` environment
+  with `Copy()`, which forced each module's `mod` and `Par` active bindings;
+  forcing `mod` materializes `.modObjs[[currentModule(sim)]]`, so the entire
+  per-module object store was deep copied once per module environment, for every
+  parsed file of every module. It is now copied with `.cloneEnvDeep()`, which
+  re-attaches active bindings instead of evaluating them. On a `simList` holding
+  a 9.5 GB `mod` object, a single `.mods` copy went from 174 s to under 0.01 s,
+  and the whole `loadSimList()` call from 627 s to 152 s.
+
 # SpaDES.core 3.2.0
 
 ## New features

@@ -617,7 +617,13 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   # This needs to be unconnected to main sim so that object sizes don't blow up
   simCopy <- Copy(sim, objects = FALSE)
-  simCopy$.mods <- Copy(sim$.mods)
+  ## NOT Copy(): it goes via as.list(all.names = TRUE), which *forces* the
+  ## `mod`/`Par` active bindings in each module env. `mod` resolves to
+  ## .modObjs[[currentModule(sim)]], so Copy() deep copies the whole per-module
+  ## object store once per module env, on every call -- GBs of data.table::copy()
+  ## per parsed file when reloading a large simList. .cloneEnvDeep() re-attaches
+  ## active bindings instead of evaluating them.
+  simCopy$.mods <- .cloneEnvDeep(sim$.mods)
   tmpEnvir$sim <- simCopy
 
   ll <- local({

@@ -891,3 +891,40 @@ test_that("convertToPackage testing", {
   # pkgload::unload(testName2)
   #}
 })
+
+test_that("evalWithActiveCode does not force the mod active binding", {
+  ## Regression: evalWithActiveCode() used Copy(sim$.mods) to detach the module
+  ## environments from the caller's sim. Copy() on an environment goes via
+  ## as.list(all.names = TRUE), which *evaluates* active bindings, and forcing
+  ## `mod` returns .modObjs[[currentModule(sim)]] -- so the whole per-module
+  ## object store was deep copied, once per module environment, for every parsed
+  ## file of every module. Reloading a large simList spent minutes in
+  ## data.table::copy(). See .cloneEnvDeep().
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testActiveBinding", tmpdir, open = FALSE)
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = "testActiveBinding")
+
+  bigObj <- 1:10
+  mySim@.xData[[".modObjs"]][["testActiveBinding"]]$big <- bigObj
+  mySim <- SpaDES.core:::currentModuleTemporary(mySim, "testActiveBinding")
+
+  modEnv <- mySim@.xData[[".mods"]][["testActiveBinding"]]
+  expect_true(bindingIsActive("mod", modEnv))
+
+  ## ask the module code itself whether its `mod` arrived as a live binding.
+  ## (The temp sim's own .modObjs are deliberately empty -- Copy(objects = FALSE)
+  ## -- which is precisely why forcing `mod` was wrong: it reached past the copy
+  ## and materialized the *caller's* store.)
+  code <- parse(text =
+    'stillActive <- bindingIsActive("mod", sim@.xData[[".mods"]][["testActiveBinding"]])')
+  SpaDES.core:::evalWithActiveCode(code, modEnv, sim = mySim)
+
+  ## with the old Copy(sim$.mods) this was FALSE: `mod` had been materialized
+  expect_true(modEnv$stillActive)
+
+  ## and the caller's store is untouched
+  expect_identical(mySim@.xData[[".modObjs"]][["testActiveBinding"]]$big, bigObj)
+})
