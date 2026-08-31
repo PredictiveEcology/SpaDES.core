@@ -158,9 +158,6 @@
 ## Is `node` (an expr) the LHS of an assignment? An expr is an LHS iff its
 ## parent is also an expr whose first expr child is `node` AND whose second
 ## child is one of LEFT_ASSIGN / RIGHT_ASSIGN / EQ_ASSIGN.
-##
-## Note: for `sim$x[1] <- v` we treat the inner `sim$x` as a get (it's read
-## then [<- is applied), matching the spirit of v1's behavior.
 .cc_isLhsOfAssign <- function(node) {
   parent <- xml2::xml_parent(node)
   if (xml2::xml_name(parent) != "expr") return(FALSE)
@@ -178,6 +175,65 @@
   ## look for an assignment op as a sibling of the expr children
   assignOps <- c("LEFT_ASSIGN", "EQ_ASSIGN", "RIGHT_ASSIGN")
   any(xml2::xml_name(kids) %in% assignOps)
+}
+
+## Is `node` the target of an assignment reached through one or more extraction
+## operations -- `sim$x[] <- v`, `sim$x[i, j] <- v`, `sim$x$y <- v`,
+## `sim[["x"]][[1]] <- v`? These are replacement-function calls, so `sim$x` is
+## read *and* rewritten; the caller records both.
+.cc_isLhsThroughSubset <- function(node) {
+  extractOps <- c("OP-LEFT-BRACKET", "LBB", "OP-DOLLAR", "OP-AT")
+  cur <- node
+  repeat {
+    parent <- xml2::xml_parent(cur)
+    if (inherits(parent, "xml_missing")) return(FALSE)
+    pName <- xml2::xml_name(parent)
+    if (length(pName) != 1L || is.na(pName) || pName != "expr") return(FALSE)
+    kids <- xml2::xml_children(parent)
+    ## parent must be an extraction, with `cur` as the object being extracted
+    ## from (i.e. the first expr child)
+    if (!any(xml2::xml_name(kids) %in% extractOps)) return(FALSE)
+    exprKids <- kids[xml2::xml_name(kids) == "expr"]
+    if (length(exprKids) == 0) return(FALSE)
+    if (!identical(xml2::xml_path(cur), xml2::xml_path(exprKids[[1]]))) return(FALSE)
+    if (.cc_isLhsOfAssign(parent)) return(TRUE)
+    cur <- parent
+  }
+}
+
+## Is `node` the target of a data.table modify-by-reference, i.e. does it sit
+## directly in front of a `[` whose arguments use `:=`? Both `sim$x[, y := 1]`
+## and its backtick-call form rewrite `sim$x` even though there is no `<-`.
+.cc_isDataTableSetByRef <- function(node) {
+  parent <- xml2::xml_parent(node)
+  if (inherits(parent, "xml_missing")) return(FALSE)
+  pName <- xml2::xml_name(parent)
+  if (length(pName) != 1L || is.na(pName) || pName != "expr") return(FALSE)
+  kids <- xml2::xml_children(parent)
+  if (!any(xml2::xml_name(kids) == "OP-LEFT-BRACKET")) return(FALSE)
+  exprKids <- kids[xml2::xml_name(kids) == "expr"]
+  if (length(exprKids) == 0) return(FALSE)
+  if (!identical(xml2::xml_path(node), xml2::xml_path(exprKids[[1]]))) return(FALSE)
+  ## `:=` reaches the parser as a LEFT_ASSIGN token, or as a function call when
+  ## written in its backtick form
+  found <- xml2::xml_find_first(
+    parent,
+    paste0("expr/LEFT_ASSIGN[text()=':=']",
+           " | expr/expr/SYMBOL_FUNCTION_CALL[text()='`:=`']")
+  )
+  !inherits(found, "xml_missing")
+}
+
+## Classify a `sim$x` / `sim[["x"]]` access: a bare LHS is a write, an LHS
+## reached through an extraction or rewritten in place by data.table (see
+## above) is both a read and a write, and anything else is a read. Returns one
+## or two `kind` values.
+.cc_accessKinds <- function(node) {
+  if (.cc_isLhsOfAssign(node)) return("sim_assign")
+  if (.cc_isLhsThroughSubset(node) || .cc_isDataTableSetByRef(node)) {
+    return(c("sim_get", "sim_assign"))
+  }
+  "sim_get"
 }
 
 ## ---------------------------------------------------------------------------
@@ -201,10 +257,11 @@
     name <- xml2::xml_text(sym)
     pos <- .cc_pos(n)
     fn <- .cc_enclosingFn(n)
-    kind <- if (.cc_isLhsOfAssign(n)) "sim_assign" else "sim_get"
-    out[[length(out) + 1]] <- .cc_use(kind, name = name, fn = fn, file = file,
-                                      line = pos$line, col = pos$col,
-                                      resolved = TRUE)
+    for (kind in .cc_accessKinds(n)) {
+      out[[length(out) + 1]] <- .cc_use(kind, name = name, fn = fn, file = file,
+                                        line = pos$line, col = pos$col,
+                                        resolved = TRUE)
+    }
   }
 
   ## sim[["x"]]  (string literal)  AND  sim[[<expr>]]  (unresolved)
@@ -219,21 +276,25 @@
     str <- xml2::xml_find_first(indexExpr, "STR_CONST")
     pos <- .cc_pos(n)
     fn <- .cc_enclosingFn(n)
-    kind <- if (.cc_isLhsOfAssign(n)) "sim_assign" else "sim_get"
+    kinds <- .cc_accessKinds(n)
     if (length(str) > 0 && !is.na(xml2::xml_text(str))) {
       ## strip surrounding quotes that STR_CONST preserves
       raw <- xml2::xml_text(str)
       name <- gsub('^["\']|["\']$', "", raw)
-      out[[length(out) + 1]] <- .cc_use(kind, name = name, fn = fn, file = file,
-                                        line = pos$line, col = pos$col,
-                                        resolved = TRUE)
+      for (kind in kinds) {
+        out[[length(out) + 1]] <- .cc_use(kind, name = name, fn = fn, file = file,
+                                          line = pos$line, col = pos$col,
+                                          resolved = TRUE)
+      }
     } else {
       ## unresolved (e.g., sim[[Par$stackName]])
-      out[[length(out) + 1]] <- .cc_use(
-        kind, name = NA_character_, fn = fn, file = file,
-        line = pos$line, col = pos$col, resolved = FALSE,
-        extra = xml2::xml_text(indexExpr)
-      )
+      for (kind in kinds) {
+        out[[length(out) + 1]] <- .cc_use(
+          kind, name = NA_character_, fn = fn, file = file,
+          line = pos$line, col = pos$col, resolved = FALSE,
+          extra = xml2::xml_text(indexExpr)
+        )
+      }
     }
   }
 
