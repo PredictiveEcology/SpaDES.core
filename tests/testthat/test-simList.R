@@ -407,7 +407,7 @@ test_that("inputObjects on module arg not sim", {
 })
 
 test_that("test sped-up Caching of sequentially cached events", {
-  testInit(sampleModReqdPkgs, opts = list())#spades.allowSequentialCaching = TRUE))
+  testInit(sampleModReqdPkgs, opts = list())
   withr::local_options(list(reproducible.cachePath = tmpdir))
   withr::local_options(reproducible.useMemoise = TRUE,
                        spades.cacheChaining = TRUE)
@@ -497,7 +497,7 @@ test_that("test sped-up Caching of sequentially cached events", {
 })
 
 test_that("test sped-up Caching of sequentially cached events 2", {
-  testInit(sampleModReqdPkgs, opts = list())#spades.allowSequentialCaching = FALSE))
+  testInit(sampleModReqdPkgs, opts = list())
   withr::local_options(list(reproducible.cachePath = tmpdir))
 
   withr::local_options(reproducible.useMemoise = TRUE,
