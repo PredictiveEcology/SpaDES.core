@@ -553,3 +553,30 @@ test_that("test sped-up Caching of sequentially cached events 2", {
     }
   }
 })
+
+test_that("simInit rejects duplicated and unnamed entries in `objects`", {
+  testInit(sampleModReqdPkgs)
+
+  mp <- getSampleModules(tempdir())
+  args <- list(times = list(start = 0, end = 1), modules = list("randomLandscapes"),
+               paths = list(modulePath = mp))
+
+  ## duplicated name: was silently last-one-wins, losing the first object
+  expect_error(
+    do.call(simInit, c(args, list(objects = list(stackName = "landscape",
+                                                 stackName = "landscape2")))),
+    "more than one element named .stackName."
+  )
+
+  ## unnamed element: reached list2env() as "attempt to use zero-length variable name"
+  a <- 1
+  expect_error(
+    do.call(simInit, c(args, list(objects = list(stackName = "landscape", a)))),
+    "element 2 has no name"
+  )
+
+  ## naming every object exactly once is still fine
+  expect_no_error(
+    do.call(simInit, c(args, list(objects = list(stackName = "landscape"))))
+  )
+})
