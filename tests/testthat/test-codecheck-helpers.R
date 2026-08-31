@@ -138,6 +138,7 @@ ccKinds <- function(text, name) {
 
 test_that("a bare assignment to sim is a write only", {
   testInit()
+  skip_if_not_installed("xmlparsedata")
 
   expect_identical(ccKinds("sim$x <- 1", "x"), "sim_assign")
   expect_identical(ccKinds('sim[["x"]] <- 1', "x"), "sim_assign")
@@ -145,6 +146,7 @@ test_that("a bare assignment to sim is a write only", {
 
 test_that("a plain read of sim is a read only", {
   testInit()
+  skip_if_not_installed("xmlparsedata")
 
   expect_identical(ccKinds("y <- sim$x", "x"), "sim_get")
   expect_identical(ccKinds('y <- sim[["x"]]', "x"), "sim_get")
@@ -155,6 +157,7 @@ test_that("a plain read of sim is a read only", {
 
 test_that("updating a sim object in place is both a read and a write", {
   testInit()
+  skip_if_not_installed("xmlparsedata")
 
   ## these all call a replacement function, so `sim$x` is read then rewritten
   for (code in c("sim$x[] <- 1", "sim$x[i, j] <- 1", "sim$x$col <- 1",
@@ -165,6 +168,7 @@ test_that("updating a sim object in place is both a read and a write", {
 
 test_that("data.table modify-by-reference on a sim object is a write", {
   testInit()
+  skip_if_not_installed("xmlparsedata")
 
   ## no `<-` at all, but `:=` rewrites sim$x in place
   expect_identical(ccKinds("sim$x[, col := 1]", "x"), c("sim_assign", "sim_get"))
@@ -174,6 +178,7 @@ test_that("data.table modify-by-reference on a sim object is a write", {
 
 test_that("subsetting a sim object without assigning is still only a read", {
   testInit()
+  skip_if_not_installed("xmlparsedata")
 
   expect_identical(ccKinds("y <- sim$x[1]", "x"), "sim_get")
   expect_identical(ccKinds("y <- sim$x[, .N, by = col]", "x"), "sim_get")

@@ -202,8 +202,8 @@
 }
 
 ## Is `node` the target of a data.table modify-by-reference, i.e. does it sit
-## directly in front of a `[` whose arguments use `:=`? `sim$x[, y := 1]` and
-## `sim$x[, \u0060:=\u0060(y = 1)]` rewrite `sim$x` even though there is no `<-`.
+## directly in front of a `[` whose arguments use `:=`? Both `sim$x[, y := 1]`
+## and its backtick-call form rewrite `sim$x` even though there is no `<-`.
 .cc_isDataTableSetByRef <- function(node) {
   parent <- xml2::xml_parent(node)
   if (inherits(parent, "xml_missing")) return(FALSE)
