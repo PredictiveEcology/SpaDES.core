@@ -166,6 +166,8 @@
 #'      [currentModule()] \tab The name of the running module.\cr
 #'      [suppliedElsewhere()] \tab `TRUE` if another module already provides an object.\cr
 #'      [checkObject()] \tab Confirm a required object exists in `sim`.\cr
+#'      [suggestModules()] \tab Confirm a module's declared inputs are present,
+#'         and name the modules that supply any that are missing.\cr
 #'      [findObjects()] \tab Look up objects across modules.\cr
 #'   }
 #' }
