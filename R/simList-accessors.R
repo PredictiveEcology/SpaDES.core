@@ -3439,6 +3439,22 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
   return(ret[])
 }
 
+## A parent module declares no objects of its own; `moduleMetadata()` gives it a
+## named list holding one table per child. Splice those in as entries of their
+## own, so `idcol = "module"` names the child that actually declares the object.
+.spliceChildEntries <- function(x) {
+  out <- list()
+  for (nm in names(x)) {
+    e <- x[[nm]]
+    if (is.data.frame(e)) {
+      out[[nm]] <- e
+    } else if (is.list(e)) {
+      for (kid in names(e)) out[[kid]] <- e[[kid]]
+    }
+  }
+  out
+}
+
 #' @inheritParams inputObjects
 #'
 #' @return
@@ -3483,6 +3499,9 @@ moduleObjects <- function(sim, module, path) {
     b <- Map(nam = unlist(unname(module)), pat = path,
              mod = module, function(mod, nam, pat)
                outputObjects(module = mod, path = pat)[[1]])
+
+    a <- .spliceChildEntries(a)
+    b <- .spliceChildEntries(b)
 
     a <- rbindlist(a, fill = TRUE, use.names = TRUE, idcol = "module")
     b <- rbindlist(b, fill = TRUE, use.names = TRUE, idcol = "module")

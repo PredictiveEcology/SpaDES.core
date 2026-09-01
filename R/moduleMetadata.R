@@ -11,6 +11,14 @@
 #'
 #' @return A list of module metadata, matching the structure in [defineModule()].
 #'
+#' For a **parent module** -- one that declares `childModules` -- a parent
+#' declares no `parameters`, `inputObjects`, `outputObjects` or `reqdPkgs` of
+#' its own, so each of those entries is instead a **named list holding one
+#' entry per child**, named by child module. Nothing is merged: each child
+#' keeps its own table with its own columns, which differ between modules.
+#' Nested parents resolve through to the modules that have no children of their
+#' own. A module with no children is returned unchanged.
+#'
 #' @author Alex Chubaty
 #' @export
 #' @include simulation-simInit.R
@@ -94,8 +102,71 @@ setMethod(
       # #metadata <- eval(parse(text = x)) # can't be used because can't evaluate start(sim)
       metadata <- rmExtraSpacesEOLList(metadata)
     }
+
+    ## A parent module declares no parameters, inputs or outputs of its own, so
+    ## querying one used to return empty tables. Report its children's instead.
+    metadata <- .parentMetadataFromChildren(metadata, module, path,
+                                            defineModuleListItems)
+
     return(metadata)
 })
+
+## Read a module's `childModules` straight from its .R file, without needing the
+## module to parse or `simInit()` to succeed. character(0) when it has none.
+.childModules <- function(module, path) {
+  f <- file.path(path, module, paste0(module, ".R"))
+  if (!file.exists(f)) return(character())
+  kids <- tryCatch(
+    as.character(unlist(.parseModulePartial(filename = f,
+                                            defineModuleElement = "childModules"))),
+    error = function(e) character()
+  )
+  kids[!is.na(kids) & nzchar(kids)]
+}
+
+## Depth-first expansion of a parent's children down to the modules that have no
+## children of their own. `seen` stops a cyclic `childModules` entry looping.
+.leafModules <- function(module, path, seen = character()) {
+  if (module %in% seen) return(character())
+  kids <- .childModules(module, path)
+  if (length(kids) == 0) return(module)
+  unlist(lapply(kids, .leafModules, path = path, seen = c(seen, module)))
+}
+
+## For a parent module, fill the (empty) metadata entries with its children's,
+## as one named entry per child. Nothing is merged: each child keeps its own
+## table with its own columns, which differ between modules (only some declare
+## `sourceURL` on inputObjects, for example).
+.parentMetadataFromChildren <- function(metadata, module, path, defineModuleListItems) {
+  kids <- .childModules(module, path)
+  if (length(kids) == 0) return(metadata)
+
+  ## simInit() expands a parent into its children, so the parent's own row -- and
+  ## with it childModules -- can come back empty; take it from the file instead
+  if ("childModules" %in% defineModuleListItems && length(unlist(metadata[["childModules"]])) == 0)
+    metadata[["childModules"]] <- kids
+
+  leaves <- unique(setdiff(.leafModules(module, path), module))
+  if (length(leaves) == 0) return(metadata)
+
+  ## A child that cannot be parsed must not take the parent's query down with
+  ## it: old SpaDES modules (LCC2005 and family) carry a top-level
+  ## `stopifnot(packageVersion("SpaDES") >= ...)` that errors when SpaDES is not
+  ## installed. Such a child is left out rather than propagated.
+  mds <- lapply(leaves, function(m)
+    tryCatch(suppressWarnings(moduleMetadata(module = m, path = path,
+                                             defineModuleListItems = defineModuleListItems)),
+             error = function(e) NULL))
+  names(mds) <- leaves
+  mds <- mds[!vapply(mds, is.null, FUN.VALUE = logical(1))]
+  if (length(mds) == 0) return(metadata)
+
+  for (item in intersect(c("parameters", "inputObjects", "outputObjects", "reqdPkgs"),
+                         defineModuleListItems))
+    metadata[[item]] <- lapply(mds, `[[`, item)
+
+  metadata
+}
 
 #' @export
 #' @rdname moduleMetadata
@@ -254,8 +325,7 @@ setMethod(
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
 
     # remove spaces and EOL
-    md[["parameters"]][["paramDesc"]] <- rmExtraSpacesEOL(md[["parameters"]][["paramDesc"]])
-    md[["parameters"]]
+    .cleanDescCol(md[["parameters"]], "paramDesc")
 })
 
 #' @export
@@ -271,9 +341,9 @@ setMethod(
   signature = c(module = "character", path = "character"),
   definition = function(module, path) {
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
+
     # remove spaces and EOL
-    md[["inputObjects"]][["desc"]] <- rmExtraSpacesEOL(md[["inputObjects"]][["desc"]])
-    md[["inputObjects"]]
+    .cleanDescCol(md[["inputObjects"]], "desc")
 })
 
 #' @export
@@ -289,9 +359,9 @@ setMethod(
   signature = c(module = "character", path = "character"),
   definition = function(module, path) {
     md <- suppressWarnings(moduleMetadata(module = module, path = path))
+
     # remove spaces and EOL
-    md[["outputObjects"]][["desc"]] <- rmExtraSpacesEOL(md[["outputObjects"]][["desc"]])
-    md[["outputObjects"]]
+    .cleanDescCol(md[["outputObjects"]], "desc")
 })
 
 #' @export
@@ -321,6 +391,19 @@ setMethod(
 replaceNAwithEmpty <- function(x) {
   x[is.na(x)] <- ""
   x
+}
+
+## A metadata entry is a data.frame for an ordinary module, and a named list of
+## data.frames -- one per child -- for a parent. Clean `col` in either shape.
+.cleanDescCol <- function(x, col) {
+  if (is.data.frame(x)) {
+    x[[col]] <- rmExtraSpacesEOL(x[[col]])
+    x
+  } else if (is.list(x)) {
+    lapply(x, .cleanDescCol, col = col)
+  } else {
+    x
+  }
 }
 
 rmExtraSpacesEOL <- function(x) gsub(" +|[ *\n]+", " ", x)

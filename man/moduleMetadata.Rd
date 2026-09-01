@@ -42,6 +42,14 @@ about.}
 }
 \value{
 A list of module metadata, matching the structure in \code{\link[=defineModule]{defineModule()}}.
+
+For a \strong{parent module} -- one that declares \code{childModules} -- a parent
+declares no \code{parameters}, \code{inputObjects}, \code{outputObjects} or \code{reqdPkgs} of
+its own, so each of those entries is instead a \strong{named list holding one
+entry per child}, named by child module. Nothing is merged: each child
+keeps its own table with its own columns, which differ between modules.
+Nested parents resolve through to the modules that have no children of their
+own. A module with no children is returned unchanged.
 }
 \description{
 Parse and extract module metadata
