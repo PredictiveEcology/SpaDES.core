@@ -38,6 +38,9 @@ utils::globalVariables(c("objName", "V1", "noFeedback"))
 #'   3 logical should be returned, or a logical of length one
 #'
 #' @return logical
+#'
+#' @seealso [objectProvenance] for the four places a value can come from.
+#'
 #' @export
 #'
 #' @examples

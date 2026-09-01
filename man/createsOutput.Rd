@@ -41,6 +41,10 @@ outputObjects <- bindrows(
 )
 
 }
+\seealso{
+\link{objectProvenance} for how a declared output interacts with
+user-supplied objects.
+}
 \author{
 Yong Luo
 }

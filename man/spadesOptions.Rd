@@ -320,5 +320,5 @@ This option does nothing unless \code{spades.dotInputObjects} is also \code{TRUE
 }
 
 \seealso{
-\code{\link[=suppliedElsewhere]{suppliedElsewhere()}}, \code{\link[=simInit]{simInit()}}
+\link{objectProvenance}, \code{\link[=suppliedElsewhere]{suppliedElsewhere()}}, \code{\link[=simInit]{simInit()}}
 }

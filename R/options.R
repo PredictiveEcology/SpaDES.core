@@ -315,7 +315,7 @@
 #'
 #' This option does nothing unless `spades.dotInputObjects` is also `TRUE`.
 #'
-#' @seealso [suppliedElsewhere()], [simInit()]
+#' @seealso [objectProvenance], [suppliedElsewhere()], [simInit()]
 #'
 spadesOptions <- function() {
   list(

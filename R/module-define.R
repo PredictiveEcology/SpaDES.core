@@ -157,7 +157,7 @@ moduleDefaults <- list(
 #' @importFrom utils person as.person
 #' @include simList-class.R
 #' @rdname defineModule
-#' @seealso [moduleDefaults()], [defineEvent()]
+#' @seealso [moduleDefaults()], [defineEvent()], [objectProvenance]
 #'
 #' @examples
 #' \donttest{
@@ -539,6 +539,8 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
 #'
 #' @return A `data.frame` suitable to be passed to `inputObjects` in a module's metadata.
 #'
+#' @seealso [objectProvenance] for where the value of a declared input comes from.
+#'
 #' @author Yong Luo
 #' @export
 #' @rdname expectsInput
@@ -618,6 +620,9 @@ setMethod(
 #'
 #' @return A `data.frame` suitable to be passed to `outputObjects` in
 #' a module's metadata.
+#'
+#' @seealso [objectProvenance] for how a declared output interacts with
+#'   user-supplied objects.
 #'
 #' @author Yong Luo
 #' @export

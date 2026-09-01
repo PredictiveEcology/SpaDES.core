@@ -76,3 +76,6 @@ if (!suppliedElsewhere("test", mySim))
                     rasterToMatch = sim$otherRasterTemplate, overwrite = TRUE)
 }
 }
+\seealso{
+\link{objectProvenance} for the four places a value can come from.
+}
