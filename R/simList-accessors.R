@@ -1216,15 +1216,18 @@ setReplaceMethod(
 #'
 #' Accessor functions for the `outputs` slots in a `simList` object.
 #'
-#' These functions are one of three mechanisms to add information about which output files to save.
+#' These functions are one of the mechanisms for saving objects to disk. The
+#' `outputs` table itself can be set two ways:
 #' \enumerate{
-#'   \item As arguments to a `simInit` call. Specifically, `inputs` or `outputs`.
-#'         See `?simInit`.
-#'   \item With the `outputs(simList)` function call.
-#'   \item By adding a function called `.inputObjects` inside a module, which will be executed
-#'         during the `simInit` call. This last way is the most "modular" way to create
-#'         default data sets for your model.
+#'   \item As the `outputs` argument to a `simInit` call. See `?simInit`.
+#'   \item With the `outputs(simList) <- ` replacement function, before calling
+#'         [spades()].
 #' }
+#'
+#' Either way, the core `save` event reads this table and writes each object at
+#' its `saveTime`. A module developer can instead offer saving through
+#' [saveFiles()] and the `.saveObjects` parameter. See [saving()] for how the
+#' `save` event, this table and [saveFiles()] fit together.
 #'
 #' See below for more details.
 #'
@@ -1277,10 +1280,13 @@ setReplaceMethod(
 #' @include simList-class.R
 #' @importFrom data.table := data.table
 #' @importFrom stats na.omit
-#' @seealso [registerOutputs()] which enables files that are saved to be added to
-#' the `simList` using the `outputs(sim)` mechanism, so the files that are saved
-#' during a module event can be tracked at the `simList` level. [saveSimList()]
-#' which will optionally add all the outputs that are tracked into an archive.
+#' @seealso [saving()] for an overview of how the `save` event, this table and
+#' [saveFiles()] work together. [saveFiles()] for the module-level saving
+#' mechanism. [registerOutputs()] which enables files that are saved to be added
+#' to the `simList` using the `outputs(sim)` mechanism, so the files that are
+#' saved during a module event can be tracked at the `simList` level.
+#' [saveSimList()] which will optionally add all the outputs that are tracked
+#' into an archive.
 #'
 #' @name outputs
 #' @rdname simList-accessors-outputs

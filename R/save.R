@@ -83,6 +83,9 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #' @author Eliot McIntire and Alex Chubaty
 #' @importFrom data.table data.table
 #' @rdname saveFiles
+#' @seealso [saving()] for how this fits together with the `outputs` table and
+#'   the `save` event, [outputs()] for the user-facing saving mechanism, and
+#'   [registerOutputs()] to track a file a module saved on its own.
 #'
 #' @examples
 #' \donttest{
@@ -270,3 +273,71 @@ simFile <- function(name, path, time = NULL, ext = "rds") {
     file.path(normPath(path), paste0(name, "_", paddedFloatToChar(time, padL = 4), ".", ext))
   }
 }
+
+##############################################################
+#' How saving works in SpaDES
+#'
+#' Saving is spread across a few functions and parameters that are easier to use
+#' once you see how they fit together. This page is the overview; each mechanism
+#' has its own help page with the details.
+#'
+#' @section The `save` event:
+#'
+#' `save` is a core module that `simInit()` adds for you -- you never write it.
+#' Its job is to run [saveFiles()] at the right times:
+#'
+#' \tabular{ll}{
+#'   `init` \tab Creates `outputPath` if needed. If [outputs()] has any rows,
+#'     schedules the first `save.spades` event at the earliest `saveTime`, using
+#'     that row's `eventPriority` (default `.last()`).\cr
+#'   `spades`, `later` \tab Call [saveFiles()], which writes every object whose
+#'     `saveTime` is the current time, then schedules the next one.\cr
+#'   `end` \tab Calls [saveFiles()] a final time and reports that files were
+#'     saved.\cr
+#' }
+#'
+#' Because the `save` event is scheduled from the [outputs()] table, an empty
+#' table means no `save` events are scheduled at all. Populating that table
+#' before calling [spades()] is what turns saving on.
+#'
+#' @section Three ways to save, and when to use each:
+#'
+#' \tabular{lll}{
+#'   **Mechanism** \tab **Who decides** \tab **See** \cr
+#'   The `outputs` table -- as a `simInit(outputs = )` argument, or through the
+#'     `outputs` replacement function. Names the objects, when to save them, and
+#'     with which function. \tab The **user**, across all modules at once
+#'     \tab [outputs()] \cr
+#'   The `.saveObjects` parameter plus [saveFiles()] called from a module's own
+#'     save event, timed by the `.saveInitialTime` and `.saveInterval`
+#'     parameters. \tab The **module developer**, for users of that module
+#'     \tab [saveFiles()] \cr
+#'   Plain `saveRDS()`/`save()` inside module code. \tab The **module
+#'     developer**, unconditionally -- the least modular option, since the user
+#'     cannot turn it off \tab -- \cr
+#' }
+#'
+#' The first two can be used together; they write through the same [saveFiles()]
+#' call at the same event.
+#'
+#' @section Turning saving off:
+#'
+#' `spades(sim, .saveInitialTime = NA)` temporarily suppresses module-level
+#' saving without changing the `simList`, so the same `simList` can be run again
+#' with its own values. It has no effect on the `outputs` table, and no effect on
+#' a module that saves with plain `saveRDS()`.
+#'
+#' @section Keeping track of what was saved:
+#'
+#' [outputs()] on a completed simulation reports which files were written and
+#' when. A module that saves a file its own way can add it to that table with
+#' [registerOutputs()], so it is tracked at the `simList` level like any other
+#' output -- and so [saveSimList()] can pick it up.
+#'
+#' @seealso [outputs()] for the user-facing table, [saveFiles()] for the
+#'   module-level mechanism, [registerOutputs()] for tracking files a module
+#'   saved itself, and [saveSimList()] for saving a whole `simList`.
+#'
+#' @name saving
+#' @rdname saving
+NULL

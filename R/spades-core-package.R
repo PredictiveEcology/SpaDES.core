@@ -250,6 +250,9 @@
 #' @section 10 Persistence and recovery:
 #'
 #' \tabular{ll}{
+#'   [saving()] \tab How the `save` event, the `outputs` table and
+#'      [saveFiles()] fit together.\cr
+#'   [saveFiles()] \tab Module-level saving via the `.saveObjects` parameter.\cr
 #'   [saveSimList()] \tab Save a `simList` to disk.\cr
 #'   [loadSimList()] \tab Load one back.\cr
 #'   [zipSimList()], [unzipSimList()] \tab Save/load a `simList` together with its files.\cr
