@@ -18,11 +18,12 @@
 #' \tabular{lcl}{
 #'   *OPTION* \tab *DEFAULT VALUE* \tab *DESCRIPTION* \cr
 #'   `spades.allowInitDuringSimInit` \tab `FALSE`
-#'      \tab New feature as of `SpaDES.core > 1.1.1.9001`; If set to `TRUE`,
-#'      `simInit` will evaluate the dependencies in the metadata objects and determine whether
-#'      there are modules whose `init` events can be run safely prior to
-#'      the `.inputObjects` of other modules, i.e., if a module's `expectsInput`
-#'      is not being supplied by any other module's `createsOutput`.\cr
+#'      \tab If `TRUE`, `simInit` runs the `init` events of some modules early,
+#'      before the other modules work out their default inputs. This lets one
+#'      module's default be calculated from another module's actual results,
+#'      rather than only knowing that a result is coming. Only modules that need
+#'      nothing from another module are run this way. See the section
+#'      *Running some init events early* below.\cr
 #'
 #'
 #'   `spades.browserOnError` \tab `FALSE` \tab If `TRUE`, the default, then any
@@ -264,6 +265,57 @@
 #'     packages are not available.\cr
 #'
 #' }
+#'
+#' @section Running some init events early:
+#'
+#' This describes `options(spades.allowInitDuringSimInit = TRUE)`.
+#'
+#' Normally every module's `init` event runs during [spades()], after every module
+#' has worked out its default inputs in `.inputObjects`. Because of that order, a
+#' module preparing a default can tell *that* another module is going to create an
+#' object, but cannot use the object itself, because it does not exist yet.
+#'
+#' With this option set to `TRUE`, `simInit()` runs the `init` events of some
+#' modules first, so the objects they create are real and available while every
+#' other module prepares its defaults. A module can then build its default *from*
+#' those values. A common case is a module that works out the study area, since
+#' many other modules want to base their defaults on it.
+#'
+#' **Which modules run early.** Only the ones that need nothing from another
+#' module, that is, where nothing they list in `expectsInput` is listed in another
+#' module's `createsOutput`. That restriction is what makes this safe: such a
+#' module cannot be affected by work that has not happened yet. Only their `init`
+#' events run early; all their other events wait for [spades()] as usual.
+#'
+#' **A module that both reads and writes the same object never runs early.** If a
+#' module lists an object in both `expectsInput` and `createsOutput`, it counts as
+#' depending on itself, so it is not eligible. Modules that take an object someone
+#' else supplied and improve it are in this category, and other modules' defaults
+#' will see the value before it was improved.
+#'
+#' **This option changes when a module's output appears, not whether it wins.** If
+#' you pass an object with `simInit(objects = ...)` and also include a module that
+#' creates an object of the same name, the module's value is the one you end up
+#' with either way, because an `init` event normally assigns its outputs without
+#' checking whether anything is already there. The option only decides whether that
+#' happens during `simInit()` or later during [spades()]. With the option off, your
+#' value is still in place when `simInit()` returns and is replaced afterwards,
+#' which can be confusing to watch.
+#'
+#' If you want a module's output to step aside for a value the user supplied, say
+#' so in the `init` event, the same way `.inputObjects` does:
+#'
+#' ```
+#' init = {
+#'   if (!suppliedElsewhere("studyArea", sim)) {
+#'     sim$studyArea <- ...   # only work it out if nobody supplied one
+#'   }
+#' }
+#' ```
+#'
+#' This option does nothing unless `spades.dotInputObjects` is also `TRUE`.
+#'
+#' @seealso [suppliedElsewhere()], [simInit()]
 #'
 spadesOptions <- function() {
   list(

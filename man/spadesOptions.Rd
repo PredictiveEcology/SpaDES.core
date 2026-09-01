@@ -24,11 +24,12 @@ The following options are likely of interest to most users
 \tabular{lcl}{
 \emph{OPTION} \tab \emph{DEFAULT VALUE} \tab \emph{DESCRIPTION} \cr
 \code{spades.allowInitDuringSimInit} \tab \code{FALSE}
-\tab New feature as of \verb{SpaDES.core > 1.1.1.9001}; If set to \code{TRUE},
-\code{simInit} will evaluate the dependencies in the metadata objects and determine whether
-there are modules whose \code{init} events can be run safely prior to
-the \code{.inputObjects} of other modules, i.e., if a module's \code{expectsInput}
-is not being supplied by any other module's \code{createsOutput}.\cr
+\tab If \code{TRUE}, \code{simInit} runs the \code{init} events of some modules early,
+before the other modules work out their default inputs. This lets one
+module's default be calculated from another module's actual results,
+rather than only knowing that a result is coming. Only modules that need
+nothing from another module are run this way. See the section
+\emph{Running some init events early} below.\cr
 
 \code{spades.browserOnError} \tab \code{FALSE} \tab If \code{TRUE}, the default, then any
 error rerun the same event with \code{debugonce} called on it to allow editing
@@ -267,4 +268,57 @@ identified as being required, these will be installed if missing, only if
 packages are not available.\cr
 
 }
+}
+\section{Running some init events early}{
+
+
+This describes \code{options(spades.allowInitDuringSimInit = TRUE)}.
+
+Normally every module's \code{init} event runs during \code{\link[=spades]{spades()}}, after every module
+has worked out its default inputs in \code{.inputObjects}. Because of that order, a
+module preparing a default can tell \emph{that} another module is going to create an
+object, but cannot use the object itself, because it does not exist yet.
+
+With this option set to \code{TRUE}, \code{simInit()} runs the \code{init} events of some
+modules first, so the objects they create are real and available while every
+other module prepares its defaults. A module can then build its default \emph{from}
+those values. A common case is a module that works out the study area, since
+many other modules want to base their defaults on it.
+
+\strong{Which modules run early.} Only the ones that need nothing from another
+module, that is, where nothing they list in \code{expectsInput} is listed in another
+module's \code{createsOutput}. That restriction is what makes this safe: such a
+module cannot be affected by work that has not happened yet. Only their \code{init}
+events run early; all their other events wait for \code{\link[=spades]{spades()}} as usual.
+
+\strong{A module that both reads and writes the same object never runs early.} If a
+module lists an object in both \code{expectsInput} and \code{createsOutput}, it counts as
+depending on itself, so it is not eligible. Modules that take an object someone
+else supplied and improve it are in this category, and other modules' defaults
+will see the value before it was improved.
+
+\strong{This option changes when a module's output appears, not whether it wins.} If
+you pass an object with \code{simInit(objects = ...)} and also include a module that
+creates an object of the same name, the module's value is the one you end up
+with either way, because an \code{init} event normally assigns its outputs without
+checking whether anything is already there. The option only decides whether that
+happens during \code{simInit()} or later during \code{\link[=spades]{spades()}}. With the option off, your
+value is still in place when \code{simInit()} returns and is replaced afterwards,
+which can be confusing to watch.
+
+If you want a module's output to step aside for a value the user supplied, say
+so in the \code{init} event, the same way \code{.inputObjects} does:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{init = \{
+  if (!suppliedElsewhere("studyArea", sim)) \{
+    sim$studyArea <- ...   # only work it out if nobody supplied one
+  \}
+\}
+}\if{html}{\out{</div>}}
+
+This option does nothing unless \code{spades.dotInputObjects} is also \code{TRUE}.
+}
+
+\seealso{
+\code{\link[=suppliedElsewhere]{suppliedElsewhere()}}, \code{\link[=simInit]{simInit()}}
 }
