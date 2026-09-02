@@ -1,5 +1,12 @@
 # SpaDES.core 3.2.1.9001 (development version)
 
+## New features
+
+* `loadSimList()` gains `reparse`; `reparse = FALSE` skips restoring module source
+  code, which dominates the load time of a lazily saved `simList`. The result is
+  inspect-only: objects (including `mod`) are still bound lazily, but it cannot be
+  passed to `spades()`.
+
 ## Bug fixes
 
 * `saveSimList()`/`loadSimList()`: the warning for a file-backed object whose

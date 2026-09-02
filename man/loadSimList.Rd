@@ -11,6 +11,7 @@ loadSimList(
   tempPath = tempdir(),
   paths = NULL,
   otherFiles = "",
+  reparse = TRUE,
   verbose = getOption("reproducible.verbose")
 )
 
@@ -35,6 +36,17 @@ existing file-backed \verb{Raster*} files that are the real paths for the possib
 incorrect paths in \code{Filenames(sim)} if the the \code{file} being read in is from
 a different computer, path, or drive. This could be the output from \code{unzipSimList}
 (which is calls \code{loadSimList} internally, passing the unzipped filenames)}
+
+\item{reparse}{Logical. If \code{TRUE} (default), the module source code is
+re-parsed on load, restoring the module functions that \code{saveSimList()}
+does not carry -- without which the \code{simList} cannot be run. Set \code{FALSE}
+to skip it when the \code{simList} is only going to be \emph{inspected}: reparsing
+dominates the cost of loading a lazily saved \code{simList} (on a 19-module
+simulation, ~7 s of a ~9.5 s load), and none of the objects need it.
+Lazy objects are unaffected either way -- both user objects and each
+module's \code{mod} objects are still bound as promises. What a
+\code{reparse = FALSE} \code{simList} lacks is the module code itself, so it cannot
+be passed to \code{\link[=spades]{spades()}}, and module \code{mod}/\code{Par} active bindings are absent.}
 
 \item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
 1 showing more messaging, 2 being more messaging, etc.
