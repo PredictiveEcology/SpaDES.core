@@ -255,3 +255,73 @@ test_that("lazy handles a value too large for a lazy-load database", {
   expect_true(rlang::env_binding_are_lazy(modAEnv, "huge"))
   expect_equal(length(modAEnv$huge), 2.5 * 1024^3)
 })
+
+## ---------------------------------------------------------------------------
+## .DollarNames.simList: $-completion must not materialise a lazy simList.
+##
+## RStudio types each candidate with `object$name` unless the completions
+## already carry an integer `types` attribute. Without one, opening the
+## completion popup on a lazily loaded simList reads the entire sidecar.
+## ---------------------------------------------------------------------------
+
+test_that(".DollarNames.simList lists names without forcing lazy bindings", {
+  skip_if_not_installed("rlang")
+
+  td <- normPath(withr::local_tempdir())
+  simPaths <- list(cachePath = td, inputPath = td, outputPath = td,
+                   modulePath = td, scratchPath = td, terraPath = td)
+  sim <- new("simList")
+  paths(sim) <- simPaths
+  sim@.xData[["alpha"]] <- 1:5
+  sim@.xData[["beta"]]  <- letters[1:3]
+
+  filename <- file.path(td, "sim.rds")
+  suppressMessages(saveSimList(sim, filename = filename, lazy = TRUE))
+  s <- suppressMessages(loadSimList(filename))
+
+  expect_true(all(rlang::env_binding_are_lazy(s@.xData, c("alpha", "beta"))))
+
+  nms <- utils::.DollarNames(s, pattern = "")
+  expect_true(all(c("alpha", "beta") %in% nms))
+  ## the point: still unforced afterwards
+  expect_true(all(rlang::env_binding_are_lazy(s@.xData, c("alpha", "beta"))))
+})
+
+test_that(".DollarNames.simList honours `pattern`", {
+  td <- normPath(withr::local_tempdir())
+  sim <- new("simList")
+  sim@.xData[["alpha"]] <- 1L
+  sim@.xData[["beta"]]  <- 2L
+  expect_identical(utils::.DollarNames(sim, pattern = "^al"), "alpha")
+})
+
+test_that(".DollarNames.simList adds `types` only when something is lazy", {
+  skip_if_not_installed("rlang")
+
+  ## No RStudio in a test session, so .rsUnknownCompletionType() is NULL and no
+  ## attribute is ever set. Fake the IDE's constant table to exercise the path.
+  td <- normPath(withr::local_tempdir())
+  simPaths <- list(cachePath = td, inputPath = td, outputPath = td,
+                   modulePath = td, scratchPath = td, terraPath = td)
+  sim <- new("simList")
+  paths(sim) <- simPaths
+  sim@.xData[["alpha"]] <- 1:5
+  filename <- file.path(td, "sim.rds")
+  suppressMessages(saveSimList(sim, filename = filename, lazy = TRUE))
+
+  fake <- new.env()
+  assign(".rs.acCompletionTypes", list(UNKNOWN = 99L), envir = fake)
+  attach(fake, name = "tools:rstudio", warn.conflicts = FALSE)
+  on.exit(detach("tools:rstudio"), add = TRUE)
+
+  s <- suppressMessages(loadSimList(filename))
+  lazyNms <- utils::.DollarNames(s, pattern = "")
+  ty <- attr(lazyNms, "types")
+  expect_true(is.integer(ty))
+  expect_identical(length(ty), length(lazyNms))   # RStudio requires both
+  expect_true(all(ty == 99L))
+
+  ## once forced, no attribute -- let the IDE compute real icons again
+  invisible(as.list(s@.xData))
+  expect_null(attr(utils::.DollarNames(s, pattern = ""), "types"))
+})

@@ -1,5 +1,11 @@
 # SpaDES.core 3.2.1.9001 (development version)
 
+## New features
+
+* `$`-completion on a lazily saved `simList` no longer materialises every object:
+  a new `.DollarNames.simList` method supplies completion types so RStudio does
+  not evaluate each member to choose an icon.
+
 ## Bug fixes
 
 * `saveSimList()`/`loadSimList()`: the warning for a file-backed object whose
