@@ -976,7 +976,7 @@ recoverDataTableFromQs <- function(sim) {
         error = function(e) {
           warning("saveSimList: could not wrap '", nm,
                   "' (backing file inaccessible); saving as NULL.\n",
-                  "  Error: ", conditionMessage(e), call. = FALSE)
+                  "  ", conditionMessage(e), call. = FALSE)
           NULL
         }
       )
@@ -1004,7 +1004,7 @@ recoverDataTableFromQs <- function(sim) {
         error = function(e) {
           warning("loadSimList: could not unwrap '", nm,
                   "' (backing file inaccessible); loading as NULL.\n",
-                  "  Error: ", conditionMessage(e), call. = FALSE)
+                  "  ", conditionMessage(e), call. = FALSE)
           NULL
         }
       )

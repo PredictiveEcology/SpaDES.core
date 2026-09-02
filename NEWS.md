@@ -2,6 +2,9 @@
 
 ## Bug fixes
 
+* `saveSimList()`/`loadSimList()`: the warning for a file-backed object whose
+  backing file is inaccessible no longer prefixes the underlying message with
+  `Error:`, which read as a failure when the load in fact continued.
 * `loadSimList()` is now much faster for simulations that carry large module
   objects (`mod`). Reparsing module source code copied the `.mods` environment
   with `Copy()`, which forced each module's `mod` and `Par` active bindings;
