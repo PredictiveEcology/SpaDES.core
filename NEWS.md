@@ -5,6 +5,10 @@
 * `$`-completion on a lazily saved `simList` no longer materialises every object:
   a new `.DollarNames.simList` method supplies completion types so RStudio does
   not evaluate each member to choose an icon.
+* `loadSimList()` gains `reparse`; `reparse = FALSE` skips restoring module source
+  code, which dominates the load time of a lazily saved `simList`. The result is
+  inspect-only: objects (including `mod`) are still bound lazily, but it cannot be
+  passed to `spades()`.
 
 ## Bug fixes
 
