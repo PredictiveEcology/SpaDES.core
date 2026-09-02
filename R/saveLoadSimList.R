@@ -445,7 +445,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #'   incorrect paths in `Filenames(sim)` if the the `file` being read in is from
 #'   a different computer, path, or drive. This could be the output from `unzipSimList`
 #'   (which is calls `loadSimList` internally, passing the unzipped filenames)
-#' @param reparse Logical. If `TRUE` (default), the module source code is
+#' @param parse Logical. If `TRUE` (default), the module source code is
 #'   re-parsed on load, restoring the module functions that `saveSimList()`
 #'   does not carry -- without which the `simList` cannot be run. Set `FALSE`
 #'   to skip it when the `simList` is only going to be *inspected*: reparsing
@@ -453,7 +453,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #'   simulation, ~7 s of a ~9.5 s load), and none of the objects need it.
 #'   Lazy objects are unaffected either way -- both user objects and each
 #'   module's `mod` objects are still bound as promises. What a
-#'   `reparse = FALSE` `simList` lacks is the module code itself, so it cannot
+#'   `parse = FALSE` `simList` lacks is the module code itself, so it cannot
 #'   be passed to [spades()], and module `mod`/`Par` active bindings are absent.
 #' @param tempPath A character string specifying the new base directory for the
 #'   temporary paths maintained in a `simList`.
@@ -470,7 +470,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @importFrom reproducible linkOrCopy remapFilenames updateFilenameSlots .unwrap
 #' @importFrom tools file_ext
 loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
-                        paths = NULL, otherFiles = "", reparse = TRUE,
+                        paths = NULL, otherFiles = "", parse = TRUE,
                         verbose = getOption("reproducible.verbose")) {
   checkSimListExts(filename)
 
@@ -602,7 +602,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   ## Restore the module functions. `saveSimList()` carries objects, metadata,
   ## paths and the event queue, but not the module code -- see .reparseModules()
   ## -- so without this a reloaded simList cannot be run.
-  if (isTRUE(reparse))
+  if (isTRUE(parse))
     tmpsim <- .reparseModules(tmpsim, modules(tmpsim), verbose = verbose)
 
   ## Lazy loading: bind a promise per sidecar object, into @.xData for user
