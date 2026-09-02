@@ -3572,3 +3572,66 @@ setMethod(
   }
 )
 
+
+
+## ---- $-completion --------------------------------------------------------
+## RStudio's .rs.getCompletionsDollar() picks an icon for each candidate with
+##     .rs.getCompletionType(eval(call("$", quote(object), names[[i]])))
+## i.e. it evaluates `object$name` for EVERY member. On a simList loaded from a
+## saveSimList(lazy = TRUE) that forces every promise and reads the whole
+## sidecar -- tens of seconds, blocking the session, purely to draw icons.
+## (Its `bindingIsActive` guard is gated on is.environment(object), and while a
+## simList *does* extend environment, the branch reached for an S4 object is
+## the one without that guard.)
+##
+## RStudio skips that loop when the completions already carry an integer
+## `types` attribute of the right length, and .rs.selectFuzzyMatches() carries
+## the attribute through its subsetting. So supplying types is enough.
+##
+## Only done when something is actually deferred: with nothing lazy there is
+## nothing to protect, so no attribute is set and RStudio computes its usual,
+## accurate icons. Base R's completion ignores the attribute entirely.
+
+## RStudio's "unknown" completion-type code, read from the IDE if it is there.
+## Read-only, and absent outside RStudio -- in which case no attribute is set.
+.rsUnknownCompletionType <- function() {
+  if (!"tools:rstudio" %in% search()) return(NULL)
+  e <- as.environment("tools:rstudio")
+  if (!exists(".rs.acCompletionTypes", envir = e, inherits = FALSE)) return(NULL)
+  ty <- tryCatch(get(".rs.acCompletionTypes", envir = e, inherits = FALSE)$UNKNOWN,
+                 error = function(e) NULL)
+  if (is.null(ty) || !is.numeric(ty) || length(ty) != 1L) return(NULL)
+  as.integer(ty)   # the caller tests is.integer(), so coerce
+}
+
+#' Completion names for a `simList`
+#'
+#' Supplies `$`-completion candidates without evaluating any of them, so that
+#' a `simList` loaded with [saveSimList()]`(lazy = TRUE)` is not materialised
+#' just to populate an IDE's completion popup.
+#'
+#' @param x A `simList`.
+#' @param pattern A regular expression, per [utils::.DollarNames()].
+#'
+#' @return A character vector of object names. When the `simList` holds
+#'   unforced lazy bindings, it carries an integer `types` attribute, which
+#'   tells RStudio not to inspect each object's value to choose an icon.
+#'
+#' @seealso [saveSimList()], [loadSimList()]
+#' @exportS3Method utils::.DollarNames
+.DollarNames.simList <- function(x, pattern = "") {
+  env <- tryCatch(x@.xData, error = function(e) NULL)
+  if (!is.environment(env)) return(character())
+
+  nms <- ls(env, all.names = TRUE)          # never forces
+  if (nzchar(pattern)) nms <- grep(pattern, nms, value = TRUE)
+  if (!length(nms)) return(nms)
+
+  lazy <- tryCatch(rlang::env_binding_are_lazy(env, nms),
+                   error = function(e) rep(FALSE, length(nms)))
+  if (any(lazy)) {
+    ty <- .rsUnknownCompletionType()
+    if (!is.null(ty)) attr(nms, "types") <- rep(ty, length(nms))
+  }
+  nms
+}
