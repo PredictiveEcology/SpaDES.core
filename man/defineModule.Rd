@@ -143,7 +143,7 @@ that will cause these objects to be put into the
 
 }
 \seealso{
-\code{\link[=moduleDefaults]{moduleDefaults()}}, \code{\link[=defineEvent]{defineEvent()}}
+\code{\link[=moduleDefaults]{moduleDefaults()}}, \code{\link[=defineEvent]{defineEvent()}}, \link{objectProvenance}
 }
 \author{
 Alex Chubaty

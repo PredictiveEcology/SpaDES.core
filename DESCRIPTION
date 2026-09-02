@@ -127,6 +127,7 @@ Collate:
     'module-template.R'
     'moduleCoverage.R'
     'moduleMetadata.R'
+    'object-provenance.R'
     'objectSynonyms.R'
     'options.R'
     'paths.R'

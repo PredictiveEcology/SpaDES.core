@@ -54,12 +54,22 @@ saving of files specified in \code{inputs(sim)}, \code{outputs(sim)} or the cach
 
 \item{...}{Additional arguments. See Details.}
 
-\item{lazy}{Logical. If \code{TRUE}, the user objects in \code{sim@.xData} are saved
-into a sibling lazy-load DB (a \verb{<filename>_xData.rdx}/\code{.rdb} pair built
-by \code{tools:::makeLazyLoadDB()}) alongside the shell \code{simList} file,
-rather than monolithically. \code{\link[=loadSimList]{loadSimList()}} detects this layout
-automatically and restores the objects via \code{\link[=lazyLoad]{lazyLoad()}}, materializing
-each one only on first access. Defaults to \code{FALSE}.}
+\item{lazy}{Logical. If \code{TRUE}, the objects are written one per file into a
+sibling \verb{<filename>_lazy/} directory instead of into the \code{simList} file
+itself, and \code{\link[=loadSimList]{loadSimList()}} binds each as a promise that reads its file on
+first access. This covers both the user objects in \code{sim@.xData} and every
+module's \code{mod} objects (\code{sim@.xData$.modObjs}); \code{.mods} and the internal
+dot-prefixed bindings stay in the file, being small and always needed. The
+result is a \code{simList} file of a few MB that opens in seconds, from which
+you pay only for the objects you actually touch.
+
+One file per object rather than a single lazy-load database because a value
+larger than 2 GB cannot be put in one at all (\verb{long vectors not supported yet}), and \code{mod} objects are routinely larger than that.
+
+Note that promises are forced by whole-environment operations -- \code{as.list()},
+\code{get()}, \code{mget()}, \code{eapply()}, and so anything that deep-copies the
+\code{simList}, such as \code{\link[reproducible:Copy]{Copy()}} -- but not by \code{ls()}, \code{exists()}, or reading
+metadata such as \code{\link[=outputs]{outputs()}}. Defaults to \code{FALSE}.}
 }
 \value{
 Invoked for side effects of saving both a \code{.qs2} (or \code{.rds}) file,

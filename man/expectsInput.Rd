@@ -47,6 +47,9 @@ inputObjects <- bindrows(
 )
 
 }
+\seealso{
+\link{objectProvenance} for where the value of a declared input comes from.
+}
 \author{
 Yong Luo
 }
