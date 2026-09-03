@@ -325,3 +325,81 @@ test_that(".DollarNames.simList adds `types` only when something is lazy", {
   invisible(as.list(s@.xData))
   expect_null(attr(utils::.DollarNames(s, pattern = ""), "types"))
 })
+
+## ---------------------------------------------------------------------------
+## loadSimList(fetch = ): the sidecar objects need not be local. `fetch` is
+## called with the expected path when an object is absent and must put the
+## bytes there. The point is that nothing else changes -- `$`, `[[` and get()
+## behave as always, and an object is transferred only if something touches it.
+## ---------------------------------------------------------------------------
+
+test_that("fetch is called per object, only on access, and only once", {
+  skip_if_not_installed("rlang")
+  td <- normPath(withr::local_tempdir())
+  simPaths <- list(cachePath = td, inputPath = td, outputPath = td,
+                   modulePath = td, scratchPath = td, terraPath = td)
+  sim <- new("simList"); paths(sim) <- simPaths
+  sim@.xData[["aa"]] <- 1:5
+  sim@.xData[["bb"]] <- letters[1:3]
+  sim@.xData[["cc"]] <- list(z = 1)
+
+  filename <- file.path(td, "sim.rds")
+  suppressMessages(saveSimList(sim, filename = filename, lazy = TRUE))
+  lazyDir <- file.path(td, "sim_lazy")
+
+  ## move the objects out of reach, leaving only the manifest
+  store <- file.path(td, "store"); dir.create(store)
+  objs <- setdiff(dir(lazyDir), .lazyManifestName)
+  file.rename(file.path(lazyDir, objs), file.path(store, objs))
+  expect_identical(dir(lazyDir), .lazyManifestName)
+
+  seen <- character(0)
+  myFetch <- function(path) {
+    seen <<- c(seen, basename(path))
+    file.copy(file.path(store, basename(path)), path)
+  }
+
+  s <- suppressMessages(loadSimList(filename, fetch = myFetch))
+  ## binding promises must not fetch anything
+  expect_length(seen, 0L)
+  expect_true(all(rlang::env_binding_are_lazy(s@.xData, c("aa", "bb", "cc"))))
+
+  expect_identical(s$bb, letters[1:3])
+  expect_length(seen, 1L)                                   # exactly one object
+  expect_true(all(rlang::env_binding_are_lazy(s@.xData, c("aa", "cc"))))
+
+  ## whatever fetch wrote is the cache: a second access must not re-fetch
+  invisible(s$bb)
+  expect_length(seen, 1L)
+
+  expect_identical(s$aa, 1:5)
+  expect_length(seen, 2L)                                   # `cc` never touched
+})
+
+test_that("fetch defaults to NULL and local lazy loading is unchanged", {
+  skip_if_not_installed("rlang")
+  td <- normPath(withr::local_tempdir())
+  simPaths <- list(cachePath = td, inputPath = td, outputPath = td,
+                   modulePath = td, scratchPath = td, terraPath = td)
+  sim <- new("simList"); paths(sim) <- simPaths
+  sim@.xData[["aa"]] <- 1:5
+  filename <- file.path(td, "sim.rds")
+  suppressMessages(saveSimList(sim, filename = filename, lazy = TRUE))
+
+  s <- suppressMessages(loadSimList(filename))
+  expect_true(rlang::env_binding_are_lazy(s@.xData, "aa"))
+  expect_identical(s$aa, 1:5)
+})
+
+test_that(".readOneLazy only calls fetch when the file is missing", {
+  td <- normPath(withr::local_tempdir())
+  f <- file.path(td, "obj.rds"); saveRDS(1:3, f)
+  called <- FALSE
+  expect_identical(.readOneLazy(f, fetch = function(p) called <<- TRUE), 1:3)
+  expect_false(called)                       # present -> fetch not called
+
+  unlink(f)
+  got <- .readOneLazy(f, fetch = function(p) { called <<- TRUE; saveRDS(1:3, p) })
+  expect_true(called)
+  expect_identical(got, 1:3)
+})
