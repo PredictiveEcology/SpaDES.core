@@ -1405,15 +1405,32 @@ setReplaceMethod(
        }
        sim@outputs[["file"]][wh] <- paste0(sim@outputs[["file"]][wh], ".", fe[wh])
 
-       ## If the file name already has a time unit on it,
-       ## i.e., passed explicitly by user, then don't postpend again
        txtTimeA <- paste0(attr(sim@outputs[["saveTime"]], "unit"))
        txtTimeB <- paddedFloatToChar(
          sim@outputs[["saveTime"]],
          ceiling(log10(end(sim, sim@simtimes[["timeunit"]]) + 1))
        )
+
+       ## Only stamp rows whose file WE are naming.
+       ##
+       ## A row with `saved = TRUE` came from registerOutputs(): the module has
+       ## already written that file, under a name it chose. Renaming it here
+       ## leaves outputs(sim)$file pointing at a file that does not exist, and
+       ## downstream code that greps those paths then silently finds nothing.
+       alreadyOnDisk <- sim@outputs[["saved"]] %in% TRUE
+
+       ## "already has a time unit on it" has to be a real test. This used to be
+       ## grepl(txtTimeA, file) -- a bare substring search over the WHOLE path --
+       ## which was wrong in both directions: a name like "burnSummary.csv" got
+       ## stamped even when the module had written it unstamped, while any path
+       ## with the unit somewhere in a *directory* (".../1991-2020_yearly/")
+       ## counted as stamped and was skipped. Match "_<unit><number>" at the end
+       ## of the basename, which is what this function actually appends.
+       bn <- tools::file_path_sans_ext(basename(as.character(sim@outputs$file)))
+       alreadyStamped <- grepl(paste0("_", txtTimeA, "[-0-9.]+$"), bn)
+
        # Add time unit and saveTime to filename, without stripping extension
-       wh <- !grepl(txtTimeA, sim@outputs$file)
+       wh <- !alreadyStamped & !alreadyOnDisk
        fns <- sim@outputs[["file"]][wh]
        sim@outputs[["file"]][wh] <- paste0(
          tools::file_path_sans_ext(fns),

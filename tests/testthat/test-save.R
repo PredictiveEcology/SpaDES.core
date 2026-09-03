@@ -459,3 +459,56 @@ test_that("registerOutputs", {
   expect_equal(NROW(outputs(sim)$file), 8)
   expect_true(all(file.exists(outputs(sim)$file)))
 })
+
+## ---------------------------------------------------------------------------
+## outputs<- appends "_<timeunit><saveTime>" to filenames it generates. Two ways
+## that used to go wrong, both silent:
+##
+##   * a row registered by registerOutputs() names a file the module has ALREADY
+##     written; renaming it left outputs(sim)$file pointing at nothing;
+##   * "already stamped?" was grepl(unit, file) over the WHOLE path, so any
+##     directory containing the unit (".../1991-2020_yearly/") suppressed the
+##     stamp, while a plain basename got stamped regardless.
+## ---------------------------------------------------------------------------
+
+test_that("outputs<- still stamps a filename it generates itself", {
+  td <- normPath(withr::local_tempdir())
+  sim <- suppressMessages(simInit(times = list(start = 0, end = 3020),
+                                  paths = list(outputPath = td)))
+  outputs(sim) <- data.frame(objectName = "cohortData", saveTime = 3020)
+  expect_identical(basename(outputs(sim)$file), "cohortData_year3020.rds")
+})
+
+test_that("outputs<- does not rename a file registerOutputs() already wrote", {
+  td <- normPath(withr::local_tempdir())
+  sim <- suppressMessages(simInit(times = list(start = 0, end = 3020),
+                                  paths = list(outputPath = td)))
+  f <- file.path(outputPath(sim), "fireSense_burnSummary.csv")
+  writeLines("a,b", f)
+  sim <- registerOutputs(f, sim)
+
+  ## the row must name the file that exists, not a synthesised one
+  expect_identical(basename(outputs(sim)$file), "fireSense_burnSummary.csv")
+  expect_true(all(file.exists(outputs(sim)$file)))
+})
+
+test_that("outputs<- does not double-stamp an already-stamped basename", {
+  td <- normPath(withr::local_tempdir())
+  sim <- suppressMessages(simInit(times = list(start = 0, end = 3020),
+                                  paths = list(outputPath = td)))
+  outputs(sim) <- data.frame(objectName = "burnMap", saveTime = 3020,
+                             file = file.path(td, "burnMap_year3020.tif"),
+                             fun = "writeRaster", package = "terra")
+  expect_identical(basename(outputs(sim)$file), "burnMap_year3020.tif")
+})
+
+test_that("the timeunit appearing in a DIRECTORY does not suppress the stamp", {
+  ## the old grepl(unit, <whole path>) test made this a false positive
+  td <- normPath(withr::local_tempdir())
+  d <- file.path(td, "1991-2020_yearly"); dir.create(d, recursive = TRUE)
+  sim <- suppressMessages(simInit(times = list(start = 0, end = 3020),
+                                  paths = list(outputPath = d)))
+  outputs(sim) <- data.frame(objectName = "cohortData", saveTime = 3020)
+  expect_true(grepl("year", dirname(outputs(sim)$file)))       # unit is in the dir
+  expect_identical(basename(outputs(sim)$file), "cohortData_year3020.rds")
+})
