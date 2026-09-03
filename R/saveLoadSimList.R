@@ -455,6 +455,16 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #'   module's `mod` objects are still bound as promises. What a
 #'   `parse = FALSE` `simList` lacks is the module code itself, so it cannot
 #'   be passed to [spades()], and module `mod`/`Par` active bindings are absent.
+#' @param fetch Optional function of one argument, used only for a lazily saved
+#'   `simList`. It is called with the path of a sidecar object that is not
+#'   present, and must place that object's bytes there; the promise then reads
+#'   it normally. This lets the objects live somewhere other than a local
+#'   directory -- for example fetched from remote storage on first access --
+#'   without changing how they are used: `$`, `[[` and [get()] behave exactly
+#'   as before, and each object is transferred only if something touches it.
+#'   Because `fetch` is called only when the file is absent, whatever it writes
+#'   also serves as the cache. Default `NULL`, i.e. read from `filename`'s
+#'   sibling `_lazy/` directory as usual.
 #' @param tempPath A character string specifying the new base directory for the
 #'   temporary paths maintained in a `simList`.
 #' @inheritParams reproducible::Cache
@@ -471,6 +481,7 @@ zipSimList <- function(sim, zipfile, ..., outputs = TRUE, inputs = TRUE, cache =
 #' @importFrom tools file_ext
 loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
                         paths = NULL, otherFiles = "", parse = TRUE,
+                        fetch = NULL,
                         verbose = getOption("reproducible.verbose")) {
   checkSimListExts(filename)
 
@@ -611,7 +622,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   ## bindings are already in place -- a module then reaches its `mod` object
   ## exactly as it would have before, and pays for it only on first access.
   if (isLazyLoad) {
-    tmpsim <- .attachLazyObjs(tmpsim, lazyDir, projectPath)
+    tmpsim <- .attachLazyObjs(tmpsim, lazyDir, projectPath, fetch = fetch)
   }
 
   return(tmpsim)
@@ -819,7 +830,12 @@ recoverDataTableFromQs <- function(sim) {
   }
 }
 
-.readOneLazy <- function(file) {
+.readOneLazy <- function(file, fetch = NULL) {
+  ## `fetch` lets the sidecar live somewhere other than a local directory: it is
+  ## called with the expected path and must put the bytes there. Because it is
+  ## only called when the file is absent, whatever it writes doubles as the
+  ## cache -- a second access to the same object is an ordinary local read.
+  if (!file.exists(file) && is.function(fetch)) fetch(file)
   if (identical(tolower(tools::file_ext(file)), "qs2")) {
     qs2::qs_read(file, nthreads = getOption("spades.qsThreads", 1))
   } else {
@@ -888,7 +904,7 @@ recoverDataTableFromQs <- function(sim) {
 ## Bind a promise per manifest row. The body matches what loadSimList() does for
 ## an eagerly loaded object -- remap file-backed paths, then unwrap -- so a lazy
 ## object is indistinguishable from an eager one once touched.
-.attachLazyObjs <- function(sim, dir, projectPath) {
+.attachLazyObjs <- function(sim, dir, projectPath, fetch = NULL) {
   mf <- file.path(dir, .lazyManifestName)
   if (!file.exists(mf)) return(sim)
 
@@ -901,8 +917,9 @@ recoverDataTableFromQs <- function(sim) {
       .nm <- ents$name[i]
       .pp <- projectPath
       .sp <- simPaths
+      .fetch <- fetch
       delayedAssign(.nm, tryCatch({
-        obj <- .readOneLazy(.f)
+        obj <- .readOneLazy(.f, fetch = .fetch)
         obj <- .remapFileBackedObj(obj, .pp, .sp)
         .unwrap(obj, cachePath = NULL, paths = .sp)
       }, error = function(e) {

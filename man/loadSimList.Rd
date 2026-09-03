@@ -12,6 +12,7 @@ loadSimList(
   paths = NULL,
   otherFiles = "",
   parse = TRUE,
+  fetch = NULL,
   verbose = getOption("reproducible.verbose")
 )
 
@@ -47,6 +48,17 @@ Lazy objects are unaffected either way -- both user objects and each
 module's \code{mod} objects are still bound as promises. What a
 \code{parse = FALSE} \code{simList} lacks is the module code itself, so it cannot
 be passed to \code{\link[=spades]{spades()}}, and module \code{mod}/\code{Par} active bindings are absent.}
+
+\item{fetch}{Optional function of one argument, used only for a lazily saved
+\code{simList}. It is called with the path of a sidecar object that is not
+present, and must place that object's bytes there; the promise then reads
+it normally. This lets the objects live somewhere other than a local
+directory -- for example fetched from remote storage on first access --
+without changing how they are used: \code{$}, \code{[[} and \code{\link[=get]{get()}} behave exactly
+as before, and each object is transferred only if something touches it.
+Because \code{fetch} is called only when the file is absent, whatever it writes
+also serves as the cache. Default \code{NULL}, i.e. read from \code{filename}'s
+sibling \verb{_lazy/} directory as usual.}
 
 \item{verbose}{Numeric, -1 silent (where possible), 0 being very quiet,
 1 showing more messaging, 2 being more messaging, etc.

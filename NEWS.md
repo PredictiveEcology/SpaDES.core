@@ -2,6 +2,10 @@
 
 ## New features
 
+* `loadSimList()` gains `fetch`, letting a lazily saved `simList` keep its objects
+  somewhere other than a local directory. The function is called with the path of an
+  absent sidecar object and must place the bytes there; `$`, `[[` and `get()` are
+  unchanged, and an object is transferred only when something touches it.
 * `$`-completion on a lazily saved `simList` no longer materialises every object:
   a new `.DollarNames.simList` method supplies completion types so RStudio does
   not evaluate each member to choose an icon.
