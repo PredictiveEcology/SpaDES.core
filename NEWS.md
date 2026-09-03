@@ -9,6 +9,16 @@
 
 ## New features
 
+* `startEnd()` returns a `simList`'s `start` and `end` times as a single named
+  numeric of length 2.
+* `resolveSimYears()` resolves a module's `simYears` parameter against the
+  simulation clock: an all-`NA` parameter means "use `startEnd(sim)`". Gives the
+  summary modules one unvarying statement, so they cannot drift apart.
+* `dirnamesFromSet()` returns the `rep<n>` directories occurring in a set of
+  output file paths, restricted to the ids asked for. Purely textual; sorts
+  numerically, so `rep10` no longer lands between `rep1` and `rep2`.
+* `padYears()` is re-exported from `reproducible`.
+
 * `loadSimList()` gains `fetch`, letting a lazily saved `simList` keep its objects
   somewhere other than a local directory. The function is called with the path of an
   absent sidecar object and must place the bytes there; `$`, `[[` and `get()` are

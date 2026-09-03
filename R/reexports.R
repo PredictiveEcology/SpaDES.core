@@ -41,3 +41,7 @@ makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
 #' @importFrom reproducible paddedFloatToChar
 #' @export
 reproducible::paddedFloatToChar
+
+#' @importFrom reproducible padYears
+#' @export
+reproducible::padYears

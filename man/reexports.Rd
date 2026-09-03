@@ -4,6 +4,7 @@
 \name{reexports}
 \alias{reexports}
 \alias{paddedFloatToChar}
+\alias{padYears}
 \title{Objects exported from other packages}
 \keyword{internal}
 \description{
@@ -11,6 +12,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{reproducible}{\code{\link[reproducible:paddedFloatToChar]{paddedFloatToChar()}}}
+  \item{reproducible}{\code{\link[reproducible:paddedFloatToChar]{paddedFloatToChar()}}, \code{\link[reproducible:padYears]{padYears()}}}
 }}
 
