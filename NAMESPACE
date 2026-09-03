@@ -102,6 +102,7 @@ export(depends)
 export(depsEdgeList)
 export(depsGraph)
 export(dhour)
+export(dirnamesFromSet)
 export(dmin)
 export(dmonth)
 export(dmonths)
@@ -177,6 +178,7 @@ export(outputObjects)
 export(outputPath)
 export(outputs)
 export(packages)
+export(padYears)
 export(paddedFloatToChar)
 export(paramCheckOtherMods)
 export(parameters)
@@ -190,6 +192,7 @@ export(rasterToMemory)
 export(registerOutputs)
 export(remoteFileSize)
 export(reqdPkgs)
+export(resolveSimYears)
 export(restartOrSimInitAndSpades)
 export(restartR)
 export(restartSimInit)
@@ -216,6 +219,7 @@ export(spades2)
 export(spadesOptions)
 export(spadesTimes)
 export(start)
+export(startEnd)
 export(suggestModules)
 export(suppliedElsewhere)
 export(terraPath)
@@ -458,6 +462,7 @@ importFrom(reproducible,
   messageDF,
   normPath,
   objSize,
+  padYears,
   paddedFloatToChar,
   remapFilenames,
   showCache,

@@ -2402,6 +2402,43 @@ setReplaceMethod(
      return(x)
 })
 
+#' Simulation start and end times
+#'
+#' A convenience accessor returning the simulation `start` and `end` times as a
+#' single named numeric vector of length 2, i.e.
+#' `unlist(times(sim)[c("start", "end")])`.
+#'
+#' @param sim A `simList` object.
+#'
+#' @return A named numeric of length 2, with elements `start` and `end`.
+#'
+#' @author Eliot McIntire
+#' @export
+#' @rdname startEnd
+startEnd <- function(sim) unlist(times(sim)[c("start", "end")])
+
+#' Resolve a module's simulation years against the simulation clock
+#'
+#' Summary modules typically take a `simYears` parameter giving the two years to
+#' compare. Its default is `c(NA, NA)`, meaning "use whatever the simulation
+#' itself is running", so that the parameter cannot silently disagree with the
+#' `simList`. This resolves the one against the other, and exists so that every
+#' module performs that resolution identically.
+#'
+#' @param years numeric of length 2, typically `P(sim)$simYears`. If every
+#'   element is `NA`, the simulation's own start and end times are used instead.
+#' @param sim A `simList` object.
+#'
+#' @return A numeric of length 2, giving the start and end years to use.
+#'
+#' @author Eliot McIntire
+#' @export
+#' @rdname resolveSimYears
+#' @seealso [startEnd()]
+resolveSimYears <- function(years, sim) {
+  if (all(is.na(years))) startEnd(sim) else years
+}
+
 #' @inheritParams times
 #' @include simList-class.R
 #' @include times.R

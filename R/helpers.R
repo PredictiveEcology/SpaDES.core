@@ -445,3 +445,56 @@ singularPlural <- function(singPlur, l, v) {
 isAre <- function(l, v) {
   singularPlural(c("is", "are"), l, v)
 }
+
+#' Directory names drawn from a set of ids
+#'
+#' Given a vector of file paths and a set of candidate integer ids, returns the
+#' `prefix`-plus-id directories that occur in those paths, keeping only ids that
+#' are in `set`. Used to determine which replicates of a multi-run simulation
+#' have outputs, without loading any of them.
+#'
+#' This is a purely textual operation on the paths; it does not check whether
+#' anything exists on disk.
+#'
+#' @param files character vector of file paths.
+#' @param set integer vector of candidate ids to keep.
+#' @param prefix character. The directory name prefix preceding each id.
+#' @param leafOnly logical. If `TRUE` (the default), only the single directory
+#'   name is returned, e.g. `"rep1"` -- the `basename()` of the `dirname()`. If
+#'   `FALSE`, the full directory path is returned, e.g. `"out/rep1"`. Note that
+#'   a full path can only be recovered from `files`, so `leafOnly = FALSE`
+#'   requires a non-empty `files`.
+#'
+#' @return A character vector of directory names (or paths, if
+#'   `leafOnly = FALSE`), ordered numerically by id.
+#'
+#' @author Eliot McIntire
+#' @export
+#' @rdname dirnamesFromSet
+#'
+#' @examples
+#' files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep2/x.tif")
+#' dirnamesFromSet(files, set = 1:10)
+#' dirnamesFromSet(files, set = 1:10, leafOnly = FALSE)
+dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
+  if (length(files) == 0) {
+    if (!leafOnly) {
+      stop("`leafOnly = FALSE` requires `files`: there is no path to take a dirname of.")
+    }
+    return(paste0(prefix, set))
+  }
+
+  pattern <- paste0(".*/", prefix, "(\\d+)/.*")
+  keep <- grepl(pattern, files)
+  ids <- as.integer(sub(pattern, "\\1", files[keep]))
+  inSet <- ids %in% set
+
+  if (leafOnly) {
+    paste0(prefix, sort(unique(ids[inSet])))
+  } else {
+    dirs <- dirname(files[keep][inSet])
+    ids <- ids[inSet]
+    firsts <- !duplicated(dirs)
+    dirs[firsts][order(ids[firsts])]
+  }
+}
