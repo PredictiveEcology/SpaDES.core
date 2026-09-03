@@ -18,7 +18,12 @@ name: Update CITATION.cff
 
 jobs:
   update-citation-cff:
-    runs-on: macos-latest
+    ## ubuntu, not macOS. The only R code in this job is cff_write(), but
+    ## setup-r-dependencies installs this package's full dependency tree, and
+    ## terra is an Import. On macOS that is a ~3GB Homebrew GDAL install for a
+    ## job whose output is one YAML file; stock noble apt is far cheaper for
+    ## exactly the same result.
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -26,7 +31,10 @@ jobs:
 
       - uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: PredictiveEcology/actions/install-spatial-deps@v0.2
+      ## @main, not a tag: every tag v0.1-v0.5 still adds the ubuntugis-unstable
+      ## PPA, which installs libgdal37 and is ABI-incompatible with the binaries
+      ## in Posit's noble cache. That line was inert on macOS; here it is not.
+      - uses: PredictiveEcology/actions/install-spatial-deps@main
 
       - uses: r-lib/actions/setup-r@v2
         with:
