@@ -1,5 +1,12 @@
 # SpaDES.core 3.2.1.9001 (development version)
 
+## Bug fixes
+
+* `outputs<-` no longer renames a file that `registerOutputs()` recorded, and no
+  longer treats the time unit appearing anywhere in a *path* as meaning the
+  filename is already time-stamped. Both left `outputs(sim)$file` naming files that
+  do not exist.
+
 ## New features
 
 * `loadSimList()` gains `fetch`, letting a lazily saved `simList` keep its objects
