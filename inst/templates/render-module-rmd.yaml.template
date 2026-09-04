@@ -1,4 +1,13 @@
 {{=[[ ]]=}}
+## Thin caller. The job itself lives in PredictiveEcology/actions, so the pins
+## for install-spatial-deps, install-Require, install-SpaDES and install-Rmd-pkgs
+## live there too and move once, instead of being frozen into every module
+## repository on the day it was created.
+##
+## https://github.com/PredictiveEcology/actions/blob/main/.github/workflows/render-module-rmd.yaml
+
+name: Render module Rmd
+
 on:
   pull_request:
     branches:
@@ -14,64 +23,17 @@ on:
       - .github/workflows/render-module-rmd.yaml
       - [[name]].Rmd
       - [[name]].R
-
-name: Render module Rmd
+  workflow_dispatch:
 
 jobs:
-  render:
-    if: "!contains(github.event.commits[0].message, '[skip-ci]')"
-    name: Render module Rmd
-    runs-on: ubuntu-latest
-
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: PredictiveEcology/actions/install-spatial-deps@v0.2
-
-      - name: Install other dependencies
-        run: |
-          sudo apt-get install -y \
-            libcurl4-openssl-dev \
-            libgit2-dev \
-            libglpk-dev \
-            libmagick++-dev \
-            libxml2-dev \
-            python3-gdal
-
-      - uses: r-lib/actions/setup-r@v2
-        with:
-          use-public-rspm: true
-          Ncpus: 2
-
-      - uses: r-lib/actions/setup-pandoc@v2
-
-      - uses: PredictiveEcology/actions/install-Rmd-pkgs@v0.2
-
-      - uses: PredictiveEcology/actions/install-Require@v0.2
-        with:
-          GitTag: 'development'
-
-      - uses: PredictiveEcology/actions/install-SpaDES@v0.2
-
-      - uses: PredictiveEcology/actions/install-Rmd-pkgs@v0.2
-
-      - name: Install module package dependencies
-        run: |
-          pkgs <- SpaDES.core::packages(modules = "[[name]]", paths = "..")[[1]]
-          Require::Require(pkgs[[1]])
-        shell: Rscript {0}
-
-      - name: Render module Rmd
-        run: |
-          rmarkdown::render("[[name]].Rmd", encoding = "UTF-8")
-        shell: Rscript {0}
-
-      - name: Commit results
-        run: |
-          git config user.email "actions@github.com"
-          git config user.name "GitHub Actions"
-          git commit [[name]].html -m 'Re-build [[name]].Rmd' || echo "No changes to commit"
-          git push https://${{github.actor}}:${{secrets.GITHUB_TOKEN}}@github.com/${{github.repository}}.git HEAD:${{github.ref}} || echo "No changes to commit"
+  render-module-rmd:
+    ## The called workflow splits `render` (contents: read, which installs and
+    ## then executes this module's own code) from `commit` (contents: write,
+    ## which runs nothing but git). A called workflow can only reduce what is
+    ## granted here, never widen it, so the write scope has to be granted at the
+    ## call site.
+    permissions:
+      contents: write
+    uses: PredictiveEcology/actions/.github/workflows/render-module-rmd.yaml@main
+    with:
+      module: [[name]]
