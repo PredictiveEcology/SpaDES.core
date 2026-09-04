@@ -1,5 +1,21 @@
 # SpaDES.core 3.2.1.9001 (development version)
 
+## Continuous integration
+
+* `use_gha()` now writes a short workflow that calls the shared
+  `render-module-rmd` workflow in `PredictiveEcology/actions`, instead of a
+  77-line copy of the job itself. New modules therefore reference one thing that
+  can be updated centrally, rather than freezing four action versions into the
+  repository on the day it is created. A survey of the 74 module repositories
+  carrying the old file (PredictiveEcology/actions#36) found them split across
+  two generations that had drifted apart, pinning those actions at `v0`,
+  `v0.0.1` or `v0.2`; those pins are the main obstacle to retiring the old tags.
+  The shared workflow also fixes four things that were wrong in every generated
+  copy: the `[skip-ci]` guard read the oldest commit of a push and was absent
+  entirely on pull requests; there was no setting to cancel superseded runs; the
+  `apt-get` step had no update, retries or timeout; and the commit step ran on
+  pull requests, where it could not succeed and failed silently every time.
+
 ## Bug fixes
 
 * `outputs<-` no longer renames a file that `registerOutputs()` recorded, and no
