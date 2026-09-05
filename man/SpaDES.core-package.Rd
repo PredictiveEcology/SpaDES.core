@@ -156,6 +156,8 @@ these constructors, called inside \code{\link[=defineModule]{defineModule()}}.
 \code{\link[=expectsInput]{expectsInput()}} \tab Declare one input the module reads from \code{sim}.\cr
 \code{\link[=createsOutput]{createsOutput()}} \tab Declare one output the module writes to \code{sim}.\cr
 \code{\link[=bindrows]{bindrows()}} \tab Combine the rows above into the metadata table.\cr
+\code{\link[=interchangeFormats]{interchangeFormats()}} \tab The on-disk format a non-R model should use
+for a given \code{objectClass}.\cr
 }
 }
 

@@ -1,0 +1,24 @@
+# SpaDES interchange formats -- canonical registry
+# version: 1
+#
+# Maps the `objectClass` declared in a module's expectsInput()/createsOutput()
+# metadata to the on-disk format a non-R process should read and write.
+#
+# Read in R with:     read.csv(system.file("extdata", "interchange-formats.csv",
+#                                          package = "SpaDES.core"), comment.char = "#")
+# Read in Python with: csv.DictReader(l for l in open(path) if not l.startswith("#"))
+#
+# `mapped` names a zero-copy alternative for handoffs where the cost of a copy
+# matters more than universality; it is an optimisation, not a replacement.
+objectClass,ext,driver,mapped,notes
+SpatRaster,tif,GTiff,,Multi-layer rasters become bands; preserve layer names.
+SpatVector,gpkg,GPKG,arrow,Single writer at a time. `mapped` means GeoArrow over uncompressed Arrow IPC.
+sf,gpkg,GPKG,arrow,As SpatVector.
+data.table,parquet,,arrow,`mapped` means uncompressed Arrow IPC (Feather V2).
+data.frame,parquet,,arrow,As data.table.
+matrix,parquet,,arrow,Dense numeric may also be shared via a raw memory mapping.
+list,json,,,Small non-numeric configuration only.
+numeric,json,,,Length-1 vectors and scalars must round-trip identically.
+integer,json,,,As numeric.
+character,json,,,As numeric.
+logical,json,,,As numeric.
