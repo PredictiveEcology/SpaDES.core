@@ -217,9 +217,13 @@ convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"
   md <- aa[[whDefModule]][[3]]
   deps <- unlist(eval(md$reqdPkgs))
 
-  dFile <- DESCRIPTIONfileFromModule(
-    module, md, deps, hasNamespaceFile, NAMESPACEFile,
-    filePathImportSpadesCore, packageFolderName)
+  dFile <- DESCRIPTIONfromModule(module, metadataList = list(aa),
+                                 modulePath = dirname(packageFolderName))
+
+  # The "import everything" stub is convertToPackage's business, not a
+  # DESCRIPTION writer's, so it stays here rather than being a side effect of
+  # generating the DESCRIPTION.
+  writeImportSpadesCore(deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore)
 
   if (isTRUE(buildDocuments)) {
     documentModule(packageFolderName, gpd, linesWithDefModule)
@@ -271,38 +275,19 @@ filenameForMainFunctions <- function(module, modulePath = ".")
   normPath(file.path(modulePath, unlist(module), "R", paste0(unlist(basename(module)), "Fns.R")))
 
 
-DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESPACEFile, filePathImportSpadesCore,
-                                      packageFolderName, verbose = getOption("Require.verbose")) {
-  d <- list()
-  d$Package <- .moduleNameNoUnderscore(module)
-  d$Type <- "Package"
-
-  d$Title <- md$name
-  d$Description <- md$description
-  d$Version <- as.character(eval(md$version[[2]]))
-  d$Date <- Sys.Date()
-  d$Authors <- md$authors
-  d$Authors <- c(paste0("  ", format(d$Authors)[1]), format(d$Authors)[-1])
-
-
-  hasSC <- grepl("SpaDES.core", deps)
-  if (all(!hasSC))
+# Write the `#' @import <pkg>` stub that lets a converted module see its
+# dependencies without per-function @importFrom tags. Extracted from the former
+# DESCRIPTIONfileFromModule(), which conflated this with writing a DESCRIPTION;
+# the DESCRIPTION half is now DESCRIPTIONfromModule(), shared with
+# SpaDES.project::makeDESCRIPTION().
+writeImportSpadesCore <- function(deps, hasNamespaceFile, NAMESPACEFile,
+                                  filePathImportSpadesCore) {
+  if (all(!grepl("SpaDES.core", deps)))
     deps <- c("SpaDES.core", deps)
+  namespaceImports <- Require::extractPkgName(deps)
 
-  d$Imports <- Require::extractPkgName(deps)
-  versionNumb <- Require::extractVersionNumber(deps)
-  needRemotes <- which(!is.na(Require::extractPkgGitHub(deps)))
-  d$Remotes <- Require::trimVersionNumber(deps[needRemotes])
-
-  hasVersionNumb <- !is.na(versionNumb)
-  inequality <- paste0("(", gsub("(.+)\\((.+)\\)", "\\2", deps[hasVersionNumb]), ")")
-  missingSpace <- !grepl("[[:space:]]", inequality)
-  if (any(missingSpace))
-    inequality[missingSpace] <- gsub("([=><]+)", "\\1 ", inequality[missingSpace])
-
-  namespaceImports <- d$Imports
-  # Create "import all" for each of the packages, unless it is already in an @importFrom
-  if (hasNamespaceFile) {
+  # Skip any package already covered by an explicit @importFrom.
+  if (isTRUE(hasNamespaceFile)) {
     nsTxt <- readLines(NAMESPACEFile)
     hasImportFrom <- grepl("importFrom", nsTxt)
     if (any(hasImportFrom)) {
@@ -314,39 +299,7 @@ DESCRIPTIONfileFromModule <- function(module, md, deps, hasNamespaceFile, NAMESP
 
   cat(paste0("#' @import ", namespaceImports, "\nNULL\n"), sep = "\n",
       file = filePathImportSpadesCore, fill = TRUE)
-
-  d$Imports[hasVersionNumb] <- paste(d$Imports[hasVersionNumb], inequality)
-
-  dFile <- filenameFromFunction(packageFolderName, "DESCRIPTION", fileExt = "")
-  origDESCtxt <- if (file.exists(dFile)) read.dcf(dFile) else character
-
-  cat(paste("Package:", d$Package), file = dFile, sep = "\n")
-  cat(paste("Type:", d$Type), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Title:", d$Title), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Version:", d$Version), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Description:", paste(d$Description, collapse = " ")), file = dFile, sep = "\n", append = TRUE)
-  cat(paste("Date:", d$Date), file = dFile, sep = "\n", append = TRUE)
-  cat(c("Authors@R:  ", format(d$Authors)), file = dFile, sep = "\n", append = TRUE)
-
-  mergeField(origDESCtxt = origDESCtxt, field = d$Imports, fieldName = "Imports", dFile)
-
-  suggs <- c('knitr', 'rmarkdown', 'testthat', 'withr', 'roxygen2')
-  if (length(suggs) || length(origDESCtxt))
-    mergeField(origDESCtxt = origDESCtxt, field = suggs, fieldName = "Suggests", dFile)
-
-  if (length(d$Remotes) || length(origDESCtxt))
-    mergeField(origDESCtxt = origDESCtxt, field = d$Remotes, fieldName = "Remotes", dFile)
-
-  cat("Encoding: UTF-8", sep = "\n", file = dFile, append = TRUE)
-  cat("License: GPL-3", sep = "\n", file = dFile, append = TRUE)
-  cat("VignetteBuilder: knitr, rmarkdown", sep = "\n", file = dFile, append = TRUE)
-  cat("ByteCompile: yes", sep = "\n", file = dFile, append = TRUE)
-  cat("Roxygen: list(markdown = TRUE)", sep = "\n", file = dFile, append = TRUE)
-  cat(paste0("RoxygenNote: ", as.character(packageVersion("roxygen2"))), sep = "\n", file = dFile, append = TRUE)
-
-
-  messageVerbose("New/updated DESCRIPTION file is: ", dFile, verbose = verbose)
-  return(dFile)
+  invisible(namespaceImports)
 }
 
 
