@@ -1,3 +1,36 @@
+# SpaDES.core 3.2.1.9002
+
+## New features
+
+* `DESCRIPTIONfromModule()` writes a `DESCRIPTION` from a module's `defineModule()`
+  metadata. This is what `convertToPackage()` needs to turn a module into an R
+  package, and what `SpaDES.project::makeDESCRIPTION()` uses to give a project a
+  single dependency manifest for `pak`/`renv`. (Module CI does not need it: the
+  shared `render-module-rmd` workflow resolves dependencies with `packages()` and
+  `Require::Require()`.) `Imports` comes from `reqdPkgs` with version inequalities
+  preserved, GitHub specs also become `Remotes` so the result is installable by
+  `pak`, and `(HEAD)` resolves to `>= <version on repos>`. Handles several modules
+  at once, and `singleDESCRIPTION = TRUE` aggregates them into one file with
+  redundancies trimmed.
+
+## Bug fixes
+
+* `convertToPackage()` wrote `Description: paste <text>` whenever a module's
+  `description` was a `paste()` call -- metadata is captured unevaluated, and the
+  call was being deparsed into the field. Module metadata fields are now
+  evaluated.
+* `convertToPackage()` read a module's version as `eval(md$version[[2]])`, which
+  assumes the metadata's `version = list(<module> = "x.y.z")` has exactly that
+  shape. It now looks the module up by name and falls back safely.
+
+## Internal
+
+* `convertToPackage()`'s DESCRIPTION half was an independent second implementation
+  of the same translation carried by `SpaDES.project::makeDESCRIPTION()`. It now
+  delegates to `DESCRIPTIONfromModule()`, keeping only the NAMESPACE `@import`
+  stub (`writeImportSpadesCore()`) that is genuinely its own concern.
+  `SpaDES.project::makeDESCRIPTION()` delegates to the same function.
+
 # SpaDES.core 3.2.1.9001 (development version)
 
 ## Continuous integration

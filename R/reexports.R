@@ -21,6 +21,8 @@ extractInequality <- getFromNamespace("extractInequality", "Require")
 GETWauthThenNonAuth <- getFromNamespace("GETWauthThenNonAuth", "Require")
 getGitCredsToken <- getFromNamespace("getGitCredsToken", "Require")
 trimRedundancies <- getFromNamespace("trimRedundancies", "Require")
+toPkgDTFull <- getFromNamespace("toPkgDTFull", "Require")
+getVersionOnRepos <- getFromNamespace("getVersionOnRepos", "Require")
 ## isAre() and singularPlural() are vendored into R/helpers.R instead
 
 getDrv <- getFromNamespace("getDrv", "reproducible")
