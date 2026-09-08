@@ -12,6 +12,7 @@
   debug,
   notOlderThan,
   events = NULL,
+  eventsBeforeAfter = NULL,
   ...
 )
 }

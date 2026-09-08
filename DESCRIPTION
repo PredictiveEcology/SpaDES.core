@@ -114,6 +114,7 @@ Collate:
     'copy.R'
     'debugging.R'
     'downloadData.R'
+    'eventStops.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'
     'load.R'

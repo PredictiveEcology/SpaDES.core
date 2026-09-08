@@ -1,5 +1,20 @@
 # SpaDES.core 3.2.1.9002
 
+* `spades(events = )` also accepts two reserved entries, `.stopBefore` and
+  `.stopAfter`, which specify a *barrier* rather than a whitelist: every event the
+  modules schedule runs as usual and the call ends at the named event. Each takes
+  the same form as `events` itself, e.g.
+  `events = list(.stopBefore = list(myModule = "run"))`. This is for the case a
+  whitelist cannot express -- "run whatever is scheduled, but do not cross this
+  line" -- since the schedule of a discrete event simulation is emergent and so
+  cannot be enumerated in advance. A `.stopBefore` event does not run and stays on
+  the queue, so the returned `simList` resumes from exactly that point.
+* `stoppedAt()` reports whether a `spades()` call ended at such a barrier, and
+  which one. Needed because a barrier stop is otherwise hard to distinguish from a
+  completed run: `.stopBefore` leaves the clock and queue untouched, so calling
+  again with the same barrier returns an equivalent object, and `.stopAfter` leaves
+  the `simList` reporting itself finished with events still queued.
+
 ## New features
 
 * `DESCRIPTIONfromModule()` writes a `DESCRIPTION` from a module's `defineModule()`
