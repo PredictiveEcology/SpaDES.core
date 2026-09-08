@@ -81,7 +81,44 @@ each of the named modules. With the \code{list} form, all unspecified modules
 will run \emph{all} their events, including internal spades modules, e.g., \code{save},
 that get invoked with the \code{outputs} argument in  \code{simInit}. However, if NOT a named list
 internal spades modules' events will not run, if not listed in the character vector.
-See example.}
+See example.
+
+Two reserved names, \code{.stopBefore} and \code{.stopAfter}, instead specify a
+\emph{barrier}: everything the modules schedule runs as usual, and the call ends at
+the named event. Each takes the same form as \code{events} itself, i.e. a named
+list of event types per module (or a bare character vector, meaning those
+event types in any module):
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{spades(sim, events = list(.stopBefore = list(fireSense_SpreadFit = "run")))
+spades(sim, events = list(.stopAfter  = list(fireSense_SpreadFit = "run")))
+}\if{html}{\out{</div>}}
+
+Use these when the run must not cross a line but the events before it cannot
+be enumerated: in a discrete event simulation the schedule is emergent, so a
+whitelist cannot be written ahead of time without risking the omission of
+something that ought to have run. A \code{.stopBefore} event is not run and is left
+on the queue, so the returned \code{simList} can be resumed from exactly that
+point; a \code{.stopAfter} event runs first. Either may be combined with an
+ordinary whitelist in the same list, in which case both apply. The two are
+parsed once per \code{spades()} call, so an event loop that uses neither pays only a
+\code{length()} check per event; \code{\link[=doEvent]{doEvent()}} called directly takes the parsed object
+as \code{eventsBeforeAfter}, not the reserved names.
+
+Three limits are worth knowing, since a barrier that does not fire is worse
+than one that does not exist. A barrier belongs to the \code{spades()} call it is
+passed to: a module that itself calls \code{spades()} or \code{simInitAndSpades()} builds
+a separate \code{simList} and does not inherit it, so a barrier only guarantees
+anything if no nested run contains a module of that name. \code{simInit()}'s
+\code{.inputObjects} phase runs through the same event machinery but is not given
+the barrier, and admits only \code{.inputObjects} events, so a barrier naming
+\code{.inputObjects} is inert there. And \code{\link[=restartSpades]{restartSpades()}} re-enters \code{spades()}
+without the original call's arguments, so the barrier does not survive a
+restart.
+
+Use \code{\link[=stoppedAt]{stoppedAt()}} to tell a call that hit a barrier from one that ran to the
+end: \code{.stopBefore} leaves the clock and queue untouched, so calling again with
+the same barrier returns an equivalent object, and \code{.stopAfter} leaves the
+\code{simList} reporting itself finished with events still queued.}
 
 \item{.plots}{Character. Sets the parameter of this name in all modules.
 See \code{\link[=Plots]{Plots()}} for possible values. Setting this without \code{"screen"} turns

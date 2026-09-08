@@ -33,6 +33,13 @@ savedSimEnv <- function(envir = .GlobalEnv) {
 #'
 #' @param sim Character string for the `simList` simulation object.
 #' @param useFuture Experimental use of future::future package. Not fully implemented.
+#' @param eventsBeforeAfter The `.stopBefore`/`.stopAfter` barriers of the `events`
+#'   argument, already parsed by [spades()] into a list with `before` and `after`
+#'   elements (see the `events` argument of [spades()]). `NULL`, the default, means
+#'   no barrier, and is what makes the feature free for runs that do not use it: the
+#'   event loop then only tests `length()`. The reserved names themselves are not
+#'   understood here; `spades()` strips them from `events` and passes them through
+#'   this argument instead.
 #'
 #' @inheritParams spades
 #' @return Returns the modified `simList` object.
@@ -52,6 +59,7 @@ savedSimEnv <- function(envir = .GlobalEnv) {
 doEvent <- function(sim, debug = FALSE, notOlderThan,
                     useFuture = getOption("spades.futureEvents", FALSE),
                     events = NULL,
+                    eventsBeforeAfter = NULL,
                     ...) {
   if (!inherits(sim, "simList")) {
     stop("doEvent can only accept a simList object")
@@ -114,6 +122,20 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       dots <- list(...)
       eventIndex <- if (!is.null(events))
         isListedEvent(sim@events, events) else 1L
+
+      ## Barriers, if any were given. `events` arrives already stripped of them by
+      ## spades(), so this is the only cost when the feature is unused.
+      if (length(eventsBeforeAfter) && eventIndex > 0L &&
+          .matchesEventSpec(sim@events[[eventIndex]], eventsBeforeAfter$before)) {
+        ## Stop *before* this event: do not run it and do not remove it from the
+        ## queue, so the returned simList is resumable from exactly here.
+        ev <- sim@events[[eventIndex]]
+        message("spades: stopping before ", ev[["moduleName"]], "'s '", ev[["eventType"]],
+                "' event at time ", sim@simtimes[["current"]],
+                " (events = list(.stopBefore = ...)); it is still queued.")
+        sim <- .recordStop(sim, ev, "before")
+        eventIndex <- 0L
+      }
 
       if (eventIndex == 0L) {
         slot(sim, "current", check = FALSE) <- list() # same as no events left
@@ -359,6 +381,17 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
 
       # current event completed, replace current with empty
       slot(sim, "current", check = FALSE) <- list() # is a list
+
+      ## Stop *after* this event: it has run, and whatever it scheduled stays on
+      ## the queue. Advancing the clock is what ends the loop in `spades()`; the
+      ## `current`-is-empty branch above only ends it when nothing was selected.
+      if (length(eventsBeforeAfter) && .matchesEventSpec(cur, eventsBeforeAfter$after)) {
+        message("spades: stopping after ", cur[["moduleName"]], "'s '", cur[["eventType"]],
+                "' event at time ", sim@simtimes[["current"]],
+                " (events = list(.stopAfter = ...)).")
+        sim <- .recordStop(sim, cur, "after")
+        sim <- .endRunNow(sim)
+      }
     } else {
       # update current simulated time and event
       # Test replacement for speed
@@ -686,6 +719,44 @@ scheduleConditionalEvent <- function(sim,
 #'   that get invoked with the `outputs` argument in  `simInit`. However, if NOT a named list
 #'   internal spades modules' events will not run, if not listed in the character vector.
 #'   See example.
+#'
+#'   Two reserved names, `.stopBefore` and `.stopAfter`, instead specify a
+#'   *barrier*: everything the modules schedule runs as usual, and the call ends at
+#'   the named event. Each takes the same form as `events` itself, i.e. a named
+#'   list of event types per module (or a bare character vector, meaning those
+#'   event types in any module):
+#'
+#'   ```
+#'   spades(sim, events = list(.stopBefore = list(fireSense_SpreadFit = "run")))
+#'   spades(sim, events = list(.stopAfter  = list(fireSense_SpreadFit = "run")))
+#'   ```
+#'
+#'   Use these when the run must not cross a line but the events before it cannot
+#'   be enumerated: in a discrete event simulation the schedule is emergent, so a
+#'   whitelist cannot be written ahead of time without risking the omission of
+#'   something that ought to have run. A `.stopBefore` event is not run and is left
+#'   on the queue, so the returned `simList` can be resumed from exactly that
+#'   point; a `.stopAfter` event runs first. Either may be combined with an
+#'   ordinary whitelist in the same list, in which case both apply. The two are
+#'   parsed once per `spades()` call, so an event loop that uses neither pays only a
+#'   `length()` check per event; [doEvent()] called directly takes the parsed object
+#'   as `eventsBeforeAfter`, not the reserved names.
+#'
+#'   Three limits are worth knowing, since a barrier that does not fire is worse
+#'   than one that does not exist. A barrier belongs to the `spades()` call it is
+#'   passed to: a module that itself calls `spades()` or `simInitAndSpades()` builds
+#'   a separate `simList` and does not inherit it, so a barrier only guarantees
+#'   anything if no nested run contains a module of that name. `simInit()`'s
+#'   `.inputObjects` phase runs through the same event machinery but is not given
+#'   the barrier, and admits only `.inputObjects` events, so a barrier naming
+#'   `.inputObjects` is inert there. And [restartSpades()] re-enters `spades()`
+#'   without the original call's arguments, so the barrier does not survive a
+#'   restart.
+#'
+#'   Use [stoppedAt()] to tell a call that hit a barrier from one that ran to the
+#'   end: `.stopBefore` leaves the clock and queue untouched, so calling again with
+#'   the same barrier returns an equivalent object, and `.stopAfter` leaves the
+#'   `simList` reporting itself finished with events still queued.
 #'
 #' @param ... Any. Can be used to make a unique cache identity, such as "replicate = 1".
 #'            This will be included in the `Cache` call, so will be unique
@@ -1208,6 +1279,15 @@ setMethod(
         if (isTRUE(specialStart)) sim@simtimes[["current"]] <- sim@events[[1]][["eventTime"]]
       }
 
+      ## The barrier form of `events` (.stopBefore/.stopAfter) is parsed exactly
+      ## once, here: `events` continues downstream as a plain whitelist, and the
+      ## event loop pays only `length(eventsBeforeAfter)` per event when unused.
+      ## `doEvent()` called directly takes the parsed object, not the raw form.
+      eventStops <- .parseEventStops(events)
+      eventsBeforeAfter <- eventStops$eventsBeforeAfter
+      events <- eventStops$events
+      sim <- .clearStop(sim)  # so stoppedAt() can never describe an earlier call
+
       simDTthreads <- getOption("spades.DTthreads", 1L)
       message("Using setDTthreads(", simDTthreads, "). To change: 'options(spades.DTthreads = X)'.")
       origDTthreads <- setDTthreads(simDTthreads)
@@ -1225,7 +1305,7 @@ setMethod(
         sim <- .stepEvent(sim, recoverMode, allObjNames,
                           thisSpadesCallRandomStr = thisSpadesCallRandomStr,
                           debug = debug, notOlderThan = notOlderThan,
-                          events = events, ...)
+                          events = events, eventsBeforeAfter = eventsBeforeAfter, ...)
 
         ## Conditional Scheduling -- adds only 900 nanoseconds per event, if none exist
         if (exists("._conditionalEvents", envir = sim, inherits = FALSE)) {
@@ -1787,7 +1867,7 @@ recoverModePost <- function(sim, rmo, recoverMode) {
 #' @return The updated `simList` (with `sim@.xData[["._rmo"]]` advanced).
 #' @keywords internal
 .stepEvent <- function(sim, recoverMode, allObjNames, thisSpadesCallRandomStr,
-                       debug, notOlderThan, events = NULL, ...) {
+                       debug, notOlderThan, events = NULL, eventsBeforeAfter = NULL, ...) {
   ## RecoverMode -- snapshot state before the event (was "Step 4" inline in the loop)
   if (recoverMode > 0)
     sim@.xData[["._rmo"]] <- recoverModePre(sim, sim@.xData[["._rmo"]], allObjNames,
@@ -1795,7 +1875,7 @@ recoverModePost <- function(sim, rmo, recoverMode) {
                                             thisSpadesCallRandomStr = thisSpadesCallRandomStr)
 
   sim <- doEvent(sim, debug = debug, notOlderThan = notOlderThan,
-                 events = events, ...)  # process the next event
+                 events = events, eventsBeforeAfter = eventsBeforeAfter, ...)  # process the next event
 
   ## RecoverMode -- record events added during the event (was "Step 5" inline in the loop)
   if (recoverMode > 0)
