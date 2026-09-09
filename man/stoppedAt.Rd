@@ -11,7 +11,11 @@ stoppedAt(sim)
 }
 \value{
 \code{NULL} if the call was not stopped by a barrier; otherwise a list with
-\code{side} (\code{"before"} or \code{"after"}), \code{moduleName}, \code{eventType} and \code{time}.
+\code{side} (\code{"before"} or \code{"after"}), \code{moduleName}, \code{eventType}, and \code{time}: the
+barrier event's own scheduled time, in the \code{simList}'s time units, so it is
+comparable with \code{\link[=time]{time()}} and \code{\link[=end]{end()}}. Note it is not \code{time(sim)} on the returned
+object: reaching a barrier ends the run, which leaves the clock at the end of the
+simulation exactly as a completed call would.
 }
 \description{
 A call stopped by an \code{events} barrier (see the \code{events} argument of \code{\link[=spades]{spades()}})

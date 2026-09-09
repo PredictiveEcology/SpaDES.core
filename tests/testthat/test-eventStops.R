@@ -142,12 +142,29 @@ test_that("stoppedAt() distinguishes a barrier stop from a completed run", {
   expect_equal(st$moduleName, "fireSpread")
   expect_equal(st$eventType, "burn")
   expect_true(is.numeric(st$time))
+  ## In the simList's own time units, not the internal seconds count: `burn` is
+  ## scheduled in years, so a caller comparing st$time with end(sim) must see years.
+  ## Note this is the time the barrier fired, which is NOT time(before): reaching the
+  ## barrier empties the current event, and that is what ends the loop, so the clock
+  ## is left at the end of the run exactly as for a call that finished.
+  expect_equal(attr(st$time, "unit"), timeunit(before))
+  expect_lte(as.numeric(st$time), as.numeric(end(before)))
+  ## events() reports in the simList's timeunit, and the barrier event is still queued,
+  ## so the recorded time is exactly when that event was going to run.
+  queued <- events(before)
+  expect_equal(as.numeric(st$time),
+               as.numeric(queued[moduleName == "fireSpread" &
+                                   eventType == "burn"][1L][["eventTime"]]))
 
   ## stopped after: this is the case that most needs a marker, because the simList
   ## reports itself finished while events remain queued
   after <- mk() |> spades(debug = FALSE, .plots = NA,
                           events = list(.stopAfter = list(fireSpread = "burn")))
   expect_equal(stoppedAt(after)$side, "after")
+  ## Names on these came from the queue row and leaked a module path into the record.
+  expect_null(names(stoppedAt(after)$moduleName))
+  expect_null(names(stoppedAt(after)$eventType))
+  expect_equal(stoppedAt(after)$moduleName, "fireSpread")
   expect_gte(time(after), end(after))
   expect_true(NROW(events(after)) > 0)
 
