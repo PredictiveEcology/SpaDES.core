@@ -13,7 +13,10 @@
   which one. Needed because a barrier stop is otherwise hard to distinguish from a
   completed run: `.stopBefore` leaves the clock and queue untouched, so calling
   again with the same barrier returns an equivalent object, and `.stopAfter` leaves
-  the `simList` reporting itself finished with events still queued.
+  the `simList` reporting itself finished with events still queued. The record's
+  `time` is the barrier event's own scheduled time, in the `simList`'s time units, so
+  it is comparable with `time()` and `end()`; `moduleName` and `eventType` are plain
+  unnamed scalars.
 * `options(spades.cacheChaining = TRUE)` fixes: an uncached `.inputObjects` no
   longer leaves the previous module's `cacheId` on the `simList`, which could
   chain a later module off a state that no longer described it; and all chains

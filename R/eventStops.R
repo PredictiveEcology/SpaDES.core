@@ -77,13 +77,41 @@ utils::globalVariables(c(".stopBeforeTxt", ".stopAfterTxt", "._stoppedAtTxt"))
 #'
 #' @param sim A `simList`.
 #' @return `NULL` if the call was not stopped by a barrier; otherwise a list with
-#'   `side` (`"before"` or `"after"`), `moduleName`, `eventType` and `time`.
+#'   `side` (`"before"` or `"after"`), `moduleName`, `eventType`, and `time`: the
+#'   barrier event's own scheduled time, in the `simList`'s time units, so it is
+#'   comparable with [time()] and [end()]. Note it is not `time(sim)` on the returned
+#'   object: reaching a barrier ends the run, which leaves the clock at the end of the
+#'   simulation exactly as a completed call would.
 #'
 #' @export
 #' @examples
-#' \dontrun{
-#' out <- spades(sim, events = list(.stopBefore = list(myModule = "run")))
-#' if (!is.null(stoppedAt(out))) message("stopped at the barrier, not finished")
+#' \donttest{
+#' if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+#'       packageVersion("SpaDES.tools") > "3.0.0") {
+#'   opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
+#'
+#'   mkSim <- function() {
+#'     simInit(
+#'       times = list(start = 0.0, end = 3.0, timeunit = "year"),
+#'       params = list(
+#'         randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+#'         fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+#'       ),
+#'       modules = list("randomLandscapes", "fireSpread"),
+#'       paths = list(modulePath = getSampleModules(tempdir()))
+#'     )
+#'   }
+#'
+#'   ## a call that ran to completion has nothing to report
+#'   stoppedAt(spades(mkSim(), debug = FALSE, .plots = NA))
+#'
+#'   ## one stopped at a barrier reports which side, which event, and when
+#'   out <- spades(mkSim(), debug = FALSE, .plots = NA,
+#'                 events = list(.stopBefore = list(fireSpread = "burn")))
+#'   stoppedAt(out)
+#'
+#'   options(opts) # reset options
+#' }
 #' }
 stoppedAt <- function(sim) {
   if (!inherits(sim, "simList")) stop("stoppedAt() needs a simList")
@@ -94,9 +122,22 @@ stoppedAt <- function(sim) {
 ## internal state there (._rmo, ._simInitContext, ...), so it is not visible as a
 ## user object.
 .recordStop <- function(sim, event, side) {
+  ## The queue row's moduleName carries the module's full path as its name, and on the
+  ## `.stopAfter` side that name survives into the record -- so `stoppedAt()` printed a
+  ## named vector with a /tmp path in it. Strip names: this is a value a caller compares
+  ## and prints, not a queue row.
+  ## The barrier event's OWN scheduled time, in the simList's timeunit.
+  ## Not sim@simtimes[["current"]]: that is the internal seconds count, so 2 years
+  ## reads as 63115200 and no caller can compare it with end(sim). And not time(sim)
+  ## either: on the `before` side the barrier event has been selected but not started,
+  ## so the clock still reads the PREVIOUS event's time -- a stop before a `burn` due
+  ## at year 1 would report year 0.
+  evTime <- convertTimeunit(event[["eventTime"]], sim@simtimes[["timeunit"]], sim@.xData)
   assign(._stoppedAtTxt,
-         list(side = side, moduleName = event[["moduleName"]],
-              eventType = event[["eventType"]], time = sim@simtimes[["current"]]),
+         list(side = side,
+              moduleName = unname(as.character(event[["moduleName"]])),
+              eventType = unname(as.character(event[["eventType"]])),
+              time = evTime),
          envir = sim@.xData)
   sim
 }

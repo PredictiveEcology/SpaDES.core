@@ -11,7 +11,11 @@ stoppedAt(sim)
 }
 \value{
 \code{NULL} if the call was not stopped by a barrier; otherwise a list with
-\code{side} (\code{"before"} or \code{"after"}), \code{moduleName}, \code{eventType} and \code{time}.
+\code{side} (\code{"before"} or \code{"after"}), \code{moduleName}, \code{eventType}, and \code{time}: the
+barrier event's own scheduled time, in the \code{simList}'s time units, so it is
+comparable with \code{\link[=time]{time()}} and \code{\link[=end]{end()}}. Note it is not \code{time(sim)} on the returned
+object: reaching a barrier ends the run, which leaves the clock at the end of the
+simulation exactly as a completed call would.
 }
 \description{
 A call stopped by an \code{events} barrier (see the \code{events} argument of \code{\link[=spades]{spades()}})
@@ -30,8 +34,32 @@ So rather than have callers parse a message, the stop is recorded on the
 \code{simList} and read back with this.
 }
 \examples{
-\dontrun{
-out <- spades(sim, events = list(.stopBefore = list(myModule = "run")))
-if (!is.null(stoppedAt(out))) message("stopped at the barrier, not finished")
+\donttest{
+if (requireNamespace("SpaDES.tools", quietly = TRUE) &&
+      packageVersion("SpaDES.tools") > "3.0.0") {
+  opts <- options("spades.moduleCodeChecks" = FALSE, "spades.useRequire" = FALSE)
+
+  mkSim <- function() {
+    simInit(
+      times = list(start = 0.0, end = 3.0, timeunit = "year"),
+      params = list(
+        randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA),
+        fireSpread = list(.plotInitialTime = NA, .plotInterval = NA)
+      ),
+      modules = list("randomLandscapes", "fireSpread"),
+      paths = list(modulePath = getSampleModules(tempdir()))
+    )
+  }
+
+  ## a call that ran to completion has nothing to report
+  stoppedAt(spades(mkSim(), debug = FALSE, .plots = NA))
+
+  ## one stopped at a barrier reports which side, which event, and when
+  out <- spades(mkSim(), debug = FALSE, .plots = NA,
+                events = list(.stopBefore = list(fireSpread = "burn")))
+  stoppedAt(out)
+
+  options(opts) # reset options
+}
 }
 }

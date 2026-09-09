@@ -131,7 +131,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
         ## queue, so the returned simList is resumable from exactly here.
         ev <- sim@events[[eventIndex]]
         message("spades: stopping before ", ev[["moduleName"]], "'s '", ev[["eventType"]],
-                "' event at time ", sim@simtimes[["current"]],
+                "' event at time ",
+                convertTimeunit(ev[["eventTime"]], sim@simtimes[["timeunit"]], sim@.xData),
                 " (events = list(.stopBefore = ...)); it is still queued.")
         sim <- .recordStop(sim, ev, "before")
         eventIndex <- 0L
@@ -387,7 +388,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       ## `current`-is-empty branch above only ends it when nothing was selected.
       if (length(eventsBeforeAfter) && .matchesEventSpec(cur, eventsBeforeAfter$after)) {
         message("spades: stopping after ", cur[["moduleName"]], "'s '", cur[["eventType"]],
-                "' event at time ", sim@simtimes[["current"]],
+                "' event at time ",
+                convertTimeunit(cur[["eventTime"]], sim@simtimes[["timeunit"]], sim@.xData),
                 " (events = list(.stopAfter = ...)).")
         sim <- .recordStop(sim, cur, "after")
         sim <- .endRunNow(sim)
