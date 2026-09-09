@@ -1646,7 +1646,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
   inputObjectsThisModule <- sim@depends@dependencies[[i]]@inputObjects[["objectName"]]
   allObjsProvided <- inputObjectsThisModule %in% sim$.userSuppliedObjNames
-  if (!all(allObjsProvided)) {
+  ## `all(logical(0))` is TRUE, so a module declaring no `expectsInput` used to
+  ##   land in the "user supplied everything needed" skip vacuously and its
+  ##   `.inputObjects` was never called at all. Declaring nothing is not the same
+  ##   as having everything supplied. A module with no `.inputObjects` to run
+  ##   pays only the `.getModuleInputObjects()` lookup just below.
+  if (!length(inputObjectsThisModule) || !all(allObjsProvided)) {
     if (!is.null(.getModuleInputObjects(sim, m))) {
       if (!missing(objects)) {
 
@@ -1810,7 +1815,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             if (cacheChaining) {
               fnEnv <- sim@.xData[[dotMods]][[mBase]]
               prevCache <- attr(sim, "tags")
-              ce <- chainingEnv(cachePath(sim))
               # # take only functions; no objects; select because the functions have ":"
               nonObjects <- nonObjectsForCacheChaining(objectsToEvaluateForCaching, fnEnv, classOptions)
 
@@ -1819,7 +1823,6 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               #                      as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
               chaining <- cacheChainingSetup(cacheIt = cacheIt,
                                              prevCache = prevCache,
-                                             chainingEnv = ce, # cachePath,
                                              nonObjects = nonObjects,
                                              fnCallAsExpr = fnCallAsExpr,
                                              module = mBase,
@@ -1836,7 +1839,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               # attr(sim, lastEventDetails) <- paste(mBase, ".inputObjects", collapse = "_")
               sim <- cacheChainingPost(sim, cacheIt, prevCache,
                                        cacheIdOfSkip = chaining$cacheIdOfSkip,
-                                       df = chaining$df, ce,
+                                       df = chaining$df,
                                        moduleName = mBase,
                                        eventType = ".inputObjects")
             }
@@ -1856,6 +1859,12 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         if (!is.null(.inputObjects)) {
           sim <- .inputObjects(sim)
           .checkEventReturn(sim, mBase, ".inputObjects", fromCache = FALSE)
+          ## cacheChaining: this ran outside Cache, so it mutated `sim` off the
+          ##   chain. Drop the previous module's cacheId, or the next module would
+          ##   chain off a state that no longer describes `sim`. `.runEvent()`
+          ##   enforces the same invariant via `cacheChainingPost()`.
+          if (isTRUE(getOption("spades.cacheChaining", FALSE)))
+            attr(sim, "tags") <- NULL
         }
       }
 

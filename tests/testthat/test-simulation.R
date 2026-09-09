@@ -30,10 +30,6 @@ test_that("simulation runs with new Cache chaining", {
     c(".inputObjects", "init",  "stats", "burn", "move")
   )
 
-  me <- chainingEnv(getOption("reproducible.cachePath"))
-  me$eventCachingDF <- NULL # make sure it is empty
-
-
   mess <- mySims <- test <- testEvalPostEvent <- list()
   opts11 <- list()
   op1 <- getOption("spades.evalPostEvent")

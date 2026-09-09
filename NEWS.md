@@ -17,6 +17,13 @@
   `time` is the barrier event's own scheduled time, in the `simList`'s time units, so
   it is comparable with `time()` and `end()`; `moduleName` and `eventType` are plain
   unnamed scalars.
+* `options(spades.cacheChaining = TRUE)` fixes: an uncached `.inputObjects` no
+  longer leaves the previous module's `cacheId` on the `simList`, which could
+  chain a later module off a state that no longer described it; and all chains
+  recorded against one cache entry are now found, not only the first.
+* a module's `.inputObjects` now runs when the module declares no `expectsInput`.
+  It was skipped, because `all(logical(0))` is `TRUE` and so a module declaring
+  nothing fell into the "user already supplied everything needed" case.
 
 ## New features
 
