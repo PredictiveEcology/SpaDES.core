@@ -8,19 +8,49 @@
 #'
 #' `convertToPackage` will:
 #' \enumerate{
-#'   \item move any functions that were defined within the main module file
-#'   (`moduleName.R`) into the R folder, with the same name, but ending with `Fns.R`;
-#'   \item keep the `defineModule(...)` function call with all the metadata in
-#'         the same file, `moduleName.R`, but with all other content removed,
-#'         i.e., only the `defineModule(...)` will be here.
-#'   \item build documentation from all the \pkg{roxygen2} tags
-#'   \item places one \pkg{roxygen2} tag, `@export` in front of the `doEvent.moduleName`
-#'         function, so that the function can be found by `SpaDES.core`
-#'   \item All other functions will be kept "private", i.e., not exported, unless
-#'         the user manually adds `@export`, as per a normal package
-#'   \item will make a `DESCRIPTION` file from the SpaDES module metadata
-#'   \item will make a `NAMESPACE` file from the \pkg{roxygen2} tags (e.g., `@export`)
+#'   \item **copy** the functions defined in the main module file (`moduleName.R`)
+#'         into `R/READONLYFromMainModuleFile.R`. The main module file is **not**
+#'         modified: it still holds both `defineModule(...)` and the function
+#'         definitions afterwards. The `R/` copy is what package tooling
+#'         (`pkgload::load_all`, `covr`) sees; the module itself continues to be
+#'         parsed from `moduleName.R` as before. Only written when
+#'         `buildDocuments = TRUE`;
+#'   \item build documentation from all the \pkg{roxygen2} tags;
+#'   \item write a `DESCRIPTION` file from the SpaDES module metadata, via
+#'         [DESCRIPTIONfromModule()];
+#'   \item write `R/imports.R` with one `@import` per `reqdPkgs` entry;
+#'   \item write a `NAMESPACE` file from the \pkg{roxygen2} tags. Note this only
+#'         happens when `buildDocuments = TRUE`; with `FALSE` you get a
+#'         `DESCRIPTION` and `R/imports.R` but no `NAMESPACE` and no function
+#'         copies, which is *not* enough for `devtools::test()` or
+#'         `covr::package_coverage()` to work;
+#'   \item write an `.Rbuildignore`.
 #' }
+#'
+#' @section Testing a module as a package:
+#'
+#' `convertToPackage()` cannot be called from `tests/testthat/setup.R`:
+#' `devtools::test()` and `devtools::check()` both require a `DESCRIPTION` before
+#' `testthat` ever sources `setup.R`, so the conversion has to happen *before*
+#' they are called, not from inside them.
+#'
+#' Use `destinationPath` to build the package rendition somewhere disposable
+#' (e.g. `tempdir()`), leaving the module directory untouched:
+#'
+#' ```
+#' pkg <- convertToPackage("myModule", path = "..", destinationPath = tempdir())
+#' devtools::test(pkg)
+#' covr::package_coverage(pkg)
+#' ```
+#'
+#' Two things commonly block `R CMD INSTALL` (and therefore
+#' `covr::package_coverage()`) on the result, both inherited from the module:
+#' an `authors` field written as `structure(list(...), class = "person")` rather
+#' than a call to `person()`, which R rejects as an unsafe call in `Authors@R`;
+#' and the `tests/unitTests.R` file left behind by [newModule()], which
+#' `R CMD check` runs and which fails with `No test files found` because it
+#' hardcodes a relative path. [newModule()] also writes no `tests/testthat.R`,
+#' so without one `R CMD check` runs no tests at all.
 #'
 #' A user can continue to use the module code as before, i.e., by editing it and
 #' putting `browser()` etc. It will be parsed during `simInit`. Because the functions
@@ -121,9 +151,20 @@
 #' @param path Character string of `modulePath`. Defaults to  `getOption("spades.modulePath")`.
 #'
 #' @param buildDocuments A logical. If `TRUE`, the default, then the documentation
-#'   will be built, if any exists, using `roxygen2::roxygenise`.
+#'   will be built, if any exists, using `roxygen2::roxygenise`. Note that with
+#'   `FALSE` no `NAMESPACE` and no function copies are written, which is not
+#'   enough for `devtools::test()` or `covr::package_coverage()`.
 #'
-#' @return invoked for the side effect of converting a module to a package
+#' @param destinationPath Character string. Optional. If supplied, the module
+#'   directory is first copied to `file.path(destinationPath, module)` and the
+#'   package rendition is built *there*, leaving the original module untouched.
+#'   This is the non-destructive way to test or measure coverage on a module --
+#'   see the *Testing a module as a package* section. If `NULL` (default) the
+#'   module is converted in place, which is **not reversible**.
+#'
+#' @return Invoked for its side effects. Invisibly returns the path of the
+#'   directory that now holds the package rendition -- the module directory
+#'   itself, or the copy under `destinationPath`.
 #'
 #' @export
 #' @examples
@@ -134,13 +175,33 @@
 #' }
 #'
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
-                             buildDocuments = TRUE) {
+                             buildDocuments = TRUE, destinationPath = NULL) {
   stopifnot(
     requireNamespace("pkgload", quietly = TRUE),
     requireNamespace("roxygen2", quietly = TRUE)
   )
 
-  mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
+  module <- unlist(module)
+  if (length(module) != 1L)
+    stop("convertToPackage() converts one module at a time; got ", length(module))
+
+  # Building into `destinationPath` leaves the module untouched. Everything below
+  # writes relative to `packageFolderName`, and documentModule() re-derives the
+  # main module file from it, so the whole module directory has to be copied --
+  # not just <module>.R -- for the copy to be a working package.
+  if (!is.null(destinationPath)) {
+    srcDir <- file.path(path, module)
+    if (!dir.exists(srcDir))
+      stop("no module directory at ", srcDir)
+    destDir <- file.path(destinationPath, module)
+    unlink(destDir, recursive = TRUE)
+    checkPath(destinationPath, create = TRUE)
+    if (!all(file.copy(srcDir, destinationPath, recursive = TRUE)))
+      stop("could not copy ", srcDir, " to ", destinationPath)
+    path <- destinationPath
+  }
+
+  mainModuleFile <- file.path(path, module, paste0(module, ".R"))
   packageFolderName <- dirname(mainModuleFile)
   aa <- parse(mainModuleFile, keep.source = TRUE)
   gpd <- getParseData(aa)
@@ -264,7 +325,7 @@ vignettes/.*\\.log$
   rbi <- unique(c(startCat, rbi, modFiles))
   cat(rbi, file = RBuildIgnoreFile, fill = TRUE, sep = "\n")
 
-  return(invisible())
+  invisible(packageFolderName)
 }
 
 filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fileExt = ".R") {
