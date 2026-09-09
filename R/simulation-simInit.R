@@ -1812,7 +1812,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                                     modifyList(defaultCacheArgs, extraCacheArgs))))
 
             cacheChaining <- getOption("spades.cacheChaining", FALSE)
-            if (cacheChaining) {
+            ## Recording is unconditional -- see cacheChainingSetup()'s `use` argument.
+            {
               fnEnv <- sim@.xData[[dotMods]][[mBase]]
               prevCache <- attr(sim, "tags")
               # # take only functions; no objects; select because the functions have ":"
@@ -1828,6 +1829,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                              module = mBase,
                                              event = ".inputObjects",
                                              led = attr(sim, lastEventDetails),
+                                             use = cacheChaining,
                                              verbose = verbose)
               fnCallAsExpr <- chaining$fnCallAsExpr
             }
@@ -1835,14 +1837,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             sim <- eval(fnCallAsExpr)
             .checkEventReturn(sim, mBase, ".inputObjects", fromCache = TRUE)
 
-            if (cacheChaining) {
-              # attr(sim, lastEventDetails) <- paste(mBase, ".inputObjects", collapse = "_")
-              sim <- cacheChainingPost(sim, cacheIt, prevCache,
-                                       cacheIdOfSkip = chaining$cacheIdOfSkip,
-                                       df = chaining$df,
-                                       moduleName = mBase,
-                                       eventType = ".inputObjects")
-            }
+            sim <- cacheChainingPost(sim, cacheIt, prevCache,
+                                     cacheIdOfSkip = chaining$cacheIdOfSkip,
+                                     df = chaining$df,
+                                     moduleName = mBase,
+                                     eventType = ".inputObjects")
 
           }
 

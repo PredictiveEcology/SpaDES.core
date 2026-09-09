@@ -166,3 +166,30 @@ test_that("cacheChaining finds every chain recorded against one entry", {
   expect_gt(n1, 0)          # liveness: chaining really engages
   expect_equal(n2, n1)      # the second recorded chain is not lost
 })
+
+test_that("the chain is recorded even when spades.cacheChaining is off", {
+  skip_on_cran()
+  testInit(sampleModReqdPkgs, opts = list())
+  modulePath <- getSampleModules(tmpdir)
+
+  times <- list(start = 1.0, end = 2.0)
+  modules <- list("randomLandscapes", "fireSpread")
+  params <- list(
+    .globals = list(burnStats = "npixelsburned", stackName = "landscape"),
+    randomLandscapes = list(.useCache = c("init", ".inputObjects"), nx = 20, ny = 20),
+    fireSpread = list(.useCache = c("init", ".inputObjects"))
+  )
+
+  ## Recording must not depend on the option. A pass run with chaining off used to
+  ## write no tags at all, so a later pass -- the one that would benefit -- had no
+  ## chain to follow, and the user had to have known to enable it in advance.
+  cp <- file.path(tmpdir, "recordedWhileOff")
+  runChainTest(cp, FALSE, times, params, modules, modulePath, 42)
+
+  tags <- showCache(cp, verbose = -1)
+  chainTags <- tags[startsWith(tags[["tagKey"]], "cacheChaining")]
+  expect_gt(NROW(chainTags), 0L)
+
+  ## And the chain written while off is usable by a later run with it on.
+  expect_no_error(runChainTest(cp, TRUE, times, params, modules, modulePath, 42))
+})
