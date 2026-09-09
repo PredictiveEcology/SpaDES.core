@@ -4,13 +4,15 @@
 \alias{moduleCoverage}
 \title{Calculate module coverage of unit tests}
 \usage{
-moduleCoverage(mod, modulePath = "..")
+moduleCoverage(mod, modulePath = "..", ...)
 }
 \arguments{
 \item{mod}{Character string. The module's name. Default is \code{basename(getwd())}}
 
 \item{modulePath}{Character string. The path to the module directory
 (default is "..", i.e., one level up from working directory).}
+
+\item{...}{Passed to \code{\link[covr:package_coverage]{covr::package_coverage()}}.}
 }
 \value{
 Return a list of two coverage objects and two data.table objects.

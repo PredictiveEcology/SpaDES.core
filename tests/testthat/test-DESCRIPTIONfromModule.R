@@ -195,3 +195,63 @@ test_that("convertToPackage(destinationPath=) leaves the module untouched", {
 test_that("convertToPackage() refuses more than one module at a time", {
   expect_error(convertToPackage(c("a", "b"), path = tempdir()), "one module at a time")
 })
+
+test_that("coverage on the generated file maps back onto the module file", {
+  ## convertToPackage() copies the module's functions into
+  ## R/READONLYFromMainModuleFile.R, so covr attributes coverage to a generated
+  ## file that exists in no repository. Unmapped, a coverage report names a file
+  ## nobody can open and shows nothing for <module>.R, which is what people edit.
+  skip_if_not_installed("pkgload")
+  skip_if_not_installed("roxygen2")
+
+  d <- file.path(tempdir(), paste0("ctpCov", .rndstr(len = 4)))
+  on.exit(unlink(d, recursive = TRUE), add = TRUE)
+  dir.create(d, recursive = TRUE)
+  withr::local_options(spades.moduleDocument = FALSE)
+  suppressMessages(newModule("modCov", d, open = FALSE, unitTests = FALSE))
+  modFile <- file.path(d, "modCov", "modCov.R")
+  cat("\n#' Double\n#' @param x n\n#' @return n\nmyHelper <- function(x) x * 2L\n",
+      "another <- function(y) y + 1L\n", sep = "", file = modFile, append = TRUE)
+
+  pkg <- suppressMessages(suppressWarnings(
+    convertToPackage("modCov", path = d, buildDocuments = TRUE,
+                     destinationPath = file.path(d, "built"))))
+  genF <- file.path(pkg, "R", "READONLYFromMainModuleFile.R")
+  expect_true(file.exists(genF))
+
+  gen <- readLines(genF)
+  orig <- readLines(modFile)
+
+  ## the header must not swallow the module's first line
+  expect_true(any(gen == orig[[1L]]))
+  expect_length(grep("^#% removedLines: ", gen), 1L)
+
+  for (pat in c("^myHelper", "^another")) {
+    genLine <- grep(pat, gen)
+    origLine <- grep(pat, orig)
+    expect_length(genLine, 1L)
+    expect_length(origLine, 1L)
+
+    sr <- structure(as.integer(c(genLine, 1L, genLine, 10L, 1L, 10L, genLine, genLine)),
+                    srcfile = srcfile(genF), class = "srcref")
+    cov <- structure(list(list(value = 1L, srcref = sr, functions = "f")), class = "coverage")
+    names(cov) <- paste(c(basename(genF), as.integer(sr)), collapse = ":")
+
+    out <- .remapModuleCoverage(cov, genF, modFile)
+    expect_identical(as.integer(out[[1L]][["srcref"]])[[1L]], as.integer(origLine))
+    expect_identical(basename(attr(out[[1L]][["srcref"]], "srcfile")[["filename"]]), "modCov.R")
+    expect_match(names(out)[[1L]], "^modCov\\.R:")
+  }
+})
+
+test_that(".remapModuleCoverage leaves other files alone", {
+  d <- file.path(tempdir(), paste0("ctpCov2", .rndstr(len = 4)))
+  on.exit(unlink(d, recursive = TRUE), add = TRUE)
+  dir.create(d, recursive = TRUE)
+  other <- file.path(d, "other.R")
+  writeLines("g <- function() 1", other)
+  sr <- structure(as.integer(c(1, 1, 1, 5, 1, 5, 1, 1)), srcfile = srcfile(other), class = "srcref")
+  cov <- structure(list(list(value = 1L, srcref = sr, functions = "g")), class = "coverage")
+  ## a generated file that does not exist: the coverage must come back untouched
+  expect_identical(.remapModuleCoverage(cov, file.path(d, "nope.R"), other), cov)
+})

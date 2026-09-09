@@ -31,81 +31,91 @@
 #' @importFrom data.table data.table
 #' @importFrom reproducible .file.move
 #' @include simList-class.R
-#' @rdname moduleCoverage
+#' @param ... Passed to [covr::package_coverage()].
 #'
-moduleCoverage <- function(mod, modulePath = "..") {
-  stop("This is a stub that is not intended for use")
-  if (requireNamespace("testthat")) {
-    if (is.null(getOption("testthat.progress.max_fails"))) {
-      options(testthat.progress.max_fails = Inf)
-    }
+#' @rdname moduleCoverage
+#' @export
+moduleCoverage <- function(mod, modulePath = "..", ...) {
+  if (!requireNamespace("covr", quietly = TRUE) || !requireNamespace("testthat", quietly = TRUE))
+    stop("moduleCoverage needs testthat and covr; install.packages(c('testthat', 'covr'))")
 
-    if (missing(mod))
-      mod <- basename(getwd())
+  if (missing(mod))
+    mod <- basename(getwd())
 
+  # Build the package rendition somewhere disposable: convertToPackage() is not
+  # reversible, and measuring coverage must not rewrite the user's module.
+  pkg <- convertToPackage(mod, path = modulePath, buildDocuments = TRUE,
+                          destinationPath = tempfile("moduleCoverage"))
+  on.exit(unlink(dirname(pkg), recursive = TRUE), add = TRUE)
 
-    # this is the trigger that causes 2 behaviours to occur
-    #   inside `simInit` and `spades`
-    opts <- options("spades.covr" = mod, "spades.covr2" = TRUE)
+  cov <- covr::package_coverage(pkg, ...)
 
-    on.exit(options(opts))
-    .pkgEnv$._covr <- list()
+  # Coverage lands on R/READONLYFromMainModuleFile.R, a generated file that exists
+  # in no repository -- so, unmapped, a coverage report names a file nobody can
+  # open and shows nothing for the module file people actually edit.
+  .remapModuleCoverage(cov,
+                       generatedFile = file.path(pkg, "R", "READONLYFromMainModuleFile.R"),
+                       moduleFile = file.path(modulePath, mod, paste0(mod, ".R")))
+}
 
-    # Copy all functions new file in R subfolder
-    tmpFile <- paste0("R/",mod,"_main.R")
-    modFileNam <- file.path(modulePath, mod, paste0(mod, ".R"))
-    b <- parse(file = modFileNam)
-    defModLine <- grep("defineModule", b)
-    tf <- tempfile(fileext = ".R")
-    .file.move(modFileNam, tf)
-    on.exit(.file.move(tf, modFileNam, overwrite = TRUE), add = TRUE)
-    cat(do.call(c, lapply(b[-defModLine], function(x) format(x))),
-        file = tmpFile, sep = "\n")
-    cat(do.call(c, lapply(b[defModLine], function(x) format(x))),
-        file = modFileNam, sep = "\n")
-    on.exit(unlink(tmpFile), add = TRUE)
+#' Map coverage on the generated module source back onto the module file
+#'
+#' [convertToPackage()] copies the module's functions into
+#' `R/READONLYFromMainModuleFile.R`, which is a header followed by the module
+#' file with the `defineModule()` block removed. Coverage collected on that file
+#' therefore has to be shifted twice to name a real location: once for the
+#' header, and once for the removed block.
+#'
+#' @param cov A `coverage` object from \pkg{covr}.
+#' @param generatedFile Path to `R/READONLYFromMainModuleFile.R`.
+#' @param moduleFile Path to the module's `<module>.R`.
+#'
+#' @return `cov`, with traces from `generatedFile` renamed and renumbered to
+#'   `moduleFile`. Traces from other files are returned untouched.
+#' @keywords internal
+#' @rdname remapModuleCoverage
+.remapModuleCoverage <- function(cov, generatedFile, moduleFile) {
+  if (!file.exists(generatedFile))
+    return(cov)
 
-    test_files <- dir(file.path(modulePath, mod, "tests", "testthat"), full.names = TRUE)
+  gen <- readLines(generatedFile, warn = FALSE)
+  header <- grep("^#%", gen)
+  header <- if (length(header)) seq_len(max(header[header <= length(gen)])) else integer(0)
+  nHeader <- length(header)
 
+  rm <- grep("^#% removedLines: ", gen[header], value = TRUE)
+  if (length(rm) != 1L)
+    return(cov) # nothing authoritative to map with; leave the coverage alone
+  rmRange <- as.integer(strsplit(sub("^#% removedLines: ", "", rm), "-", fixed = TRUE)[[1L]])
+  removedStart <- rmRange[[1L]]
+  removedN <- rmRange[[2L]] - rmRange[[1L]] + 1L
 
-    # run test files
-
-    ################
-    options(opts)
-    test_files <- dir(file.path("tests", "testthat"), full.names = TRUE)
-    bb <- covr::file_coverage(source_files = checkPath(dir("R", full.names = TRUE, pattern = "\\.R")),
-                              test_files = grep("Ward", test_files, value = TRUE) )
-    #################
-
-
-    ignore <- lapply(test_files, source)
-
-    covr <- do.call(c, .pkgEnv$._covr)
-    class(covr) <-  "coverage"
-
-    options(opts)
-
-    # Now do tests all 2nd time, but this time testing unique function calls without `spades` or `simInit`
-    # test_files <- dir(file.path(modulePath, mod, "tests"), pattern = ".R$", full.names = TRUE)
-    bb <- covr::file_coverage(source_files = checkPath(dir("R", full.names = TRUE)),
-                        test_files = test_files )
-
-    # Need to update file names of the bb so that they are the same as the covr
-    #bb2 <- bb
-    #covr2 <- covr
-    # names(bb) <- gsub(paste0(mod, ".R"), "tmpDeleteMeForCoverageOnly", names(bb))
-    # bbChar <- sapply(bb[grep(basename(tmpFile), names(bb))], function(x) as.character(x$srcref))
-    # covrChar <- sapply(covr[grep("Biomass_core", names(covr))], function(x) as.character(x$srcref))
-    # mm <- match(unname(bbChar), unname(covrChar))
-    # whNoNA <- which(!is.na(mm));
-    # bb[whNoNA] <- covr[mm[whNoNA]]
-    # names(bb)[whNoNA] <- names(covr[mm[whNoNA]])
-
-    covr2 <- c(covr, bb)
-    class(covr2) <-  "coverage"
-    return(covr2)
-  } else {
-    stop("moduleCoverage doesn't work without testthat and covr; install.packages(c('testthat', 'covr'))")
+  # generated line -> line in the module file
+  toModuleLine <- function(k) {
+    j <- k - nHeader                      # index within the retained module lines
+    ifelse(j < removedStart, j, j + removedN)
   }
+
+  genNorm <- normalizePath(generatedFile, mustWork = FALSE)
+  modSrcFile <- srcfile(normalizePath(moduleFile, mustWork = FALSE))
+
+  isGen <- vapply(cov, function(x) {
+    identical(normalizePath(attr(x[["srcref"]], "srcfile")[["filename"]], mustWork = FALSE), genNorm)
+  }, logical(1))
+  if (!any(isGen))
+    return(cov)
+
+  cov[isGen] <- lapply(cov[isGen], function(x) {
+    sr <- as.integer(x[["srcref"]])
+    # srcref layout: first_line, first_byte, last_line, last_byte,
+    #                first_column, last_column, first_parsed, last_parsed
+    sr[c(1L, 3L, 7L, 8L)] <- as.integer(toModuleLine(sr[c(1L, 3L, 7L, 8L)]))
+    x[["srcref"]] <- structure(sr, srcfile = modSrcFile, class = "srcref")
+    x
+  })
+  names(cov)[isGen] <- vapply(cov[isGen], function(x) {
+    paste(c(basename(moduleFile), as.integer(x[["srcref"]])), collapse = ":")
+  }, character(1))
+  cov
 }
 
