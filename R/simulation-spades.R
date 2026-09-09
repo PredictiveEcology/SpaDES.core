@@ -1642,11 +1642,16 @@ setMethod(
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
       # attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
     }
+    ## The return guard runs FIRST. An event that returned something other than a simList
+    ## must produce .checkEventReturn()'s clear, named error; handing that value to
+    ## cacheChainingPost() would fail earlier and less helpfully. This ordering only became
+    ## load-bearing when recording stopped being gated by spades.cacheChaining -- before,
+    ## the guard was reached first whenever the option was off, which is the common case.
+    .checkEventReturn(sim, cur[["moduleName"]], cur[["eventType"]], fromCache = isTRUE(cacheIt))
     sim <- cacheChainingPost(sim, cacheIt, prevCache,
                              chaining$cacheIdOfSkip, chaining$df,
                              moduleName = cur[["moduleName"]],
                              eventType = cur[["eventType"]])
-    .checkEventReturn(sim, cur[["moduleName"]], cur[["eventType"]], fromCache = isTRUE(cacheIt))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
