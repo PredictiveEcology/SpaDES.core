@@ -1615,8 +1615,9 @@ setMethod(
 
     rr <- .Random.seed
 
-    if (cacheChaining) {
-
+    ## Recording is unconditional; `cacheChaining` only decides whether the chain is USED.
+    ## A pass run with the option off would otherwise leave no tags for a later pass.
+    {
       nonObjects <- nonObjectsForCacheChaining(moduleSpecificObjects, fnEnv, classOptions)
       # append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
       #        classOptions)
@@ -1633,6 +1634,7 @@ setMethod(
         module = cur[["moduleName"]],
         event = cur[["eventType"]],
         led = attr(sim, lastEventDetails),
+        use = cacheChaining,
         verbose = verbose)
       fnCallAsExpr <- chaining$fnCallAsExpr
     }
@@ -1640,13 +1642,16 @@ setMethod(
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
       # attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
     }
-    if (cacheChaining) {
-      sim <- cacheChainingPost(sim, cacheIt, prevCache,
-                               chaining$cacheIdOfSkip, chaining$df,
-                               moduleName = cur[["moduleName"]],
-                               eventType = cur[["eventType"]])
-    }
+    ## The return guard runs FIRST. An event that returned something other than a simList
+    ## must produce .checkEventReturn()'s clear, named error; handing that value to
+    ## cacheChainingPost() would fail earlier and less helpfully. This ordering only became
+    ## load-bearing when recording stopped being gated by spades.cacheChaining -- before,
+    ## the guard was reached first whenever the option was off, which is the common case.
     .checkEventReturn(sim, cur[["moduleName"]], cur[["eventType"]], fromCache = isTRUE(cacheIt))
+    sim <- cacheChainingPost(sim, cacheIt, prevCache,
+                             chaining$cacheIdOfSkip, chaining$df,
+                             moduleName = cur[["moduleName"]],
+                             eventType = cur[["eventType"]])
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
@@ -2849,8 +2854,13 @@ evalPostEvent <- function(envir = parent.frame()) {
   }
 }
 
+#' @param use Logical. When `FALSE`, the chain is still RECORDED -- `df` is built and
+#'   `cacheChainingPost()` writes it -- but it is not USED to skip ahead. Writing must not
+#'   depend on the option: a pass run with chaining off would otherwise record nothing, and
+#'   a later pass would have no chain to follow. Recording costs a `CacheDigest()` of the
+#'   module's functions plus one tag write, measured at ~4 ms per event.
 cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
-                               module, event, led,
+                               module, event, led, use = TRUE,
                                verbose = getOption("reproducible.verbose")) {
   df <- cacheIdOfSkip <- NULL
   if (!is.null(prevCache) && isTRUE(cacheIt)) {
@@ -2861,6 +2871,10 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
     #df <- data.table(prevCache = prevCache, digestNonObjects = digestNonObjects,
     #                 module = module, event = event)
     set(df, NULL, lastEventDetails, led)
+    ## Recording is done: `df` is built. The rest is the USE half -- reading the chain
+    ## back and pointing this call at the entry it can skip to.
+    if (!isTRUE(use)) return(list(cacheIdOfSkip = NULL, df = df, fnCallAsExpr = fnCallAsExpr))
+
     cacheId <- gsub("cacheId:", "", prevCache)
     sc <- showCacheFast(cacheId = cacheId)
     ccVals <- sc[startsWith(sc$tagKey, "cacheChaining")]

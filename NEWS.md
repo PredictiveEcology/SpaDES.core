@@ -1,5 +1,15 @@
 # SpaDES.core 3.2.1.9002
 
+## Bug fixes
+
+* the cache chain is now RECORDED whether or not `options(spades.cacheChaining = )` is
+  set; the option decides only whether a recorded chain is USED. Recording used to be
+  gated too, so a pass run with the option off left no tags behind and the later pass --
+  the one that would actually benefit -- had nothing to chain from. That required knowing
+  in advance, on the first pass, that chaining would be wanted later. Recording costs a
+  `CacheDigest()` of the module's functions plus one tag write: measured at about 4 ms per
+  event (2.7 ms + 1.1 ms), against events that run for seconds or longer.
+
 * `spades(events = )` also accepts two reserved entries, `.stopBefore` and
   `.stopAfter`, which specify a *barrier* rather than a whitelist: every event the
   modules schedule runs as usual and the call ends at the named event. Each takes
