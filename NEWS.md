@@ -2,6 +2,15 @@
 
 ## Bug fixes
 
+* After a Cache hit on `.inputObjects` or an event, the params that are not cached on
+  (`.useCache`, `.useCacheArgs`, `.useCloud`) were put back by position, using an index
+  built on the module's current param names but applied to the cached param list. Adding
+  or removing one of those params does not change the cacheId, so an older cache entry
+  still hits, and its values shifted: a module that gained `.useCloud` ahead of
+  `.useCacheArgs` got `.useCacheArgs = TRUE` and the next cached event stopped with
+  "subscript out of bounds"; the reverse handed `.useCloud` the `.useCacheArgs` list.
+  They are now put back by name.
+
 * `moduleCoverage()` did not measure a module's tests, and its result could not be
   tallied. It ran covr's default `type = "tests"`, i.e. only the top-level `tests/*.R`;
   a module has no `tests/testthat.R`, so its testthat suite never ran, while a stale

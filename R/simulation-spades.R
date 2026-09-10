@@ -1658,10 +1658,12 @@ setMethod(
     }
   }
 
-  ## put back the current values of params that were not cached on
+  ## put back the current values of params that were not cached on -- by name: after a Cache
+  ## hit these are the cached params, whose names and order can differ from the current ones
   if (exists("modParams", inherits = FALSE)) {
-    if (sum(paramsDontCacheOnActual)) {
-      sim@params[[cur[["moduleName"]]]][paramsDontCacheOnActual] <- modParamsFull[paramsDontCacheOnActual]
+    dontCacheOn <- names(modParamsFull)[paramsDontCacheOnActual]
+    if (length(dontCacheOn)) {
+      sim@params[[cur[["moduleName"]]]][dontCacheOn] <- modParamsFull[dontCacheOn]
     }
   }
 
