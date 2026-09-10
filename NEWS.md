@@ -2,6 +2,21 @@
 
 ## Bug fixes
 
+* `documentModule()` wrote the header of `R/READONLYFromMainModuleFile.R` without a
+  trailing newline, so the first line of the module file was welded onto the last `#%`
+  comment line. Harmless when that line is itself a comment, which is why it went
+  unnoticed; a module whose first line is code lost that line into a comment.
+
+* `documentModule()` located the `defineModule()` block to cut with
+  `grep("defineModule", gpd$text)`, which matches every mention rather than the call, so
+  the result can have more than one row. `a:b` on the two-column result then used only
+  the first element of each and warned (`numerical expression has 2 elements: only the
+  first used`). It happened to produce the right range; it was not choosing it. The
+  widest spanning row is now selected explicitly, and the cut range is recorded in the
+  generated file's header as `#% removedLines: <start>-<end>` so coverage can be mapped
+  back from it.
+
+
 * the cache chain is now RECORDED whether or not `options(spades.cacheChaining = )` is
   set; the option decides only whether a recorded chain is USED. Recording used to be
   gated too, so a pass run with the option off left no tags behind and the later pass --
@@ -36,6 +51,22 @@
   nothing fell into the "user already supplied everything needed" case.
 
 ## New features
+
+* `moduleCoverage()` reports a module's test coverage against `<module>.R`. It replaces a
+  stub whose body began `stop("This is a stub that is not intended for use")` -- while the
+  `test-template.R` that `newModule()` generates has always told users to call it. It
+  converts the module into a temporary directory (via the new
+  `convertToPackage(destinationPath = )`, so the module is not touched), runs
+  `covr::package_coverage()` there, and maps the result back onto the module file.
+
+  The mapping is the point. `covr` attributes coverage to
+  `R/READONLYFromMainModuleFile.R`, the file `convertToPackage()` generates -- which
+  exists in no repository. Unmapped, a coverage report names a file nobody can open and
+  shows nothing at all for `<module>.R`, the file people actually edit and the one a
+  coverage badge is read as describing. The alternative would have been to require modules
+  to keep their functions in `R/`; that changes how modules are written for the
+  convenience of the tooling, so the coverage is moved instead.
+
 
 * `convertToPackage()` gains `destinationPath`. Without it the function rewrote the
   module in place and, as its own documentation says, not reversibly -- so there was no
