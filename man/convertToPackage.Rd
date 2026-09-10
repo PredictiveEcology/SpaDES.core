@@ -7,7 +7,8 @@
 convertToPackage(
   module = NULL,
   path = getOption("spades.modulePath"),
-  buildDocuments = TRUE
+  buildDocuments = TRUE,
+  destinationPath = NULL
 )
 }
 \arguments{
@@ -16,7 +17,16 @@ convertToPackage(
 \item{path}{Character string of \code{modulePath}. Defaults to  \code{getOption("spades.modulePath")}.}
 
 \item{buildDocuments}{A logical. If \code{TRUE}, the default, then the documentation
-will be built, if any exists, using \code{roxygen2::roxygenise}.}
+will be built, if any exists, using \code{roxygen2::roxygenise}. Note that with
+\code{FALSE} no \code{NAMESPACE} and no function copies are written, which is not
+enough for \code{devtools::test()} or \code{covr::package_coverage()}.}
+
+\item{destinationPath}{Character string. Optional. If supplied, the module
+directory is first copied to \code{file.path(destinationPath, module)} and the
+package rendition is built \emph{there}, leaving the original module untouched.
+This is the non-destructive way to test or measure coverage on a module --
+see the \emph{Testing a module as a package} section. If \code{NULL} (default) the
+module is converted in place, which is \strong{not reversible}.}
 }
 \value{
 Invoked for its side effects. There will be a new or modified
@@ -33,7 +43,9 @@ This means that any modifications to source code
 will be read in during the \code{simInit} call, as is the practice when a module
 is not a package.
 
-invoked for the side effect of converting a module to a package
+Invoked for its side effects. Invisibly returns the path of the
+directory that now holds the package rendition -- the module directory
+itself, or the copy under \code{destinationPath}.
 }
 \description{
 \emph{EXPERIMENTAL -- USE WITH CAUTION}. This function attempts to convert a
@@ -45,19 +57,49 @@ These
 \details{
 \code{convertToPackage} will:
 \enumerate{
-\item move any functions that were defined within the main module file
-(\code{moduleName.R}) into the R folder, with the same name, but ending with \code{Fns.R};
-\item keep the \code{defineModule(...)} function call with all the metadata in
-the same file, \code{moduleName.R}, but with all other content removed,
-i.e., only the \code{defineModule(...)} will be here.
-\item build documentation from all the \pkg{roxygen2} tags
-\item places one \pkg{roxygen2} tag, \verb{@export} in front of the \code{doEvent.moduleName}
-function, so that the function can be found by \code{SpaDES.core}
-\item All other functions will be kept "private", i.e., not exported, unless
-the user manually adds \verb{@export}, as per a normal package
-\item will make a \code{DESCRIPTION} file from the SpaDES module metadata
-\item will make a \code{NAMESPACE} file from the \pkg{roxygen2} tags (e.g., \verb{@export})
+\item \strong{copy} the functions defined in the main module file (\code{moduleName.R})
+into \code{R/READONLYFromMainModuleFile.R}. The main module file is \strong{not}
+modified: it still holds both \code{defineModule(...)} and the function
+definitions afterwards. The \verb{R/} copy is what package tooling
+(\code{pkgload::load_all}, \code{covr}) sees; the module itself continues to be
+parsed from \code{moduleName.R} as before. Only written when
+\code{buildDocuments = TRUE};
+\item build documentation from all the \pkg{roxygen2} tags;
+\item write a \code{DESCRIPTION} file from the SpaDES module metadata, via
+\code{\link[=DESCRIPTIONfromModule]{DESCRIPTIONfromModule()}};
+\item write \code{R/imports.R} with one \verb{@import} per \code{reqdPkgs} entry;
+\item write a \code{NAMESPACE} file from the \pkg{roxygen2} tags. Note this only
+happens when \code{buildDocuments = TRUE}; with \code{FALSE} you get a
+\code{DESCRIPTION} and \code{R/imports.R} but no \code{NAMESPACE} and no function
+copies, which is \emph{not} enough for \code{devtools::test()} or
+\code{covr::package_coverage()} to work;
+\item write an \code{.Rbuildignore}.
 }
+}
+\section{Testing a module as a package}{
+
+
+\code{convertToPackage()} cannot be called from \code{tests/testthat/setup.R}:
+\code{devtools::test()} and \code{devtools::check()} both require a \code{DESCRIPTION} before
+\code{testthat} ever sources \code{setup.R}, so the conversion has to happen \emph{before}
+they are called, not from inside them.
+
+Use \code{destinationPath} to build the package rendition somewhere disposable
+(e.g. \code{tempdir()}), leaving the module directory untouched:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{pkg <- convertToPackage("myModule", path = "..", destinationPath = tempdir())
+devtools::test(pkg)
+covr::package_coverage(pkg)
+}\if{html}{\out{</div>}}
+
+Two things commonly block \verb{R CMD INSTALL} (and therefore
+\code{covr::package_coverage()}) on the result, both inherited from the module:
+an \code{authors} field written as \code{structure(list(...), class = "person")} rather
+than a call to \code{person()}, which R rejects as an unsafe call in \code{Authors@R};
+and the \code{tests/unitTests.R} file left behind by \code{\link[=newModule]{newModule()}}, which
+\verb{R CMD check} runs and which fails with \verb{No test files found} because it
+hardcodes a relative path. \code{\link[=newModule]{newModule()}} also writes no \code{tests/testthat.R},
+so without one \verb{R CMD check} runs no tests at all.
 
 A user can continue to use the module code as before, i.e., by editing it and
 putting \code{browser()} etc. It will be parsed during \code{simInit}. Because the functions
@@ -94,6 +136,7 @@ e.g., via \code{devtools::install} or the like. So one can simply remove the
 package from \code{.libPaths} and delete the \code{DESCRIPTION} file and
 \code{SpaDES.core} will treat it as a normal module.
 }
+
 \section{Reverting}{
 
 Currently, this is not a reversible process. We recommend trying one module at

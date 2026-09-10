@@ -161,3 +161,37 @@ test_that("convertToPackage still produces a DESCRIPTION and the @import stub", 
   expect_true(any(grepl("@import SpaDES.core", imports)))
   expect_true(any(grepl("@import data.table", imports)))
 })
+
+test_that("convertToPackage(destinationPath=) leaves the module untouched", {
+  ## convertToPackage() is irreversible and rewrites in place, which makes it
+  ## unusable for "convert, then test" workflows. destinationPath builds the
+  ## package rendition in a throwaway directory instead.
+  skip_if_not_installed("pkgload")
+  skip_if_not_installed("roxygen2")
+
+  d <- file.path(tempdir(), paste0("ctpDest", .rndstr(len = 4)))
+  on.exit(unlink(d, recursive = TRUE), add = TRUE)
+  dir.create(d, recursive = TRUE)
+  withr::local_options(spades.moduleDocument = FALSE)
+  suppressMessages(newModule("modDest", d, open = FALSE, unitTests = FALSE))
+  src <- file.path(d, "modDest")
+
+  before <- sort(list.files(src, recursive = TRUE, all.files = TRUE, no.. = TRUE))
+
+  dest <- file.path(d, "built")
+  pkg <- suppressMessages(suppressWarnings(
+    convertToPackage("modDest", path = d, buildDocuments = FALSE, destinationPath = dest)))
+
+  ## the source module is byte-for-byte the same set of files
+  expect_identical(sort(list.files(src, recursive = TRUE, all.files = TRUE, no.. = TRUE)), before)
+  expect_false(file.exists(file.path(src, "DESCRIPTION")))
+
+  ## and the package rendition landed under destinationPath, whose path is returned
+  expect_identical(normalizePath(pkg), normalizePath(file.path(dest, "modDest")))
+  expect_true(file.exists(file.path(pkg, "DESCRIPTION")))
+  expect_true(file.exists(file.path(pkg, "R", "imports.R")))
+})
+
+test_that("convertToPackage() refuses more than one module at a time", {
+  expect_error(convertToPackage(c("a", "b"), path = tempdir()), "one module at a time")
+})
