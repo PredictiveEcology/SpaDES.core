@@ -294,6 +294,8 @@ test_that("remapped coverage reports paths relative to the module repository", {
 
   out <- .remapModuleCoverage(cov, genF, modFile)
   expect_identical(unique(as.data.frame(out)$filename), "modRoot.R")
-  expect_identical(attr(out, "root"), normalizePath(modDir))
-  expect_identical(attr(out, "package")$path, normalizePath(modDir))
+  ## forward slashes, or covr cannot strip the root from its own paths on Windows
+  expect_identical(attr(out, "root"), normalizePath(modDir, winslash = "/"))
+  expect_identical(attr(out, "package")$path, normalizePath(modDir, winslash = "/"))
+  expect_false(grepl("\\\\", attr(out, "root")))
 })

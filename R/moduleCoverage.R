@@ -96,11 +96,15 @@ moduleCoverage <- function(mod, modulePath = "..", ...) {
     ifelse(j < removedStart, j, j + removedN)
   }
 
-  genNorm <- normalizePath(generatedFile, mustWork = FALSE)
-  modSrcFile <- srcfile(normalizePath(moduleFile, mustWork = FALSE))
+  # Forward slashes throughout: `covr:::to_relative_path()` strips `root` followed
+  # by a "/", so a backslashed Windows path never matches its own root and covr
+  # reports the whole absolute path -- which is what would reach codecov.
+  genNorm <- normalizePath(generatedFile, winslash = "/", mustWork = FALSE)
+  modSrcFile <- srcfile(normalizePath(moduleFile, winslash = "/", mustWork = FALSE))
 
   isGen <- vapply(cov, function(x) {
-    identical(normalizePath(attr(x[["srcref"]], "srcfile")[["filename"]], mustWork = FALSE), genNorm)
+    identical(normalizePath(attr(x[["srcref"]], "srcfile")[["filename"]],
+                            winslash = "/", mustWork = FALSE), genNorm)
   }, logical(1))
   if (!any(isGen))
     return(cov)
@@ -124,7 +128,7 @@ moduleCoverage <- function(mod, modulePath = "..", ...) {
   # upload absolute temp paths that match nothing in the repository. For a SpaDES
   # module the repository root is the module directory itself, with <module>.R at
   # the top of it, which is what a coverage service needs to see.
-  moduleRoot <- normalizePath(dirname(moduleFile), mustWork = FALSE)
+  moduleRoot <- normalizePath(dirname(moduleFile), winslash = "/", mustWork = FALSE)
   attr(cov, "root") <- moduleRoot
   if (!is.null(attr(cov, "package")))
     attr(cov, "package")$path <- moduleRoot

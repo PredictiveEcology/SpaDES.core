@@ -74,6 +74,9 @@
   the rendition was built in, which would upload absolute temporary paths matching
   nothing in the repository. They are repointed at the module directory, so a module
   repository reports `<module>.R` at its root exactly as a package reports `R/*.R`.
+  Paths are recorded with forward slashes: `covr:::to_relative_path()` strips `root`
+  followed by a `"/"`, so a backslashed Windows path never matches its own root and
+  covr reports the whole absolute path.
 
 
 * `convertToPackage()` gains `destinationPath`. Without it the function rewrote the
