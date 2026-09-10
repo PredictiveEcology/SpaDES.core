@@ -37,6 +37,31 @@
 
 ## New features
 
+* `convertToPackage()` gains `destinationPath`. Without it the function rewrote the
+  module in place and, as its own documentation says, not reversibly -- so there was no
+  way to build the package rendition of a module (to run `devtools::test()` or measure
+  coverage) without permanently altering the module. With it, the module directory is
+  copied first and the rendition is built in the copy. The whole directory is copied,
+  not just `<module>.R`, because `documentModule()` re-derives the main module file from
+  the destination and `tests/` and `data/` have to travel with it for the result to be a
+  working package. The function now returns the path holding the rendition, and rejects
+  more than one module rather than silently converting only the first.
+
+* `convertToPackage()`'s documentation described behaviour it does not have, and now
+  describes what it does. It *copies* the module's functions into
+  `R/READONLYFromMainModuleFile.R`; it does not move them, and the main module file
+  still defines them afterwards -- the docs claimed `defineModule()` would be left
+  "with all other content removed". Neither the function copies nor `NAMESPACE` are
+  written when `buildDocuments = FALSE`, which is not enough for `devtools::test()` or
+  `covr::package_coverage()` to work; that was not stated either. A new section also
+  records why the conversion cannot be driven from `tests/testthat/setup.R`
+  (`devtools::test()` and `check()` both need a `DESCRIPTION` before `testthat` ever
+  sources `setup.R`), and the two module-inherited things that block `R CMD INSTALL` on
+  the result: an `authors` field written as `structure(list(...), class = "person")`,
+  which R rejects in `Authors@R` as an unsafe call, and the `tests/unitTests.R` that
+  `newModule()` leaves behind, which `R CMD check` runs and which fails with
+  `No test files found`.
+
 * `DESCRIPTIONfromModule()` writes a `DESCRIPTION` from a module's `defineModule()`
   metadata. This is what `convertToPackage()` needs to turn a module into an R
   package, and what `SpaDES.project::makeDESCRIPTION()` uses to give a project a
