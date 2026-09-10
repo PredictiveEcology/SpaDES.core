@@ -15,26 +15,22 @@ moduleCoverage(mod, modulePath = "..", ...)
 \item{...}{Passed to \code{\link[covr:package_coverage]{covr::package_coverage()}}.}
 }
 \value{
-Return a list of two coverage objects and two data.table objects.
-The two coverage objects are named \code{moduleCoverage} and \code{functionCoverage}.
-The \code{moduleCoverage} object contains the percent value of unit test coverage
-for the module.
-The \code{functionCoverage} object contains percentage values for unit test
-coverage for each function defined in the module.
-Please use \code{covr::report()} to view the coverage information.
-Two data.tables give the information of all the tested and untested functions
-in the module.
+A \code{coverage} object from \pkg{covr}, with its traces mapped onto the
+module's \verb{<module>.R}. Use \code{covr::percent_coverage()}, \code{covr::report()} or
+\code{covr::to_cobertura()} on it.
 }
 \description{
 Calculate the test coverage by unit tests for the module and its functions.
 }
 \note{
-When running this function, the test files must be strictly placed in
-the \file{tests/testthat/} directory under module path.
+The module's tests must be \pkg{testthat} tests in the
+\file{tests/testthat/} directory under the module path: that suite is what is
+run and measured. Other top-level scripts in \file{tests/} are not run.
+Only module code that the tests call directly is counted: \code{\link[=simInit]{simInit()}} and
+\code{\link[=spades]{spades()}} evaluate a module's functions from \verb{<module>.R} into the \code{simList},
+not from the instrumented package, so code run through them is not counted.
 To automatically generate this folder, please set \code{unitTests = TRUE}
 when creating a new module using \code{\link[=newModule]{newModule()}}.
-To accurately test your module, the test filename must follow the format
-\code{test-functionName.R}.
 }
 \seealso{
 \code{\link[=newModule]{newModule()}}.
