@@ -1845,9 +1845,13 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           }
 
-          # put back the current values of params that were not cached on
-          if (sum(paramsDontCacheOnActual))
-            sim@params[[mBase]][paramsDontCacheOnActual] <- modParams[paramsDontCacheOnActual]
+          # put back the current values of params that were not cached on -- by name. After a
+          # Cache hit these are the cached params, whose names and order can differ from the
+          # current module's (a not-cached-on param added or removed since the entry was made
+          # does not change the cacheId), so an index built on the current names misaligns
+          dontCacheOn <- names(modParams)[paramsDontCacheOnActual]
+          if (length(dontCacheOn))
+            sim@params[[mBase]][dontCacheOn] <- modParams[dontCacheOn]
 
 
 
