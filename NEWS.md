@@ -1,4 +1,4 @@
-# SpaDES.core 3.2.1.9002
+# SpaDES.core 3.2.1.9003
 
 ## Bug fixes
 
@@ -10,6 +10,10 @@
   `.useCacheArgs` got `.useCacheArgs = TRUE` and the next cached event stopped with
   "subscript out of bounds"; the reverse handed `.useCloud` the `.useCacheArgs` list.
   They are now put back by name.
+
+# SpaDES.core 3.2.1.9002
+
+## Bug fixes
 
 * `moduleCoverage()` did not measure a module's tests, and its result could not be
   tallied. It ran covr's default `type = "tests"`, i.e. only the top-level `tests/*.R`;
