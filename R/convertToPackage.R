@@ -176,14 +176,16 @@
 #'
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
                              buildDocuments = TRUE, destinationPath = NULL) {
+  # Validate the arguments before the optional dependencies: a caller who passes
+  # two modules should be told that, not that roxygen2 is missing.
+  module <- unlist(module)
+  if (length(module) != 1L)
+    stop("convertToPackage() converts one module at a time; got ", length(module))
+
   stopifnot(
     requireNamespace("pkgload", quietly = TRUE),
     requireNamespace("roxygen2", quietly = TRUE)
   )
-
-  module <- unlist(module)
-  if (length(module) != 1L)
-    stop("convertToPackage() converts one module at a time; got ", length(module))
 
   # Building into `destinationPath` leaves the module untouched. Everything below
   # writes relative to `packageFolderName`, and documentModule() re-derives the

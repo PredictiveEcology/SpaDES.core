@@ -45,7 +45,9 @@
   not just `<module>.R`, because `documentModule()` re-derives the main module file from
   the destination and `tests/` and `data/` have to travel with it for the result to be a
   working package. The function now returns the path holding the rendition, and rejects
-  more than one module rather than silently converting only the first.
+  more than one module rather than silently converting only the first. That argument
+  check runs before the `pkgload`/`roxygen2` `stopifnot()`, so a caller who passes two
+  modules is told that rather than that a suggested package is missing.
 
 * `convertToPackage()`'s documentation described behaviour it does not have, and now
   describes what it does. It *copies* the module's functions into
