@@ -2,6 +2,18 @@
 
 ## Bug fixes
 
+* `moduleCoverage()` did not measure a module's tests, and its result could not be
+  tallied. It ran covr's default `type = "tests"`, i.e. only the top-level `tests/*.R`;
+  a module has no `tests/testthat.R`, so its testthat suite never ran, while a stale
+  top-level script (such as an old `tests/Test_<module>.R`) did, and failed the whole
+  run. It now runs `tests/testthat/` against the instrumented package. Separately, the
+  remapped coverage carried a plain `srcfile`, which `covr::percent_coverage()` cannot
+  read ("vector size cannot be infinite"); it now carries a `srcfilecopy`. And coverage
+  on a module's own `R/*.R` files kept the temporary build directory's path, which
+  nothing in the repository matches; it is now mapped to the module's `R/` directory.
+  Only code the tests call directly is counted: `simInit()`/`spades()` evaluate a
+  module's functions from `<module>.R`, not from the instrumented package.
+
 * `documentModule()` wrote the header of `R/READONLYFromMainModuleFile.R` without a
   trailing newline, so the first line of the module file was welded onto the last `#%`
   comment line. Harmless when that line is itself a comment, which is why it went
