@@ -244,8 +244,10 @@ test_that("coverage on the generated file maps back onto the module file", {
 
     ## what a coverage service actually receives: covr reports names relative to
     ## `root`, so this must be the bare file at the repository root, not an
-    ## absolute path into the throwaway build directory.
-    expect_identical(unname(covr:::display_name(out)), "modCov.R")
+    ## absolute path into the throwaway build directory. `as.data.frame()` is what
+    ## `to_cobertura()` and `codecov()` consume.
+    skip_if_not_installed("covr")
+    expect_identical(unique(as.data.frame(out)$filename), "modCov.R")
   }
 })
 
@@ -266,6 +268,8 @@ test_that("remapped coverage reports paths relative to the module repository", {
   ## to_cobertura() takes <sources> from attr(cov, "package")$path. Both are the
   ## temporary build directory until the remap moves them, which would upload
   ## absolute temp paths that match nothing in the repository.
+  skip_if_not_installed("covr")
+
   d <- file.path(tempdir(), paste0("ctpRoot", .rndstr(len = 4)))
   on.exit(unlink(d, recursive = TRUE), add = TRUE)
   modDir <- file.path(d, "modRoot")
@@ -289,7 +293,7 @@ test_that("remapped coverage reports paths relative to the module repository", {
   names(cov) <- paste(c(basename(genF), as.integer(sr)), collapse = ":")
 
   out <- .remapModuleCoverage(cov, genF, modFile)
-  expect_identical(unname(covr:::display_name(out)), "modRoot.R")
+  expect_identical(unique(as.data.frame(out)$filename), "modRoot.R")
   expect_identical(attr(out, "root"), normalizePath(modDir))
   expect_identical(attr(out, "package")$path, normalizePath(modDir))
 })
