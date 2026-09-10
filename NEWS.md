@@ -67,6 +67,14 @@
   to keep their functions in `R/`; that changes how modules are written for the
   convenience of the tooling, so the coverage is moved instead.
 
+  The result is uploadable. `covr` reports every filename relative to
+  `attr(cov, "root")` (via `covr:::display_name()`, and so via `to_cobertura()` and
+  `codecov()`), and `to_cobertura()` takes its `<sources>` from
+  `attr(cov, "package")$path`; both otherwise still point at the throwaway directory
+  the rendition was built in, which would upload absolute temporary paths matching
+  nothing in the repository. They are repointed at the module directory, so a module
+  repository reports `<module>.R` at its root exactly as a package reports `R/*.R`.
+
 
 * `convertToPackage()` gains `destinationPath`. Without it the function rewrote the
   module in place and, as its own documentation says, not reversibly -- so there was no

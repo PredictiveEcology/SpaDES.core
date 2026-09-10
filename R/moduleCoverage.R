@@ -116,6 +116,18 @@ moduleCoverage <- function(mod, modulePath = "..", ...) {
   names(cov)[isGen] <- vapply(cov[isGen], function(x) {
     paste(c(basename(moduleFile), as.integer(x[["srcref"]])), collapse = ":")
   }, character(1))
+
+  # covr reports every filename relative to `root` (`covr:::display_name()`, used
+  # by `as.data.frame.coverage()` and so by `to_cobertura()` and `codecov()`), and
+  # `to_cobertura()` takes its <sources> from `attr(cov, "package")$path`. Both are
+  # still the throwaway directory the rendition was built in, so leaving them would
+  # upload absolute temp paths that match nothing in the repository. For a SpaDES
+  # module the repository root is the module directory itself, with <module>.R at
+  # the top of it, which is what a coverage service needs to see.
+  moduleRoot <- normalizePath(dirname(moduleFile), mustWork = FALSE)
+  attr(cov, "root") <- moduleRoot
+  if (!is.null(attr(cov, "package")))
+    attr(cov, "package")$path <- moduleRoot
   cov
 }
 
