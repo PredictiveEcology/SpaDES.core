@@ -115,6 +115,7 @@ Collate:
     'debugging.R'
     'downloadData.R'
     'eventStops.R'
+    'interchange-formats.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'
     'load.R'

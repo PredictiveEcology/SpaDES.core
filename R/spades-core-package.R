@@ -146,6 +146,8 @@
 #'      [expectsInput()] \tab Declare one input the module reads from `sim`.\cr
 #'      [createsOutput()] \tab Declare one output the module writes to `sim`.\cr
 #'      [bindrows()] \tab Combine the rows above into the metadata table.\cr
+#'      [interchangeFormats()] \tab The on-disk format a non-R model should use
+#'         for a given `objectClass`.\cr
 #'   }
 #' }
 #'
