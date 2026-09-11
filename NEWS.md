@@ -1,5 +1,14 @@
 # SpaDES.core 3.2.1.9004
 
+## New features
+
+* New `moduleRmdToVignette()` adds a module's `<module>.Rmd` to its package rendition
+  as `vignettes/<module>.Rmd`, so a pkgdown site built from
+  `convertToPackage(destinationPath = )` can publish the module's documentation as an
+  article. It repoints the template's `".."` module path in R code (not in prose), adds
+  `pkgdown: as_is: true` so bookdown's table cross-references still resolve, and copies
+  `citations/` and `figures/` alongside. See PredictiveEcology/SpaDES-modules#40.
+
 ## Bug fixes
 
 * With `options(spades.cacheChaining = TRUE)`, an event could skip straight to the cacheId
