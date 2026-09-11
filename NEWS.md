@@ -1,4 +1,15 @@
-# SpaDES.core 3.2.1.9003
+# SpaDES.core 3.2.1.9004
+
+## Bug fixes
+
+* With `options(spades.cacheChaining = TRUE)`, an event could skip straight to the cacheId
+  recorded after the previous event even when its `.useCacheArgs` had changed. A chained
+  cacheId bypasses Cache()'s digest, so a `.cacheExtra` (or `omitArgs`) meant to change the
+  key had no effect: the event kept returning the entry recorded before the change. The
+  `.useCacheArgs` that affect the key are now part of what the chain matches on, for events
+  and `.inputObjects`.
+
+# SpaDES.core 3.2.1.9002
 
 ## Bug fixes
 

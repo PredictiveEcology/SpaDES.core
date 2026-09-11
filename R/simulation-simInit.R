@@ -1817,7 +1817,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               fnEnv <- sim@.xData[[dotMods]][[mBase]]
               prevCache <- attr(sim, "tags")
               # # take only functions; no objects; select because the functions have ":"
-              nonObjects <- nonObjectsForCacheChaining(objectsToEvaluateForCaching, fnEnv, classOptions)
+              nonObjects <- nonObjectsForCacheChaining(objectsToEvaluateForCaching, fnEnv, classOptions,
+                                                       extraCacheArgs = extraCacheArgs)
 
               # fns2 <- extractFns(objectsToEvaluateForCaching)
               # nonObjects <- append(classOptions,
@@ -2497,11 +2498,23 @@ objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
 
 spadesDebugWidthDefault <- c(9, 10, 9, 13)
 
-nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions) {
+nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions,
+                                       extraCacheArgs = NULL) {
   fns2 <- extractFns(objectsToEvaluateForCaching)
   nonObjects <- append(classOptions,
                        as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
+  ## A chained cacheId makes Cache() skip its digest, so the `.useCacheArgs` that change what
+  ## Cache() keys on (`.cacheExtra`, `omitArgs`, ...) must be part of what the chain matches
+  ## on; otherwise changing them can never break the chain, and the event keeps returning the
+  ## entry recorded before the change. Arguments that do not affect the result are left out,
+  ## so they do not break chains for nothing.
+  keyArgs <- extraCacheArgs[setdiff(names(extraCacheArgs), .cacheArgsNotAffectingKey)]
+  if (length(keyArgs))
+    nonObjects <- append(nonObjects, list(.useCacheArgs = keyArgs))
+  nonObjects
 }
+
+.cacheArgsNotAffectingKey <- c("useCloud", "cloudFolderID", "userTags", "verbose", "showSimilar")
 
 classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, mBase) {
   list(events = events,
