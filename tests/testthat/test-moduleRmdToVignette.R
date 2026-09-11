@@ -73,6 +73,7 @@ test_that("moduleRmdToVignette() stops without an .Rmd, or without a YAML header
 
 test_that("the vignette renders from vignettes/, with its tables and cross-references", {
   skip_on_cran()
+  skip_if_not_installed("curl")  # skip_if_offline() errors, not skips, without it
   skip_if_offline()  # the template's setup chunk downloads a badge
   skip_if_not_installed("rmarkdown")
   skip_if_not_installed("bookdown")
