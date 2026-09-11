@@ -1618,7 +1618,8 @@ setMethod(
     ## Recording is unconditional; `cacheChaining` only decides whether the chain is USED.
     ## A pass run with the option off would otherwise leave no tags for a later pass.
     {
-      nonObjects <- nonObjectsForCacheChaining(moduleSpecificObjects, fnEnv, classOptions)
+      nonObjects <- nonObjectsForCacheChaining(moduleSpecificObjects, fnEnv, classOptions,
+                                               extraCacheArgs = if (isTRUE(cacheIt)) extraCacheArgs)
       # append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
       #        classOptions)
 
