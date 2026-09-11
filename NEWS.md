@@ -22,6 +22,10 @@
   "subscript out of bounds"; the reverse handed `.useCloud` the `.useCacheArgs` list.
   They are now put back by name.
 
+# SpaDES.core 3.2.1.9002
+
+## Bug fixes
+
 * `moduleCoverage()` did not measure a module's tests, and its result could not be
   tallied. It ran covr's default `type = "tests"`, i.e. only the top-level `tests/*.R`;
   a module has no `tests/testthat.R`, so its testthat suite never ran, while a stale
