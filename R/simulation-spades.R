@@ -273,6 +273,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           }
           
           
+          if (!.spadesUseCache()$events) cacheIt <- FALSE # options(spades.useCache = "off")
           # browser(expr = exists("._doEvent_2"))
           showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
                              isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
@@ -993,6 +994,14 @@ setMethod(
     opt <- options("encoding" = "UTF-8")
     on.exit(options(opt), add = TRUE)
 
+    ## options(spades.useCache = "eventsOnly" / "off"): Cache() calls inside module code take
+    ## reproducible.useCache, so set it for the run; the event-level calls pass useCache explicitly
+    innerUseCache <- .spadesUseCache()$inner
+    if (!is.null(innerUseCache)) {
+      optInner <- options(reproducible.useCache = innerUseCache)
+      on.exit(options(optInner), add = TRUE)
+    }
+
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
       modNam <- getOption("spades.covr")
       tf <- tempfile();
@@ -1593,6 +1602,9 @@ setMethod(
                          paste0("eventType:", cur[["eventType"]]),
                          paste0("eventTime:", time(sim))))
     )
+    ## "eventsOnly"/"off"/numeric pass useCache explicitly; "all" leaves it to reproducible.useCache
+    useCacheSpades <- .spadesUseCache()$useCache
+    if (!is.null(useCacheSpades)) defaultCacheArgs$useCache <- useCacheSpades
     as.expression(as.call(c(list(quote(Cache)),
                             modifyList(defaultCacheArgs, extraCacheArgs))))
   } else {

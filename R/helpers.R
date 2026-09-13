@@ -392,6 +392,31 @@ noEventWarning <- function(sim) {
 ._txtSimNesting <- "._simNesting"
 ._txtDotUseCache <- ".useCache"
 ._txtDotUseCacheArgs <- ".useCacheArgs"
+
+## How caching applies inside simInit() and spades(), from options(spades.useCache):
+##   "all"        events per each module's `.useCache`; Cache() calls inside module code follow
+##                `reproducible.useCache` (the default, and the behaviour before this option)
+##   "eventsOnly" events per `.useCache`, with `useCache = TRUE` passed explicitly so a simInit()
+##                nested inside an event still caches its events; `reproducible.useCache` is set to
+##                FALSE for the run, so Cache() calls inside module code are skipped
+##   "off"        no event caching, and Cache() calls inside module code are skipped
+##   0, 1, 2      the same three, in that order: 0 = "off", 1 = "eventsOnly", 2 = "all"
+## Returns: events (logical: wrap events in Cache at all), useCache (value to pass to Cache(), or
+## NULL to leave it to the option) and inner (value for reproducible.useCache during the run, or
+## NULL to leave it alone).
+.spadesUseCache <- function(opt = getOption("spades.useCache", "all")) {
+  levels <- c("off", "eventsOnly", "all")
+  if (is.numeric(opt)) {
+    if (!opt %in% 0:2) stop("options(spades.useCache) must be 0, 1 or 2 when numeric (= ",
+                            paste(dQuote(levels, FALSE), collapse = ", "), ")")
+    opt <- levels[opt + 1]
+  }
+  opt <- match.arg(opt, levels)
+  switch(opt,
+         all = list(events = TRUE, useCache = NULL, inner = NULL),
+         eventsOnly = list(events = TRUE, useCache = TRUE, inner = FALSE),
+         off = list(events = FALSE, useCache = FALSE, inner = FALSE))
+}
 ._txtDotUseCloud <- ".useCloud"
 
 #' Reserved module parameter names
