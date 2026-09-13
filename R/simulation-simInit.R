@@ -399,6 +399,14 @@ setMethod(
 
     opt <- options("encoding" = "UTF-8")
 
+    ## options(spades.useCache = "eventsOnly" / "off"): Cache() calls inside module code take
+    ## reproducible.useCache, so set it for the run; the .inputObjects call passes useCache explicitly
+    innerUseCache <- .spadesUseCache()$inner
+    if (!is.null(innerUseCache)) {
+      optInner <- options(reproducible.useCache = innerUseCache)
+      on.exit(options(optInner), add = TRUE)
+    }
+
     # rcae <- get(reproducible.CacheAddressEnv)
     # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
     # on.exit(rm(rcae))
@@ -1681,6 +1689,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
           }
         }
       }
+      if (!.spadesUseCache()$events) cacheIt <- FALSE # options(spades.useCache = "off")
 
       cur <- sim@current
       curModNam <- cur$moduleName
@@ -1808,6 +1817,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                  "eventType:.inputObjects")),
               verbose = quote(verbose)
             )
+            ## "eventsOnly"/"off"/numeric pass useCache explicitly; "all" leaves it to reproducible.useCache
+            useCacheSpades <- .spadesUseCache()$useCache
+            if (!is.null(useCacheSpades)) defaultCacheArgs$useCache <- useCacheSpades
             fnCallAsExpr <- as.expression(as.call(c(list(quote(Cache)),
                                                     modifyList(defaultCacheArgs, extraCacheArgs))))
 

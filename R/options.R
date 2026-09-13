@@ -42,6 +42,14 @@
 #'      \tab The default local directory in which to cache simulation outputs.
 #'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).\cr
 #'
+#'   `spades.useCache` \tab `"all"`
+#'      \tab How caching applies inside [simInit()] and [spades()]. `"all"`: events and
+#'      `.inputObjects` are cached as each module's `.useCache` parameter asks, and
+#'      `Cache()` calls inside module code follow `reproducible.useCache`. `"eventsOnly"`:
+#'      the `.useCache` events are cached (also in a `simInit()` nested inside an event),
+#'      but `Cache()` calls inside module code are skipped. `"off"`: nothing is cached.
+#'      The numbers `2`, `1` and `0` mean the same three, in that order.\cr
+#'
 #'   `spades.cacheChaining` \tab `FALSE`
 #'      \tab If set to `TRUE`, then sequential events that are cached can re-use
 #'      their `digest` step. The second event will only digest the functions and
@@ -323,6 +331,7 @@ spadesOptions <- function() {
     spades.browserOnError = FALSE,
     spades.cacheChaining = FALSE,
     spades.compressionLevel = 1L,
+    spades.useCache = "all",
     # spades.cachePath = reproCachePath,
     spades.debug = 1, ## TODO: is this the best default? see discussion in #5
     spades.dotInputObjects = TRUE,

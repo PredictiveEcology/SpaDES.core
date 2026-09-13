@@ -1,3 +1,16 @@
+# SpaDES.core 3.2.1.9006
+
+## New features
+
+* New option `spades.useCache` chooses how caching applies inside `simInit()` and `spades()`
+  without touching module code: `"all"` (the default, and the previous behaviour), `"eventsOnly"`
+  (the modules' `.useCache` events and `.inputObjects` are cached, including in a `simInit()`
+  nested inside an event, while `Cache()` calls inside module code are skipped), `"off"` (no
+  caching), or `2`, `1`, `0` for the same three. Measured on a
+  fireSense fitting campaign, `Cache()` calls inside module code wrote 74 GB in 2 hours of which
+  57 GB (the per-ELF cohort-building chain) was never read back, while the event caches were
+  19 GB and are what makes a retry after a failure resume rather than restart.
+
 # SpaDES.core 3.2.1.9005
 
 ## New features

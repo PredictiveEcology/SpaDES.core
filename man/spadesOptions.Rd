@@ -47,6 +47,14 @@ is after the error is addressed. \code{TRUE} is likely somewhat slower.\cr
 \tab The default local directory in which to cache simulation outputs.
 Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/cache}).\cr
 
+\code{spades.useCache} \tab \code{"all"}
+\tab How caching applies inside \code{\link[=simInit]{simInit()}} and \code{\link[=spades]{spades()}}. \code{"all"}: events and
+\code{.inputObjects} are cached as each module's \code{.useCache} parameter asks, and
+\code{Cache()} calls inside module code follow \code{reproducible.useCache}. \code{"eventsOnly"}:
+the \code{.useCache} events are cached (also in a \code{simInit()} nested inside an event),
+but \code{Cache()} calls inside module code are skipped. \code{"off"}: nothing is cached.
+The numbers \code{2}, \code{1} and \code{0} mean the same three, in that order.\cr
+
 \code{spades.cacheChaining} \tab \code{FALSE}
 \tab If set to \code{TRUE}, then sequential events that are cached can re-use
 their \code{digest} step. The second event will only digest the functions and
