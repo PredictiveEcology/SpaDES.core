@@ -226,3 +226,38 @@ test_that("C-level (archive-style) progress flood is throttled, not re-prefixed"
   expect_gt(length(shown), 0L)
   expect_true(all(grepl("^[\u2800-\u28FF]", shown)))   # what survived really were ticks
 })
+
+test_that("a non-dynamic tick after a dynamic one does not error on a NULL .progressLastShown", {
+  testInit(smcc = FALSE, debug = FALSE)
+  skip_if_not_installed("cli")
+
+  # .handleProgressTick(): a `\r` (dynamic) frame set `.inProgressBar` but not
+  # `.progressLastShown`; the next plain frame then took the throttle branch and
+  # computed `now - NULL`, which is length zero, and `if` failed with "argument is
+  # of length zero". Seen in a fits job whose event downloaded from Google Drive
+  # (dynamic ticks) before extracting (plain ticks), 2026-09-12.
+  # loggingMessage() looks up a `sim` on the call stack for the module prefix unless
+  # the prefix width is zero; there is no simList here.
+  withr::local_options(spades.messagingNumCharsModule = 0)
+  pe <- .pkgEnv
+  old <- mget(c(".inProgressBar", ".progressLastShown", ".progressInPlace"), envir = pe,
+              ifnotfound = list(NULL))
+  on.exit(for (nm in names(old)) assign(nm, old[[nm]], envir = pe), add = TRUE)
+  pe$.inProgressBar <- NULL
+  pe$.progressLastShown <- NULL
+  pe$.progressInPlace <- NULL
+
+  cond <- function(msg)
+    structure(class = c("cliMessage", "simpleMessage", "message", "condition"),
+              list(message = msg, call = NULL))
+  dynamic <- "\rextracting 50%"
+  # a non-dynamic frame recognised without an active R-level bar (Braille spinner)
+  plain <- "\u2839 13 extracted | 2.3 GB ( 15 MB/s) | 2m 30.4s\n"
+  expect_false(grepl("\r", plain))
+  out <- capture.output({
+    expect_true(.handleProgressTick(cond(dynamic), dynamic))
+    expect_no_error(res <- .handleProgressTick(cond(plain), plain))
+  }, type = "message")
+  expect_true(res)
+  expect_s3_class(pe$.progressLastShown, "POSIXct")
+})

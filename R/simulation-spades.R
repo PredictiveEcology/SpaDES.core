@@ -2361,17 +2361,22 @@ loggingMessagePrefixLength <- 15
   clean <- trimws(cli::ansi_strip(msg))
   if (nzchar(clean)) {
     line <- if (is.null(prefix)) loggingMessage(clean) else loggingMessage(clean, prefix = prefix)
+    now <- Sys.time()
     if (grepl("\r", msg, fixed = TRUE)) {
       cat("\r", cli::ansi_strtrim(line, cli::console_width()), "\033[K", sep = "", file = stderr())
       .pkgEnv$.progressInPlace <- TRUE
       .pkgEnv$.inProgressBar <- TRUE
+      # A dynamic frame opens the bar too; without this, the first non-dynamic frame
+      # that follows one (a Drive download inside an event, 2026-09-12) reached the
+      # throttle with `.progressLastShown` NULL: "argument is of length zero".
+      .pkgEnv$.progressLastShown <- now
     } else {
-      now <- Sys.time()
       if (!isTRUE(.pkgEnv$.inProgressBar)) {
         .pkgEnv$.inProgressBar <- TRUE
         .pkgEnv$.progressLastShown <- now
         message(line)
-      } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
+      } else if (is.null(.pkgEnv$.progressLastShown) ||
+                 as.numeric(now - .pkgEnv$.progressLastShown) >=
                  getOption("spades.progressInterval", 2)) {
         message(line)
         .pkgEnv$.progressLastShown <- now
