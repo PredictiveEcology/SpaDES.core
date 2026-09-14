@@ -31,6 +31,10 @@
 
 ## Bug fixes
 
+* On an event cache hit, outputs recorded with `registerOutputs()` were lost except one per
+  save time: merging the cached `outputs(sim)` dropped duplicates while ignoring `file`, and
+  those rows differ only by `file`. Duplicates are now matched on the file's basename, so
+  the same file saved under a different `outputPath` is still recorded once.
 * The `moduleRmdToVignette()` example no longer carries a `\dontrun{}` block that installs the
   package rendition and builds its \pkg{pkgdown} site. Run under `--run-dontrun` (as
   \pkg{reproducible}'s downstream check does), it failed: the runner has no \pkg{pkgdown}, and the
