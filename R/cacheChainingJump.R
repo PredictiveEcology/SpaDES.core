@@ -98,13 +98,19 @@
 
 ## The chains recorded on one entry: one row per postCacheId, columns prevCache,
 ## digestNonObjects, module, event, lastEventDetails, postCacheId. Flattening every tag into a
-## single row would collapse them (duplicate names get mangled, rows pair positionally).
+## single row would collapse them (duplicate names get mangled, rows pair positionally). The same
+## link can also have been recorded more than once under one postCacheId -- by a version whose
+## digest differs -- and only its newest recording counts: otherwise its repeated names are mangled
+## the same way and the join sees the oldest, which then never matches again.
 .chainSuccessors <- function(sc) {
   ccVals <- sc[startsWith(sc$tagKey, "cacheChaining")]
   if (!NROW(ccVals)) return(NULL)
+  if ("createdDate" %in% names(ccVals)) ccVals <- ccVals[order(ccVals$createdDate)]
   spli <- strsplit(ccVals$tagKey, "_")
   nams <- vapply(spli, function(x) x[[2]], character(1))
   postCacheIds <- vapply(spli, function(x) x[[3]], character(1))
+  newest <- !duplicated(paste(postCacheIds, nams), fromLast = TRUE)
+  ccVals <- ccVals[newest]; nams <- nams[newest]; postCacheIds <- postCacheIds[newest]
   rbindlist(
     lapply(split(seq_along(nams), postCacheIds), function(ix)
       as.data.frame(as.list(ccVals$tagValue[ix]) |> setNames(nams[ix]))),

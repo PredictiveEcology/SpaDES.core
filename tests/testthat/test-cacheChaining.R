@@ -193,3 +193,91 @@ test_that("the chain is recorded even when spades.cacheChaining is off", {
   ## And the chain written while off is usable by a later run with it on.
   expect_no_error(runChainTest(cp, TRUE, times, params, modules, modulePath, 42))
 })
+
+
+## A link recorded more than once under one postCacheId -- first by an earlier version whose digest
+## differs -- used to stop chaining for good: the reader flattened its recordings into one row (repeated
+## names renamed `digestNonObjects.1`, ...) and compared only the oldest, and the writer appended another
+## copy on every run. The writer now replaces a link's tags and the reader takes its newest recording.
+test_that(".chainSuccessors() reads a link's newest recording, by time", {
+  link <- function(digest, when) data.table::data.table(
+    cacheId = "prev",
+    tagKey = paste0("cacheChaining_", c("prevCache", "digestNonObjects", "module", "event",
+                                        "lastEventDetails", "postCacheId"), "_post1"),
+    tagValue = c("cacheId:prev", digest, "modC", ".inputObjects", "modB .inputObjects", "post1"),
+    createdDate = when)
+  ## stored newest first: "newest" has to come from createdDate, not from storage order
+  sc <- rbind(link("current", "2026-09-14 11:41:17.604587"), link("stale", "2026-09-14 00:38:03.152215"))
+  succ <- .chainSuccessors(sc)
+  expect_equal(nrow(succ), 1L)
+  expect_equal(succ$digestNonObjects, "current")
+  expect_false(any(grepl("[.][0-9]+$", names(succ))))
+})
+
+chainLinkTags <- function(cp, successor) {
+  sc <- data.table::as.data.table(reproducible::showCache(cp, verbose = -2))
+  mod <- sc[startsWith(tagKey, "cacheChaining_module_") & tagValue == successor]
+  post <- unique(sub("^cacheChaining_module_", "", mod$tagKey))
+  prevId <- unique(mod$cacheId)
+  stopifnot(length(post) == 1L, length(prevId) == 1L)
+  list(prevId = prevId, post = post,
+       tags = sc[cacheId == prevId & startsWith(tagKey, "cacheChaining_") & endsWith(tagKey, paste0("_", post))])
+}
+
+test_that("a link recorded twice, stale first, still chains", {
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  mkChainMod(mp, "modA", 'bindrows(expectsInput("unsupplied0", "numeric", ""))',
+             'bindrows(createsOutput("a", "numeric", ""))', "sim$a <- 1")
+  mkChainMod(mp, "modB", 'bindrows(expectsInput("a", "numeric", ""))',
+             'bindrows(createsOutput("b", "numeric", ""))', "sim$b <- 10")
+  mkChainMod(mp, "modC", 'bindrows(expectsInput("b", "numeric", ""))',
+             'bindrows(createsOutput("cc", "numeric", ""))', "sim$cc <- sim$b + 1")
+  runIt <- function(cp) do.call(simInit, list(
+    times = list(start = 1, end = 1),
+    params = list(modA = list(.useCache = ".inputObjects"), modB = list(.useCache = ".inputObjects"),
+                  modC = list(.useCache = ".inputObjects")),
+    modules = list("modA", "modB", "modC"), paths = list(modulePath = mp, cachePath = cp)))
+  nChained <- function(cp) length(grep("Using cacheChaining", capture_messages(invisible(runIt(cp)))))
+  withr::local_options(spades.cacheChaining = TRUE)
+
+  cpClean <- file.path(tmpdir, "clean"); invisible(runIt(cpClean))
+  nClean <- nChained(cpClean)
+  expect_gt(nClean, 0)
+
+  ## the state found in a real cache: the modB -> modC link recorded first with a stale digest, then
+  ##   again with the current one. The newest recording must be the one read.
+  cpDup <- file.path(tmpdir, "dup"); invisible(runIt(cpDup))
+  lk <- chainLinkTags(cpDup, "modC")
+  reproducible::.updateTagsRepo(lk$prevId, cpDup, paste0("cacheChaining_digestNonObjects_", lk$post), "stale")
+  reproducible::.addTagsRepo(lk$prevId, cpDup, tagKey = lk$tags$tagKey, tagValue = lk$tags$tagValue)
+  expect_equal(nrow(chainLinkTags(cpDup, "modC")$tags), 12L)
+  expect_equal(nChained(cpDup), nClean)
+
+})
+
+## The writer, tested directly: re-running the workflow cannot guarantee the re-recorded link lands on
+## the same successor entry, so call cacheChainingPost() twice for one link under one postCacheId.
+test_that("cacheChainingPost() replaces a link recorded again instead of appending a second copy", {
+  testInit(opts = list())
+  cp <- file.path(tmpdir, "cc"); dir.create(cp, showWarnings = FALSE)
+  withr::local_options(reproducible.cachePath = cp)
+  out <- reproducible::Cache(sum, 1, 2, cachePath = cp)
+  prevCache <- attr(out, "tags")
+  prevId <- gsub("cacheId:", "", prevCache)
+  sim <- simInit(paths = list(cachePath = cp))
+  attr(sim, "tags") <- "cacheId:POSTCACHEIDONE"
+  record <- function(digest) {
+    df <- data.table::data.table(prevCache = prevCache, digestNonObjects = digest, module = "modX",
+                                 event = "init", lastEventDetails = "modW init")
+    cacheChainingPost(sim, cacheIt = TRUE, prevCache = prevCache, cacheIdOfSkip = NULL, df = df,
+                      moduleName = "modX", eventType = "init")
+  }
+  record("stale")
+  record("current")
+  sc <- data.table::as.data.table(reproducible::showCache(cp, verbose = -2))
+  link <- sc[cacheId == prevId & startsWith(tagKey, "cacheChaining_") & endsWith(tagKey, "_POSTCACHEIDONE")]
+  expect_equal(nrow(link), 6L)
+  expect_equal(link[tagKey == "cacheChaining_digestNonObjects_POSTCACHEIDONE"]$tagValue, "current")
+})
