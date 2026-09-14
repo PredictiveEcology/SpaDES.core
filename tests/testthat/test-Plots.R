@@ -495,3 +495,52 @@ test_that("canonicalize_ggplot digest is stable for identical plots", {
   trans <- canonicalize_ggplot(ggplot(d, aes(x, y)) + geom_point() + scale_y_log10())$scales[[1]]$trans
   expect_true(is.character(trans) && nzchar(trans))
 })
+
+## useCacheNeedNewPlot() asked Cache() for a record and then read `attr(., ".Cache")$newCache`
+## and `cacheId()` from it. With caching off -- options(spades.useCache = "eventsOnly") turns
+## reproducible.useCache off inside spades() -- Cache() returns the bare list, `newCache` is NULL,
+## and `if (ret %in% FALSE)` died with "argument is of length zero" (the 2026-09-13 fits relaunch
+## failed in fireSense_ELFs' init this way). Worse, the exit handler then ran
+## clearCache(cacheId = NULL), which empties the whole cache.
+test_that("Plots(useCache = TRUE) with caching switched off plots, and does not clear the cache", {
+  skip_on_cran()
+  skip_if_not_installed("ggplot2")
+  testInit(opts = list(spades.useCache = "eventsOnly", reproducible.useMemoise = FALSE))
+  newModule("test", tmpdir, open = FALSE)
+  withr::local_options(reproducible.cacheSaveFormat = "qs2")
+
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+      name = "test", description = NA, keywords = NA,
+      authors = person("A", "B"), childModules = character(0),
+      version = list(test = "0.0.1"),
+      timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year",
+      citation = list(), documentation = list(), reqdPkgs = list("ggplot2"),
+      parameters = rbind(), inputObjects = bindrows(), outputObjects = bindrows()
+    ))
+    doEvent.test <- function(sim, eventTime, eventType, debug = FALSE) {
+      switch(eventType,
+        init = {
+          gg <- ggplot2::ggplot(data.frame(a = rnorm(20)), ggplot2::aes(a)) +
+            ggplot2::geom_histogram(bins = 5)
+          Plots(data = gg, filename = "nocache_test", types = "png",
+                .plotInitialTime = NA, useCache = TRUE)
+        }
+      )
+      return(invisible(sim))
+    }
+  ', fill = TRUE)
+
+  ## an unrelated entry that must survive the Plots() call
+  keep <- Cache(rnorm, 3, cachePath = tmpCache)
+  expect_identical(NROW(showCache(tmpCache, verbose = -2)[tagKey == "function"]), 1L)
+
+  sim <- simInit(modules = "test",
+                 paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs"), cachePath = tmpCache),
+                 times = list(start = 0, end = 1, timeunit = "year"))
+  expect_no_error(suppressMessages(simOut <- spades(sim, debug = FALSE)))
+  files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
+  expect_true(any(grepl("nocache_test", files) & endsWith(files, ".png")))
+  ## the cache was not emptied on the way out
+  expect_identical(NROW(showCache(tmpCache, verbose = -2)[tagKey == "function"]), 1L)
+})

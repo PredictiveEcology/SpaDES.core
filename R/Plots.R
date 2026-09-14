@@ -504,7 +504,7 @@ Plots <- function(data, fn, filename,
     for (i in seq(filenamesForSave)) {
       type <- typesNoScreen[i]
       filenameSaved <- .robustDigest(asPath(filenamesForSave[i]))[[1]]
-      if (needNewPlot)
+      if (needNewPlot && !is.null(cacheId)) # NULL when caching is off: no record to tag
         .addTagsRepo(cacheId, cachePath = cachePath(sim), tagKey = tagKeySavedFile, tagValue = paste0(type, ":", filenameSaved))
     }
   }
@@ -591,11 +591,17 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
     allArgs[["data"]] <- .robustDigest(metadata)
   }
   cached <- list(allArgs) |> Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
+  ## With caching off (reproducible.useCache = FALSE, e.g. under spades.useCache = "eventsOnly")
+  ## Cache() hands the list straight back: no ".Cache" attribute, no cacheId. There is then nothing
+  ## to consult and nothing to clear -- and clearCache(cacheId = NULL) would empty the WHOLE cache
+  ## on the way out -- so the answer is simply "plot".
+  cid <- cacheId(cached)
+  if (is.null(cid)) return(TRUE)
   reproducible:::on.exit2({
-    clearCache(cacheId = cacheId(cached), ask = FALSE, verbose = FALSE)
+    clearCache(cacheId = cid, ask = FALSE, verbose = FALSE)
     message("Plots did not complete; clearing the cached record")
     })
-  
+
   ret <- attr(cached, ".Cache")$newCache %in% TRUE
   attributes(ret) <- attributes(cached)
   if (ret %in% FALSE) { # means it doesn't need a new plotting

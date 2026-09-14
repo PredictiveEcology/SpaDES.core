@@ -35,9 +35,13 @@
 #' @seealso [convertToPackage()]
 #' @export
 #' @examples
+#' if (requireNamespace("ggplot2") && requireNamespace("pkgload")) {
+#'   tmpdir <- tempdir2()
+#'   newModule("myModule", tmpdir, open = FALSE)
+#'   pkg <- convertToPackage("myModule", path = tmpdir, destinationPath = tempfile())
+#'   moduleRmdToVignette("myModule", pkg)
+#' }
 #' \dontrun{
-#' pkg <- convertToPackage("myModule", path = "modules", destinationPath = tempfile())
-#' moduleRmdToVignette("myModule", pkg)
 #' install.packages(pkg, repos = NULL, type = "source")
 #' pkgdown::build_site(pkg, install = FALSE)
 #' }
