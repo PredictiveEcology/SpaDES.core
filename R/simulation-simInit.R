@@ -1845,7 +1845,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                              use = cacheChaining,
                                              verbose = verbose,
                                              sim = sim,
-                                             userObjects = if (!missing(objects)) objects)
+                                             userObjects = if (!missing(objects)) objects,
+                                             jumpControls = list())
               fnCallAsExpr <- chaining$fnCallAsExpr
               if (!is.null(chaining$jump))
                 sim <- .chainJumpPrepare(sim, chaining$jump, verbose = verbose)

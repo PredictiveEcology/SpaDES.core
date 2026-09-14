@@ -21,8 +21,9 @@
 
 ## The `current` event list for an event that is not (yet) current.
 .chainCur <- function(sim, module, event, eventTime = NA_real_) {
+  ## in seconds, like the event queue -- not start(sim) / time(sim), which are in the simList's unit
   if (is.na(eventTime))
-    eventTime <- if (identical(event, ".inputObjects")) start(sim) else time(sim)
+    eventTime <- if (identical(event, ".inputObjects")) sim@simtimes[["start"]] else sim@simtimes[["current"]]
   list(eventTime = eventTime, moduleName = module, eventType = event, eventPriority = .normal())
 }
 
@@ -145,13 +146,15 @@
 ## recovered from. Returns the events that can be skipped, in order -- a data.table with
 ## cacheId, module, event, eventTime -- or NULL.
 .chainWalk <- function(sim, cacheId, module, event, cachePath, produced = NULL, userObjects = NULL,
-                       verbose = getOption("reproducible.verbose")) {
+                       controls = list(), verbose = getOption("reproducible.verbose")) {
   phaseIO <- identical(event, ".inputObjects")
   produced <- union(produced, .chainOutputs(sim, module, event))
   led <- paste(module, event)
   steps <- list()
   seen <- cacheId
   cur <- cacheId
+  ## a .stopAfter barrier on the event being recovered: nothing may be skipped past it
+  if (.chainStopsAfter(controls, module, event)) return(NULL)
   repeat {
     sc <- .chainEntryTags(cur, cachePath)
     if (is.null(sc)) break
@@ -173,10 +176,13 @@
       if (!.chainExternalInputsMatch(sim, row$module, postTags, produced, userObjects)) next
       et <- postTags$tagValue[postTags$tagKey == "eventTime"]
       hit <- list(cacheId = row$postCacheId, module = row$module, event = row$event,
-                  eventTime = if (length(et)) suppressWarnings(as.numeric(et[[1]])) else NA_real_)
+                  eventTime = .chainTagTime(et, sim))
       break
     }
     if (is.null(hit)) break
+    ## A skipped event never passes through doEvent(), where the barriers, the `events` whitelist
+    ##   and end(sim) are tested. An event any of them would act on has to run as itself.
+    if (.chainBlocked(controls, sim, hit)) break
     steps[[length(steps) + 1L]] <- hit
     produced <- union(produced, .chainOutputs(sim, hit$module, hit$event))
     seen <- c(seen, hit$cacheId)
@@ -184,6 +190,34 @@
     led <- paste(hit$module, hit$event)
   }
   if (length(steps)) rbindlist(steps) else NULL
+}
+
+## The eventTime tag on an event entry is written in the simList's time unit (`time(sim)`, in
+## .runEvent()), whereas the queue, current(sim) and completed(sim) hold times in seconds.
+.chainTagTime <- function(et, sim) {
+  x <- if (length(et)) suppressWarnings(as.numeric(et[[1]])) else NA_real_
+  if (is.na(x)) return(NA_real_)
+  as.numeric(convertTimeunit(structure(x, unit = timeunit(sim)), "second", sim@.xData))
+}
+
+## `controls` is what doEvent() passes down: `events` (the whitelist) and `eventsBeforeAfter`
+## (the barriers). .stopAfter on the event a jump starts from: doEvent() tests it on that event.
+.chainStopsAfter <- function(controls, module, event) {
+  ba <- controls$eventsBeforeAfter
+  length(ba) > 0L && .matchesEventSpec(list(moduleName = module, eventType = event), ba$after)
+}
+
+## May `hit` be skipped? Not if a barrier names it (doEvent() tests .stopAfter on its own `cur`, the
+## event the jump started from, so a barrier on a later event would never fire), not if the
+## whitelist excludes it, and not if it is past end(sim) or its time is unknown.
+.chainBlocked <- function(controls, sim, hit) {
+  ev <- list(moduleName = hit$module, eventType = hit$event)
+  ba <- controls$eventsBeforeAfter
+  if (length(ba) && (.matchesEventSpec(ev, ba$before) || .matchesEventSpec(ev, ba$after))) return(TRUE)
+  if (!is.null(controls$events) && isListedEvent(list(ev), controls$events) == 0L) return(TRUE)
+  if (!identical(hit$event, ".inputObjects") &&
+      (is.na(hit$eventTime) || hit$eventTime > sim@simtimes[["end"]])) return(TRUE)
+  FALSE
 }
 
 ## `jump` (cacheChainingSetup()): one row per event recovered by the jump, in order -- row 1 is

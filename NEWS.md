@@ -8,7 +8,9 @@
   produced it, instead of recovering the simList event by event. Per skipped event the module's
   code and parameters are still digested, and any of its `expectsInput`s that the chain did not
   produce must digest to what the entry recorded (so a new object supplied at `simInit()` stops
-  the jump at the module that reads it). The skipped events appear in `completed(sim)`. No new
+  the jump at the module that reads it). The skipped events appear in `completed(sim)`. A jump
+  stops at any event that a `.stopBefore` or `.stopAfter` barrier, the `events` whitelist or
+  `end(sim)` would act on, and does not happen while `spades.evalPostEvent` is set. No new
   option: it is part of `spades.cacheChaining = TRUE`.
 
 ## Bug fixes

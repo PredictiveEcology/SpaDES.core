@@ -165,3 +165,95 @@ test_that("a deleted entry in the chain shortens the jump instead of breaking th
   expect_equal(s$d, 13) # jD ran and its result is right
   expect_equal(s$shared, 200)
 })
+
+## Per-event controls live in doEvent(): the .stopBefore/.stopAfter barriers, the `events` whitelist
+## and end(sim) are tested on each event as it is dequeued, and spades.evalPostEvent runs after each.
+## A skipped event never passes through there, so the walk has to stop at any event those act on.
+## Oracle for every control: with a chain recorded end to end WITHOUT the control, chaining off and
+## chaining on end in the same state -- objects, completed events with their times, clock, and
+## stoppedAt().
+runJumpCtl <- function(mp, cp, params, events = NULL, end = 2, chaining = TRUE) {
+  withr::local_options(spades.cacheChaining = chaining)
+  simInitAndSpades(times = list(start = 1, end = end), params = params, objects = list(ext = 5),
+                   modules = list("jA", "jB", "jC", "jD"),
+                   paths = list(modulePath = mp, cachePath = cp), events = events)
+}
+
+ctlStateOf <- function(sim) {
+  comp <- as.data.frame(completed(sim))
+  st <- stoppedAt(sim)
+  list(objs = stateOf(sim)$objs,
+       completed = comp[, c("moduleName", "eventType", "eventTime")],
+       time = time(sim),
+       stoppedAt = if (is.null(st)) NULL else c(st$moduleName, st$eventType))
+}
+
+controlOutcomes <- function(mp, root, params, events = NULL, end = 2) {
+  lapply(c(off = FALSE, on = TRUE), function(chaining) {
+    cp <- file.path(root, if (chaining) "on" else "off")
+    runJumpCtl(mp, cp, params, chaining = chaining) # records the chain end to end
+    runJumpCtl(mp, cp, params, chaining = chaining)
+    m <- capture_messages(s <- runJumpCtl(mp, cp, params, events = events, end = end, chaining = chaining))
+    list(state = ctlStateOf(s), jumps = grep("skipping ahead over", m, value = TRUE),
+         hooks = sum(grepl("postEventHook", m)))
+  })
+}
+
+test_that("a jump stops at .stopBefore and .stopAfter barriers, on the event it starts from or a later one", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  barriers <- list(
+    stopBeforeLater = list(.stopBefore = list(jC = "init")), # a successor inside the recorded chain
+    stopAfterFirst  = list(.stopAfter = list(jB = "init")),  # the event the jump would start from
+    stopAfterLater  = list(.stopAfter = list(jD = "init"))
+  )
+  res <- lapply(names(barriers), function(nm)
+    controlOutcomes(mp, file.path(tmpdir, nm), jumpParams(), events = barriers[[nm]]))
+  names(res) <- names(barriers)
+  for (nm in names(res)) expect_equal(res[[nm]]$on$state, res[[nm]]$off$state, info = nm)
+  expect_equal(res$stopBeforeLater$on$state$stoppedAt, c("jC", "init"))
+  ## liveness: with the barrier on jD the walk still skips jC -- and stops before jD
+  expect_length(res$stopAfterLater$on$jumps, 1L)
+  expect_match(res$stopAfterLater$on$jumps, "over 1 cached event to jC init")
+})
+
+test_that("a jump does not recover an event the `events` whitelist excludes", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  res <- controlOutcomes(mp, tmpdir, jumpParams(), events = list(jC = character(0)))
+  expect_equal(res$on$state, res$off$state)
+  expect_null(res$on$state$objs$cc)
+})
+
+test_that("a jump does not go past end(sim), and skipped events keep their own times", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  growCached <- lapply(jumpParams(), function(p) { p$.useCache <- c("init", "grow"); p })
+  res <- controlOutcomes(mp, tmpdir, growCached, end = 1) # the chain was recorded to t = 2
+  expect_equal(res$on$state, res$off$state)
+  expect_equal(as.numeric(res$on$state$time), 1) # time(sim) carries a `unit` attribute
+  ## liveness: the t = 1 events are still skipped, up to the last one before end(sim)
+  expect_length(res$on$jumps, 1L)
+  expect_match(res$on$jumps, "to jD init")
+})
+
+test_that("no jump while spades.evalPostEvent is set: the hook sees every event", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  ## options(), not withr::local_options(): the latter leaves this quoted-call option unset
+  op <- options(spades.evalPostEvent = quote(message("postEventHook")))
+  withr::defer(options(op))
+  res <- controlOutcomes(mp, tmpdir, jumpParams())
+  expect_length(res$on$jumps, 0L)
+  expect_equal(res$on$state, res$off$state)
+  expect_gt(res$off$hooks, 0)
+  expect_equal(res$on$hooks, res$off$hooks)
+})

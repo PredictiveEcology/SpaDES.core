@@ -826,7 +826,9 @@ setMethod(
           ##   difference between the two queues, so the recorded queue is the queue -- merging
           ##   would leave the skipped events queued and run them again one by one.
           simPost@events <- simFromCache@events
-          simPost@simtimes <- simFromCache@simtimes
+          ## only the clock: start, end and timeunit are this run's, not those of the run that recorded
+          ##   the chain -- taking them all carried a recorded end(sim) past this run's own end
+          simPost@simtimes[["current"]] <- simFromCache@simtimes[["current"]]
         } else if (NROW(current(simPost)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
           simPost@events <- simFromCache@events

@@ -445,7 +445,9 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
-  expect_true(sum(grepl(oa, mess)) == 2) # does not continue from .inputObjects to init
+  ## init after a separate simInit() is a genuine hit (the tag is dropped outside simInitAndSpades);
+  ##   the chained inits after it are recovered in one cacheChaining jump
+  expect_equal(sum(grepl(oa, mess)), 1) # does not continue from .inputObjects to init
 
   mess2 <- capture_messages(
     mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
@@ -455,7 +457,7 @@ test_that("test sped-up Caching of sequentially cached events", {
     mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
                               debug = 1, .plotInitialTime = NA)
   )
-  expect_true(sum(grepl(oa, mess3)) == 3) # continues from .inputObjects to init for simInitAndSpades
+  expect_equal(sum(grepl(oa, mess3)), 1) # continues from .inputObjects to init for simInitAndSpades; one jump
 
 
   ## If they are not sequential, shouldn't do it
@@ -542,8 +544,9 @@ test_that("test sped-up Caching of sequentially cached events 2", {
       expect_equal(sum(grepl(oa, mess)), 0)
       expect_equal(sum(grepl(oa, mess1)), 0)
     } else if (i == 2) {
-      expect_equal(sum(grepl(oa, mess)), 2)
-      expect_equal(sum(grepl(oa, mess1)), 2)
+      ## after the first cache hit, the chained events are recovered in one cacheChaining jump
+      expect_equal(sum(grepl(oa, mess)), 1)
+      expect_equal(sum(grepl(oa, mess1)), 1)
     }
     if (i == 2) {
       params$fireSpread$.useCache <- NULL # remove the "middle" one, so that it should do none

@@ -340,7 +340,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           
           if (!skipEvent) {
             sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                             showSimilar = showSimilar, .pkgEnv)
+                             showSimilar = showSimilar, .pkgEnv,
+                             jumpControls = list(events = events, eventsBeforeAfter = eventsBeforeAfter))
           }
           
           if (!is.null(eventSeed)) {
@@ -1543,7 +1544,7 @@ setMethod(
 #' @keywords internal
 #' @importFrom cli bg_yellow
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                      showSimilar, .pkgEnv) {
+                      showSimilar, .pkgEnv, jumpControls = NULL) {
   cacheChaining <- getOption("spades.cacheChaining", FALSE)
   classOptions <- moduleSpecificObjects <- NULL # set defaults
   # cacheIt <- cacheChaining || cacheIt
@@ -1657,7 +1658,8 @@ setMethod(
         led = attr(sim, lastEventDetails),
         use = cacheChaining,
         verbose = verbose,
-        sim = sim)
+        sim = sim,
+        jumpControls = jumpControls)
       fnCallAsExpr <- chaining$fnCallAsExpr
       ## A jump lands on a later event's entry: that event becomes the current one, so the
       ## entry is merged as if it had just run (see .unwrap.simList()).
@@ -2895,10 +2897,13 @@ evalPostEvent <- function(envir = parent.frame()) {
 #'   pointed at the last entry that checks out; the skipped events are returned as `jump`.
 #' @param userObjects The user-supplied `objects` of `simInit()`, for the `.inputObjects`
 #'   phase: an input a skipped module would have taken from there is digested from there.
+#' @param jumpControls The per-event controls a jump must respect: a list with `events` (the
+#'   whitelist) and `eventsBeforeAfter` (the barriers), as `doEvent()` has them. `NULL` -- a caller
+#'   that does not pass them, e.g. an event run in a future -- means no jump.
 cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
                                module, event, led, use = TRUE,
                                verbose = getOption("reproducible.verbose"),
-                               sim = NULL, userObjects = NULL) {
+                               sim = NULL, userObjects = NULL, jumpControls = NULL) {
   df <- cacheIdOfSkip <- jump <- NULL
   if (!is.null(prevCache) && isTRUE(cacheIt)) {
     digestNonObjects <- .chainDigest(nonObjects)
@@ -2948,10 +2953,13 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
         } else {
           fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
           messageCache("Using cacheChaining ... ", verbose = verbose)
-          ## Follow the chain on from this entry; land on the last entry that checks out.
-          if (!is.null(sim)) {
+          ## Follow the chain on from this entry; land on the last entry that checks out. Only with
+          ##   the per-event controls to respect, and never while spades.evalPostEvent is set: it
+          ##   observes the simList after EACH event, and a jump never materialises the states between.
+          if (!is.null(sim) && !is.null(jumpControls) && is.null(getOption("spades.evalPostEvent"))) {
             jump <- .chainWalk(sim, cacheIdOfSkip, module, event, cachePath = sim@paths[["cachePath"]],
-                               produced = produced, userObjects = userObjects, verbose = verbose)
+                               produced = produced, userObjects = userObjects,
+                               controls = jumpControls, verbose = verbose)
             if (!is.null(jump)) {
               ## row 1 is this event's own entry: with the call pointed at the last entry it is
               ##   never loaded itself, so its outputs are restored like the other skipped ones
