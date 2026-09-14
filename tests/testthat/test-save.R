@@ -479,6 +479,58 @@ test_that("outputs<- still stamps a filename it generates itself", {
   expect_identical(basename(outputs(sim)$file), "cohortData_year3020.rds")
 })
 
+test_that("registerOutputs() rows all survive an event cache hit", {
+  skip_on_cran()
+  testInit("terra")
+  modName <- "regOutsCached"
+  dir.create(file.path(tmpdir, modName), recursive = TRUE, showWarnings = FALSE)
+  writeLines(con = file.path(tmpdir, modName, paste0(modName, ".R")), '
+defineModule(sim, list(name = "regOutsCached", description = "", keywords = "",
+  authors = person("A", "B", email = "a@b.com", role = c("aut", "cre")),
+  childModules = character(0), version = list(regOutsCached = "0.0.1"),
+  spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", "init", NA, NA, "")),
+  inputObjects = bindrows(), outputObjects = bindrows()))
+
+doEvent.regOutsCached <- function(sim, eventTime, eventType, debug = FALSE) {
+  switch(eventType, init = {
+    cat("ran\\n", file = file.path(outputPath(sim), "ranCount.txt"), append = TRUE)
+    for (nm in c("first", "second")) {
+      f <- file.path(outputPath(sim), paste0(nm, ".rds"))
+      saveRDS(nm, f)
+      sim <- registerOutputs(filename = f, sim = sim)
+    }
+  })
+  invisible(sim)
+}
+')
+  outPath <- file.path(tmpdir, "out")
+  runIt <- function() simInitAndSpades(times = list(start = 0, end = 0), modules = modName,
+    paths = list(modulePath = tmpdir, cachePath = tmpCache, outputPath = outPath))
+  cold <- runIt()
+  warm <- runIt()
+  ## the second run really was a cache hit: init did not run again
+  expect_length(readLines(file.path(outPath, "ranCount.txt")), 1L)
+  expect_setequal(basename(outputs(cold)$file), c("first.rds", "second.rds"))
+  ## both rows are restored, although they differ only by `file`
+  expect_setequal(basename(outputs(warm)$file), c("first.rds", "second.rds"))
+})
+
+test_that(".mergeCachedOutputs() keeps rows that differ by file, and one row per file across outputPaths", {
+  testInit()
+  empty <- simInit()@outputs
+  local <- outputsAppend(empty, saveTime = 1, file = "/local/out/a.rds")
+  cached <- outputsAppend(outputsAppend(empty, saveTime = 1, file = "/other/out/a.rds"),
+                          saveTime = 1, file = "/other/out/b.rds")
+  merged <- .mergeCachedOutputs(local, cached)
+  ## a.rds once (the same file under another outputPath), b.rds kept
+  expect_equal(sort(basename(merged$file)), c("a.rds", "b.rds"))
+  ## the local copy of a.rds wins
+  expect_true(any(grepl("^/local/", merged$file[basename(merged$file) == "a.rds"])))
+  expect_false(any(grepl("^/other/out/a", merged$file)))
+})
+
 test_that("outputs<- does not rename a file registerOutputs() already wrote", {
   td <- normPath(withr::local_tempdir())
   sim <- suppressMessages(simInit(times = list(start = 0, end = 3020),

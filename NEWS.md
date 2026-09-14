@@ -1,3 +1,12 @@
+# SpaDES.core 3.2.1.9010
+
+## Bug fixes
+
+* On an event cache hit, outputs recorded with `registerOutputs()` were lost except one per
+  save time: merging the cached `outputs(sim)` dropped duplicates while ignoring `file`, and
+  those rows differ only by `file`. Duplicates are now matched on the file's basename, so
+  the same file saved under a different `outputPath` is still recorded once.
+
 # SpaDES.core 3.2.1.9009
 
 ## Bug fixes

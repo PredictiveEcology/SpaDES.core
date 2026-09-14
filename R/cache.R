@@ -877,18 +877,8 @@ setMethod(
           })
           outputsFromTheseMods <- unlist(outputsFromTheseMods)
 
-          ooo <- rbindlist(list(
-            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
-            use.names = TRUE, fill = TRUE)
-          allowedColumnsForUnique <- (sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE
-          
-          # the file column must be changed to be the local one: there could be a different outputPath
-          #   so the file names will be slightly different if they include the outputPath
-          #   if they were being run in a different outputPath, but shared cachePath
-          allowedColumnsForUnique <- setdiff(names(ooo)[allowedColumnsForUnique], "file")
-          # because they were rbindlisted in order of simPost, then simCache (i.e., object), it will
-          #   keep the simPost, which is the local path
-          simPost@outputs <- unique(ooo, by = allowedColumnsForUnique)
+          simPost@outputs <- .mergeCachedOutputs(
+            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods, ])
 
         }
 
@@ -1690,6 +1680,21 @@ clearCacheEventsOnly <- function(ask = TRUE,
     if (isFALSE(dryRun))
       clearCache(cacheId = y, ask = ask, verbose = verbose - 1)
   })
+}
+
+## Merge a cache entry's outputs(sim) rows into the local ones after a cache hit, dropping rows
+##   recorded twice. The local rows come first, so a duplicate keeps the local copy. `file` is
+##   compared by basename only: the same cache may be used from a different outputPath, so the same
+##   saved file can carry a different directory. Comparing without `file` at all collapsed rows that
+##   differ ONLY by file -- e.g. every registerOutputs() row at one saveTime (objectName NA) -- so
+##   all but one of them were lost on a cache hit.
+.mergeCachedOutputs <- function(localOutputs, cachedOutputs) {
+  ooo <- rbindlist(list(localOutputs, cachedOutputs), use.names = TRUE, fill = TRUE)
+  if (!NROW(ooo)) return(ooo)
+  keyCols <- names(ooo)[(sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE]
+  key <- ooo[, setdiff(keyCols, "file"), with = FALSE]
+  if ("file" %in% names(ooo)) set(key, NULL, ".fileBasename", basename(as.character(ooo$file)))
+  ooo[!duplicated(key)]
 }
 
 outputsRmDontNeedForCache <- function(nonDotList, whichOutputs) {
