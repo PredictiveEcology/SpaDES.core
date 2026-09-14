@@ -1,3 +1,32 @@
+# SpaDES.core 3.2.1.9011
+
+## New features
+
+* `cacheChaining` now follows a recorded chain to its end. When the previous event was recovered
+  from the cache and the chain recorded from there matches several consecutive cached events, the
+  run lands directly on the last entry and loads each object once, from the last event that
+  produced it, instead of recovering the simList event by event. Per skipped event the module's
+  code and parameters are still digested, and any of its `expectsInput`s that the chain did not
+  produce must digest to what the entry recorded (so a new object supplied at `simInit()` stops
+  the jump at the module that reads it). The skipped events appear in `completed(sim)`. A jump
+  stops at any event that a `.stopBefore` or `.stopAfter` barrier, the `events` whitelist or
+  `end(sim)` would act on, and does not happen while `spades.evalPostEvent` is set. No new
+  option: it is part of `spades.cacheChaining = TRUE`.
+
+## Bug fixes
+
+* `cacheChaining` keyed a chain link on the previous entry plus the module's code and
+  parameters only. That fixes every input the chain produced, but not an input the module
+  reads from outside the chain -- an object supplied at `simInit()`, or written by an uncached
+  event -- so the same chain followed by a different such object returned the entry computed
+  from the old one. Those inputs are now digested and compared with what the entry recorded
+  before a link is used.
+* The chain digest (`digestNonObjects`) is now computed from the deparsed module functions
+  and unnamed atomic values. Digesting the closures folded in the module environment, whose
+  contents change during a run, and `setDT()` stripped names from a shared vector by reference,
+  so the same code could digest differently at record time and at replay time. Chains recorded
+  by earlier versions do not match the new digest and are re-recorded on the next run.
+
 # SpaDES.core 3.2.1.9010
 
 ## Bug fixes
