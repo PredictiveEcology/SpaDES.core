@@ -23,7 +23,12 @@
 #' }
 #'
 #' `\pkg{pkgdown}` builds from an *installed* package, so install the package
-#' rendition before `pkgdown::build_site(install = FALSE)`.
+#' rendition before `pkgdown::build_site(install = FALSE)`:
+#'
+#' ```
+#' install.packages(pkg, repos = NULL, type = "source")
+#' pkgdown::build_site(pkg, install = FALSE)
+#' ```
 #'
 #' @param module Character string of module name, without path.
 #' @param pkgPath Character string. The package rendition of the module, as
@@ -40,10 +45,6 @@
 #'   newModule("myModule", tmpdir, open = FALSE)
 #'   pkg <- convertToPackage("myModule", path = tmpdir, destinationPath = tempfile())
 #'   moduleRmdToVignette("myModule", pkg)
-#' }
-#' \dontrun{
-#' install.packages(pkg, repos = NULL, type = "source")
-#' pkgdown::build_site(pkg, install = FALSE)
 #' }
 moduleRmdToVignette <- function(module, pkgPath) {
   rmd <- file.path(pkgPath, paste0(module, ".Rmd"))

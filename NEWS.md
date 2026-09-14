@@ -1,3 +1,14 @@
+# SpaDES.core 3.2.1.9010
+
+## Bug fixes
+
+* The `moduleRmdToVignette()` example no longer carries a `\dontrun{}` block that installs the
+  package rendition and builds its \pkg{pkgdown} site. Run under `--run-dontrun` (as
+  \pkg{reproducible}'s downstream check does), it failed: the runner has no \pkg{pkgdown}, and the
+  rendition does not install anyway because its `Authors@R` is written as
+  `structure(..., class = "person")`, which R rejects (see `?convertToPackage`). Those two lines
+  are now shown in the function's description instead.
+
 # SpaDES.core 3.2.1.9009
 
 ## Bug fixes
