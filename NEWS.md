@@ -1,3 +1,13 @@
+# SpaDES.core 3.2.1.9009
+
+## Bug fixes
+
+* `Plots(useCache = TRUE)` failed with "argument is of length zero" when caching was switched off
+  (`reproducible.useCache = FALSE`, which `spades.useCache = "eventsOnly"` sets inside `spades()`): the
+  cache record it consults does not exist then. It now simply plots. Its exit handler also ran
+  `clearCache(cacheId = NULL)` in that case, which empties the whole cache; the handler is now only
+  registered when there is a record to clear.
+
 # SpaDES.core 3.2.1.9006
 
 ## New features
