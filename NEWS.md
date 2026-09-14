@@ -8,6 +8,15 @@
   `clearCache(cacheId = NULL)` in that case, which empties the whole cache; the handler is now only
   registered when there is a record to clear.
 
+# SpaDES.core 3.2.1.9008
+
+## Bug fixes
+
+* The progress-tick handler no longer fails with "argument is of length zero" when a
+  non-dynamic progress frame follows a dynamic (`\r`) one -- e.g. a Google Drive download
+  inside an event followed by an extraction. The dynamic frame now records
+  `.progressLastShown` as well, and the throttle tolerates it being unset.
+
 # SpaDES.core 3.2.1.9006
 
 ## New features
