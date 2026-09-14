@@ -41,7 +41,11 @@ into \verb{vignettes/}.
 }
 
 \verb{\pkg{pkgdown}} builds from an \emph{installed} package, so install the package
-rendition before \code{pkgdown::build_site(install = FALSE)}.
+rendition before \code{pkgdown::build_site(install = FALSE)}:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{install.packages(pkg, repos = NULL, type = "source")
+pkgdown::build_site(pkg, install = FALSE)
+}\if{html}{\out{</div>}}
 }
 \examples{
 if (requireNamespace("ggplot2") && requireNamespace("pkgload")) {
@@ -49,10 +53,6 @@ if (requireNamespace("ggplot2") && requireNamespace("pkgload")) {
   newModule("myModule", tmpdir, open = FALSE)
   pkg <- convertToPackage("myModule", path = tmpdir, destinationPath = tempfile())
   moduleRmdToVignette("myModule", pkg)
-}
-\dontrun{
-install.packages(pkg, repos = NULL, type = "source")
-pkgdown::build_site(pkg, install = FALSE)
 }
 }
 \seealso{

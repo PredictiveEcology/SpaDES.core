@@ -1843,18 +1843,28 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                              event = ".inputObjects",
                                              led = attr(sim, lastEventDetails),
                                              use = cacheChaining,
-                                             verbose = verbose)
+                                             verbose = verbose,
+                                             sim = sim,
+                                             userObjects = if (!missing(objects)) objects,
+                                             jumpControls = list())
               fnCallAsExpr <- chaining$fnCallAsExpr
+              if (!is.null(chaining$jump))
+                sim <- .chainJumpPrepare(sim, chaining$jump, verbose = verbose)
             }
 
             sim <- eval(fnCallAsExpr)
             .checkEventReturn(sim, mBase, ".inputObjects", fromCache = TRUE)
 
+            if (!is.null(chaining$jump))
+              sim <- .chainJumpFinish(sim, chaining$jump, cachePath = sim@paths$cachePath,
+                                      userObjects = if (!missing(objects)) objects,
+                                      verbose = verbose)
+            chainLast <- .chainLast(chaining$jump, mBase, ".inputObjects")
             sim <- cacheChainingPost(sim, cacheIt, prevCache,
                                      cacheIdOfSkip = chaining$cacheIdOfSkip,
                                      df = chaining$df,
-                                     moduleName = mBase,
-                                     eventType = ".inputObjects")
+                                     moduleName = chainLast$module,
+                                     eventType = chainLast$event)
 
           }
 

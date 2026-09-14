@@ -340,7 +340,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           
           if (!skipEvent) {
             sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                             showSimilar = showSimilar, .pkgEnv)
+                             showSimilar = showSimilar, .pkgEnv,
+                             jumpControls = list(events = events, eventsBeforeAfter = eventsBeforeAfter))
           }
           
           if (!is.null(eventSeed)) {
@@ -376,10 +377,18 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       } # end normal-event dispatch (`.inputObjects` is handled by the branch above)
       
       # add to list of completed events
+      jumped <- attr(sim, "cacheChainingJumped") # events a cacheChaining jump recovered along with this one
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         # cur[[._txtClockTime]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         sim <- appendCompleted(sim, cur)
+        for (k in seq_len(NROW(jumped))) {
+          sim <- appendCompleted(sim, list(
+            eventTime = if (is.na(jumped$eventTime[k])) cur[["eventTime"]] else jumped$eventTime[k],
+            moduleName = jumped$module[k], eventType = jumped$event[k],
+            eventPriority = cur[["eventPriority"]]))
+        }
       }
+      if (!is.null(jumped)) attr(sim, "cacheChainingJumped") <- NULL
 
       # current event completed, replace current with empty
       slot(sim, "current", check = FALSE) <- list() # is a list
@@ -1535,7 +1544,7 @@ setMethod(
 #' @keywords internal
 #' @importFrom cli bg_yellow
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                      showSimilar, .pkgEnv) {
+                      showSimilar, .pkgEnv, jumpControls = NULL) {
   cacheChaining <- getOption("spades.cacheChaining", FALSE)
   classOptions <- moduleSpecificObjects <- NULL # set defaults
   # cacheIt <- cacheChaining || cacheIt
@@ -1648,8 +1657,14 @@ setMethod(
         event = cur[["eventType"]],
         led = attr(sim, lastEventDetails),
         use = cacheChaining,
-        verbose = verbose)
+        verbose = verbose,
+        sim = sim,
+        jumpControls = jumpControls)
       fnCallAsExpr <- chaining$fnCallAsExpr
+      ## A jump lands on a later event's entry: that event becomes the current one, so the
+      ## entry is merged as if it had just run (see .unwrap.simList()).
+      if (!is.null(chaining$jump))
+        sim <- .chainJumpPrepare(sim, chaining$jump, verbose = verbose)
     }
     if (runFnCallAsExpr) {
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
@@ -1661,10 +1676,13 @@ setMethod(
     ## load-bearing when recording stopped being gated by spades.cacheChaining -- before,
     ## the guard was reached first whenever the option was off, which is the common case.
     .checkEventReturn(sim, cur[["moduleName"]], cur[["eventType"]], fromCache = isTRUE(cacheIt))
+    if (!is.null(chaining$jump))
+      sim <- .chainJumpFinish(sim, chaining$jump, cachePath = sim@paths[["cachePath"]], verbose = verbose)
+    chainLast <- .chainLast(chaining$jump, cur[["moduleName"]], cur[["eventType"]])
     sim <- cacheChainingPost(sim, cacheIt, prevCache,
                              chaining$cacheIdOfSkip, chaining$df,
-                             moduleName = cur[["moduleName"]],
-                             eventType = cur[["eventType"]])
+                             moduleName = chainLast$module,
+                             eventType = chainLast$event)
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
@@ -2879,12 +2897,21 @@ evalPostEvent <- function(envir = parent.frame()) {
 #'   depend on the option: a pass run with chaining off would otherwise record nothing, and
 #'   a later pass would have no chain to follow. Recording costs a `CacheDigest()` of the
 #'   module's functions plus one tag write, measured at ~4 ms per event.
+#' @param sim The `simList`. When given (and `use` is `TRUE`), a chain hit is followed
+#'   forward through the recorded chain -- see `.chainWalk()` -- and `fnCallAsExpr` is
+#'   pointed at the last entry that checks out; the skipped events are returned as `jump`.
+#' @param userObjects The user-supplied `objects` of `simInit()`, for the `.inputObjects`
+#'   phase: an input a skipped module would have taken from there is digested from there.
+#' @param jumpControls The per-event controls a jump must respect: a list with `events` (the
+#'   whitelist) and `eventsBeforeAfter` (the barriers), as `doEvent()` has them. `NULL` -- a caller
+#'   that does not pass them, e.g. an event run in a future -- means no jump.
 cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
                                module, event, led, use = TRUE,
-                               verbose = getOption("reproducible.verbose")) {
-  df <- cacheIdOfSkip <- NULL
+                               verbose = getOption("reproducible.verbose"),
+                               sim = NULL, userObjects = NULL, jumpControls = NULL) {
+  df <- cacheIdOfSkip <- jump <- NULL
   if (!is.null(prevCache) && isTRUE(cacheIt)) {
-    digestNonObjects <- reproducible::CacheDigest(nonObjects)$outputHash
+    digestNonObjects <- .chainDigest(nonObjects)
 
     df <- setDT(list(prevCache = prevCache, digestNonObjects = digestNonObjects,
                      module = module, event = event))
@@ -2893,27 +2920,13 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
     set(df, NULL, lastEventDetails, led)
     ## Recording is done: `df` is built. The rest is the USE half -- reading the chain
     ## back and pointing this call at the entry it can skip to.
-    if (!isTRUE(use)) return(list(cacheIdOfSkip = NULL, df = df, fnCallAsExpr = fnCallAsExpr))
+    if (!isTRUE(use)) return(list(cacheIdOfSkip = NULL, df = df, fnCallAsExpr = fnCallAsExpr, jump = NULL))
 
     cacheId <- gsub("cacheId:", "", prevCache)
     sc <- showCacheFast(cacheId = cacheId)
-    ccVals <- sc[startsWith(sc$tagKey, "cacheChaining")]
-    if (NROW(ccVals)) {
-      spli <- strsplit(ccVals$tagKey, "_")
-      nams <- vapply(spli, function(x) x[[2]], character(1))
-      postCacheIds <- vapply(spli, function(x) x[[3]], character(1))
-
-      ## One recorded chain per postCacheId, one row each. Flattening every tag
-      ##   value into a single row collapses them: duplicate column names are
-      ##   mangled (`prevCache.1`, ...) so only the first chain recorded against
-      ##   this entry stays joinable, and the row is built positionally, so any
-      ##   row order other than insertion order can pair one chain's
-      ##   `digestNonObjects` with another's `postCacheId`.
-      prevDF <- rbindlist(
-        lapply(split(seq_along(nams), postCacheIds), function(ix)
-          as.data.frame(as.list(ccVals$tagValue[ix]) |> setNames(nams[ix]))),
-        use.names = TRUE, fill = TRUE)
-
+    ## One recorded chain per postCacheId, one row each (see .chainSuccessors()).
+    prevDF <- .chainSuccessors(sc)
+    if (!is.null(prevDF)) {
       # THIS IS THE IMPORTANT LINE; JOIN on ALL COLUMNS especially digestNonObjects
       anyExisting <- prevDF[df, on = colnames(df), nomatch = NULL]
 
@@ -2926,18 +2939,64 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
         ## >1 match would mean two chains recorded the same state under different
         ##   postCacheIds; either recovers it, so take the first.
         cacheIdOfSkip <- anyExisting$postCacheId[[1]]
-        fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
-        messageCache("Using cacheChaining ... ", verbose = verbose)
+        ## The chain keys on the previous entry plus this module's code and parameters. That
+        ##   fixes every input the chain produced, but not an input this module reads from
+        ##   OUTSIDE the chain (an object supplied at simInit, or written by an uncached event):
+        ##   the same chain can be followed by a different such object and would have returned
+        ##   the entry computed from the old one. Those inputs are digested and compared with
+        ##   what the entry recorded (`preDigest` tags); a difference is not a chain hit.
+        produced <- if (!is.null(sim)) attr(sim, "cacheChainingProduced") else NULL
+        okExternal <- if (is.null(sim)) TRUE else {
+          postTags <- .chainEntryTags(cacheIdOfSkip, sim@paths[["cachePath"]])
+          !is.null(postTags) &&
+            .chainExternalInputsMatch(sim, module, postTags, produced = produced, userObjects = userObjects)
+        }
+        if (!okExternal) {
+          messageCache("Using cacheChaining; but an input of ", module, " that the chain did not produce ",
+                       "has changed; not chaining", verbose = verbose)
+          cacheIdOfSkip <- NULL
+        } else {
+          fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
+          messageCache("Using cacheChaining ... ", verbose = verbose)
+          ## Follow the chain on from this entry; land on the last entry that checks out. Only with
+          ##   the per-event controls to respect, and never while spades.evalPostEvent is set: it
+          ##   observes the simList after EACH event, and a jump never materialises the states between.
+          if (!is.null(sim) && !is.null(jumpControls) && is.null(getOption("spades.evalPostEvent"))) {
+            jump <- .chainWalk(sim, cacheIdOfSkip, module, event, cachePath = sim@paths[["cachePath"]],
+                               produced = produced, userObjects = userObjects,
+                               controls = jumpControls, verbose = verbose)
+            if (!is.null(jump)) {
+              ## row 1 is this event's own entry: with the call pointed at the last entry it is
+              ##   never loaded itself, so its outputs are restored like the other skipped ones
+              jump <- rbindlist(list(
+                data.table(cacheId = cacheIdOfSkip, module = module, event = event, eventTime = NA_real_),
+                jump), use.names = TRUE)
+              fnCallAsExpr[[1]]$cacheId <- jump$cacheId[NROW(jump)]
+            }
+          }
+        }
       }
     }
   }
-  list(cacheIdOfSkip = cacheIdOfSkip, df = df, fnCallAsExpr = fnCallAsExpr)
+  list(cacheIdOfSkip = cacheIdOfSkip, df = df, fnCallAsExpr = fnCallAsExpr, jump = jump)
 }
 
 
 cacheChainingPost <- function(sim, cacheIt, prevCache,
                               cacheIdOfSkip, df, moduleName, eventType) {
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
+  ## The objects the current unbroken run of cached events has produced; what a later link
+  ##   may trust without digesting (cacheChainingSetup(), .chainWalk()). Reset with the chain.
+  produced <- if (isTRUE(cacheIt)) {
+    prev <- if (is.null(prevCache)) character() else attr(sim, "cacheChainingProduced")
+    jumped <- attr(sim, "cacheChainingJumped")
+    steps <- if (is.null(jumped)) list(list(module = moduleName, event = eventType)) else
+      c(Map(function(m, e) list(module = m, event = e), jumped$module, jumped$event))
+    Reduce(union, lapply(steps, function(s) .chainOutputs(sim, s$module, s$event)), prev)
+  } else {
+    NULL
+  }
+  attr(sim, "cacheChainingProduced") <- produced
   if (!isTRUE(cacheIt)) {
     attr(sim, "tags") <- NULL # Remove the tag from Cache recovery
   } else if (!is.null(prevCache)) {

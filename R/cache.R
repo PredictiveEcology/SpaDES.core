@@ -820,7 +820,16 @@ setMethod(
           ## means it is not in a spades call
           simPost@completed <- simFromCache@completed
         }
-        if (NROW(current(simPost)) == 0) {
+        if (!is.null(attr(simPre[[whSimList]], "cacheChainingJump"))) {
+          ## A cacheChaining jump: this entry is the state after the LAST of several skipped
+          ##   events. The events those skipped events consumed and scheduled are exactly the
+          ##   difference between the two queues, so the recorded queue is the queue -- merging
+          ##   would leave the skipped events queued and run them again one by one.
+          simPost@events <- simFromCache@events
+          ## only the clock: start, end and timeunit are this run's, not those of the run that recorded
+          ##   the chain -- taking them all carried a recorded end(sim) past this run's own end
+          simPost@simtimes[["current"]] <- simFromCache@simtimes[["current"]]
+        } else if (NROW(current(simPost)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
           simPost@events <- simFromCache@events
           simPost@simtimes <- simFromCache@simtimes
