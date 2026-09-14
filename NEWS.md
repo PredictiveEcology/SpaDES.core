@@ -1,3 +1,14 @@
+# SpaDES.core 3.2.1.9012
+
+## Bug fixes
+
+* `cacheChaining` stopped chaining for good once a link had been recorded twice under the same
+  cache entry -- e.g. first by an earlier version, whose digest differs. The reader flattened a
+  link's recordings into one row, so the repeated tags were renamed (`digestNonObjects.1`, ...)
+  and only the oldest was compared, and the writer then appended another copy on every run. A
+  link's tags are now replaced rather than appended, and its newest recording is the one read, so
+  a cache left in that state chains again after its next run.
+
 # SpaDES.core 3.2.1.9011
 
 ## New features

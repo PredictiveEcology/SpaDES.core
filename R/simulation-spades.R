@@ -3008,8 +3008,13 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
       ##   that is the only copy. An in-memory mirror used to be accumulated here
       ##   in a per-cachePath environment in .GlobalEnv, but nothing ever read it
       ##   and it grew for the life of the session.
-      .addTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
-                   tagKey = paste0("cacheChaining_", colnames(df), "_", postCacheId), tagValue = unname(unlist(df)))
+      ## Replace, do not append: the same link can be recorded again under the same postCacheId
+      ##   (its digest changed, e.g. across versions), and a copy appended beside the stale one
+      ##   leaves the reader two recordings of one link. .updateTagsRepo() takes one tagKey per call.
+      for (col in colnames(df))
+        reproducible::.updateTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
+                                      tagKey = paste0("cacheChaining_", col, "_", postCacheId),
+                                      tagValue = as.character(df[[col]]))
     }
   }
   sim
