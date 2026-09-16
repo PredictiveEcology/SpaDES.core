@@ -1,3 +1,18 @@
+# SpaDES.core 3.2.1.9013
+
+## Bug fixes
+
+* An event's cacheId no longer depends on whether `outputs(sim)$arguments` is an `AsIs` column or a
+  plain list. `.robustDigest()`'s `simList` method drops the outputs *rows* for a module-level call
+  and then digests what survives -- the column structure: names, order and class. `arguments` is
+  `AsIs` when rows were added through `outputsAppend()`, which wraps the column with `I()` so
+  `rbindlist()` will bind it, and a plain list otherwise, so with the rows gone that class was
+  essentially all the digest saw. The same event consequently got two different cacheIds depending
+  only on how its outputs happened to be built. Seen in a FireSense run: across 2395 cache entries
+  the `sim.outputs` component took exactly two values, `5d0cef838b366d87` and `fd0dc16cc74b5a3c`,
+  spread across unrelated modules, so warm caches missed and events re-ran. The class is now
+  normalised before digesting; the outputs' contents still affect the cacheId as before.
+
 # SpaDES.core 3.2.1.9012
 
 ## Bug fixes
