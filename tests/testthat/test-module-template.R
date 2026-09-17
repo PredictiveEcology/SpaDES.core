@@ -60,6 +60,40 @@ test_that("module templates work", {
   # test_file(file.path(mpath, "tests", "testthat", "test-template.R")) # TODO: make it work
 })
 
+test_that("newModule writes a NEWS.md heading that agrees with the version it declares", {
+  testInit(smcc = FALSE)
+
+  moduleName <- "myModule"
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE)
+
+  declared <- moduleMetadata(module = moduleName, path = tmpdir)[["version"]]
+  heading <- grep("^# ", readLines(file.path(tmpdir, moduleName, "NEWS.md")), value = TRUE)[1]
+
+  ## an unreleased version (x.y.z.9000) takes usethis' development heading
+  expected <- if (length(unclass(declared)[[1]]) > 3L) {
+    "(development version)"
+  } else {
+    as.character(declared)
+  }
+  expect_identical(heading, paste("#", moduleName, expected))
+})
+
+test_that("newModule gives a child module the same starting version as its parent", {
+  testInit(smcc = FALSE)
+
+  newModule("myChild", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE)
+  newModule("myParent", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE,
+            type = "parent", children = "myChild")
+
+  ## moduleMetadata() collapses `version` to the module's own, so read it unparsed
+  versions <- .parseModulePartial(
+    filename = file.path(tmpdir, "myParent", "myParent.R"),
+    defineModuleElement = "version"
+  )
+
+  expect_identical(versions[["myChild"]], versions[["myParent"]])
+})
+
 test_that("empty defineModule", {
   testInit()
 

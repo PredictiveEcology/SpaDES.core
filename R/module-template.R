@@ -301,7 +301,7 @@ setMethod(
     version <- list()
     version[[name]] <- moduleDefaults[["version"]]
     if (args$type == "parent")
-      lapply(args$children, function(x) version[[x]] <<- "0.0.1")
+      lapply(args$children, function(x) version[[x]] <<- moduleDefaults[["version"]])
 
     SpaDES.core.version <- as.character(utils::packageVersion("SpaDES.core"))
     DESCtxt <- readLines(system.file("DESCRIPTION", package = "SpaDES.core"))
