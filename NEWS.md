@@ -1,3 +1,15 @@
+# SpaDES.core 3.2.1.9014
+
+## Bug fixes
+
+* `newModule()` no longer writes a `NEWS.md` whose heading contradicts the version it declares. The
+  generated file said `# <moduleName> 0.0.1 (<date>)` -- a released version, and a release date --
+  while the generated module code declared `version = list(<moduleName> = "0.0.0.9000")`.
+  `defineModule(version = ...)` is a module's only version record, so every new module started out of
+  step with itself. The heading is now `# <moduleName> (development version)`, the convention
+  `usethis::use_news_md()` uses for packages, and takes a version and a date when the module is first
+  released.
+
 # SpaDES.core 3.2.1.9013
 
 ## Bug fixes
