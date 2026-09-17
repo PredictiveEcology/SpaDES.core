@@ -78,6 +78,22 @@ test_that("newModule writes a NEWS.md heading that agrees with the version it de
   expect_identical(heading, paste("#", moduleName, expected))
 })
 
+test_that("newModule gives a child module the same starting version as its parent", {
+  testInit(smcc = FALSE)
+
+  newModule("myChild", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE)
+  newModule("myParent", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE,
+            type = "parent", children = "myChild")
+
+  ## moduleMetadata() collapses `version` to the module's own, so read it unparsed
+  versions <- .parseModulePartial(
+    filename = file.path(tmpdir, "myParent", "myParent.R"),
+    defineModuleElement = "version"
+  )
+
+  expect_identical(versions[["myChild"]], versions[["myParent"]])
+})
+
 test_that("empty defineModule", {
   testInit()
 

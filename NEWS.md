@@ -10,6 +10,10 @@
   `usethis::use_news_md()` uses for packages, and takes a version and a date when the module is first
   released.
 
+* `newModule(type = "parent")` now gives its children the same starting version it gives itself.
+  Children were hard-coded to `"0.0.1"` while the parent took `moduleDefaults[["version"]]`
+  (`"0.0.0.9000"`), so a new parent's metadata disagreed with each child's own module file.
+
 # SpaDES.core 3.2.1.9013
 
 ## Bug fixes
