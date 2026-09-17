@@ -1,6 +1,23 @@
-# SpaDES.core 3.2.1.9012
+# SpaDES.core 3.2.1.9013
 
 ## Bug fixes
+
+* Recovering an event from the cache no longer leaves a duplicated event in the queue. When
+  `.prepareOutput()` merged the queue the cached run had with the live one, it first wrote a sort key
+  into every event -- `2` on the cached events, `1` on the live ones -- and only then called
+  `unique()`, stripping the key again after sorting. An event sitting in both queues was therefore not
+  identical at the moment `unique()` ran, survived as a duplicate, and re-emerged with the key removed:
+  two byte-identical events. The merge now de-duplicates before any sort key exists and takes the
+  tie-break from provenance instead of from a field written into the event.
+
+  The effect compounded, because the event queue is part of an event's cacheId: a warm hit on one event
+  returned a queue with a duplicate, so the next event digested a different `sim.events`, got a
+  different cacheId, and missed. A warm cache turned itself cold. Measured on a FireSense cache, of the
+  entries identical in every digest component except the event queue, 17 of 17 differed by exactly one
+  event and in every case it was a duplicate of one already queued -- never a new event -- across
+  `burnSummaries`, `Biomass_summary`, `Biomass_speciesData`, `Biomass_speciesParameters`, `NRV_summary`,
+  `fireSense_dataPrepFit`, `fireSense_dataPrepPredict`, `fireSense_IgnitionFit` and
+  `fireSense_IgnitionPredict`.
 
 * `cacheChaining` stopped chaining for good once a link had been recorded twice under the same
   cache entry -- e.g. first by an earlier version, whose digest differs. The reader flattened a

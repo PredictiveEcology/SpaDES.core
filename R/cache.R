@@ -633,6 +633,32 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
   l1Different
 }
 
+## Merge the event queue recovered from the cache with the live one, so that events the cached event
+## scheduled are not lost. `keep` selects which of the cached events to consider: an event can only
+## have scheduled its own module's events.
+##
+## `order` is a sort key only -- it makes cached-added events fall after live ones at the same
+## eventTime and eventPriority -- and is stripped before the queue is returned.
+.mergeEventQueues <- function(cached, live, keep = TRUE) {
+  ## `cached[keep]` on an empty list pads rather than staying empty: a logical index longer than the
+  ## object yields list(NULL), which rbindlist() then silently drops, desynchronising the sort keys.
+  combined <- append(if (length(cached)) cached[keep] else cached, live)
+  if (!length(combined)) {
+    return(live)
+  }
+  ## Dedupe on the events THEMSELVES, before any sort key exists. Previously a sort key was written
+  ## into each event first -- 2 for the cached ones, 1 for the live ones -- so an event sitting in
+  ## both queues was no longer identical when unique() ran, survived as a duplicate, and re-emerged
+  ## with the key stripped: two byte-identical events. Since the queue is part of the next event's
+  ## cacheId, that duplicate turned every subsequent warm hit into a miss.
+  combined <- unique(combined)
+  ## Tie-break by provenance rather than by a field written into the event: at equal eventTime and
+  ## eventPriority, events the live run already had come before ones recovered from the cache.
+  fromLive <- vapply(combined, function(e) any(vapply(live, identical, logical(1), e)), logical(1))
+  ord <- rbindlist(combined)
+  combined[order(ord$eventTime, ord$eventPriority, ifelse(fromLive, 1L, 2L))]
+}
+
 #' `.prepareOutput` for `simList` objects
 #'
 #' See [reproducible::.prepareOutput()].
@@ -845,35 +871,8 @@ setMethod(
           eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
 
           if (NROW(eventsAddedByThisModuleDT)) {
-            # if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
-              b <- simFromCache@events
-              b <- lapply(b, function(x) {
-                x[["order"]] <- 2
-                x
-              })
-
-              d <- simPost@events
-              d <- lapply(d, function(x) {
-                x[["order"]] <- 1
-                x
-              })
-
-              a <- do.call(unique, args = alist(append(b[eventsAddedByThisModule], d)))
-              if (length(a)) {
-
-                # a <- do.call(unique,
-                #              args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
-                a1 <- rbindlist(a)
-                # f1 <- if (NROW(a1)) a[order(a1$eventTime, a1$eventPriority, a1$order)] else a1
-                f1 <- a[order(a1$eventTime, a1$eventPriority, a1$order)]
-                simPost@events <- lapply(f1, function(f) {
-                  f$order <- NULL
-                  f
-                })
-              }
-              # simPost@events <- do.call(unique,
-              #                           args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
-            # }
+            simPost@events <- .mergeEventQueues(simFromCache@events, simPost@events,
+                                                eventsAddedByThisModule)
           }
           #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
