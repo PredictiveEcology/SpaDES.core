@@ -2,15 +2,15 @@
 ## rendition's vignettes/, so pkgdown can publish it as an article
 ## (PredictiveEcology/SpaDES-modules#40).
 
-## The .Rmd newModule() writes, with the module path the fireSense modules were
-## created with, plus the bibliography file its header points at.
+## The .Rmd newModule() writes, plus the bibliography file its header points at.
+## The template resolves the module by relative path, so there is nothing here to
+## stand in for the directory the module was created in.
 writeTemplateRmd <- function(name, dir) {
   md <- file.path(dir, name)
   dir.create(file.path(md, "citations"), recursive = TRUE, showWarnings = FALSE)
   tmpl <- readLines(file.path(.pkgEnv[["templatePath"]], "module.Rmd.template"))
   writeLines(whisker::whisker.render(tmpl, list(author = "A B", date = "01 January 2026",
-                                                name = name, name2 = gsub("_", "-", name),
-                                                path = "..")),
+                                                name = name, name2 = gsub("_", "-", name))),
              file.path(md, paste0(name, ".Rmd")))
   writeLines(character(0), file.path(md, "citations", paste0("references_", name, ".bib")))
   md

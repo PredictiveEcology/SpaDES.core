@@ -250,3 +250,44 @@ test_that("moduleReqdPkgs returns an empty data.frame for a module with no reqdP
   expect_identical(nrow(pkgs), 0L)
   expect_identical(names(pkgs), c("packageName", "minVersion"))
 })
+
+test_that("newModule() writes no absolute paths into the generated module", {
+  testInit(smcc = FALSE)
+
+  moduleName <- "myModule"
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = TRUE, useGitHub = FALSE)
+  mpath <- file.path(tmpdir, moduleName)
+
+  ## a generated module is committed to its own repository and built on a machine
+  ## that is not the author's, so no file in it may name the directory it was
+  ## created in
+  generated <- list.files(mpath, recursive = TRUE, full.names = TRUE, all.files = TRUE,
+                          no.. = TRUE)
+  generated <- generated[!dir.exists(generated)]
+  offenders <- Filter(
+    function(f) any(grepl(basename(tmpdir), readLines(f, warn = FALSE), fixed = TRUE)),
+    generated
+  )
+  expect_identical(basename(offenders), character(0))
+
+  rmd <- readLines(file.path(mpath, paste0(moduleName, ".Rmd")))
+
+  ## the four metadata tables resolve the module from beside it, matching the
+  ## subtitle and authors lines. This is the form moduleRmdToVignette() repoints
+  ## to "../.." and SpaDES.docs::prepManualRmds() sets `root.dir` for; neither
+  ## can do anything with an absolute path
+  expect_length(
+    grep(paste0('<- SpaDES.core::module[A-Za-z]+\\("', moduleName, '", "\\.\\."\\)'), rmd),
+    4
+  )
+  expect_length(grep("path = '..')", rmd, fixed = TRUE), 2)
+
+  ## the prose advises the reader with the same relative path the code uses
+  expect_length(
+    grep(paste0('`downloadData("', moduleName, '", "..")`'), rmd, fixed = TRUE), 1
+  )
+
+  ## the generated unit test resolves modulePath from tests/testthat/
+  tmpl <- readLines(file.path(mpath, "tests", "testthat", "test-template.R"))
+  expect_length(grep('modulePath = file.path("..", "..", "..")', tmpl, fixed = TRUE), 1)
+})
