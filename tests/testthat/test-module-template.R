@@ -60,6 +60,40 @@ test_that("module templates work", {
   # test_file(file.path(mpath, "tests", "testthat", "test-template.R")) # TODO: make it work
 })
 
+test_that("newModule writes a NEWS.md heading that agrees with the version it declares", {
+  testInit(smcc = FALSE)
+
+  moduleName <- "myModule"
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE)
+
+  declared <- moduleMetadata(module = moduleName, path = tmpdir)[["version"]]
+  heading <- grep("^# ", readLines(file.path(tmpdir, moduleName, "NEWS.md")), value = TRUE)[1]
+
+  ## an unreleased version (x.y.z.9000) takes usethis' development heading
+  expected <- if (length(unclass(declared)[[1]]) > 3L) {
+    "(development version)"
+  } else {
+    as.character(declared)
+  }
+  expect_identical(heading, paste("#", moduleName, expected))
+})
+
+test_that("newModule gives a child module the same starting version as its parent", {
+  testInit(smcc = FALSE)
+
+  newModule("myChild", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE)
+  newModule("myParent", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE,
+            type = "parent", children = "myChild")
+
+  ## moduleMetadata() collapses `version` to the module's own, so read it unparsed
+  versions <- .parseModulePartial(
+    filename = file.path(tmpdir, "myParent", "myParent.R"),
+    defineModuleElement = "version"
+  )
+
+  expect_identical(versions[["myChild"]], versions[["myParent"]])
+})
+
 test_that("empty defineModule", {
   testInit()
 
@@ -215,4 +249,45 @@ test_that("moduleReqdPkgs returns an empty data.frame for a module with no reqdP
   expect_s3_class(pkgs, "data.frame")
   expect_identical(nrow(pkgs), 0L)
   expect_identical(names(pkgs), c("packageName", "minVersion"))
+})
+
+test_that("newModule() writes no absolute paths into the generated module", {
+  testInit(smcc = FALSE)
+
+  moduleName <- "myModule"
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = TRUE, useGitHub = FALSE)
+  mpath <- file.path(tmpdir, moduleName)
+
+  ## a generated module is committed to its own repository and built on a machine
+  ## that is not the author's, so no file in it may name the directory it was
+  ## created in
+  generated <- list.files(mpath, recursive = TRUE, full.names = TRUE, all.files = TRUE,
+                          no.. = TRUE)
+  generated <- generated[!dir.exists(generated)]
+  offenders <- Filter(
+    function(f) any(grepl(basename(tmpdir), readLines(f, warn = FALSE), fixed = TRUE)),
+    generated
+  )
+  expect_identical(basename(offenders), character(0))
+
+  rmd <- readLines(file.path(mpath, paste0(moduleName, ".Rmd")))
+
+  ## the four metadata tables resolve the module from beside it, matching the
+  ## subtitle and authors lines. This is the form moduleRmdToVignette() repoints
+  ## to "../.." and SpaDES.docs::prepManualRmds() sets `root.dir` for; neither
+  ## can do anything with an absolute path
+  expect_length(
+    grep(paste0('<- SpaDES.core::module[A-Za-z]+\\("', moduleName, '", "\\.\\."\\)'), rmd),
+    4
+  )
+  expect_length(grep("path = '..')", rmd, fixed = TRUE), 2)
+
+  ## the prose advises the reader with the same relative path the code uses
+  expect_length(
+    grep(paste0('`downloadData("', moduleName, '", "..")`'), rmd, fixed = TRUE), 1
+  )
+
+  ## the generated unit test resolves modulePath from tests/testthat/
+  tmpl <- readLines(file.path(mpath, "tests", "testthat", "test-template.R"))
+  expect_length(grep('modulePath = file.path("..", "..", "..")', tmpl, fixed = TRUE), 1)
 })

@@ -53,12 +53,12 @@ This is a template for module documentation, and should be changed to reflect yo
 ### Module inputs and parameters
 
 Describe input data required by the module and how to obtain it (e.g., directly from online sources or supplied by other modules)
-If `sourceURL` is specified, `downloadData("{{{name}}}", "{{{path}}}")` may be sufficient.
+If `sourceURL` is specified, `downloadData("{{{name}}}", "..")` may be sufficient.
 
 Table \@ref(tab:moduleInputs-{{{name2}}}) shows the full list of module inputs.
 
 ```{r moduleInputs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "{{{path}}}")
+df_inputs <- SpaDES.core::moduleInputs("{{{name}}}", "..")
 knitr::kable(df_inputs,
              caption = "List of (ref:{{{name2}}}) input objects and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
@@ -68,7 +68,7 @@ Summary of user-visible parameters (Table \@ref(tab:moduleParams-{{{name2}}}))
 
 
 ```{r moduleParams-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_params <- SpaDES.core::moduleParams("{{{name}}}", "{{{path}}}")
+df_params <- SpaDES.core::moduleParams("{{{name}}}", "..")
 knitr::kable(df_params, caption = "List of (ref:{{{name2}}}) parameters and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
@@ -77,7 +77,7 @@ Table \@ref(tab:moduleReqdPkgs-{{{name2}}}) lists the R packages this module
 requires. These are installed and loaded automatically by `simInit()`.
 
 ```{r moduleReqdPkgs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_pkgs <- SpaDES.core::moduleReqdPkgs("{{{name}}}", "{{{path}}}")
+df_pkgs <- SpaDES.core::moduleReqdPkgs("{{{name}}}", "..")
 knitr::kable(df_pkgs, caption = "List of (ref:{{{name2}}}) required packages.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```
@@ -99,7 +99,7 @@ Write what is saved.
 Description of the module outputs (Table \@ref(tab:moduleOutputs-{{{name2}}})).
 
 ```{r moduleOutputs-{{{name2}}}, echo = FALSE, eval = TRUE, message = FALSE, warning = FALSE}
-df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "{{{path}}}")
+df_outputs <- SpaDES.core::moduleOutputs("{{{name}}}", "..")
 knitr::kable(df_outputs, caption = "List of (ref:{{{name2}}}) outputs and their description.") |>
   kableExtra::kable_styling(latex_options = "scale_down", full_width = TRUE)
 ```

@@ -12,6 +12,27 @@
   the `sim.outputs` component took exactly two values, `5d0cef838b366d87` and `fd0dc16cc74b5a3c`,
   spread across unrelated modules, so warm caches missed and events re-ran. The class is now
   normalised before digesting; the outputs' contents still affect the cacheId as before.
+* `newModule()` no longer writes a `NEWS.md` whose heading contradicts the version it declares. The
+  generated file said `# <moduleName> 0.0.1 (<date>)` -- a released version, and a release date --
+  while the generated module code declared `version = list(<moduleName> = "0.0.0.9000")`.
+  `defineModule(version = ...)` is a module's only version record, so every new module started out of
+  step with itself. The heading is now `# <moduleName> (development version)`, the convention
+  `usethis::use_news_md()` uses for packages, and takes a version and a date when the module is first
+  released.
+
+* `newModule(type = "parent")` now gives its children the same starting version it gives itself.
+  Children were hard-coded to `"0.0.1"` while the parent took `moduleDefaults[["version"]]`
+  (`"0.0.0.9000"`), so a new parent's metadata disagreed with each child's own module file.
+
+* `newModule()` no longer writes absolute paths into a generated module. Three templates
+  interpolated the path the module was created at, which `checkPath()` returns absolute: the four
+  metadata table chunks and the `downloadData()` advice in `module.Rmd.template`, the `cd` line in
+  `README.template`, and `modulePath` in `test-template.R.template`. Those paths resolved nowhere but
+  the machine that ran `newModule()`, so a generated module's own `render-module-rmd` CI, the pkgdown
+  site built by `moduleRmdToVignette()`, any manual assembled by `SpaDES.docs::prepManualRmds()`, and
+  its own unit tests all read a directory that was not there. The `.Rmd` now uses `".."` throughout,
+  matching the subtitle and authors lines that already did; the unit test template uses
+  `file.path("..", "..", "..")`, relative to `tests/testthat/`.
 
 # SpaDES.core 3.2.1.9013
 
