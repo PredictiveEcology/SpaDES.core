@@ -308,8 +308,16 @@ setMethod(
     obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
     # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
-    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", .txtArguments)],
-                                    quick = TRUE, algo = algo)
+    ## `arguments` is an `AsIs` column when the rows were added through `outputsAppend()`, which wraps
+    ## it with `I()` so `rbindlist()` will bind it, and a plain list when they were not. That is a
+    ## construction detail with no bearing on what an event computes -- but the rows are dropped just
+    ## above for a module-level call, so the column's CLASS is essentially all that reaches the digest.
+    ## It therefore split the cacheId of every event in every module: in a FireSense run, `sim.outputs`
+    ## took exactly two values across 2395 entries, `5d0cef838b366d87` (AsIs) and `fd0dc16cc74b5a3c`
+    ## (list), and warm caches missed for no reason. Normalise the class; contents still count.
+    outs <- object@outputs[, c("objectName", "saveTime", "file", .txtArguments)]
+    outs[[.txtArguments]] <- unclass(outs[[.txtArguments]])
+    obj["outputs"] <- .robustDigest(outs, quick = TRUE, algo = algo)
     if (!is.null(classOptions$depends)) { # this is used for Cache(.inputObjects(...))
       keep <- intersect(names(obj$depends[[curMod]]), classOptions$depends)
       obj$depends[[curMod]] <- obj$depends[[curMod]][keep]
