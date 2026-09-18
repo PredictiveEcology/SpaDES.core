@@ -14,6 +14,16 @@
   Children were hard-coded to `"0.0.1"` while the parent took `moduleDefaults[["version"]]`
   (`"0.0.0.9000"`), so a new parent's metadata disagreed with each child's own module file.
 
+* `newModule()` no longer writes absolute paths into a generated module. Three templates
+  interpolated the path the module was created at, which `checkPath()` returns absolute: the four
+  metadata table chunks and the `downloadData()` advice in `module.Rmd.template`, the `cd` line in
+  `README.template`, and `modulePath` in `test-template.R.template`. Those paths resolved nowhere but
+  the machine that ran `newModule()`, so a generated module's own `render-module-rmd` CI, the pkgdown
+  site built by `moduleRmdToVignette()`, any manual assembled by `SpaDES.docs::prepManualRmds()`, and
+  its own unit tests all read a directory that was not there. The `.Rmd` now uses `".."` throughout,
+  matching the subtitle and authors lines that already did; the unit test template uses
+  `file.path("..", "..", "..")`, relative to `tests/testthat/`.
+
 # SpaDES.core 3.2.1.9013
 
 ## Bug fixes

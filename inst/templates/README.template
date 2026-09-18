@@ -1,8 +1,8 @@
 After knitting and rendering `{{{name}}}.Rmd`, overwrite this file with a symlink to `{{{name}}}.md`.
 
-E.g., on Linux/macOS from terminal:
+E.g., on Linux/macOS from terminal, in the directory that contains the module:
 
 ```bash
-cd {{{path}}}/{{{name}}}
+cd {{{name}}}
 rm README.md && ln -s {{{name}}}.md README.md
 ```
