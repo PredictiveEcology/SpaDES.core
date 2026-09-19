@@ -99,7 +99,7 @@
                         <h4 data-toc-skip class="author">Eliot J. B.
 McIntire</h4>
             
-            <h4 data-toc-skip class="date">August 29 2026</h4>
+            <h4 data-toc-skip class="date">September 19 2026</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/PredictiveEcology/SpaDES.core/blob/main/vignettes/iii-cache.Rmd" class="external-link"><code>vignettes/iii-cache.Rmd</code></a></small>
       <div class="hidden name"><code>iii-cache.Rmd</code></div>
@@ -176,7 +176,7 @@ call.</p>
 <span>  <span class="va">outSim</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span>, notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   1.399   0.023   1.420</span></span></code></pre>
+<span><span class="co">##   1.259   0.029   1.288</span></span></code></pre>
 <p>Note that if there were any visualizations (here we turned them off
 with <code>.plotInitialTime = NA</code> above) they will happen the
 first time through, but not the cached times.</p>
@@ -186,7 +186,7 @@ first time through, but not the cached times.</p>
 <span>  <span class="va">outSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, cache <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.050   0.000   0.051</span></span></code></pre>
+<span><span class="co">##   0.041   0.000   0.041</span></span></code></pre>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="va">outSim</span>, <span class="va">outSimCached</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## [1] "Length mismatch: comparison on first 5 components"</span></span></code></pre>
@@ -218,14 +218,14 @@ support, etc.).</p>
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.806   0.001   0.806</span></span></code></pre>
+<span><span class="co">##   0.766   0.001   0.767</span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   0.508   0.000   0.508</span></span></code></pre>
+<span><span class="co">##   0.524   0.001   0.524</span></span></code></pre>
 <p>Test that only layers produced in <code>randomLandscapes</code> are
 identical, not <code>fireSpread</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -277,14 +277,14 @@ for <code>randomLandscapes</code>, but we add to it a cache for only the
 <span>                      notOlderThan <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.time</a></span><span class="op">(</span><span class="op">)</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   1.334   0.044   1.380</span></span></code></pre>
+<span><span class="co">##   1.068   0.072   1.140</span></span></code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># faster the second time</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">randomSimCached</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/spades.html">spades</a></span><span class="op">(</span><span class="fu"><a href="https://reproducible.predictiveecology.org/reference/Copy.html" class="external-link">Copy</a></span><span class="op">(</span><span class="va">mySim</span><span class="op">)</span>, .plotInitialTime <span class="op">=</span> <span class="cn">NA</span>, debug <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">##    user  system elapsed </span></span>
-<span><span class="co">##   1.155   0.001   1.155</span></span></code></pre>
+<span><span class="co">##   1.127   0.002   1.128</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="function-level-caching">Function-level caching<a class="anchor" aria-label="anchor" href="#function-level-caching"></a>
