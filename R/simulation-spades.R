@@ -291,6 +291,13 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           if (!is.null(eventSeed)) {
             initialRandomSeed <- get0(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
             set.seed(eventSeed) # will create .Random.seed
+            ## restore the session's stream even if the event errors
+            on.exit({
+              if (is.null(initialRandomSeed))
+                rm(".Random.seed", envir = .GlobalEnv)
+              else
+                assign(".Random.seed", initialRandomSeed, envir = .GlobalEnv)
+            }, add = TRUE)
           }
           
           .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
@@ -341,13 +348,6 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
             sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
                              showSimilar = showSimilar, .pkgEnv,
                              jumpControls = list(events = events, eventsBeforeAfter = eventsBeforeAfter))
-          }
-          
-          if (!is.null(eventSeed)) {
-            if (is.null(initialRandomSeed))
-              rm(".Random.seed", envir = .GlobalEnv)
-            else
-              assign(".Random.seed", initialRandomSeed, envir = .GlobalEnv)
           }
           
           # browser(expr = exists("._doEvent_3"))
