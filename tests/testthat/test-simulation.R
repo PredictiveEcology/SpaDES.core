@@ -219,6 +219,34 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(all(file.exists(outputs(mySimEvent12Out)$file[outputs(mySimEvent12Out)$saved])))
 })
 
+test_that(".seed sets the event seed and restores the session RNG stream after", {
+  skip_on_cran()
+  testInit(sampleModReqdPkgs)
+
+  runSeeded <- function(seed, nx = 20) {
+    params <- list(randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA,
+                                           nx = nx, ny = 20, .seed = list(init = seed)))
+    sim <- simInit(times = list(start = 0, end = 0), modules = "randomLandscapes",
+                   params = params, paths = list(modulePath = getSampleModules(tmpdir)))
+    set.seed(1)
+    if (nx == 0) { # init errors
+      expect_error(spades(sim, debug = FALSE))
+      return(list(nextDraw = runif(1)))
+    }
+    sim <- spades(sim, debug = FALSE)
+    list(map = terra::values(sim$landscape), nextDraw = runif(1))
+  }
+  a <- runSeeded(321)
+  b <- runSeeded(321)
+  c <- runSeeded(999)
+  expect_identical(a$map, b$map)
+  expect_false(identical(a$map, c$map))
+  ## after the event, the session stream no longer depends on the event seed
+  expect_identical(a$nextDraw, c$nextDraw)
+  ## ... also when the seeded event errors
+  expect_identical(runSeeded(321, nx = 0)$nextDraw, runSeeded(999, nx = 0)$nextDraw)
+})
+
 test_that("spades calls - diff't signatures", {
   testInit(sampleModReqdPkgs, verbose = TRUE)
 

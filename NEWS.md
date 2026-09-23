@@ -1,7 +1,10 @@
-# SpaDES.core 3.2.1.9014
+# SpaDES.core 3.2.1.9015
 
 ## Bug fixes
 
+* The `.seed` module parameter now restores the session's random number stream after the seeded
+  event, including when the event errors, as `?simInit` documents. `doEvent()` assigned the saved `.Random.seed` to a local variable,
+  so every later event, and the session after `spades()`, kept drawing from the event's fixed seed.
 * An event's cacheId no longer depends on whether `outputs(sim)$arguments` is an `AsIs` column or a
   plain list. `.robustDigest()`'s `simList` method drops the outputs *rows* for a module-level call
   and then digests what survives -- the column structure: names, order and class. `arguments` is
