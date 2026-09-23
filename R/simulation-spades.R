@@ -289,8 +289,7 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           
           skipEvent <- FALSE
           if (!is.null(eventSeed)) {
-            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
-              initialRandomSeed <- .Random.seed
+            initialRandomSeed <- get0(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
             set.seed(eventSeed) # will create .Random.seed
           }
           
@@ -345,8 +344,10 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           }
           
           if (!is.null(eventSeed)) {
-            if (exists("initialRandomSeed", inherits = FALSE))
-              .Random.seed <- initialRandomSeed
+            if (is.null(initialRandomSeed))
+              rm(".Random.seed", envir = .GlobalEnv)
+            else
+              assign(".Random.seed", initialRandomSeed, envir = .GlobalEnv)
           }
           
           # browser(expr = exists("._doEvent_3"))
