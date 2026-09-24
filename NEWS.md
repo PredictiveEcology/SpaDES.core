@@ -1,3 +1,12 @@
+# SpaDES.core 3.2.1.9017
+
+## Bug fixes
+
+* A cached `simList` now names its files in the cache entry's tags, as a cached list does. `.wrap.simList()` wraps
+  its objects with reproducible's `.wrap()`, which collects the tags of what it wraps (a file-backed raster's
+  `origFilename`, `filenamesInCache`, ...), but `list2env()` then dropped them, so `showCache()`, `clearCache()` and
+  the cloud cache could not see the files of, e.g., a cached `.inputObjects`. Existing cache entries still load.
+
 # SpaDES.core 3.2.1.9016
 
 ## Bug fixes

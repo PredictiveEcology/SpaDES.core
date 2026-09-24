@@ -1170,6 +1170,13 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
+  ## Keep the tags the wrapped pieces carry (e.g., a file-backed raster's origFilename and filenamesInCache),
+  ##   as reproducible's .wrap.list does: Cache() records attr(<wrapped>, "tags") on the entry, and
+  ##   showCache()/clearCache() and the cloud cache find an entry's files through them. list2env() dropped
+  ##   them, so a cached simList's entry named none of its files.
+  tags <- c(attr(objTmp[[dotMods]], "tags"), attr(objTmp[[dotObjs]], "tags"), attr(out, "tags"))
+  if (length(tags))
+    attr(objTmp, "tags") <- c(attr(obj, "tags"), tags)
   objTmp
 }
 
