@@ -68,12 +68,12 @@ utils::globalVariables(c("objName", "V1", "noFeedback"))
 #' }
 suppliedElsewhere <- function(object, sim, where = c("sim", "user", "initEvent"),
                               returnWhere = FALSE) {
-  mc <- as.list(match.call())[-1] # there is something weird about the argument "where"
-                     # on my windows system -- shows something similar to sys.calls()
-  forms <- formals()
-  forms[names(mc)] <- mc
+  ## The VALUE of `where`. It used to come from match.call(), unevaluated: `where = c("sim", "user")`
+  ## arrived as the call c("sim", "user"), whose leading "c" matched "cyclic" and switched on the
+  ## future-init check the caller had left out; `where = w` (a variable) arrived as a symbol and
+  ## matched nothing, so it stopped.
   partialMatching <- c("s", "i", "u", "c")
-  forms$where <- partialMatching[which(!is.na(pmatch(partialMatching, forms$where)))]
+  forms <- list(where = partialMatching[which(!is.na(pmatch(partialMatching, where)))])
   if (length(forms$where) == 0) stop("where must be either sim, user, initEvent, or cyclic")
   objDeparsed <- substitute(object)
   if (missing(sim)) {

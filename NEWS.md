@@ -1,4 +1,14 @@
+# SpaDES.core 3.2.1.9016
+
+## Bug fixes
+
+* `suppliedElsewhere()` now reads `where` by value. It took it from `match.call()`, unevaluated, so
+  `where = c("sim", "user")` was read as "c", "sim", "user": the "c" matched "cyclic", and the future-init
+  check the caller had left out ran anyway. A module then saw an object as supplied by another module's init
+  event and skipped its own default. `where = <a variable>` stopped with "where must be ...".
+
 # SpaDES.core 3.2.1.9015
+
 
 ## Bug fixes
 
