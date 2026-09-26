@@ -1274,7 +1274,9 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #'
 #' Because of the environment slot, `simList` objects don't correctly
 #' memoise a `simList`.
-#' This method for `simList` converts the object to a `simList_` first.
+#' This method for `simList` converts the object to a `simList_` first,
+#' after a [Copy()], so that objects a later event modifies by reference
+#' (e.g., a `data.table`) do not change the memoised copy.
 #'
 #' @inheritParams reproducible::makeMemoisable
 #'
@@ -1286,7 +1288,7 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #' @rdname makeMemoisable
 #' @seealso [reproducible::makeMemoisable()]
 makeMemoisable.simList <- function(x) {
-  as(x, "simList_")
+  as(Copy(x), "simList_")
 }
 
 #' @export
