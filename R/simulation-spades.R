@@ -1667,10 +1667,18 @@ setMethod(
       if (!is.null(chaining$jump))
         sim <- .chainJumpPrepare(sim, chaining$jump, verbose = verbose)
     }
+    ## A Cache() hit (`fnCallAsExpr` above) returns a brand-new simList (a fresh
+    ## @.xData) built by .unwrap.simList(), which never carries simInit()/spades()-only
+    ## transient state (see .transientSimStateNames) -- that state was never part of what
+    ## was cached. During simInit()'s `.inputObjects` phase, the live `sim` carries
+    ## ._simInitContext; put it back, mirroring the paramsDontCacheOn restoration below.
+    simInitContextPreCall <- sim@.xData[["._simInitContext"]]
     if (runFnCallAsExpr) {
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
       # attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
     }
+    if (!is.null(simInitContextPreCall) && is.null(sim@.xData[["._simInitContext"]]))
+      sim@.xData[["._simInitContext"]] <- simInitContextPreCall
     ## The return guard runs FIRST. An event that returned something other than a simList
     ## must produce .checkEventReturn()'s clear, named error; handing that value to
     ## cacheChainingPost() would fail earlier and less helpfully. This ordering only became
