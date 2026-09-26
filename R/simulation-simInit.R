@@ -1719,6 +1719,17 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(dotMods, "$", m), paste0(dotObjs, "$", m))
+        ## `.inputObjects` may set an object it declares only via `createsOutput`, not
+        ##   `expectsInput` (e.g. a value no other module needs as an input). A cache HIT must
+        ##   restore that object too, or it silently vanishes from the simList on reload -- a
+        ##   cache MISS never showed this, since that returns the live, freshly computed sim
+        ##   rather than round-tripping through `.wrap()`/`.unwrap()`. Kept separate from
+        ##   `moduleSpecificInputObjects`, which also drives the cache KEY below
+        ##   (`objectsToEvaluateForCaching`): an object that does not exist yet before
+        ##   `.inputObjects` runs must never be digested into that key.
+        moduleSpecificOutputObjects <- union(
+          moduleSpecificInputObjects,
+          na.omit(sim@depends@dependencies[[i]]@outputObjects[["objectName"]]))
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -1807,7 +1818,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               FUN = quote(.inputObjects(sim)),
               .objects = quote(objectsToEvaluateForCaching),
               notOlderThan = quote(notOlderThan),
-              outputObjects = quote(moduleSpecificInputObjects),
+              outputObjects = quote(moduleSpecificOutputObjects),
               quick = quote(getOption("reproducible.quick", FALSE)),
               cachePath = quote(sim@paths$cachePath),
               classOptions = quote(classOptions),
