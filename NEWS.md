@@ -1,3 +1,17 @@
+# SpaDES.core 3.2.1.9018
+
+## Bug fixes
+
+* With `reproducible.useMemoise = TRUE`, a `cacheChaining` jump followed by a plain cached event on the same entry,
+  in the same session, failed with "did not return a simList (got an object of class "list")". The jump reads
+  skipped entries with `reproducible::loadFromCache()`, which memoised them in a form `Cache()` did not read back.
+  Fixed in reproducible; requires reproducible >= 3.2.1.9044. The cacheChaining jump tests now run with memoise off
+  and on.
+* With `reproducible.useMemoise = TRUE`, a later event could change the memoised copy of a cached event, so the next
+  run in the same session got wrong values from that cached event, with no error. `makeMemoisable.simList()` now
+  `Copy()`s the `simList`, so objects changed in place (e.g. a `data.table` with `:=`) are copied too; reproducible
+  3.2.1.9044 now memoises every entry through `makeMemoisable()`.
+
 # SpaDES.core 3.2.1.9017
 
 ## Bug fixes

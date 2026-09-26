@@ -55,6 +55,19 @@ jumpParams <- function(...) {
 ## (as in test-cacheChaining.R's liveness test); `debug` is therefore not passed here.
 jumpOpts <- list(reproducible.useMemoise = FALSE, spades.debug = TRUE, reproducible.verbose = 1)
 
+## Every jump test runs with memoise off and on: with it on, the jump's loadFromCache() and the
+## plain Cache() hits share one memoise environment, and that once broke a run.
+jumpTest <- function(desc, code) {
+  code <- substitute(code)
+  for (memo in c(FALSE, TRUE)) {
+    body <- bquote({
+      jumpOpts <- modifyList(jumpOpts, list(reproducible.useMemoise = .(memo)))
+      .(code)
+    })
+    eval(bquote(test_that(.(paste0(desc, " [memoise ", if (memo) "on" else "off", "]")), .(body))))
+  }
+}
+
 runJump <- function(mp, cp, params, ext = 5, chaining = TRUE) {
   withr::local_options(spades.cacheChaining = chaining)
   simInitAndSpades(times = list(start = 1, end = 2), params = params, objects = list(ext = ext),
@@ -77,7 +90,7 @@ stateOf <- function(sim) {
        time = time(sim))
 }
 
-test_that("a run of cached events is recovered in one jump, with the same result", {
+jumpTest("a run of cached events is recovered in one jump, with the same result", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -108,7 +121,7 @@ test_that("a run of cached events is recovered in one jump, with the same result
   expect_equal(grownOf(s2), rep(2, 4))
 })
 
-test_that("a novel object supplied at simInit stops the jump at the module that reads it", {
+jumpTest("a novel object supplied at simInit stops the jump at the module that reads it", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -130,7 +143,7 @@ test_that("a novel object supplied at simInit stops the jump at the module that 
   expect_equal(stateOf(s3)$objs, stateOf(s)$objs)
 })
 
-test_that("an uncached event in the middle ends the jump there", {
+jumpTest("an uncached event in the middle ends the jump there", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -146,7 +159,7 @@ test_that("an uncached event in the middle ends the jump there", {
   expect_equal(s$shared, 200)
 })
 
-test_that("a deleted entry in the chain shortens the jump instead of breaking the run", {
+jumpTest("a deleted entry in the chain shortens the jump instead of breaking the run", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -199,7 +212,7 @@ controlOutcomes <- function(mp, root, params, events = NULL, end = 2) {
   })
 }
 
-test_that("a jump stops at .stopBefore and .stopAfter barriers, on the event it starts from or a later one", {
+jumpTest("a jump stops at .stopBefore and .stopAfter barriers, on the event it starts from or a later one", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -219,7 +232,7 @@ test_that("a jump stops at .stopBefore and .stopAfter barriers, on the event it 
   expect_match(res$stopAfterLater$on$jumps, "over 1 cached event to jC init")
 })
 
-test_that("a jump does not recover an event the `events` whitelist excludes", {
+jumpTest("a jump does not recover an event the `events` whitelist excludes", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -229,7 +242,7 @@ test_that("a jump does not recover an event the `events` whitelist excludes", {
   expect_null(res$on$state$objs$cc)
 })
 
-test_that("a jump does not go past end(sim), and skipped events keep their own times", {
+jumpTest("a jump does not go past end(sim), and skipped events keep their own times", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -243,7 +256,7 @@ test_that("a jump does not go past end(sim), and skipped events keep their own t
   expect_match(res$on$jumps, "to jD init")
 })
 
-test_that("no jump while spades.evalPostEvent is set: the hook sees every event", {
+jumpTest("no jump while spades.evalPostEvent is set: the hook sees every event", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
   mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
@@ -256,4 +269,25 @@ test_that("no jump while spades.evalPostEvent is set: the hook sees every event"
   expect_equal(res$on$state, res$off$state)
   expect_gt(res$off$hooks, 0)
   expect_equal(res$on$hooks, res$off$hooks)
+})
+
+## With memoise on, a jump reads skipped entries with reproducible::loadFromCache(), which memoised
+## them in a different form from the one a plain Cache() hit reads: after a jump, a plain hit on the
+## same cacheId got a `list` instead of a simList.
+test_that("with memoise on, plain Cache() hits after a jump in the same session", {
+  skip_on_cran()
+  testInit("terra", opts = modifyList(jumpOpts, list(reproducible.useMemoise = TRUE)))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  cp <- file.path(tmpdir, "on")
+
+  ref <- runJump(mp, cp, jumpParams())
+  runJump(mp, cp, jumpParams()) # records the chain
+
+  me <- reproducible:::memoiseEnv(cp)
+  rm(list = ls(me), envir = me) # a new session
+  j <- jumpMessages(runJump(mp, cp, jumpParams()))
+  expect_length(j$jumps, 1L)
+  s <- runJump(mp, cp, jumpParams(), chaining = FALSE)
+  expect_equal(stateOf(s), stateOf(ref))
 })
