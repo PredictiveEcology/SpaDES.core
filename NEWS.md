@@ -1,3 +1,16 @@
+# SpaDES.core 3.2.1.9020
+
+## Bug fixes
+
+* A cache HIT on a module's `.inputObjects` no longer drops an object that module set but
+  declared only via `createsOutput` (not also `expectsInput`). `.runModuleInputObjects()`
+  passed only the module's own declared `expectsInput` names as the `outputObjects` argument
+  to the `Cache()` call wrapping `.inputObjects`, which decides what a cache hit restores; an
+  output-only object was never in that set and silently vanished from the simList on reload (a
+  cache miss never showed this, since it returns the live, freshly computed sim). A separate
+  `moduleSpecificOutputObjects`, the union of the module's own inputs and outputs, is now used
+  for that argument; the cache key itself is unaffected.
+
 # SpaDES.core 3.2.1.9019
 
 ## Bug fixes
