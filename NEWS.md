@@ -1,3 +1,11 @@
+# SpaDES.core 3.2.1.9022
+
+## Minor improvements
+
+* A cacheChaining jump's message now lists the events it skipped, numbered in the order they
+  would have run, each with its cache ID (`.chainJumpPrepare()`), so a reader can see what
+  was recovered instead of just the count.
+
 # SpaDES.core 3.2.1.9021
 
 ## Bug fixes
