@@ -2948,12 +2948,14 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
         ## >1 match would mean two chains recorded the same state under different
         ##   postCacheIds; either recovers it, so take the first.
         cacheIdOfSkip <- anyExisting$postCacheId[[1]]
-        ## The chain keys on the previous entry plus this module's code and parameters. That
-        ##   fixes every input the chain produced, but not an input this module reads from
-        ##   OUTSIDE the chain (an object supplied at simInit, or written by an uncached event):
-        ##   the same chain can be followed by a different such object and would have returned
-        ##   the entry computed from the old one. Those inputs are digested and compared with
-        ##   what the entry recorded (`preDigest` tags); a difference is not a chain hit.
+        ## The chain keys on the previous entry plus this module's code and parameters, plus
+        ##   every input this module reads that was NOT produced by an event restored from the
+        ##   recorded chain in THIS run -- a chain hit itself, or an event jumped over / landed
+        ##   on by a jump (see cacheChainingPost(): only those events' outputs go into `produced`).
+        ##   An input produced instead by a freshly computed or ordinarily cache-hit event is not
+        ##   covered by the chain even if the same object was produced by a genuine chain hit
+        ##   earlier in the run; it is digested and compared with what the entry recorded
+        ##   (`preDigest` tags); a difference is not a chain hit.
         produced <- if (!is.null(sim)) attr(sim, "cacheChainingProduced") else NULL
         okExternal <- if (is.null(sim)) TRUE else {
           postTags <- .chainEntryTags(cacheIdOfSkip, sim@paths[["cachePath"]])
@@ -2996,12 +2998,23 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
   ## The objects the current unbroken run of cached events has produced; what a later link
   ##   may trust without digesting (cacheChainingSetup(), .chainWalk()). Reset with the chain.
+  ##   Only events RESTORED FROM THE RECORDED CHAIN belong here: this event itself when it was
+  ##   a chain hit (`cacheIdOfSkip` non-NULL), or an event jumped over / landed on by a jump
+  ##   (`cacheChainingJumped`; each such step was already re-validated by .chainWalk()). A cached
+  ##   event that instead ran fresh, or matched an ordinary (non-chain) cache entry, is not backed
+  ##   by the recorded chain -- its outputs are removed from `produced`, not added, in case an
+  ##   earlier, genuine chain hit in this same run had produced the same name.
   produced <- if (isTRUE(cacheIt)) {
     prev <- if (is.null(prevCache)) character() else attr(sim, "cacheChainingProduced")
     jumped <- attr(sim, "cacheChainingJumped")
-    steps <- if (is.null(jumped)) list(list(module = moduleName, event = eventType)) else
-      c(Map(function(m, e) list(module = m, event = e), jumped$module, jumped$event))
-    Reduce(union, lapply(steps, function(s) .chainOutputs(sim, s$module, s$event)), prev)
+    if (!is.null(jumped)) {
+      steps <- Map(function(m, e) list(module = m, event = e), jumped$module, jumped$event)
+      Reduce(union, lapply(steps, function(s) .chainOutputs(sim, s$module, s$event)), prev)
+    } else if (!is.null(cacheIdOfSkip)) {
+      union(prev, .chainOutputs(sim, moduleName, eventType))
+    } else {
+      setdiff(prev, .chainOutputs(sim, moduleName, eventType))
+    }
   } else {
     NULL
   }
