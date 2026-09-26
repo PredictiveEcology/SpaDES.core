@@ -1,3 +1,15 @@
+# SpaDES.core 3.2.1.9019
+
+## Bug fixes
+
+* A cached `.inputObjects` entry no longer saves `simInit()`'s transient resume state
+  (`sim@.xData[["._simInitContext"]]`, `._rmo`). `.wrap.simList()` copied it into the saved
+  `simList` raw, without `.wrap()`ing it, so a terra object passed to `simInit()` via
+  `objects =`/`inputs =` was saved unwrapped and came back with a dead pointer
+  ("external pointer is not valid") the next time the entry was loaded. `.unwrap.simList()`
+  also drops the state if a pre-existing cache entry still has it, and `.runEvent()` restores
+  the live `sim`'s own `._simInitContext` if a cache hit replaces `sim`'s environment.
+
 # SpaDES.core 3.2.1.9018
 
 ## Bug fixes

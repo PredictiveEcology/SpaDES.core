@@ -1119,6 +1119,14 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   return(total)
 }
 
+## Transient state that simInit()/spades() keep only on the *live* sim: ._simInitContext
+## (restartSimInit()'s resume state, present only while simInit()'s .inputObjects phase is
+## running) and ._rmo (the recovery-mode accumulator, live only during a single simInit()/
+## spades() call). Neither has any meaning once reloaded from a cache entry, and
+## ._simInitContext can hold arbitrary user `objects` (e.g., SpatRaster/SpatVector) that
+## .wrap.simList() below never wraps -- see .wrap.simList()/.unwrap.simList().
+.transientSimStateNames <- c("._simInitContext", "._rmo")
+
 #' Methods for `.wrap` and `.unwrap`
 #'
 #'
@@ -1149,6 +1157,10 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
     modules <- gsub(paste0("^.mods", "\\$"), "", outputObjects[isAModule])
   }
   objTmp <- Copy(obj, objects = 2, modules = modules, drv = drv, conn = conn, verbose = verbose)
+
+  ## Drop simInit()/spades()-only transient state from the *saved* copy (not `obj`, which
+  ## is still live); see .transientSimStateNames.
+  for (nm in .transientSimStateNames) envir(objTmp)[[nm]] <- NULL
 
   # Remove Par and mod active bindings --> these shouldn't be .wrap'd
   modulesInSim <- ls(objTmp[[dotMods]])
@@ -1266,6 +1278,12 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 
   # .unwrap the metadata ... i.e,. @depends
   obj <- .wrapOrUnwrapSimListAts(obj, wrapOrUnwrap = .unwrap)
+
+  ## Drop simInit()/spades()-only transient state (see .transientSimStateNames): entries
+  ## saved before .wrap.simList() stopped keeping it may still carry it, and a loaded
+  ## `obj` fully replaces the live sim (see .runEvent()), so a stale/foreign copy here
+  ## must not overwrite a live simInit() resume context.
+  for (nm in .transientSimStateNames) envir(obj)[[nm]] <- NULL
 
   obj
 }
