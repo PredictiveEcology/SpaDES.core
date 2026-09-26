@@ -80,8 +80,7 @@ grownOf <- function(sim) unname(unlist(mget(paste0("grown_", c("jA", "jB", "jC",
 jumpMessages <- function(expr) {
   m <- capture_messages(expr)
   list(jumps = grep("skipping ahead over", m, value = TRUE),
-       chains = grep("Using cacheChaining", m, value = TRUE),
-       raw = m)
+       chains = grep("Using cacheChaining", m, value = TRUE))
 }
 
 stateOf <- function(sim) {
@@ -111,14 +110,6 @@ jumpTest("a run of cached events is recovered in one jump, with the same result"
   ## jB init chains, and from there the walk reaches jC and jD in one step.
   expect_length(warm$jumps, 1L)
   expect_match(warm$jumps, "over 2 cached events to jD init")
-
-  ## the skipped events are listed, numbered in the order they would have run, with cache IDs
-  listMsg <- grep("1\\.\\s*jB init", warm$raw, value = TRUE)
-  expect_length(listMsg, 1L)
-  expect_match(listMsg, "1\\.\\s+jB init\\s+\\([[:alnum:]]+\\)")
-  expect_match(listMsg, "2\\.\\s+jC init\\s+\\([[:alnum:]]+\\)")
-  if (length(listMsg))
-    expect_lt(regexpr("1\\. jB init", listMsg)[[1]], regexpr("2\\. jC init", listMsg)[[1]])
 
   ## every answer identical to caching without chaining
   expect_equal(stateOf(s2)$objs, stateOf(ref)$objs)

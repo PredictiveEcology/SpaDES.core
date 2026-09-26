@@ -237,10 +237,6 @@
   slot(sim, "current", check = FALSE) <- .chainCur(sim, jump$module[n], jump$event[n], jump$eventTime[n])
   messageCache("Using cacheChaining ... skipping ahead over ", n - 1L, " cached event",
                if (n > 2L) "s", " to ", jump$module[n], " ", jump$event[n], verbose = verbose)
-  skipped <- seq_len(n - 1L)
-  messageCache(paste(sprintf("%s. %s %s  (%s)", formatC(skipped, width = nchar(n - 1L)),
-                              jump$module[skipped], jump$event[skipped], jump$cacheId[skipped]),
-                      collapse = "\n"), verbose = verbose)
   sim
 }
 
