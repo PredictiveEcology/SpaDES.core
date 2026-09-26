@@ -1,3 +1,16 @@
+# SpaDES.core 3.2.1.9021
+
+## Bug fixes
+
+* With `spades.cacheChaining = TRUE`, `cacheChainingPost()` added EVERY cached event's outputs
+  to `produced` -- the set of objects a later chain link may trust without re-digesting --
+  including events that were not themselves restored from the recorded chain (a fresh
+  recompute, or an ordinary digest-based cache hit). A downstream module's genuine chain hit
+  could then skip re-digesting an object that a fresh recompute upstream had actually changed,
+  and silently return a stale cached result. `cacheChainingPost()` now only adds an event's
+  outputs to `produced` when that event was itself a chain hit or was jumped over/landed on by
+  a jump; any other cached event's outputs are removed from `produced` instead.
+
 # SpaDES.core 3.2.1.9020
 
 ## Bug fixes
