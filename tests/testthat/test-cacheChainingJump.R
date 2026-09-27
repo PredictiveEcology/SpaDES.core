@@ -300,3 +300,76 @@ test_that("with memoise on, plain Cache() hits after a jump in the same session"
   s <- runJump(mp, cp, jumpParams(), chaining = FALSE)
   expect_equal(stateOf(s), stateOf(ref))
 })
+
+## Same four-module chain as jumpFixture(), but every module's cached work happens in
+## `.inputObjects` instead of `init`. ioB reads `a`/`ext` and creates `b`; ioC reads `b` and creates
+## `cc`; ioD reads `cc`/`shared` (merely passing `cc` through, never reassigning it) and creates
+## `d`/`shared`. A jump starting at ioB's own entry walks forward and lands on ioD, skipping ioC.
+mkIOJumpMod <- function(mp, name, inObjs, outObjs, ioBody) {
+  d <- file.path(mp, name)
+  dir.create(d, recursive = TRUE, showWarnings = FALSE)
+  writeLines(sprintf('
+defineModule(sim, list(name = "%s", description = "", keywords = "",
+  authors = person(c("A"), "B", email = "a@b.com", role = c("aut", "cre")),
+  childModules = character(0), version = list(%s = "0.0.1"),
+  spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list("citation.bib"), documentation = list(),
+  reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", NA, NA, NA, "")),
+  inputObjects = %s, outputObjects = %s))
+
+doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) {
+  switch(eventType, init = {})
+  return(invisible(sim))
+}
+
+.inputObjects <- function(sim) { %s; return(invisible(sim)) }
+', name, name, inObjs, outObjs, name, ioBody), file.path(d, paste0(name, ".R")))
+  invisible(name)
+}
+
+ioJumpFixture <- function(mp) {
+  mkIOJumpMod(mp, "ioA", 'bindrows(expectsInput("unsupplied0", "numeric", ""))',
+              'bindrows(createsOutput("a", "numeric", ""), createsOutput("shared", "numeric", ""))',
+              "sim$a <- 1; sim$shared <- 100")
+  mkIOJumpMod(mp, "ioB", 'bindrows(expectsInput("a", "numeric", ""), expectsInput("ext", "numeric", ""))',
+              'bindrows(createsOutput("b", "numeric", ""))', "sim$b <- sim$a + sim$ext")
+  mkIOJumpMod(mp, "ioC", 'bindrows(expectsInput("b", "numeric", ""))',
+              'bindrows(createsOutput("cc", "numeric", ""))', "sim$cc <- sim$b * 2")
+  mkIOJumpMod(mp, "ioD", 'bindrows(expectsInput("cc", "numeric", ""), expectsInput("shared", "numeric", ""))',
+              'bindrows(createsOutput("d", "numeric", ""), createsOutput("shared", "numeric", ""))',
+              "sim$d <- sim$cc + 1; sim$shared <- 200")
+}
+
+ioJumpParams <- function() {
+  list(ioA = list(.useCache = ".inputObjects"), ioB = list(.useCache = ".inputObjects"),
+       ioC = list(.useCache = ".inputObjects"), ioD = list(.useCache = ".inputObjects"))
+}
+
+runIOJump <- function(mp, cp, chaining = TRUE) {
+  withr::local_options(spades.cacheChaining = chaining)
+  simInit(times = list(start = 1, end = 2), params = ioJumpParams(), objects = list(ext = 5),
+         modules = list("ioA", "ioB", "ioC", "ioD"),
+         paths = list(modulePath = mp, cachePath = cp))
+}
+
+jumpTest("a jump landing on .inputObjects restores an expectsInput the landing module only reads", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "iomods"); dir.create(mp, showWarnings = FALSE)
+  ioJumpFixture(mp)
+  cp <- file.path(tmpdir, "io")
+
+  runIOJump(mp, cp)                              # cold: writes every entry, records the chain
+  got <- jumpMessages(sim <- runIOJump(mp, cp))   # warm: ioB's own hit jumps, landing on ioD
+  expect_length(got$jumps, 1L)
+  expect_match(got$jumps, "to ioD \\.inputObjects")
+
+  ## `cc` is ioC's own createsOutput and also ioD's expectsInput; ioD's `.inputObjects` only reads
+  ## it (never reassigns it), so it is not among ioD's own cache entry's restorable objects and
+  ## must come from ioC's own (skipped) entry instead.
+  expect_true(exists("cc", envir = sim@.xData, inherits = FALSE))
+  expect_equal(sim$cc, 12)
+  expect_equal(sim$d, 13)
+  expect_equal(sim$shared, 200)
+})

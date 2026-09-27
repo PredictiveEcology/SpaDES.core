@@ -38,6 +38,22 @@
   unique(as.character(na.omit(out)))
 }
 
+## What a module's OWN cache entry is guaranteed to restore: its declared `createsOutput`s only.
+## Unlike `.chainOutputs()`, this never adds `expectsInput`s for `.inputObjects` --
+## `.prepareOutput()` (R/cache.R, `lsObjectsChanged()`) only carries an `expectsInput` back out of
+## a loaded entry when the module's own call actually changed it
+## (`attr(simFromCache, ".Cache")$changed`); one it merely read and passed through, unchanged, is
+## never in that restore. In an ordinary (non-jumped) run this is invisible -- the live simList
+## already has it, supplied by whichever module produced it, running just before. A jump skips
+## that producing module, so nothing supplies it. Used only to decide what a LATER step in a jump
+## has already (re)written -- `.chainJumpFinish()`'s `later` -- never for `.chainOutputs()`'s other
+## job of tracking what the chain as a whole has produced.
+.chainCreates <- function(sim, module) {
+  dep <- sim@depends@dependencies[[module]]
+  if (is.null(dep)) return(character())
+  unique(as.character(na.omit(dep@outputObjects$objectName)))
+}
+
 ## Rebuild, for any (module, event), the `nonObjects` that .runEvent() / .runModuleInputObjects()
 ## give cacheChainingSetup() -- without running anything. Must stay identical to those two
 ## call sites: a difference does not break anything, it only means the jump never engages.
@@ -244,10 +260,13 @@
   sim
 }
 
-## After it: the last entry only holds its own module's outputs. Objects produced by the skipped
-## events in between come from the last entry that produced each of them; objects a later step
-## overwrote are never loaded. User-supplied objects a skipped `.inputObjects` would have placed
-## in the simList are placed first, so an entry's copy wins where both exist.
+## After it: the last entry only holds its own module's outputs -- and, for `.inputObjects`, only
+## the `expectsInput`s it actually changed (`.prepareOutput()`'s restore is keyed on
+## `attr(simFromCache, ".Cache")$changed`; one it merely read and passed through is not in it).
+## Objects produced by the skipped events in between come from the last entry that produced each
+## of them; objects a later step overwrote are never loaded. User-supplied objects a skipped
+## `.inputObjects` would have placed in the simList are placed first, so an entry's copy wins where
+## both exist.
 .chainJumpFinish <- function(sim, jump, cachePath, userObjects = NULL,
                              verbose = getOption("reproducible.verbose")) {
   n <- NROW(jump)
@@ -258,7 +277,7 @@
       if (length(theirs)) list2env(userObjects[theirs], envir = sim@.xData)
     }
   }
-  later <- .chainOutputs(sim, jump$module[n], jump$event[n])
+  later <- .chainCreates(sim, jump$module[n])
   modsDone <- jump$module[n]
   for (i in rev(seq_len(n - 1L))) {
     want <- setdiff(.chainOutputs(sim, jump$module[i], jump$event[i]), later)
@@ -285,7 +304,7 @@
                      verbose = verbose)
       }
     }
-    later <- union(later, .chainOutputs(sim, jump$module[i], jump$event[i]))
+    later <- union(later, .chainCreates(sim, jump$module[i]))
     modsDone <- union(modsDone, jump$module[i])
   }
   attr(sim, "cacheChainingJump") <- NULL
