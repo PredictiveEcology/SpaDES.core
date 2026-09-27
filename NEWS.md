@@ -1,3 +1,20 @@
+# SpaDES.core 3.2.1.9023
+
+## Bug fixes
+
+* With `spades.cacheChaining = TRUE`, a jump landing on a module's `.inputObjects` could drop an
+  `expectsInput` that a skipped module in between had produced, when the landing module only read
+  that object and never reassigned it. The landing entry's own cache hit only restores objects it
+  actually changed (`.prepareOutput()`'s `lsObjectsChanged()`, `R/cache.R`), so an unchanged,
+  merely-read `expectsInput` is not among them; a normal (non-jumped) run never shows this because
+  the live simList already has that object, supplied by whichever module produced it, running just
+  before -- a jump skips that module, so nothing else supplies it. `.chainJumpFinish()`
+  (`R/cacheChainingJump.R`) treated every one of the landing module's declared `expectsInput`s as
+  already restored; it now only assumes that for the module's own `createsOutput`s
+  (new `.chainCreates()`), so a merely-read input is still recovered from the skipped module that
+  actually produced it. Only `.inputObjects` jumps were affected; the event-jump path already
+  used `createsOutput` only.
+
 # SpaDES.core 3.2.1.9022
 
 ## Minor improvements
