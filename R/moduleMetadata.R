@@ -153,6 +153,15 @@ setMethod(
   if ("childModules" %in% defineModuleListItems && length(unlist(metadata[["childModules"]])) == 0)
     metadata[["childModules"]] <- kids
 
+  ## ... and likewise the parent's other own fields (name, version, description, authors, ...)
+  aggregated <- c("childModules", "parameters", "inputObjects", "outputObjects", "reqdPkgs")
+  for (item in setdiff(defineModuleListItems, aggregated)) {
+    own <- tryCatch(eval(.parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                                             defineModuleElement = item)),
+                    error = function(e) NULL)
+    if (!is.null(own)) metadata[[item]] <- own
+  }
+
   leaves <- unique(setdiff(.leafModules(module, path), module))
   if (length(leaves) == 0) return(metadata)
 

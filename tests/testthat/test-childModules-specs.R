@@ -113,3 +113,36 @@ test_that("newModule writes a parseable parent for a long list of child specs", 
   v <- SpaDES.core:::.parseModulePartial(filename = f, defineModuleElement = "version")
   expect_setequal(names(v), c("fireSense", paste0("fireSense_child", 1:9)))
 })
+
+test_that("simInit(modules = parent) equals simInit(modules = its children)", {
+  testInit()
+  mp <- makeSpecParent(file.path(tmpdir, "famExpand"), specs = c("kidA", "kidB", "kidC@modsForX"))
+  kids <- c("kidA", "kidB", "kidC")
+  args <- list(paths = list(modulePath = mp), times = list(start = 0, end = 1))
+  simP <- suppressMessages(do.call(simInit, c(args, list(modules = list("fam")))))
+  simK <- suppressMessages(do.call(simInit, c(args, list(modules = as.list(kids)))))
+
+  expect_setequal(unlist(modules(simP)), kids)
+  expect_identical(unlist(modules(simP)), unlist(modules(simK)))
+  expect_identical(names(simP@depends@dependencies), names(simK@depends@dependencies))
+  expect_false("fam" %in% names(simP@depends@dependencies))
+  expect_identical(lapply(params(simP)[kids], names), lapply(params(simK)[kids], names))
+  expect_identical(events(simP), events(simK))
+})
+
+test_that("moduleMetadata of a parent with children on disk keeps the parent's own fields", {
+  testInit()
+  mp <- makeSpecParent(file.path(tmpdir, "famMeta"), specs = c("kidA", "kidB", "kidC@modsForX"))
+  f <- file.path(mp, "fam", "fam.R")
+  x <- readLines(f)
+  x <- sub('^  description = .*', '  description = "the parent description",', x)
+  x <- sub('fam = "0.0.0.9000"', 'fam = "7.8.9"', x, fixed = TRUE)
+  writeLines(x, f)
+
+  md <- moduleMetadata(module = "fam", path = mp)
+  expect_identical(md$name, "fam")
+  expect_identical(as.character(md$version[["fam"]]), "7.8.9")
+  expect_identical(md$description, "the parent description")
+  expect_true(length(md$authors) > 0)
+  expect_setequal(names(md$parameters), c("kidA", "kidB", "kidC"))
+})
