@@ -46,7 +46,7 @@ test_that("simulation runs with new Cache chaining", {
         capture_messages(mySims[[iter]] <- simInit(times, params, modules,
                                                    objects = list(), paths) |>
                            spades(debug = TRUE, .plots = NA))
-      test[[iter]] <- grep("cacheId passed to override", mess[[iter]])
+      test[[iter]] <- grep("Using cacheChaining \\.\\.\\.|cacheChaining: restored", mess[[iter]])
       testEvalPostEvent[[iter]] <- length(grep("ThisMess", mess[[iter]])) ==
         (NROW(completed(mySims[[iter]])) -
            length(modules(mySims[[iter]])) +  # rm all 3 .inputObjects

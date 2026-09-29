@@ -148,7 +148,8 @@ jumpTest("a jump announces its events once, labelled with the landing event", {
   ## the plain "Using cacheChaining ..." is for a chain of one event, not for a jump
   expect_length(grep("Using cacheChaining \\.\\.\\.", m), 0L)
   ## reproducible's cacheId override message repeats what was just said
-  expect_length(grep("cacheId passed to override", m), 0L)
+  if (packageVersion("reproducible") >= "3.2.1.9051") # older versions do not know cacheIdAnnounced
+    expect_length(grep("cacheId passed to override", m), 0L)
   ## the entry loaded is the landing event's (jD), not the one the call started from (jB)
   expect_length(grep("Loaded! (Cached|Memoised) result from previous doEvent.jB::init", m), 0L)
   expect_length(grep("Object to retrieve \\(fn: doEvent.jB::init", m), 0L)
