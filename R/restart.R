@@ -261,7 +261,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
       sim@.xData[[dotMods]][[module]] <- new.env(parent = asNamespace("SpaDES.core"))
       attr(sim@.xData[[dotMods]][[module]], "name") <- module
     }
-    modEnv <- sim@.xData[[dotMods]][[module]]
+    modEnv <- .setModuleImports(sim@.xData[[dotMods]][[module]], .moduleReqdPkgs(sim, module), module)
 
     parsed <- .parseConditional(envir = NULL, filename = mainFile)
     pp <- list(parsed[["parsedFile"]][!parsed[["defineModuleItem"]]])

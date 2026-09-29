@@ -262,7 +262,10 @@ setMethod(
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         tmp <- .parseConditional(envir = envir, filename = filename)
         activeCode <- list()
-        sim <- newEnvsByModule(sim, mBase)  # sets up the module environment and the .objects sub environment
+        sim <- newEnvsByModule(sim, mBase,   # sets up the module environment and the .objects sub environment
+                               reqdPkgs = .parseModulePartial(filename = filename,
+                                                              defineModuleElement = "reqdPkgs",
+                                                              envir = envir))
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         # attr(sim@.xData$.mods[[mBase]], "name") <- mBase
         # sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
@@ -772,8 +775,8 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   return(isPack)
 }
 
-newEnvsByModule <- function(sim, modu) {
-  sim@.xData$.mods[[modu]] <- new.env(parent = asNamespace("SpaDES.core"))
+newEnvsByModule <- function(sim, modu, reqdPkgs = .moduleReqdPkgs(sim, modu)) {
+  sim@.xData$.mods[[modu]] <- new.env(parent = .moduleImportsEnv(reqdPkgs, modu))
   attr(sim@.xData$.mods[[modu]], "name") <- modu
 
   if (FALSE) {
