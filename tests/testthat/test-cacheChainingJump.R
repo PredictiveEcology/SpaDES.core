@@ -110,7 +110,7 @@ jumpTest("a run of cached events is recovered in one jump, with the same result"
   ## jA init is a genuine hit (first cached event of the run, nothing to chain from);
   ## jB init chains, and from there the walk reaches jC and jD in one step.
   expect_length(warm$jumps, 1L)
-  expect_match(warm$jumps, "restored 3 events from the cache \\(jB init, jC init, jD init\\); continuing with the next scheduled event")
+  expect_match(warm$jumps, "restored 3 cached events in one step")
 
   ## the skipped events are listed, numbered in the order they would have run, with cache IDs
   listMsg <- grep("1\\.\\s*jB init", warm$raw, value = TRUE)
@@ -128,6 +128,42 @@ jumpTest("a run of cached events is recovered in one jump, with the same result"
   expect_equal(s2$b, 6); expect_equal(s2$cc, 12); expect_equal(s2$d, 13); expect_equal(s2$shared, 200)
   ## the queue after the jump was the recorded one: every module's `grow` still ran
   expect_equal(grownOf(s2), rep(2, 4))
+})
+
+jumpTest("a jump announces its events once, labelled with the landing event", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  warm <- jumpMessages(runJump(mp, cp, jumpParams()))
+  m <- gsub("\\s+", " ", cli::ansi_strip(warm$raw))
+
+  ## one header, one numbered list: each restored event appears exactly once
+  expect_length(grep("cacheChaining: restored 3 cached events in one step", m), 1L)
+  for (ev in c("jB init", "jC init", "jD init"))
+    expect_length(grep(paste0("\\d\\. ", ev, " \\("), m), 1L)
+  expect_length(grep("continuing with the next scheduled event", m), 0L)
+  ## the plain "Using cacheChaining ..." is for a chain of one event, not for a jump
+  expect_length(grep("Using cacheChaining \\.\\.\\.", m), 0L)
+  ## reproducible's cacheId override message repeats what was just said
+  if (packageVersion("reproducible") >= "3.2.1.9051") # older versions do not know cacheIdAnnounced
+    expect_length(grep("cacheId passed to override", m), 0L)
+  ## the entry loaded is the landing event's (jD), not the one the call started from (jB)
+  expect_length(grep("Loaded! (Cached|Memoised) result from previous doEvent.jB::init", m), 0L)
+  expect_length(grep("Object to retrieve \\(fn: doEvent.jB::init", m), 0L)
+  expect_length(grep("Loaded! (Cached|Memoised) result from previous doEvent.jD::init", m), 1L)
+})
+
+test_that("messageNewObjects prints no column header, however many rows", {
+  for (n in c(3, 25)) {
+    m <- capture_messages(messageNewObjects(setNames(vector("list", n), paste0("obj", seq_len(n))),
+                                            verbose = 1))
+    m <- unlist(strsplit(cli::ansi_strip(m), "\n"))
+    expect_false(any(grepl("newObjects|<char>", m)), info = paste(n, "rows"))
+    expect_equal(sum(grepl("^ *[0-9]+: +obj", m)), n, info = paste(n, "rows"))
+  }
 })
 
 jumpTest("a novel object supplied at simInit stops the jump at the module that reads it", {
@@ -183,7 +219,7 @@ jumpTest("a deleted entry in the chain shortens the jump instead of breaking the
 
   got <- jumpMessages(s <- runJump(mp, cp, jumpParams()))
   expect_length(got$jumps, 1L)
-  expect_match(got$jumps, "restored 2 events from the cache \\(jB init, jC init\\); continuing with the next scheduled event")
+  expect_match(got$jumps, "restored 2 cached events in one step")
   expect_equal(s$d, 13) # jD ran and its result is right
   expect_equal(s$shared, 200)
 })
@@ -238,7 +274,7 @@ jumpTest("a jump stops at .stopBefore and .stopAfter barriers, on the event it s
   expect_equal(res$stopBeforeLater$on$state$stoppedAt, c("jC", "init"))
   ## liveness: with the barrier on jD the walk still skips jC -- and stops before jD
   expect_length(res$stopAfterLater$on$jumps, 1L)
-  expect_match(res$stopAfterLater$on$jumps, "restored 2 events from the cache \\(jB init, jC init\\); continuing with the next scheduled event")
+  expect_match(res$stopAfterLater$on$jumps, "restored 2 cached events in one step")
 })
 
 jumpTest("a jump does not recover an event the `events` whitelist excludes", {
@@ -262,7 +298,7 @@ jumpTest("a jump does not go past end(sim), and skipped events keep their own ti
   expect_equal(as.numeric(res$on$state$time), 1) # time(sim) carries a `unit` attribute
   ## liveness: the t = 1 events are still skipped, up to the last one before end(sim)
   expect_length(res$on$jumps, 1L)
-  expect_match(res$on$jumps, "restored 3 events from the cache \\(jB init, jC init, jD init\\)")
+  expect_match(res$on$jumps, "restored 3 cached events in one step")
 })
 
 jumpTest("no jump while spades.evalPostEvent is set: the hook sees every event", {
@@ -363,7 +399,7 @@ jumpTest("a jump landing on .inputObjects restores an expectsInput the landing m
   runIOJump(mp, cp)                              # cold: writes every entry, records the chain
   got <- jumpMessages(sim <- runIOJump(mp, cp))   # warm: ioB's own hit jumps, landing on ioD
   expect_length(got$jumps, 1L)
-  expect_match(got$jumps, "restored 3 events from the cache \\(ioB \\.inputObjects, ioC \\.inputObjects, ioD \\.inputObjects")
+  expect_match(got$jumps, "restored 3 cached events in one step")
 
   ## `cc` is ioC's own createsOutput and also ioD's expectsInput; ioD's `.inputObjects` only reads
   ## it (never reassigns it), so it is not among ioD's own cache entry's restorable objects and
