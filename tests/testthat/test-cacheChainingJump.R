@@ -79,7 +79,7 @@ grownOf <- function(sim) unname(unlist(mget(paste0("grown_", c("jA", "jB", "jC",
 
 jumpMessages <- function(expr) {
   m <- capture_messages(expr)
-  list(jumps = grep("skipping ahead over", m, value = TRUE),
+  list(jumps = restoredMsgs(m),
        chains = grep("Using cacheChaining", m, value = TRUE),
        raw = m)
 }
@@ -110,7 +110,7 @@ jumpTest("a run of cached events is recovered in one jump, with the same result"
   ## jA init is a genuine hit (first cached event of the run, nothing to chain from);
   ## jB init chains, and from there the walk reaches jC and jD in one step.
   expect_length(warm$jumps, 1L)
-  expect_match(warm$jumps, "over 2 cached events to jD init")
+  expect_match(warm$jumps, "restored 3 events from the cache \\(jB init, jC init, jD init\\); continuing with the next scheduled event")
 
   ## the skipped events are listed, numbered in the order they would have run, with cache IDs
   listMsg <- grep("1\\.\\s*jB init", warm$raw, value = TRUE)
@@ -183,7 +183,7 @@ jumpTest("a deleted entry in the chain shortens the jump instead of breaking the
 
   got <- jumpMessages(s <- runJump(mp, cp, jumpParams()))
   expect_length(got$jumps, 1L)
-  expect_match(got$jumps, "over 1 cached event to jC init")
+  expect_match(got$jumps, "restored 2 events from the cache \\(jB init, jC init\\); continuing with the next scheduled event")
   expect_equal(s$d, 13) # jD ran and its result is right
   expect_equal(s$shared, 200)
 })
@@ -216,7 +216,7 @@ controlOutcomes <- function(mp, root, params, events = NULL, end = 2) {
     runJumpCtl(mp, cp, params, chaining = chaining) # records the chain end to end
     runJumpCtl(mp, cp, params, chaining = chaining)
     m <- capture_messages(s <- runJumpCtl(mp, cp, params, events = events, end = end, chaining = chaining))
-    list(state = ctlStateOf(s), jumps = grep("skipping ahead over", m, value = TRUE),
+    list(state = ctlStateOf(s), jumps = restoredMsgs(m),
          hooks = sum(grepl("postEventHook", m)))
   })
 }
@@ -238,7 +238,7 @@ jumpTest("a jump stops at .stopBefore and .stopAfter barriers, on the event it s
   expect_equal(res$stopBeforeLater$on$state$stoppedAt, c("jC", "init"))
   ## liveness: with the barrier on jD the walk still skips jC -- and stops before jD
   expect_length(res$stopAfterLater$on$jumps, 1L)
-  expect_match(res$stopAfterLater$on$jumps, "over 1 cached event to jC init")
+  expect_match(res$stopAfterLater$on$jumps, "restored 2 events from the cache \\(jB init, jC init\\); continuing with the next scheduled event")
 })
 
 jumpTest("a jump does not recover an event the `events` whitelist excludes", {
@@ -262,7 +262,7 @@ jumpTest("a jump does not go past end(sim), and skipped events keep their own ti
   expect_equal(as.numeric(res$on$state$time), 1) # time(sim) carries a `unit` attribute
   ## liveness: the t = 1 events are still skipped, up to the last one before end(sim)
   expect_length(res$on$jumps, 1L)
-  expect_match(res$on$jumps, "to jD init")
+  expect_match(res$on$jumps, "restored 3 events from the cache \\(jB init, jC init, jD init\\)")
 })
 
 jumpTest("no jump while spades.evalPostEvent is set: the hook sees every event", {
@@ -363,7 +363,7 @@ jumpTest("a jump landing on .inputObjects restores an expectsInput the landing m
   runIOJump(mp, cp)                              # cold: writes every entry, records the chain
   got <- jumpMessages(sim <- runIOJump(mp, cp))   # warm: ioB's own hit jumps, landing on ioD
   expect_length(got$jumps, 1L)
-  expect_match(got$jumps, "to ioD \\.inputObjects")
+  expect_match(got$jumps, "restored 3 events from the cache \\(ioB \\.inputObjects, ioC \\.inputObjects, ioD \\.inputObjects")
 
   ## `cc` is ioC's own createsOutput and also ioD's expectsInput; ioD's `.inputObjects` only reads
   ## it (never reassigns it), so it is not among ioD's own cache entry's restorable objects and

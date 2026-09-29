@@ -1,4 +1,4 @@
-# SpaDES.core 3.2.1.9025
+# SpaDES.core 3.2.1.9026
 
 ## New features
 
@@ -16,6 +16,25 @@
   resulting `version` list) were long enough for `dput()`/`deparse()` to wrap over several lines.
 * `downloadModule()` could not check a local module's version when `version` is a named list (the
   format since SpaDES 1.3.1.9044), so it errored on any parent whose children are already local.
+
+# SpaDES.core 3.2.1.9025
+
+## Bug fixes
+
+* With `spades.cacheChaining = TRUE`, a module with a list-valued `expectsInput` never chained, even
+  when nothing had changed. `.chainExternalInputsMatch()` (`R/cacheChainingJump.R`) looked the
+  input's recorded digest up under its bare name (`sim..list.<object>`), but `Cache()` records a
+  list element by element (`sim..list.<object>.<element>`), so the input always read as "not
+  recorded" and the run printed "an input ... has changed; not chaining". It now flattens the
+  current digest the way `Cache()` names the tags and compares the two as multisets.
+
+## Changes
+
+* The cacheChaining jump message now says what happened: "Using cacheChaining: restored 2 events from
+  the cache (NRV_summary init, Biomass_summary init); continuing with the next scheduled event".
+  It lists every restored event, including the one the jump lands on; the old text ("skipping ahead
+  over 1 cached event to Biomass_summary init") read as if the last event would run next. Behaviour
+  is unchanged.
 
 # SpaDES.core 3.2.1.9024
 
