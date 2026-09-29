@@ -1,4 +1,4 @@
-# SpaDES.core 3.2.1.9027
+# SpaDES.core 3.2.1.9028
 
 ## Bug fixes
 
@@ -10,6 +10,15 @@
   for a chained call (with reproducible >= 3.2.1.9051; older versions still print it).
 * "New objects created:" no longer prints `<char>` above the names and the `newObjects` header again
   below them when there are more than 20 names.
+
+# SpaDES.core 3.2.1.9027
+
+## Bug fixes
+
+* `moduleMetadata()` on a parent module whose children are on disk returned `NULL`/`NA` for the parent's
+  own `name`, `version`, `description`, `authors` etc., because `simInit()` expands the parent and drops
+  its row. Those fields now come from the parent's file; the children's `parameters`, `inputObjects`,
+  `outputObjects` and `reqdPkgs` are aggregated as before.
 
 # SpaDES.core 3.2.1.9026
 
