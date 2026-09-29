@@ -62,7 +62,8 @@ openIsRequested <- function(open, suff) {
 #'    more of the following:\cr\cr
 #' \describe{
 #'   \item{`children`}{Required when `type = "parent"`. A character vector
-#'   specifying the names of child modules.}
+#'   specifying the names of child modules, or GitHub specs such as
+#'   `"owner/repo@branch"` (see `childModules` in [defineModule()]).}
 #'   \item{`open`}{Logical. Should the new module file be opened after creation?
 #'   Default `TRUE`.}
 #'   \item{`type`}{Character string specifying one of `"child"` (default),
@@ -295,13 +296,14 @@ setMethod(
     children_char <- if (any(is.na(args$children)) || length(args$children) == 0L) {
       "character(0)"
     } else {
-      capture.output(dput(args$children))
+      ## dput() wraps a long vector over several lines; keep them all
+      paste(capture.output(dput(args$children)), collapse = "\n")
     }
 
     version <- list()
     version[[name]] <- moduleDefaults[["version"]]
     if (args$type == "parent")
-      lapply(args$children, function(x) version[[x]] <<- moduleDefaults[["version"]])
+      lapply(args$children, function(x) version[[.childModuleName(x)]] <<- moduleDefaults[["version"]])
 
     SpaDES.core.version <- as.character(utils::packageVersion("SpaDES.core"))
     DESCtxt <- readLines(system.file("DESCRIPTION", package = "SpaDES.core"))
@@ -398,7 +400,7 @@ setMethod(
       timeframe = deparse(moduleDefaults[["timeframe"]]),
       timeunit = deparse(moduleDefaults[["timeunit"]]),
       type = args$type,
-      versions = deparse(version)
+      versions = paste(deparse(version), collapse = "\n")
     )
     moduleTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.R.template"))
     writeLines(whisker.render(moduleTemplate, moduleData), filenameR)

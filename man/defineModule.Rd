@@ -42,7 +42,12 @@ i.e., 'child modules', this should be \code{character(0)} or
 \code{NA}.
 If a character vector is provided, then these must be the
 names of the modules located in the same file path as this
-parent module that will be loaded during the \code{simInit}.\cr
+parent module that will be loaded during the \code{simInit}.
+An entry may also be a GitHub spec, \code{"owner/repo@branch"},
+\code{"owner/repo"} or \code{"name@branch"}; SpaDES.core uses only
+the module name (the repository name), and
+\code{SpaDES.project::setupProject()} uses the spec to fetch
+the child.\cr
 \code{authors} \tab Module author information (as a vector of \code{\link[=person]{person()}}
 objects. This is currently not parsed by SpaDES;
 it is for human readers only.\cr

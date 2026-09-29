@@ -223,6 +223,7 @@ setMethod(
           if (isTRUE(length(v) > length(name))) {
             v <- v[names(v) %in% name]
           }
+          v <- unlist(v) ## `version` is a named list since SpaDES 1.3.1.9044
           result <- ifelse(v == numeric_version(version), TRUE, FALSE)
         }
       }
@@ -368,6 +369,7 @@ setMethod(
       files2 <- list()
       children <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
                                       defineModuleElement = "childModules")
+      if (length(children)) children <- .childModuleName(children)
       childVersions <- .parseModulePartial(filename = file.path(path, name, paste0(name, ".R")),
                                            defineModuleElement = "version")
 
@@ -407,6 +409,7 @@ setMethod(
 
         children <- .parseModulePartial(filename = moduleFilename,
                                         defineModuleElement = "childModules")
+        if (length(children)) children <- .childModuleName(children)
 
         dataList <- downloadData(module = name, path = path, quiet = quiet,
                                  quickCheck = quickCheck, urls = urls, children = children)

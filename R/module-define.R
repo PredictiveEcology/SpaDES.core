@@ -56,7 +56,12 @@ moduleDefaults <- list(
 #'                             `NA`.
 #'                             If a character vector is provided, then these must be the
 #'                             names of the modules located in the same file path as this
-#'                             parent module that will be loaded during the `simInit`.\cr
+#'                             parent module that will be loaded during the `simInit`.
+#'                             An entry may also be a GitHub spec, `"owner/repo@branch"`,
+#'                             `"owner/repo"` or `"name@branch"`; SpaDES.core uses only
+#'                             the module name (the repository name), and
+#'                             `SpaDES.project::setupProject()` uses the spec to fetch
+#'                             the child.\cr
 #'    `authors` \tab Module author information (as a vector of [person()]
 #'                        objects. This is currently not parsed by SpaDES;
 #'                        it is for human readers only.\cr
@@ -214,7 +219,8 @@ setMethod(
       if (any(is.na(x$childModules))) {
         moduleDefaults$childModules
       } else {
-        x$childModules |> as.character() |> na.omit() |> as.character() # nolint
+        x$childModules |> as.character() |> na.omit() |> as.character() |> # nolint
+          .childModuleName()
       }
     }
 

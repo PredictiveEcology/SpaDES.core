@@ -124,11 +124,18 @@ setMethod(
   kids[!is.na(kids) & nzchar(kids)]
 }
 
+## A `childModules` entry may be a GitHub spec -- "owner/repo@branch", "owner/repo"
+## or "name@branch" -- or a plain module name. The module is the repository name,
+## without owner, branch or version spec (the same parsing as `Require`).
+.childModuleName <- function(x) {
+  extractPkgName(unname(as.character(x)))
+}
+
 ## Depth-first expansion of a parent's children down to the modules that have no
 ## children of their own. `seen` stops a cyclic `childModules` entry looping.
 .leafModules <- function(module, path, seen = character()) {
   if (module %in% seen) return(character())
-  kids <- .childModules(module, path)
+  kids <- .childModuleName(.childModules(module, path))
   if (length(kids) == 0) return(module)
   unlist(lapply(kids, .leafModules, path = path, seen = c(seen, module)))
 }
