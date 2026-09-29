@@ -104,7 +104,7 @@ test_that("cacheChaining chains over a module with a list-valued input, and not 
   jump <- restoredMsgs(warm$msgs)
   expect_length(jump, 1L)
   ## the message lists every restored event, the one it lands on included
-  expect_match(jump, "restored 2 events from the cache \\(lB init, lC init\\); continuing with the next scheduled event")
+  expect_match(jump, "restored 2 cached events in one step")
   expect_equal(warm$sim$cc, 2 * (1 + 10))
 
   lst2 <- lst; lst2$two <- data.table::data.table(v = 30:40)

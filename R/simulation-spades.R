@@ -2967,8 +2967,9 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
                        "has changed; not chaining", verbose = verbose)
           cacheIdOfSkip <- NULL
         } else {
-          fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
-          messageCache("Using cacheChaining ... ", verbose = verbose)
+          ## The attribute tells reproducible::Cache() not to repeat, as "cacheId passed to override",
+          ##   what cacheChaining announces itself (ignored by a reproducible that does not know it)
+          fnCallAsExpr[[1]]$cacheId <- structure(cacheIdOfSkip, cacheIdAnnounced = TRUE)
           ## Follow the chain on from this entry; land on the last entry that checks out. Only with
           ##   the per-event controls to respect, and never while spades.evalPostEvent is set: it
           ##   observes the simList after EACH event, and a jump never materialises the states between.
@@ -2982,9 +2983,17 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
               jump <- rbindlist(list(
                 data.table(cacheId = cacheIdOfSkip, module = module, event = event, eventTime = NA_real_),
                 jump), use.names = TRUE)
-              fnCallAsExpr[[1]]$cacheId <- jump$cacheId[NROW(jump)]
+              last <- NROW(jump)
+              fnCallAsExpr[[1]]$cacheId <- structure(jump$cacheId[last], cacheIdAnnounced = TRUE)
+              ## the entry loaded is the landing event's: name it, not the event the call started from
+              fnCallAsExpr[[1]]$.functionName <- if (identical(jump$event[last], ".inputObjects"))
+                paste0(".inputObjects_", jump$module[last])
+              else paste0("doEvent.", jump$module[last], "::", jump$event[last])
             }
           }
+          ## a jump announces itself in .chainJumpPrepare()
+          if (is.null(jump))
+            messageCache("Using cacheChaining ... ", verbose = verbose)
         }
       }
     }
