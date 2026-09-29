@@ -1,3 +1,13 @@
+# SpaDES.core 3.2.1.9024
+
+## Bug fixes
+
+* Regression test for a memoised cached event (`reproducible.useMemoise = TRUE`, `.useCache =
+  "init"`) that writes a file-backed raster: `makeMemoisable.simList()` (`R/cache.R:1308`) calls
+  `Copy(sim)` on the unwrapped simList, and until reproducible's `fix/cache-file-copies` branch
+  (`>= 3.2.1.9050`, now the `Imports` floor) that `Copy()` wrote a "<name>_1.tif" beside the
+  original file, so two processes sharing an output folder overwrote each other's copy.
+
 # SpaDES.core 3.2.1.9023
 
 ## Bug fixes
