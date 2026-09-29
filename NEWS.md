@@ -1,3 +1,19 @@
+# SpaDES.core 3.2.1.9030
+
+## New features
+
+* New option `spades.reqdPkgsAttach` (default `TRUE`, i.e., no change). With `FALSE`, a module's
+  `reqdPkgs` are loaded, and installed if needed, but no longer attached to the search path for every
+  module and the user's session. Instead each module's function environment gets a parent "imports"
+  environment holding the exports of that module's `reqdPkgs` and of the packages they `Depends` on,
+  built as R builds a package's `@import`s (bindings, not copies), so a package listed by one module
+  (e.g., an unused `snow`, which printed partial-match warnings and masked `parallel`'s cluster
+  functions) no longer affects other modules or the session. Where two packages export the same name,
+  the one listed later in `reqdPkgs` is used. Modules with the same packages share one imports
+  environment, and event cache keys do not change. Module code that relied on packages attached by
+  another module, or by the user, must list them in its own `reqdPkgs` or use `pkg::fn`. `FALSE` is
+  intended to become the default after further testing.
+
 # SpaDES.core 3.2.1.9028
 
 ## Bug fixes

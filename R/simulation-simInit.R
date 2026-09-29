@@ -2089,9 +2089,10 @@ loadPkgs <- function(reqdPkgs) {
     pkgsDontLoad <- getOption("spades.reqdPkgsDontLoad", NULL)
     allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
 
+    attach <- getOption("spades.reqdPkgsAttach", TRUE)
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, require = TRUE, standAlone = FALSE, upgrade = FALSE)
+      Require(allPkgs, require = attach, standAlone = FALSE, upgrade = FALSE)
       if (!is.null(pkgsDontLoad)) {
         verbose <- getOption("reproducible.verbose")
         Require::Require(pkgsDontLoad, require = FALSE, standAlone = FALSE,
@@ -2100,7 +2101,11 @@ loadPkgs <- function(reqdPkgs) {
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
       allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
+      loadedPkgs <- if (attach) {
+        lapply(allPkgs, base::require, character.only = TRUE)
+      } else {
+        lapply(allPkgs, requireNamespace, quietly = TRUE)
+      }
     }
   }
 }
