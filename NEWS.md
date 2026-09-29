@@ -15,6 +15,19 @@
   own time in seconds, which replaces the `eventTime` tag (in the simList's unit at record time) as the
   time a jump reports for a skipped event.
 
+# SpaDES.core 3.2.1.9028
+
+## Bug fixes
+
+* A cacheChaining jump over several cached events announced its events three times, and the `Cache()`
+  messages named the event the jump started from. It now prints one line, "cacheChaining: restored
+  <n> cached events in one step", followed by the numbered list of events; "Using cacheChaining ..."
+  is left to a chain of one event. The "Object to retrieve" and "Loaded!" lines name the landing
+  event's function, and the "cacheId passed to override automatic digesting" message is suppressed
+  for a chained call (with reproducible >= 3.2.1.9051; older versions still print it).
+* "New objects created:" no longer prints `<char>` above the names and the `newObjects` header again
+  below them when there are more than 20 names.
+
 # SpaDES.core 3.2.1.9027
 
 ## Bug fixes

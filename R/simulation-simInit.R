@@ -2268,7 +2268,12 @@ objectsCreatedPost <- function(sim, objsIsNullBefore, verbose = getOption("repro
 messageNewObjects <- function(newObjs, prefix = "New objects created:", verbose = getOption("reproducible.verbose")) {
   df <- data.frame(newObjects = names(newObjs))
   messageColoured(prefix, colour = "yellow", verbose = verbose)
-  messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
+  ## data.table repeats the column header at the foot of a table longer than 20 rows, and prints a
+  ##   type row (`<char>`); messageDF() strips only the first line, so format the rows here
+  if (isTRUE(1 <= verbose)) {
+    rows <- capture.output(print(as.data.table(df), col.names = "none", class = FALSE))
+    messageColoured(paste(rows, collapse = "\n"), colour = "yellow", verbose = verbose)
+  }
   setDT(df)
 }
 
