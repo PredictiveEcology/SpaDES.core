@@ -155,10 +155,22 @@
       if (o %in% names(recorded)) return(FALSE)
       next
     }
-    if (!o %in% names(recorded)) return(FALSE)
     ## the same call, with the same defaults, that Cache() makes per object of a simList
     now <- .robustDigest(val, length = getOption("reproducible.length", Inf), algo = "xxhash64",
                          quick = getOption("reproducible.quick", FALSE))
+    if (is.list(now)) {
+      ## Cache() records a list-valued object element by element (`sim..list.<object>.<element>`,
+      ## an unnamed element as `sim..list.<object>`), never necessarily under the bare object name.
+      ## Flatten the digest as reproducible does (unlist(), and metadata_define_preEval() drops the
+      ## numbers unlist() adds), and compare as multisets: tag order is not guaranteed, names repeat.
+      key <- function(nm, h) sort(paste0(sub("[[:digit:]]{1,5}$", "", nm), ":", h), method = "radix")
+      rec <- recorded[names(recorded) == o | startsWith(names(recorded), paste0(o, "."))]
+      if (!length(rec)) return(FALSE)
+      now <- unlist(stats::setNames(list(now), o))
+      if (!identical(key(names(now), now), key(names(rec), rec))) return(FALSE)
+      next
+    }
+    if (!o %in% names(recorded)) return(FALSE)
     if (!identical(unname(now), unname(recorded[[o]]))) return(FALSE)
   }
   TRUE
@@ -251,11 +263,13 @@
   n <- NROW(jump)
   attr(sim, "cacheChainingJump") <- jump
   slot(sim, "current", check = FALSE) <- .chainCur(sim, jump$module[n], jump$event[n], jump$eventTime[n])
-  messageCache("Using cacheChaining ... skipping ahead over ", n - 1L, " cached event",
-               if (n > 2L) "s", " to ", jump$module[n], " ", jump$event[n], verbose = verbose)
-  skipped <- seq_len(n - 1L)
-  messageCache(paste(sprintf("%s. %s %s  (%s)", formatC(skipped, width = nchar(n - 1L)),
-                              jump$module[skipped], jump$event[skipped], jump$cacheId[skipped]),
+  ## every event the jump restored, the one it lands on included; none of them runs again
+  restored <- seq_len(n)
+  messageCache("Using cacheChaining: restored ", n, " event", if (n > 1L) "s",
+               " from the cache (", paste(jump$module[restored], jump$event[restored], collapse = ", "),
+               "); continuing with the next scheduled event", verbose = verbose)
+  messageCache(paste(sprintf("%s. %s %s  (%s)", formatC(restored, width = nchar(n)),
+                              jump$module[restored], jump$event[restored], jump$cacheId[restored]),
                       collapse = "\n"), verbose = verbose)
   sim
 }
