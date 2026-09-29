@@ -196,6 +196,18 @@
 #'   with `restartSimInit` (see `?restartSimInit`).
 #'   There is a message which describes how to find that.\cr
 #'
+#'   `spades.reqdPkgsAttach` \tab `TRUE`
+#'     \tab Whether a module's `reqdPkgs` are attached (`library`) to the search path,
+#'     for every module and the user's session (`TRUE`, the historical behaviour).
+#'     If `FALSE`, they are loaded (and installed if needed) but not attached;
+#'     instead each module's code sees the exports of its own `reqdPkgs`, and of the
+#'     packages those `Depends` on, as a package sees its `@import`s, so one module's
+#'     packages do not affect other modules or the session. When two of a module's
+#'     packages export the same name, the one listed later in `reqdPkgs` is used, as
+#'     when attaching. Module code that relied on another module's, or the user's,
+#'     attached packages must then use `pkg::fn` or list the package in its own
+#'     `reqdPkgs`. `FALSE` is intended to become the default.\cr
+#'
 #'   `spades.reqdPkgsDontLoad` \tab `NULL` \tab Specify any packages that should not
 #'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
 #'   listed in a module's `reqdPkgs`.\cr
@@ -358,6 +370,7 @@ spadesOptions <- function() {
     spades.evalPostEvent = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
+    spades.reqdPkgsAttach = TRUE,
     spades.reqdPkgsDontLoad = NULL,
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,

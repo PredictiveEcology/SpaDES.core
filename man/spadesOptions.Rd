@@ -200,6 +200,18 @@ module's \code{.inputObjects} runs, so an interrupted \code{simInit} can be reco
 with \code{restartSimInit} (see \code{?restartSimInit}).
 There is a message which describes how to find that.\cr
 
+\code{spades.reqdPkgsAttach} \tab \code{TRUE}
+\tab Whether a module's \code{reqdPkgs} are attached (\code{library}) to the search path,
+for every module and the user's session (\code{TRUE}, the historical behaviour).
+If \code{FALSE}, they are loaded (and installed if needed) but not attached;
+instead each module's code sees the exports of its own \code{reqdPkgs}, and of the
+packages those \code{Depends} on, as a package sees its \verb{@import}s, so one module's
+packages do not affect other modules or the session. When two of a module's
+packages export the same name, the one listed later in \code{reqdPkgs} is used, as
+when attaching. Module code that relied on another module's, or the user's,
+attached packages must then use \code{pkg::fn} or list the package in its own
+\code{reqdPkgs}. \code{FALSE} is intended to become the default.\cr
+
 \code{spades.reqdPkgsDontLoad} \tab \code{NULL} \tab Specify any packages that should not
 be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if
 listed in a module's \code{reqdPkgs}.\cr

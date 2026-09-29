@@ -1166,6 +1166,8 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   modulesInSim <- ls(objTmp[[dotMods]])
   for (mo in modulesInSim) {
     try(rm(list = c("Par", "mod"), envir = objTmp[[dotMods]][[mo]]))
+    ## the module imports (spades.reqdPkgsAttach = FALSE) must not be serialized; loadSimList() restores them
+    .setModuleImports(objTmp[[dotMods]][[mo]], character(), mo)
   }
 
   # .wrap the metadata ... i.e,. @depends
