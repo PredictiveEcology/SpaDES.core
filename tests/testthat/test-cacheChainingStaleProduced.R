@@ -79,5 +79,5 @@ test_that("a chain hit does not inherit a fresh recompute's outputs as 'produced
   ## run 3 (p = 2 again): modA is now an ordinary cache hit on run 2's entry, so a genuine
   ## modA -> modB chain link (recorded after run 2) is available; chaining must still engage.
   msgs <- capture_messages(invisible(runIt(2)))
-  expect_true(any(grepl("Using cacheChaining", msgs)))
+  expect_true(any(grepl("Using cacheChaining|cacheChaining: restored", msgs)))
 })

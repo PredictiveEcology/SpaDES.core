@@ -265,9 +265,7 @@
   slot(sim, "current", check = FALSE) <- .chainCur(sim, jump$module[n], jump$event[n], jump$eventTime[n])
   ## every event the jump restored, the one it lands on included; none of them runs again
   restored <- seq_len(n)
-  messageCache("Using cacheChaining: restored ", n, " event", if (n > 1L) "s",
-               " from the cache (", paste(jump$module[restored], jump$event[restored], collapse = ", "),
-               "); continuing with the next scheduled event", verbose = verbose)
+  messageCache("cacheChaining: restored ", n, " cached events in one step", verbose = verbose)
   messageCache(paste(sprintf("%s. %s %s  (%s)", formatC(restored, width = nchar(n)),
                               jump$module[restored], jump$event[restored], jump$cacheId[restored]),
                       collapse = "\n"), verbose = verbose)

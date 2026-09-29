@@ -435,7 +435,7 @@ test_that("test sped-up Caching of sequentially cached events", {
   expect_is(et, "data.table")
   expect_identical(units(et2$elapsedTime), mins)
   expect_identical(colnames(et), c("moduleName", "eventType", "elapsedTime"))
-  oa <- "override automatic"
+  oa <- "Using cacheChaining \\.\\.\\.|cacheChaining: restored"  # one line per chained Cache() call
   expect_false(any(grepl(oa, mess)))
 
   ## Rerun with Cached copies being recovered
@@ -539,7 +539,7 @@ test_that("test sped-up Caching of sequentially cached events 2", {
     mess <- capture_messages({
       mySimOut <- spades(mySim, debug = 1, .plots = NA)
     })
-    oa <- "override automatic"
+    oa <- "Using cacheChaining \\.\\.\\.|cacheChaining: restored"  # one line per chained Cache() call
     if (i == 1) {
       expect_equal(sum(grepl(oa, mess)), 0)
       expect_equal(sum(grepl(oa, mess1)), 0)

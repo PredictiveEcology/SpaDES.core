@@ -159,7 +159,7 @@ test_that("cacheChaining finds every chain recorded against one entry", {
 
   ## both branches are now recorded; re-running each must chain the same amount
   nChained <- function(p)
-    length(grep("Using cacheChaining", capture_messages(invisible(runIt(p)))))
+    length(grep("Using cacheChaining|cacheChaining: restored", capture_messages(invisible(runIt(p)))))
   n1 <- nChained(1)
   n2 <- nChained(2)
 
@@ -239,7 +239,7 @@ test_that("a link recorded twice, stale first, still chains", {
     params = list(modA = list(.useCache = ".inputObjects"), modB = list(.useCache = ".inputObjects"),
                   modC = list(.useCache = ".inputObjects")),
     modules = list("modA", "modB", "modC"), paths = list(modulePath = mp, cachePath = cp)))
-  nChained <- function(cp) length(grep("Using cacheChaining", capture_messages(invisible(runIt(cp)))))
+  nChained <- function(cp) length(grep("Using cacheChaining|cacheChaining: restored", capture_messages(invisible(runIt(cp)))))
   withr::local_options(spades.cacheChaining = TRUE)
 
   cpClean <- file.path(tmpdir, "clean"); invisible(runIt(cpClean))
