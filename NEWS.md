@@ -1,4 +1,4 @@
-# SpaDES.core 3.2.1.9028
+# SpaDES.core 3.2.1.9029
 
 ## Bug fixes
 
@@ -14,6 +14,15 @@
   before it and that event is an ordinary single-event cache hit. The delta also records the event's
   own time in seconds, which replaces the `eventTime` tag (in the simList's unit at record time) as the
   time a jump reports for a skipped event.
+
+# SpaDES.core 3.2.1.9027
+
+## Bug fixes
+
+* `moduleMetadata()` on a parent module whose children are on disk returned `NULL`/`NA` for the parent's
+  own `name`, `version`, `description`, `authors` etc., because `simInit()` expands the parent and drops
+  its row. Those fields now come from the parent's file; the children's `parameters`, `inputObjects`,
+  `outputObjects` and `reqdPkgs` are aggregated as before.
 
 # SpaDES.core 3.2.1.9026
 
