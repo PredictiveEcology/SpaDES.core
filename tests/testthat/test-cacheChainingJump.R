@@ -409,3 +409,166 @@ jumpTest("a jump landing on .inputObjects restores an expectsInput the landing m
   expect_equal(sim$d, 13)
   expect_equal(sim$shared, 200)
 })
+
+## The queue after a jump is the LIVE queue, minus the events the jump restored, plus what those events
+## scheduled -- never the queue stored in the entry the jump lands on. That queue belongs to the run that
+## saved the entry, and an entry is shared by runs with different module sets. Each entry carries its own
+## event's queue delta (the `eventQueueDelta` tag); the walk replays them onto the live queue and only
+## skips an event that is the next one in it. Oracle: the same modules, chaining off, cold cache.
+jumpKeys <- c("a", "b", "cc", "d", "shared", "x")
+
+## `.inputObjects` phase modules, or init-phase modules, from a list of names; each extra module reads
+## something a fixture module makes and creates `x`
+mkExtraMod <- function(mp, name, phaseIO, expects = "a") {
+  inObjs <- sprintf('bindrows(expectsInput("%s", "numeric", ""))', expects)
+  outObjs <- 'bindrows(createsOutput("x", "numeric", ""))'
+  body <- sprintf("sim$x <- sim$%s + 1000", expects)
+  if (phaseIO) mkIOJumpMod(mp, name, inObjs, outObjs, body)
+  else mkJumpMod(mp, name, inObjs, outObjs, body)
+}
+
+runMods <- function(mp, cp, mods, phaseIO, chaining = TRUE) {
+  withr::local_options(spades.cacheChaining = chaining)
+  params <- lapply(stats::setNames(mods, mods), function(m)
+    list(.useCache = if (phaseIO) ".inputObjects" else "init"))
+  run <- if (phaseIO) simInit else simInitAndSpades
+  run(times = list(start = 1, end = 2), params = params, objects = list(ext = 5),
+      modules = as.list(mods), paths = list(modulePath = mp, cachePath = cp))
+}
+
+modsState <- function(sim, mods) {
+  list(objs = mget(c(jumpKeys, paste0("grown_", mods)), envir = sim@.xData, ifnotfound = list(NULL)),
+       completed = as.data.frame(completed(sim)[, c("moduleName", "eventType")]))
+}
+
+## record the chain with `recMods` (cold, then warm: the warm run has the chain to follow), then run
+## with `runModsNow`; the answer must be what the same modules give with chaining off
+queueCase <- function(tmpdir, phaseIO, recMods, runModsNow, mkMods = NULL) {
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  if (phaseIO) ioJumpFixture(mp) else jumpFixture(mp)
+  if (is.function(mkMods)) mkMods(mp)
+  cp <- file.path(tmpdir, "on")
+  runMods(mp, cp, recMods, phaseIO)
+  runMods(mp, cp, recMods, phaseIO)
+  got <- jumpMessages(s <- runMods(mp, cp, runModsNow, phaseIO))
+  ref <- runMods(mp, file.path(tmpdir, "off"), runModsNow, phaseIO, chaining = FALSE)
+  list(got = got, state = modsState(s, runModsNow), ref = modsState(ref, runModsNow))
+}
+
+phaseNames <- function(phaseIO) {
+  list(ph = if (phaseIO) ".inputObjects" else "init",
+       base = if (phaseIO) c("ioA", "ioB", "ioC", "ioD") else c("jA", "jB", "jC", "jD"),
+       xm = if (phaseIO) "ioX" else "jX",
+       renamed = if (phaseIO) "ioE" else "jE")
+}
+
+## the extra module comes last: its event is in the queue the landing entry stored
+scenExtraLast <- function(tmpdir, phaseIO) {
+  n <- phaseNames(phaseIO)
+  queueCase(tmpdir, phaseIO, c(n$base, n$xm), n$base,
+            mkMods = function(mp) mkExtraMod(mp, n$xm, phaseIO, expects = "d"))
+}
+
+## the extra module loads between the second and third: its event is in the live queue only
+scenExtraMiddle <- function(tmpdir, phaseIO) {
+  n <- phaseNames(phaseIO)
+  queueCase(tmpdir, phaseIO, n$base, c(n$base[1:2], n$xm, n$base[3:4]),
+            mkMods = function(mp) mkExtraMod(mp, n$xm, phaseIO, expects = "a"))
+}
+
+## the last module renamed, same code: the landing entry's queue names the old one
+scenRenamed <- function(tmpdir, phaseIO) {
+  n <- phaseNames(phaseIO)
+  mk <- if (phaseIO) mkIOJumpMod else mkJumpMod
+  queueCase(tmpdir, phaseIO, n$base, c(n$base[1:3], n$renamed),
+            mkMods = function(mp)
+              mk(mp, n$renamed, 'bindrows(expectsInput("cc", "numeric", ""), expectsInput("shared", "numeric", ""))',
+                 'bindrows(createsOutput("d", "numeric", ""), createsOutput("shared", "numeric", ""))',
+                 "sim$d <- sim$cc + 1; sim$shared <- 200"))
+}
+
+for (phaseIO in c(TRUE, FALSE)) {
+  ph <- phaseNames(phaseIO)$ph
+  eval(bquote({
+    jumpTest(.(paste0("a chain recorded with an extra module still jumps without it (", ph, ")")), {
+      skip_on_cran()
+      testInit("terra", opts = jumpOpts)
+      r <- scenExtraLast(tmpdir, .(phaseIO))
+      n <- phaseNames(.(phaseIO))
+      ## `.inputObjects` keys leave out the queue and the other modules, so the entries are shared and the
+      ##   jump engages; an event's key includes the queue, so a different module set never hits there
+      if (.(phaseIO)) {
+        expect_length(r$got$jumps, 1L)
+        expect_match(r$got$jumps, "restored 3 cached events in one step")
+        expect_identical(restoredList(r$got$raw), c("ioB .inputObjects", "ioC .inputObjects", "ioD .inputObjects"))
+      }
+      expect_equal(r$state, r$ref)
+      expect_null(r$state$objs$x)
+    })
+
+    jumpTest(.(paste0("a chain recorded without a module still runs that module's events when it is added (", ph, ")")), {
+      skip_on_cran()
+      testInit("terra", opts = jumpOpts)
+      r <- scenExtraMiddle(tmpdir, .(phaseIO))
+      n <- phaseNames(.(phaseIO))
+      expect_equal(r$state, r$ref)
+      expect_equal(r$state$objs$x, 1001)
+      if (!.(phaseIO)) expect_equal(as.numeric(r$state$objs$grown_jX), 2)
+      expect_true(paste(n$xm, n$ph) %in% paste(r$state$completed$moduleName, r$state$completed$eventType))
+    })
+
+    jumpTest(.(paste0("a chain recorded before a module was renamed does not queue the old name (", ph, ")")), {
+      skip_on_cran()
+      testInit("terra", opts = jumpOpts)
+      r <- scenRenamed(tmpdir, .(phaseIO))
+      expect_equal(r$state$objs[jumpKeys], r$ref$objs[jumpKeys])
+      expect_equal(r$state$completed, r$ref$completed)
+      expect_equal(r$state$objs$d, 13)
+    })
+  }))
+}
+
+## init phase: skipped events schedule events of their own module; each must be queued and run once
+## (not lost, not twice) after the jump. jC schedules two identical `grow` events.
+jumpTest("events a skipped event scheduled are queued after a jump, duplicates counted", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))', 'bindrows(createsOutput("cc", "numeric", ""))',
+            'sim$cc <- sim$b * 2; sim <- scheduleEvent(sim, time(sim) + 1, "jC", "grow")')
+  cp <- file.path(tmpdir, "on")
+  mods <- c("jA", "jB", "jC", "jD")
+  runMods(mp, cp, mods, FALSE)
+  runMods(mp, cp, mods, FALSE)
+  got <- jumpMessages(s <- runMods(mp, cp, mods, FALSE))
+  ref <- runMods(mp, file.path(tmpdir, "off"), mods, FALSE, chaining = FALSE)
+  expect_length(got$jumps, 1L)
+  expect_match(got$jumps, "restored 3 cached events in one step")
+  expect_identical(restoredList(got$raw), c("jB init", "jC init", "jD init"))
+  expect_equal(modsState(s, mods), modsState(ref, mods))
+  comp <- completed(s)
+  expect_equal(sum(comp$moduleName == "jC" & comp$eventType == "grow"), 2L)
+  expect_equal(sum(comp$moduleName == "jB" & comp$eventType == "grow"), 1L)
+  expect_equal(NROW(events(s)), 0L)
+})
+
+## An entry saved before queue deltas were recorded has none: the walk cannot cross it, so that link
+## is an ordinary single-event cache hit. Simulated by recording with the delta not written.
+jumpTest("an entry without a queue delta stops the jump", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  cp <- file.path(tmpdir, "on")
+  mods <- c("jA", "jB", "jC", "jD")
+  local({
+    testthat::local_mocked_bindings(.chainDeltaIfRan = function(...) NULL)
+    runMods(mp, cp, mods, FALSE)
+    runMods(mp, cp, mods, FALSE)
+  })
+  got <- jumpMessages(s <- runMods(mp, cp, mods, FALSE))
+  ref <- runMods(mp, file.path(tmpdir, "off"), mods, FALSE, chaining = FALSE)
+  expect_length(got$jumps, 0L)
+  expect_equal(modsState(s, mods), modsState(ref, mods))
+})

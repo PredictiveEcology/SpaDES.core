@@ -1863,6 +1863,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                 sim <- .chainJumpPrepare(sim, chaining$jump, verbose = verbose)
             }
 
+            eventsPreCall <- sim@events
             sim <- eval(fnCallAsExpr)
             .checkEventReturn(sim, mBase, ".inputObjects", fromCache = TRUE)
 
@@ -1875,7 +1876,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                      cacheIdOfSkip = chaining$cacheIdOfSkip,
                                      df = chaining$df,
                                      moduleName = chainLast$module,
-                                     eventType = chainLast$event)
+                                     eventType = chainLast$event,
+                                     queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
+                                                           sim@simtimes[["start"]]))
 
           }
 

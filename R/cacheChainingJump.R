@@ -16,8 +16,89 @@
 ##     object supplied at simInit to a later module therefore stops the jump at that module even
 ##     though everything before it chained.
 ##   * the entry's file still exists. A deleted entry means the event has to run.
+##   * the event queue. The queue after a jump is the LIVE queue, never the one stored in the entry it
+##     lands on -- an entry is shared by runs with different module sets and different queues. Each
+##     entry carries the delta its own event made to the queue (the `eventQueueDelta` tag, written when
+##     the event ran; see .chainQueueDelta()). The walk replays those deltas onto the live queue link
+##     by link, and a link is only skipped if its event is the head of the queue as replayed so far. An
+##     entry without a delta (saved before deltas were recorded) stops the walk.
 ## A jump never crosses between `.inputObjects` and the event queue, and, as before, a chain
 ## stops at the first uncached event.
+
+## The queue delta of one event: what it added to the queue and what it removed, comparing the queue
+## just before it ran with the queue just after. Multiset-correct: two identical events count twice.
+## The first line is a format marker (so an event that changed nothing is still a recorded delta); the
+## second is the event's own eventTime in seconds (the `eventTime` tag is in the simList's unit at the
+## time, which a later run may not share). Then one line per event, `+` or `-`, eventTime (17
+## significant digits, seconds, as queued), eventPriority, module, eventType, tab separated.
+.chainEvKey <- function(e) {
+  sprintf("%.17g\t%.17g\t%s\t%s", as.numeric(e[["eventTime"]]), as.numeric(e[["eventPriority"]]),
+          e[["moduleName"]], e[["eventType"]])
+}
+
+.chainQueueKeys <- function(q) {
+  k <- vapply(q, .chainEvKey, character(1))
+  if (length(k)) paste0(k, "#", stats::ave(seq_along(k), k, FUN = seq_along)) else k
+}
+
+.chainQueueDelta <- function(pre, post, eventTime) {
+  kPre <- .chainQueueKeys(pre)
+  kPost <- .chainQueueKeys(post)
+  added <- vapply(post[!kPost %in% kPre], .chainEvKey, character(1))
+  removed <- vapply(pre[!kPre %in% kPost], .chainEvKey, character(1))
+  paste(c(.chainDeltaMarker, sprintf("@\t%.17g", as.numeric(eventTime)), if (length(added)) paste0("+\t", added),
+          if (length(removed)) paste0("-\t", removed)), collapse = "\n")
+}
+
+## The delta to record for the event that just went through Cache(): only when it actually ran (a new
+## cache entry) and no jump was taken. NULL otherwise.
+.chainDeltaIfRan <- function(sim, cacheIt, chaining, eventsPreCall, eventTime) {
+  if (!isTRUE(cacheIt) || !is.null(chaining$jump)) return(NULL)
+  if (!attr(sim, ".Cache")$newCache %in% TRUE) return(NULL)
+  .chainQueueDelta(eventsPreCall, sim@events, eventTime)
+}
+
+.chainDeltaTag <- "eventQueueDelta"
+.chainDeltaMarker <- "queueDelta1"
+
+## The delta recorded in an entry's tags, as list(add, remove) of queue events; NULL if it has none.
+.chainReadDelta <- function(sc) {
+  txt <- sc$tagValue[sc$tagKey == .chainDeltaTag]
+  if (!length(txt)) return(NULL)
+  lines <- strsplit(txt[[length(txt)]], "\n", fixed = TRUE)[[1]]
+  if (!identical(lines[1], .chainDeltaMarker)) return(NULL)
+  toEvents <- function(l) lapply(strsplit(l, "\t", fixed = TRUE), function(x)
+    list(eventTime = structure(as.numeric(x[2]), unit = "second"), moduleName = x[4],
+         eventType = x[5], eventPriority = as.numeric(x[3])))
+  own <- lines[startsWith(lines, "@")]
+  list(time = if (length(own)) as.numeric(sub("^@\t", "", own[[1]])) else NA_real_,
+       add = toEvents(lines[startsWith(lines, "+")]), remove = toEvents(lines[startsWith(lines, "-")]))
+}
+
+## Replay a delta onto a queue: drop the events it removed (one each), then add the ones it added
+## after the queued events at equal time and priority, as scheduleEvent() does.
+.chainApplyDelta <- function(q, delta) {
+  for (e in delta$remove) {
+    i <- match(.chainEvKey(e), vapply(q, .chainEvKey, character(1)))
+    if (!is.na(i)) q <- q[-i]
+  }
+  if (length(delta$add)) {
+    q <- c(q, delta$add)
+    q <- q[order(vapply(q, function(e) as.numeric(e[["eventTime"]]), numeric(1)),
+                 vapply(q, function(e) as.numeric(e[["eventPriority"]]), numeric(1)))]
+  }
+  q
+}
+
+## Is `hit` the event at the head of queue `q`? `.inputObjects` events all sit at start(sim).
+.chainIsHead <- function(q, hit) {
+  if (!length(q)) return(FALSE)
+  e <- q[[1]]
+  if (!identical(unname(as.character(e[["moduleName"]])), hit$module) ||
+      !identical(unname(as.character(e[["eventType"]])), hit$event)) return(FALSE)
+  if (identical(hit$event, ".inputObjects")) return(TRUE)
+  isTRUE(abs(as.numeric(e[["eventTime"]]) - hit$eventTime) <= 1e-9 * max(1, abs(hit$eventTime)))
+}
 
 ## The `current` event list for an event that is not (yet) current.
 .chainCur <- function(sim, module, event, eventTime = NA_real_) {
@@ -189,8 +270,13 @@
   cur <- cacheId
   ## a .stopAfter barrier on the event being recovered: nothing may be skipped past it
   if (.chainStopsAfter(controls, module, event)) return(NULL)
+  ## The live queue, as it will be once each event walked over has run: the event being recovered is
+  ##   already off it; replay its delta, then each skipped event's.
+  sc <- .chainEntryTags(cur, cachePath)
+  delta <- if (is.null(sc)) NULL else .chainReadDelta(sc)
+  if (is.null(delta)) return(NULL)
+  q <- .chainApplyDelta(sim@events, delta)
   repeat {
-    sc <- .chainEntryTags(cur, cachePath)
     if (is.null(sc)) break
     cand <- .chainSuccessors(sc)
     if (is.null(cand) || !lastEventDetails %in% colnames(cand)) break
@@ -208,9 +294,14 @@
       if (is.null(postTags)) next
       if (!any(file.exists(reproducible::CacheStoredFile(cachePath, row$postCacheId)))) next
       if (!.chainExternalInputsMatch(sim, row$module, postTags, produced, userObjects)) next
-      et <- postTags$tagValue[postTags$tagKey == "eventTime"]
-      hit <- list(cacheId = row$postCacheId, module = row$module, event = row$event,
-                  eventTime = .chainTagTime(et, sim))
+      ## only an event that is next in the live queue may be skipped, and only if its entry says what
+      ##   it did to the queue; the time it ran at is the one it recorded, in seconds
+      delta <- .chainReadDelta(postTags)
+      if (is.null(delta) || is.na(delta$time)) next
+      cHit <- list(cacheId = row$postCacheId, module = row$module, event = row$event,
+                   eventTime = delta$time)
+      if (!.chainIsHead(q, cHit)) next
+      hit <- cHit
       break
     }
     if (is.null(hit)) break
@@ -218,20 +309,20 @@
     ##   and end(sim) are tested. An event any of them would act on has to run as itself.
     if (.chainBlocked(controls, sim, hit)) break
     steps[[length(steps) + 1L]] <- hit
+    q <- .chainApplyDelta(q[-1L], delta)
     produced <- union(produced, .chainOutputs(sim, hit$module, hit$event))
     seen <- c(seen, hit$cacheId)
     cur <- hit$cacheId
+    sc <- postTags
     led <- paste(hit$module, hit$event)
   }
-  if (length(steps)) rbindlist(steps) else NULL
-}
-
-## The eventTime tag on an event entry is written in the simList's time unit (`time(sim)`, in
-## .runEvent()), whereas the queue, current(sim) and completed(sim) hold times in seconds.
-.chainTagTime <- function(et, sim) {
-  x <- if (length(et)) suppressWarnings(as.numeric(et[[1]])) else NA_real_
-  if (is.na(x)) return(NA_real_)
-  as.numeric(convertTimeunit(structure(x, unit = timeunit(sim)), "second", sim@.xData))
+  if (length(steps)) {
+    res <- rbindlist(steps)
+    attr(res, "queue") <- q
+    res
+  } else {
+    NULL
+  }
 }
 
 ## `controls` is what doEvent() passes down: `events` (the whitelist) and `eventsBeforeAfter`
@@ -320,6 +411,8 @@
     modsDone <- union(modsDone, jump$module[i])
   }
   attr(sim, "cacheChainingJump") <- NULL
+  ## the live queue with every restored event taken off and what each scheduled put on (.chainWalk())
+  slot(sim, "events", check = FALSE) <- attr(jump, "queue")
   ## doEvent() records the current event itself; these are the ones it would not know about
   attr(sim, "cacheChainingJumped") <- jump[-1L, ]
   sim

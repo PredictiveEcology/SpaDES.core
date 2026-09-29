@@ -1,3 +1,20 @@
+# SpaDES.core 3.2.1.9031
+
+## Bug fixes
+
+* A cacheChaining jump installed the event queue stored in the entry it landed on
+  (`.prepareOutput()`, R/cache.R). That queue belongs to the run that saved the entry, and
+  `.inputObjects` entries are shared by runs with different module sets, so a run whose modules had
+  been renamed queued the old names and failed in `.runModuleInputObjects()` ("attempt to select less
+  than one element in get1index"); a module present only in the live run could also lose its events.
+  The queue after a jump is now the live queue with the skipped events removed and what each of them
+  scheduled added. Each cached event stores its own queue change (an `eventQueueDelta` tag, written
+  when the event runs), the walk replays those link by link, and it only skips an event that is next
+  in the live queue as replayed so far. An entry saved before this change has no delta: a jump stops
+  before it and that event is an ordinary single-event cache hit. The delta also records the event's
+  own time in seconds, which replaces the `eventTime` tag (in the simList's unit at record time) as the
+  time a jump reports for a skipped event.
+
 # SpaDES.core 3.2.1.9030
 
 ## New features

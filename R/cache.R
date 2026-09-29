@@ -855,11 +855,11 @@ setMethod(
           simPost@completed <- simFromCache@completed
         }
         if (!is.null(attr(simPre[[whSimList]], "cacheChainingJump"))) {
-          ## A cacheChaining jump: this entry is the state after the LAST of several skipped
-          ##   events. The events those skipped events consumed and scheduled are exactly the
-          ##   difference between the two queues, so the recorded queue is the queue -- merging
-          ##   would leave the skipped events queued and run them again one by one.
-          simPost@events <- simFromCache@events
+          ## A cacheChaining jump: this entry is the state after the LAST of several skipped events.
+          ##   The queue is NOT the one stored in it -- that is the queue of whichever run saved the
+          ##   entry, and an entry is shared by runs with different module sets. `simPost` still has the
+          ##   live queue here; .chainJumpFinish() replaces it with the live queue as the skipped events
+          ##   would have left it (each event's own recorded delta; see .chainWalk()).
           ## only the clock: start, end and timeunit are this run's, not those of the run that recorded
           ##   the chain -- taking them all carried a recorded end(sim) past this run's own end
           simPost@simtimes[["current"]] <- simFromCache@simtimes[["current"]]

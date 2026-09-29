@@ -1673,6 +1673,7 @@ setMethod(
     ## was cached. During simInit()'s `.inputObjects` phase, the live `sim` carries
     ## ._simInitContext; put it back, mirroring the paramsDontCacheOn restoration below.
     simInitContextPreCall <- sim@.xData[["._simInitContext"]]
+    eventsPreCall <- sim@events
     if (runFnCallAsExpr) {
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
       # attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
@@ -1691,7 +1692,9 @@ setMethod(
     sim <- cacheChainingPost(sim, cacheIt, prevCache,
                              chaining$cacheIdOfSkip, chaining$df,
                              moduleName = chainLast$module,
-                             eventType = chainLast$event)
+                             eventType = chainLast$event,
+                             queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
+                                                           cur[["eventTime"]]))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
@@ -2980,9 +2983,11 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
             if (!is.null(jump)) {
               ## row 1 is this event's own entry: with the call pointed at the last entry it is
               ##   never loaded itself, so its outputs are restored like the other skipped ones
+              liveQueue <- attr(jump, "queue") # the queue once every restored event has run (.chainWalk())
               jump <- rbindlist(list(
                 data.table(cacheId = cacheIdOfSkip, module = module, event = event, eventTime = NA_real_),
                 jump), use.names = TRUE)
+              attr(jump, "queue") <- liveQueue
               last <- NROW(jump)
               fnCallAsExpr[[1]]$cacheId <- structure(jump$cacheId[last], cacheIdAnnounced = TRUE)
               ## the entry loaded is the landing event's: name it, not the event the call started from
@@ -3003,7 +3008,7 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
 
 
 cacheChainingPost <- function(sim, cacheIt, prevCache,
-                              cacheIdOfSkip, df, moduleName, eventType) {
+                              cacheIdOfSkip, df, moduleName, eventType, queueDelta = NULL) {
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
   ## The objects the current unbroken run of cached events has produced; what a later link
   ##   may trust without digesting (cacheChainingSetup(), .chainWalk()). Reset with the chain.
@@ -3046,6 +3051,11 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
         reproducible::.updateTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
                                       tagKey = paste0("cacheChaining_", col, "_", postCacheId),
                                       tagValue = as.character(df[[col]]))
+      ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
+      ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
+      if (!is.null(queueDelta))
+        reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
+                                      tagKey = .chainDeltaTag, tagValue = queueDelta)
     }
   }
   sim
