@@ -1277,7 +1277,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         x = modulesToSearch3[isParent],
         nam = dirname(names(modulesToSearch3[isParent])),
         function(x, nam) {
-          mods <- lapply(x, function(y) file.path(nam, y))
+          mods <- lapply(x, function(y) file.path(nam, .childModuleName(y)))
           names(mods) <- unlist(lapply(mods, basename2))
           .identifyChildModules(sim = sim, modules = mods, verbose = verbose)
         }

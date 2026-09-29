@@ -38,7 +38,8 @@ function definitions (which will be added to the \code{simList}) or one or
 more of the following:\cr\cr
 \describe{
 \item{\code{children}}{Required when \code{type = "parent"}. A character vector
-specifying the names of child modules.}
+specifying the names of child modules, or GitHub specs such as
+\code{"owner/repo@branch"} (see \code{childModules} in \code{\link[=defineModule]{defineModule()}}).}
 \item{\code{open}}{Logical. Should the new module file be opened after creation?
 Default \code{TRUE}.}
 \item{\code{type}}{Character string specifying one of \code{"child"} (default),

@@ -1,3 +1,22 @@
+# SpaDES.core 3.2.1.9025
+
+## New features
+
+* A parent module's `childModules` may list GitHub specs (`"owner/repo@branch"`, `"owner/repo"`,
+  `"name@branch"`) as well as plain names, so a parent can say where each child comes from
+  (`SpaDES.project::setupProject()` fetches them). SpaDES.core uses the module name, i.e. the
+  repository name (`Require::extractPkgName()`), wherever it uses a child: `simInit()`'s expansion of
+  a parent (`.identifyChildModules()`), `defineModule()`'s check that each child exists,
+  `moduleMetadata()` on a parent, `newModule(type = "parent")`'s `version` list, and
+  `downloadModule()`'s child lookups. Plain names behave as before.
+
+## Bug fixes
+
+* `newModule(type = "parent")` wrote an unparseable module file when the `children` (or the
+  resulting `version` list) were long enough for `dput()`/`deparse()` to wrap over several lines.
+* `downloadModule()` could not check a local module's version when `version` is a named list (the
+  format since SpaDES 1.3.1.9044), so it errored on any parent whose children are already local.
+
 # SpaDES.core 3.2.1.9024
 
 ## Bug fixes
