@@ -91,7 +91,9 @@ test_that("two processes running the same cached init do not corrupt the shared 
     'cat(if (ok) "ALLGOOD" else "BAD", "\\n")'), script)
 
   logs <- file.path(withr::local_tempdir("logs"), c("p1.log", "p2.log"))
-  system(sprintf("Rscript %s > %s 2>&1 & Rscript %s > %s 2>&1; wait", script, logs[1], script, logs[2]))
+  Rscript <- shQuote(file.path(R.home("bin"), "Rscript")) # R CMD check refuses a bare "Rscript"
+  system(sprintf("%s %s > %s 2>&1 & %s %s > %s 2>&1; wait",
+                 Rscript, shQuote(script), shQuote(logs[1]), Rscript, shQuote(script), shQuote(logs[2])))
   for (lg in logs) expect_true(any(grepl("ALLGOOD", readLines(lg))), info = paste(readLines(lg), collapse = "\n"))
 
   ## nothing but the one raster: no "_1" copy, no temporary file
