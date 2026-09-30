@@ -919,9 +919,14 @@ setMethod(
         # keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData[[dotMods]], all.names = TRUE))
         # list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = simPreOrigEnv[[dotMods]]), envir = simPost@.xData[[dotMods]])
 
-        if (exists(".objectSynonyms", envir = simPost@.xData)) {
+        ## Synonyms the cached event added (e.g., objectSynonyms() in a module's init) are not in
+        ##   `changed` when the sim already had synonyms, so take them from the cache entry too.
+        cachedSyns <- if (exists(".objectSynonyms", envir = simFromCache@.xData, inherits = FALSE))
+          simFromCache@.xData$.objectSynonyms
+        if (exists(".objectSynonyms", envir = simPost@.xData) || length(cachedSyns)) {
           # objSyns <- lapply(attr(simPost$.objectSynonyms, "bindings"), function(x) unname(unlist(x)))
-          objSyns <- lapply(simPost$.objectSynonyms, function(x) unname(unlist(x)))
+          objSyns <- lapply(c(simPost$.objectSynonyms, cachedSyns), function(x) unname(unlist(x)))
+          objSyns <- unique(objSyns)
           # must remove the "other ones" first
           objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
           objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = simPost@.xData))
