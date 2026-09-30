@@ -1498,6 +1498,11 @@ setMethod(
     }
 
     if (cache) {
+      ## the sim's ledger is the sink while the outer Cache() collects the run's urls (it writes
+      ##   them when it exits, after the inner spades() has restored the option) -- otherwise
+      ##   they go to the session log and never reach the sim; see R/urlLog.R
+      .urlLogToken <- .installUrlLog(sim)
+      on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
       return(
         Cache(spades(sim = sim,
                      debug = debug,

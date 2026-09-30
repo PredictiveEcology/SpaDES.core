@@ -1,3 +1,24 @@
+# SpaDES.core 3.2.1.9032
+
+## New features
+
+* `urlLog(sim)` (a method of `reproducible::urlLog()`, which needs reproducible >= 3.2.1.9054) returns the
+  per-run download ledger -- every `prepInputs()`/`preProcess()` URL access made during `simInit()`/`spades()`
+  with the module and event that made it -- as a `data.table`, with the same column names as
+  `urlLog()` on a cache path.
+
+## Bug fixes
+
+* The ledger (`envir(sim)$._urlLog`) lost records in three places. `simInit()` with
+  `spades.allowInitDuringSimInit = TRUE` replaced the outer sim's ledger with that of the second sim that ran
+  the early `init` events (R/simulation-simInit.R); the two are now merged. A cacheChaining jump never
+  recorded the URLs of the events it skipped, and tagged the landing event's URLs with the module and event
+  the jump started from (R/cacheChainingJump.R); each skipped entry's URL tags are now replayed with that
+  event's own module and event. `spades(cache = TRUE)` collected the run's URLs in the outer `Cache()`, which
+  wrote them to the session log instead of the sim (R/simulation-spades.R). A whole-`spades()` cache hit now
+  merges the entry's records into the live ledger, and an event hit never takes `._urlLog` from the entry
+  (`lsObjectsChanged()`, R/cache.R). The ledger is still kept out of `.robustDigest()`.
+
 # SpaDES.core 3.2.1.9031
 
 ## Bug fixes
