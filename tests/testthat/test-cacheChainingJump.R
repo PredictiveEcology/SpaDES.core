@@ -615,3 +615,42 @@ jumpTest("without recorded deltas the .inputObjects phase jumps and the event ph
   expect_equal(stateOf(s)$objs, stateOf(ref)$objs)
   expect_equal(stateOf(s)$completed, stateOf(ref)$completed)
 })
+
+## The download ledger (urlLog(), R/urlLog.R) must hold every access of a run, tagged with the
+## module + event that made it. A jump never dispatches the events it skips and restores their
+## entries with loadFromCache(), which does not replay the URL tags -- so without help their
+## records are missing, or carry the context of the event the jump started from.
+ledger <- function(sim) urlLog(sim, which = c("cacheId", "function", "module", "event", "url"))
+
+jumpTest("a jump puts each skipped event's download in the ledger, with its own module and event, once", {
+  skip_on_cran()
+  testInit("terra", opts = c(jumpOpts, list(spades.urlLog = TRUE)))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  dl <- function(nm) {
+    f <- file.path(tmpdir, paste0("src_", nm, ".txt")); writeLines(nm, f)
+    sprintf('reproducible::prepInputs(url = "file://%s", targetFile = "%s", destinationPath = "%s", fun = NA)',
+            f, basename(f), file.path(tmpdir, "dl", nm))
+  }
+  ## jA: a plain hit; jC: skipped in the middle of the jump; jD: the entry the jump lands on
+  mkJumpMod(mp, "jA", 'bindrows(expectsInput("unsupplied0", "numeric", ""))',
+            'bindrows(createsOutput("a", "numeric", ""), createsOutput("shared", "numeric", ""))',
+            paste0("sim$a <- 1; sim$shared <- 100; ", dl("jA")))
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("cc", "numeric", ""))', paste0("sim$cc <- sim$b * 2; ", dl("jC")))
+  mkJumpMod(mp, "jD", 'bindrows(expectsInput("cc", "numeric", ""), expectsInput("shared", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""), createsOutput("shared", "numeric", ""))',
+            paste0("sim$d <- sim$cc + 1; sim$shared <- 200; ", dl("jD")))
+
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  warm <- jumpMessages(s2 <- runJump(mp, cp, jumpParams()))
+  expect_match(warm$jumps, "restored 3 cached events in one step") # the jump really engaged
+
+  ul <- ledger(s2)
+  expect_identical(NROW(ul), 3L)
+  ul <- ul[order(ul$module), ]
+  expect_identical(ul$module, c("jA", "jC", "jD"))
+  expect_identical(ul$event, rep("init", 3L))
+  expect_identical(basename(ul$url), c("src_jA.txt", "src_jC.txt", "src_jD.txt"))
+})

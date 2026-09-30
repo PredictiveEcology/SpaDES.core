@@ -748,6 +748,7 @@ setMethod(
 
         ## Step 1 -- copy the non-simEnv slots
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
+        wholeCall <- NROW(current(simPost)) == 0 # a spades()/simInit() call, not one event
 
         ## This was unnecessary if the parameters never change; but they can
         ##  -- but draw from Cache only from this module -- other modules may have
@@ -804,6 +805,7 @@ setMethod(
         }
 
         # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
+        lsObjectEnv <- setdiff(lsObjectEnv, "._urlLog") # the live ledger stays; see below
         list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
 
         otherModules <- setdiff(namesAllMods, currModules)
@@ -904,6 +906,13 @@ setMethod(
         lsSimPreOrigEnv <- ls(simPreOrigEnv, all.names = TRUE)
         keepFromOrig <- !(lsSimPreOrigEnv %in% ls(simPost@.xData, all.names = TRUE))
         list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPreOrigEnv), envir = simPost@.xData)
+
+        ## The download ledger (._urlLog) is the live run's: lsObjectsChanged() never takes it from
+        ##   the entry, so `simPost` holds the live environment. For a whole simInit()/spades() hit
+        ##   (no current event) the entry's records are merged in; for an event hit they reach the
+        ##   live ledger through reproducible's replay of the entry's reproducible.url* tags.
+        if (wholeCall)
+          .mergeUrlLog(envir(simPost)$._urlLog, envir(simFromCache)$._urlLog)
 
         # Deal with .mods
         # lsOrigModsEnv <- ls(simPreOrigEnv[[dotMods]], all.names = TRUE)
@@ -1675,8 +1684,10 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
   dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs)
 
   # lsObjectEnv --> this should only be objects that can be outputted, not expectsInputs
-  lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
-                dotObjectsChanged %in% TRUE]
+  out <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
+                       dotObjectsChanged %in% TRUE]
+  ## the download ledger belongs to the live run; an entry's copy is stale (see .prepareOutput())
+  setdiff(out, "._urlLog")
 }
 
 # }

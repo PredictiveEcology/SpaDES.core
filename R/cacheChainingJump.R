@@ -364,6 +364,9 @@
   n <- NROW(jump)
   attr(sim, "cacheChainingJump") <- jump
   slot(sim, "current", check = FALSE) <- .chainCur(sim, jump$module[n], jump$event[n], jump$eventTime[n])
+  ## the landing entry's Cache() hit replays its URLs into the ledger with the context set here, so
+  ## it must be the landing event's, not that of the event the jump started from
+  .updateUrlLogExtra(sim)
   ## every event the jump restored, the one it lands on included; none of them runs again
   restored <- seq_len(n)
   messageCache("cacheChaining: restored ", n, " cached events in one step", verbose = verbose)
@@ -390,6 +393,10 @@
       if (length(theirs)) list2env(userObjects[theirs], envir = sim@.xData)
     }
   }
+  ## every skipped event's downloads, with that event's module + event (the landing entry, row
+  ## n, was replayed by its own Cache() hit); see .replayUrlLog()
+  for (i in seq_len(n - 1L))
+    .replayUrlLog(sim, cachePath, jump$cacheId[i], jump$module[i], jump$event[i])
   later <- .chainCreates(sim, jump$module[n])
   modsDone <- jump$module[n]
   for (i in rev(seq_len(n - 1L))) {
