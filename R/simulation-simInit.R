@@ -2185,6 +2185,10 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       list2env(objs(simAltOut), envir(sim))
 
       dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
+      ## the ledger is merged, not replaced: `sim` keeps the environment reproducible.urlLog
+      ## points at, and the records it already holds
+      dotUnderscoreObjs <- setdiff(dotUnderscoreObjs, "._urlLog")
+      .mergeUrlLog(envir(sim)$._urlLog, envir(simAltOut)$._urlLog)
       list2env(mget(dotUnderscoreObjs, envir = envir(simAltOut)), envir(sim))
 
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
