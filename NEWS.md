@@ -1,3 +1,13 @@
+# SpaDES.core 3.2.1.9033
+
+## Bug fixes
+
+* cacheChaining jumps almost never engaged in the `.inputObjects` phase. `.chainWalk()`
+  (R/cacheChainingJump.R) stopped at any entry without a recorded `eventQueueDelta`, and
+  `.inputObjects` entries saved before the delta existed are cache hits that never re-run, so they never
+  gained one. An `.inputObjects` event schedules nothing and runs at `start(sim)`, so its delta is known:
+  the walk now uses that implied delta. Event-phase entries without a delta still stop the jump.
+
 # SpaDES.core 3.2.1.9032
 
 ## New features

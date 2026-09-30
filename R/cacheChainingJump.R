@@ -75,6 +75,14 @@
        add = toEvents(lines[startsWith(lines, "+")]), remove = toEvents(lines[startsWith(lines, "-")]))
 }
 
+## The delta of an entry that has none recorded. An `.inputObjects` event schedules nothing and runs
+## at start(sim), so its delta is what .chainQueueDelta() would have recorded: empty, with its time.
+## Any other event could have scheduled anything: NULL.
+.chainImpliedDelta <- function(sim, event) {
+  if (!identical(event, ".inputObjects")) return(NULL)
+  list(time = as.numeric(sim@simtimes[["start"]]), add = list(), remove = list())
+}
+
 ## Replay a delta onto a queue: drop the events it removed (one each), then add the ones it added
 ## after the queued events at equal time and priority, as scheduleEvent() does.
 .chainApplyDelta <- function(q, delta) {
@@ -274,6 +282,7 @@
   ##   already off it; replay its delta, then each skipped event's.
   sc <- .chainEntryTags(cur, cachePath)
   delta <- if (is.null(sc)) NULL else .chainReadDelta(sc)
+  if (is.null(delta) && !is.null(sc)) delta <- .chainImpliedDelta(sim, event)
   if (is.null(delta)) return(NULL)
   q <- .chainApplyDelta(sim@events, delta)
   repeat {
@@ -297,6 +306,7 @@
       ## only an event that is next in the live queue may be skipped, and only if its entry says what
       ##   it did to the queue; the time it ran at is the one it recorded, in seconds
       delta <- .chainReadDelta(postTags)
+      if (is.null(delta)) delta <- .chainImpliedDelta(sim, row$event)
       if (is.null(delta) || is.na(delta$time)) next
       cHit <- list(cacheId = row$postCacheId, module = row$module, event = row$event,
                    eventTime = delta$time)
