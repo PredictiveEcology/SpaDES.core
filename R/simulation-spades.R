@@ -3058,9 +3058,13 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
                                       tagValue = as.character(df[[col]]))
       ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
       ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
-      if (!is.null(queueDelta))
+      ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()).
+      if (!is.null(queueDelta)) {
         reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
                                       tagKey = .chainDeltaTag, tagValue = queueDelta)
+        reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
+                                      tagKey = .chainSynTag, tagValue = .chainSynText(sim))
+      }
     }
   }
   sim

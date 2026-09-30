@@ -59,6 +59,43 @@
 }
 
 .chainDeltaTag <- "eventQueueDelta"
+
+## The object synonyms of an entry, stored with it (the `eventObjectSynonyms` tag) so a jump can give
+## the live simList the synonyms a skipped event added without loading that entry. A marker line, then
+## one line per synonym group (the names, tab separated); the marker alone is an event with none.
+.chainSynTag <- "eventObjectSynonyms"
+.chainSynMarker <- "objSyn1"
+
+.chainSynText <- function(sim) {
+  syns <- envir(sim)[[objSynName]]
+  paste(c(.chainSynMarker, vapply(syns, function(g) paste(unname(unlist(g)), collapse = "\t"), character(1))),
+        collapse = "\n")
+}
+
+## The groups recorded in an entry's tags, as a list of character vectors; NULL if it has no record
+## (an entry saved before the tag existed), which is not the same as an empty list.
+.chainReadSyns <- function(sc) {
+  txt <- sc$tagValue[sc$tagKey == .chainSynTag]
+  if (!length(txt)) return(NULL)
+  lines <- strsplit(txt[[length(txt)]], "\n", fixed = TRUE)[[1]]
+  if (!identical(lines[1], .chainSynMarker)) return(NULL)
+  strsplit(lines[-1L], "\t", fixed = TRUE)
+}
+
+## Give `sim` the synonym groups `groups` that it does not have yet, as a cache hit would
+## (.prepareOutput()): a name that stands for another object is removed first.
+.chainApplySyns <- function(sim, groups) {
+  have <- lapply(envir(sim)[[objSynName]], function(g) unname(unlist(g)))
+  groups <- unique(groups)
+  groups <- groups[!vapply(groups, function(g) any(vapply(have, identical, logical(1), g)), logical(1))]
+  if (!length(groups)) return(invisible(sim))
+  nonCanonical <- unlist(lapply(groups, `[`, -1L))
+  isPlain <- vapply(nonCanonical, function(o) exists(o, envir = sim@.xData, inherits = FALSE) &&
+                      !bindingIsActive(o, sim@.xData), logical(1))
+  if (any(isPlain)) rm(list = nonCanonical[isPlain], envir = sim@.xData)
+  suppressMessages(objectSynonyms(synonyms = groups, envir = sim@.xData))
+  invisible(sim)
+}
 .chainDeltaMarker <- "queueDelta1"
 
 ## The delta recorded in an entry's tags, as list(add, remove) of queue events; NULL if it has none.
@@ -426,6 +463,21 @@
     }
     later <- union(later, .chainCreates(sim, jump$module[i]))
     modsDone <- union(modsDone, jump$module[i])
+  }
+  ## The synonyms each skipped event added, in the order they ran. A hit restores its entry's synonyms
+  ##   (.prepareOutput()); the landing entry may not carry a skipped event's (it can have been saved
+  ##   after they were lost), so they are applied here, once the objects they name are in place. An
+  ##   entry without the tag is loaded to read them.
+  for (i in seq_len(n - 1L)) {
+    sc <- .chainEntryTags(jump$cacheId[i], cachePath)
+    groups <- if (!is.null(sc)) .chainReadSyns(sc)
+    if (is.null(groups)) {
+      simI <- try(reproducible::loadFromCache(cachePath = cachePath, cacheId = jump$cacheId[i],
+                                              verbose = -1), silent = TRUE)
+      if (is(simI, "simList"))
+        groups <- lapply(simI@.xData[[objSynName]], function(g) unname(unlist(g)))
+    }
+    if (length(groups)) .chainApplySyns(sim, groups)
   }
   attr(sim, "cacheChainingJump") <- NULL
   ## the live queue with every restored event taken off and what each scheduled put on (.chainWalk())

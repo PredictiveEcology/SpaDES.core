@@ -5,7 +5,9 @@
 * A synonym that a cached event adds with `objectSynonyms()` (e.g., in a module's `init`) was lost on a
   cache hit when the `simList` already had synonyms: the change was not recorded, so only the pre-event
   synonyms were rebuilt. `.prepareOutput()` now rebuilds the synonyms of both the live `simList` and the
-  cache entry.
+  cache entry. A cacheChaining jump applies the synonyms of each event it skips as well (the
+  `eventObjectSynonyms` tag on the entry, or the entry itself if it has no tag), so the `simList` after a
+  jump has the synonyms a non-jumping run has.
 * cacheChaining jumps almost never engaged in the `.inputObjects` phase. `.chainWalk()`
   (R/cacheChainingJump.R) stopped at any entry without a recorded `eventQueueDelta`, and
   `.inputObjects` entries saved before the delta existed are cache hits that never re-run, so they never
