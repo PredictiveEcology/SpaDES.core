@@ -572,3 +572,46 @@ jumpTest("an entry without a queue delta stops the jump", {
   expect_length(got$jumps, 0L)
   expect_equal(modsState(s, mods), modsState(ref, mods))
 })
+
+## An `.inputObjects` event schedules nothing and sits at start(sim), so its queue effect is known
+## without a recorded delta. Entries saved before deltas existed are almost always `.inputObjects`
+## cache hits that never re-run, so they would never gain one: the `.inputObjects` phase must still jump.
+jumpTest("an .inputObjects chain without recorded queue deltas still jumps", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  ioJumpFixture(mp)
+  cp <- file.path(tmpdir, "on")
+  mods <- c("ioA", "ioB", "ioC", "ioD")
+  local({
+    testthat::local_mocked_bindings(.chainDeltaIfRan = function(...) NULL)
+    runMods(mp, cp, mods, TRUE)
+    runMods(mp, cp, mods, TRUE)
+  })
+  got <- jumpMessages(s <- runMods(mp, cp, mods, TRUE))
+  ref <- runMods(mp, file.path(tmpdir, "off"), mods, TRUE, chaining = FALSE)
+  expect_length(got$jumps, 1L)
+  expect_match(got$jumps, "restored 3 cached events in one step")
+  expect_identical(restoredList(got$raw), c("ioB .inputObjects", "ioC .inputObjects", "ioD .inputObjects"))
+  expect_equal(modsState(s, mods), modsState(ref, mods))
+})
+
+jumpTest("without recorded deltas the .inputObjects phase jumps and the event phase does not", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  cp <- file.path(tmpdir, "on")
+  params <- lapply(jumpParams(), function(p) list(.useCache = c(".inputObjects", "init")))
+  local({
+    testthat::local_mocked_bindings(.chainDeltaIfRan = function(...) NULL)
+    runJump(mp, cp, params)
+    runJump(mp, cp, params)
+  })
+  got <- jumpMessages(s <- runJump(mp, cp, params))
+  ref <- runJump(mp, file.path(tmpdir, "off"), params, chaining = FALSE)
+  expect_length(got$jumps, 1L)
+  expect_identical(restoredList(got$raw), c("jB .inputObjects", "jC .inputObjects", "jD .inputObjects"))
+  expect_equal(stateOf(s)$objs, stateOf(ref)$objs)
+  expect_equal(stateOf(s)$completed, stateOf(ref)$completed)
+})
