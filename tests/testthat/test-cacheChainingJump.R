@@ -725,3 +725,58 @@ jumpTest("a jump over entries saved without the synonym tag still gives the syno
   expect_identical(s$ccAlias, 12)
   expect_true(bindingIsActive("ccAlias", s@.xData))
 })
+
+## The same for outputs(sim): jC (skipped) registers an output file, and jD's init empties the table, so
+## the landing entry lacks jC's row. A hit merges each entry's rows; a jump has to as well.
+outFixture <- function(mp) {
+  jumpFixture(mp)
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("cc", "numeric", ""))',
+            paste0('sim$cc <- sim$b * 2; f <- file.path(tempdir(), "jCout.rds"); saveRDS(1, f); ',
+                   'sim <- registerOutputs(f)'))
+  mkJumpMod(mp, "jD", 'bindrows(expectsInput("cc", "numeric", ""), expectsInput("shared", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""), createsOutput("shared", "numeric", ""))',
+            'sim$d <- sim$cc + 1; sim$shared <- 200; sim@outputs <- sim@outputs[integer(0), , drop = FALSE]')
+}
+
+outState <- function(sim) {
+  o <- as.data.frame(outputs(sim))
+  o <- o[, intersect(c("objectName", "saveTime", "file"), names(o)), drop = FALSE]
+  o$file <- basename(as.character(o$file))
+  o[order(o$file), , drop = FALSE]
+}
+
+jumpTest("an outputs row added by a skipped event is in outputs(sim) after a jump, as without chaining", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  outFixture(mp)
+
+  cpOff <- file.path(tmpdir, "off")
+  runSyn(mp, cpOff, chaining = FALSE)
+  ref <- runSyn(mp, cpOff, chaining = FALSE)
+  expect_true("jCout.rds" %in% outState(ref)$file) # sequential hits keep the row
+
+  cp <- file.path(tmpdir, "on")
+  runSyn(mp, cp)
+  warm <- jumpMessages(s <- runSyn(mp, cp))
+  expect_match(warm$jumps, "restored 3 cached events in one step")
+  expect_equal(outState(s), outState(ref), ignore_attr = TRUE)
+})
+
+jumpTest("a jump over entries saved without the outputs tag still merges their outputs rows", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  outFixture(mp)
+  cp <- file.path(tmpdir, "on")
+  runSyn(mp, cp)
+  sc <- reproducible::showCache(cp, verbose = -2)
+  ids <- unique(sc$cacheId[sc$tagKey == "eventOutputsAdded"])
+  expect_gt(length(ids), 0L)
+  for (id in ids) reproducible::.updateTagsRepo(cacheId = id, cachePath = cp, tagKey = "eventOutputsAdded",
+                                               tagValue = "oldEntry")
+  warm <- jumpMessages(s <- runSyn(mp, cp))
+  expect_match(warm$jumps, "restored 3 cached events in one step")
+  expect_true("jCout.rds" %in% outState(s)$file)
+})
