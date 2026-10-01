@@ -163,3 +163,37 @@ test_that("test objectSynonyms", {
   expect_equal(sim$studyArea, sim$studyArea2)
   expect_false(isTRUE(sim$worked))
 })
+
+test_that("a synonym added by a cached event survives a cache hit", {
+  ## the sim already has a synonym (from simInit); a module's cached init adds another
+  testInit(opts = list(spades.useRequire = FALSE))
+  modPath <- file.path(tmpdir, "modules")
+  dir.create(file.path(modPath, "synmod"), recursive = TRUE)
+  cat(file = file.path(modPath, "synmod", "synmod.R"), '
+defineModule(sim, list(
+  name = "synmod", description = "", keywords = "", authors = person("A", "B"),
+  childModules = character(0), version = list(synmod = "0.0.1"),
+  timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year", citation = list(),
+  documentation = list(), reqdPkgs = list(),
+  parameters = bindrows(defineParameter(".useCache", "character", "init", NA, NA, "")),
+  inputObjects = bindrows(expectsInput("canon", "numeric", ""), expectsInput("alias", "numeric", "")),
+  outputObjects = bindrows(createsOutput("other", "numeric", ""))
+))
+doEvent.synmod <- function(sim, eventTime, eventType) {
+  if (eventType == "init") {
+    sim <- objectSynonyms(sim, list(c("canon", "alias")))
+    sim$other <- 1
+  }
+  invisible(sim)
+}
+')
+  for (i in 1:2) { # 1: cache miss; 2: cache hit
+    sim <- simInit(times = list(start = 0, end = 1), modules = "synmod",
+                   objects = list(canon = 5, x = 1, objectSynonyms = list(c("x", "y"))),
+                   paths = list(modulePath = modPath, cachePath = tmpCache))
+    sim <- spades(sim)
+    expect_identical(sim$alias, 5)
+    expect_true(bindingIsActive("alias", envir(sim)))
+    expect_identical(sim$y, 1)
+  }
+})

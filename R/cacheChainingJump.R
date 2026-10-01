@@ -58,7 +58,72 @@
   .chainQueueDelta(eventsPreCall, sim@events, eventTime)
 }
 
+## The same, for the outputs rows the event added (`.chainOutText()`).
+.chainOutTextIfRan <- function(sim, cacheIt, chaining, outputsPreCall) {
+  if (!isTRUE(cacheIt) || !is.null(chaining$jump)) return(NULL)
+  if (!attr(sim, ".Cache")$newCache %in% TRUE) return(NULL)
+  .chainOutText(outputsPreCall, sim@outputs)
+}
+
 .chainDeltaTag <- "eventQueueDelta"
+
+## The object synonyms of an entry, stored with it (the `eventObjectSynonyms` tag) so a jump can give
+## the live simList the synonyms a skipped event added without loading that entry. A marker line, then
+## one line per synonym group (the names, tab separated); the marker alone is an event with none.
+.chainSynTag <- "eventObjectSynonyms"
+.chainSynMarker <- "objSyn1"
+
+## How many outputs(sim) rows the event added (by the key a cache hit merges on, .mergeCachedOutputs()),
+## stored as the `eventOutputsAdded` tag. A jump loads only the skipped entries that added some (or
+## have no tag): an outputs table can hold long `arguments` lists, so the rows themselves are not
+## copied into a tag.
+.chainOutTag <- "eventOutputsAdded"
+.chainOutMarker <- "outAdd1"
+
+.chainOutText <- function(pre, post) {
+  n <- NROW(.mergeCachedOutputs(pre, post)) - NROW(pre)
+  paste(.chainOutMarker, max(n, 0L), sep = "\t")
+}
+
+## TRUE if the entry's event added outputs rows; NA if it has no record (saved before the tag existed).
+.chainReadOutAdded <- function(sc) {
+  txt <- sc$tagValue[sc$tagKey == .chainOutTag]
+  if (!length(txt)) return(NA)
+  parts <- strsplit(txt[[length(txt)]], "\t", fixed = TRUE)[[1]]
+  if (!identical(parts[1], .chainOutMarker)) return(NA)
+  as.numeric(parts[2]) > 0
+}
+
+.chainSynText <- function(sim) {
+  syns <- envir(sim)[[objSynName]]
+  paste(c(.chainSynMarker, vapply(syns, function(g) paste(unname(unlist(g)), collapse = "\t"), character(1))),
+        collapse = "\n")
+}
+
+## The groups recorded in an entry's tags, as a list of character vectors; NULL if it has no record
+## (an entry saved before the tag existed), which is not the same as an empty list.
+.chainReadSyns <- function(sc) {
+  txt <- sc$tagValue[sc$tagKey == .chainSynTag]
+  if (!length(txt)) return(NULL)
+  lines <- strsplit(txt[[length(txt)]], "\n", fixed = TRUE)[[1]]
+  if (!identical(lines[1], .chainSynMarker)) return(NULL)
+  strsplit(lines[-1L], "\t", fixed = TRUE)
+}
+
+## Give `sim` the synonym groups `groups` that it does not have yet, as a cache hit would
+## (.prepareOutput()): a name that stands for another object is removed first.
+.chainApplySyns <- function(sim, groups) {
+  have <- lapply(envir(sim)[[objSynName]], function(g) unname(unlist(g)))
+  groups <- unique(groups)
+  groups <- groups[!vapply(groups, function(g) any(vapply(have, identical, logical(1), g)), logical(1))]
+  if (!length(groups)) return(invisible(sim))
+  nonCanonical <- unlist(lapply(groups, `[`, -1L))
+  isPlain <- vapply(nonCanonical, function(o) exists(o, envir = sim@.xData, inherits = FALSE) &&
+                      !bindingIsActive(o, sim@.xData), logical(1))
+  if (any(isPlain)) rm(list = nonCanonical[isPlain], envir = sim@.xData)
+  suppressMessages(objectSynonyms(synonyms = groups, envir = sim@.xData))
+  invisible(sim)
+}
 .chainDeltaMarker <- "queueDelta1"
 
 ## The delta recorded in an entry's tags, as list(add, remove) of queue events; NULL if it has none.
@@ -426,6 +491,31 @@
     }
     later <- union(later, .chainCreates(sim, jump$module[i]))
     modsDone <- union(modsDone, jump$module[i])
+  }
+  ## The synonyms each skipped event added, in the order they ran. A hit restores its entry's synonyms
+  ##   (.prepareOutput()); the landing entry may not carry a skipped event's (it can have been saved
+  ##   after they were lost), so they are applied here, once the objects they name are in place. An
+  ##   entry without the tag is loaded to read them.
+  ##   The outputs(sim) rows each added are merged the same way, as a hit merges them: the entry's rows
+  ##   except those named for its own module's outputs. Only an entry that added rows is loaded.
+  for (i in seq_len(n - 1L)) {
+    sc <- .chainEntryTags(jump$cacheId[i], cachePath)
+    groups <- if (!is.null(sc)) .chainReadSyns(sc)
+    addedOut <- if (!is.null(sc)) .chainReadOutAdded(sc) else NA
+    simI <- NULL
+    if (is.null(groups) || !identical(addedOut, FALSE)) {
+      simI <- try(reproducible::loadFromCache(cachePath = cachePath, cacheId = jump$cacheId[i],
+                                              verbose = -1), silent = TRUE)
+      if (!is(simI, "simList")) simI <- NULL
+    }
+    if (is.null(groups) && !is.null(simI))
+      groups <- lapply(simI@.xData[[objSynName]], function(g) unname(unlist(g)))
+    if (length(groups)) .chainApplySyns(sim, groups)
+    if (!is.null(simI) && !identical(addedOut, FALSE)) {
+      own <- .chainCreates(sim, jump$module[i])
+      slot(sim, "outputs", check = FALSE) <- .mergeCachedOutputs(
+        sim@outputs, simI@outputs[!simI@outputs$objectName %in% own, ])
+    }
   }
   attr(sim, "cacheChainingJump") <- NULL
   ## the live queue with every restored event taken off and what each scheduled put on (.chainWalk())

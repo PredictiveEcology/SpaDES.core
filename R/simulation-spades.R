@@ -1679,6 +1679,7 @@ setMethod(
     ## ._simInitContext; put it back, mirroring the paramsDontCacheOn restoration below.
     simInitContextPreCall <- sim@.xData[["._simInitContext"]]
     eventsPreCall <- sim@events
+    outputsPreCall <- sim@outputs
     if (runFnCallAsExpr) {
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
       # attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
@@ -1699,7 +1700,8 @@ setMethod(
                              moduleName = chainLast$module,
                              eventType = chainLast$event,
                              queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
-                                                           cur[["eventTime"]]))
+                                                           cur[["eventTime"]]),
+                             outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
@@ -3013,7 +3015,7 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
 
 
 cacheChainingPost <- function(sim, cacheIt, prevCache,
-                              cacheIdOfSkip, df, moduleName, eventType, queueDelta = NULL) {
+                              cacheIdOfSkip, df, moduleName, eventType, queueDelta = NULL, outputsText = NULL) {
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
   ## The objects the current unbroken run of cached events has produced; what a later link
   ##   may trust without digesting (cacheChainingSetup(), .chainWalk()). Reset with the chain.
@@ -3058,9 +3060,16 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
                                       tagValue = as.character(df[[col]]))
       ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
       ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
-      if (!is.null(queueDelta))
+      ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()).
+      if (!is.null(queueDelta)) {
         reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
                                       tagKey = .chainDeltaTag, tagValue = queueDelta)
+        reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
+                                      tagKey = .chainSynTag, tagValue = .chainSynText(sim))
+        if (!is.null(outputsText))
+          reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
+                                        tagKey = .chainOutTag, tagValue = outputsText)
+      }
     }
   }
   sim

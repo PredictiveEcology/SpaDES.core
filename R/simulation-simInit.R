@@ -1864,6 +1864,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             }
 
             eventsPreCall <- sim@events
+            outputsPreCall <- sim@outputs
             sim <- eval(fnCallAsExpr)
             .checkEventReturn(sim, mBase, ".inputObjects", fromCache = TRUE)
 
@@ -1878,7 +1879,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                      moduleName = chainLast$module,
                                      eventType = chainLast$event,
                                      queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
-                                                           sim@simtimes[["start"]]))
+                                                           sim@simtimes[["start"]]),
+                                     outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall))
 
           }
 
