@@ -54,9 +54,9 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' The `params` list can contain a list (named `.globals`) of named objects
 #' e.g., `.globals = list(climateURL = "https:\\something.com")` entry. Any and every
 #' module that has a parameter with that name (in this case `climateURL`) will be
-#' overridden with this value as passed. The dot parameters SpaDES.core knows
-#' (e.g., `.plots`, `.useCache`) are also set in every module, even one that does not
-#' define them; see [dotParameters].
+#' overridden with this value as passed. The universal dot parameters (`.plots`, `.seed`,
+#' `.showSimilar`, `.useCache`, `.useCacheArgs`) are set in every module, even one that does
+#' not declare them; see [dotParameters].
 #'
 #' `params` can set the seed for a specific event in a module, e.g.,
 #' `params = list(moduleName = list(.seed = list(init = 123)))`; see [dotParameters].
@@ -2226,10 +2226,9 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates,
   }
   globalsUsed <- globalsUsedInModules <- NULL
   globalsDF <- list()
-  knownParamsWOdotPlotInitialTime <- setdiff(.knownDotParams, ".plotInitialTime")
   for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
     modParams <- modDefaultParams[[mod]]
-    modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
+    modParams <- union(modParams, .knownDotParams)
     userOverrides <- if (is.null(dontUseGlobals[[mod]])) NULL else dontUseGlobals[[mod]]
     common <- intersect(modParams, names(paramsWithUpdates$.globals))
     common <- setdiff(common, names(userOverrides))

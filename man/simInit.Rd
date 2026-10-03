@@ -218,9 +218,9 @@ parameters from multiple modules all at once, with say:
 The \code{params} list can contain a list (named \code{.globals}) of named objects
 e.g., \code{.globals = list(climateURL = "https:\\\\something.com")} entry. Any and every
 module that has a parameter with that name (in this case \code{climateURL}) will be
-overridden with this value as passed. The dot parameters SpaDES.core knows
-(e.g., \code{.plots}, \code{.useCache}) are also set in every module, even one that does not
-define them; see \link{dotParameters}.
+overridden with this value as passed. The universal dot parameters (\code{.plots}, \code{.seed},
+\code{.showSimilar}, \code{.useCache}, \code{.useCacheArgs}) are set in every module, even one that does
+not declare them; see \link{dotParameters}.
 
 \code{params} can set the seed for a specific event in a module, e.g.,
 \code{params = list(moduleName = list(.seed = list(init = 123)))}; see \link{dotParameters}.

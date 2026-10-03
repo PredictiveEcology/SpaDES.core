@@ -7,8 +7,9 @@
 .knownDotParams
 }
 \description{
-The dot parameters that SpaDES.core knows by name, so \code{.globals} sets them in
-every module whether or not it defines them (except \code{.plotInitialTime}).
+The universal dot parameters: SpaDES.core itself acts on each one for every module,
+without module code, so \code{.globals} sets them in every module, whether or not the
+module declares them. Other dot parameters reach only modules that declare them.
 What each one does is described in \link{dotParameters}.
 }
 \keyword{internal}

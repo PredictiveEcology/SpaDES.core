@@ -15,11 +15,11 @@ code, as listed below.
 \details{
 Setting a value: \verb{params = list(<module> = list(.plots = "png"))} sets it for
 one module. \code{params = list(.globals = list(.plots = "png"))} sets it for every
-module that defines a parameter of that name. The exceptions are \code{.plots},
-\code{.plotInterval}, \code{.saveInitialTime}, \code{.saveInterval}, \code{.useCache},
-\code{.useCacheArgs}, \code{.useCloud}, \code{.useParallel} and \code{.rep}, which SpaDES.core knows:
-\code{.globals} sets those in every module, whether or not it defines them.
-A value given for a module in \code{params} wins over \code{.globals}.
+module, with this rule: a dot parameter is \emph{universal} if SpaDES.core itself
+acts on it for every module, without module code. \code{.globals} sets universal
+parameters in every module, declared or not. All others are \emph{declared only}:
+\code{.globals} sets them only in modules that declare them. A value given for a
+module in \code{params} wins over \code{.globals}.
 \code{\link[=spades]{spades()}} arguments \code{.plots} and \code{.saveInitialTime} override the
 parameters of the same name in all modules for that call.
 }
@@ -29,52 +29,55 @@ parameters of the same name in all modules for that call.
 The "default" is the value when the module declares the parameter
 with the module template, or, where stated, the value SpaDES.core fills in.
 
-\tabular{lll}{
-\strong{Parameter} \tab \strong{Default} \tab \strong{Effect}\cr
-\code{.plots} \tab \code{"screen"} (template) \tab Types of output \code{\link[=Plots]{Plots()}} makes
+\tabular{llll}{
+\strong{Parameter} \tab \strong{Tier} \tab \strong{Default} \tab \strong{Effect}\cr
+\code{.plots} \tab universal \tab \code{"screen"} (template) \tab Types of output \code{\link[=Plots]{Plots()}} makes
 (\code{"screen"}, \code{"object"}, \code{"raw"}, or a file type such as \code{"png"});
 \code{NA} for none. \code{spades(sim, .plots = )} sets it in all modules.
-Read by \code{\link[=Plots]{Plots()}} and \code{\link[=anyPlotting]{anyPlotting()}}.\cr
-\code{.plotInitialTime} \tab \code{start(sim)} (template); \code{NA} if the module does not
+Read by \code{\link[=Plots]{Plots()}} and \code{\link[=anyPlotting]{anyPlotting()}}. It is part of the
+cache key: an event loaded from the cache does not run, so it makes no new
+plots and a changed \code{.plots} must re-run the event.\cr
+\code{.plotInitialTime} \tab declared only \tab \code{start(sim)} (template); \code{NA} if the module does not
 set it \tab Time of the first plot event; the module schedules it with
 \code{scheduleEvent()}. \code{NA} switches screen plotting off in \code{\link[=Plots]{Plots()}}. \code{\link[=Plots]{Plots()}}
 only looks at it if the module declares it. \code{spades(sim, .plots = )} without
 \code{"screen"} sets it to \code{NA}.\cr
-\code{.plotInterval} \tab \code{NA} \tab Time between plot events, used by the module's
+\code{.plotInterval} \tab declared only \tab \code{NA} \tab Time between plot events, used by the module's
 own plot event.\cr
-\code{.saveInitialTime} \tab \code{NA} \tab Time of the first save event of the module.
+\code{.saveInitialTime} \tab declared only \tab \code{NA} \tab Time of the first save event of the module.
 \code{spades(sim, .saveInitialTime = )} overrides it in all modules.
 See \code{\link[=saveFiles]{saveFiles()}}.\cr
-\code{.saveInterval} \tab \code{NA} \tab Time between save events.\cr
-\code{.saveObjects} \tab none \tab Names of the \code{sim} objects that \code{\link[=saveFiles]{saveFiles()}}
+\code{.saveInterval} \tab declared only \tab \code{NA} \tab Time between save events.\cr
+\code{.saveObjects} \tab declared only \tab none \tab Names of the \code{sim} objects that \code{\link[=saveFiles]{saveFiles()}}
 saves when called from the module's own save event.\cr
-\code{.savePath} \tab none \tab Not used by SpaDES.core code. It is exempt from
+\code{.savePath} \tab declared only \tab none \tab Not used by SpaDES.core code. It is exempt from
 \code{\link[=checkParams]{checkParams()}}'s "parameter not used in module" message, as are
 \code{.saveObjects} and \code{.seed}.\cr
-\code{.seed} \tab \code{list()} (template) \tab Named list, one seed per event,
+\code{.seed} \tab universal \tab \code{list()} (template) \tab Named list, one seed per event,
 e.g. \code{list(init = 123)}. \code{\link[=spades]{spades()}} calls \code{set.seed()} for that event,
-then restores the random number stream afterwards.\cr
-\code{.useCache} \tab \code{FALSE} (template) \tab \code{TRUE} caches every event of the
+then restores the random number stream afterwards. Part of the cache key,
+since it changes results.\cr
+\code{.useCache} \tab universal \tab \code{FALSE} (template) \tab \code{TRUE} caches every event of the
 module including \code{.inputObjects}; a character vector caches only those
 events (e.g. \code{c("init", ".inputObjects")}); a time (\code{POSIXt}) caches
 all events and forces them to re-run if the cache entry is older. Turned
 off for all modules by \code{options(spades.useCache = "off")}. Not part of
 the cache key. See \code{\link[=clearCacheEventsOnly]{clearCacheEventsOnly()}} and
 \code{vignette("iii-cache", package = "SpaDES.core")}.\cr
-\code{.useCacheArgs} \tab none \tab Named list keyed by event name (or
+\code{.useCacheArgs} \tab universal \tab none \tab Named list keyed by event name (or
 \code{".inputObjects"}) of extra arguments for \code{\link[reproducible:Cache]{reproducible::Cache()}} for that
 event, e.g. \code{cacheId}, \code{useCloud}, \code{cloudFolderID}. Entries made with
 \code{quote()}, e.g. \code{quote(P(sim)$.useCloud)}, are evaluated in the module's
 context. Not part of the cache key.\cr
-\code{.useCloud} \tab none \tab Not read by SpaDES.core directly. It is a known
-name so that \code{.globals} can set it, and it is not part of the cache key.
-Modules use it in \code{.useCacheArgs}, as above.\cr
-\code{.useParallel} \tab none \tab Number of cores, or whether to use parallel
-processing. A known name only: SpaDES.core never reads it; the module does.\cr
-\code{.showSimilar} \tab none (\code{reproducible.showSimilar} is used) \tab \code{TRUE}
+\code{.useCloud} \tab declared only \tab none \tab Not read by SpaDES.core directly, so declared only.
+It is not part of the cache key. Modules use it in \code{.useCacheArgs}, as above.\cr
+\code{.useParallel} \tab declared only \tab none \tab Number of cores, or whether to use parallel
+processing. SpaDES.core never reads it; the module does.\cr
+\code{.showSimilar} \tab universal \tab none (\code{reproducible.showSimilar} is used) \tab \code{TRUE}
 asks \code{\link[reproducible:Cache]{reproducible::Cache()}} to report how a cache miss differs from the
-nearest cache entry, for this module's cached events. Not part of the cache key.\cr
-\code{.progress} \tab text bar when interactive \tab Not a module parameter: a
+nearest cache entry, for this module's cached events. Read for every module
+(\code{.runEvent}, \code{.inputObjects}). Not part of the cache key.\cr
+\code{.progress} \tab not a module parameter \tab text bar when interactive \tab Not a module parameter: a
 list with \code{type} and \code{interval} in \code{params}, set with
 \code{spades(sim, progress = )}, for the progress bar. Ignored by \code{.globals}.\cr
 }
@@ -91,18 +94,18 @@ whether or not the module declares them.
 
 
 These are not read by SpaDES.core. \code{SpaDES.project::setupProject()} puts them in
-\code{params$.globals}, so each module receives them only if it declares a parameter
-of the same name.
+\code{params$.globals}. Both are declared only: a module receives them only if it
+declares a parameter of the same name.
 
-\tabular{lll}{
-\strong{Parameter} \tab \strong{Default} \tab \strong{Effect}\cr
-\code{.studyAreaName} \tab \code{NA} (template) \tab Human-readable name of the study
+\tabular{llll}{
+\strong{Parameter} \tab \strong{Tier} \tab \strong{Default} \tab \strong{Effect}\cr
+\code{.studyAreaName} \tab declared only \tab \code{NA} (template) \tab Human-readable name of the study
 area, e.g. from \code{reproducible::studyAreaName()}; \code{setupProject()} fills
 \code{.globals$.studyAreaName}. The module template declares it.\cr
-\code{.rep} \tab none \tab Replicate number. \code{setupProject()} sets
+\code{.rep} \tab declared only \tab none \tab Replicate number. \code{setupProject()} sets
 \code{.globals$.rep} from a \code{.rep} entry, e.g. the \code{.rep} column of an
-experiment table. SpaDES.core knows it, so \code{.globals} sets it in every
-module; a module that uses the replicate declares a \code{.rep} parameter, e.g.
+experiment table. A module that uses the replicate declares a \code{.rep}
+parameter, e.g.
 \code{fireSense_spreadFit} and \code{fireSense_spreadPredict}.\cr
 }
 }

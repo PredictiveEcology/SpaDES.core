@@ -2,7 +2,7 @@
 
 ## Enhancements
 
-* `.rep` (replicate number) joins the known dot parameters (`.knownDotParams`), so `.globals$.rep` -- which `SpaDES.project::setupProject()` sets from the experiment's `.rep` -- reaches every module.
+* `.globals` now sets only the universal dot parameters (`.plots`, `.seed`, `.showSimilar`, `.useCache`, `.useCacheArgs`) in modules that do not declare them; `.knownDotParams` is that list. `.plotInterval`, `.saveInitialTime`, `.saveInterval`, `.useCloud` and `.useParallel` (and `.plotInitialTime`, already excluded) now reach only modules that declare them, as does `.rep`. `.seed` and `.showSimilar` now reach every module. `?dotParameters` states the rule.
 
 ## Documentation
 
