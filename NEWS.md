@@ -5,6 +5,11 @@
 * The `simList` methods of `.wrap()` and `.unwrap()` (R/cache.R) take `filebackedPath` instead of `cachePath`,
   following reproducible, where the first path argument is not only a cache location. `cachePath` still works,
   silently for now. Calls inside SpaDES.core use the new name. Needs reproducible >= 3.2.1.9062.
+* `saveFiles()` saved `.rds` outputs with `base::saveRDS`, which keeps only the external pointer of a
+  terra `SpatRaster`/`SpatVector`, so `readRDS()` returned an unusable object ("external pointer is not
+  valid"). `saveFiles()` now uses `terra::saveRDS` (identical to the base function for other objects)
+  and `inputs` reads `.rds` files with `terra::readRDS`. Read such a file outside `inputs` with
+  `terra::readRDS()` (or `terra::unwrap(readRDS(f))`).
 
 # SpaDES.core 3.2.1.9033
 

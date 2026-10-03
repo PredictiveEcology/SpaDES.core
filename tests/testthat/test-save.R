@@ -564,3 +564,32 @@ test_that("the timeunit appearing in a DIRECTORY does not suppress the stamp", {
   expect_true(grepl("year", dirname(outputs(sim)$file)))       # unit is in the dir
   expect_identical(basename(outputs(sim)$file), "cohortData_year3020.rds")
 })
+
+test_that("saveFiles() writes terra objects to .rds that can be read back", {
+  skip_if_not_installed("terra")
+  testInit(smcc = FALSE)
+
+  r <- terra::rast(terra::ext(0, 3, 0, 2), res = 1, vals = 1:6)
+  v <- terra::vect(cbind(x = 1:3, y = 3:1))
+  sim <- simInit(times = list(start = 0, end = 1), objects = list(r = r, v = v),
+                 paths = list(outputPath = tmpdir))
+  outputs(sim) <- data.frame(objectName = c("r", "v"), saveTime = 1,
+                             fun = "saveRDS", package = "base")
+  sim <- spades(sim, .plots = NA)
+
+  files <- outputs(sim)$file
+  expect_true(all(file.exists(files)))
+  expect_true(all(grepl("\\.rds$", files)))
+
+  rBack <- terra::readRDS(files[1])
+  expect_s4_class(rBack, "SpatRaster")
+  expect_equal(terra::values(rBack)[, 1], 1:6)
+  vBack <- terra::readRDS(files[2])
+  expect_s4_class(vBack, "SpatVector")
+  expect_equal(terra::crds(vBack)[, "x"], 1:3, ignore_attr = TRUE)
+
+  ## and they load as inputs, unwrapped
+  sim2 <- simInit(inputs = data.frame(file = files[1], objectName = "rIn", loadTime = 0),
+                  paths = list(outputPath = tmpdir))
+  expect_equal(terra::values(sim2$rIn)[, 1], 1:6)
+})

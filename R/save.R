@@ -166,8 +166,8 @@ saveFiles <- function(sim) {
           }))])
 
           ## The actual save line
-          do.call(outputs(sim)[["fun"]][i], args = args,
-                  envir = getNamespace(outputs(sim)[["package"]][i]))
+          saveFunPkg <- .terraSafeRds(outputs(sim)[["fun"]][i], outputs(sim)[["package"]][i])
+          do.call(saveFunPkg[["fun"]], args = args, envir = getNamespace(saveFunPkg[["package"]]))
 
           ## using @ works when outputs is a DT
         } else {
@@ -205,6 +205,14 @@ saveFiles <- function(sim) {
     }
   }
   return(invisible(sim))
+}
+
+## `base::saveRDS`/`readRDS` keep only the external pointer of a terra `SpatRaster`/`SpatVector`,
+## so the file cannot be read back. `terra::saveRDS`/`readRDS` wrap/unwrap those objects and
+## behave as the base functions for everything else.
+.terraSafeRds <- function(fun, package) {
+  if (identical(package, "base") && fun %in% c("saveRDS", "readRDS")) package <- "terra"
+  c(fun = fun, package = package)
 }
 
 #' File extensions map

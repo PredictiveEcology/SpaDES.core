@@ -233,6 +233,9 @@ setMethod(
             }
 
             # The actual load call
+            loadFunPkg <- .terraSafeRds(loadFun[y], loadPackage[y])
+            loadFun[y] <- loadFunPkg[["fun"]]
+            loadPackage[y] <- loadFunPkg[["package"]]
             if (identical(loadFun[y], "load")) {
               do.call(
                 getFromNamespace(loadFun[y], loadPackage[y]),
