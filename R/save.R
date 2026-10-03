@@ -166,6 +166,9 @@ saveFiles <- function(sim) {
           }))])
 
           ## The actual save line
+          if (outputs(sim)[["fun"]][i] %in% .serialiseSaveFuns) {
+            args[[1]] <- .wrap(args[[1]], filebackedPath = dirname(outputs(sim)[["file"]][i]), copyFiles = TRUE)
+          }
           do.call(outputs(sim)[["fun"]][i], args = args,
                   envir = getNamespace(outputs(sim)[["package"]][i]))
 
@@ -206,6 +209,11 @@ saveFiles <- function(sim) {
   }
   return(invisible(sim))
 }
+
+## Functions that serialise the R object as is: a terra `SpatRaster`/`SpatVector` then keeps only an
+## external pointer and cannot be read back. Wrap before saving (`.wrap`) and `.unwrap` after reading.
+.serialiseSaveFuns <- c("saveRDS", "qsave", "qs_save")
+.serialiseLoadFuns <- c("readRDS", "qread", "qs_read")
 
 #' File extensions map
 #'

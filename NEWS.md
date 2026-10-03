@@ -5,6 +5,14 @@
 * The `simList` methods of `.wrap()` and `.unwrap()` (R/cache.R) take `filebackedPath` instead of `cachePath`,
   following reproducible, where the first path argument is not only a cache location. `cachePath` still works,
   silently for now. Calls inside SpaDES.core use the new name. Needs reproducible >= 3.2.1.9062.
+* `saveFiles()` saved `.rds` outputs with `base::saveRDS`, which keeps only the external pointer of a
+  terra `SpatRaster`/`SpatVector`, so `readRDS()` returned an unusable object ("external pointer is not
+  valid"). `saveFiles()` now passes the object through `reproducible::.wrap()` before `saveRDS`, `qs::qsave`
+  and `qs2::qs_save`, and `inputs` applies `.unwrap()` after `readRDS`, `qs::qread` and `qs2::qs_read`
+  (also for terra objects inside a list). A file-backed `SpatRaster` is wrapped with
+  `copyFiles = TRUE`, so its file is copied next to the `.rds` (in `cacheOutputs/`) and the output
+  is self-contained; this needs reproducible >= 3.2.1.9062. Read such a file manually with
+  `reproducible::.unwrap(readRDS(f), filebackedPath = dirname(f))`.
 
 # SpaDES.core 3.2.1.9033
 
