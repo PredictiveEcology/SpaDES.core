@@ -15,7 +15,7 @@ test_that(".unwrapResiliently NULLs unwrappable objects with warning", {
   terra::writeRaster(r, tf, overwrite = TRUE)
   rOnDisk <- terra::rast(tf)
 
-  wrapped <- reproducible::.wrap(rOnDisk, cachePath = NULL, paths = simPaths)
+  wrapped <- reproducible::.wrap(rOnDisk, filebackedPath = NULL, paths = simPaths)
   skip_if(is.null(attr(wrapped, "tags")),
           "reproducible::.wrap did not produce tagged output")
 

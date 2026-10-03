@@ -1152,16 +1152,17 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 #'            `DBIConnection` object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #' @inheritParams reproducible::.wrap
-#' @importFrom reproducible .wrap
+#' @importFrom reproducible .wrap .filebackedPath
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.wrap.simList <- function(obj, cachePath = getOption("reproducible.cachePath"),
+.wrap.simList <- function(obj, filebackedPath = getOption("reproducible.cachePath"),
                           preDigest, drv = getOption("reproducible.drv", NULL),
                           conn = getOption("reproducible.conn", NULL),
                           verbose = getOption("reproducible.verbose"),
                           outputObjects = NULL, cacheId = NULL,
-                          ...) {
+                          ..., cachePath) {
+  filebackedPath <- .filebackedPath(filebackedPath, missing(filebackedPath), cachePath, missing(cachePath))
 
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
   modules <- TRUE
@@ -1188,12 +1189,12 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   objTmp <- .wrapOrUnwrapSimListAts(objTmp, .wrap)
 
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
-  objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
-  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose)
+  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects, cacheId = cacheId,
+  out <- .wrap(obj2, filebackedPath = filebackedPath, outputObjects = outputObjects, cacheId = cacheId,
                drv = drv, conn = conn, verbose = verbose, ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
@@ -1275,20 +1276,22 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #' @rdname dealWithClass
 .unwrap.simList <- function(
   obj,
-  cachePath = getOption("reproducible.cachePath"),
+  filebackedPath = getOption("reproducible.cachePath"),
   cacheId = NULL,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
-  ...
+  ...,
+  cachePath
 ) {
+  filebackedPath <- .filebackedPath(filebackedPath, missing(filebackedPath), cachePath, missing(cachePath))
   ## the as.list doesn't get everything. But with a simList, this is OK; rest will stay
-  obj[[dotMods]] <- .unwrap(obj[[dotMods]], cachePath = cachePath, cacheId = cacheId,
+  obj[[dotMods]] <- .unwrap(obj[[dotMods]], filebackedPath = filebackedPath, cacheId = cacheId,
                             drv = drv, conn = conn, ...)
-  obj[[dotObjs]] <- .unwrap(obj[[dotObjs]], cachePath = cachePath, cacheId = cacheId,
+  obj[[dotObjs]] <- .unwrap(obj[[dotObjs]], filebackedPath = filebackedPath, cacheId = cacheId,
                             drv = drv, conn = conn, ...)
   objList <- as.list(obj, all.names = TRUE) # don't overwrite everything, just the ones in the list part
 
-  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
+  outList <- .unwrap(objList, filebackedPath = filebackedPath, cacheId = cacheId,
                      drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
 
