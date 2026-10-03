@@ -571,11 +571,14 @@ test_that("saveFiles() writes terra objects to .rds that can be read back", {
 
   r <- terra::rast(terra::ext(0, 3, 0, 2), res = 1, vals = 1:6)
   v <- terra::vect(cbind(x = 1:3, y = 3:1))
+  tif <- file.path(tmpdir, "rOnDisk.tif")
+  terra::writeRaster(r, tif)
+  rDisk <- terra::rast(tif)
   lst <- list(r = r, v = v, n = 1)
   sim <- simInit(times = list(start = 0, end = 1),
-                 objects = list(r = r, v = v, lst = lst),
+                 objects = list(r = r, v = v, lst = lst, rDisk = rDisk),
                  paths = list(outputPath = tmpdir))
-  outputs(sim) <- data.frame(objectName = c("r", "v", "lst"), saveTime = 1,
+  outputs(sim) <- data.frame(objectName = c("r", "v", "lst", "rDisk"), saveTime = 1,
                              fun = "saveRDS", package = "base")
   sim <- spades(sim, .plots = NA)
 
@@ -594,6 +597,10 @@ test_that("saveFiles() writes terra objects to .rds that can be read back", {
   expect_equal(terra::values(lstBack$r)[, 1], 1:6)
   expect_s4_class(lstBack$v, "SpatVector")
   expect_identical(lstBack$n, 1)
+
+  unlink(tif) ## file-backed: the saved .rds must not depend on the original file
+  rDiskBack <- readBack(files[4])
+  expect_equal(terra::values(rDiskBack)[, 1], 1:6)
 
   ## and they load as inputs, unwrapped
   sim2 <- simInit(inputs = data.frame(file = files[1:3], objectName = c("rIn", "vIn", "lIn"),

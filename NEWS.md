@@ -9,9 +9,10 @@
   terra `SpatRaster`/`SpatVector`, so `readRDS()` returned an unusable object ("external pointer is not
   valid"). `saveFiles()` now passes the object through `reproducible::.wrap()` before `saveRDS`, `qs::qsave`
   and `qs2::qs_save`, and `inputs` applies `.unwrap()` after `readRDS`, `qs::qread` and `qs2::qs_read`
-  (also for terra objects inside a list). Read such a file manually with
-  `reproducible::.unwrap(readRDS(f), cachePath = dirname(f))`. A file-backed `SpatRaster` is not
-  yet supported: `.wrap()` stores only a path to its file, not the values.
+  (also for terra objects inside a list). A file-backed `SpatRaster` is wrapped with
+  `copyFiles = TRUE`, so its file is copied next to the `.rds` (in `cacheOutputs/`) and the output
+  is self-contained; this needs reproducible >= 3.2.1.9062. Read such a file manually with
+  `reproducible::.unwrap(readRDS(f), cachePath = dirname(f))`.
 
 # SpaDES.core 3.2.1.9033
 
