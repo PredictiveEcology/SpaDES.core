@@ -17,7 +17,7 @@ Setting a value: \verb{params = list(<module> = list(.plots = "png"))} sets it f
 one module. \code{params = list(.globals = list(.plots = "png"))} sets it for every
 module that defines a parameter of that name. The exceptions are \code{.plots},
 \code{.plotInterval}, \code{.saveInitialTime}, \code{.saveInterval}, \code{.useCache},
-\code{.useCacheArgs}, \code{.useCloud} and \code{.useParallel}, which SpaDES.core knows:
+\code{.useCacheArgs}, \code{.useCloud}, \code{.useParallel} and \code{.rep}, which SpaDES.core knows:
 \code{.globals} sets those in every module, whether or not it defines them.
 A value given for a module in \code{params} wins over \code{.globals}.
 \code{\link[=spades]{spades()}} arguments \code{.plots} and \code{.saveInitialTime} override the
@@ -101,8 +101,9 @@ area, e.g. from \code{reproducible::studyAreaName()}; \code{setupProject()} fill
 \code{.globals$.studyAreaName}. The module template declares it.\cr
 \code{.rep} \tab none \tab Replicate number. \code{setupProject()} sets
 \code{.globals$.rep} from a \code{.rep} entry, e.g. the \code{.rep} column of an
-experiment table. A module that needs the replicate declares a \code{.rep}
-parameter, e.g. \code{fireSense_spreadFit} and \code{fireSense_spreadPredict}.\cr
+experiment table. SpaDES.core knows it, so \code{.globals} sets it in every
+module; a module that uses the replicate declares a \code{.rep} parameter, e.g.
+\code{fireSense_spreadFit} and \code{fireSense_spreadPredict}.\cr
 }
 }
 

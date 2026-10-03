@@ -11,7 +11,7 @@
 #' one module. `params = list(.globals = list(.plots = "png"))` sets it for every
 #' module that defines a parameter of that name. The exceptions are `.plots`,
 #' `.plotInterval`, `.saveInitialTime`, `.saveInterval`, `.useCache`,
-#' `.useCacheArgs`, `.useCloud` and `.useParallel`, which SpaDES.core knows:
+#' `.useCacheArgs`, `.useCloud`, `.useParallel` and `.rep`, which SpaDES.core knows:
 #' `.globals` sets those in every module, whether or not it defines them.
 #' A value given for a module in `params` wins over `.globals`.
 #' [spades()] arguments `.plots` and `.saveInitialTime` override the
@@ -92,8 +92,9 @@
 #'     `.globals$.studyAreaName`. The module template declares it.\cr
 #'   `.rep` \tab none \tab Replicate number. `setupProject()` sets
 #'     `.globals$.rep` from a `.rep` entry, e.g. the `.rep` column of an
-#'     experiment table. A module that needs the replicate declares a `.rep`
-#'     parameter, e.g. `fireSense_spreadFit` and `fireSense_spreadPredict`.\cr
+#'     experiment table. SpaDES.core knows it, so `.globals` sets it in every
+#'     module; a module that uses the replicate declares a `.rep` parameter, e.g.
+#'     `fireSense_spreadFit` and `fireSense_spreadPredict`.\cr
 #' }
 #'
 #' @seealso [defineParameter()], [simInit()], [spades()], [Plots()], [saveFiles()],

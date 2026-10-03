@@ -431,7 +431,8 @@ noEventWarning <- function(sim) {
                      ".plots",
                      ".saveInitialTime", ".saveInterval",
                      ._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
-                     ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
+                     ".useParallel",
+                     ".rep") ## TODO: add others here, e.g. .studyAreaName?
 
 
 ## Singular/plural message grammar ---------------------------------------------

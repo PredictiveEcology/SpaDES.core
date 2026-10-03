@@ -254,12 +254,11 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           cacheIt <- FALSE
           eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
           a <- sim@params[[curModuleName]][[._txtDotUseCache]]
+          ## .useCache: TRUE caches every event; a character vector caches the events it
+          ## names; a POSIXt caches every event with that notOlderThan; FALSE or NULL caches none
           if (!is.null(a)) {
-            #.useCache is a parameter
             if (!identical(FALSE, a)) {
-              #.useCache is not FALSE
               if (!isTRUE(a)) {
-                #.useCache is not TRUE
                 if (cur[["eventType"]] %in% a) {
                   cacheIt <- TRUE
                 } else if (inherits(a, "POSIXt")) {

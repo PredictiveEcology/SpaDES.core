@@ -1,5 +1,9 @@
 # SpaDES.core 3.2.1.9034
 
+## Enhancements
+
+* `.rep` (replicate number) joins the known dot parameters (`.knownDotParams`), so `.globals$.rep` -- which `SpaDES.project::setupProject()` sets from the experiment's `.rep` -- reaches every module.
+
 ## Documentation
 
 * New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
