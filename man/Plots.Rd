@@ -113,7 +113,7 @@ This offers up to 4 different actions for a given plot:
 }
 
 To turn off plotting both to screen and disk, set both
-\code{.plotInititalTime = NA} and \code{.plots = NA} or any other
+\code{.plotInitialTime = NA} and \code{.plots = NA} (see \link{dotParameters}) or any other
 value that will not trigger a TRUE with a \code{grepl} with the \code{types}
 argument (e.g., \code{""} will omit all saving).
 }

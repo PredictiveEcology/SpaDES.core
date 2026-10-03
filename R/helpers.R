@@ -421,19 +421,9 @@ noEventWarning <- function(sim) {
 
 #' Reserved module parameter names
 #'
-#' These are common parameter names that are reserved for specific use within modules.
-#'
-#' - `.plotInitialTime`: the initial time for plotting;
-#' - `.plotInterval`: the interval between plots;
-#' - `.plots`: the types of plots to create (see `types` argument in [Plots()]);
-#' - `.saveInitialTime`: the initial time for saving;
-#' - `.saveInterval`: the interval between saves;
-#' - `.useCache`: whether to use caching, or which events to cache;
-#' - `.useCacheArgs`: optional named list (keyed by event name) of extra arguments
-#'   passed to [reproducible::Cache()] for that event (e.g. `cacheId`,
-#'   `useCloud`, `cloudFolderID`); enables a developer to pin a fixed cloud
-#'   cache key for a deterministic event;
-#' - `.useParallel`: whether to use parallel processing, or the number of parallel cores to use;
+#' The dot parameters that SpaDES.core knows by name, so `.globals` sets them in
+#' every module whether or not it defines them (except `.plotInitialTime`).
+#' What each one does is described in [dotParameters].
 #'
 #' @keywords internal
 #' @rdname dot-params

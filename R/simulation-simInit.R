@@ -44,8 +44,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'
 #' `params` can only contain updates to any parameters that are defined in
 #' the metadata of modules. Take the example of a module named, `Fire`, which
-#' has a parameter named `.plotInitialTime`. In the metadata of that module,
-#' it says `TRUE`. Here we can override that default with:
+#' has a parameter named `.plotInitialTime` (see [dotParameters]). Here we can override that default with:
 #' `list(Fire=list(.plotInitialTime=NA))`, effectively turning off plotting.
 #' Since this is a list of lists, one can override the module defaults for multiple
 #' parameters from multiple modules all at once, with say:
@@ -55,15 +54,12 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' The `params` list can contain a list (named `.globals`) of named objects
 #' e.g., `.globals = list(climateURL = "https:\\something.com")` entry. Any and every
 #' module that has a parameter with that name (in this case `climateURL`) will be
-#' overridden with this value as passed.
+#' overridden with this value as passed. The dot parameters SpaDES.core knows
+#' (e.g., `.plots`, `.useCache`) are also set in every module, even one that does not
+#' define them; see [dotParameters].
 #'
-#' `params` can be used to set the seed for a specific event in a module. This
-#' is done using the normal `params` argument, specifying `.seed` as a list
-#' where the elements are a numeric for the seed and the name is the event. Since
-#' parameters must be specific to a module, this creates a module and event specific
-#' seed e.g., `params = list(moduleName = list(.seed = list(init = 123)))` will
-#' set the `init` event of module named `moduleName` to 123. The RN stream
-#' will be reset to its state prior to the `set.seed` call after the event.
+#' `params` can set the seed for a specific event in a module, e.g.,
+#' `params = list(moduleName = list(.seed = list(init = 123)))`; see [dotParameters].
 #'
 #' We implement a discrete event simulation in a more modular fashion so it is
 #' easier to add modules to the simulation. We use S4 classes and methods,
@@ -175,8 +171,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'
 #' @param notOlderThan A time, as in from `Sys.time()`. This is passed into
 #'                     the `Cache` function that wraps `.inputObjects`.
-#'                     If the module uses the `.useCache` parameter and it is
-#'                     set to `TRUE` or `".inputObjects"`,
+#'                     If the module's `.useCache` parameter (see [dotParameters]) is
+#'                     `TRUE` or includes `".inputObjects"`,
 #'                     then the `.inputObjects` will be cached.
 #'                     Setting `notOlderThan = Sys.time()` will cause the
 #'                     cached versions of `.inputObjects` to be refreshed,

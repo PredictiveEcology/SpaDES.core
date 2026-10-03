@@ -48,8 +48,9 @@ See \code{\link[=saveFiles]{saveFiles()}}.\cr
 \code{.saveInterval} \tab \code{NA} \tab Time between save events.\cr
 \code{.saveObjects} \tab none \tab Names of the \code{sim} objects that \code{\link[=saveFiles]{saveFiles()}}
 saves when called from the module's own save event.\cr
-\code{.savePath} \tab none \tab Checked by \code{\link[=checkParams]{checkParams()}} as a character
-parameter; no other SpaDES.core code reads it.\cr
+\code{.savePath} \tab none \tab Not used by SpaDES.core code. It is exempt from
+\code{\link[=checkParams]{checkParams()}}'s "parameter not used in module" message, as are
+\code{.saveObjects} and \code{.seed}.\cr
 \code{.seed} \tab \code{list()} (template) \tab Named list, one seed per event,
 e.g. \code{list(init = 123)}. \code{\link[=spades]{spades()}} calls \code{set.seed()} for that event,
 then restores the random number stream afterwards.\cr

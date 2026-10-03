@@ -135,8 +135,8 @@ load order will be determined automatically.}
 
 \item{notOlderThan}{A time, as in from \code{Sys.time()}. This is passed into
 the \code{Cache} function that wraps \code{.inputObjects}.
-If the module uses the \code{.useCache} parameter and it is
-set to \code{TRUE} or \code{".inputObjects"},
+If the module's \code{.useCache} parameter (see \link{dotParameters}) is
+\code{TRUE} or includes \code{".inputObjects"},
 then the \code{.inputObjects} will be cached.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
@@ -209,8 +209,7 @@ runs \code{.inputObjects} functions \tab from every module
 
 \code{params} can only contain updates to any parameters that are defined in
 the metadata of modules. Take the example of a module named, \code{Fire}, which
-has a parameter named \code{.plotInitialTime}. In the metadata of that module,
-it says \code{TRUE}. Here we can override that default with:
+has a parameter named \code{.plotInitialTime} (see \link{dotParameters}). Here we can override that default with:
 \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
 Since this is a list of lists, one can override the module defaults for multiple
 parameters from multiple modules all at once, with say:
@@ -219,15 +218,12 @@ parameters from multiple modules all at once, with say:
 The \code{params} list can contain a list (named \code{.globals}) of named objects
 e.g., \code{.globals = list(climateURL = "https:\\\\something.com")} entry. Any and every
 module that has a parameter with that name (in this case \code{climateURL}) will be
-overridden with this value as passed.
+overridden with this value as passed. The dot parameters SpaDES.core knows
+(e.g., \code{.plots}, \code{.useCache}) are also set in every module, even one that does not
+define them; see \link{dotParameters}.
 
-\code{params} can be used to set the seed for a specific event in a module. This
-is done using the normal \code{params} argument, specifying \code{.seed} as a list
-where the elements are a numeric for the seed and the name is the event. Since
-parameters must be specific to a module, this creates a module and event specific
-seed e.g., \code{params = list(moduleName = list(.seed = list(init = 123)))} will
-set the \code{init} event of module named \code{moduleName} to 123. The RN stream
-will be reset to its state prior to the \code{set.seed} call after the event.
+\code{params} can set the seed for a specific event in a module, e.g.,
+\code{params = list(moduleName = list(.seed = list(init = 123)))}; see \link{dotParameters}.
 
 We implement a discrete event simulation in a more modular fashion so it is
 easier to add modules to the simulation. We use S4 classes and methods,

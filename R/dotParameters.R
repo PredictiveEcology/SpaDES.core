@@ -41,8 +41,9 @@
 #'   `.saveInterval` \tab `NA` \tab Time between save events.\cr
 #'   `.saveObjects` \tab none \tab Names of the `sim` objects that [saveFiles()]
 #'     saves when called from the module's own save event.\cr
-#'   `.savePath` \tab none \tab Checked by [checkParams()] as a character
-#'     parameter; no other SpaDES.core code reads it.\cr
+#'   `.savePath` \tab none \tab Not used by SpaDES.core code. It is exempt from
+#'     [checkParams()]'s "parameter not used in module" message, as are
+#'     `.saveObjects` and `.seed`.\cr
 #'   `.seed` \tab `list()` (template) \tab Named list, one seed per event,
 #'     e.g. `list(init = 123)`. [spades()] calls `set.seed()` for that event,
 #'     then restores the random number stream afterwards.\cr
