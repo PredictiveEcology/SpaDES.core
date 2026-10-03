@@ -11,14 +11,15 @@
 \usage{
 \method{.wrap}{simList}(
   obj,
-  cachePath = getOption("reproducible.cachePath"),
+  filebackedPath = getOption("reproducible.cachePath"),
   preDigest,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
   verbose = getOption("reproducible.verbose"),
   outputObjects = NULL,
   cacheId = NULL,
-  ...
+  ...,
+  cachePath
 )
 
 \method{.wrap}{.simDeps}(obj, ...)
@@ -31,18 +32,20 @@
 
 \method{.unwrap}{simList}(
   obj,
-  cachePath = getOption("reproducible.cachePath"),
+  filebackedPath = getOption("reproducible.cachePath"),
   cacheId = NULL,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
-  ...
+  ...,
+  cachePath
 )
 }
 \arguments{
 \item{obj}{Any arbitrary R object.}
 
-\item{cachePath}{A repository used for storing cached objects.
-This is optional if \code{Cache} is used inside a SpaDES module.}
+\item{filebackedPath}{Directory under which file-backed objects (e.g., a file-backed \code{SpatRaster})
+are anchored and, with \code{copyFiles = TRUE}, stored (in \verb{cacheOutputs/}). \code{Cache()} uses its
+\code{cachePath}; outside of \code{Cache()} it is any directory, e.g., the one holding an \code{.rds}.}
 
 \item{preDigest}{The list of \code{preDigest} that comes from \code{CacheDigest} of an object}
 
@@ -76,6 +79,8 @@ missing, which is the same as \code{TRUE}. If there are errors due
 to regular expression problem, try \code{FALSE}. For \code{cc}, it is
 passed to \code{clearCache}, e.g., \code{ask}, \code{userTags}. For \code{showCache},
 it can also be \code{sorted = FALSE} to return the object unsorted.}
+
+\item{cachePath}{Deprecated; the former name of \code{filebackedPath}. It still works, with a message.}
 }
 \value{
 The same object as passed into the function, but dealt with so that it can be

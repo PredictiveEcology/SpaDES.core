@@ -246,6 +246,10 @@ setMethod(
                 do.call(getFromNamespace(loadFun[y], loadPackage[y]), args = argument)
               }
             }
+            if (loadFun[y] %in% .serialiseLoadFuns) {
+              sim[[filelist[y, "objectName"]]] <- .unwrap(sim[[filelist[y, "objectName"]]],
+                                                          filebackedPath = dirname(filelist[y, "file"]))
+            }
             filelist[y, "loaded"] <- TRUE
 
             mess <- paste0(

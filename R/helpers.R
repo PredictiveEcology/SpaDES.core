@@ -313,8 +313,8 @@ all.equal.simList <- function(target, current, ...) {
   rm(list = objNamesTarget, envir = envir(target))
   rm(list = objNamesCurrent, envir = envir(current))
 
-  target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
-  current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  target1 <- .wrap(target, filebackedPath = getwd()) # deals with SpatVector/SpatRaster etc.
+  current1 <- .wrap(current, filebackedPath = getwd()) # deals with SpatVector/SpatRaster etc.
   all.equal.default(target1, current1, ...)
 }
 
