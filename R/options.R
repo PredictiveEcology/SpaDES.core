@@ -44,7 +44,7 @@
 #'
 #'   `spades.useCache` \tab `"all"`
 #'      \tab How caching applies inside [simInit()] and [spades()]. `"all"`: events and
-#'      `.inputObjects` are cached as each module's `.useCache` parameter asks, and
+#'      `.inputObjects` are cached as each module's `.useCache` parameter (see [dotParameters]) asks, and
 #'      `Cache()` calls inside module code follow `reproducible.useCache`. `"eventsOnly"`:
 #'      the `.useCache` events are cached (also in a `simInit()` nested inside an event),
 #'      but `Cache()` calls inside module code are skipped. `"off"`: nothing is cached.
@@ -170,8 +170,8 @@
 #'     \tab The default local directory in which to save simulation outputs.\cr
 #'
 #'   `spades.plots`
-#'     \tab The value of this will passed to `.plots` within every module; it will thus
-#'     override all module parameter values for `.plots`. This can, e.g., be used
+#'     \tab The value of this will be passed to `.plots` (see [dotParameters]) within every
+#'     module; it will thus override all module parameter values for `.plots`. This can, e.g., be used
 #'     to turn off all plotting.
 #'     \tab The default is `NULL`, meaning accept the module-level parameter.\cr
 #'

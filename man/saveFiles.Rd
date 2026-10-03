@@ -14,8 +14,8 @@ saveFiles(sim)
 invoked for side effect of saving the simulation to file.
 }
 \description{
-In the \code{\link[=simInit]{simInit()}} call, a parameter called \code{.saveObjects} can be provided in
-each module.
+In the \code{\link[=simInit]{simInit()}} call, a parameter called \code{.saveObjects} (see \link{dotParameters}) can be
+provided in each module.
 This must be a character string vector of all object names to save. These objects will
 then be saved whenever a call to \code{saveFiles} is made.
 }

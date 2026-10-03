@@ -32,8 +32,8 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 ##############################################################
 #' Save objects using `.saveObjects` in `params` slot of `simInit`
 #'
-#' In the [simInit()] call, a parameter called `.saveObjects` can be provided in
-#' each module.
+#' In the [simInit()] call, a parameter called `.saveObjects` (see [dotParameters]) can be
+#' provided in each module.
 #' This must be a character string vector of all object names to save. These objects will
 #' then be saved whenever a call to `saveFiles` is made.
 #'
@@ -318,7 +318,7 @@ simFile <- function(name, path, time = NULL, ext = "rds") {
 #'     \tab [outputs()] \cr
 #'   The `.saveObjects` parameter plus [saveFiles()] called from a module's own
 #'     save event, timed by the `.saveInitialTime` and `.saveInterval`
-#'     parameters. \tab The **module developer**, for users of that module
+#'     parameters (see [dotParameters]). \tab The **module developer**, for users of that module
 #'     \tab [saveFiles()] \cr
 #'   Plain `saveRDS()`/`save()` inside module code. \tab The **module
 #'     developer**, unconditionally -- the least modular option, since the user

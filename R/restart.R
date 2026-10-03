@@ -69,7 +69,7 @@ doEvent.restartR <- function(sim, eventTime, eventType, debug = FALSE) {
 #'   These will be replayed backwards in time to reproduce the initial state of the `simList`
 #'   before the event that is `numEvents` prior to the first event in `events(sim)`.
 #'
-#' @param ... Passed to `spades`, e.g., `debug`, `.plotInitialTime`. If the
+#' @param ... Passed to `spades`, e.g., `debug`, `.plots`. If the
 #'   interrupted `spades()` call used an `events` filter (to run only certain
 #'   events), the same filter is reused automatically on restart; pass a new
 #'   `events` argument here to override it.

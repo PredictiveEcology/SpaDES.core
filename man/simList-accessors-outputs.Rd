@@ -71,7 +71,7 @@ These functions are one of the mechanisms for saving objects to disk. The
 
 Either way, the core \code{save} event reads this table and writes each object at
 its \code{saveTime}. A module developer can instead offer saving through
-\code{\link[=saveFiles]{saveFiles()}} and the \code{.saveObjects} parameter. See \code{\link[=saving]{saving()}} for how the
+\code{\link[=saveFiles]{saveFiles()}} and the \code{.saveObjects} parameter (see \link{dotParameters}). See \code{\link[=saving]{saving()}} for how the
 \code{save} event, this table and \code{\link[=saveFiles]{saveFiles()}} fit together.
 
 See below for more details.

@@ -45,6 +45,10 @@ are for human use only. To ensure that a user cannot set parameters outside of
 a range of values, the module developer should use assertions in their module
 code.
 }
+\details{
+Parameter names that start with a dot (\code{.plots}, \code{.useCache}, ...) are
+recognised by the framework; see \link{dotParameters}.
+}
 \note{
 Be sure to use the correct NA type: logical (\code{NA}), integer (\code{NA_integer_}),
 real (\code{NA_real_}), complex (\code{NA_complex_}), or character (\code{NA_character_}).

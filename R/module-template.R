@@ -36,6 +36,9 @@ openIsRequested <- function(open, suff) {
 #' `newModuleCode` will not generate the module code.
 #' `newModuleDocumentation` will create the other files.
 #'
+#' The generated module declares several "dot" parameters (`.plots`, `.useCache`, ...);
+#' see [dotParameters].
+#'
 #' All files will be created within a subdirectory named `name` within the `path`:
 #'
 #' ```
