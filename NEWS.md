@@ -1,4 +1,4 @@
-# SpaDES.core (development version)
+# SpaDES.core 3.2.1.9034
 
 ## Bug fixes
 
