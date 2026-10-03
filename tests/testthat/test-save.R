@@ -571,25 +571,35 @@ test_that("saveFiles() writes terra objects to .rds that can be read back", {
 
   r <- terra::rast(terra::ext(0, 3, 0, 2), res = 1, vals = 1:6)
   v <- terra::vect(cbind(x = 1:3, y = 3:1))
-  sim <- simInit(times = list(start = 0, end = 1), objects = list(r = r, v = v),
+  lst <- list(r = r, v = v, n = 1)
+  sim <- simInit(times = list(start = 0, end = 1),
+                 objects = list(r = r, v = v, lst = lst),
                  paths = list(outputPath = tmpdir))
-  outputs(sim) <- data.frame(objectName = c("r", "v"), saveTime = 1,
+  outputs(sim) <- data.frame(objectName = c("r", "v", "lst"), saveTime = 1,
                              fun = "saveRDS", package = "base")
   sim <- spades(sim, .plots = NA)
 
   files <- outputs(sim)$file
   expect_true(all(file.exists(files)))
   expect_true(all(grepl("\\.rds$", files)))
+  readBack <- function(f) reproducible::.unwrap(readRDS(f), cachePath = dirname(f))
 
-  rBack <- terra::readRDS(files[1])
+  rBack <- readBack(files[1])
   expect_s4_class(rBack, "SpatRaster")
   expect_equal(terra::values(rBack)[, 1], 1:6)
-  vBack <- terra::readRDS(files[2])
+  vBack <- readBack(files[2])
   expect_s4_class(vBack, "SpatVector")
   expect_equal(terra::crds(vBack)[, "x"], 1:3, ignore_attr = TRUE)
+  lstBack <- readBack(files[3])
+  expect_equal(terra::values(lstBack$r)[, 1], 1:6)
+  expect_s4_class(lstBack$v, "SpatVector")
+  expect_identical(lstBack$n, 1)
 
   ## and they load as inputs, unwrapped
-  sim2 <- simInit(inputs = data.frame(file = files[1], objectName = "rIn", loadTime = 0),
+  sim2 <- simInit(inputs = data.frame(file = files[1:3], objectName = c("rIn", "vIn", "lIn"),
+                                      loadTime = 0),
                   paths = list(outputPath = tmpdir))
   expect_equal(terra::values(sim2$rIn)[, 1], 1:6)
+  expect_s4_class(sim2$vIn, "SpatVector")
+  expect_equal(terra::values(sim2$lIn$r)[, 1], 1:6)
 })

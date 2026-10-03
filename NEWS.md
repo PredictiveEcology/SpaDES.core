@@ -7,9 +7,11 @@
   silently for now. Calls inside SpaDES.core use the new name. Needs reproducible >= 3.2.1.9062.
 * `saveFiles()` saved `.rds` outputs with `base::saveRDS`, which keeps only the external pointer of a
   terra `SpatRaster`/`SpatVector`, so `readRDS()` returned an unusable object ("external pointer is not
-  valid"). `saveFiles()` now uses `terra::saveRDS` (identical to the base function for other objects)
-  and `inputs` reads `.rds` files with `terra::readRDS`. Read such a file outside `inputs` with
-  `terra::readRDS()` (or `terra::unwrap(readRDS(f))`).
+  valid"). `saveFiles()` now passes the object through `reproducible::.wrap()` before `saveRDS`, `qs::qsave`
+  and `qs2::qs_save`, and `inputs` applies `.unwrap()` after `readRDS`, `qs::qread` and `qs2::qs_read`
+  (also for terra objects inside a list). Read such a file manually with
+  `reproducible::.unwrap(readRDS(f), cachePath = dirname(f))`. A file-backed `SpatRaster` is not
+  yet supported: `.wrap()` stores only a path to its file, not the values.
 
 # SpaDES.core 3.2.1.9033
 

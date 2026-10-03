@@ -166,8 +166,11 @@ saveFiles <- function(sim) {
           }))])
 
           ## The actual save line
-          saveFunPkg <- .terraSafeRds(outputs(sim)[["fun"]][i], outputs(sim)[["package"]][i])
-          do.call(saveFunPkg[["fun"]], args = args, envir = getNamespace(saveFunPkg[["package"]]))
+          if (outputs(sim)[["fun"]][i] %in% .serialiseSaveFuns) {
+            args[[1]] <- .wrap(args[[1]], cachePath = dirname(outputs(sim)[["file"]][i]))
+          }
+          do.call(outputs(sim)[["fun"]][i], args = args,
+                  envir = getNamespace(outputs(sim)[["package"]][i]))
 
           ## using @ works when outputs is a DT
         } else {
@@ -207,13 +210,10 @@ saveFiles <- function(sim) {
   return(invisible(sim))
 }
 
-## `base::saveRDS`/`readRDS` keep only the external pointer of a terra `SpatRaster`/`SpatVector`,
-## so the file cannot be read back. `terra::saveRDS`/`readRDS` wrap/unwrap those objects and
-## behave as the base functions for everything else.
-.terraSafeRds <- function(fun, package) {
-  if (identical(package, "base") && fun %in% c("saveRDS", "readRDS")) package <- "terra"
-  c(fun = fun, package = package)
-}
+## Functions that serialise the R object as is: a terra `SpatRaster`/`SpatVector` then keeps only an
+## external pointer and cannot be read back. Wrap before saving (`.wrap`) and `.unwrap` after reading.
+.serialiseSaveFuns <- c("saveRDS", "qsave", "qs_save")
+.serialiseLoadFuns <- c("readRDS", "qread", "qs_read")
 
 #' File extensions map
 #'
