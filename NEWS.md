@@ -12,7 +12,7 @@
   (also for terra objects inside a list). A file-backed `SpatRaster` is wrapped with
   `copyFiles = TRUE`, so its file is copied next to the `.rds` (in `cacheOutputs/`) and the output
   is self-contained; this needs reproducible >= 3.2.1.9062. Read such a file manually with
-  `reproducible::.unwrap(readRDS(f), cachePath = dirname(f))`.
+  `reproducible::.unwrap(readRDS(f), filebackedPath = dirname(f))`.
 
 # SpaDES.core 3.2.1.9033
 

@@ -248,7 +248,7 @@ setMethod(
             }
             if (loadFun[y] %in% .serialiseLoadFuns) {
               sim[[filelist[y, "objectName"]]] <- .unwrap(sim[[filelist[y, "objectName"]]],
-                                                          cachePath = dirname(filelist[y, "file"]))
+                                                          filebackedPath = dirname(filelist[y, "file"]))
             }
             filelist[y, "loaded"] <- TRUE
 

@@ -167,7 +167,7 @@ saveFiles <- function(sim) {
 
           ## The actual save line
           if (outputs(sim)[["fun"]][i] %in% .serialiseSaveFuns) {
-            args[[1]] <- .wrap(args[[1]], cachePath = dirname(outputs(sim)[["file"]][i]), copyFiles = TRUE)
+            args[[1]] <- .wrap(args[[1]], filebackedPath = dirname(outputs(sim)[["file"]][i]), copyFiles = TRUE)
           }
           do.call(outputs(sim)[["fun"]][i], args = args,
                   envir = getNamespace(outputs(sim)[["package"]][i]))

@@ -585,7 +585,7 @@ test_that("saveFiles() writes terra objects to .rds that can be read back", {
   files <- outputs(sim)$file
   expect_true(all(file.exists(files)))
   expect_true(all(grepl("\\.rds$", files)))
-  readBack <- function(f) reproducible::.unwrap(readRDS(f), cachePath = dirname(f))
+  readBack <- function(f) reproducible::.unwrap(readRDS(f), filebackedPath = dirname(f))
 
   rBack <- readBack(files[1])
   expect_s4_class(rBack, "SpatRaster")
