@@ -4,7 +4,7 @@
 
 * The `simList` methods of `.wrap()` and `.unwrap()` (R/cache.R) take `filebackedPath` instead of `cachePath`,
   following reproducible, where the first path argument is not only a cache location. `cachePath` still works,
-  with a message. Calls inside SpaDES.core use the new name. Needs reproducible >= 3.2.1.9062.
+  silently for now. Calls inside SpaDES.core use the new name. Needs reproducible >= 3.2.1.9062.
 
 # SpaDES.core 3.2.1.9033
 
