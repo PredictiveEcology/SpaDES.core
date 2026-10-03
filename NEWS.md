@@ -1,5 +1,11 @@
 # SpaDES.core 3.2.1.9034
 
+## Documentation
+
+* New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
+  with its default and effect, including `.studyAreaName` and `.rep`, which SpaDES.project sets. It is linked from
+  `defineParameter()`, `newModule()` and the package overview.
+
 ## Bug fixes
 
 * The `simList` methods of `.wrap()` and `.unwrap()` (R/cache.R) take `filebackedPath` instead of `cachePath`,
@@ -15,12 +21,6 @@
   `reproducible::.unwrap(readRDS(f), filebackedPath = dirname(f))`.
 
 # SpaDES.core 3.2.1.9033
-
-## Documentation
-
-* New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
-  with its default and effect, including `.studyAreaName` and `.rep`, which SpaDES.project sets. It is linked from
-  `defineParameter()`, `newModule()` and the package overview.
 
 ## Bug fixes
 
