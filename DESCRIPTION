@@ -114,6 +114,7 @@ Collate:
     'convertToPackage.R'
     'copy.R'
     'debugging.R'
+    'dotParameters.R'
     'downloadData.R'
     'eventStops.R'
     'simulation-parseModule.R'

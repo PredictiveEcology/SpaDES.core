@@ -396,6 +396,9 @@ setMethod(
 #'                  having to use `paste`; any character strings after `desc`
 #'                  will be `paste`d together with `desc`.
 #'
+#' @details Parameter names that start with a dot (`.plots`, `.useCache`, ...) are
+#' recognised by the framework; see [dotParameters].
+#'
 #' @return a `data.frame`
 #'
 #' @author Alex Chubaty and Eliot McIntire

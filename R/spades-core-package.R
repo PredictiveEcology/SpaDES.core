@@ -73,6 +73,7 @@
 #'      [P()] \tab Get a parameter for the current module without naming it.\cr
 #'      [globals()] \tab Simulation-wide (global) parameters.\cr
 #'      [paramCheckOtherMods()] \tab Compare a parameter's value across modules.\cr
+#'      [dotParameters] \tab The framework-aware "dot" parameters (`.plots`, `.useCache`, `.seed`, ...).\cr
 #'   }
 #' }
 #'
@@ -214,6 +215,7 @@
 #' Inside a module's metadata you can set the parameter `.useCache` to `TRUE`
 #' (cache the whole module), a character vector (cache only those events),
 #' or use `.useCacheArgs` to pin per-event arguments to [reproducible::Cache()].
+#' All "dot" parameters (`.plots`, `.useCache`, `.seed`, ...) are listed in [dotParameters].
 #' See the caching vignette: `vignette("iii-cache", package = "SpaDES.core")`.
 #'
 #' @section 8 Plotting:
