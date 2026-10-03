@@ -252,7 +252,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   ## wrap remaining / non-file-backed; `projectPath` is offered as an anchor so a
   ## file-backed object that sits under it -- but under none of the sim's named
   ## paths -- can still be re-rooted on load instead of silently becoming NULL
-  sim <- .wrap(sim, cachePath = NULL, paths = .wrapAnchors(sim, projectPath))
+  sim <- .wrap(sim, filebackedPath = NULL, paths = .wrapAnchors(sim, projectPath))
   sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
@@ -599,7 +599,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   isLazyLoad <- file.exists(file.path(lazyDir, .lazyManifestName))
 
   tmpsim <- .unwrapResiliently(tmpsim, paths(tmpsim))
-  tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim))
+  tmpsim <- .unwrap(tmpsim, filebackedPath = NULL, paths = paths(tmpsim))
 
   ## Work around for bug in qs that recovers data.tables as lists
   # tmpsim <- recoverDataTableFromQs(tmpsim)
@@ -921,7 +921,7 @@ recoverDataTableFromQs <- function(sim) {
       delayedAssign(.nm, tryCatch({
         obj <- .readOneLazy(.f, fetch = .fetch)
         obj <- .remapFileBackedObj(obj, .pp, .sp)
-        .unwrap(obj, cachePath = NULL, paths = .sp)
+        .unwrap(obj, filebackedPath = NULL, paths = .sp)
       }, error = function(e) {
         warning("Could not load lazy object '", .nm, "' from '", .f, "': ",
                 conditionMessage(e), call. = FALSE)
@@ -1000,7 +1000,7 @@ recoverDataTableFromQs <- function(sim) {
     fns <- tryCatch(Filenames(obj), error = function(e) character(0))
     if (length(fns) && any(nchar(fns) > 0L)) {
       sim@.xData[[nm]] <- tryCatch(
-        .wrap(obj, cachePath = NULL, paths = simPaths),
+        .wrap(obj, filebackedPath = NULL, paths = simPaths),
         error = function(e) {
           warning("saveSimList: could not wrap '", nm,
                   "' (backing file inaccessible); saving as NULL.\n",
@@ -1028,7 +1028,7 @@ recoverDataTableFromQs <- function(sim) {
     fns <- tryCatch(Filenames(obj), error = function(e) character(0))
     if (length(fns) && any(nchar(fns) > 0L)) {
       sim@.xData[[nm]] <- tryCatch(
-        .unwrap(obj, cachePath = NULL, paths = simPaths),
+        .unwrap(obj, filebackedPath = NULL, paths = simPaths),
         error = function(e) {
           warning("loadSimList: could not unwrap '", nm,
                   "' (backing file inaccessible); loading as NULL.\n",
