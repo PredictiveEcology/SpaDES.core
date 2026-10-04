@@ -1104,7 +1104,11 @@ warnDeprecFileBacked <- function(arg) {
 
 archiveExtract <- function(archiveName, exdir) {
   if (requireNamespace("archive") && !isWindows()) {
-    archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
+    ## Read the archive the caller named: archive_extract() detects zip and tar
+    ## from the content, so a .zip written on Windows reads here too. Only fall
+    ## back to the .tar.gz name archiveWrite() would have used when it is absent.
+    if (!file.exists(archiveName))
+      archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
     ## `dir` defaults to "."; without it this extracts into the working
     ## directory and ignores `exdir`, diverging from the unzip() branch below
     ## and scattering the archive's own directory names (cache/, outputs/,

@@ -4,6 +4,10 @@
 
 * `.globals` now sets only the universal dot parameters (`.plots`, `.seed`, `.showSimilar`, `.useCache`, `.useCacheArgs`) in modules that do not declare them; `.knownDotParams` is that list. `.plotInterval`, `.saveInitialTime`, `.saveInterval`, `.useCloud` and `.useParallel` (and `.plotInitialTime`, already excluded) now reach only modules that declare them, as does `.rep`. `.seed` and `.showSimilar` now reach every module. `?dotParameters` states the rule.
 
+## Bug fixes
+
+* `loadSimList()` reads a `.zip` archive on Linux and macOS again. `archiveExtract()` renamed every archive to `.tar.gz` before reading it, so a simList saved on Windows failed with "cannot open file '<name>.tar.gz'".
+
 ## Documentation
 
 * New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
