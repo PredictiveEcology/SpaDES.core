@@ -35,7 +35,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'     }
 #'
 #' To turn off plotting both to screen and disk, set both
-#' `.plotInititalTime = NA` and `.plots = NA` or any other
+#' `.plotInitialTime = NA` and `.plots = NA` (see [dotParameters]) or any other
 #' value that will not trigger a TRUE with a `grepl` with the `types`
 #' argument (e.g., `""` will omit all saving).
 #'

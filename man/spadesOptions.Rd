@@ -49,7 +49,7 @@ Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/cache}).\c
 
 \code{spades.useCache} \tab \code{"all"}
 \tab How caching applies inside \code{\link[=simInit]{simInit()}} and \code{\link[=spades]{spades()}}. \code{"all"}: events and
-\code{.inputObjects} are cached as each module's \code{.useCache} parameter asks, and
+\code{.inputObjects} are cached as each module's \code{.useCache} parameter (see \link{dotParameters}) asks, and
 \code{Cache()} calls inside module code follow \code{reproducible.useCache}. \code{"eventsOnly"}:
 the \code{.useCache} events are cached (also in a \code{simInit()} nested inside an event),
 but \code{Cache()} calls inside module code are skipped. \code{"off"}: nothing is cached.
@@ -174,8 +174,8 @@ retain in the \code{completed} event queue.\cr
 \tab The default local directory in which to save simulation outputs.\cr
 
 \code{spades.plots}
-\tab The value of this will passed to \code{.plots} within every module; it will thus
-override all module parameter values for \code{.plots}. This can, e.g., be used
+\tab The value of this will be passed to \code{.plots} (see \link{dotParameters}) within every
+module; it will thus override all module parameter values for \code{.plots}. This can, e.g., be used
 to turn off all plotting.
 \tab The default is \code{NULL}, meaning accept the module-level parameter.\cr
 

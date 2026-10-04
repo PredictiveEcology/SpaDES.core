@@ -85,8 +85,8 @@ load order will be determined automatically.}
 
 \item{notOlderThan}{A time, as in from \code{Sys.time()}. This is passed into
 the \code{Cache} function that wraps \code{.inputObjects}.
-If the module uses the \code{.useCache} parameter and it is
-set to \code{TRUE} or \code{".inputObjects"},
+If the module's \code{.useCache} parameter (see \link{dotParameters}) is
+\code{TRUE} or includes \code{".inputObjects"},
 then the \code{.inputObjects} will be cached.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
@@ -106,10 +106,11 @@ then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
-\item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link[=Plots]{Plots()}} for possible values. Setting this without \code{"screen"} turns
-off all plotting; setting it with \code{"screen"} triggers plotting for any
-module that uses this parameter, and has no effect on modules that do not.
+\item{.plots}{Character. Sets the \code{.plots} parameter (see \link{dotParameters}) in
+all modules for this call. See \code{\link[=Plots]{Plots()}} for possible values. Setting this
+without \code{"screen"} turns off all plotting; setting it with \code{"screen"} triggers
+plotting for any module that uses this parameter, and has no effect on modules
+that do not.
 
 This replaces the \code{.plotInitialTime} argument, which was removed. Use
 \code{.plots = NA} where you previously used \code{.plotInitialTime = NA}. The
@@ -117,7 +118,7 @@ This replaces the \code{.plotInitialTime} argument, which was removed. Use
 per module through \code{params}.}
 
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.saveInitialTime}
-parameter for all modules. See Details.}
+parameter (see \link{dotParameters}) for all modules. See Details.}
 
 \item{events}{A character vector or a named list of character vectors. If specified,
 the simulations will only do the events indicated here. If a named list, the names

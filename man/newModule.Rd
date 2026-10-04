@@ -81,6 +81,9 @@ wrapper around \code{newModuleCode} and \code{newModuleDocumentation}.
 \code{newModuleDocumentation} will create the other files.
 }
 \details{
+The generated module declares several "dot" parameters (\code{.plots}, \code{.useCache}, ...);
+see \link{dotParameters}.
+
 All files will be created within a subdirectory named \code{name} within the \code{path}:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  <path>/
