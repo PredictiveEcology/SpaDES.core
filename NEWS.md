@@ -1,4 +1,4 @@
-# SpaDES.core 3.2.1.9034
+# SpaDES.core 3.2.1.9035
 
 ## Enhancements
 
@@ -9,6 +9,8 @@
 * New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
   with its default and effect, including `.studyAreaName` and `.rep`, which SpaDES.project sets. It is linked from
   `defineParameter()`, `newModule()` and the package overview.
+
+# SpaDES.core 3.2.1.9034
 
 ## Bug fixes
 
