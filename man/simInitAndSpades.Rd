@@ -87,7 +87,8 @@ load order will be determined automatically.}
 the \code{Cache} function that wraps \code{.inputObjects}.
 If the module uses the \code{.useCache} parameter and it is
 set to \code{TRUE} or \code{".inputObjects"},
-then the \code{.inputObjects} will be cached.
+then the \code{.inputObjects} will be cached, unless the module
+lists \code{".inputObjects"} in its \code{.neverCache} parameter.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}

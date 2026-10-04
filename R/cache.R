@@ -232,7 +232,7 @@ setMethod(
       if (!is.null(classOptions["params"])) {
         object@params <- classOptions["params"] |> setNames(curMod)
       } else {
-        omitParams <- c(".showSimilar", ".useCache")
+        omitParams <- c(".showSimilar", ".useCache", ._txtDotNeverCache)
         object@params <- object@params[curMod]
         object@params[[curMod]] <- object@params[[curMod]][
           !names(object@params[[curMod]]) %in% omitParams

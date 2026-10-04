@@ -1,3 +1,14 @@
+# SpaDES.core (development version)
+
+## New features
+
+* New module parameter `.neverCache`: a character vector of event names (possibly `".inputObjects"`)
+  that are never cached, even when `.useCache` asks for them (`TRUE`, event names or a time), whoever
+  set `.useCache`. For events that run for their side effects. It is declared-only (`.globals` sets it
+  only in modules that declare it) and is left out of event cache keys. One message per module and
+  event says when it overrides `.useCache`. One helper, `.eventIsCached()` (R/helpers.R), now makes the
+  decision for events and for `.inputObjects`. The row in `?dotParameters` is to follow once #482 merges.
+
 # SpaDES.core 3.2.1.9034
 
 ## Bug fixes
