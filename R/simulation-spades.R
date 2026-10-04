@@ -692,12 +692,13 @@ scheduleConditionalEvent <- function(sim,
 #'              See also the vignette on caching for examples.
 #'
 #' @param .saveInitialTime Numeric. Temporarily override the `.saveInitialTime`
-#'                                  parameter for all modules. See Details.
+#'                                  parameter (see [dotParameters]) for all modules. See Details.
 #'
-#' @param .plots Character. Sets the parameter of this name in all modules.
-#'   See [Plots()] for possible values. Setting this without `"screen"` turns
-#'   off all plotting; setting it with `"screen"` triggers plotting for any
-#'   module that uses this parameter, and has no effect on modules that do not.
+#' @param .plots Character. Sets the `.plots` parameter (see [dotParameters]) in
+#'   all modules for this call. See [Plots()] for possible values. Setting this
+#'   without `"screen"` turns off all plotting; setting it with `"screen"` triggers
+#'   plotting for any module that uses this parameter, and has no effect on modules
+#'   that do not.
 #'
 #'   This replaces the `.plotInitialTime` argument, which was removed. Use
 #'   `.plots = NA` where you previously used `.plotInitialTime = NA`. The
@@ -791,8 +792,8 @@ scheduleConditionalEvent <- function(sim,
 #' can be cached and mixtures of all of these will work. For functions, simply
 #' wrap the call with `Cache`, moving the original function name into
 #' the first argument of Cache. For events or modules, set the module `parameters`,
-#' `.useCache`, e.g.,
-#' `simInit(..., parameters = list(myModule = list(.useCache = "init")))`.
+#' `.useCache` (see [dotParameters]), e.g.,
+#' `simInit(..., params = list(myModule = list(.useCache = "init")))`.
 #' This can be set to an event name, which will cache that event, or a logical,
 #' which will cache *every* event in that module. Event and module caching
 #' makes most sense when the event or module only runs once, such as an initialization
@@ -2678,10 +2679,8 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
   sim
 }
 
-## don't change Caching based on .useCache etc. -
+## paramsDontCacheOn (helpers.R): don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
-paramsDontCacheOn <- c(grep(c("useCache|useCloud"), .knownDotParams, value = TRUE),
-                       ._txtDotNeverCache)
 
 appendCompleted <- function(sim, cur) {
 

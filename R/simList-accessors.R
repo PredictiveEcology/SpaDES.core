@@ -643,6 +643,7 @@ P.simList <- function(sim, param, module) {
 #' `globals`, and the alias `G`, accesses or sets the "globals"
 #' in the `simList`. This currently is not an explicit slot in the `simList`,
 #' but it is a `.globals` element in the `params` slot of the `simList`.
+#' Which modules a global parameter reaches is described in [simInit()] and [dotParameters].
 #'
 #' @inheritParams params
 #'
@@ -1226,7 +1227,7 @@ setReplaceMethod(
 #'
 #' Either way, the core `save` event reads this table and writes each object at
 #' its `saveTime`. A module developer can instead offer saving through
-#' [saveFiles()] and the `.saveObjects` parameter. See [saving()] for how the
+#' [saveFiles()] and the `.saveObjects` parameter (see [dotParameters]). See [saving()] for how the
 #' `save` event, this table and [saveFiles()] fit together.
 #'
 #' See below for more details.

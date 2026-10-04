@@ -66,7 +66,7 @@ of that exact same \code{simList}. Default \code{FALSE}. See Details.
 See also the vignette on caching for examples.}
 
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.saveInitialTime}
-parameter for all modules. See Details.}
+parameter (see \link{dotParameters}) for all modules. See Details.}
 
 \item{notOlderThan}{Date or time. Passed to \code{reproducible::Cache} to update the cache.
 Default is \code{NULL}, meaning don't update the cache.
@@ -120,10 +120,11 @@ end: \code{.stopBefore} leaves the clock and queue untouched, so calling again w
 the same barrier returns an equivalent object, and \code{.stopAfter} leaves the
 \code{simList} reporting itself finished with events still queued.}
 
-\item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link[=Plots]{Plots()}} for possible values. Setting this without \code{"screen"} turns
-off all plotting; setting it with \code{"screen"} triggers plotting for any
-module that uses this parameter, and has no effect on modules that do not.
+\item{.plots}{Character. Sets the \code{.plots} parameter (see \link{dotParameters}) in
+all modules for this call. See \code{\link[=Plots]{Plots()}} for possible values. Setting this
+without \code{"screen"} turns off all plotting; setting it with \code{"screen"} triggers
+plotting for any module that uses this parameter, and has no effect on modules
+that do not.
 
 This replaces the \code{.plotInitialTime} argument, which was removed. Use
 \code{.plots = NA} where you previously used \code{.plotInitialTime = NA}. The
@@ -173,8 +174,8 @@ experiment calls (see \url{https://github.com/PredictiveEcology/SpaDES.experimen
 can be cached and mixtures of all of these will work. For functions, simply
 wrap the call with \code{Cache}, moving the original function name into
 the first argument of Cache. For events or modules, set the module \code{parameters},
-\code{.useCache}, e.g.,
-\code{simInit(..., parameters = list(myModule = list(.useCache = "init")))}.
+\code{.useCache} (see \link{dotParameters}), e.g.,
+\code{simInit(..., params = list(myModule = list(.useCache = "init")))}.
 This can be set to an event name, which will cache that event, or a logical,
 which will cache \emph{every} event in that module. Event and module caching
 makes most sense when the event or module only runs once, such as an initialization

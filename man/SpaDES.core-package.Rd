@@ -81,6 +81,7 @@ have matching setters (e.g., \code{params(sim) <- ...}).
 \code{\link[=P]{P()}} \tab Get a parameter for the current module without naming it.\cr
 \code{\link[=globals]{globals()}} \tab Simulation-wide (global) parameters.\cr
 \code{\link[=paramCheckOtherMods]{paramCheckOtherMods()}} \tab Compare a parameter's value across modules.\cr
+\link{dotParameters} \tab The framework-aware "dot" parameters (\code{.plots}, \code{.useCache}, \code{.seed}, ...).\cr
 }
 }
 
@@ -225,9 +226,8 @@ shortcuts for caching at the \code{spades}, module, event, and function level.
 \code{\link[reproducible:keepCache]{reproducible::keepCache()}} \tab Keep only the entries you name.\cr
 }
 
-Inside a module's metadata you can set the parameter \code{.useCache} to \code{TRUE}
-(cache the whole module), a character vector (cache only those events),
-or use \code{.useCacheArgs} to pin per-event arguments to \code{\link[reproducible:Cache]{reproducible::Cache()}}.
+A module's \code{.useCache} and \code{.useCacheArgs} parameters control event and module
+caching; see \link{dotParameters}.
 See the caching vignette: \code{vignette("iii-cache", package = "SpaDES.core")}.
 }
 

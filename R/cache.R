@@ -1716,7 +1716,7 @@ lsModObjectsChanged <- function(namesAllMods, changedObjs, hasDotObjs) {
 #' Convenience wrapper around `clearCache` for SpaDES events
 #'
 #' This will clear only the event- and module-level caching that is triggered
-#' using a module parameter, `.useCache`.
+#' using a module parameter, `.useCache` (see [dotParameters]).
 #'
 #' @inheritParams reproducible::clearCache
 #' @param dryRun logical. If `FALSE`, the default, then the function will deleted

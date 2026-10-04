@@ -36,6 +36,7 @@ G(sim) <- value
 \code{globals}, and the alias \code{G}, accesses or sets the "globals"
 in the \code{simList}. This currently is not an explicit slot in the \code{simList},
 but it is a \code{.globals} element in the \code{params} slot of the \code{simList}.
+Which modules a global parameter reaches is described in \code{\link[=simInit]{simInit()}} and \link{dotParameters}.
 }
 \seealso{
 \link{SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.

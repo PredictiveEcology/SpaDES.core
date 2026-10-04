@@ -35,5 +35,5 @@ cleared.
 }
 \description{
 This will clear only the event- and module-level caching that is triggered
-using a module parameter, \code{.useCache}.
+using a module parameter, \code{.useCache} (see \link{dotParameters}).
 }

@@ -467,27 +467,19 @@ noEventWarning <- function(sim) {
 
 #' Reserved module parameter names
 #'
-#' These are common parameter names that are reserved for specific use within modules.
-#'
-#' - `.plotInitialTime`: the initial time for plotting;
-#' - `.plotInterval`: the interval between plots;
-#' - `.plots`: the types of plots to create (see `types` argument in [Plots()]);
-#' - `.saveInitialTime`: the initial time for saving;
-#' - `.saveInterval`: the interval between saves;
-#' - `.useCache`: whether to use caching, or which events to cache;
-#' - `.useCacheArgs`: optional named list (keyed by event name) of extra arguments
-#'   passed to [reproducible::Cache()] for that event (e.g. `cacheId`,
-#'   `useCloud`, `cloudFolderID`); enables a developer to pin a fixed cloud
-#'   cache key for a deterministic event;
-#' - `.useParallel`: whether to use parallel processing, or the number of parallel cores to use;
+#' The universal dot parameters: SpaDES.core itself acts on each one for every module,
+#' without module code, so `.globals` sets them in every module, whether or not the
+#' module declares them. Other dot parameters reach only modules that declare them.
+#' What each one does is described in [dotParameters].
 #'
 #' @keywords internal
 #' @rdname dot-params
-.knownDotParams <- c(".plotInitialTime", ".plotInterval",
-                     ".plots",
-                     ".saveInitialTime", ".saveInterval",
-                     ._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
-                     ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
+## Rule: a dot parameter is universal iff SpaDES.core itself acts on it for every module.
+.knownDotParams <- c(".plots", ".seed", ".showSimilar", ._txtDotUseCache, ._txtDotUseCacheArgs)
+
+## Left out of the event cache key: they change how an event is cached, not its result
+paramsDontCacheOn <- c(._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
+                       ._txtDotNeverCache)
 
 
 ## Singular/plural message grammar ---------------------------------------------

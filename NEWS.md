@@ -11,6 +11,16 @@
 
 # SpaDES.core 3.2.1.9034
 
+## Enhancements
+
+* `.globals` now sets only the universal dot parameters (`.plots`, `.seed`, `.showSimilar`, `.useCache`, `.useCacheArgs`) in modules that do not declare them; `.knownDotParams` is that list. `.plotInterval`, `.saveInitialTime`, `.saveInterval`, `.useCloud` and `.useParallel` (and `.plotInitialTime`, already excluded) now reach only modules that declare them, as does `.rep`. `.seed` and `.showSimilar` now reach every module. `?dotParameters` states the rule.
+
+## Documentation
+
+* New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
+  with its default and effect, including `.studyAreaName` and `.rep`, which SpaDES.project sets. It is linked from
+  `defineParameter()`, `newModule()` and the package overview.
+
 ## Bug fixes
 
 * The `simList` methods of `.wrap()` and `.unwrap()` (R/cache.R) take `filebackedPath` instead of `cachePath`,
