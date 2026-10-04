@@ -253,26 +253,11 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           # for future caching of modules
           cacheIt <- FALSE
           eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-          a <- sim@params[[curModuleName]][[._txtDotUseCache]]
-          if (!is.null(a)) {
-            #.useCache is a parameter
-            if (!identical(FALSE, a)) {
-              #.useCache is not FALSE
-              if (!isTRUE(a)) {
-                #.useCache is not TRUE
-                if (cur[["eventType"]] %in% a) {
-                  cacheIt <- TRUE
-                } else if (inherits(a, "POSIXt")) {
-                  cacheIt <- TRUE
-                  notOlderThan <- a
-                }
-              } else {
-                cacheIt <- TRUE
-              }
-            }
-          }
-          
-          
+          eventCache <- .eventIsCached(sim@params[[curModuleName]], cur[["eventType"]],
+                                       curModuleName, verbose = debugToVerbose(debug))
+          cacheIt <- eventCache$cache
+          if (!is.null(eventCache$notOlderThan)) notOlderThan <- eventCache$notOlderThan
+
           if (!.spadesUseCache()$events) cacheIt <- FALSE # options(spades.useCache = "off")
           # browser(expr = exists("._doEvent_2"))
           showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
@@ -827,6 +812,12 @@ scheduleConditionalEvent <- function(sim,
 #' Caching is only based on the input `simList.`
 #' See also the vignette on caching for examples.
 #'
+#' A module whose events run for their side effects can list them in its `.neverCache`
+#' parameter (a character vector of event names, possibly `".inputObjects"`). `.neverCache`
+#' wins over every form of `.useCache` (`TRUE`, event names, a time), whether the module, the
+#' user or `.globals` set it, and it is not part of the event cache key. Being declared-only,
+#' `.globals` sets it only in modules that declare it.
+#'
 #' @section `debug`:
 #'
 #' The most powerful way to use debug is to invoke the `logging`
@@ -1006,6 +997,7 @@ setMethod(
 
     ## options(spades.useCache = "eventsOnly" / "off"): Cache() calls inside module code take
     ## reproducible.useCache, so set it for the run; the event-level calls pass useCache explicitly
+    .pkgEnv$neverCacheMsgd <- NULL ## one `.neverCache` message per module and event, per call
     innerUseCache <- .spadesUseCache()$inner
     if (!is.null(innerUseCache)) {
       optInner <- options(reproducible.useCache = innerUseCache)
@@ -2688,7 +2680,8 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
 
 ## don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
-paramsDontCacheOn <- grep(c("useCache|useCloud"), .knownDotParams, value = TRUE)
+paramsDontCacheOn <- c(grep(c("useCache|useCloud"), .knownDotParams, value = TRUE),
+                       ._txtDotNeverCache)
 
 appendCompleted <- function(sim, cur) {
 
