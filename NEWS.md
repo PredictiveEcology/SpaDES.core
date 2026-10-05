@@ -1,8 +1,10 @@
-# SpaDES.core 3.2.1.9035
+# SpaDES.core 3.2.1.9036
 
 ## Bug fixes
 
 * With `spades.cacheChaining = TRUE`, a chained event or `.inputObjects` cache hit ignored changes to the module's metadata values (`version`, `reqdPkgs`, ...), which the ordinary event cache key does digest, so it restored the entry recorded before the change. The chain key now includes those values. Existing chains are broken once.
+
+# SpaDES.core 3.2.1.9035
 
 ## Enhancements
 
