@@ -1646,6 +1646,7 @@ setMethod(
     ## A pass run with the option off would otherwise leave no tags for a later pass.
     {
       nonObjects <- nonObjectsForCacheChaining(moduleSpecificObjects, fnEnv, classOptions,
+                                               sim@depends@dependencies[[cur[["moduleName"]]]],
                                                extraCacheArgs = if (isTRUE(cacheIt)) extraCacheArgs)
       # append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
       #        classOptions)

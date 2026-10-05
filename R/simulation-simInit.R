@@ -1837,6 +1837,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               prevCache <- attr(sim, "tags")
               # # take only functions; no objects; select because the functions have ":"
               nonObjects <- nonObjectsForCacheChaining(objectsToEvaluateForCaching, fnEnv, classOptions,
+                                                       sim@depends@dependencies[[mBase]],
                                                        extraCacheArgs = extraCacheArgs)
 
               # fns2 <- extractFns(objectsToEvaluateForCaching)
@@ -2545,11 +2546,27 @@ objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
 
 spadesDebugWidthDefault <- c(9, 10, 9, 13)
 
+## `classOptions$depends` names the metadata slots the ordinary event key digests, but a chain
+## key built from the names alone never changes when a slot's VALUE does (a raised `reqdPkgs`
+## floor, a new `version`). Give the chain the values of those slots. They are the ones the
+## ordinary key digests (.robustDigest,simList): "parameters" is not (its resolved values are
+## `classOptions$params`) and the `desc` columns of the object tables are not.
+.chainDependsValues <- function(dep, dependsSlots) {
+  slots <- setdiff(dependsSlots, "parameters")
+  vals <- lapply(slots, function(x) {
+    v <- slot(dep, x)
+    if (is.data.frame(v)) v[, grep("desc$", colnames(v), value = TRUE, invert = TRUE), drop = FALSE] else v
+  })
+  setNames(vals, slots)
+}
+
 nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions,
-                                       extraCacheArgs = NULL) {
+                                       dep, extraCacheArgs = NULL) {
   fns2 <- extractFns(objectsToEvaluateForCaching)
   nonObjects <- append(classOptions,
                        as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
+  nonObjects <- append(nonObjects,
+                       list(.dependsValues = .chainDependsValues(dep, classOptions$depends)))
   ## A chained cacheId makes Cache() skip its digest, so the `.useCacheArgs` that change what
   ## Cache() keys on (`.cacheExtra`, `omitArgs`, ...) must be part of what the chain matches
   ## on; otherwise changing them can never break the chain, and the event keeps returning the
