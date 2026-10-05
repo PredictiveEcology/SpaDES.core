@@ -1,5 +1,9 @@
 # SpaDES.core 3.2.1.9035
 
+## Bug fixes
+
+* With `spades.cacheChaining = TRUE`, a chained event or `.inputObjects` cache hit ignored changes to the module's metadata values (`version`, `reqdPkgs`, ...), which the ordinary event cache key does digest, so it restored the entry recorded before the change. The chain key now includes those values. Existing chains are broken once.
+
 ## Enhancements
 
 * `.globals` now sets only the universal dot parameters (`.plots`, `.seed`, `.showSimilar`, `.useCache`, `.useCacheArgs`) in modules that do not declare them; `.knownDotParams` is that list. `.plotInterval`, `.saveInitialTime`, `.saveInterval`, `.useCloud` and `.useParallel` (and `.plotInitialTime`, already excluded) now reach only modules that declare them, as does `.rep`. `.seed` and `.showSimilar` now reach every module. `?dotParameters` states the rule.

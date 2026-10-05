@@ -243,7 +243,7 @@
     env <- list2env(list(sim = simTmp, cur = simTmp@current), parent = environment())
     extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = env)
   }
-  nonObjectsForCacheChaining(objs, fnEnv, classOptions, extraCacheArgs = extraCacheArgs)
+  nonObjectsForCacheChaining(objs, fnEnv, classOptions, dep, extraCacheArgs = extraCacheArgs)
 }
 
 ## The digest the chain keys on (`digestNonObjects`): module code, parameters, metadata slots
