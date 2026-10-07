@@ -9,7 +9,13 @@
   event says when it overrides `.useCache`. One helper, `.eventIsCached()` (R/helpers.R), now makes the
   decision for events and for `.inputObjects`. The row in `?dotParameters` is to follow once #482 merges.
 
-# SpaDES.core 3.2.1.9034
+# SpaDES.core 3.2.1.9036
+
+## Bug fixes
+
+* With `spades.cacheChaining = TRUE`, a chained event or `.inputObjects` cache hit ignored changes to the module's metadata values (`version`, `reqdPkgs`, ...), which the ordinary event cache key does digest, so it restored the entry recorded before the change. The chain key now includes those values. Existing chains are broken once.
+
+# SpaDES.core 3.2.1.9035
 
 ## Enhancements
 
@@ -20,6 +26,8 @@
 * New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
   with its default and effect, including `.studyAreaName` and `.rep`, which SpaDES.project sets. It is linked from
   `defineParameter()`, `newModule()` and the package overview.
+
+# SpaDES.core 3.2.1.9034
 
 ## Bug fixes
 
