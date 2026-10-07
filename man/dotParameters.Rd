@@ -31,6 +31,11 @@ with the module template, or, where stated, the value SpaDES.core fills in.
 
 \tabular{llll}{
 \strong{Parameter} \tab \strong{Tier} \tab \strong{Default} \tab \strong{Effect}\cr
+\code{.neverCache} \tab declared only \tab none \tab Events (names, may include
+\code{".inputObjects"}) that are never cached, because they run for their side effects.
+Wins over \code{.useCache} in every form, including \code{TRUE} from \code{.globals}; a
+message says so once per module and event. Declared only: the module owns it.
+Not part of the cache key.\cr
 \code{.plots} \tab universal \tab \code{"screen"} (template) \tab Types of output \code{\link[=Plots]{Plots()}} makes
 (\code{"screen"}, \code{"object"}, \code{"raw"}, or a file type such as \code{"png"});
 \code{NA} for none. \code{spades(sim, .plots = )} sets it in all modules.

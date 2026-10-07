@@ -194,6 +194,12 @@ been rerun. Use this with caution, as it will return exactly the result from
 a previous run, even if there is stochasticity internally.
 Caching is only based on the input \code{simList.}
 See also the vignette on caching for examples.
+
+A module whose events run for their side effects can list them in its \code{.neverCache}
+parameter (a character vector of event names, possibly \code{".inputObjects"}). \code{.neverCache}
+wins over every form of \code{.useCache} (\code{TRUE}, event names, a time), whether the module, the
+user or \code{.globals} set it, and it is not part of the event cache key. Being declared-only,
+\code{.globals} sets it only in modules that declare it.
 }
 
 \section{\code{debug}}{

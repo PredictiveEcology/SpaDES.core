@@ -173,7 +173,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'                     the `Cache` function that wraps `.inputObjects`.
 #'                     If the module's `.useCache` parameter (see [dotParameters]) is
 #'                     `TRUE` or includes `".inputObjects"`,
-#'                     then the `.inputObjects` will be cached.
+#'                     then the `.inputObjects` will be cached, unless the module
+#'                     lists `".inputObjects"` in its `.neverCache` parameter.
 #'                     Setting `notOlderThan = Sys.time()` will cause the
 #'                     cached versions of `.inputObjects` to be refreshed,
 #'                     i.e., rerun.
@@ -397,6 +398,7 @@ setMethod(
 
     ## options(spades.useCache = "eventsOnly" / "off"): Cache() calls inside module code take
     ## reproducible.useCache, so set it for the run; the .inputObjects call passes useCache explicitly
+    .pkgEnv$neverCacheMsgd <- NULL ## one `.neverCache` message per module and event, per call
     innerUseCache <- .spadesUseCache()$inner
     if (!is.null(innerUseCache)) {
       optInner <- options(reproducible.useCache = innerUseCache)
@@ -1673,18 +1675,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         }
         list2env(objectsToUse, envir = sim@.xData)
       }
-      a <- P(sim, ._txtDotUseCache, mBase)
-      if (!is.null(a)) {
-        if (!identical(FALSE, a)) {
-          if (isTRUE(a)) {
-            cacheIt <- TRUE
-          } else {
-            if (".inputObjects" %in% a) {
-              cacheIt <- TRUE
-            }
-          }
-        }
-      }
+      cacheIt <- .eventIsCached(sim@params[[mBase]], ".inputObjects", mBase,
+                                verbose = debugToVerbose(debug))$cache
       if (!.spadesUseCache()$events) cacheIt <- FALSE # options(spades.useCache = "off")
 
       cur <- sim@current

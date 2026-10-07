@@ -392,6 +392,52 @@ noEventWarning <- function(sim) {
 ._txtSimNesting <- "._simNesting"
 ._txtDotUseCache <- ".useCache"
 ._txtDotUseCacheArgs <- ".useCacheArgs"
+._txtDotNeverCache <- ".neverCache"
+
+#' Should a module event be cached?
+#'
+#' The one place that turns a module's `.useCache` and `.neverCache` parameters into a
+#' caching decision, for events in `.runEvent()` and for `.inputObjects` in `simInit()`.
+#' `.useCache` may be `TRUE`, `FALSE`, `NULL`, a character vector of event names or a
+#' `POSIXt` (cache every event, and refresh entries older than that time). `.neverCache`
+#' (a character vector of event names, possibly `".inputObjects"`) wins over every form of
+#' `.useCache`, whoever set it: the module, the user or `.globals`. When `.useCache` asked to
+#' cache an event that `.neverCache` lists, one message per module and event is shown for each
+#' `simInit()` or `spades()` call.
+#'
+#' @param params The module's parameter list, i.e., `sim@params[[moduleName]]`.
+#' @param eventType Event name, e.g., `"init"` or `".inputObjects"`.
+#' @param moduleName,verbose Used only for the message; no message if `moduleName` is `NULL`.
+#' @return A list with `cache` (logical) and `notOlderThan` (a `POSIXt`, or `NULL`).
+#' @keywords internal
+#' @noRd
+.eventIsCached <- function(params, eventType, moduleName = NULL,
+                           verbose = getOption("reproducible.verbose")) {
+  a <- params[[._txtDotUseCache]]
+  cache <- FALSE
+  notOlderThan <- NULL
+  if (!is.null(a) && !identical(FALSE, a)) {
+    if (isTRUE(a) || eventType %in% a) {
+      cache <- TRUE
+    } else if (inherits(a, "POSIXt")) {
+      cache <- TRUE
+      notOlderThan <- a
+    }
+  }
+  if (cache && eventType %in% params[[._txtDotNeverCache]]) {
+    if (!is.null(moduleName)) {
+      key <- paste(moduleName, eventType)
+      if (!key %in% .pkgEnv$neverCacheMsgd) {
+        .pkgEnv$neverCacheMsgd <- c(.pkgEnv$neverCacheMsgd, key)
+        messageVerbose("Module ", moduleName, " event ", eventType, " is not cached, ",
+                       "because the module lists it in `.neverCache`", verbose = verbose)
+      }
+    }
+    cache <- FALSE
+    notOlderThan <- NULL
+  }
+  list(cache = cache, notOlderThan = notOlderThan)
+}
 
 ## How caching applies inside simInit() and spades(), from options(spades.useCache):
 ##   "all"        events per each module's `.useCache`; Cache() calls inside module code follow
@@ -432,7 +478,8 @@ noEventWarning <- function(sim) {
 .knownDotParams <- c(".plots", ".seed", ".showSimilar", ._txtDotUseCache, ._txtDotUseCacheArgs)
 
 ## Left out of the event cache key: they change how an event is cached, not its result
-paramsDontCacheOn <- c(._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud)
+paramsDontCacheOn <- c(._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
+                       ._txtDotNeverCache)
 
 
 ## Singular/plural message grammar ---------------------------------------------

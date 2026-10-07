@@ -24,6 +24,11 @@
 #'
 #' \tabular{llll}{
 #'   **Parameter** \tab **Tier** \tab **Default** \tab **Effect**\cr
+#'   `.neverCache` \tab declared only \tab none \tab Events (names, may include
+#'     `".inputObjects"`) that are never cached, because they run for their side effects.
+#'     Wins over `.useCache` in every form, including `TRUE` from `.globals`; a
+#'     message says so once per module and event. Declared only: the module owns it.
+#'     Not part of the cache key.\cr
 #'   `.plots` \tab universal \tab `"screen"` (template) \tab Types of output [Plots()] makes
 #'     (`"screen"`, `"object"`, `"raw"`, or a file type such as `"png"`);
 #'     `NA` for none. `spades(sim, .plots = )` sets it in all modules.
