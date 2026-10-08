@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Deprecated
+
+* `downloadModule()` is deprecated in favour of `SpaDES.project::getModule()`, which fetches a module from its own GitHub repository at a branch, a version tag or its latest release, with its child modules. `downloadModule()` reads `.zip` files from `PredictiveEcology/SpaDES-modules`, which holds a few older modules and has not been updated since 2021, so current modules (fireSense, LandR Biomass) could not be downloaded with it. It still works for those older modules, with one deprecation warning per call.
+
 ## New features
 
 * New module parameter `.neverCache`: a character vector of event names (possibly `".inputObjects"`)

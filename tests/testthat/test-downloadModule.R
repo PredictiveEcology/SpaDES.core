@@ -1,3 +1,19 @@
+test_that("downloadModule is deprecated, once per call", {
+  testInit()
+  ## a parent and its child, both already local, so nothing is fetched; the parent's call
+  ## calls downloadModule() again for the child
+  mp <- file.path(tmpdir, "deprecated")
+  for (m in c("par", "kid")) dir.create(file.path(mp, m), recursive = TRUE)
+  writeLines(paste0('defineModule(sim, list(name = "par", ',
+                    'version = list(par = "1.0.0", kid = "1.0.0"), childModules = "kid"))'),
+             file.path(mp, "par", "par.R"))
+  writeLines('defineModule(sim, list(name = "kid", version = list(kid = "1.0.0"), childModules = character(0)))',
+             file.path(mp, "kid", "kid.R"))
+  warns <- capture_warnings(try(suppressMessages(
+    downloadModule("par", path = mp, version = "1.0.0", data = FALSE, quiet = TRUE)), silent = TRUE))
+  expect_identical(sum(grepl("SpaDES.project::getModule", warns, fixed = TRUE)), 1L)
+})
+
 test_that("downloadModule downloads and unzips a single module", {
   skip_on_cran()
 
