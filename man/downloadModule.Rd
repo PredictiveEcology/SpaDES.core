@@ -81,7 +81,7 @@ repository at a branch, a version tag or the latest release, and its child modul
 \details{
 Download a .zip file of the module and extract (unzip) it to a user-specified location.
 The default repository, \code{PredictiveEcology/SpaDES-modules}, holds .zip files only for
-a few older modules and has not been updated since 2021, so current modules
+a few older modules and has had no new module .zip files since 2022, so current modules
 (e.g. the fireSense and LandR Biomass families) cannot be downloaded this way.
 
 Currently only works with GitHub repositories where modules are located in

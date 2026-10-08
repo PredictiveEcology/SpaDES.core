@@ -252,7 +252,7 @@ setMethod(
 #'
 #' Download a .zip file of the module and extract (unzip) it to a user-specified location.
 #' The default repository, `PredictiveEcology/SpaDES-modules`, holds .zip files only for
-#' a few older modules and has not been updated since 2021, so current modules
+#' a few older modules and has had no new module .zip files since 2022, so current modules
 #' (e.g. the fireSense and LandR Biomass families) cannot be downloaded this way.
 #'
 #' Currently only works with GitHub repositories where modules are located in
@@ -307,7 +307,7 @@ setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
     .Deprecated("SpaDES.project::getModule", package = "SpaDES.core",
                 msg = paste0("downloadModule() is deprecated; use SpaDES.project::getModule(). ",
                              "The .zip repository it reads (PredictiveEcology/SpaDES-modules) ",
-                             "has not been updated since 2021."))
+                             "has had no new module .zip files since 2022."))
     .pkgEnv$.inDownloadModule <- TRUE
     on.exit(.pkgEnv$.inDownloadModule <- FALSE, add = TRUE)
   }
