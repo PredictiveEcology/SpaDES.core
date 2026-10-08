@@ -247,7 +247,13 @@ setMethod(
 ################################################################################
 #' Download a module from a SpaDES module GitHub repository
 #'
+#' Deprecated. Use [SpaDES.project::getModule()], which fetches a module from its own GitHub
+#' repository at a branch, a version tag or the latest release, and its child modules with it.
+#'
 #' Download a .zip file of the module and extract (unzip) it to a user-specified location.
+#' The default repository, `PredictiveEcology/SpaDES-modules`, holds .zip files only for
+#' a few older modules and has had no new module .zip files since 2022, so current modules
+#' (e.g. the fireSense and LandR Biomass families) cannot be downloaded this way.
 #'
 #' Currently only works with GitHub repositories where modules are located in
 #' a `modules` directory in the root tree on the `master` branch.
@@ -296,6 +302,15 @@ setMethod(
 setGeneric("downloadModule", function(name, path, version, repo, data, quiet,
                                       quickCheck = FALSE, overwrite = FALSE,
                                       verbose = getOption("reproducible.verbose")) {
+  ## once per call, not again for each child module it downloads
+  if (!isTRUE(.pkgEnv$.inDownloadModule)) {
+    .Deprecated("SpaDES.project::getModule", package = "SpaDES.core",
+                msg = paste0("downloadModule() is deprecated; use SpaDES.project::getModule(). ",
+                             "The .zip repository it reads (PredictiveEcology/SpaDES-modules) ",
+                             "has had no new module .zip files since 2022."))
+    .pkgEnv$.inDownloadModule <- TRUE
+    on.exit(.pkgEnv$.inDownloadModule <- FALSE, add = TRUE)
+  }
   standardGeneric("downloadModule")
 })
 
