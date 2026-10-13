@@ -37,6 +37,9 @@ layerNamesDelimiter <- getFromNamespace("layerNamesDelimiter", "reproducible")
 cacheId <- getFromNamespace("cacheId", "reproducible")
 showCacheFast <- getFromNamespace("showCacheFast", "reproducible")
 makeAbsolute <- getFromNamespace("makeAbsolute", "reproducible")
+useDBI <- getFromNamespace("useDBI", "reproducible")
+withLockFile <- getFromNamespace("withLockFile", "reproducible")
+CacheTagLockFile <- getFromNamespace("CacheTagLockFile", "reproducible")
 
 ## re-exported functions --------------------------------------------------------
 

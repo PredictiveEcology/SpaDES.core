@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Bug fixes
+
+* With `spades.cacheChaining = TRUE`, a run that read a cache entry while another process was recording a chain link on it failed with `argument specifying columns received non-existing column(s): cols[4]='event'`. A link is now recorded as one tag (`eventChainLink_<postCacheId>`), so one locked write records all of it; the entry's tags are read under that lock; and an incomplete or unreadable link means no jump, never an error. Links recorded as six `cacheChaining_*` tags are still read when complete.
+
 ## Deprecated
 
 * `downloadModule()` is deprecated in favour of `SpaDES.project::getModule()`, which fetches a module from its own GitHub repository at a branch, a version tag or its latest release, with its child modules. `downloadModule()` reads `.zip` files from `PredictiveEcology/SpaDES-modules`, which holds a few older modules and has had no new module `.zip` files since 2022, so current modules (fireSense, LandR Biomass) could not be downloaded with it. It still works for those older modules, with one deprecation warning per call.

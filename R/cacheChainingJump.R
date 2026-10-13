@@ -261,30 +261,80 @@
   reproducible::CacheDigest(nonObjects)$outputHash
 }
 
-.chainEntryTags <- function(cacheId, cachePath) {
-  sc <- try(showCacheFast(cacheId = cacheId, cachePath = cachePath), silent = TRUE)
+## An entry's tags. In the file backend a tag write rewrites the whole tag file under a lock, and the
+## reader of showCacheFast() takes none, so it can see the file between one tag write and the next, or
+## part-written: read under the writer's lock. (A DBI backend answers with one SELECT, already consistent.)
+## NULL when they cannot be read, which means no jump.
+.chainEntryTags <- function(cacheId, cachePath = getOption("reproducible.cachePath")) {
+  read <- function() showCacheFast(cacheId = cacheId, cachePath = cachePath)
+  sc <- try(if (useDBI()) read() else withLockFile(CacheTagLockFile(cachePath, cacheId), read()),
+            silent = TRUE)
   if (is(sc, "try-error") || !NROW(sc)) NULL else sc
 }
 
-## The chains recorded on one entry: one row per postCacheId, columns prevCache,
-## digestNonObjects, module, event, lastEventDetails, postCacheId. Flattening every tag into a
-## single row would collapse them (duplicate names get mangled, rows pair positionally). The same
+## A link (previous entry -> this event, recorded on the previous entry) is ONE tag, `eventChainLink_<postCacheId>`,
+## so that one write, under the tag lock, records all of it. prevCache and postCacheId are the entry and
+## the key. Its value is a marker and the other fields, tab separated, as for the tags above.
+## It must not start with "cacheChaining": versions before this one read every such tag as a column of
+## the old six-tag format and stop on a link that has fewer.
+.chainLinkKeyPrefix <- "eventChainLink_"
+.chainLinkMarker <- "chainLink1"
+lastEventDetails <- "lastEventDetails"
+.chainLinkFields <- c("digestNonObjects", "module", "event", lastEventDetails)
+.chainLinkCols <- c("prevCache", .chainLinkFields, "postCacheId")
+
+.chainLinkTagKey <- function(postCacheId) paste0(.chainLinkKeyPrefix, postCacheId)
+
+.chainLinkText <- function(df)
+  paste(c(.chainLinkMarker, vapply(.chainLinkFields, function(f) as.character(df[[f]]), character(1))),
+        collapse = "\t")
+
+## The one-tag links in `ccVals` (tags of one entry), as a data.frame of the columns of .chainLinkCols;
+## a tag whose value is not a link is dropped.
+.chainNewLinks <- function(ccVals) {
+  ccVals <- ccVals[startsWith(ccVals$tagKey, .chainLinkKeyPrefix)]
+  parts <- strsplit(ccVals$tagValue, "\t", fixed = TRUE)
+  ok <- vapply(parts, function(x) length(x) == length(.chainLinkFields) + 1L &&
+                 identical(x[[1]], .chainLinkMarker), logical(1))
+  if (!any(ok)) return(NULL)
+  parts <- parts[ok]; ccVals <- ccVals[ok]
+  out <- as.data.frame(lapply(seq_along(.chainLinkFields), function(i)
+    vapply(parts, `[[`, character(1), i + 1L)) |> setNames(.chainLinkFields))
+  out$prevCache <- paste0("cacheId:", ccVals$cacheId)
+  out$postCacheId <- substring(ccVals$tagKey, nchar(.chainLinkKeyPrefix) + 1L)
+  out[, .chainLinkCols, drop = FALSE]
+}
+
+## The chains recorded on one entry: one row per postCacheId, columns .chainLinkCols. Flattening every
+## tag into a single row would collapse them (duplicate names get mangled, rows pair positionally). The same
 ## link can also have been recorded more than once under one postCacheId -- by a version whose
 ## digest differs -- and only its newest recording counts: otherwise its repeated names are mangled
 ## the same way and the join sees the oldest, which then never matches again.
+## Links recorded before they were one tag are six tags, `cacheChaining_<column>_<postCacheId>`, written
+## one at a time; a group of them that lacks a column (read while being written, or left by an
+## interrupted writer) is not a link and is dropped. NULL if there is no link.
 .chainSuccessors <- function(sc) {
-  ccVals <- sc[startsWith(sc$tagKey, "cacheChaining")]
+  if ("createdDate" %in% names(sc)) sc <- sc[order(sc$createdDate)]
+  out <- rbindlist(list(.chainOldLinks(sc[startsWith(sc$tagKey, "cacheChaining")]),
+                        .chainNewLinks(sc[startsWith(sc$tagKey, .chainLinkKeyPrefix)])), use.names = TRUE)
+  ## newest last, so a one-tag link beats a six-tag one, and a later recording beats an earlier
+  if (NROW(out)) out[!duplicated(out$postCacheId, fromLast = TRUE)] else NULL
+}
+
+.chainOldLinks <- function(ccVals) {
   if (!NROW(ccVals)) return(NULL)
-  if ("createdDate" %in% names(ccVals)) ccVals <- ccVals[order(ccVals$createdDate)]
   spli <- strsplit(ccVals$tagKey, "_")
   nams <- vapply(spli, function(x) x[[2]], character(1))
   postCacheIds <- vapply(spli, function(x) x[[3]], character(1))
   newest <- !duplicated(paste(postCacheIds, nams), fromLast = TRUE)
   ccVals <- ccVals[newest]; nams <- nams[newest]; postCacheIds <- postCacheIds[newest]
+  groups <- split(seq_along(nams), postCacheIds)
+  groups <- groups[vapply(groups, function(ix) all(.chainLinkCols %in% nams[ix]), logical(1))]
+  if (!length(groups)) return(NULL)
   rbindlist(
-    lapply(split(seq_along(nams), postCacheIds), function(ix)
-      as.data.frame(as.list(ccVals$tagValue[ix]) |> setNames(nams[ix]))),
-    use.names = TRUE, fill = TRUE)
+    lapply(groups, function(ix)
+      as.data.frame(as.list(ccVals$tagValue[ix]) |> setNames(nams[ix]))[, .chainLinkCols, drop = FALSE]),
+    use.names = TRUE)
 }
 
 ## The expectsInputs of `module` that the chain did not produce must be what they were when the
