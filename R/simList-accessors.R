@@ -2269,16 +2269,10 @@ time.simList <- function(x, unit, ...) {
     return(t)
 }
 
-#' @aliases simList-accessors-times
-#' @export
-#' @rdname simList-accessors-times
-setGeneric("time<-", function(x, value) {
-  standardGeneric("time<-")
-})
-
 #' @aliases time<-,simList-method
 #' @aliases simList-accessors-times
-#' @export
+#' @export time<-
+#' @importFrom terra time<-
 #' @name time<-
 #' @rdname simList-accessors-times
 setReplaceMethod(
