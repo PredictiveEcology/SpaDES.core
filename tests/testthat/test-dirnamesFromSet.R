@@ -73,3 +73,11 @@ test_that("dirnamesFromSet errors on leafOnly = FALSE with no files", {
   expect_error(dirnamesFromSet(character(0), set = 1:2, leafOnly = FALSE),
                "requires `files`")
 })
+
+test_that("dirnamesFromSet returns the rep directory, not a subfolder, when leafOnly is FALSE", {
+  ## outputs(sim) lists files in subfolders of a rep directory too
+  files <- c("out/rep1/figures/plot.png", "out/rep1/climate/MDC.tif", "out/rep1/burnMap.tif",
+             "out/rep2/figures/plot.png")
+
+  expect_identical(dirnamesFromSet(files, set = 1:2, leafOnly = FALSE), c("out/rep1", "out/rep2"))
+})

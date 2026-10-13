@@ -555,7 +555,8 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
   if (leafOnly) {
     paste0(prefix, sort(unique(ids[inSet])))
   } else {
-    dirs <- dirname(files[keep][inSet])
+    ## the path up to and including the rep directory, so files in its subfolders give the same one
+    dirs <- sub(paste0("(.*/", prefix, "\\d+)/.*"), "\\1", files[keep][inSet])
     ids <- ids[inSet]
     firsts <- !duplicated(dirs)
     dirs[firsts][order(ids[firsts])]

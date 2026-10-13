@@ -1,4 +1,8 @@
-# SpaDES.core (development version)
+# SpaDES.core 3.2.1.9037
+
+## Bug fixes
+
+* `dirnamesFromSet(leafOnly = FALSE)` returned the folder of each file, so a file in a subfolder of a replicate (`out/rep1/figures/plot.png`) gave `out/rep1/figures` instead of `out/rep1`, and one replicate could appear several times. It now returns the replicate directory, as documented.
 
 ## Deprecated
 
