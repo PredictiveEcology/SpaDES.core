@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+* `time(sim) <- value` failed with "unable to find an inherited method" when terra was attached after SpaDES.core, because SpaDES.core defined its own `time<-` generic next to terra's. SpaDES.core now adds its `simList` method to terra's generic and re-exports it, so it works in either attach order.
+
 * With `spades.cacheChaining = TRUE`, a run that read a cache entry while another process was recording a chain link on it failed with `argument specifying columns received non-existing column(s): cols[4]='event'`. A link is now recorded as one tag (`eventChainLink_<postCacheId>`), so one locked write records all of it; the entry's tags are read under that lock; and an incomplete or unreadable link means no jump, never an error. Links recorded as six `cacheChaining_*` tags are still read when complete.
 
 ## Deprecated
