@@ -132,3 +132,27 @@ test_that("a child that cannot be parsed does not break the parent's query", {
   ## ... and the broken one is simply left out
   expect_false("bad" %in% names(p))
 })
+
+test_that("simInit and spades run every leaf of a parent of parents", {
+  testInit()
+
+  mp <- file.path(tmpdir, "nestedParents")
+  for (m in c("a1", "a2", "b1", "b2"))
+    suppressMessages(newModule(m, mp, open = FALSE, unitTests = FALSE))
+  suppressMessages({
+    newModule("midA", mp, open = FALSE, unitTests = FALSE, children = c("a1", "a2"), type = "parent")
+    newModule("midB", mp, open = FALSE, unitTests = FALSE, children = c("b1", "b2"), type = "parent")
+    newModule("top", mp, open = FALSE, unitTests = FALSE, children = c("midA", "midB"), type = "parent")
+  })
+
+  ## b2 is also listed directly: it is loaded once, not twice
+  mySim <- simInit(times = list(start = 0, end = 1), modules = list("top", "b2"),
+                   params = list(.globals = list(.plots = NA)),
+                   paths = list(modulePath = mp))
+  leaves <- c("a1", "a2", "b1", "b2")
+  expect_setequal(unlist(modules(mySim)), leaves)
+
+  mySim <- spades(mySim, debug = FALSE)
+  inits <- completed(mySim)[eventType == "init", moduleName]
+  expect_setequal(intersect(inits, c(leaves, "midA", "midB", "top")), leaves)
+})
