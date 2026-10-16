@@ -523,8 +523,9 @@ isAre <- function(l, v) {
 #' @param set integer vector of candidate ids to keep.
 #' @param prefix character. The directory name prefix preceding each id.
 #' @param leafOnly logical. If `TRUE` (the default), only the single directory
-#'   name is returned, e.g. `"rep1"` -- the `basename()` of the `dirname()`. If
-#'   `FALSE`, the full directory path is returned, e.g. `"out/rep1"`. Note that
+#'   name is returned, e.g. `"rep1"`, spelled as it is in `files` (so `"rep01"`
+#'   stays `"rep01"`). If `FALSE`, the full replicate directory path is returned,
+#'   e.g. `"out/rep1"`, also when `files` are in its subfolders. Note that
 #'   a full path can only be recovered from `files`, so `leafOnly = FALSE`
 #'   requires a non-empty `files`.
 #'
@@ -547,17 +548,16 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
     return(paste0(prefix, set))
   }
 
-  pattern <- paste0(".*/", prefix, "(\\d+)/.*")
-  keep <- grepl(pattern, files)
-  ids <- as.integer(sub(pattern, "\\1", files[keep]))
+  ## the path up to and including the rep directory, so files in its subfolders give the same one
+  repPattern <- paste0("(.*/", prefix, "(\\d+))/.*")
+  keep <- grepl(repPattern, files)
+  dirs <- sub(repPattern, "\\1", files[keep])
+  ids <- as.integer(sub(repPattern, "\\2", files[keep]))
   inSet <- ids %in% set
+  dirs <- dirs[inSet]
+  ids <- ids[inSet]
+  firsts <- !duplicated(dirs)
+  dirs <- dirs[firsts][order(ids[firsts])]
 
-  if (leafOnly) {
-    paste0(prefix, sort(unique(ids[inSet])))
-  } else {
-    dirs <- dirname(files[keep][inSet])
-    ids <- ids[inSet]
-    firsts <- !duplicated(dirs)
-    dirs[firsts][order(ids[firsts])]
-  }
+  if (leafOnly) unique(basename(dirs)) else dirs
 }
