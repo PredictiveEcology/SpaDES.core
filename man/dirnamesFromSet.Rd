@@ -14,7 +14,10 @@ dirnamesFromSet(files, set, prefix = "rep", leafOnly = TRUE)
 \item{prefix}{character. The directory name prefix preceding each id.}
 
 \item{leafOnly}{logical. If \code{TRUE} (the default), only the single directory
-name is returned, e.g. \code{"rep1"} -- the \code{basename()} of the \code{dirname()}. If
+name found in \code{files} is returned, e.g. \code{"rep1"} or, for zero-padded
+folders, \code{"rep01"} -- the \code{basename()} of the \code{dirname()}. With no \code{files}
+the names cannot be read from paths, so they are built from \code{set} and are
+unpadded (\code{"rep1"}). If
 \code{FALSE}, the full directory path is returned, e.g. \code{"out/rep1"}. Note that
 a full path can only be recovered from \code{files}, so \code{leafOnly = FALSE}
 requires a non-empty \code{files}.}

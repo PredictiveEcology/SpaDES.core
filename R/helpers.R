@@ -523,7 +523,10 @@ isAre <- function(l, v) {
 #' @param set integer vector of candidate ids to keep.
 #' @param prefix character. The directory name prefix preceding each id.
 #' @param leafOnly logical. If `TRUE` (the default), only the single directory
-#'   name is returned, e.g. `"rep1"` -- the `basename()` of the `dirname()`. If
+#'   name found in `files` is returned, e.g. `"rep1"` or, for zero-padded
+#'   folders, `"rep01"` -- the `basename()` of the `dirname()`. With no `files`
+#'   the names cannot be read from paths, so they are built from `set` and are
+#'   unpadded (`"rep1"`). If
 #'   `FALSE`, the full directory path is returned, e.g. `"out/rep1"`. Note that
 #'   a full path can only be recovered from `files`, so `leafOnly = FALSE`
 #'   requires a non-empty `files`.
@@ -552,12 +555,9 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
   ids <- as.integer(sub(pattern, "\\1", files[keep]))
   inSet <- ids %in% set
 
-  if (leafOnly) {
-    paste0(prefix, sort(unique(ids[inSet])))
-  } else {
-    dirs <- dirname(files[keep][inSet])
-    ids <- ids[inSet]
-    firsts <- !duplicated(dirs)
-    dirs[firsts][order(ids[firsts])]
-  }
+  dirs <- dirname(files[keep][inSet])
+  ids <- ids[inSet]
+  firsts <- !duplicated(dirs)
+  dirs <- dirs[firsts][order(ids[firsts])]
+  if (leafOnly) unique(basename(dirs)) else dirs
 }

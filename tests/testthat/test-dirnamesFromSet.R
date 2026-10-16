@@ -73,3 +73,15 @@ test_that("dirnamesFromSet errors on leafOnly = FALSE with no files", {
   expect_error(dirnamesFromSet(character(0), set = 1:2, leafOnly = FALSE),
                "requires `files`")
 })
+
+test_that("dirnamesFromSet returns zero-padded folder names as they are on disk", {
+  files <- c("/a/rep10/x.tif", "/a/rep02/y.tif", "/a/rep01/x.tif", "/a/rep03/z.tif")
+
+  expect_identical(dirnamesFromSet(files, set = c(1, 2, 10)), c("rep01", "rep02", "rep10"))
+})
+
+test_that("dirnamesFromSet lists a padded folder once however many files it holds", {
+  files <- c("/a/rep01/x.tif", "/a/rep01/y.tif", "/a/rep02/y.tif", "/a/rep01/z.tif")
+
+  expect_identical(dirnamesFromSet(files, set = 1:2), c("rep01", "rep02"))
+})
