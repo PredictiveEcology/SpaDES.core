@@ -2935,9 +2935,9 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
     if (!isTRUE(use)) return(list(cacheIdOfSkip = NULL, df = df, fnCallAsExpr = fnCallAsExpr, jump = NULL))
 
     cacheId <- gsub("cacheId:", "", prevCache)
-    sc <- showCacheFast(cacheId = cacheId)
+    sc <- .chainEntryTags(cacheId)
     ## One recorded chain per postCacheId, one row each (see .chainSuccessors()).
-    prevDF <- .chainSuccessors(sc)
+    prevDF <- if (is.null(sc)) NULL else .chainSuccessors(sc)
     if (!is.null(prevDF)) {
       # THIS IS THE IMPORTANT LINE; JOIN on ALL COLUMNS especially digestNonObjects
       anyExisting <- prevDF[df, on = colnames(df), nomatch = NULL]
@@ -3046,11 +3046,10 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
       ##   and it grew for the life of the session.
       ## Replace, do not append: the same link can be recorded again under the same postCacheId
       ##   (its digest changed, e.g. across versions), and a copy appended beside the stale one
-      ##   leaves the reader two recordings of one link. .updateTagsRepo() takes one tagKey per call.
-      for (col in colnames(df))
-        reproducible::.updateTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
-                                      tagKey = paste0("cacheChaining_", col, "_", postCacheId),
-                                      tagValue = as.character(df[[col]]))
+      ##   leaves the reader two recordings of one link. The whole link is one tag (see .chainLinkText()),
+      ##   so a single write, under the tag lock, records all of it.
+      reproducible::.updateTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
+                                    tagKey = .chainLinkTagKey(postCacheId), tagValue = .chainLinkText(df))
       ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
       ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
       ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()).
@@ -3068,8 +3067,6 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
   sim
 }
 
-
-lastEventDetails <- "lastEventDetails"
 
 
 extractFns <- function(moduleSpecificObjects) {

@@ -14,8 +14,9 @@ dirnamesFromSet(files, set, prefix = "rep", leafOnly = TRUE)
 \item{prefix}{character. The directory name prefix preceding each id.}
 
 \item{leafOnly}{logical. If \code{TRUE} (the default), only the single directory
-name is returned, e.g. \code{"rep1"} -- the \code{basename()} of the \code{dirname()}. If
-\code{FALSE}, the full directory path is returned, e.g. \code{"out/rep1"}. Note that
+name is returned, e.g. \code{"rep1"}, spelled as it is in \code{files} (so \code{"rep01"}
+stays \code{"rep01"}). If \code{FALSE}, the full replicate directory path is returned,
+e.g. \code{"out/rep1"}, also when \code{files} are in its subfolders. Note that
 a full path can only be recovered from \code{files}, so \code{leafOnly = FALSE}
 requires a non-empty \code{files}.}
 }

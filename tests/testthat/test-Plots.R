@@ -75,22 +75,24 @@ test_that("Plots function 1", {
       simOut <- spades(sim, debug = TRUE)
     })
     files <- dir(figurePath(sim), full.names = TRUE, recursive = TRUE)
+    ## match on file names only: the random temp directory in the full path can itself contain "gg"
+    fileNames <- basename(files)
     expect_true(all(grepl(fn, files)))
     if (iii == 5) {
       expect_true(length(files) == 0L)
     }
     if (any(grepl("object", out))) {
-      expect_true(any(grepl("gg", files)))
+      expect_true(any(grepl("gg", fileNames)))
     }
     if (any(grepl("raw", out))) {
-      expect_true(any(grepl("qs2", files) & !grepl("gg", files)))
+      expect_true(any(grepl("qs2", fileNames) & !grepl("gg", fileNames)))
     }
     if (any(grepl("png", out))) {
-      expect_true(any(grepl("png", files)))
+      expect_true(any(grepl("png", fileNames)))
       expect_true(sum(grepl(wdth, mess)) == 1)
     }
     if (any(grepl("pdf", out))) {
-      expect_true(any(grepl("pdf", files)))
+      expect_true(any(grepl("pdf", fileNames)))
     }
 
     expect_true(NROW(outputs(simOut)) == length(out))

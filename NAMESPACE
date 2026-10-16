@@ -265,7 +265,6 @@ exportMethods("progressType<-")
 exportMethods("rasterPath<-")
 exportMethods("scratchPath<-")
 exportMethods("terraPath<-")
-exportMethods("time<-")
 exportMethods("times<-")
 exportMethods("timeunit<-")
 exportMethods(.addChangedAttr)
@@ -491,6 +490,7 @@ importFrom(stats,
   time
 )
 importFrom(terra,
+  "time<-",
   ext,
   inMemory,
   rast,

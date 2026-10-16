@@ -37,8 +37,6 @@ times(x) <- value
 
 \method{time}{simList}(x, unit, ...)
 
-time(x) <- value
-
 \S4method{time}{simList}(x) <- value
 
 end(x, ...)

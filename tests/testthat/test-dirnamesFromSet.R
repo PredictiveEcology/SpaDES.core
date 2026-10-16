@@ -81,3 +81,36 @@ test_that("dirnamesFromSet returns the rep directory, not a subfolder, when leaf
 
   expect_identical(dirnamesFromSet(files, set = 1:2, leafOnly = FALSE), c("out/rep1", "out/rep2"))
 })
+
+test_that("dirnamesFromSet returns zero-padded folder names as they are on disk", {
+  files <- c("/a/rep10/x.tif", "/a/rep02/y.tif", "/a/rep01/x.tif", "/a/rep03/z.tif")
+
+  expect_identical(dirnamesFromSet(files, set = c(1, 2, 10)), c("rep01", "rep02", "rep10"))
+})
+
+test_that("dirnamesFromSet lists a padded folder once however many files it holds", {
+  files <- c("/a/rep01/x.tif", "/a/rep01/y.tif", "/a/rep02/y.tif", "/a/rep01/z.tif")
+
+  expect_identical(dirnamesFromSet(files, set = 1:2), c("rep01", "rep02"))
+})
+
+test_that("dirnamesFromSet keeps padding when files are in subfolders of the rep directory", {
+  files <- c("/o/rep01/figures/p.png", "/o/rep01/a.tif", "/o/rep02/climate/c.vrt")
+
+  expect_identical(dirnamesFromSet(files, set = 1:2), c("rep01", "rep02"))
+  expect_identical(dirnamesFromSet(files, set = 1:2, leafOnly = FALSE), c("/o/rep01", "/o/rep02"))
+})
+
+test_that("dirnamesFromSet keeps whatever padding is on disk", {
+  files <- c("/o/rep001/a.tif", "/o/rep2/a.tif")
+
+  expect_identical(dirnamesFromSet(files, set = 1:2), c("rep001", "rep2"))
+})
+
+test_that("dirnamesFromSet unpadded output is the same for subfolders as for plain files", {
+  files <- c("out/rep2/figures/p.png", "out/rep1/a.tif", "out/rep10/b.tif", "out/rep1/figures/p.png")
+
+  expect_identical(dirnamesFromSet(files, set = 1:10), c("rep1", "rep2", "rep10"))
+  expect_identical(dirnamesFromSet(files, set = 1:10, leafOnly = FALSE),
+                   c("out/rep1", "out/rep2", "out/rep10"))
+})
