@@ -74,9 +74,9 @@
 .chainSynMarker <- "objSyn1"
 
 ## How many outputs(sim) rows the event added (by the key a cache hit merges on, .mergeCachedOutputs()),
-## stored as the `eventOutputsAdded` tag. A jump loads only the skipped entries that added some (or
-## have no tag): an outputs table can hold long `arguments` lists, so the rows themselves are not
-## copied into a tag.
+## stored as the `eventOutputsAdded` tag on every new entry. A hit restores only those rows
+## (.chainOutAddedRows()); a jump loads only the skipped entries that added some (or have no tag): an
+## outputs table can hold long `arguments` lists, so the rows themselves are not copied into a tag.
 .chainOutTag <- "eventOutputsAdded"
 .chainOutMarker <- "outAdd1"
 
@@ -85,13 +85,28 @@
   paste(.chainOutMarker, max(n, 0L), sep = "\t")
 }
 
-## TRUE if the entry's event added outputs rows; NA if it has no record (saved before the tag existed).
-.chainReadOutAdded <- function(sc) {
-  txt <- sc$tagValue[sc$tagKey == .chainOutTag]
-  if (!length(txt)) return(NA)
+## How many outputs rows the entry's event added; NA if it has no record (saved before the tag existed).
+.chainReadOutAddedN <- function(sc) {
+  txt <- if (!is.null(sc)) sc$tagValue[sc$tagKey == .chainOutTag]
+  if (!length(txt)) return(NA_real_)
   parts <- strsplit(txt[[length(txt)]], "\t", fixed = TRUE)[[1]]
-  if (!identical(parts[1], .chainOutMarker)) return(NA)
-  as.numeric(parts[2]) > 0
+  if (!identical(parts[1], .chainOutMarker)) return(NA_real_)
+  as.numeric(parts[2])
+}
+
+## TRUE if the entry's event added outputs rows; NA if it has no record.
+.chainReadOutAdded <- function(sc) .chainReadOutAddedN(sc) > 0
+
+## The outputs(sim) rows an entry's event added, out of the whole table stored in the entry. That table
+## is the saving run's: it also holds rows that run already had (an earlier module's Plots() row, a
+## user's `outputs` argument), which are not a later run's to restore -- a row saved at the saving run's
+## start made the save module schedule before start(sim) when a run with a later start hit the entry.
+## Rows are appended (outputsAppend()), so the event's own are the last `n`, `n` from the tag. An entry
+## without the tag gives all its rows, as every hit did before the tag existed.
+.chainOutAddedRows <- function(cachedOutputs, sc) {
+  n <- .chainReadOutAddedN(sc)
+  if (is.na(n) || n >= NROW(cachedOutputs)) return(cachedOutputs)
+  utils::tail(cachedOutputs, n)
 }
 
 .chainSynText <- function(sim) {
@@ -546,8 +561,9 @@ lastEventDetails <- "lastEventDetails"
   ##   (.prepareOutput()); the landing entry may not carry a skipped event's (it can have been saved
   ##   after they were lost), so they are applied here, once the objects they name are in place. An
   ##   entry without the tag is loaded to read them.
-  ##   The outputs(sim) rows each added are merged the same way, as a hit merges them: the entry's rows
-  ##   except those named for its own module's outputs. Only an entry that added rows is loaded.
+  ##   The outputs(sim) rows each added are merged the same way, as a hit merges them: the rows its event
+  ##   added (.chainOutAddedRows()) except those named for its own module's outputs. Only an entry that
+  ##   added rows is loaded.
   for (i in seq_len(n - 1L)) {
     sc <- .chainEntryTags(jump$cacheId[i], cachePath)
     groups <- if (!is.null(sc)) .chainReadSyns(sc)
@@ -563,8 +579,9 @@ lastEventDetails <- "lastEventDetails"
     if (length(groups)) .chainApplySyns(sim, groups)
     if (!is.null(simI) && !identical(addedOut, FALSE)) {
       own <- .chainCreates(sim, jump$module[i])
+      added <- .chainOutAddedRows(simI@outputs, sc)
       slot(sim, "outputs", check = FALSE) <- .mergeCachedOutputs(
-        sim@outputs, simI@outputs[!simI@outputs$objectName %in% own, ])
+        sim@outputs, added[!added$objectName %in% own, ])
     }
   }
   attr(sim, "cacheChainingJump") <- NULL
