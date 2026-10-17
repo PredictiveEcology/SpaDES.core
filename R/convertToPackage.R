@@ -352,12 +352,11 @@ writeImportSpadesCore <- function(deps, hasNamespaceFile, NAMESPACEFile,
   # Skip any package already covered by an explicit @importFrom.
   if (isTRUE(hasNamespaceFile)) {
     nsTxt <- readLines(NAMESPACEFile)
-    hasImportFrom <- grepl("importFrom", nsTxt)
-    if (any(hasImportFrom)) {
-      pkgsNotNeeded <- unique(gsub(".+\\((.+)\\,.+\\)", "\\1", nsTxt[hasImportFrom]))
-      namespaceImports <- grep(paste(pkgsNotNeeded, collapse = "|"),
-                               namespaceImports, invert = TRUE, value = TRUE)
-    }
+    importFromLines <- grep("^\\s*importFrom\\(", nsTxt, value = TRUE)
+    # package name = first argument, with any quotes or backticks removed
+    pkgsNotNeeded <- unique(gsub("^\\s*importFrom\\(\\s*[\"'`]?([^,\"'`[:space:]]+).*$", "\\1",
+                                 importFromLines))
+    namespaceImports <- setdiff(namespaceImports, pkgsNotNeeded)
   }
 
   cat(paste0(importTags(namespaceImports), "\nNULL\n"), sep = "\n",

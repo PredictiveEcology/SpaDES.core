@@ -200,6 +200,24 @@ test_that("convertToPackage() imports a name exported by several packages from o
   expect_identical(unlist(boundTo[names(expected)]), expected)
 })
 
+test_that("an explicit importFrom skips only that package, not names containing it", {
+  ## the skip matched package names as an unanchored regex, so importFrom(sp, ...)
+  ## also dropped spatstat.geom, and "." matched any character
+  skip_if_not_installed("Require")
+  tf <- tempfile(fileext = ".R")
+  nsf <- tempfile()
+  on.exit(unlink(c(tf, nsf)))
+  writeLines(c('importFrom(sp,CRS)', 'importFrom("sf", st_crs, st_bbox)',
+               "importFrom(`terra`, rast)"), nsf)
+  deps <- c("sp", "sf", "terra", "spatstat.geom", "data.table", "SpaDES.core")
+  kept <- writeImportSpadesCore(deps, TRUE, nsf, tf)
+  expect_identical(sort(kept), sort(c("spatstat.geom", "data.table", "SpaDES.core")))
+
+  writeLines("importFrom(data_table,foo)", nsf)
+  kept <- writeImportSpadesCore(c("data.table", "SpaDES.core"), TRUE, nsf, tf)
+  expect_true("data.table" %in% kept)
+})
+
 test_that("convertToPackage(destinationPath=) leaves the module untouched", {
   ## convertToPackage() is irreversible and rewrites in place, which makes it
   ## unusable for "convert, then test" workflows. destinationPath builds the
