@@ -360,9 +360,33 @@ writeImportSpadesCore <- function(deps, hasNamespaceFile, NAMESPACEFile,
     }
   }
 
-  cat(paste0("#' @import ", namespaceImports, "\nNULL\n"), sep = "\n",
+  cat(paste0(importTags(namespaceImports), "\nNULL\n"), sep = "\n",
       file = filePathImportSpadesCore, fill = TRUE)
   invisible(namespaceImports)
+}
+
+# One roxygen import tag per package. A name exported by several packages makes
+# installing the package warn ("replacing previous import"), so it is imported
+# only from the package whose import() comes last in the NAMESPACE -- roxygen
+# sorts the lines in the C locale, i.e. by package name here -- which is the one
+# that wins when every package is imported whole. A package that is not
+# installed is imported whole, as before. S4 method tables (`.__T__`, `.__C__`)
+# are merged by R, never replaced, so they are not excluded.
+importTags <- function(pkgs) {
+  exports <- lapply(setNames(pkgs, pkgs), function(p)
+    grep("^\\.__[CT]__", tryCatch(getNamespaceExports(p), error = function(e) character()),
+         invert = TRUE, value = TRUE))
+  exports <- exports[order(names(exports), method = "radix")]
+  winner <- character()
+  for (p in names(exports)) winner[exports[[p]]] <- p
+  vapply(pkgs, function(p) {
+    lost <- exports[[p]][winner[exports[[p]]] != p]
+    if (length(lost))
+      paste0("#' @rawNamespace import(", p, ", except = c(",
+             paste0("\"", sort(lost), "\"", collapse = ", "), "))")
+    else
+      paste0("#' @import ", p)
+  }, character(1), USE.NAMES = FALSE)
 }
 
 

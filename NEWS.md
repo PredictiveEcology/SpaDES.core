@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+* `convertToPackage()` imported every package in `reqdPkgs` whole, so two packages exporting the same name (`Require` and `SpaDES.core`, `data.table` and `purrr`) made installing the converted module warn "replacing previous import", and `R CMD check` report a WARNING. A name exported by several packages is now imported only from the package that already won it, with `import(pkg, except = ...)` for the others, so no name is bound to a different function than before.
+
 * `dirnamesFromSet()` returned the wrong folder in two cases. With `leafOnly = FALSE`, a file in a subfolder of a replicate (`out/rep1/figures/plot.png`) gave `out/rep1/figures` instead of `out/rep1`. With `leafOnly = TRUE`, a zero-padded folder (`rep01`) came back as `rep1`. It now returns the replicate directory, with its padding as on disk.
 
 * `time(sim) <- value` failed with "unable to find an inherited method" when terra was attached after SpaDES.core, because SpaDES.core defined its own `time<-` generic next to terra's. SpaDES.core now adds its `simList` method to terra's generic and re-exports it, so it works in either attach order.
