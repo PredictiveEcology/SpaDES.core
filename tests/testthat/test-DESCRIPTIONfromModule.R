@@ -158,8 +158,64 @@ test_that("convertToPackage still produces a DESCRIPTION and the @import stub", 
   expect_match(dcf[, "Imports"], "SpaDES.core")
 
   imports <- readLines(file.path(md, "R", "imports.R"))
-  expect_true(any(grepl("@import SpaDES.core", imports)))
-  expect_true(any(grepl("@import data.table", imports)))
+  expect_true(any(grepl("import.* SpaDES.core|import\\(SpaDES.core", imports)))
+  expect_true(any(grepl("import.* data.table|import\\(data.table", imports)))
+})
+
+test_that("convertToPackage() imports a name exported by several packages from one only", {
+  ## Importing whole packages that share an export makes installing the converted
+  ## module warn "replacing previous import". The name must be imported once, from
+  ## the package that wins when every package is imported whole (the last
+  ## import() in the sorted NAMESPACE), so what it is bound to does not change.
+  skip_if_not_installed("pkgload")
+  skip_if_not_installed("roxygen2")
+  skip_if_not_installed("Require")
+
+  pkgs <- c("data.table", "Require", "SpaDES.core")
+  d <- mkModule("modClash", pkgs)
+  on.exit(unlink(d, recursive = TRUE))
+  md <- file.path(d, "modClash")
+  cat("\ndoEvent.modClash <- function(sim, eventTime, eventType) sim\n",
+      file = file.path(md, "modClash.R"), append = TRUE)
+  suppressMessages(convertToPackage(module = "modClash", path = d))
+
+  ns <- parse(file.path(md, "NAMESPACE"))
+  ns <- ns[vapply(ns, function(x) as.character(x[[1]]) == "import", logical(1))]
+  ## S4 method tables are merged by R, not replaced
+  exportsOf <- function(p) grep("^\\.__[CT]__", getNamespaceExports(p), invert = TRUE, value = TRUE)
+  boundTo <- list()
+  for (x in ns) {
+    p <- as.character(x[[2]])
+    nms <- exportsOf(p)
+    if (!is.null(x$except)) nms <- setdiff(nms, eval(x$except))
+    for (nm in nms) boundTo[[nm]] <- c(boundTo[[nm]], p)
+  }
+  expect_true(all(lengths(boundTo) == 1L))
+
+  ## the winner under the former plain `import(pkg)` for each package
+  allPkgs <- sort(pkgs, method = "radix")
+  expected <- character()
+  for (p in allPkgs) expected[exportsOf(p)] <- p
+  expect_gt(anyDuplicated(unlist(lapply(pkgs, exportsOf))), 0L)
+  expect_identical(unlist(boundTo[names(expected)]), expected)
+})
+
+test_that("an explicit importFrom skips only that package, not names containing it", {
+  ## the skip matched package names as an unanchored regex, so importFrom(sp, ...)
+  ## also dropped spatstat.geom, and "." matched any character
+  skip_if_not_installed("Require")
+  tf <- tempfile(fileext = ".R")
+  nsf <- tempfile()
+  on.exit(unlink(c(tf, nsf)))
+  writeLines(c('importFrom(sp,CRS)', 'importFrom("sf", st_crs, st_bbox)',
+               "importFrom(`terra`, rast)"), nsf)
+  deps <- c("sp", "sf", "terra", "spatstat.geom", "data.table", "SpaDES.core")
+  kept <- writeImportSpadesCore(deps, TRUE, nsf, tf)
+  expect_identical(sort(kept), sort(c("spatstat.geom", "data.table", "SpaDES.core")))
+
+  writeLines("importFrom(data_table,foo)", nsf)
+  kept <- writeImportSpadesCore(c("data.table", "SpaDES.core"), TRUE, nsf, tf)
+  expect_true("data.table" %in% kept)
 })
 
 test_that("convertToPackage(destinationPath=) leaves the module untouched", {
