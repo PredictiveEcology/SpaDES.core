@@ -3058,12 +3058,15 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
                                       tagKey = .chainDeltaTag, tagValue = queueDelta)
         reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
                                       tagKey = .chainSynTag, tagValue = .chainSynText(sim))
-        if (!is.null(outputsText))
-          reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
-                                        tagKey = .chainOutTag, tagValue = outputsText)
       }
     }
   }
+  ## The outputs rows this event added, on every new entry -- not only one with a previous entry to
+  ##   chain from: a hit restores only those rows (.prepareOutput(), .chainOutAddedRows()), so the first
+  ##   cached event of a run needs the record as much as any other. NULL unless the event ran.
+  if (!is.null(outputsText))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainOutTag, tagValue = outputsText)
   sim
 }
 
