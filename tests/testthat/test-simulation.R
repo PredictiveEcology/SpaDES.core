@@ -174,7 +174,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent9 <- simInitAndSpades(times, params, modules, objects = list(), paths,
-                        debug = FALSE, .plotInitialTime = NA, events = "init")
+                        debug = FALSE, .plots = NA, events = "init")
   compped <- completed(mySimEvent9)
   compped <- compped[!compped$eventType %in% ".inputObjects"]
   expect_true(all("init" == compped$eventType))
@@ -183,7 +183,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   # Test times
   #  Set end time to WAY after the init events
   mySimEvent10 <- simInitAndSpades(times = list(start = 0, end = 10), params, modules, objects = list(), paths,
-                                  debug = FALSE, .plotInitialTime = NA, events = "init")
+                                  debug = FALSE, .plots = NA, events = "init")
   compped <- completed(mySimEvent10)
   compped <- compped[!compped$eventType %in% ".inputObjects"]
   expect_true(time(mySimEvent10) == end(mySimEvent10)) # it is at 10, the end
@@ -966,7 +966,7 @@ test_that("debug using logging", {
     mess2 <- capture.output(type = "output", {
       mySim2 <- spades(Copy(mySim),
                        debug = list("console" = list(level = 10), debug = 1),
-                       .plotInitialTime = NA)
+                       .plots = NA)
     })
   })
   expect_false(any(grepl("total elpsd", mess1))) # using new mechanism console
@@ -981,7 +981,7 @@ test_that("debug using logging", {
                        debug = list("console" = list(level = 5),
                                     "file" = list(file = tmpfile),
                                     debug = 1),
-                       .plotInitialTime = NA)
+                       .plots = NA)
     })
   })
 
@@ -1009,7 +1009,7 @@ test_that("debug using logging", {
       suppressMessages({
         mySim2 <- spades(Copy(mySim),
                          debug = list("console" = list(level = "INFO"), debug = 1),
-                         .plotInitialTime = NA)
+                         .plots = NA)
       })
     })
   })

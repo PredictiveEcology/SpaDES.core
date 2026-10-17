@@ -78,10 +78,12 @@ test_that("downloadModule finds spec children locally by name and version", {
   v <- SpaDES.core:::.parseModulePartial(filename = file.path(mp, "fam", "fam.R"),
                                          defineModuleElement = "version")
 
-  ## everything is local at the right version, so nothing is fetched
-  expect_no_error(
+  ## everything is local at the right version, so nothing is fetched. downloadModule() is deprecated
+  ##   (one base deprecation warning per call); the test is about its child lookup, so expect it
+  expect_warning(
     f <- suppressMessages(downloadModule("fam", path = mp, version = as.character(v[["fam"]]),
-                                         data = FALSE, quiet = TRUE))
+                                         data = FALSE, quiet = TRUE)),
+    class = "deprecatedWarning"
   )
   ## no folder named after a spec was created
   expect_setequal(dir(mp), c("fam", childNames))

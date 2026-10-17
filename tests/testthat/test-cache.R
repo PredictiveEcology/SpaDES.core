@@ -715,7 +715,7 @@ test_that("caching simInitAndSpades specifically", {
       }
       set.seed(42)
       mySimEvent[[i]] <- fn(modules = modules, paths = paths, times = times,
-                            .plotInitialTime = NA) |>
+                            .plots = NA) |>
         Cache(.cacheExtra = asPath(dir(paths$modulePath, recursive = TRUE, full.names = T)))
       if (identical(i, 2L))
         expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
@@ -738,7 +738,7 @@ test_that("caching simInitAndSpades specifically", {
             "newFun <- function(sim) return(invisible(sim))")
       }
       mySimEvent[[i]] <- do.call(fn, list(l = list(modules = modules, paths = paths, times = times,
-                                                   .plotInitialTime = NA))) |>
+                                                   .plots = NA))) |>
         Cache(.cacheExtra = asPath(dir(paths$modulePath, recursive = TRUE, full.names = T)))
       if (identical(i, 2L))
         expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
