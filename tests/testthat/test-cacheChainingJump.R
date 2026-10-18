@@ -780,3 +780,67 @@ jumpTest("a jump over entries saved without the outputs tag still merges their o
   expect_match(warm$jumps, "restored 3 cached events in one step")
   expect_true("jCout.rds" %in% outState(s)$file)
 })
+
+## A module may declare an object as `createsOutput` that it does not always write: Biomass_core
+## declares `speciesLayers`, which Biomass_borealDataPrep's `.inputObjects` makes. What an entry
+## restores is what its event changed, not what its module declares. Here jB makes X; jC declares X
+## (expectsInput and createsOutput) but only reads it; jE, not cached, needs X after the jump.
+## The FireSense failure was jC as the landing event (second test): its hit restores only what it
+## changed, and X was never loaded from jB's entry because jC "created" it.
+declaredFixture <- function(mp, withD = TRUE) {
+  mkJumpMod(mp, "jA", 'bindrows(expectsInput("unsupplied0", "numeric", ""))',
+            'bindrows(createsOutput("a", "numeric", ""))', "sim$a <- 1")
+  mkJumpMod(mp, "jB", 'bindrows(expectsInput("a", "numeric", ""))',
+            'bindrows(createsOutput("X", "numeric", ""), createsOutput("b", "numeric", ""))',
+            "sim$X <- 10; sim$b <- sim$a + 1")
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("X", "numeric", ""))',
+            'bindrows(createsOutput("X", "numeric", ""), createsOutput("cc", "numeric", ""))',
+            "sim$cc <- sim$X * 2")
+  if (withD)
+    mkJumpMod(mp, "jD", 'bindrows(expectsInput("cc", "numeric", ""))',
+              'bindrows(createsOutput("d", "numeric", ""))', "sim$d <- sim$cc + 1")
+  ## jE also reads d, so that it is scheduled after jD and jC is a skipped event, not the landing one
+  mkJumpMod(mp, "jE", 'bindrows(expectsInput("X", "numeric", ""), expectsInput("d", "numeric", ""))',
+            'bindrows(createsOutput("e", "numeric", ""))', "sim$e <- sim$X + if (is.null(sim$d)) 100 else sim$d")
+}
+
+runDeclared <- function(mp, cp, withD = TRUE) {
+  withr::local_options(spades.cacheChaining = TRUE)
+  mods <- c("jA", "jB", "jC", if (withD) "jD", "jE")
+  params <- lapply(setNames(nm = setdiff(mods, "jE")), function(m) list(.useCache = "init"))
+  simInitAndSpades(times = list(start = 1, end = 2), params = params, modules = as.list(mods),
+                   paths = list(modulePath = mp, cachePath = cp))
+}
+
+jumpTest("a jump keeps an object a skipped event made when a later skipped module declares but did not write it", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  declaredFixture(mp)
+  cp <- file.path(tmpdir, "on")
+  s1 <- runDeclared(mp, cp)
+  expect_equal(s1$X, 10); expect_equal(s1$e, 31) # d = cc + 1 = 21
+  ## jB init, jC init, jD init in one jump: jC (skipped) declares X without writing it
+  warm <- jumpMessages(s2 <- runDeclared(mp, cp))
+  expect_match(warm$jumps, "restored 3 cached events in one step")
+  expect_equal(restoredList(warm$raw), c("jB init", "jC init", "jD init"))
+  expect_equal(s2$X, 10)
+  expect_equal(s2$e, 31)
+  expect_equal(mget(c("a", "b", "cc", "d"), envir = s2@.xData), mget(c("a", "b", "cc", "d"), envir = s1@.xData))
+})
+
+jumpTest("a jump keeps an object a skipped event made when the landing module declares but did not write it", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  declaredFixture(mp, withD = FALSE)
+  cp <- file.path(tmpdir, "on")
+  s1 <- runDeclared(mp, cp, withD = FALSE)
+  expect_equal(s1$X, 10); expect_equal(s1$e, 110)
+  ## jB init, jC init in one jump: jC (the landing event) declares X without writing it
+  warm <- jumpMessages(s2 <- runDeclared(mp, cp, withD = FALSE))
+  expect_match(warm$jumps, "restored 2 cached events in one step")
+  expect_equal(restoredList(warm$raw), c("jB init", "jC init"))
+  expect_equal(s2$X, 10)
+  expect_equal(s2$e, 110)
+})
