@@ -33,6 +33,23 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo = "xxhash64", quick, classOptions) {
     # browser(expr = exists("._robustDigest_1"))
+    ## A simList reachable from its own environment (`sim$x <- sim`, or `sim` left in a module
+    ## environment) would recurse through digestEnviros() until the C stack runs out. Same rule
+    ## as reproducible's environment method (`prevEnvir`): an environment already being digested
+    ## further up this path is skipped. The record travels in its own `classOptions` element,
+    ## removed again here so the options this method reads are what the caller passed.
+    prevSimEnvirs <- classOptions[[.prevSimEnvirs]]
+    if (any(vapply(prevSimEnvirs, identical, logical(1), object@.xData)))
+      return(NULL)
+    if (isTRUE(classOptions[[.prevSimEnvirsWasNull]])) {
+      classOptions <- NULL
+    } else if (is.list(classOptions) && any(names(classOptions) %in% .prevSimEnvirs)) {
+      classOptions <- classOptions[!names(classOptions) %in% c(.prevSimEnvirs, .prevSimEnvirsWasNull)]
+    }
+    classOptionsInner <- classOptions
+    if (is.null(classOptionsInner)) classOptionsInner <- setNames(list(TRUE), .prevSimEnvirsWasNull)
+    classOptionsInner[[.prevSimEnvirs]] <- c(prevSimEnvirs, list(object@.xData))
+
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
@@ -110,12 +127,12 @@ setMethod(
                            if (!is.null(.objects[[xDataDotModDotObj]][[moduleNam]]) && length(obj)) {
                              digestEnviros(obj, .objects[[xDataDotModDotObj]][[moduleNam]],
                                            allEnvsInSimList[[xDataDotModDotObj]][[moduleNam]],
-                                           algo, quick, length, classOptions)
+                                           algo, quick, length, classOptionsInner)
                            }
                          })
 
                        } else {
-                         out <- digestEnviros(objs, .objects[[".xData"]], allEnvsInSimList[[".xData"]], algo, quick, length, classOptions)
+                         out <- digestEnviros(objs, .objects[[".xData"]], allEnvsInSimList[[".xData"]], algo, quick, length, classOptionsInner)
                        }
                        out
                      })
@@ -1486,6 +1503,9 @@ sortInner <- function(l, useNames = FALSE) {
   l
 }
 
+
+.prevSimEnvirs <- ".prevSimListEnvirs"
+.prevSimEnvirsWasNull <- ".prevSimListClassOptionsWasNull"
 
 digestEnviros <- function(objs, .objects, envToLookIn, algo, quick, length, classOptions) {
   dotUnderscoreObjs <- objs[startsWith(objs, "._")]
