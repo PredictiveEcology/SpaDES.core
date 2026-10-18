@@ -1,5 +1,7 @@
 utils::globalVariables(c(
-  ".", "keepBasedOnRedundantInequalities", "inequality", "verbose", "inequality"
+  ".", "keepBasedOnRedundantInequalities", "inequality", "verbose", "inequality",
+  ## data.table columns inside Require's getVersionOnRepos(), copied into this namespace below
+  "..apCachedCols", ".N", "N", "VersionOK", "i.VersionOnRepos", "repoLocation", "versionSpec"
 ))
 
 ## non-exported imports from other packages -------------------------------------
