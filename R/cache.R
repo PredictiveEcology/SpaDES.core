@@ -889,14 +889,20 @@ setMethod(
         simPost@current <- simFromCache@current
 
         # Outputs -- there may have been outputs added by another module that should be recovered
-        if (length(currModules) > 0) {
+        if (length(currModules) > 0 && NROW(object@outputs)) {
           outputsFromTheseMods <- lapply(currModules, function(cmod) {
             object@depends@dependencies[[cmod]]@outputObjects$objectName
           })
           outputsFromTheseMods <- unlist(outputsFromTheseMods)
 
+          ## only the rows the cached event itself added (its `eventOutputsAdded` tag), not every row
+          ##   the run that saved the entry had: those can be another run's, saved before this
+          ##   run's start(sim) -- see .chainOutAddedRows()
+          id <- cacheId(object)
+          sc <- if (length(id)) .chainEntryTags(id, cachePath)
+          added <- .chainOutAddedRows(object@outputs, sc)
           simPost@outputs <- .mergeCachedOutputs(
-            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods, ])
+            simPost@outputs, added[!added$objectName %in% outputsFromTheseMods, ])
 
         }
 

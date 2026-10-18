@@ -89,7 +89,10 @@ test_that("Plots function 1", {
     }
     if (any(grepl("png", out))) {
       expect_true(any(grepl("png", fileNames)))
-      expect_true(sum(grepl(wdth, mess)) == 1)
+      ## ggsave()'s one "Saving 4.77 x 7 in image" message. Not the bare number: as a regex, `4.77`
+      ##   also matched the random temp directory in the "Saved figure to: <path>" messages
+      ##   (e.g. `file4a77bc9e`), which made all three png iterations fail together on one CI run
+      expect_true(sum(grepl(paste0("Saving ", wdth, " x "), mess, fixed = TRUE)) == 1)
     }
     if (any(grepl("pdf", out))) {
       expect_true(any(grepl("pdf", fileNames)))

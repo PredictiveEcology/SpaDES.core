@@ -451,11 +451,11 @@ test_that("test sped-up Caching of sequentially cached events", {
 
   mess2 <- capture_messages(
     mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
-                              debug = 1, .plotInitialTime = NA)
+                              debug = 1)
   )
   mess3 <- capture_messages(
     mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
-                              debug = 1, .plotInitialTime = NA)
+                              debug = 1)
   )
   expect_equal(sum(grepl(oa, mess3)), 1) # continues from .inputObjects to init for simInitAndSpades; one jump
 
