@@ -4,6 +4,10 @@
 
 * A cache hit on an event (or `.inputObjects`) merged every `outputs(sim)` row of the cached simList into the live run, including rows the run that saved the entry already had from other modules (e.g. a `Plots()` figure). When a run with a later `start(sim)` hit such an entry, the foreign row's `saveTime` fell before its start and `spades()` stopped with "You have tried to schedule an event before start(sim)". A hit (and a cacheChaining jump) now restores only the rows the cached event itself added, read from the `eventOutputsAdded` tag, which is now written on every new entry rather than only on entries that chain from a previous one. Entries saved without the tag restore all their rows, as before.
 
+* `convertToPackage()` imported every package in `reqdPkgs` whole, so two packages exporting the same name (`Require` and `SpaDES.core`, `data.table` and `purrr`) made installing the converted module warn "replacing previous import", and `R CMD check` report a WARNING. A name exported by several packages is now imported only from the package that already won it, with `import(pkg, except = ...)` for the others, so no name is bound to a different function than before.
+
+* `convertToPackage()` skipped packages named in an explicit `importFrom()` by matching their names as an unanchored regular expression, so `importFrom(sp, ...)` also dropped `spatstat.geom`, and a `.` in a name matched any character. Package names are now extracted from the `importFrom()` line (quoted or not) and compared exactly.
+
 * `dirnamesFromSet()` returned the wrong folder in two cases. With `leafOnly = FALSE`, a file in a subfolder of a replicate (`out/rep1/figures/plot.png`) gave `out/rep1/figures` instead of `out/rep1`. With `leafOnly = TRUE`, a zero-padded folder (`rep01`) came back as `rep1`. It now returns the replicate directory, with its padding as on disk.
 
 * `time(sim) <- value` failed with "unable to find an inherited method" when terra was attached after SpaDES.core, because SpaDES.core defined its own `time<-` generic next to terra's. SpaDES.core now adds its `simList` method to terra's generic and re-exports it, so it works in either attach order.
