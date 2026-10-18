@@ -207,20 +207,30 @@
   unique(as.character(na.omit(out)))
 }
 
-## What a module's OWN cache entry is guaranteed to restore: its declared `createsOutput`s only.
-## Unlike `.chainOutputs()`, this never adds `expectsInput`s for `.inputObjects` --
-## `.prepareOutput()` (R/cache.R, `lsObjectsChanged()`) only carries an `expectsInput` back out of
-## a loaded entry when the module's own call actually changed it
-## (`attr(simFromCache, ".Cache")$changed`); one it merely read and passed through, unchanged, is
-## never in that restore. In an ordinary (non-jumped) run this is invisible -- the live simList
-## already has it, supplied by whichever module produced it, running just before. A jump skips
-## that producing module, so nothing supplies it. Used only to decide what a LATER step in a jump
-## has already (re)written -- `.chainJumpFinish()`'s `later` -- never for `.chainOutputs()`'s other
-## job of tracking what the chain as a whole has produced.
+## A module's declared `createsOutput`s. Used for the outputs(sim) rows a skipped entry may contribute
+## (`.chainJumpFinish()`): rows named for the module's own outputs come from its own entry.
 .chainCreates <- function(sim, module) {
   dep <- sim@depends@dependencies[[module]]
   if (is.null(dep)) return(character())
   unique(as.character(na.omit(dep@outputObjects$objectName)))
+}
+
+## What `entry`, a module's own cache entry, actually restores to the live simList: of the objects
+## the module declares (`expectsInput`s and `createsOutput`s), those its event CHANGED
+## (`attr(entry, ".Cache")$changed`). `.prepareOutput()` (R/cache.R, `lsObjectsChanged()`) carries no
+## other object out of a loaded entry: not an `expectsInput` the event merely read, and not a
+## `createsOutput` it declares but did not write (Biomass_core declares `speciesLayers`, which
+## Biomass_borealDataPrep's `.inputObjects` makes). In an ordinary (non-jumped) run this is
+## invisible -- the live simList already has such an object, supplied by whichever event produced
+## it, running just before. A jump skips that producing event, so what each entry restores has to
+## be known exactly: used to decide what a LATER step in a jump has already (re)written --
+## `.chainJumpFinish()`'s `later` -- never for `.chainOutputs()`'s other job of tracking what the
+## chain as a whole has produced. Deciding it from the declaration instead lost the object.
+.chainRestored <- function(sim, entry, module) {
+  dep <- sim@depends@dependencies[[module]]
+  if (is.null(dep)) return(character())
+  declared <- unique(as.character(na.omit(c(dep@inputObjects$objectName, dep@outputObjects$objectName))))
+  intersect(declared, names(attr(entry, ".Cache")$changed))
 }
 
 ## Rebuild, for any (module, event), the `nonObjects` that .runEvent() / .runModuleInputObjects()
@@ -506,13 +516,13 @@ lastEventDetails <- "lastEventDetails"
   sim
 }
 
-## After it: the last entry only holds its own module's outputs -- and, for `.inputObjects`, only
-## the `expectsInput`s it actually changed (`.prepareOutput()`'s restore is keyed on
-## `attr(simFromCache, ".Cache")$changed`; one it merely read and passed through is not in it).
+## After it: the last entry only restores the objects its own event changed (`.chainRestored()`;
+## `.prepareOutput()`'s restore is keyed on `attr(simFromCache, ".Cache")$changed`, so neither an
+## `expectsInput` it merely read nor a `createsOutput` it declares but did not write is in it).
 ## Objects produced by the skipped events in between come from the last entry that produced each
-## of them; objects a later step overwrote are never loaded. User-supplied objects a skipped
-## `.inputObjects` would have placed in the simList are placed first, so an entry's copy wins where
-## both exist.
+## of them; objects a later step changed are never loaded from an earlier one. User-supplied objects
+## a skipped `.inputObjects` would have placed in the simList are placed first, so an entry's copy
+## wins where both exist.
 .chainJumpFinish <- function(sim, jump, cachePath, userObjects = NULL,
                              verbose = getOption("reproducible.verbose")) {
   n <- NROW(jump)
@@ -527,7 +537,8 @@ lastEventDetails <- "lastEventDetails"
   ## n, was replayed by its own Cache() hit); see .replayUrlLog()
   for (i in seq_len(n - 1L))
     .replayUrlLog(sim, cachePath, jump$cacheId[i], jump$module[i], jump$event[i])
-  later <- .chainCreates(sim, jump$module[n])
+  ## the landing entry's own hit has just been merged: `sim` carries that entry's `.Cache` attribute
+  later <- .chainRestored(sim, sim, jump$module[n])
   modsDone <- jump$module[n]
   for (i in rev(seq_len(n - 1L))) {
     want <- setdiff(.chainOutputs(sim, jump$module[i], jump$event[i]), later)
@@ -548,13 +559,13 @@ lastEventDetails <- "lastEventDetails"
             if (length(objNames)) list2env(mget(objNames, envir = mo), envir = moTo)
           }
         }
+        later <- union(later, .chainRestored(sim, simI, jump$module[i]))
       } else {
         messageCache("cacheChaining: could not load skipped entry ", jump$cacheId[i], " (",
                      jump$module[i], " ", jump$event[i], "); its outputs are not restored",
                      verbose = verbose)
       }
     }
-    later <- union(later, .chainCreates(sim, jump$module[i]))
     modsDone <- union(modsDone, jump$module[i])
   }
   ## The synonyms each skipped event added, in the order they ran. A hit restores its entry's synonyms
