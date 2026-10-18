@@ -781,3 +781,51 @@ doEvent.%s <- function(sim, eventTime, eventType) { %s; invisible(sim) }
   expect_equal(run()$seen, c(x = 1, dt = 1)) # first run: memoises mA init
   expect_equal(run()$seen, c(x = 1, dt = 1)) # memoised hit
 })
+
+test_that(".robustDigest of a simList that contains itself finishes", {
+  ## Regression: a simList reachable from its own environment (here directly, and through a
+  ## module environment, as an evalWithActiveCode() leak left it) recursed through
+  ## digestEnviros() until the C stack ran out.
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testSelfDigest", tmpdir, open = FALSE)
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = "testSelfDigest")
+  mySim$a <- 1
+  d0 <- .robustDigest(mySim)
+  expect_identical(.robustDigest(mySim), d0)
+
+  mySim$self <- mySim
+  expect_no_error(d1 <- .robustDigest(mySim))
+  expect_identical(.robustDigest(mySim), d1)
+  rm("self", envir = envir(mySim))
+  expect_identical(.robustDigest(mySim), d0)
+
+  mySim$lst <- list(list(mySim))
+  expect_no_error(.robustDigest(mySim))
+  rm("lst", envir = envir(mySim))
+
+  modEnv <- mySim@.xData[[".mods"]][["testSelfDigest"]]
+  modEnv$sim <- mySim
+  expect_no_error(.robustDigest(mySim, .objects = c("a", ".mods$testSelfDigest")))
+  expect_no_error(.robustDigest(mySim))
+})
+
+test_that("caching .inputObjects of a module with top-level compiler::cmpfun() works", {
+  ## Regression (#496): `sim` was left in the module environment of a module whose code calls
+  ## compiler::cmpfun() at top level (Biomass_core), and digesting the result of its cached
+  ## .inputObjects recursed until "node stack overflow" / "C stack usage ... too close to the limit".
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testCmpfunCache", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "testCmpfunCache", "R", "compiled.R"),
+      "f <- compiler::cmpfun(function(x) x + 1)", sep = "\n")
+  expect_no_error(
+    mySim <- simInit(times = list(start = 0, end = 0),
+                     paths = list(modulePath = tmpdir, cachePath = tmpCache),
+                     modules = "testCmpfunCache",
+                     params = list(testCmpfunCache = list(.useCache = ".inputObjects")))
+  )
+  expect_false(exists("sim", envir = mySim@.xData[[".mods"]][["testCmpfunCache"]], inherits = FALSE))
+})

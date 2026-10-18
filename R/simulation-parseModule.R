@@ -628,14 +628,10 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   ## active bindings instead of evaluating them.
   simCopy$.mods <- .cloneEnvDeep(sim$.mods)
   tmpEnvir$sim <- simCopy
-  ## Make tmpEnvir the top-level environment of the module code (`topenv()` stops at an
-  ## environment holding `.packageName`); otherwise it is the SpaDES.core namespace, and a
-  ## top-level `globalVariables()` (the R CMD check idiom) tries to change it and errors.
-  tmpEnvir$.packageName <- "SpaDES module"
 
   ll <- local({
     lapply(parsedModuleNoDefineModule,
-                 function(x) tryCatch(eval(x, envir = tmpEnvir),
+                 function(x) tryCatch(eval(x, envir = .evalEnvFor(x, tmpEnvir)),
                                       error = function(x) "ERROR"))
   })
 
@@ -646,8 +642,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 
-  rm(list = intersect(c("sim", ".packageName", ".__global__"), ls(tmpEnvir, all.names = TRUE)),
-     envir = tmpEnvir)
+  rm(list = "sim", envir = tmpEnvir)
   list2env(as.list(tmpEnvir, all.names = TRUE), envir = envir)
   rm(tmpEnvir)
 
@@ -657,11 +652,29 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     # env <- new.env(parent = asNamespace("SpaDES.core"));
     env$sim <- sim#simCopy
     aa <- lapply(parsedModuleNoDefineModule[activeCode], function(ac) {
-      eval(ac, envir = env)
+      eval(ac, envir = .evalEnvFor(ac, env))
     })
+    ## `sim` is the caller's simList: left in the module environment, the simList would contain
+    ## itself, and digesting it (e.g. Cache of .inputObjects) recurses until the C stack runs out
+    rm(list = "sim", envir = env)
     list2env(as.list(env, all.names = TRUE), envir)
   }
   activeCode
+}
+
+## The environment to evaluate one top-level expression of module code in. A top-level
+## `globalVariables()` call (the R CMD check idiom) registers its names in `topenv()`, which is
+## the locked SpaDES.core namespace here, so it errors. It runs in a throwaway child environment
+## holding `.packageName`, which makes that child its own `topenv()`. Only those calls: with
+## `.packageName` in the main environment, `compiler::cmpfun()` at top level fails ("namespace
+## found within global environments"), and the expression is then rerun as active code.
+.evalEnvFor <- function(x, envir) {
+  isGV <- is.call(x) && (identical(x[[1]], as.name("globalVariables")) ||
+                           identical(x[[1]], quote(utils::globalVariables)))
+  if (!isGV) return(envir)
+  gvEnv <- new.env(parent = envir)
+  gvEnv$.packageName <- "SpaDES module"
+  gvEnv
 }
 
 #' Extract the user-defined `.inputObjects` function from a module
