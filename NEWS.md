@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+* A module whose `R/` files call `globalVariables()` at top level (the `R CMD check` idiom, and the normal one once `convertToPackage()` makes the module a package) failed in `simInit()` with "The namespace for package "SpaDES.core" is locked; no changes in the global variables list may be made". Module code is evaluated in an environment whose top-level environment was the SpaDES.core namespace, so `globalVariables()` tried to change it. That environment is now its own top-level environment while the module code is evaluated, so the call succeeds and changes nothing outside the module.
+
 * `convertToPackage()` imported every package in `reqdPkgs` whole, so two packages exporting the same name (`Require` and `SpaDES.core`, `data.table` and `purrr`) made installing the converted module warn "replacing previous import", and `R CMD check` report a WARNING. A name exported by several packages is now imported only from the package that already won it, with `import(pkg, except = ...)` for the others, so no name is bound to a different function than before.
 
 * `convertToPackage()` skipped packages named in an explicit `importFrom()` by matching their names as an unanchored regular expression, so `importFrom(sp, ...)` also dropped `spatstat.geom`, and a `.` in a name matched any character. Package names are now extracted from the `importFrom()` line (quoted or not) and compared exactly.

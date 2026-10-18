@@ -628,6 +628,10 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   ## active bindings instead of evaluating them.
   simCopy$.mods <- .cloneEnvDeep(sim$.mods)
   tmpEnvir$sim <- simCopy
+  ## Make tmpEnvir the top-level environment of the module code (`topenv()` stops at an
+  ## environment holding `.packageName`); otherwise it is the SpaDES.core namespace, and a
+  ## top-level `globalVariables()` (the R CMD check idiom) tries to change it and errors.
+  tmpEnvir$.packageName <- "SpaDES module"
 
   ll <- local({
     lapply(parsedModuleNoDefineModule,
@@ -642,7 +646,8 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 
-  rm("sim", envir = tmpEnvir)
+  rm(list = intersect(c("sim", ".packageName", ".__global__"), ls(tmpEnvir, all.names = TRUE)),
+     envir = tmpEnvir)
   list2env(as.list(tmpEnvir, all.names = TRUE), envir = envir)
   rm(tmpEnvir)
 

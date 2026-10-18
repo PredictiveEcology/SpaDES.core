@@ -341,6 +341,21 @@ test_that("simInit with R subfolder scripts", {
   expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
 })
 
+test_that("a module R/ file may call globalVariables() at top level", {
+  testInit()
+
+  ## the R CMD check idiom for a module that can become a package (convertToPackage);
+  ## it used to try to change the locked SpaDES.core namespace and stop simInit
+  newModule("child1", ".", open = FALSE)
+  cat(file = file.path("child1", "R", "globals.R"),
+      'globalVariables(c("col1", "col2"))',
+      'utils::globalVariables("col3")',
+      "a <- function(x) x + 1", sep = "\n")
+  expect_no_error(mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir)))
+  expect_identical(mySim@.xData$.mods$child1$a(2), 3)
+  expect_false(exists(".packageName", envir = mySim@.xData$.mods$child1, inherits = FALSE))
+})
+
 test_that("simInit with .globals but no modules does not error (#empty-deps)", {
   testInit()
 
