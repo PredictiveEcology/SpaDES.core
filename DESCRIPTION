@@ -103,6 +103,7 @@ Collate:
     'Plots.R'
     'cache.R'
     'cacheChainingJump.R'
+    'cacheKeyReachable.R'
     'check.R'
     'priority.R'
     'checkpoint.R'

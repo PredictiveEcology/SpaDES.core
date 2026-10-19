@@ -62,6 +62,19 @@ parameters, but not objects. Every event will add a tag or remove that tag
 if it is cached or not cached, so this will not mistakenly \code{cacheChain} when
 it isn't appropriate.\cr
 
+\code{spades.cacheKeyReachable} \tab \code{FALSE}
+\tab If \code{TRUE}, a cached event's (or \code{.inputObjects}') cache key holds only the
+module parameters and module functions its code can reach: its branch of
+\verb{doEvent.<module>}, then the module functions that calls, to any depth, the
+parameters they read (\code{P(sim)$x}, \code{Par$x}, \code{P(sim, "x")},
+\code{params(sim)[[currentModule(sim)]]$x}, ...) and \code{.seed}. The module \code{version}
+and \code{reqdPkgs} are left out, as the function bodies carry code changes. When
+the code does something that cannot be read statically (\code{eval()}, \code{get()} of a
+computed name, \code{P(sim)} passed to a package function, ...), that event keeps the
+full key. Parameters left out keep their current values after a cache hit.
+With \code{showSimilar}, a message says what each key was narrowed to, or why not.
+Changes every narrowed event's cacheId once.\cr
+
 \code{spades.codeCheckEngine} \tab \code{"v1"}
 \tab Which module code checker \code{simInit()} uses when
 \code{spades.moduleCodeChecks} is on. \code{"v1"} is the legacy checker; \code{"v2"} is

@@ -241,22 +241,29 @@
   dep <- sim@depends@dependencies[[module]]
   if (is.null(fnEnv) || is.null(dep)) return(NULL)
   modParamsFull <- sim@params[[module]]
-  modParams <- modParamsFull[!names(modParamsFull) %in% paramsDontCacheOn]
+  ## the same key as .runEvent() / .runModuleInputObjects(), including its narrowing under
+  ##   options(spades.cacheKeyReachable = TRUE)
   if (identical(event, ".inputObjects")) {
     if (!.isNamespaced(sim, module)) return(NULL) # the legacy (non-namespaced) digest is not mirrored
-    objs <- paste(module, .fnsReachableFrom(".inputObjects", fnEnv), sep = ":")
-    dependsSlots <- outputsRmDontNeedForCache(metadataToDigest, "outputObjects")
-    classOptions <- classOptionsForCache(events = FALSE, modParams, dependsSlots, module)
+    keyParts <- .narrowKeyParts(fnEnv, module, event, fns = .fnsReachableFrom(".inputObjects", fnEnv),
+                                modParamsFull = modParamsFull,
+                                dependsSlots = outputsRmDontNeedForCache(metadataToDigest, "outputObjects"))
+    modParams <- modParamsFull[keyParts$paramsInKey]
+    objs <- paste(module, keyParts$fns, sep = ":")
+    classOptions <- classOptionsForCache(events = FALSE, modParams, keyParts$dependsSlots, module)
   } else {
     notFns <- c(".inputObjects", "mod", "Par", ".objects")
-    fns <- setdiff(ls(fnEnv, all.names = TRUE), notFns)
+    keyParts <- .narrowKeyParts(fnEnv, module, event, fns = setdiff(ls(fnEnv, all.names = TRUE), notFns),
+                                modParamsFull = modParamsFull, dependsSlots = metadataToDigest)
+    modParams <- modParamsFull[keyParts$paramsInKey]
     objsInMod <- setdiff(ls(sim@.xData[[dotObjs]][[module]], all.names = TRUE), notFns)
     objs <- c(ls(sim@.xData, all.names = TRUE, pattern = module),
-              paste0(attr(fnEnv, "name"), ":", fns),
+              paste0(attr(fnEnv, "name"), ":", keyParts$fns),
               paste0(attr(fnEnv, "name"), ":", objsInMod),
               na.omit(dep@inputObjects$objectName))
     classOptions <- classOptionsForCache(events = event, paramsWoKnowns = modParams,
-                                         dependsSlots = metadataToDigest, mBase = module)
+                                         dependsSlots = keyParts$dependsSlots, mBase = module,
+                                         eventCode = keyParts$eventCode)
   }
   extraCacheArgs <- sim@params[[module]][[._txtDotUseCacheArgs]][[event]]
   if (!is.list(extraCacheArgs)) extraCacheArgs <- list()

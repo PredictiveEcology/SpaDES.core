@@ -23,6 +23,8 @@
 
 ## New features
 
+* New option `spades.cacheKeyReachable` (default `FALSE`): a cached event's key holds only what its code can reach, the module parameters it reads and the module functions it calls (its branch of `doEvent.<module>`, then everything those call), instead of every parameter, every module function, the module version and `reqdPkgs`. A parameter that only labels a run (`.runName`, `.rep`, a file suffix) or an edit to a function the event never calls no longer recomputes it, and such parameters keep their current values after a hit. When the code does something that cannot be read statically (`eval()`, `get()` of a computed name, `P(sim)[[nm]]`, `params(sim)` or `Par` used whole, a function taken from an object), the event keeps its full key. `.inputObjects` and cache chaining use the same rule. With `showSimilar`, each event reports what its key was narrowed to, or why not. Supersedes the per-module `omitParams` list of #499.
+
 * New module parameter `.neverCache`: a character vector of event names (possibly `".inputObjects"`)
   that are never cached, even when `.useCache` asks for them (`TRUE`, event names or a time), whoever
   set `.useCache`. For events that run for their side effects. It is declared-only (`.globals` sets it
