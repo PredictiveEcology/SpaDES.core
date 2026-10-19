@@ -481,6 +481,25 @@ noEventWarning <- function(sim) {
 paramsDontCacheOn <- c(._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
                        ._txtDotNeverCache)
 
+## `.useCacheArgs[[event]]$omitParams`: module parameters that only label a run (a run name, a
+## replicate number, a file-name suffix), so one event leaves them out of its cache key as well.
+## Like paramsDontCacheOn, they keep their current values after a cache hit.
+._txtOmitParams <- "omitParams"
+
+## The names of `params` (one module's) that are not part of `eventType`'s cache key
+.paramsNotCachedOn <- function(params, eventType) {
+  omit <- params[[._txtDotUseCacheArgs]][[eventType]][[._txtOmitParams]]
+  intersect(names(params), c(paramsDontCacheOn, as.character(omit)))
+}
+
+## The `.useCacheArgs` of one event that are passed to Cache(): all but `omitParams`
+.extraCacheArgsFor <- function(params, eventType) {
+  extraCacheArgs <- params[[._txtDotUseCacheArgs]][[eventType]]
+  if (!is.list(extraCacheArgs)) return(list())
+  extraCacheArgs[[._txtOmitParams]] <- NULL
+  extraCacheArgs
+}
+
 
 ## Singular/plural message grammar ---------------------------------------------
 ##

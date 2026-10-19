@@ -23,6 +23,8 @@
 
 ## New features
 
+* `.useCacheArgs` takes `omitParams` for an event: module parameters left out of that event's cache key, e.g. `.useCacheArgs = list(init = list(omitParams = c(".runName", ".rep")))`. Every module parameter is part of an event's cache key, so a parameter that only labels a run (a run name, a replicate number, a ledger file-name suffix) made each new label recompute data preparation that was already cached. After a cache hit these parameters keep their current values, as `.useCache` and the other parameters not cached on already did; the cached values would otherwise replace them. `omitParams` is not passed to `Cache()`.
+
 * New module parameter `.neverCache`: a character vector of event names (possibly `".inputObjects"`)
   that are never cached, even when `.useCache` asks for them (`TRUE`, event names or a time), whoever
   set `.useCache`. For events that run for their side effects. It is declared-only (`.globals` sets it
