@@ -80,6 +80,35 @@
 .chainOutTag <- "eventOutputsAdded"
 .chainOutMarker <- "outAdd1"
 
+## The `mod` objects the entry's event changed (`attr(sim, ".Cache")$changed[[module]]$.objects`,
+## what a hit restores of them: R/cache.R, `lsModObjectsChanged()`), stored as the
+## `eventModObjectsChanged` tag on every new entry: a marker, then the names, tab separated. A jump
+## loads a skipped entry of a module it has already restored only if the tag names a `mod` object no
+## later step restored (.chainJumpFinish()); an entry without the tag is loaded to find out.
+.chainModTag <- "eventModObjectsChanged"
+.chainModMarker <- "modChg1"
+
+.chainModChanged <- function(sim, module)
+  names(attr(sim, ".Cache")$changed[[module]][[.objectsSlot]])
+
+.chainModText <- function(sim, module)
+  paste(c(.chainModMarker, .chainModChanged(sim, module)), collapse = "\t")
+
+.chainModTextIfRan <- function(sim, cacheIt, chaining, module) {
+  if (!isTRUE(cacheIt) || !is.null(chaining$jump)) return(NULL)
+  if (!attr(sim, ".Cache")$newCache %in% TRUE) return(NULL)
+  .chainModText(sim, module)
+}
+
+## The names in an entry's tag; NULL if it has no record (saved before the tag existed).
+.chainReadModChanged <- function(sc) {
+  txt <- if (!is.null(sc)) sc$tagValue[sc$tagKey == .chainModTag]
+  if (!length(txt)) return(NULL)
+  parts <- strsplit(txt[[length(txt)]], "\t", fixed = TRUE)[[1]]
+  if (!identical(parts[1], .chainModMarker)) return(NULL)
+  parts[-1L]
+}
+
 .chainOutText <- function(pre, post) {
   n <- NROW(.mergeCachedOutputs(pre, post)) - NROW(pre)
   paste(.chainOutMarker, max(n, 0L), sep = "\t")
@@ -539,10 +568,18 @@ lastEventDetails <- "lastEventDetails"
     .replayUrlLog(sim, cachePath, jump$cacheId[i], jump$module[i], jump$event[i])
   ## the landing entry's own hit has just been merged: `sim` carries that entry's `.Cache` attribute
   later <- .chainRestored(sim, sim, jump$module[n])
+  ## A hit restores only the `mod` objects its event CHANGED (R/cache.R, `lsModObjectsChanged()`), the
+  ##   landing hit included; the rest come from the live sim, where a `mod` object a skipped event of
+  ##   the landing module made does not exist. So every skipped entry's changed `mod` objects are
+  ##   restored too, from the last step that changed each (`laterMod`, as `later` for objects); the
+  ##   `eventModObjectsChanged` tag says whether an entry has any left to give without loading it.
+  laterMod <- paste(jump$module[n], .chainModChanged(sim, jump$module[n]))
   modsDone <- jump$module[n]
   for (i in rev(seq_len(n - 1L))) {
     want <- setdiff(.chainOutputs(sim, jump$module[i], jump$event[i]), later)
-    needMod <- !jump$module[i] %in% modsDone
+    modChanged <- .chainReadModChanged(.chainEntryTags(jump$cacheId[i], cachePath))
+    needMod <- if (is.null(modChanged)) !jump$module[i] %in% modsDone else
+      length(setdiff(paste(jump$module[i], modChanged), laterMod)) > 0L
     if (length(want) || needMod) {
       simI <- try(reproducible::loadFromCache(cachePath = cachePath, cacheId = jump$cacheId[i],
                                               verbose = -1), silent = TRUE)
@@ -554,9 +591,15 @@ lastEventDetails <- "lastEventDetails"
           mo <- simI@.xData[[dotObjs]][[jump$module[i]]]
           moTo <- sim@.xData[[dotObjs]][[jump$module[i]]]
           if (is.environment(mo) && is.environment(moTo)) {
-            objNames <- grep("^\\._", ls(mo, all.names = TRUE), value = TRUE, invert = TRUE)
+            ## with a record: the objects this event changed that no later step restored; without
+            ##   one (an older entry): every object, as before
+            objNames <- if (is.null(modChanged)) ls(mo, all.names = TRUE) else modChanged
+            objNames <- grep("^\\._", objNames, value = TRUE, invert = TRUE)
             objNames <- setdiff(objNames, c("mod", "Par"))
+            objNames <- objNames[!paste(jump$module[i], objNames) %in% laterMod]
+            objNames <- intersect(objNames, ls(mo, all.names = TRUE))
             if (length(objNames)) list2env(mget(objNames, envir = mo), envir = moTo)
+            laterMod <- union(laterMod, paste(jump$module[i], objNames))
           }
         }
         later <- union(later, .chainRestored(sim, simI, jump$module[i]))

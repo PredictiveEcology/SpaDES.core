@@ -1695,7 +1695,8 @@ setMethod(
                              eventType = chainLast$event,
                              queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
                                                            cur[["eventTime"]]),
-                             outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall))
+                             outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall),
+                             modText = .chainModTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]]))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
@@ -3008,7 +3009,8 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
 
 
 cacheChainingPost <- function(sim, cacheIt, prevCache,
-                              cacheIdOfSkip, df, moduleName, eventType, queueDelta = NULL, outputsText = NULL) {
+                              cacheIdOfSkip, df, moduleName, eventType, queueDelta = NULL, outputsText = NULL,
+                              modText = NULL) {
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
   ## The objects the current unbroken run of cached events has produced; what a later link
   ##   may trust without digesting (cacheChainingSetup(), .chainWalk()). Reset with the chain.
@@ -3050,16 +3052,18 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
       ##   so a single write, under the tag lock, records all of it.
       reproducible::.updateTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
                                     tagKey = .chainLinkTagKey(postCacheId), tagValue = .chainLinkText(df))
-      ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
-      ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
-      ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()).
-      if (!is.null(queueDelta)) {
-        reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
-                                      tagKey = .chainDeltaTag, tagValue = queueDelta)
-        reproducible::.updateTagsRepo(cacheId = postCacheId, cachePath = cachePath(sim),
-                                      tagKey = .chainSynTag, tagValue = .chainSynText(sim))
-      }
     }
+  }
+  ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
+  ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
+  ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()).
+  ##   On every new entry, not only one with a previous entry to chain from: the first cached event after
+  ##   an uncached one has none, and a walk cannot start from an entry without a delta.
+  if (!is.null(queueDelta)) {
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainDeltaTag, tagValue = queueDelta)
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainSynTag, tagValue = .chainSynText(sim))
   }
   ## The outputs rows this event added, on every new entry -- not only one with a previous entry to
   ##   chain from: a hit restores only those rows (.prepareOutput(), .chainOutAddedRows()), so the first
@@ -3067,6 +3071,10 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
   if (!is.null(outputsText))
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
                                   tagKey = .chainOutTag, tagValue = outputsText)
+  ## The `mod` objects this event changed, likewise on every new entry (.chainJumpFinish()).
+  if (!is.null(modText))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainModTag, tagValue = modText)
   sim
 }
 
