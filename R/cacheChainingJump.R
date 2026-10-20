@@ -80,6 +80,35 @@
 .chainOutTag <- "eventOutputsAdded"
 .chainOutMarker <- "outAdd1"
 
+## The `mod` objects the entry's event changed (`attr(sim, ".Cache")$changed[[module]]$.objects`,
+## what a hit restores of them: R/cache.R, `lsModObjectsChanged()`), stored as the
+## `eventModObjectsChanged` tag on every new entry: a marker, then the names, tab separated. A jump
+## loads a skipped entry of a module it has already restored only if the tag names a `mod` object no
+## later step restored (.chainJumpFinish()); an entry without the tag is loaded to find out.
+.chainModTag <- "eventModObjectsChanged"
+.chainModMarker <- "modChg1"
+
+.chainModChanged <- function(sim, module)
+  names(attr(sim, ".Cache")$changed[[module]][[.objectsSlot]])
+
+.chainModText <- function(sim, module)
+  paste(c(.chainModMarker, .chainModChanged(sim, module)), collapse = "\t")
+
+.chainModTextIfRan <- function(sim, cacheIt, chaining, module) {
+  if (!isTRUE(cacheIt) || !is.null(chaining$jump)) return(NULL)
+  if (!attr(sim, ".Cache")$newCache %in% TRUE) return(NULL)
+  .chainModText(sim, module)
+}
+
+## The names in an entry's tag; NULL if it has no record (saved before the tag existed).
+.chainReadModChanged <- function(sc) {
+  txt <- if (!is.null(sc)) sc$tagValue[sc$tagKey == .chainModTag]
+  if (!length(txt)) return(NULL)
+  parts <- strsplit(txt[[length(txt)]], "\t", fixed = TRUE)[[1]]
+  if (!identical(parts[1], .chainModMarker)) return(NULL)
+  parts[-1L]
+}
+
 .chainOutText <- function(pre, post) {
   n <- NROW(.mergeCachedOutputs(pre, post)) - NROW(pre)
   paste(.chainOutMarker, max(n, 0L), sep = "\t")
@@ -365,7 +394,14 @@ lastEventDetails <- "lastEventDetails"
 ## entry was written: compare their digest now with the entry's `preDigest` tags
 ## (`sim..list.<object>:<hash>`). An object not yet in the simList may still be waiting in the
 ## user-supplied `objects` of simInit; it is digested from there.
-.chainExternalInputsMatch <- function(sim, module, postTags, produced, userObjects = NULL) {
+##
+## `digests` is a memo of this call's object digests, by object name: an environment made by
+## cacheChainingSetup() for one chain hit and its walk. Nothing runs between the hit's own check and
+## the last link of the walk, so an object's digest is the same at every link; without the memo each
+## link digested every input of its module again -- a module's inputs twice in a two-event jump (the
+## hit, then the link), and a shared input (cohortData, rasterToMatch) once per module of a long jump.
+## Those digests were most of the 25-45 s before each jump in the FireSense runs. NULL: no memo.
+.chainExternalInputsMatch <- function(sim, module, postTags, produced, userObjects = NULL, digests = NULL) {
   dep <- sim@depends@dependencies[[module]]
   ext <- setdiff(as.character(na.omit(dep@inputObjects$objectName)), produced)
   if (!length(ext)) return(TRUE)
@@ -374,18 +410,24 @@ lastEventDetails <- "lastEventDetails"
   recorded <- sub("^[^:]+:", "", pre)
   names(recorded) <- sub("^sim\\.\\.list\\.", "", sub(":.*$", "", pre))
   for (o in ext) {
-    val <- if (exists(o, envir = sim@.xData, inherits = FALSE)) {
-      get(o, envir = sim@.xData, inherits = FALSE)
+    if (!is.null(digests) && exists(o, envir = digests, inherits = FALSE)) {
+      now <- get(o, envir = digests, inherits = FALSE)
     } else {
-      userObjects[[o]]
+      val <- if (exists(o, envir = sim@.xData, inherits = FALSE)) {
+        get(o, envir = sim@.xData, inherits = FALSE)
+      } else {
+        userObjects[[o]]
+      }
+      ## the same call, with the same defaults, that Cache() makes per object of a simList
+      now <- if (is.null(val)) NULL else
+        .robustDigest(val, length = getOption("reproducible.length", Inf), algo = "xxhash64",
+                      quick = getOption("reproducible.quick", FALSE))
+      if (!is.null(digests)) assign(o, now, envir = digests)
     }
-    if (is.null(val)) {
+    if (is.null(now)) {
       if (o %in% names(recorded)) return(FALSE)
       next
     }
-    ## the same call, with the same defaults, that Cache() makes per object of a simList
-    now <- .robustDigest(val, length = getOption("reproducible.length", Inf), algo = "xxhash64",
-                         quick = getOption("reproducible.quick", FALSE))
     if (is.list(now)) {
       ## Cache() records a list-valued object element by element (`sim..list.<object>.<element>`,
       ## an unnamed element as `sim..list.<object>`), never necessarily under the bare object name.
@@ -408,7 +450,7 @@ lastEventDetails <- "lastEventDetails"
 ## recovered from. Returns the events that can be skipped, in order -- a data.table with
 ## cacheId, module, event, eventTime -- or NULL.
 .chainWalk <- function(sim, cacheId, module, event, cachePath, produced = NULL, userObjects = NULL,
-                       controls = list(), verbose = getOption("reproducible.verbose")) {
+                       controls = list(), verbose = getOption("reproducible.verbose"), digests = NULL) {
   phaseIO <- identical(event, ".inputObjects")
   produced <- union(produced, .chainOutputs(sim, module, event))
   led <- paste(module, event)
@@ -441,7 +483,7 @@ lastEventDetails <- "lastEventDetails"
       postTags <- .chainEntryTags(row$postCacheId, cachePath)
       if (is.null(postTags)) next
       if (!any(file.exists(reproducible::CacheStoredFile(cachePath, row$postCacheId)))) next
-      if (!.chainExternalInputsMatch(sim, row$module, postTags, produced, userObjects)) next
+      if (!.chainExternalInputsMatch(sim, row$module, postTags, produced, userObjects, digests)) next
       ## only an event that is next in the live queue may be skipped, and only if its entry says what
       ##   it did to the queue; the time it ran at is the one it recorded, in seconds
       delta <- .chainReadDelta(postTags)
@@ -538,14 +580,27 @@ lastEventDetails <- "lastEventDetails"
     .replayUrlLog(sim, cachePath, jump$cacheId[i], jump$module[i], jump$event[i])
   ## the landing entry's own hit has just been merged: `sim` carries that entry's `.Cache` attribute
   later <- .chainRestored(sim, sim, jump$module[n])
+  ## A hit restores only the `mod` objects its event CHANGED (R/cache.R, `lsModObjectsChanged()`), the
+  ##   landing hit included; the rest come from the live sim, where a `mod` object a skipped event of
+  ##   the landing module made does not exist. So every skipped entry's changed `mod` objects are
+  ##   restored too, from the last step that changed each (`laterMod`, as `later` for objects); the
+  ##   `eventModObjectsChanged` tag says whether an entry has any left to give without loading it.
+  laterMod <- paste(jump$module[n], .chainModChanged(sim, jump$module[n]))
   modsDone <- jump$module[n]
+  ## what the synonyms/outputs pass below needs from an entry this pass loads, so it is not loaded twice
+  ##   (an entry saved without the tags that pass reads is loaded by it otherwise: seconds per entry)
+  synsOf <- outsOf <- vector("list", n)
   for (i in rev(seq_len(n - 1L))) {
     want <- setdiff(.chainOutputs(sim, jump$module[i], jump$event[i]), later)
-    needMod <- !jump$module[i] %in% modsDone
+    modChanged <- .chainReadModChanged(.chainEntryTags(jump$cacheId[i], cachePath))
+    needMod <- if (is.null(modChanged)) !jump$module[i] %in% modsDone else
+      length(setdiff(paste(jump$module[i], modChanged), laterMod)) > 0L
     if (length(want) || needMod) {
       simI <- try(reproducible::loadFromCache(cachePath = cachePath, cacheId = jump$cacheId[i],
                                               verbose = -1), silent = TRUE)
       if (is(simI, "simList")) {
+        synsOf[[i]] <- list(lapply(simI@.xData[[objSynName]], function(g) unname(unlist(g))))
+        outsOf[[i]] <- list(simI@outputs)
         have <- intersect(want, ls(simI@.xData, all.names = TRUE))
         if (length(have))
           list2env(mget(have, envir = simI@.xData), envir = sim@.xData)
@@ -553,9 +608,15 @@ lastEventDetails <- "lastEventDetails"
           mo <- simI@.xData[[dotObjs]][[jump$module[i]]]
           moTo <- sim@.xData[[dotObjs]][[jump$module[i]]]
           if (is.environment(mo) && is.environment(moTo)) {
-            objNames <- grep("^\\._", ls(mo, all.names = TRUE), value = TRUE, invert = TRUE)
+            ## with a record: the objects this event changed that no later step restored; without
+            ##   one (an older entry): every object, as before
+            objNames <- if (is.null(modChanged)) ls(mo, all.names = TRUE) else modChanged
+            objNames <- grep("^\\._", objNames, value = TRUE, invert = TRUE)
             objNames <- setdiff(objNames, c("mod", "Par"))
+            objNames <- objNames[!paste(jump$module[i], objNames) %in% laterMod]
+            objNames <- intersect(objNames, ls(mo, all.names = TRUE))
             if (length(objNames)) list2env(mget(objNames, envir = mo), envir = moTo)
+            laterMod <- union(laterMod, paste(jump$module[i], objNames))
           }
         }
         later <- union(later, .chainRestored(sim, simI, jump$module[i]))
@@ -578,18 +639,20 @@ lastEventDetails <- "lastEventDetails"
     sc <- .chainEntryTags(jump$cacheId[i], cachePath)
     groups <- if (!is.null(sc)) .chainReadSyns(sc)
     addedOut <- if (!is.null(sc)) .chainReadOutAdded(sc) else NA
-    simI <- NULL
-    if (is.null(groups) || !identical(addedOut, FALSE)) {
+    if (is.null(groups) && !is.null(synsOf[[i]])) groups <- synsOf[[i]][[1]]
+    cachedOutputs <- if (!identical(addedOut, FALSE) && !is.null(outsOf[[i]])) outsOf[[i]][[1]]
+    if ((is.null(groups) || (!identical(addedOut, FALSE) && is.null(cachedOutputs)))) {
       simI <- try(reproducible::loadFromCache(cachePath = cachePath, cacheId = jump$cacheId[i],
                                               verbose = -1), silent = TRUE)
-      if (!is(simI, "simList")) simI <- NULL
+      if (is(simI, "simList")) {
+        if (is.null(groups)) groups <- lapply(simI@.xData[[objSynName]], function(g) unname(unlist(g)))
+        if (!identical(addedOut, FALSE)) cachedOutputs <- simI@outputs
+      }
     }
-    if (is.null(groups) && !is.null(simI))
-      groups <- lapply(simI@.xData[[objSynName]], function(g) unname(unlist(g)))
     if (length(groups)) .chainApplySyns(sim, groups)
-    if (!is.null(simI) && !identical(addedOut, FALSE)) {
+    if (!is.null(cachedOutputs)) {
       own <- .chainCreates(sim, jump$module[i])
-      added <- .chainOutAddedRows(simI@outputs, sc)
+      added <- .chainOutAddedRows(cachedOutputs, sc)
       slot(sim, "outputs", check = FALSE) <- .mergeCachedOutputs(
         sim@outputs, added[!added$objectName %in% own, ])
     }

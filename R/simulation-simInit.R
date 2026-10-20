@@ -2559,6 +2559,13 @@ spadesDebugWidthDefault <- c(9, 10, 9, 13)
 nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions,
                                        dep, extraCacheArgs = NULL) {
   fns2 <- extractFns(objectsToEvaluateForCaching)
+  ## Only names bound in the module's function environment: `objectsToEvaluateForCaching` also
+  ## lists the module's `mod` objects (for Cache()'s own digest), which live in `.modObjs`, not
+  ## here. Indexing `as.list(fnEnv)` by those names gave an NA-named NULL per `mod` object, so
+  ## the chain digest changed with the SET of `mod` objects present when it was computed. A jump
+  ## rebuilds the digest before the skipped events are restored (.chainNonObjects()), so a
+  ## skipped event that created a `mod` object broke the walk at every later event of its module.
+  fns2 <- fns2[fns2 %in% ls(fnEnv, all.names = TRUE)]
   nonObjects <- append(classOptions,
                        as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
   nonObjects <- append(nonObjects,
