@@ -2532,8 +2532,13 @@ debugToVerbose <- function(debug) {
 }
 
 
-metadataToDigest <- c("inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
-                      "spatialExtent", "timeframe", "timeunit", "version")
+## The `depends` slots a cache key digests besides the object tables. `version` is deliberately
+## absent: a code change is already in the key through the module's function bodies, so the version
+## only turned a bump with no code change into a miss. `@depends` keeps the version; it is just not
+## digested. Used for `.inputObjects`, events and cacheChaining (via `metadataToDigest`) and for the
+## whole-simList key (`.robustDigest,simList`).
+otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs", "spatialExtent", "timeframe", "timeunit")
+metadataToDigest <- c("inputObjects", "outputObjects", "parameters", otherDependsToDig)
 
 objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
   comps <- rbindlist(as.list(sim@completed)) # completed(sim)
@@ -2555,7 +2560,7 @@ spadesDebugWidthDefault <- c(9, 10, 9, 13)
 
 ## `classOptions$depends` names the metadata slots the ordinary event key digests, but a chain
 ## key built from the names alone never changes when a slot's VALUE does (a raised `reqdPkgs`
-## floor, a new `version`). Give the chain the values of those slots. They are the ones the
+## floor). Give the chain the values of those slots. They are the ones the
 ## ordinary key digests (.robustDigest,simList): "parameters" is not (its resolved values are
 ## `classOptions$params`) and the `desc` columns of the object tables are not.
 .chainDependsValues <- function(dep, dependsSlots) {
@@ -2570,6 +2575,13 @@ spadesDebugWidthDefault <- c(9, 10, 9, 13)
 nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions,
                                        dep, extraCacheArgs = NULL) {
   fns2 <- extractFns(objectsToEvaluateForCaching)
+  ## Only names bound in the module's function environment: `objectsToEvaluateForCaching` also
+  ## lists the module's `mod` objects (for Cache()'s own digest), which live in `.modObjs`, not
+  ## here. Indexing `as.list(fnEnv)` by those names gave an NA-named NULL per `mod` object, so
+  ## the chain digest changed with the SET of `mod` objects present when it was computed. A jump
+  ## rebuilds the digest before the skipped events are restored (.chainNonObjects()), so a
+  ## skipped event that created a `mod` object broke the walk at every later event of its module.
+  fns2 <- fns2[fns2 %in% ls(fnEnv, all.names = TRUE)]
   nonObjects <- append(classOptions,
                        as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
   nonObjects <- append(nonObjects,

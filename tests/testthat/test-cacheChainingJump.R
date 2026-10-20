@@ -4,34 +4,6 @@
 ## ever be faster, never change an answer. Liveness -- that the jump really engages -- is
 ## asserted through its message, because a jump that never engages still gives right answers.
 
-## Four modules, each with a cached `init` that writes its own output from the previous module's,
-## then schedules a `grow` event (so the queue after the chain is not trivial). modB also reads
-## `ext`, an object the user supplies at simInit: the "external input" the jump must re-check.
-mkJumpMod <- function(mp, name, inObjs, outObjs, initBody, useCache = c(".inputObjects", "init")) {
-  d <- file.path(mp, name)
-  dir.create(d, recursive = TRUE, showWarnings = FALSE)
-  writeLines(sprintf('
-defineModule(sim, list(name = "%s", description = "", keywords = "",
-  authors = person(c("A"), "B", email = "a@b.com", role = c("aut", "cre")),
-  childModules = character(0), version = list(%s = "0.0.1"),
-  spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
-  timeunit = "year", citation = list("citation.bib"), documentation = list(),
-  reqdPkgs = list(),
-  parameters = rbind(defineParameter(".useCache", "character", NA, NA, NA, "")),
-  inputObjects = %s, outputObjects = %s))
-
-doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) {
-  switch(eventType,
-    init = { %s; sim <- scheduleEvent(sim, time(sim) + 1, "%s", "grow") },
-    grow = { sim$grown_%s <- time(sim) })
-  return(invisible(sim))
-}
-
-.inputObjects <- function(sim) { return(invisible(sim)) }
-', name, name, inObjs, outObjs, name, initBody, name, name), file.path(d, paste0(name, ".R")))
-  invisible(name)
-}
-
 jumpFixture <- function(mp) {
   mkJumpMod(mp, "jA", 'bindrows(expectsInput("unsupplied0", "numeric", ""))',
             'bindrows(createsOutput("a", "numeric", ""), createsOutput("shared", "numeric", ""))',
@@ -51,23 +23,6 @@ jumpParams <- function(...) {
   modifyList(p, list(...))
 }
 
-## `spades.debug = TRUE` + `reproducible.verbose = 1` so the chaining messages are emitted
-## (as in test-cacheChaining.R's liveness test); `debug` is therefore not passed here.
-jumpOpts <- list(reproducible.useMemoise = FALSE, spades.debug = TRUE, reproducible.verbose = 1)
-
-## Every jump test runs with memoise off and on: with it on, the jump's loadFromCache() and the
-## plain Cache() hits share one memoise environment, and that once broke a run.
-jumpTest <- function(desc, code) {
-  code <- substitute(code)
-  for (memo in c(FALSE, TRUE)) {
-    body <- bquote({
-      jumpOpts <- modifyList(jumpOpts, list(reproducible.useMemoise = .(memo)))
-      .(code)
-    })
-    eval(bquote(test_that(.(paste0(desc, " [memoise ", if (memo) "on" else "off", "]")), .(body))))
-  }
-}
-
 runJump <- function(mp, cp, params, ext = 5, chaining = TRUE) {
   withr::local_options(spades.cacheChaining = chaining)
   simInitAndSpades(times = list(start = 1, end = 2), params = params, objects = list(ext = ext),
@@ -76,13 +31,6 @@ runJump <- function(mp, cp, params, ext = 5, chaining = TRUE) {
 }
 
 grownOf <- function(sim) unname(unlist(mget(paste0("grown_", c("jA", "jB", "jC", "jD")), envir = sim@.xData)))
-
-jumpMessages <- function(expr) {
-  m <- capture_messages(expr)
-  list(jumps = restoredMsgs(m),
-       chains = grep("Using cacheChaining", m, value = TRUE),
-       raw = m)
-}
 
 stateOf <- function(sim) {
   list(objs = mget(c("a", "b", "cc", "d", "shared", "grown_jA", "grown_jB", "grown_jC", "grown_jD"),
