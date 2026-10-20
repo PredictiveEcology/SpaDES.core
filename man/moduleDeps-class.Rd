@@ -60,7 +60,9 @@ of the module, with columns \code{paramName},
 of type \code{character}, \code{character}, and
 \code{ANY}, respectively. Default values may be
 overridden by the user by passing a list of parameters
-to \code{\link[=simInit]{simInit()}}.}
+to \code{\link[=simInit]{simInit()}}. Made by \code{\link[=defineParameter]{defineParameter()}}, whose
+\code{cacheKey} column says whether a parameter is part
+of the module's cache keys.}
 
 \item{\code{inputObjects}}{A \code{data.frame} specifying the object dependencies of
 the module, with columns \code{objectName},

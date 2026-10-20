@@ -27,6 +27,7 @@
 
 ## New features
 
+* `defineParameter()` gains `cacheKey` (default `TRUE`, given by name). With `cacheKey = FALSE` a parameter is left out of the module's cache keys -- its events, its `.inputObjects` and cacheChaining -- and keeps its current value after a cache hit. It is for a parameter that changes only how the module does its work, not its result: the hosts or cores a cluster may use (fireSense_spreadFit's `cores`, where adding a host re-ran every cached spreadFit event). A module that does not use it has exactly the keys it had: the parameter definition table is not digested, and the fixed list of parameters already left out (`.useCache`, `.useCacheArgs`, `.useCloud`, `.neverCache`) is unchanged. One helper, `.paramsNotCachedOn()` (R/helpers.R), now decides this for events, `.inputObjects` and the cacheChaining jump. On an older SpaDES.core the argument is harmless (it is appended to the description), so a module using it should set `SpaDES.core (>= 3.2.1.9045)` in its `reqdPkgs`.
 * New module parameter `.neverCache`: a character vector of event names (possibly `".inputObjects"`)
   that are never cached, even when `.useCache` asks for them (`TRUE`, event names or a time), whoever
   set `.useCache`. For events that run for their side effects. It is declared-only (`.globals` sets it

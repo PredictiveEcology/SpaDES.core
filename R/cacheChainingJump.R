@@ -241,7 +241,7 @@
   dep <- sim@depends@dependencies[[module]]
   if (is.null(fnEnv) || is.null(dep)) return(NULL)
   modParamsFull <- sim@params[[module]]
-  modParams <- modParamsFull[!names(modParamsFull) %in% paramsDontCacheOn]
+  modParams <- modParamsFull[!names(modParamsFull) %in% .paramsNotCachedOn(sim, module)]
   if (identical(event, ".inputObjects")) {
     if (!.isNamespaced(sim, module)) return(NULL) # the legacy (non-namespaced) digest is not mirrored
     objs <- paste(module, .fnsReachableFrom(".inputObjects", fnEnv), sep = ":")

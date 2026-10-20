@@ -1767,8 +1767,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             debugonce(.inputObjects)
 
           modParams <- sim@params[[mBase]]
-          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
-            paramsDontCacheOn
+          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in% .paramsNotCachedOn(sim, mBase)
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           runFnCallAsExpr <- TRUE

@@ -7,7 +7,8 @@
 ## Four modules, each with a cached `init` that writes its own output from the previous module's,
 ## then schedules a `grow` event (so the queue after the chain is not trivial). modB also reads
 ## `ext`, an object the user supplies at simInit: the "external input" the jump must re-check.
-mkJumpMod <- function(mp, name, inObjs, outObjs, initBody, useCache = c(".inputObjects", "init")) {
+mkJumpMod <- function(mp, name, inObjs, outObjs, initBody, useCache = c(".inputObjects", "init"),
+                      params = 'defineParameter(".useCache", "character", NA, NA, NA, "")') {
   d <- file.path(mp, name)
   dir.create(d, recursive = TRUE, showWarnings = FALSE)
   writeLines(sprintf('
@@ -17,7 +18,7 @@ defineModule(sim, list(name = "%s", description = "", keywords = "",
   spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year", citation = list("citation.bib"), documentation = list(),
   reqdPkgs = list(),
-  parameters = rbind(defineParameter(".useCache", "character", NA, NA, NA, "")),
+  parameters = rbind(%s),
   inputObjects = %s, outputObjects = %s))
 
 doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) {
@@ -28,7 +29,7 @@ doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 .inputObjects <- function(sim) { return(invisible(sim)) }
-', name, name, inObjs, outObjs, name, initBody, name, name), file.path(d, paste0(name, ".R")))
+', name, name, params, inObjs, outObjs, name, initBody, name, name), file.path(d, paste0(name, ".R")))
   invisible(name)
 }
 
@@ -843,4 +844,27 @@ jumpTest("a jump keeps an object a skipped event made when the landing module de
   expect_equal(restoredList(warm$raw), c("jB init", "jC init"))
   expect_equal(s2$X, 10)
   expect_equal(s2$e, 110)
+})
+
+jumpTest("a parameter defined with cacheKey = FALSE neither breaks a chain nor stops a jump", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  ## jC gains a parameter that is not part of its cache keys (the hosts a cluster may use)
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("cc", "numeric", ""))', "sim$cc <- sim$b * 2",
+            params = 'defineParameter(".useCache", "character", NA, NA, NA, ""),
+                      defineParameter("hosts", "character", "a", NA, NA, "", cacheKey = FALSE)')
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  warm <- jumpMessages(runJump(mp, cp, jumpParams()))
+  expect_match(warm$jumps, "restored 3 cached events in one step")
+
+  ## a new `hosts` for jC: the same jump, and jC keeps the new value, not the cached one
+  hot <- jumpMessages(s3 <- runJump(mp, cp, jumpParams(jC = list(.useCache = "init", hosts = "b"))))
+  expect_length(hot$jumps, 1L)
+  expect_match(hot$jumps, "restored 3 cached events in one step")
+  expect_identical(params(s3)$jC$hosts, "b")
+  expect_equal(s3$cc, 12)
 })

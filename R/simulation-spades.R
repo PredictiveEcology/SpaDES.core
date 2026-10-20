@@ -1568,7 +1568,7 @@ setMethod(
                                        objSynName
                                        )
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
-      paramsDontCacheOnActual <- names(modParamsFull) %in% paramsDontCacheOn
+      paramsDontCacheOnActual <- names(modParamsFull) %in% .paramsNotCachedOn(sim, cur[["moduleName"]])
       # simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
       modParams <- modParamsFull[!paramsDontCacheOnActual]
 

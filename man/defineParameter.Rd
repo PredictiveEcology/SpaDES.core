@@ -4,7 +4,7 @@
 \alias{defineParameter}
 \title{Define a parameter used in a module}
 \usage{
-defineParameter(name, class, default, min, max, desc, ...)
+defineParameter(name, class, default, min, max, desc, ..., cacheKey = TRUE)
 }
 \arguments{
 \item{name}{Character string giving the parameter name.}
@@ -34,6 +34,14 @@ or multiple quotes.}
 \item{...}{A convenience that allows writing a long \code{desc} without
 having to use \code{paste}; any character strings after \code{desc}
 will be \code{paste}d together with \code{desc}.}
+
+\item{cacheKey}{Logical. \code{TRUE} (the default): the parameter's value is part of the
+module's cache keys (its events, its \code{.inputObjects} and cacheChaining),
+so a change is a cache miss. \code{FALSE}: the parameter changes only how the
+module does its work, not its result -- the hosts or the number of cores
+a cluster may use -- so it is left out of those keys, and after a cache
+hit it keeps its current value rather than the cached one. Must be given
+by name.}
 }
 \value{
 a \code{data.frame}

@@ -481,6 +481,20 @@ noEventWarning <- function(sim) {
 paramsDontCacheOn <- c(._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
                        ._txtDotNeverCache)
 
+## The column of a module's parameter table (defineParameter()) saying whether a parameter is
+## part of the module's cache keys
+._txtCacheKey <- "cacheKey"
+
+## The names of `module`'s params that are not part of its cache keys (events, .inputObjects,
+## cacheChaining): `paramsDontCacheOn`, plus the params the module defined with
+## `defineParameter(cacheKey = FALSE)`. A table without the column (metadata saved before it
+## existed) has every param keyed on, as before. After a cache hit these keep their current values.
+.paramsNotCachedOn <- function(sim, module) {
+  dep <- sim@depends@dependencies[[module]]
+  notKeyed <- if (!is.null(dep)) dep@parameters$paramName[dep@parameters[[._txtCacheKey]] %in% FALSE]
+  intersect(names(sim@params[[module]]), c(paramsDontCacheOn, notKeyed))
+}
+
 
 ## Singular/plural message grammar ---------------------------------------------
 ##
