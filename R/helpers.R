@@ -481,6 +481,36 @@ noEventWarning <- function(sim) {
 paramsDontCacheOn <- c(._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
                        ._txtDotNeverCache)
 
+## The column of a module's parameter table (defineParameter()) saying whether a parameter is
+## part of the module's cache keys
+._txtCacheKey <- "cacheKey"
+
+## `.useCacheArgs[[event]]$omitParams`: module parameters that only label a run (a run name, a
+## replicate number, a file-name suffix), so one event leaves them out of its cache key as well.
+._txtOmitParams <- "omitParams"
+
+## The names of `module`'s params that are not part of `eventType`'s cache key (an event,
+## ".inputObjects", or the cacheChaining rebuild of either): `paramsDontCacheOn`; the params the
+## module defined with `defineParameter(cacheKey = FALSE)` (every event; a table without the
+## column, saved before it existed, has every param keyed on); and the `omitParams` that
+## `.useCacheArgs` gives for this event (set by the module's defaults or by the run). After a
+## cache hit all of these keep their current values, not the cached ones.
+.paramsNotCachedOn <- function(sim, module, eventType) {
+  params <- sim@params[[module]]
+  dep <- sim@depends@dependencies[[module]]
+  notKeyed <- if (!is.null(dep)) dep@parameters$paramName[dep@parameters[[._txtCacheKey]] %in% FALSE]
+  omit <- params[[._txtDotUseCacheArgs]][[eventType]][[._txtOmitParams]]
+  intersect(names(params), c(paramsDontCacheOn, notKeyed, as.character(omit)))
+}
+
+## The `.useCacheArgs` of one event that are passed to Cache(): all but `omitParams`
+.extraCacheArgsFor <- function(params, eventType) {
+  extraCacheArgs <- params[[._txtDotUseCacheArgs]][[eventType]]
+  if (!is.list(extraCacheArgs)) return(list())
+  extraCacheArgs[[._txtOmitParams]] <- NULL
+  extraCacheArgs
+}
+
 
 ## Singular/plural message grammar ---------------------------------------------
 ##

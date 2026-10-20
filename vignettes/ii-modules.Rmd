@@ -151,7 +151,7 @@ Every module requires complete metadata, structured as a named list, and passed 
 **`documentation`**   | List of filenames referring to module documentation sources.
 **`reqdPkgs`**        | Character vector of R package names to be loaded.
 **`parameters`**      | A `data.frame` constructed using `rbind` with `defineParameter`, specifying module
-&nbsp;                | parameters, with columns `paramName`, `paramClass`, `default`, `min`, `max`, and `paramDesc`.
+&nbsp;                | parameters, with columns `paramName`, `paramClass`, `default`, `min`, `max`, `paramDesc`, and `cacheKey`.
 &nbsp;                | Default values may be overridden by the user by passing a list of parameters to `simInit`.
 **`inputObjects`**    | A `data.frame` constructed using `bindrows` with `expectsInput`, specifying
 &nbsp;                | the object dependencies of the module, with columns `objectName`, `objectClass`, `desc`, `sourceURL` and other specifications.

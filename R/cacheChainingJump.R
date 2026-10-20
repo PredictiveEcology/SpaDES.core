@@ -270,7 +270,7 @@
   dep <- sim@depends@dependencies[[module]]
   if (is.null(fnEnv) || is.null(dep)) return(NULL)
   modParamsFull <- sim@params[[module]]
-  modParams <- modParamsFull[!names(modParamsFull) %in% paramsDontCacheOn]
+  modParams <- modParamsFull[!names(modParamsFull) %in% .paramsNotCachedOn(sim, module, event)]
   if (identical(event, ".inputObjects")) {
     if (!.isNamespaced(sim, module)) return(NULL) # the legacy (non-namespaced) digest is not mirrored
     objs <- paste(module, .fnsReachableFrom(".inputObjects", fnEnv), sep = ":")
@@ -287,8 +287,7 @@
     classOptions <- classOptionsForCache(events = event, paramsWoKnowns = modParams,
                                          dependsSlots = metadataToDigest, mBase = module)
   }
-  extraCacheArgs <- sim@params[[module]][[._txtDotUseCacheArgs]][[event]]
-  if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+  extraCacheArgs <- .extraCacheArgsFor(sim@params[[module]], event)
   isCalls <- vapply(extraCacheArgs, is.call, logical(1))
   if (any(isCalls)) {
     ## quoted entries (e.g. `quote(P(sim)$.useCloud)`) resolve against the module they belong to

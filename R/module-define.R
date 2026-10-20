@@ -272,6 +272,9 @@ setMethod(
       x$parameters <- defineParameter()
     } else {
       if (is(x$parameters, "data.frame")) {
+        ## a table built before `cacheKey` existed (saved metadata, or by hand): all keyed on
+        if (is.null(x$parameters[[._txtCacheKey]]))
+          x$parameters[[._txtCacheKey]] <- rep(TRUE, NROW(x$parameters))
         if (!all(colnames(x$parameters) %in% colnames(defineParameter())) ||
             !all(colnames(defineParameter()) %in% colnames(x$parameters))) {
           stop("invalid data.frame `parameters` in module `", x$name, "`")
@@ -395,6 +398,15 @@ setMethod(
 #' @param ...       A convenience that allows writing a long `desc` without
 #'                  having to use `paste`; any character strings after `desc`
 #'                  will be `paste`d together with `desc`.
+#' @param cacheKey  Logical. `TRUE` (the default): the parameter's value is part of the
+#'                  module's cache keys (its events, its `.inputObjects` and cacheChaining),
+#'                  so a change is a cache miss. `FALSE`: the parameter changes only how the
+#'                  module does its work, not its result -- the hosts or the number of cores
+#'                  a cluster may use -- so it is left out of those keys, and after a cache
+#'                  hit it keeps its current value rather than the cached one. Must be given
+#'                  by name. For a parameter that changes some events' results but not
+#'                  others' (a run label), see `omitParams` in `.useCacheArgs` ([dotParameters]),
+#'                  which a run can set per event.
 #'
 #' @details Parameter names that start with a dot (`.plots`, `.useCache`, ...) are
 #' recognised by the framework; see [dotParameters].
@@ -453,12 +465,11 @@ setMethod(
 #' unlink(tmpdir, recursive = TRUE)
 #' }
 #'
-defineParameter <- function(name, class, default, min, max, desc, ...) {
+defineParameter <- function(name, class, default, min, max, desc, ..., cacheKey = TRUE) {
   if (missing(name) && missing(class) && missing(default) && missing(min) && missing(max) && missing(desc))
-    return(data.frame(
-      paramName = character(0), paramClass = character(0),
-      default = I(list()), min = I(list()), max = I(list()),
-      paramDesc = character(0), stringsAsFactors = FALSE))
+    return(._parametersDF())
+  if (!isTRUE(cacheKey) && !isFALSE(cacheKey))
+    stop("defineParameter: `cacheKey` for '", name, "' must be TRUE or FALSE")
   if (is.character(name) && is.character(class) && missing(min) && missing(max)) {
     NAtypes <- c("character", "complex", "integer", "logical", "numeric") # nolint
     if (any(class %in% NAtypes)) {
@@ -520,7 +531,7 @@ defineParameter <- function(name, class, default, min, max, desc, ...) {
   #   min = I(list(min)), max = I(list(max)), paramDesc = desc))
   df <- data.frame(
     paramName = name, paramClass = I(list(class)), default = I(list(default)),
-    min = I(list(min)), max = I(list(max)), paramDesc = desc,
+    min = I(list(min)), max = I(list(max)), paramDesc = desc, cacheKey = cacheKey,
     stringsAsFactors = FALSE)
   return(df)
 
