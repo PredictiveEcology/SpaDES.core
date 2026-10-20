@@ -1782,6 +1782,21 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             dependsSlots <- outputsRmDontNeedForCache(metadataToDigest, "outputObjects")
             # dependsSlots <- setdiff(dependsSlots, "outputObjects")
 
+            ## options(spades.cacheKeyReachable = TRUE): only what `.inputObjects` reaches
+            if (.isNamespaced(sim, mBase)) {
+              keyParts <- .narrowKeyParts(sim, sim@.xData[[dotMods]][[mBase]], mBase, ".inputObjects",
+                                          fns = reachable, modParamsFull = modParams,
+                                          dependsSlots = dependsSlots,
+                                          verbose = isTRUE(showSimilar) || .verboseKeyScope())
+              if (!identical(keyParts$fns, reachable))
+                objectsToEvaluateForCaching <- c(paste(mBase, keyParts$fns, sep = ":"),
+                                                 setdiff(objectsToEvaluateForCaching,
+                                                         paste(mBase, reachable, sep = ":")))
+              paramsDontCacheOnActual <- !keyParts$paramsInKey
+              paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
+              dependsSlots <- keyParts$dependsSlots
+            }
+
             classOptions <- classOptionsForCache(events = FALSE, paramsWoKnowns, dependsSlots, mBase)
             # classOptions <- list(events = FALSE,
             #                      current = FALSE,
@@ -2583,8 +2598,9 @@ nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, class
 
 .cacheArgsNotAffectingKey <- c("useCloud", "cloudFolderID", "userTags", "verbose", "showSimilar")
 
-classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, mBase) {
-  list(events = events,
+classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, mBase,
+                                 eventCode = NULL) {
+  out <- list(events = events,
        current = FALSE,
        completed = FALSE,
        simtimes = FALSE,
@@ -2592,5 +2608,8 @@ classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, m
        depends = dependsSlots,
        # .globals = globsWoKnowns,
        modules = mBase)
+  ## the event's branch of doEvent.<module>, when the key is narrowed (see .cacheKeyScope())
+  if (!is.null(eventCode)) out$eventCode <- eventCode
+  out
 }
 

@@ -1568,14 +1568,22 @@ setMethod(
                                        objSynName
                                        )
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
-      paramsDontCacheOnActual <- names(modParamsFull) %in%
-        .paramsNotCachedOn(sim, cur[["moduleName"]], cur[["eventType"]])
+      ## options(spades.cacheKeyReachable = TRUE): only what the event's code reaches
+      keyParts <- .narrowKeyParts(sim, fnEnv, cur[["moduleName"]], cur[["eventType"]], fns = fns,
+                                  modParamsFull = modParamsFull, dependsSlots = metadataToDigest,
+                                  verbose = isTRUE(showSimilar) || .verboseKeyScope())
+      if (!identical(keyParts$fns, fns))
+        moduleSpecificObjects <- c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]),
+                                   paste0(attr(fnEnv, "name"), ":", keyParts$fns),
+                                   paste0(attr(fnEnv, "name"), ":", objs),
+                                   na.omit(expectsInputs))
+      paramsDontCacheOnActual <- !keyParts$paramsInKey
       # simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
       modParams <- modParamsFull[!paramsDontCacheOnActual]
 
       classOptions <- classOptionsForCache(events = cur[["eventType"]],
-                                           paramsWoKnowns = modParams, dependsSlots = metadataToDigest,
-                                           mBase = cur[["moduleName"]])
+                                           paramsWoKnowns = modParams, dependsSlots = keyParts$dependsSlots,
+                                           mBase = cur[["moduleName"]], eventCode = keyParts$eventCode)
 
       # classOptions <- list(events = cur[["eventType"]], current = FALSE, completed = FALSE, simtimes = FALSE,
       #                      paths = FALSE, outputs = FALSE,

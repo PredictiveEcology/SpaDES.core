@@ -57,6 +57,19 @@
 #'      if it is cached or not cached, so this will not mistakenly `cacheChain` when
 #'      it isn't appropriate.\cr
 #'
+#'   `spades.cacheKeyReachable` \tab `FALSE`
+#'      \tab If `TRUE`, a cached event's (or `.inputObjects`') cache key holds only the
+#'      module parameters and module functions its code can reach: its branch of
+#'      `doEvent.<module>`, then the module functions that calls, to any depth, the
+#'      parameters they read (`P(sim)$x`, `Par$x`, `P(sim, "x")`,
+#'      `params(sim)[[currentModule(sim)]]$x`, ...) and `.seed`. The module `version`
+#'      and `reqdPkgs` are left out, as the function bodies carry code changes. When
+#'      the code does something that cannot be read statically (`eval()` of code, `get()`
+#'      of a computed name, `P(sim)` passed to a package function, ...), that event keeps
+#'      the full key. Parameters left out keep their current values after a cache hit.
+#'      With `showSimilar`, a message says what each key was narrowed to, or why not.
+#'      Changes every narrowed event's cacheId once.\cr
+#'
 #'   `spades.codeCheckEngine` \tab `"v1"`
 #'     \tab Which module code checker `simInit()` uses when
 #'     `spades.moduleCodeChecks` is on. `"v1"` is the legacy checker; `"v2"` is
@@ -342,6 +355,7 @@ spadesOptions <- function() {
     spades.allowInitDuringSimInit = FALSE,
     spades.browserOnError = FALSE,
     spades.cacheChaining = FALSE,
+    spades.cacheKeyReachable = FALSE,
     spades.compressionLevel = 1L,
     spades.useCache = "all",
     # spades.cachePath = reproCachePath,

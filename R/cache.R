@@ -337,6 +337,10 @@ setMethod(
       keep <- intersect(names(obj$depends[[curMod]]), classOptions$depends)
       obj$depends[[curMod]] <- obj$depends[[curMod]][keep]
     }
+    ## a narrowed event key (options(spades.cacheKeyReachable)) digests the event's own branch of
+    ##   doEvent.<module> in place of the whole function
+    if (!is.null(classOptions$eventCode))
+      obj$eventCode <- .robustDigest(classOptions$eventCode, algo = algo)
 
     if (!is.null(classOptions$events)) {
       if (FALSE %in% classOptions$events) obj$events <- NULL
