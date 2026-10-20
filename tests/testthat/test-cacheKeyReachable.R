@@ -259,13 +259,13 @@ test_that("a narrowed key also leaves out what .paramsNotCachedOn() excludes, ev
   testInit(opts = .reachOpts(TRUE))
   ## init reads alpha, and .useCacheArgs$init$omitParams leaves it out (#503): a change is a hit
   .writeReachModule(tmpdir)
-  .runReachModule(tmpdir, tmpCache, list(alpha = 1, .useCacheArgs = list(init = list(omitParams = "alpha"))))
-  res <- .runReachModule(tmpdir, tmpCache, list(alpha = 5, .useCacheArgs = list(init = list(omitParams = "alpha"))))
+  omit <- list(.useCacheArgs = list(init = list(omitParams = "alpha")))
+  .runReachModule(tmpdir, tmpCache, c(list(alpha = 1), omit))
+  res <- .runReachModule(tmpdir, tmpCache, c(list(alpha = 5), omit))
   expect_identical(.nReachEntries(tmpCache, "doEvent.reach::init"), 1L)
   expect_identical(res$x, 2)             # the cached result
   expect_identical(res$params$alpha, 5)  # with the current value of the omitted parameter
-  s <- suppressMessages(simInit(modules = "reach", times = list(start = 0, end = 1),
-                                params = list(reach = list(.useCacheArgs = list(init = list(omitParams = "alpha")))),
+  s <- suppressMessages(simInit(modules = "reach", times = list(start = 0, end = 1), params = list(reach = omit),
                                 paths = list(modulePath = tmpdir, cachePath = tmpCache)))
   expect_false("alpha" %in% names(.chainNonObjects(s, "reach", "init")$params))
 })
