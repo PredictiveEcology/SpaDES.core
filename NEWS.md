@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Enhancements
+
+* A module's `version` is no longer part of the cache key of its `.inputObjects`, its events, cacheChaining or a whole-`simList` call. A code change is already in the key through the bodies of the module's functions, so the version only made a version bump with no code change (`Bump to x.y.z`) re-run every cached event of the module. The version stays in `@depends`, and a cache hit returns the current module's version. The `reqdPkgs` strings are still in the key. Cache entries made by earlier versions of SpaDES.core are missed once, because their keys change. `test-cacheChainingMetadata.R` now expects a version-only change to keep a chain, and a function-body or `reqdPkgs` change to break it.
+
 ## Bug fixes
 
 * Caching the `.inputObjects` of a module that calls `compiler::cmpfun()` at top level (Biomass_core) ran for minutes at full CPU and then stopped with "C stack usage ... is too close to the limit". Since the `globalVariables()` fix below, module code was evaluated in an environment holding `.packageName`, where `compiler::cmpfun()` fails ("namespace found within global environments"); `evalWithActiveCode()` then reran the expression as active code in an environment holding the caller's `sim`, and copied that `sim` into the module environment. The simList then contained itself, and its digest recursed without end. `.packageName` is now set only for the `globalVariables()` calls themselves, the active-code pass no longer leaves `sim` in the module environment, and the `simList` method of `.robustDigest()` skips a simList already being digested further up (as reproducible's environment method does), so a self-referencing simList digests in finite time. Digests of other simLists are unchanged.

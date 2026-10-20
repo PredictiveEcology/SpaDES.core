@@ -314,8 +314,6 @@ setMethod(
       # object@outputs <- object@outputs[object@outputs$objectName %in% outputsFromThisMod,]
     }
 
-    otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
-                           "spatialExtent", "timeframe", "timeunit", "version")
     dependsSecond <-
       .robustDigest(lapply(object@depends@dependencies,
                            function(mo) {
