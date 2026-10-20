@@ -51,6 +51,13 @@
                      "source", "sys.source", "sys.function", "body<-", "formals<-",
                      "environment<-", "attach", "eval_tidy", "inject")
 
+## Parameter classes (defineParameter) whose value is code: `eval(P(sim)$x)` then runs that code
+.languageClasses <- c("call", "language", "name", "symbol", "expression", "formula", "function",
+                      "closure")
+
+## Calls that read a function's code without running it: `deparse(f)` in a `.cacheExtra`
+.fnCodeReaders <- c("deparse", "body", "formals")
+
 ## Calls that name an object or function by a string: resolvable only for a literal
 .byNameFns <- c("get", "get0", "mget", "exists", "match.fun", "getFunction", "do.call",
                 "getFromNamespace")
@@ -67,12 +74,21 @@
 ##   objects   names in the module environment reachable from the event (functions and objects)
 ##   params    module parameters the event's reachable code reads
 ##   eventCode the event's branch of `doEvent.<module>`, deparsed (NULL for `.inputObjects`)
-.cacheKeyScope <- function(fnEnv, module, eventType) {
+## `paramClasses` is the module's declared parameter classes (see `.paramClasses()`): without them,
+## `eval()` of a parameter is a fallback.
+.cacheKeyScope <- function(fnEnv, module, eventType, paramClasses = NULL) {
   if (!isTRUE(getOption(._txtCacheKeyReachable, FALSE))) return(NULL)
-  .cacheKeyScopeAnalyse(fnEnv, module, eventType)
+  .cacheKeyScopeAnalyse(fnEnv, module, eventType, paramClasses)
 }
 
-.cacheKeyScopeAnalyse <- function(fnEnv, module, eventType) {
+## The declared class(es) of each parameter of `module`, as a named list
+.paramClasses <- function(sim, module) {
+  p <- sim@depends@dependencies[[module]]@parameters
+  if (is.null(p)) return(NULL)
+  setNames(as.list(p$paramClass), p$paramName)
+}
+
+.cacheKeyScopeAnalyse <- function(fnEnv, module, eventType, paramClasses = NULL) {
   fallback <- function(reasons)
     list(narrowed = FALSE, reasons = unique(reasons), objects = character(), params = character(),
          eventCode = NULL)
@@ -118,7 +134,8 @@
       seen <- c(seen, item$name)
       objects <- c(objects, item$name)
     }
-    u <- .keyCodeUses(item$fn, module = module, modFns = modFns, fnEnv = fnEnv)
+    u <- .keyCodeUses(item$fn, module = module, modFns = modFns, fnEnv = fnEnv,
+                      paramClasses = paramClasses)
     params <- c(params, u$params)
     reasons <- c(reasons, if (length(u$reasons)) paste0(item$name, ": ", u$reasons))
     if (length(u$calledFormals)) calledFormals[[item$name]] <- u$calledFormals
@@ -176,7 +193,7 @@
 ## and the reasons (if any) the analysis cannot account for all of them.
 ##   `fnEnv` is the module environment; module functions found there are looked into when the
 ##   module's whole parameter list is passed to one of them.
-.keyCodeUses <- function(fn, module, modFns, fnEnv = NULL) {
+.keyCodeUses <- function(fn, module, modFns, fnEnv = NULL, paramClasses = NULL) {
   globals <- tryCatch(codetools::findGlobals(fn, merge = TRUE), error = function(e) NULL)
   if (is.null(globals))
     return(list(globals = character(), params = character(), reasons = "could not be analysed"))
@@ -192,6 +209,7 @@
   curModNames <- .assignedNames(b, .isCurrentModuleExpr)
   isWholeOwnList <- function(e) .isWholeParamList(e, module, curModNames)
   parAliases <- setdiff(.assignedNames(b, isWholeOwnList), "Par")
+  consts <- .stringConstants(b, exclude = formalsAll) # `k <- "x"` then `Par[[k]]` reads `x`
 
   params <- character()
   reasons <- character()
@@ -199,6 +217,20 @@
   dep <- function(e) paste(deparse(e, width.cutoff = 60L)[1L], collapse = "")
   modKey <- function(k, dollar = FALSE) .moduleKey(k, module, curModNames, dollar)
   isListName <- function(e) is.name(e) && as.character(e) %in% c("Par", parAliases)
+  selName <- function(e) .selectedName(e, consts)
+  pParam <- function(e) .constOf(.pParam(e), consts)
+  ## the parameter a literal read `Par$x`, `P(sim)$x`, `P(sim, "x")` names, or NA
+  literalParamRead <- function(a) {
+    if (.isSelector(a) && (isListName(a[[2L]]) || (.isFnCall(a[[2L]], "P") &&
+                                                   is.null(.pParam(a[[2L]])) &&
+                                                   .pModule(a[[2L]], modKey) == "own")))
+      return(selName(a))
+    if (.isFnCall(a, "P") && .pModule(a, modKey) == "own") {
+      p <- pParam(a)
+      if (is.character(p) && length(p) == 1L) return(p)
+    }
+    NA_character_
+  }
   calledFormals <- character() # formals this function calls as functions
   valueRefs <- character()     # module functions used as values, not called
   modCalls <- list()           # calls to module functions, with this function's local functions
@@ -218,7 +250,7 @@
 
     ## Par$x, p$x where p <- P(sim)
     if (sel && isListName(e[[2L]])) {
-      p <- .selectedName(e)
+      p <- selName(e)
       if (is.na(p)) addReason("non-literal ", dep(e)) else params <<- c(params, p)
       if (identical(head, quote(`[[`))) walk(e[[3L]])
       return(invisible())
@@ -226,7 +258,7 @@
     ## P(sim)$x, P(sim)[["x"]]
     if (sel && .isFnCall(e[[2L]], "P") && is.null(.pParam(e[[2L]]))) {
       pm <- .pModule(e[[2L]], modKey)
-      p <- .selectedName(e)
+      p <- selName(e)
       if (pm == "unknown") addReason("P() with a non-literal module: ", dep(e))
       else if (pm == "own") {
         if (is.na(p)) addReason("non-literal ", dep(e)) else params <<- c(params, p)
@@ -239,7 +271,7 @@
     if (sel && .isSelector(e[[2L]]) && .isFnCall(e[[2L]][[2L]], "params")) {
       inner <- e[[2L]]
       mk <- .selectorModule(inner, modKey)
-      p <- .selectedName(e)
+      p <- selName(e)
       if (mk == "unknown") addReason("params() with a non-literal module: ", dep(e))
       else if (mk == "own") {
         if (is.na(p)) addReason("non-literal ", dep(e)) else params <<- c(params, p)
@@ -254,7 +286,7 @@
       return(invisible())
     if (.isFnCall(e, "P")) {
       pm <- .pModule(e, modKey)
-      p <- .pParam(e)
+      p <- pParam(e)
       if (pm == "unknown") addReason("P() with a non-literal module: ", dep(e))
       else if (pm == "own") {
         if (is.null(p)) addReason("P(sim) used whole: ", dep(e))
@@ -287,6 +319,25 @@
     headTxt <- dep(head)
     if (!is.na(headName) && headName %in% names(.fnsReadingParams))
       params <<- c(params, .fnsReadingParams[[headName]])
+
+    ## eval() of something that is not code: a data.table column name (`DT[, eval(col) := v]`,
+    ## like get(col)), a package function's formal default, or a parameter declared as a value
+    if (!is.na(headName) && headName == "eval" && length(e) == 2L) {
+      a <- e[[2L]]
+      if ((dt && is.name(a)) || .isPkgFormalDefault(a)) {
+        walk(a, dt)
+        return(invisible())
+      }
+      p <- literalParamRead(a)
+      if (!is.na(p)) {
+        cls <- paramClasses[[p]]
+        if (is.null(cls)) addReason("eval() of parameter ", p, ", whose declared class is unknown")
+        else if (any(cls %in% .languageClasses))
+          addReason("eval() of parameter ", p, ", declared ", paste(cls, collapse = "/"), ": its value is code")
+        walk(a, dt) # the parameter read itself
+        return(invisible())
+      }
+    }
 
     ## dynamic code
     if (!is.na(headName) && headName %in% .dynamicCallFns)
@@ -369,6 +420,9 @@
     idx <- seq_along(e)[-1L]
     if (identical(head, quote(`$`)) || identical(head, quote(`@`))) idx <- 2L
     if (isAssign) idx <- setdiff(idx, 2L) # the name assigned to is not a use
+    ## deparse(f): f's code is read (f is reached through findGlobals), not passed around
+    if (!is.na(headName) && headName %in% .fnCodeReaders && length(e) >= 2L &&
+        is.name(e[[2L]]) && as.character(e[[2L]]) %in% modFns) idx <- setdiff(idx, 2L)
     isBracket <- identical(head, quote(`[`))
     for (i in idx) {
       if (identical(e[[i]], quote(expr = ))) next
@@ -436,12 +490,48 @@
 .isSelector <- function(e) is.call(e) && length(e) == 3L &&
   (identical(e[[1L]], quote(`$`)) || identical(e[[1L]], quote(`[[`)))
 
-## the name selected by `x$name` / `x[["name"]]`, or NA when it is not a literal
-.selectedName <- function(e) {
+## the name selected by `x$name` / `x[["name"]]`, or NA when it is not a literal;
+## `x[[k]]` is literal when `k` is one of the string constants `consts` (see `.stringConstants()`)
+.selectedName <- function(e, consts = NULL) {
   k <- e[[3L]]
   if (identical(e[[1L]], quote(`$`)) && (is.name(k) || is.character(k))) return(as.character(k))
+  k <- .constOf(k, consts)
   if (identical(e[[1L]], quote(`[[`)) && is.character(k) && length(k) == 1L) return(k)
   NA_character_
+}
+
+## `k` itself, or the string it holds when it is a name among the string constants `consts`
+.constOf <- function(k, consts)
+  if (is.name(k) && as.character(k) %in% names(consts)) consts[[as.character(k)]] else k
+
+## `formals(pkg::f)$x` / `formals(pkg::f)[["x"]]`: a package function's default, not module code
+.isPkgFormalDefault <- function(a) {
+  if (!.isSelector(a) || is.na(.selectedName(a))) return(FALSE)
+  f <- a[[2L]]
+  is.call(f) && identical(f[[1L]], quote(formals)) && length(f) == 2L && is.call(f[[2L]]) &&
+    (identical(f[[2L]][[1L]], quote(`::`)) || identical(f[[2L]][[1L]], quote(`:::`)))
+}
+
+## Variables assigned exactly once in `expr` (by `<-`, `=`, `<<-` or `for`), to a string literal:
+## a named character vector, name -> string. `exclude` are names that are also formals.
+.stringConstants <- function(expr, exclude = character()) {
+  n <- integer()
+  val <- list()
+  walk <- function(e) {
+    if (!is.call(e)) return()
+    h <- e[[1L]]
+    isAssign <- (identical(h, quote(`<-`)) || identical(h, quote(`=`)) || identical(h, quote(`<<-`))) &&
+      length(e) == 3L
+    if ((isAssign || identical(h, quote(`for`))) && is.name(e[[2L]])) {
+      nm <- as.character(e[[2L]])
+      n[nm] <<- sum(n[nm], 1L, na.rm = TRUE)
+      if (isAssign && is.character(e[[3L]]) && length(e[[3L]]) == 1L) val[[nm]] <<- e[[3L]]
+    }
+    for (i in seq_along(e)[-1L]) if (!identical(e[[i]], quote(expr = ))) walk(e[[i]])
+  }
+  walk(expr)
+  once <- setdiff(names(n)[n == 1L], exclude)
+  unlist(val[intersect(once, names(val))])
 }
 
 ## `f(...)` or `SpaDES.core::f(...)`
@@ -576,10 +666,10 @@
 ##   fns (names in the module environment), modParamsFull, dependsSlots.
 ## Returns the parts to use: fns, paramsInKey (logical over modParamsFull), dependsSlots, eventCode.
 .narrowKeyParts <- function(fnEnv, module, eventType, fns, modParamsFull, dependsSlots,
-                            verbose = FALSE) {
+                            verbose = FALSE, paramClasses = NULL) {
   inKey <- !names(modParamsFull) %in% paramsDontCacheOn
   out <- list(fns = fns, paramsInKey = inKey, dependsSlots = dependsSlots, eventCode = NULL)
-  scope <- .cacheKeyScope(fnEnv, module, eventType)
+  scope <- .cacheKeyScope(fnEnv, module, eventType, paramClasses)
   if (is.null(scope)) return(out)
   what <- paste0(module, "::", eventType, " cache key")
   if (!isTRUE(scope$narrowed)) {

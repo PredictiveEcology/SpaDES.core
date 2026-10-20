@@ -64,9 +64,9 @@
 #'      parameters they read (`P(sim)$x`, `Par$x`, `P(sim, "x")`,
 #'      `params(sim)[[currentModule(sim)]]$x`, ...) and `.seed`. The module `version`
 #'      and `reqdPkgs` are left out, as the function bodies carry code changes. When
-#'      the code does something that cannot be read statically (`eval()`, `get()` of a
-#'      computed name, `P(sim)` passed to a package function, ...), that event keeps the
-#'      full key. Parameters left out keep their current values after a cache hit.
+#'      the code does something that cannot be read statically (`eval()` of code, `get()`
+#'      of a computed name, `P(sim)` passed to a package function, ...), that event keeps
+#'      the full key. Parameters left out keep their current values after a cache hit.
 #'      With `showSimilar`, a message says what each key was narrowed to, or why not.
 #'      Changes every narrowed event's cacheId once.\cr
 #'

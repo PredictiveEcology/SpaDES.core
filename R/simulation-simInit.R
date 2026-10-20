@@ -1787,7 +1787,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               keyParts <- .narrowKeyParts(sim@.xData[[dotMods]][[mBase]], mBase, ".inputObjects",
                                           fns = reachable, modParamsFull = modParams,
                                           dependsSlots = dependsSlots,
-                                          verbose = isTRUE(showSimilar) || .verboseKeyScope())
+                                          verbose = isTRUE(showSimilar) || .verboseKeyScope(),
+                                          paramClasses = .paramClasses(sim, mBase))
               if (!identical(keyParts$fns, reachable))
                 objectsToEvaluateForCaching <- c(paste(mBase, keyParts$fns, sep = ":"),
                                                  setdiff(objectsToEvaluateForCaching,

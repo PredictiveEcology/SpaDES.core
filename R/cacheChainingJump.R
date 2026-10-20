@@ -276,14 +276,16 @@
     if (!.isNamespaced(sim, module)) return(NULL) # the legacy (non-namespaced) digest is not mirrored
     keyParts <- .narrowKeyParts(fnEnv, module, event, fns = .fnsReachableFrom(".inputObjects", fnEnv),
                                 modParamsFull = modParamsFull,
-                                dependsSlots = outputsRmDontNeedForCache(metadataToDigest, "outputObjects"))
+                                dependsSlots = outputsRmDontNeedForCache(metadataToDigest, "outputObjects"),
+                                paramClasses = .paramClasses(sim, module))
     modParams <- modParamsFull[keyParts$paramsInKey]
     objs <- paste(module, keyParts$fns, sep = ":")
     classOptions <- classOptionsForCache(events = FALSE, modParams, keyParts$dependsSlots, module)
   } else {
     notFns <- c(".inputObjects", "mod", "Par", ".objects")
     keyParts <- .narrowKeyParts(fnEnv, module, event, fns = setdiff(ls(fnEnv, all.names = TRUE), notFns),
-                                modParamsFull = modParamsFull, dependsSlots = metadataToDigest)
+                                modParamsFull = modParamsFull, dependsSlots = metadataToDigest,
+                                paramClasses = .paramClasses(sim, module))
     modParams <- modParamsFull[keyParts$paramsInKey]
     objsInMod <- setdiff(ls(sim@.xData[[dotObjs]][[module]], all.names = TRUE), notFns)
     objs <- c(ls(sim@.xData, all.names = TRUE, pattern = module),

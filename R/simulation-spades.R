@@ -1571,7 +1571,8 @@ setMethod(
       ## options(spades.cacheKeyReachable = TRUE): only what the event's code reaches
       keyParts <- .narrowKeyParts(fnEnv, cur[["moduleName"]], cur[["eventType"]], fns = fns,
                                   modParamsFull = modParamsFull, dependsSlots = metadataToDigest,
-                                  verbose = isTRUE(showSimilar) || .verboseKeyScope())
+                                  verbose = isTRUE(showSimilar) || .verboseKeyScope(),
+                                  paramClasses = .paramClasses(sim, cur[["moduleName"]]))
       if (!identical(keyParts$fns, fns))
         moduleSpecificObjects <- c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]),
                                    paste0(attr(fnEnv, "name"), ":", keyParts$fns),
