@@ -66,7 +66,12 @@
 #'     `".inputObjects"`) of extra arguments for [reproducible::Cache()] for that
 #'     event, e.g. `cacheId`, `useCloud`, `cloudFolderID`. Entries made with
 #'     `quote()`, e.g. `quote(P(sim)$.useCloud)`, are evaluated in the module's
-#'     context. Not part of the cache key.\cr
+#'     context. Not part of the cache key. One entry is not passed to `Cache()`:
+#'     `omitParams`, a character vector of this module's parameters left out of
+#'     that event's cache key, for parameters that label a run without changing
+#'     the event's result, e.g.
+#'     `list(init = list(omitParams = c(".runName", ".rep")))`. After a cache hit
+#'     they keep their current values, not the cached ones.\cr
 #'   `.useCloud` \tab declared only \tab none \tab Not read by SpaDES.core directly, so declared only.
 #'     It is not part of the cache key. Modules use it in `.useCacheArgs`, as above.\cr
 #'   `.useParallel` \tab declared only \tab none \tab Number of cores, or whether to use parallel

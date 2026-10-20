@@ -217,9 +217,10 @@ test_that("eval() of a data.table column name, a package formal default or a val
   expect_true(s$narrowed)
   expect_setequal(s$params, c(".seed", "alpha", "beta"))
   ## a parameter declared as code runs whatever it holds
-  .reachFallsBack("sim$x <- eval(P(sim)$alpha)", paramClasses = list(alpha = c("numeric", "name", "call")))
-  .reachFallsBack("sim$x <- eval(P(sim)$alpha)", paramClasses = list(alpha = "function"))
-  .reachFallsBack("sim$x <- eval(P(sim)$alpha)")                        # class unknown
+  evalAlpha <- "sim$x <- eval(P(sim)$alpha)"
+  .reachFallsBack(evalAlpha, paramClasses = list(alpha = c("numeric", "name", "call")))
+  .reachFallsBack(evalAlpha, paramClasses = list(alpha = "function"))
+  .reachFallsBack(evalAlpha)                                            # class unknown
   .reachFallsBack("col <- 'b'; sim$x <- eval(col)")                     # a name outside DT[...]
   .reachFallsBack("DT[a == 1, eval(quote(b)) := 1]")                    # code inside DT[...]
   .reachFallsBack("sim$x <- eval(formals(helper)$a)", list(helper = "function(a = 1) a"))
@@ -251,6 +252,22 @@ test_that("code that really is dynamic still falls back", {
   .reachFallsBack("f <- getFromNamespace(paste0('rno', 'rm'), 'stats'); sim$x <- f(1)")
   .reachFallsBack("sim$x <- eval(quote(P(sim)$alpha))")
   .reachFallsBack("sim$x <- eval(sim$code)")
+})
+
+test_that("a narrowed key also leaves out what .paramsNotCachedOn() excludes, even when read", {
+  skip_on_cran()
+  testInit(opts = .reachOpts(TRUE))
+  ## init reads alpha, and .useCacheArgs$init$omitParams leaves it out (#503): a change is a hit
+  .writeReachModule(tmpdir)
+  .runReachModule(tmpdir, tmpCache, list(alpha = 1, .useCacheArgs = list(init = list(omitParams = "alpha"))))
+  res <- .runReachModule(tmpdir, tmpCache, list(alpha = 5, .useCacheArgs = list(init = list(omitParams = "alpha"))))
+  expect_identical(.nReachEntries(tmpCache, "doEvent.reach::init"), 1L)
+  expect_identical(res$x, 2)             # the cached result
+  expect_identical(res$params$alpha, 5)  # with the current value of the omitted parameter
+  s <- suppressMessages(simInit(modules = "reach", times = list(start = 0, end = 1),
+                                params = list(reach = list(.useCacheArgs = list(init = list(omitParams = "alpha")))),
+                                paths = list(modulePath = tmpdir, cachePath = tmpCache)))
+  expect_false("alpha" %in% names(.chainNonObjects(s, "reach", "init")$params))
 })
 
 test_that("a falling-back event has exactly the key it had without the option", {

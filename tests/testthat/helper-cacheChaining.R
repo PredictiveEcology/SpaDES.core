@@ -17,7 +17,8 @@ restoredList <- function(m) {
 ## Four modules, each with a cached `init` that writes its own output from the previous module's,
 ## then schedules a `grow` event (so the queue after the chain is not trivial). modB also reads
 ## `ext`, an object the user supplies at simInit: the "external input" the jump must re-check.
-mkJumpMod <- function(mp, name, inObjs, outObjs, initBody, useCache = c(".inputObjects", "init")) {
+mkJumpMod <- function(mp, name, inObjs, outObjs, initBody, useCache = c(".inputObjects", "init"),
+                      params = 'defineParameter(".useCache", "character", NA, NA, NA, "")') {
   d <- file.path(mp, name)
   dir.create(d, recursive = TRUE, showWarnings = FALSE)
   writeLines(sprintf('
@@ -27,7 +28,7 @@ defineModule(sim, list(name = "%s", description = "", keywords = "",
   spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
   timeunit = "year", citation = list("citation.bib"), documentation = list(),
   reqdPkgs = list(),
-  parameters = rbind(defineParameter(".useCache", "character", NA, NA, NA, "")),
+  parameters = rbind(%s),
   inputObjects = %s, outputObjects = %s))
 
 doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) {
@@ -38,7 +39,7 @@ doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) {
 }
 
 .inputObjects <- function(sim) { return(invisible(sim)) }
-', name, name, inObjs, outObjs, name, initBody, name, name), file.path(d, paste0(name, ".R")))
+', name, name, params, inObjs, outObjs, name, initBody, name, name), file.path(d, paste0(name, ".R")))
   invisible(name)
 }
 

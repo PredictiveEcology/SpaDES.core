@@ -274,18 +274,16 @@
   ##   options(spades.cacheKeyReachable = TRUE)
   if (identical(event, ".inputObjects")) {
     if (!.isNamespaced(sim, module)) return(NULL) # the legacy (non-namespaced) digest is not mirrored
-    keyParts <- .narrowKeyParts(fnEnv, module, event, fns = .fnsReachableFrom(".inputObjects", fnEnv),
+    keyParts <- .narrowKeyParts(sim, fnEnv, module, event, fns = .fnsReachableFrom(".inputObjects", fnEnv),
                                 modParamsFull = modParamsFull,
-                                dependsSlots = outputsRmDontNeedForCache(metadataToDigest, "outputObjects"),
-                                paramClasses = .paramClasses(sim, module))
+                                dependsSlots = outputsRmDontNeedForCache(metadataToDigest, "outputObjects"))
     modParams <- modParamsFull[keyParts$paramsInKey]
     objs <- paste(module, keyParts$fns, sep = ":")
     classOptions <- classOptionsForCache(events = FALSE, modParams, keyParts$dependsSlots, module)
   } else {
     notFns <- c(".inputObjects", "mod", "Par", ".objects")
-    keyParts <- .narrowKeyParts(fnEnv, module, event, fns = setdiff(ls(fnEnv, all.names = TRUE), notFns),
-                                modParamsFull = modParamsFull, dependsSlots = metadataToDigest,
-                                paramClasses = .paramClasses(sim, module))
+    keyParts <- .narrowKeyParts(sim, fnEnv, module, event, fns = setdiff(ls(fnEnv, all.names = TRUE), notFns),
+                                modParamsFull = modParamsFull, dependsSlots = metadataToDigest)
     modParams <- modParamsFull[keyParts$paramsInKey]
     objsInMod <- setdiff(ls(sim@.xData[[dotObjs]][[module]], all.names = TRUE), notFns)
     objs <- c(ls(sim@.xData, all.names = TRUE, pattern = module),
@@ -296,8 +294,7 @@
                                          dependsSlots = keyParts$dependsSlots, mBase = module,
                                          eventCode = keyParts$eventCode)
   }
-  extraCacheArgs <- sim@params[[module]][[._txtDotUseCacheArgs]][[event]]
-  if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+  extraCacheArgs <- .extraCacheArgsFor(sim@params[[module]], event)
   isCalls <- vapply(extraCacheArgs, is.call, logical(1))
   if (any(isCalls)) {
     ## quoted entries (e.g. `quote(P(sim)$.useCloud)`) resolve against the module they belong to

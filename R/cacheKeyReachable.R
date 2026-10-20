@@ -662,14 +662,16 @@
   out
 }
 
-## Apply the scope to one cached event's key parts. `parts` holds what the full key would use:
-##   fns (names in the module environment), modParamsFull, dependsSlots.
+## Apply the scope to one cached event's key parts. `fns` (names in the module environment),
+##   `modParamsFull` and `dependsSlots` hold what the full key would use.
 ## Returns the parts to use: fns, paramsInKey (logical over modParamsFull), dependsSlots, eventCode.
-.narrowKeyParts <- function(fnEnv, module, eventType, fns, modParamsFull, dependsSlots,
-                            verbose = FALSE, paramClasses = NULL) {
-  inKey <- !names(modParamsFull) %in% paramsDontCacheOn
+## A parameter `.paramsNotCachedOn()` leaves out stays out of a narrowed key too, even when the
+## event's code reads it.
+.narrowKeyParts <- function(sim, fnEnv, module, eventType, fns, modParamsFull, dependsSlots,
+                            verbose = FALSE) {
+  inKey <- !names(modParamsFull) %in% .paramsNotCachedOn(sim, module, eventType)
   out <- list(fns = fns, paramsInKey = inKey, dependsSlots = dependsSlots, eventCode = NULL)
-  scope <- .cacheKeyScope(fnEnv, module, eventType, paramClasses)
+  scope <- .cacheKeyScope(fnEnv, module, eventType, .paramClasses(sim, module))
   if (is.null(scope)) return(out)
   what <- paste0(module, "::", eventType, " cache key")
   if (!isTRUE(scope$narrowed)) {

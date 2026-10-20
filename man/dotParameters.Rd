@@ -73,7 +73,12 @@ the cache key. See \code{\link[=clearCacheEventsOnly]{clearCacheEventsOnly()}} a
 \code{".inputObjects"}) of extra arguments for \code{\link[reproducible:Cache]{reproducible::Cache()}} for that
 event, e.g. \code{cacheId}, \code{useCloud}, \code{cloudFolderID}. Entries made with
 \code{quote()}, e.g. \code{quote(P(sim)$.useCloud)}, are evaluated in the module's
-context. Not part of the cache key.\cr
+context. Not part of the cache key. One entry is not passed to \code{Cache()}:
+\code{omitParams}, a character vector of this module's parameters left out of
+that event's cache key, for parameters that label a run without changing
+the event's result, e.g.
+\code{list(init = list(omitParams = c(".runName", ".rep")))}. After a cache hit
+they keep their current values, not the cached ones.\cr
 \code{.useCloud} \tab declared only \tab none \tab Not read by SpaDES.core directly, so declared only.
 It is not part of the cache key. Modules use it in \code{.useCacheArgs}, as above.\cr
 \code{.useParallel} \tab declared only \tab none \tab Number of cores, or whether to use parallel

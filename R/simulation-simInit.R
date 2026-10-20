@@ -1768,7 +1768,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           modParams <- sim@params[[mBase]]
           paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
-            paramsDontCacheOn
+            .paramsNotCachedOn(sim, mBase, ".inputObjects")
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           runFnCallAsExpr <- TRUE
@@ -1784,11 +1784,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
             ## options(spades.cacheKeyReachable = TRUE): only what `.inputObjects` reaches
             if (.isNamespaced(sim, mBase)) {
-              keyParts <- .narrowKeyParts(sim@.xData[[dotMods]][[mBase]], mBase, ".inputObjects",
+              keyParts <- .narrowKeyParts(sim, sim@.xData[[dotMods]][[mBase]], mBase, ".inputObjects",
                                           fns = reachable, modParamsFull = modParams,
                                           dependsSlots = dependsSlots,
-                                          verbose = isTRUE(showSimilar) || .verboseKeyScope(),
-                                          paramClasses = .paramClasses(sim, mBase))
+                                          verbose = isTRUE(showSimilar) || .verboseKeyScope())
               if (!identical(keyParts$fns, reachable))
                 objectsToEvaluateForCaching <- c(paste(mBase, keyParts$fns, sep = ":"),
                                                  setdiff(objectsToEvaluateForCaching,
@@ -1807,8 +1806,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             #                      depends = dependsSlots,
             #                      # .globals = globsWoKnowns,
             #                     modules = mBase)
-            extraCacheArgs <- sim@params[[mBase]][[._txtDotUseCacheArgs]][[".inputObjects"]]
-            if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+            extraCacheArgs <- .extraCacheArgsFor(sim@params[[mBase]], ".inputObjects")
             # Evaluate any quoted entries (e.g. `quote(P(sim)$.useCloud)`) here, while
             # `sim@current$moduleName` is `mBase` (set above), so module-context accessors
             # like P(sim) resolve to this module. Otherwise they would reach Cache() as

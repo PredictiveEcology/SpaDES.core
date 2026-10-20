@@ -1569,10 +1569,9 @@ setMethod(
                                        )
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
       ## options(spades.cacheKeyReachable = TRUE): only what the event's code reaches
-      keyParts <- .narrowKeyParts(fnEnv, cur[["moduleName"]], cur[["eventType"]], fns = fns,
+      keyParts <- .narrowKeyParts(sim, fnEnv, cur[["moduleName"]], cur[["eventType"]], fns = fns,
                                   modParamsFull = modParamsFull, dependsSlots = metadataToDigest,
-                                  verbose = isTRUE(showSimilar) || .verboseKeyScope(),
-                                  paramClasses = .paramClasses(sim, cur[["moduleName"]]))
+                                  verbose = isTRUE(showSimilar) || .verboseKeyScope())
       if (!identical(keyParts$fns, fns))
         moduleSpecificObjects <- c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]),
                                    paste0(attr(fnEnv, "name"), ":", keyParts$fns),
@@ -1598,8 +1597,7 @@ setMethod(
     modCall <- get(moduleCall, envir = fnEnv)
     # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
     # if (isTRUE(cur$eventType %in% c(".inputObjects", "init"))) browser()
-    extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
-    if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+    extraCacheArgs <- .extraCacheArgsFor(sim@params[[cur[["moduleName"]]]], cur[["eventType"]])
     isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
     if (isTRUE(any(isCalls))) 
       extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())
