@@ -2961,10 +2961,13 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
         ##   earlier in the run; it is digested and compared with what the entry recorded
         ##   (`preDigest` tags); a difference is not a chain hit.
         produced <- if (!is.null(sim)) attr(sim, "cacheChainingProduced") else NULL
+        ## one memo of object digests for this hit's check and every link of its walk (.chainExternalInputsMatch())
+        digests <- new.env(parent = emptyenv())
         okExternal <- if (is.null(sim)) TRUE else {
           postTags <- .chainEntryTags(cacheIdOfSkip, sim@paths[["cachePath"]])
           !is.null(postTags) &&
-            .chainExternalInputsMatch(sim, module, postTags, produced = produced, userObjects = userObjects)
+            .chainExternalInputsMatch(sim, module, postTags, produced = produced, userObjects = userObjects,
+                                      digests = digests)
         }
         if (!okExternal) {
           messageCache("Using cacheChaining; but an input of ", module, " that the chain did not produce ",
@@ -2980,7 +2983,7 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
           if (!is.null(sim) && !is.null(jumpControls) && is.null(getOption("spades.evalPostEvent"))) {
             jump <- .chainWalk(sim, cacheIdOfSkip, module, event, cachePath = sim@paths[["cachePath"]],
                                produced = produced, userObjects = userObjects,
-                               controls = jumpControls, verbose = verbose)
+                               controls = jumpControls, verbose = verbose, digests = digests)
             if (!is.null(jump)) {
               ## row 1 is this event's own entry: with the call pointed at the last entry it is
               ##   never loaded itself, so its outputs are restored like the other skipped ones
