@@ -1568,7 +1568,8 @@ setMethod(
                                        objSynName
                                        )
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
-      paramsDontCacheOnActual <- names(modParamsFull) %in% .paramsNotCachedOn(sim, cur[["moduleName"]])
+      paramsDontCacheOnActual <- names(modParamsFull) %in%
+        .paramsNotCachedOn(sim, cur[["moduleName"]], cur[["eventType"]])
       # simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
       modParams <- modParamsFull[!paramsDontCacheOnActual]
 
@@ -1588,8 +1589,7 @@ setMethod(
     modCall <- get(moduleCall, envir = fnEnv)
     # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
     # if (isTRUE(cur$eventType %in% c(".inputObjects", "init"))) browser()
-    extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
-    if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+    extraCacheArgs <- .extraCacheArgsFor(sim@params[[cur[["moduleName"]]]], cur[["eventType"]])
     isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
     if (isTRUE(any(isCalls))) 
       extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())

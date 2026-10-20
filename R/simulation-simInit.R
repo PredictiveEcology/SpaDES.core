@@ -1767,7 +1767,8 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             debugonce(.inputObjects)
 
           modParams <- sim@params[[mBase]]
-          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in% .paramsNotCachedOn(sim, mBase)
+          paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
+            .paramsNotCachedOn(sim, mBase, ".inputObjects")
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           runFnCallAsExpr <- TRUE
@@ -1790,8 +1791,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             #                      depends = dependsSlots,
             #                      # .globals = globsWoKnowns,
             #                     modules = mBase)
-            extraCacheArgs <- sim@params[[mBase]][[._txtDotUseCacheArgs]][[".inputObjects"]]
-            if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+            extraCacheArgs <- .extraCacheArgsFor(sim@params[[mBase]], ".inputObjects")
             # Evaluate any quoted entries (e.g. `quote(P(sim)$.useCloud)`) here, while
             # `sim@current$moduleName` is `mBase` (set above), so module-context accessors
             # like P(sim) resolve to this module. Otherwise they would reach Cache() as

@@ -111,7 +111,7 @@ test_that("a module that does not use cacheKey is keyed on the same parameters a
                                 paths = list(modulePath = tmpdir, cachePath = tmpCache)))
   ## every parameter is keyed on, except the fixed list that was already left out
   expect_true(all(s@depends@dependencies$m@parameters$cacheKey))
-  expect_identical(.paramsNotCachedOn(s, "m"),
+  expect_identical(.paramsNotCachedOn(s, "m", "init"),
                    intersect(names(params(s)$m), paramsDontCacheOn))
 
   ## and a changed `hosts` is a miss, as it was

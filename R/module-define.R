@@ -404,7 +404,9 @@ setMethod(
 #'                  module does its work, not its result -- the hosts or the number of cores
 #'                  a cluster may use -- so it is left out of those keys, and after a cache
 #'                  hit it keeps its current value rather than the cached one. Must be given
-#'                  by name.
+#'                  by name. For a parameter that changes some events' results but not
+#'                  others' (a run label), see `omitParams` in `.useCacheArgs` ([dotParameters]),
+#'                  which a run can set per event.
 #'
 #' @details Parameter names that start with a dot (`.plots`, `.useCache`, ...) are
 #' recognised by the framework; see [dotParameters].
