@@ -662,28 +662,21 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
 
 ## Merge the event queue recovered from the cache with the live one, so that events the cached event
 ## scheduled are not lost. `keep` selects which of the cached events to consider: an event can only
-## have scheduled its own module's events.
+## have scheduled its own module's events. Only for an entry saved without an `eventQueueDelta` tag;
+## an entry with one has its delta replayed instead (.prepareOutput()).
 ##
-## `order` is a sort key only -- it makes cached-added events fall after live ones at the same
-## eventTime and eventPriority -- and is stripped before the queue is returned.
+## An event in both queues is added once per copy the cached queue has BEYOND the live queue: no more
+## (the cached queue also holds the events the live run already had, which must not be duplicated)
+## and no less (`unique()` on the union also collapsed a duplicate the live run had really scheduled,
+## which changed every later event's cacheId). Multiplicity is counted as the chain counts it
+## (.chainQueueKeys()), and the added events are queued as a replayed delta is (.chainApplyDelta()):
+## after the live events at equal eventTime and eventPriority, as scheduleEvent() would have.
 .mergeEventQueues <- function(cached, live, keep = TRUE) {
   ## `cached[keep]` on an empty list pads rather than staying empty: a logical index longer than the
-  ## object yields list(NULL), which rbindlist() then silently drops, desynchronising the sort keys.
-  combined <- append(if (length(cached)) cached[keep] else cached, live)
-  if (!length(combined)) {
-    return(live)
-  }
-  ## Dedupe on the events THEMSELVES, before any sort key exists. Previously a sort key was written
-  ## into each event first -- 2 for the cached ones, 1 for the live ones -- so an event sitting in
-  ## both queues was no longer identical when unique() ran, survived as a duplicate, and re-emerged
-  ## with the key stripped: two byte-identical events. Since the queue is part of the next event's
-  ## cacheId, that duplicate turned every subsequent warm hit into a miss.
-  combined <- unique(combined)
-  ## Tie-break by provenance rather than by a field written into the event: at equal eventTime and
-  ## eventPriority, events the live run already had come before ones recovered from the cache.
-  fromLive <- vapply(combined, function(e) any(vapply(live, identical, logical(1), e)), logical(1))
-  ord <- rbindlist(combined)
-  combined[order(ord$eventTime, ord$eventPriority, ifelse(fromLive, 1L, 2L))]
+  ## object yields list(NULL)
+  cached <- if (length(cached)) cached[keep] else cached
+  added <- cached[!.chainQueueKeys(cached) %in% .chainQueueKeys(live)]
+  .chainApplyDelta(live, list(add = added, remove = list()))
 }
 
 #' `.prepareOutput` for `simList` objects
@@ -875,6 +868,9 @@ setMethod(
           ## means it is not in a spades call
           simPost@completed <- simFromCache@completed
         }
+        ## the entry's tags: what its event did to the queue and which outputs rows it added
+        id <- cacheId(object)
+        sc <- if (length(id)) .chainEntryTags(id, cachePath)
         if (!is.null(attr(simPre[[whSimList]], "cacheChainingJump"))) {
           ## A cacheChaining jump: this entry is the state after the LAST of several skipped events.
           ##   The queue is NOT the one stored in it -- that is the queue of whichever run saved the
@@ -889,21 +885,29 @@ setMethod(
           simPost@events <- simFromCache@events
           simPost@simtimes <- simFromCache@simtimes
         } else {
-          # if this is FALSE, it means that events were added by the event
+          ## An event hit: the live queue (the event itself already off it) as the event would have
+          ##   left it. The entry records what its event did to the queue when it ran (the
+          ##   `eventQueueDelta` tag); replay it, as a cacheChaining jump does (.chainWalk()). The queue
+          ##   stored in the entry is not used: it is the saving run's whole queue, and merging it with
+          ##   the live one either duplicated the events the live run already had or, de-duplicated
+          ##   with unique(), collapsed a duplicate the live run had really scheduled.
+          delta <- if (!is.null(sc)) .chainReadDelta(sc)
+          if (!is.null(delta)) {
+            simPost@events <- .chainApplyDelta(simPost@events, delta)
+          } else {
+            ## an entry saved before the tag existed: the saving run's queue is all there is
+            esfc <- events(simFromCache)
 
-          esfc <- events(simFromCache)
-          cur <- current(simFromCache)
+            # anti-join to find new ones
+            eventsAddedByThisModuleDT <- esfc[!events(simPost), on = colnames(esfc)]
 
-          # anti-join to find new ones
-          eventsAddedByThisModuleDT <- esfc[!events(simPost), on = colnames(esfc)]
+            eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
 
-          eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
-
-          if (NROW(eventsAddedByThisModuleDT)) {
-            simPost@events <- .mergeEventQueues(simFromCache@events, simPost@events,
-                                                eventsAddedByThisModule)
+            if (NROW(eventsAddedByThisModuleDT)) {
+              simPost@events <- .mergeEventQueues(simFromCache@events, simPost@events,
+                                                  eventsAddedByThisModule)
+            }
           }
-          #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
         simPost@current <- simFromCache@current
 
@@ -917,8 +921,6 @@ setMethod(
           ## only the rows the cached event itself added (its `eventOutputsAdded` tag), not every row
           ##   the run that saved the entry had: those can be another run's, saved before this
           ##   run's start(sim) -- see .chainOutAddedRows()
-          id <- cacheId(object)
-          sc <- if (length(id)) .chainEntryTags(id, cachePath)
           added <- .chainOutAddedRows(object@outputs, sc)
           simPost@outputs <- .mergeCachedOutputs(
             simPost@outputs, added[!added$objectName %in% outputsFromTheseMods, ])
