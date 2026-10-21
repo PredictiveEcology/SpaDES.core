@@ -69,3 +69,21 @@ test_that("empty queues are handled", {
   expect_length(.mergeEventQueues(cached = list(one), live = list()), 1L)
   expect_length(.mergeEventQueues(cached = list(), live = list()), 0L)
 })
+
+## The dedupe above must not go further than the live queue warrants. `unique()` on the union also
+## collapsed two byte-identical events the LIVE run had scheduled (a module calling scheduleEvent()
+## twice with the same time, priority and type), so the queue after a hit differed from the real
+## run's and every later event's cacheId changed. The merge removes only as many copies of a cached
+## event as the live queue already holds.
+test_that("a duplicate the live run scheduled is kept", {
+  work <- ev(0, "work", "dup")
+  after <- ev(0, "after", "dup", priority = 10)
+  out <- .mergeEventQueues(cached = list(work, work, after), live = list(work, work))
+  expect_identical(vapply(out, function(e) e$eventType, character(1)), c("work", "work", "after"))
+})
+
+test_that("a copy the cached event added beyond what the live queue holds is kept", {
+  work <- ev(0, "work", "dup")
+  out <- .mergeEventQueues(cached = list(work, work), live = list(work))
+  expect_length(out, 2L)
+})
