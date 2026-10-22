@@ -16,6 +16,8 @@
 ##     object supplied at simInit to a later module therefore stops the jump at that module even
 ##     though everything before it chained.
 ##   * the entry's file still exists. A deleted entry means the event has to run.
+##   * nothing for params: a param a skipped event changed itself is restored, like an object it
+##     produced, from the last entry that changed it (`eventParamsChanged`; .chainJumpFinish()).
 ##   * the event queue. The queue after a jump is the LIVE queue, never the one stored in the entry it
 ##     lands on -- an entry is shared by runs with different module sets and different queues. Each
 ##     entry carries the delta its own event made to the queue (the `eventQueueDelta` tag, written when
@@ -116,8 +118,9 @@
 
 ## The params of its own module the entry's event changed (`P(sim, "x") <- ...`), stored as the
 ## `eventParamsChanged` tag on every new entry. A hit takes these from the entry, with the params in
-## its key; every other param keeps its live value (.prepareOutput()). A jump does not load the
-## entries it skips, so it never skips past an entry that names any (.chainWalk()).
+## its key; every other param keeps its live value (.prepareOutput()). A jump restores them like the
+## objects an event produced: each from the last entry that changed it (.chainJumpFinish()). An entry
+## without the tag (saved before it existed) gives none, as a hit on it does.
 .chainParamsTag <- "eventParamsChanged"
 .chainParamsMarker <- "parChg1"
 
@@ -516,9 +519,6 @@ lastEventDetails <- "lastEventDetails"
   q <- .chainApplyDelta(sim@events, delta)
   repeat {
     if (is.null(sc)) break
-    ## an entry whose event changed its own params can be landed on (its hit restores them), not
-    ##   skipped: the walk ends there, or does not start
-    if (length(.chainReadParamsChanged(sc))) break
     cand <- .chainSuccessors(sc)
     if (is.null(cand) || !lastEventDetails %in% colnames(cand)) break
     ## plain-vector indexing: inside `[.data.table`, `lastEventDetails` would resolve to the column
@@ -637,16 +637,22 @@ lastEventDetails <- "lastEventDetails"
   ##   restored too, from the last step that changed each (`laterMod`, as `later` for objects); the
   ##   `eventModObjectsChanged` tag says whether an entry has any left to give without loading it.
   laterMod <- paste(jump$module[n], .chainModChanged(sim, jump$module[n]))
+  ## Params an event changed itself likewise: the landing hit restored its own (.prepareOutput()); each
+  ##   other one comes from the last skipped entry whose `eventParamsChanged` tag names it (`laterPar`)
+  laterPar <- paste(jump$module[n], .chainReadParamsChanged(.chainEntryTags(jump$cacheId[n], cachePath)))
   modsDone <- jump$module[n]
   ## what the synonyms/outputs pass below needs from an entry this pass loads, so it is not loaded twice
   ##   (an entry saved without the tags that pass reads is loaded by it otherwise: seconds per entry)
   synsOf <- outsOf <- vector("list", n)
   for (i in rev(seq_len(n - 1L))) {
     want <- setdiff(.chainOutputs(sim, jump$module[i], jump$event[i]), later)
-    modChanged <- .chainReadModChanged(.chainEntryTags(jump$cacheId[i], cachePath))
+    tagsI <- .chainEntryTags(jump$cacheId[i], cachePath)
+    modChanged <- .chainReadModChanged(tagsI)
     needMod <- if (is.null(modChanged)) !jump$module[i] %in% modsDone else
       length(setdiff(paste(jump$module[i], modChanged), laterMod)) > 0L
-    if (length(want) || needMod) {
+    wantPar <- .chainReadParamsChanged(tagsI)
+    wantPar <- wantPar[!paste(jump$module[i], wantPar) %in% laterPar]
+    if (length(want) || needMod || length(wantPar)) {
       simI <- try(reproducible::loadFromCache(cachePath = cachePath, cacheId = jump$cacheId[i],
                                               verbose = -1), silent = TRUE)
       if (is(simI, "simList")) {
@@ -670,6 +676,9 @@ lastEventDetails <- "lastEventDetails"
             laterMod <- union(laterMod, paste(jump$module[i], objNames))
           }
         }
+        wantPar <- intersect(wantPar, names(simI@params[[jump$module[i]]]))
+        sim@params[[jump$module[i]]][wantPar] <- simI@params[[jump$module[i]]][wantPar]
+        laterPar <- union(laterPar, paste(jump$module[i], wantPar))
         later <- union(later, .chainRestored(sim, simI, jump$module[i]))
       } else {
         messageCache("cacheChaining: could not load skipped entry ", jump$cacheId[i], " (",

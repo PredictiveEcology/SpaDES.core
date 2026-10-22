@@ -3081,7 +3081,7 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
   if (!is.null(modText))
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
                                   tagKey = .chainModTag, tagValue = modText)
-  ## The params of its own module this event changed, likewise (.prepareOutput(), .chainWalk()).
+  ## The params of its own module this event changed, likewise (.prepareOutput(), .chainJumpFinish()).
   if (!is.null(paramsText))
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
                                   tagKey = .chainParamsTag, tagValue = paramsText)
