@@ -1883,20 +1883,11 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                      eventType = chainLast$event,
                                      queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
                                                            sim@simtimes[["start"]]),
-                                     outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall))
+                                     outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall),
+                                     paramsText = .chainParamsTextIfRan(sim, cacheIt, chaining, mBase,
+                                                                        pre = modParams))
 
           }
-
-          # put back the current values of params that were not cached on -- by name. After a
-          # Cache hit these are the cached params, whose names and order can differ from the
-          # current module's (a not-cached-on param added or removed since the entry was made
-          # does not change the cacheId), so an index built on the current names misaligns
-          dontCacheOn <- names(modParams)[paramsDontCacheOnActual]
-          if (length(dontCacheOn))
-            sim@params[[mBase]][dontCacheOn] <- modParams[dontCacheOn]
-
-
-
         }
       } else {
         # .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)

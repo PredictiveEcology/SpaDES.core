@@ -50,18 +50,20 @@
           if (length(removed)) paste0("-\t", removed)), collapse = "\n")
 }
 
-## The delta to record for the event that just went through Cache(): only when it actually ran (a new
-## cache entry) and no jump was taken. NULL otherwise.
+## Did the event that just went through Cache() actually run (a new cache entry), with no jump taken?
+## Only then is there anything to record about what it did.
+.chainRan <- function(sim, cacheIt, chaining)
+  isTRUE(cacheIt) && is.null(chaining$jump) && attr(sim, ".Cache")$newCache %in% TRUE
+
+## The delta to record for the event that just went through Cache(); NULL unless it ran.
 .chainDeltaIfRan <- function(sim, cacheIt, chaining, eventsPreCall, eventTime) {
-  if (!isTRUE(cacheIt) || !is.null(chaining$jump)) return(NULL)
-  if (!attr(sim, ".Cache")$newCache %in% TRUE) return(NULL)
+  if (!.chainRan(sim, cacheIt, chaining)) return(NULL)
   .chainQueueDelta(eventsPreCall, sim@events, eventTime)
 }
 
 ## The same, for the outputs rows the event added (`.chainOutText()`).
 .chainOutTextIfRan <- function(sim, cacheIt, chaining, outputsPreCall) {
-  if (!isTRUE(cacheIt) || !is.null(chaining$jump)) return(NULL)
-  if (!attr(sim, ".Cache")$newCache %in% TRUE) return(NULL)
+  if (!.chainRan(sim, cacheIt, chaining)) return(NULL)
   .chainOutText(outputsPreCall, sim@outputs)
 }
 
@@ -91,23 +93,41 @@
 .chainModChanged <- function(sim, module)
   names(attr(sim, ".Cache")$changed[[module]][[.objectsSlot]])
 
-.chainModText <- function(sim, module)
-  paste(c(.chainModMarker, .chainModChanged(sim, module)), collapse = "\t")
+## The text of a tag that lists names: its marker, then the names, tab separated.
+.chainNamesText <- function(marker, nms) paste(c(marker, nms), collapse = "\t")
+
+## The names in an entry's `tag`; NULL if it has no record (saved before the tag existed).
+.chainReadNames <- function(sc, tag, marker) {
+  txt <- if (!is.null(sc)) sc$tagValue[sc$tagKey == tag]
+  if (!length(txt)) return(NULL)
+  parts <- strsplit(txt[[length(txt)]], "\t", fixed = TRUE)[[1]]
+  if (!identical(parts[1], marker)) return(NULL)
+  parts[-1L]
+}
+
+.chainModText <- function(sim, module) .chainNamesText(.chainModMarker, .chainModChanged(sim, module))
 
 .chainModTextIfRan <- function(sim, cacheIt, chaining, module) {
-  if (!isTRUE(cacheIt) || !is.null(chaining$jump)) return(NULL)
-  if (!attr(sim, ".Cache")$newCache %in% TRUE) return(NULL)
+  if (!.chainRan(sim, cacheIt, chaining)) return(NULL)
   .chainModText(sim, module)
 }
 
-## The names in an entry's tag; NULL if it has no record (saved before the tag existed).
-.chainReadModChanged <- function(sc) {
-  txt <- if (!is.null(sc)) sc$tagValue[sc$tagKey == .chainModTag]
-  if (!length(txt)) return(NULL)
-  parts <- strsplit(txt[[length(txt)]], "\t", fixed = TRUE)[[1]]
-  if (!identical(parts[1], .chainModMarker)) return(NULL)
-  parts[-1L]
+.chainReadModChanged <- function(sc) .chainReadNames(sc, .chainModTag, .chainModMarker)
+
+## The params of its own module the entry's event changed (`P(sim, "x") <- ...`), stored as the
+## `eventParamsChanged` tag on every new entry. A hit takes these from the entry, with the params in
+## its key; every other param keeps its live value (.prepareOutput()). A jump does not load the
+## entries it skips, so it never skips past an entry that names any (.chainWalk()).
+.chainParamsTag <- "eventParamsChanged"
+.chainParamsMarker <- "parChg1"
+
+## `pre`: the module's params just before the event ran
+.chainParamsTextIfRan <- function(sim, cacheIt, chaining, module, pre) {
+  if (!.chainRan(sim, cacheIt, chaining)) return(NULL)
+  .chainNamesText(.chainParamsMarker, names(setdiffNamed(sim@params[[module]], pre)))
 }
+
+.chainReadParamsChanged <- function(sc) .chainReadNames(sc, .chainParamsTag, .chainParamsMarker)
 
 .chainOutText <- function(pre, post) {
   n <- NROW(.mergeCachedOutputs(pre, post)) - NROW(pre)
@@ -262,6 +282,35 @@
   intersect(declared, names(attr(entry, ".Cache")$changed))
 }
 
+## Names in a module's function environment that are not its functions, so not in an event's key
+## (.runEvent(): `.inputObjects` is not run in `spades`; `mod` is the same as `.objects`)
+.notEventFns <- c(".inputObjects", "mod", "Par", ".objects")
+
+## The key parts (.narrowKeyParts()) of one (module, event): the same key as .runEvent() /
+## .runModuleInputObjects(), including its narrowing under options(spades.cacheKeyReachable = TRUE).
+## NULL for a non-namespaced module's `.inputObjects`, whose legacy digest is not mirrored.
+.chainKeyParts <- function(sim, module, event) {
+  fnEnv <- sim@.xData[[dotMods]][[module]]
+  modParamsFull <- sim@params[[module]]
+  if (identical(event, ".inputObjects")) {
+    if (!.isNamespaced(sim, module)) return(NULL)
+    .narrowKeyParts(sim, fnEnv, module, event, fns = .fnsReachableFrom(".inputObjects", fnEnv),
+                    modParamsFull = modParamsFull,
+                    dependsSlots = outputsRmDontNeedForCache(metadataToDigest, "outputObjects"))
+  } else {
+    .narrowKeyParts(sim, fnEnv, module, event, fns = setdiff(ls(fnEnv, all.names = TRUE), .notEventFns),
+                    modParamsFull = modParamsFull, dependsSlots = metadataToDigest)
+  }
+}
+
+## The names of `module`'s params in the cache key of `event`, as .runEvent() / .runModuleInputObjects()
+## build it: a non-namespaced module's `.inputObjects` key is not narrowed.
+.paramsInKey <- function(sim, module, event) {
+  nms <- names(sim@params[[module]])
+  keyParts <- .chainKeyParts(sim, module, event)
+  if (is.null(keyParts)) setdiff(nms, .paramsNotCachedOn(sim, module, event)) else nms[keyParts$paramsInKey]
+}
+
 ## Rebuild, for any (module, event), the `nonObjects` that .runEvent() / .runModuleInputObjects()
 ## give cacheChainingSetup() -- without running anything. Must stay identical to those two
 ## call sites: a difference does not break anything, it only means the jump never engages.
@@ -270,22 +319,14 @@
   dep <- sim@depends@dependencies[[module]]
   if (is.null(fnEnv) || is.null(dep)) return(NULL)
   modParamsFull <- sim@params[[module]]
-  ## the same key as .runEvent() / .runModuleInputObjects(), including its narrowing under
-  ##   options(spades.cacheKeyReachable = TRUE)
+  keyParts <- .chainKeyParts(sim, module, event)
+  if (is.null(keyParts)) return(NULL)
+  modParams <- modParamsFull[keyParts$paramsInKey]
   if (identical(event, ".inputObjects")) {
-    if (!.isNamespaced(sim, module)) return(NULL) # the legacy (non-namespaced) digest is not mirrored
-    keyParts <- .narrowKeyParts(sim, fnEnv, module, event, fns = .fnsReachableFrom(".inputObjects", fnEnv),
-                                modParamsFull = modParamsFull,
-                                dependsSlots = outputsRmDontNeedForCache(metadataToDigest, "outputObjects"))
-    modParams <- modParamsFull[keyParts$paramsInKey]
     objs <- paste(module, keyParts$fns, sep = ":")
     classOptions <- classOptionsForCache(events = FALSE, modParams, keyParts$dependsSlots, module)
   } else {
-    notFns <- c(".inputObjects", "mod", "Par", ".objects")
-    keyParts <- .narrowKeyParts(sim, fnEnv, module, event, fns = setdiff(ls(fnEnv, all.names = TRUE), notFns),
-                                modParamsFull = modParamsFull, dependsSlots = metadataToDigest)
-    modParams <- modParamsFull[keyParts$paramsInKey]
-    objsInMod <- setdiff(ls(sim@.xData[[dotObjs]][[module]], all.names = TRUE), notFns)
+    objsInMod <- setdiff(ls(sim@.xData[[dotObjs]][[module]], all.names = TRUE), .notEventFns)
     objs <- c(ls(sim@.xData, all.names = TRUE, pattern = module),
               paste0(attr(fnEnv, "name"), ":", keyParts$fns),
               paste0(attr(fnEnv, "name"), ":", objsInMod),
@@ -475,6 +516,9 @@ lastEventDetails <- "lastEventDetails"
   q <- .chainApplyDelta(sim@events, delta)
   repeat {
     if (is.null(sc)) break
+    ## an entry whose event changed its own params can be landed on (its hit restores them), not
+    ##   skipped: the walk ends there, or does not start
+    if (length(.chainReadParamsChanged(sc))) break
     cand <- .chainSuccessors(sc)
     if (is.null(cand) || !lastEventDetails %in% colnames(cand)) break
     ## plain-vector indexing: inside `[.data.table`, `lastEventDetails` would resolve to the column

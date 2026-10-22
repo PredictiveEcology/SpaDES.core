@@ -815,3 +815,57 @@ jumpTest("a parameter defined with cacheKey = FALSE neither breaks a chain nor s
   expect_identical(params(s3)$jC$hosts, "b")
   expect_equal(s3$cc, 12)
 })
+
+## A param the key does not include (here `cacheKey = FALSE`; also any param an event does not read
+## under spades.cacheKeyReachable) changes without breaking the chain. The jump lands on the last
+## module's entry, which was saved with the old value; that module must keep the current one,
+## like every other module (FireSense, 2026-10-21: fitFileSuffix came back as "" for one module).
+jumpTest("a jump keeps the landing module's current value of a param not in its key", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  prm <- 'defineParameter(".useCache", "character", NA, NA, NA, ""),
+          defineParameter("sfx", "character", "", NA, NA, "", cacheKey = FALSE)'
+  mkJumpMod(mp, "jA", 'bindrows(expectsInput("unsupplied0", "numeric", ""))',
+            'bindrows(createsOutput("a", "numeric", ""))', "sim$a <- 1", params = prm)
+  mkJumpMod(mp, "jB", 'bindrows(expectsInput("a", "numeric", ""), expectsInput("ext", "numeric", ""))',
+            'bindrows(createsOutput("b", "numeric", ""))', "sim$b <- sim$a + sim$ext", params = prm)
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("cc", "numeric", ""))', "sim$cc <- sim$b * 2", params = prm)
+  mkJumpMod(mp, "jD", 'bindrows(expectsInput("cc", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""))', "sim$d <- sim$cc + 1", params = prm)
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams(.globals = list(sfx = "old")))
+  warm <- jumpMessages(s2 <- runJump(mp, cp, jumpParams(.globals = list(sfx = "new"))))
+  expect_match(warm$jumps, "restored 3 cached events in one step")
+  sfx <- vapply(c("jA", "jB", "jC", "jD"), function(m) params(s2)[[m]][["sfx"]], character(1))
+  expect_equal(unname(sfx), rep("new", 4))
+})
+
+## An event that changes its own params (`P(sim, "x") <- ...`) is reproduced by a hit on its
+## entry, but a jump does not load the entries it skips. So a jump may land on such an entry,
+## and never skips past one; the params come out as in a run without chaining.
+jumpTest("a jump keeps the params a skipped event changed itself", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  ## jC's init sets `k`, in its key, and `note`, not in it
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("cc", "numeric", ""))',
+            'sim$cc <- sim$b * 2; P(sim, "k") <- 2; P(sim, "note") <- "set by init"',
+            params = 'defineParameter(".useCache", "character", NA, NA, NA, ""),
+                      defineParameter("k", "numeric", 1, NA, NA, ""),
+                      defineParameter("note", "character", "", NA, NA, "", cacheKey = FALSE)')
+  ## the reference runs uncached
+  ref <- runJump(mp, file.path(tmpdir, "off"), lapply(jumpParams(), modifyList, list(.useCache = NA)),
+                 chaining = FALSE)
+  expect_identical(params(ref)$jC[c("k", "note")], list(k = 2, note = "set by init"))
+
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  warm <- jumpMessages(s2 <- runJump(mp, cp, jumpParams()))
+  expect_equal(restoredList(warm$raw), c("jB init", "jC init"))
+  expect_identical(params(s2)$jC[c("k", "note")], params(ref)$jC[c("k", "note")])
+  expect_equal(stateOf(s2)$objs, stateOf(ref)$objs)
+})
