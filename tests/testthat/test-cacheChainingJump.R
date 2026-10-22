@@ -942,3 +942,98 @@ jumpTest("a jump does not load a skipped entry that has nothing left to give", {
   expect_false(any(idC %in% loaded))
   expect_equal(s2$d, 7)
 })
+
+## A hit restores only the objects its event CHANGED (`attr(entry, ".Cache")$changed`, lsObjectsChanged()),
+## not every output it declares. The `eventObjectsChanged` tag records those names, so a jump does not
+## load a skipped entry for a declared output its event never wrote. Here jC declares `cc` but writes
+## nothing; jD, landed on, does not read it. An entry without the tag (older caches) is loaded, as before.
+noWriteFixture <- function(mp) {
+  jumpFixture(mp)
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("cc", "numeric", ""))', "NULL")
+  mkJumpMod(mp, "jD", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""))', "sim$d <- sim$b + 1")
+}
+
+## the ids of the entries a jump loaded, and of the skipped `jC init` entry, from its numbered list
+loadsInJump <- function(mp, cp) {
+  loaded <- character()
+  origLoad <- reproducible::loadFromCache
+  testthat::local_mocked_bindings(loadFromCache = function(cachePath, cacheId, ...) {
+    loaded <<- c(loaded, cacheId)
+    origLoad(cachePath = cachePath, cacheId = cacheId, ...)
+  }, .package = "reproducible")
+  warm <- jumpMessages(s <- runJump(mp, cp, jumpParams()))
+  m <- unlist(strsplit(warm$raw, "\n", fixed = TRUE))
+  idC <- sub("^.*jC init\\s+\\(([0-9a-f]+)\\).*$", "\\1", grep("2\\.\\s+jC init", m, value = TRUE))
+  list(sim = s, restored = restoredList(warm$raw), loaded = loaded, idC = idC)
+}
+
+## objects, `mod` objects and params of a run; not `.useCache`, which the uncached reference leaves NA
+fullState <- function(sim) {
+  list(objs = stateOf(sim)$objs,
+       mods = lapply(as.list(sim@.xData[[".modObjs"]]), function(e) as.list(e, all.names = TRUE)),
+       params = lapply(params(sim), function(p) p[setdiff(names(p), ".useCache")]))
+}
+
+jumpTest("a jump does not load a skipped entry for a declared output its event did not change", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  noWriteFixture(mp)
+  ref <- runJump(mp, file.path(tmpdir, "off"), lapply(jumpParams(), modifyList, list(.useCache = NA)),
+                 chaining = FALSE)
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  sc <- reproducible::showCache(cp, verbose = -2)
+  idC <- unique(sc$cacheId[sc$tagKey == "function" & sc$tagValue == "doEvent.jC::init"])
+  expect_equal(sc$tagValue[sc$cacheId == idC & sc$tagKey == "eventObjectsChanged"], "objChg1")
+
+  j <- loadsInJump(mp, cp)
+  expect_equal(j$restored, c("jB init", "jC init", "jD init"))
+  expect_equal(j$idC, idC)
+  expect_false(any(idC %in% j$loaded))
+  expect_equal(fullState(j$sim), fullState(ref))
+})
+
+jumpTest("a jump loads a skipped entry for a declared output its event changed", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  ## jD, landed on, reads `cc` but does not write it: only jC's entry has it
+  ref <- runJump(mp, file.path(tmpdir, "off"), lapply(jumpParams(), modifyList, list(.useCache = NA)),
+                 chaining = FALSE)
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  sc <- reproducible::showCache(cp, verbose = -2)
+  idC <- unique(sc$cacheId[sc$tagKey == "function" & sc$tagValue == "doEvent.jC::init"])
+  expect_equal(sc$tagValue[sc$cacheId == idC & sc$tagKey == "eventObjectsChanged"], "objChg1\tcc")
+
+  j <- loadsInJump(mp, cp)
+  expect_equal(j$restored, c("jB init", "jC init", "jD init"))
+  expect_true(idC %in% j$loaded)
+  expect_equal(j$sim$cc, 12)
+  expect_equal(fullState(j$sim), fullState(ref))
+})
+
+jumpTest("a jump over entries saved without the objects-changed tag loads them, as before", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  noWriteFixture(mp)
+  ref <- runJump(mp, file.path(tmpdir, "off"), lapply(jumpParams(), modifyList, list(.useCache = NA)),
+                 chaining = FALSE)
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  sc <- reproducible::showCache(cp, verbose = -2)
+  ids <- unique(sc$cacheId[sc$tagKey == "function" & grepl("^doEvent\\.j", sc$tagValue)])
+  for (id in ids) reproducible::.updateTagsRepo(cacheId = id, cachePath = cp, tagKey = "eventObjectsChanged",
+                                               tagValue = "oldEntry")
+  idC <- unique(sc$cacheId[sc$tagKey == "function" & sc$tagValue == "doEvent.jC::init"])
+
+  j <- loadsInJump(mp, cp)
+  expect_equal(j$restored, c("jB init", "jC init", "jD init"))
+  expect_true(idC %in% j$loaded)
+  expect_equal(fullState(j$sim), fullState(ref))
+})

@@ -3062,7 +3062,8 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
   }
   ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
   ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
-  ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()).
+  ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()),
+  ##   and the objects it changed, so a jump loads it only for one of those (.chainJumpFinish()).
   ##   On every new entry, not only one with a previous entry to chain from: the first cached event after
   ##   an uncached one has none, and a walk cannot start from an entry without a delta.
   if (!is.null(queueDelta)) {
@@ -3070,6 +3071,8 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
                                   tagKey = .chainDeltaTag, tagValue = queueDelta)
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
                                   tagKey = .chainSynTag, tagValue = .chainSynText(sim))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainObjTag, tagValue = .chainObjText(sim, moduleName))
   }
   ## The outputs rows this event added, on every new entry -- not only one with a previous entry to
   ##   chain from: a hit restores only those rows (.prepareOutput(), .chainOutAddedRows()), so the first
