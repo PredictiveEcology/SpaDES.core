@@ -104,6 +104,7 @@ Collate:
     'cache.R'
     'cacheChainingJump.R'
     'cacheKeyReachable.R'
+    'cacheObjectStore.R'
     'check.R'
     'priority.R'
     'checkpoint.R'

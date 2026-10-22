@@ -817,22 +817,16 @@ setMethod(
         deps <- simPre[[whSimList]]@depends@dependencies
         namesAllMods <- names(deps)
         if (!is.null(namesAllMods)) { # i.e., are there modules in the simList
-          hasCurrModule <- match(currModules, names(deps))
-          if (length(currModules) == 0) {
-            currModules <- namesAllMods
-          }
-
-          changedObjs <- attr(simFromCache, ".Cache")$changed
-          lsObjectEnv <- lsObjectsChanged(lsObjectEnv, changedObjs,
-                                          hasCurrModule, currModules, deps)
-          hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
-          changedModEnvObjs <- lsModObjectsChanged(namesAllMods, changedObjs, hasDotObjs)
-
+          restore <- .objectsToRestore(lsObjectEnv, attr(simFromCache, ".Cache")$changed, currModules,
+                                       deps, !is.null(simFromCache@.xData[[dotObjs]]))
+          currModules <- restore$currModules
+          lsObjectEnv <- restore$objs
+          changedModEnvObjs <- restore$mods
         }
 
         # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
         lsObjectEnv <- setdiff(lsObjectEnv, "._urlLog") # the live ledger stays; see below
-        list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
+        .copyBindings(lsObjectEnv, simFromCache@.xData, simPost@.xData)
 
         otherModules <- setdiff(namesAllMods, currModules)
         # Need to pull all things from "other modules" i.e., functions and .objects etc. from non currModules
@@ -865,11 +859,8 @@ setMethod(
           # Now changed objects
           if (length(unlist(changedModEnvObjs))) {
             Map(nam = names(changedModEnvObjs), objs = changedModEnvObjs, function(nam, objs) {
-              objNames <- names(objs[[.objectsSlot]]) # used to be "names(...)" -- but don't want `._` objs
-              objNames <- grep("^._.+", objNames, value = TRUE, invert = TRUE)
-              if (!is.null(objNames))
-                list2env(mget(objNames, envir = simFromCache@.xData[[dotObjs]][[nam]]),
-                         envir = simPost@.xData[[dotObjs]][[nam]])
+              .copyBindings(.changedModObjNames(objs), simFromCache@.xData[[dotObjs]][[nam]],
+                            simPost@.xData[[dotObjs]][[nam]])
             })
             # override everything first -- this includes .objects -- take from Cache
             # list2env(mget(changedModEnvObjs, envir = simFromCache@.xData[[dotMods]]), envir = simPost@.xData[[dotMods]])
@@ -943,7 +934,7 @@ setMethod(
         #   current module -- these need to be copied over
         lsSimPreOrigEnv <- ls(simPreOrigEnv, all.names = TRUE)
         keepFromOrig <- !(lsSimPreOrigEnv %in% ls(simPost@.xData, all.names = TRUE))
-        list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPreOrigEnv), envir = simPost@.xData)
+        .copyBindings(lsSimPreOrigEnv[keepFromOrig], simPreOrigEnv, simPost@.xData)
 
         ## The download ledger (._urlLog) is the live run's: lsObjectsChanged() never takes it from
         ##   the entry, so `simPost` holds the live environment. For a whole simInit()/spades() hit
@@ -1226,11 +1217,38 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   # .wrap the metadata ... i.e,. @depends
   objTmp <- .wrapOrUnwrapSimListAts(objTmp, .wrap)
 
+  ## options(spades.cacheObjectStore): the entry keeps only what a hit restores, each object (but a
+  ##   file-backed one) as a reference to its file in the object store (R/cacheObjectStore.R)
+  storeIt <- .objStoreUse(obj, outputObjects, filebackedPath)
+  storeTags <- character()
+  if (storeIt) {
+    restore <- .objectsToRestore(ls(obj@.xData, all.names = TRUE), attr(obj, ".Cache")$changed,
+                                 currentModule(obj), obj@depends@dependencies,
+                                 !is.null(obj@.xData[[dotObjs]]))
+    for (m in ls(objTmp[[dotObjs]], all.names = TRUE)) {
+      modEnv <- objTmp[[dotObjs]][[m]]
+      if (!is.environment(modEnv)) next
+      keep <- intersect(.changedModObjNames(restore$mods[[m]]), ls(modEnv, all.names = TRUE))
+      rm(list = setdiff(ls(modEnv, all.names = TRUE), keep), envir = modEnv)
+      put <- .objStorePutNames(keep, modEnv, filebackedPath)
+      list2env(put, envir = modEnv)
+      storeTags <- c(storeTags, .objStoreTags(put))
+    }
+  }
+
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
   objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose)
   objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose)
   # Deal with the potentially large things -- convert to list -- not a copy
-  obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
+  ## only the objects that are saved: getting one reads an object-store object a hit left unread
+  objNames <- ls(obj@.xData, all.names = FALSE) # don't copy the . or ._ objects, already done
+  if (!is.null(outputObjects)) objNames <- intersect(objNames, outputObjects)
+  if (storeIt) {
+    obj2 <- .objStorePutNames(intersect(objNames, restore$objs), obj@.xData, filebackedPath)
+    storeTags <- c(storeTags, .objStoreTags(obj2))
+  } else {
+    obj2 <- mget(objNames, envir = obj@.xData)
+  }
   # Now the individual objects
   out <- .wrap(obj2, filebackedPath = filebackedPath, outputObjects = outputObjects, cacheId = cacheId,
                drv = drv, conn = conn, verbose = verbose, ...)
@@ -1241,7 +1259,7 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   ##   as reproducible's .wrap.list does: Cache() records attr(<wrapped>, "tags") on the entry, and
   ##   showCache()/clearCache() and the cloud cache find an entry's files through them. list2env() dropped
   ##   them, so a cached simList's entry named none of its files.
-  tags <- c(attr(objTmp[[dotMods]], "tags"), attr(objTmp[[dotObjs]], "tags"), attr(out, "tags"))
+  tags <- c(attr(objTmp[[dotMods]], "tags"), attr(objTmp[[dotObjs]], "tags"), attr(out, "tags"), storeTags)
   if (length(tags))
     attr(objTmp, "tags") <- c(attr(obj, "tags"), tags)
   objTmp
@@ -1332,6 +1350,11 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
   outList <- .unwrap(objList, filebackedPath = filebackedPath, cacheId = cacheId,
                      drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
+  ## an entry in the object store: a promise per reference, read when used (R/cacheObjectStore.R)
+  .objStoreAttach(envir(obj), filebackedPath)
+  if (is.environment(obj[[dotObjs]]))
+    for (m in ls(obj[[dotObjs]], all.names = TRUE))
+      if (is.environment(obj[[dotObjs]][[m]])) .objStoreAttach(obj[[dotObjs]][[m]], filebackedPath)
 
   # .unwrap the metadata ... i.e,. @depends
   obj <- .wrapOrUnwrapSimListAts(obj, wrapOrUnwrap = .unwrap)
@@ -1625,8 +1648,8 @@ copyModuleSpecificFunsAndObjs <- function(simPreWhSimList, simPost, currModule) 
     dontCopyObjs <- c(.objectsSlot, "mod", "Par") # take these from the Cached copy (made 3 lines above)
     objsInModuleActive <- setdiff(objsInModuleActive, dontCopyObjs)
     if (length(objsInModuleActive))
-      list2env(mget(objsInModuleActive, envir = simPreWhSimList@.xData[[dotType]][[currModule]]),
-               envir = simPost@.xData[[dotType]][[currModule]])
+      .copyBindings(objsInModuleActive, simPreWhSimList@.xData[[dotType]][[currModule]],
+                    simPost@.xData[[dotType]][[currModule]])
   }
 }
 
@@ -1740,6 +1763,24 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
 }
 
 # }
+
+## What a hit restores from an entry (.prepareOutput()), so what an entry in the object store keeps
+##   (.wrap.simList()): of the objects the event changed, those lsObjectsChanged() takes, and the
+##   changed `mod` objects of each module (lsModObjectsChanged(); names by .changedModObjNames()).
+##   `currModules` empty means every module.
+.objectsToRestore <- function(lsObjectEnv, changedObjs, currModules, deps, hasDotObjs) {
+  namesAllMods <- names(deps)
+  hasCurrModule <- match(currModules, namesAllMods)
+  if (length(currModules) == 0) currModules <- namesAllMods
+  list(objs = lsObjectsChanged(lsObjectEnv, changedObjs, hasCurrModule, currModules, deps),
+       mods = lsModObjectsChanged(namesAllMods, changedObjs, hasDotObjs),
+       currModules = currModules)
+}
+
+## The names of the `mod` objects in one module's element of lsModObjectsChanged(), without `._` ones
+.changedModObjNames <- function(objs) {
+  grep("^._.+", names(objs[[.objectsSlot]]), value = TRUE, invert = TRUE)
+}
 
 lsModObjectsChanged <- function(namesAllMods, changedObjs, hasDotObjs) {
   changedModEnvObjs <- character()

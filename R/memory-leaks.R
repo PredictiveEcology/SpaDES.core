@@ -1,6 +1,7 @@
 #' @importFrom utils object.size packageVersion
 testObjectForLeak <- function(objs, envir, class, type, customMessage) {
   lapply(seq(objs), function(i) {
+    if (.objStoreIsPending(objs[i], envir)) return(NULL) # not read yet: checked when its event ran
     x <- get(objs[i], envir = envir)
     nam <- objs[i]
     if (is(x, class)) {

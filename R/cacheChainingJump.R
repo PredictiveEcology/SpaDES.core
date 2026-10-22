@@ -663,8 +663,7 @@ lastEventDetails <- "lastEventDetails"
         synsOf[[i]] <- list(lapply(simI@.xData[[objSynName]], function(g) unname(unlist(g))))
         outsOf[[i]] <- list(simI@outputs)
         have <- intersect(want, ls(simI@.xData, all.names = TRUE))
-        if (length(have))
-          list2env(mget(have, envir = simI@.xData), envir = sim@.xData)
+        .copyBindings(have, simI@.xData, sim@.xData)
         if (needMod) {
           mo <- simI@.xData[[dotObjs]][[jump$module[i]]]
           moTo <- sim@.xData[[dotObjs]][[jump$module[i]]]
@@ -676,7 +675,7 @@ lastEventDetails <- "lastEventDetails"
             objNames <- setdiff(objNames, c("mod", "Par"))
             objNames <- objNames[!.chainNameKeys(jump$module[i], objNames) %in% laterMod]
             objNames <- intersect(objNames, ls(mo, all.names = TRUE))
-            if (length(objNames)) list2env(mget(objNames, envir = mo), envir = moTo)
+            .copyBindings(objNames, mo, moTo)
             laterMod <- union(laterMod, .chainNameKeys(jump$module[i], objNames))
           }
         }

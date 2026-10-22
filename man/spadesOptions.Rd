@@ -75,6 +75,16 @@ the full key. Parameters left out keep their current values after a cache hit.
 With \code{showSimilar}, a message says what each key was narrowed to, or why not.
 Changes every narrowed event's cacheId once.\cr
 
+\code{spades.cacheObjectStore} \tab \code{FALSE}
+\tab If \code{TRUE}, the cache entry of an event (or \code{.inputObjects}) keeps only the
+objects the event changed, which are all a cache hit restores. Each is saved once, in
+a file under \code{file.path(cachePath, "objects")} named for its content, so entries with
+an identical object share the file; a file-backed object (e.g., a \code{SpatRaster} on
+disk) stays in the entry. A cache hit reads an object only when it is used. Entries
+saved without the option load as before, with or without it. A \code{simInit()} or
+\code{spades()} call cached whole is saved complete. \code{\link[reproducible:clearCache]{reproducible::clearCache()}} does not
+delete the object files; \code{\link[=clearCacheObjectStore]{clearCacheObjectStore()}} deletes those no entry refers to.\cr
+
 \code{spades.codeCheckEngine} \tab \code{"v1"}
 \tab Which module code checker \code{simInit()} uses when
 \code{spades.moduleCodeChecks} is on. \code{"v1"} is the legacy checker; \code{"v2"} is

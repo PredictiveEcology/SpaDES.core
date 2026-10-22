@@ -2281,11 +2281,12 @@ messageNewObjects <- function(newObjs, prefix = "New objects created:", verbose 
   setDT(df)
 }
 
+## an object-store object not read yet is not NULL (a NULL is not put in the store), so it is not read
 objsAreNull <- function(sim) {
-  areNULL <- mapply(obj = mget(grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
-                         ls(sim, all.names = TRUE), invert = TRUE, value = TRUE),
-                    envir = envir(sim)), function(obj) is.null(obj))
-  areNULL
+  nms <- grep("^\\._|^\\.mods|^\\.parsedFiles|^\\.userSuppliedObjNames",
+              ls(sim, all.names = TRUE), invert = TRUE, value = TRUE)
+  vapply(nms, function(nm) !.objStoreIsPending(nm, envir(sim)) &&
+           is.null(get(nm, envir = envir(sim), inherits = FALSE)), logical(1))
 }
 
 adjustModuleNameSpacing <- function(modNames) {
