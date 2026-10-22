@@ -1553,8 +1553,8 @@ setMethod(
 
     if (cacheIt) { # means that a module or event is to be cached
 
-      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
-      objs <- setdiff(ls(sim@.xData[[dotObjs]][[cur[["moduleName"]]]], all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
+      fns <- setdiff(ls(fnEnv, all.names = TRUE), .notEventFns)
+      objs <- setdiff(ls(sim@.xData[[dotObjs]][[cur[["moduleName"]]]], all.names = TRUE), .notEventFns)
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
@@ -1678,7 +1678,7 @@ setMethod(
     ## @.xData) built by .unwrap.simList(), which never carries simInit()/spades()-only
     ## transient state (see .transientSimStateNames) -- that state was never part of what
     ## was cached. During simInit()'s `.inputObjects` phase, the live `sim` carries
-    ## ._simInitContext; put it back, mirroring the paramsDontCacheOn restoration below.
+    ## ._simInitContext; put it back.
     simInitContextPreCall <- sim@.xData[["._simInitContext"]]
     eventsPreCall <- sim@events
     outputsPreCall <- sim@outputs
@@ -1704,19 +1704,12 @@ setMethod(
                              queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
                                                            cur[["eventTime"]]),
                              outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall),
-                             modText = .chainModTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]]))
+                             modText = .chainModTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]]),
+                             paramsText = .chainParamsTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]],
+                                                                pre = modParamsFull))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
-    }
-  }
-
-  ## put back the current values of params that were not cached on -- by name: after a Cache
-  ## hit these are the cached params, whose names and order can differ from the current ones
-  if (exists("modParams", inherits = FALSE)) {
-    dontCacheOn <- names(modParamsFull)[paramsDontCacheOnActual]
-    if (length(dontCacheOn)) {
-      sim@params[[cur[["moduleName"]]]][dontCacheOn] <- modParamsFull[dontCacheOn]
     }
   }
 
@@ -3021,7 +3014,7 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
 
 cacheChainingPost <- function(sim, cacheIt, prevCache,
                               cacheIdOfSkip, df, moduleName, eventType, queueDelta = NULL, outputsText = NULL,
-                              modText = NULL) {
+                              modText = NULL, paramsText = NULL) {
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
   ## The objects the current unbroken run of cached events has produced; what a later link
   ##   may trust without digesting (cacheChainingSetup(), .chainWalk()). Reset with the chain.
@@ -3086,6 +3079,10 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
   if (!is.null(modText))
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
                                   tagKey = .chainModTag, tagValue = modText)
+  ## The params of its own module this event changed, likewise (.prepareOutput(), .chainWalk()).
+  if (!is.null(paramsText))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainParamsTag, tagValue = paramsText)
   sim
 }
 

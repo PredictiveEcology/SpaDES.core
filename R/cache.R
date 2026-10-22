@@ -762,12 +762,26 @@ setMethod(
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
         wholeCall <- NROW(current(simPost)) == 0 # a spades()/simInit() call, not one event
 
-        ## This was unnecessary if the parameters never change; but they can
-        ##  -- but draw from Cache only from this module -- other modules may have
-        ##     changed during this simInit/spades call --> don't want their cached copies
-        ##   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
-        ##   cached copy of other modules
-        simPost@params[currModules] <- simFromCache@params[currModules]
+        ## the entry's tags: what its event did to the queue, to its params, and which outputs rows it added
+        id <- cacheId(object)
+        sc <- if (length(id)) .chainEntryTags(id, cachePath)
+
+        ## Params: draw from Cache only for this module -- other modules may have changed during
+        ##   this simInit/spades call --> don't want their cached copies. Of this module's, only the
+        ##   ones the event set: those in the entry's key (equal to the live ones, unless the event
+        ##   changed them) and those its event recorded changing (`eventParamsChanged`). Every other
+        ##   param keeps its live value: one the key leaves out (.paramsNotCachedOn(), or not reached
+        ##   under spades.cacheKeyReachable) can differ from the value the entry was saved with. The
+        ##   module is the one whose entry this is, also when a cacheChaining jump lands on another
+        ##   module's entry. The live params are `simPre`'s: `simPost` lacks the module functions
+        ##   the key is read from.
+        eventType <- current(simPost)[["eventType"]]
+        fromEntry <- .chainReadParamsChanged(sc)
+        for (m in currModules) {
+          take <- intersect(union(.paramsInKey(simPre[[whSimList]], m, eventType), fromEntry),
+                            names(simFromCache@params[[m]]))
+          simPost@params[[m]][take] <- simFromCache@params[[m]][take]
+        }
         if (FALSE) {
           ## Eliot Dec 2023 -- removed this because it is already occuring during simInit;
           ##  also, user may have passed individual values for individual modules that should not
@@ -868,9 +882,6 @@ setMethod(
           ## means it is not in a spades call
           simPost@completed <- simFromCache@completed
         }
-        ## the entry's tags: what its event did to the queue and which outputs rows it added
-        id <- cacheId(object)
-        sc <- if (length(id)) .chainEntryTags(id, cachePath)
         if (!is.null(attr(simPre[[whSimList]], "cacheChainingJump"))) {
           ## A cacheChaining jump: this entry is the state after the LAST of several skipped events.
           ##   The queue is NOT the one stored in it -- that is the queue of whichever run saved the
