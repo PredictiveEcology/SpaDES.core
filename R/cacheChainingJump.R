@@ -120,6 +120,23 @@
 
 .chainReadModChanged <- function(sc) .chainReadNames(sc, .chainModTag, .chainModMarker)
 
+## The simList objects the entry's event changed that a hit restores (`attr(sim, ".Cache")$changed`, as
+## `.prepareOutput()` filters it: R/cache.R, `lsObjectsChanged()`), stored as the `eventObjectsChanged`
+## tag on every new entry: a marker, then the names, tab separated. A jump loads a skipped entry for a
+## declared output only if the tag names it (.chainJumpFinish()): a declared output the event did not
+## change is not in the entry's restore. An entry without the tag is loaded for any declared output.
+.chainObjTag <- "eventObjectsChanged"
+.chainObjMarker <- "objChg1"
+
+.chainObjText <- function(sim, module) {
+  deps <- sim@depends@dependencies
+  changed <- lsObjectsChanged(ls(sim@.xData, all.names = TRUE), attr(sim, ".Cache")$changed,
+                              match(module, names(deps)), module, deps)
+  .chainNamesText(.chainObjMarker, changed)
+}
+
+.chainReadObjChanged <- function(sc) .chainReadNames(sc, .chainObjTag, .chainObjMarker)
+
 ## The params of its own module the entry's event changed (`P(sim, "x") <- ...`), stored as the
 ## `eventParamsChanged` tag on every new entry. A hit takes these from the entry, with the params in
 ## its key; every other param keeps its live value (.prepareOutput()). A jump restores them like the
@@ -271,10 +288,10 @@
   unique(as.character(na.omit(dep@outputObjects$objectName)))
 }
 
-## What `entry`, a module's own cache entry, actually restores to the live simList: of the objects
-## the module declares (`expectsInput`s and `createsOutput`s), those its event CHANGED
-## (`attr(entry, ".Cache")$changed`). `.prepareOutput()` (R/cache.R, `lsObjectsChanged()`) carries no
-## other object out of a loaded entry: not an `expectsInput` the event merely read, and not a
+## What a module's own cache entry actually restores to the live simList: of the objects the module
+## declares (`expectsInput`s and `createsOutput`s), those its event CHANGED (`changed`: the names in
+## `attr(entry, ".Cache")$changed`, .chainEntryChanged(), or the entry's `eventObjectsChanged` tag).
+## `.prepareOutput()` (R/cache.R, `lsObjectsChanged()`) carries no other object out of a loaded entry: not an `expectsInput` the event merely read, and not a
 ## `createsOutput` it declares but did not write (Biomass_core declares `speciesLayers`, which
 ## Biomass_borealDataPrep's `.inputObjects` makes). In an ordinary (non-jumped) run this is
 ## invisible -- the live simList already has such an object, supplied by whichever event produced
@@ -282,12 +299,14 @@
 ## be known exactly: used to decide what a LATER step in a jump has already (re)written --
 ## `.chainJumpFinish()`'s `later` -- never for `.chainOutputs()`'s other job of tracking what the
 ## chain as a whole has produced. Deciding it from the declaration instead lost the object.
-.chainRestored <- function(sim, entry, module) {
+.chainRestored <- function(sim, changed, module) {
   dep <- sim@depends@dependencies[[module]]
   if (is.null(dep)) return(character())
   declared <- unique(as.character(na.omit(c(dep@inputObjects$objectName, dep@outputObjects$objectName))))
-  intersect(declared, names(attr(entry, ".Cache")$changed))
+  intersect(declared, changed)
 }
+
+.chainEntryChanged <- function(entry) names(attr(entry, ".Cache")$changed)
 
 ## Names in a module's function environment that are not its functions, so not in an event's key
 ## (.runEvent(): `.inputObjects` is not run in `spades`; `mod` is the same as `.objects`)
@@ -634,7 +653,7 @@ lastEventDetails <- "lastEventDetails"
   for (i in seq_len(n - 1L))
     .replayUrlLog(sim, cachePath, jump$cacheId[i], jump$module[i], jump$event[i])
   ## the landing entry's own hit has just been merged: `sim` carries that entry's `.Cache` attribute
-  later <- .chainRestored(sim, sim, jump$module[n])
+  later <- .chainRestored(sim, .chainEntryChanged(sim), jump$module[n])
   ## A hit restores only the `mod` objects its event CHANGED (R/cache.R, `lsModObjectsChanged()`), the
   ##   landing hit included; the rest come from the live sim, where a `mod` object a skipped event of
   ##   the landing module made does not exist. So every skipped entry's changed `mod` objects are
@@ -649,8 +668,13 @@ lastEventDetails <- "lastEventDetails"
   ##   (an entry saved without the tags that pass reads is loaded by it otherwise: seconds per entry)
   synsOf <- outsOf <- vector("list", n)
   for (i in rev(seq_len(n - 1L))) {
-    want <- setdiff(.chainOutputs(sim, jump$module[i], jump$event[i]), later)
     tagsI <- .chainEntryTags(jump$cacheId[i], cachePath)
+    ## of its declared outputs, those its event changed (`eventObjectsChanged`), as a hit restores; all
+    ##   of them for an entry without the tag
+    objChanged <- .chainReadObjChanged(tagsI)
+    want <- .chainOutputs(sim, jump$module[i], jump$event[i])
+    if (!is.null(objChanged)) want <- intersect(want, objChanged)
+    want <- setdiff(want, later)
     modChanged <- .chainReadModChanged(tagsI)
     needMod <- if (is.null(modChanged)) !jump$module[i] %in% modsDone else
       length(setdiff(.chainNameKeys(jump$module[i], modChanged), laterMod)) > 0L
@@ -683,13 +707,15 @@ lastEventDetails <- "lastEventDetails"
         wantPar <- intersect(wantPar, names(simI@params[[jump$module[i]]]))
         sim@params[[jump$module[i]]][wantPar] <- simI@params[[jump$module[i]]][wantPar]
         laterPar <- union(laterPar, .chainNameKeys(jump$module[i], wantPar))
-        later <- union(later, .chainRestored(sim, simI, jump$module[i]))
+        if (is.null(objChanged)) objChanged <- .chainEntryChanged(simI)
       } else {
         messageCache("cacheChaining: could not load skipped entry ", jump$cacheId[i], " (",
                      jump$module[i], " ", jump$event[i], "); its outputs are not restored",
                      verbose = verbose)
       }
     }
+    ## what this entry restores, loaded or not: no earlier step's copy of it is wanted
+    later <- union(later, .chainRestored(sim, objChanged, jump$module[i]))
     modsDone <- union(modsDone, jump$module[i])
   }
   ## The synonyms each skipped event added, in the order they ran. A hit restores its entry's synonyms
