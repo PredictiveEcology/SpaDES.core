@@ -1705,8 +1705,10 @@ setMethod(
                                                            cur[["eventTime"]]),
                              outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall),
                              modText = .chainModTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]]),
-                             paramsText = .chainParamsTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]],
-                                                                pre = modParamsFull))
+                             ## no `modParamsFull` for a module without an @depends entry
+                             paramsText = if (exists("modParamsFull", inherits = FALSE))
+                               .chainParamsTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]],
+                                                     pre = modParamsFull))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
