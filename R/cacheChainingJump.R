@@ -98,6 +98,10 @@
 ## The text of a tag that lists names: its marker, then the names, tab separated.
 .chainNamesText <- function(marker, nms) paste(c(marker, nms), collapse = "\t")
 
+## "module name" keys for `nms`, a module's `mod` objects or params; none for none (`paste()` would give
+## one blank name, "module ", which looks like one still to restore).
+.chainNameKeys <- function(module, nms) if (length(nms)) paste(module, nms) else character()
+
 ## The names in an entry's `tag`; NULL if it has no record (saved before the tag existed).
 .chainReadNames <- function(sc, tag, marker) {
   txt <- if (!is.null(sc)) sc$tagValue[sc$tagKey == tag]
@@ -636,10 +640,10 @@ lastEventDetails <- "lastEventDetails"
   ##   the landing module made does not exist. So every skipped entry's changed `mod` objects are
   ##   restored too, from the last step that changed each (`laterMod`, as `later` for objects); the
   ##   `eventModObjectsChanged` tag says whether an entry has any left to give without loading it.
-  laterMod <- paste(jump$module[n], .chainModChanged(sim, jump$module[n]))
+  laterMod <- .chainNameKeys(jump$module[n], .chainModChanged(sim, jump$module[n]))
   ## Params an event changed itself likewise: the landing hit restored its own (.prepareOutput()); each
   ##   other one comes from the last skipped entry whose `eventParamsChanged` tag names it (`laterPar`)
-  laterPar <- paste(jump$module[n], .chainReadParamsChanged(.chainEntryTags(jump$cacheId[n], cachePath)))
+  laterPar <- .chainNameKeys(jump$module[n], .chainReadParamsChanged(.chainEntryTags(jump$cacheId[n], cachePath)))
   modsDone <- jump$module[n]
   ## what the synonyms/outputs pass below needs from an entry this pass loads, so it is not loaded twice
   ##   (an entry saved without the tags that pass reads is loaded by it otherwise: seconds per entry)
@@ -649,9 +653,9 @@ lastEventDetails <- "lastEventDetails"
     tagsI <- .chainEntryTags(jump$cacheId[i], cachePath)
     modChanged <- .chainReadModChanged(tagsI)
     needMod <- if (is.null(modChanged)) !jump$module[i] %in% modsDone else
-      length(setdiff(paste(jump$module[i], modChanged), laterMod)) > 0L
+      length(setdiff(.chainNameKeys(jump$module[i], modChanged), laterMod)) > 0L
     wantPar <- .chainReadParamsChanged(tagsI)
-    wantPar <- wantPar[!paste(jump$module[i], wantPar) %in% laterPar]
+    wantPar <- wantPar[!.chainNameKeys(jump$module[i], wantPar) %in% laterPar]
     if (length(want) || needMod || length(wantPar)) {
       simI <- try(reproducible::loadFromCache(cachePath = cachePath, cacheId = jump$cacheId[i],
                                               verbose = -1), silent = TRUE)
@@ -670,15 +674,15 @@ lastEventDetails <- "lastEventDetails"
             objNames <- if (is.null(modChanged)) ls(mo, all.names = TRUE) else modChanged
             objNames <- grep("^\\._", objNames, value = TRUE, invert = TRUE)
             objNames <- setdiff(objNames, c("mod", "Par"))
-            objNames <- objNames[!paste(jump$module[i], objNames) %in% laterMod]
+            objNames <- objNames[!.chainNameKeys(jump$module[i], objNames) %in% laterMod]
             objNames <- intersect(objNames, ls(mo, all.names = TRUE))
             if (length(objNames)) list2env(mget(objNames, envir = mo), envir = moTo)
-            laterMod <- union(laterMod, paste(jump$module[i], objNames))
+            laterMod <- union(laterMod, .chainNameKeys(jump$module[i], objNames))
           }
         }
         wantPar <- intersect(wantPar, names(simI@params[[jump$module[i]]]))
         sim@params[[jump$module[i]]][wantPar] <- simI@params[[jump$module[i]]][wantPar]
-        laterPar <- union(laterPar, paste(jump$module[i], wantPar))
+        laterPar <- union(laterPar, .chainNameKeys(jump$module[i], wantPar))
         later <- union(later, .chainRestored(sim, simI, jump$module[i]))
       } else {
         messageCache("cacheChaining: could not load skipped entry ", jump$cacheId[i], " (",

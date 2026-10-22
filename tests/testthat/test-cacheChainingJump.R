@@ -911,3 +911,34 @@ jumpTest("a jump skips events that changed their own params and restores the par
   expect_identical(c(params(s2)$jC$note, params(s2)$jD$note), c("set by jC", "set by jD"))
   expect_equal(stateOf(s2)$objs, stateOf(ref)$objs)
 })
+
+## A skipped entry with nothing left to give -- its event changed no params and no `mod` objects, and
+## a later step restored all its outputs -- is not loaded: its tags say so. An empty name list once
+## turned into one blank name (`paste(module, character(0))` is "module "), which looked like a
+## `mod` object or param still to restore, so every such entry was loaded.
+jumpTest("a jump does not load a skipped entry that has nothing left to give", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  ## jC declares `d` but does not write it; jD, landed on, does
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""))', "NULL")
+  mkJumpMod(mp, "jD", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""))', "sim$d <- sim$b + 1")
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  loaded <- character()
+  origLoad <- reproducible::loadFromCache
+  testthat::local_mocked_bindings(loadFromCache = function(cachePath, cacheId, ...) {
+    loaded <<- c(loaded, cacheId)
+    origLoad(cachePath = cachePath, cacheId = cacheId, ...)
+  }, .package = "reproducible")
+  warm <- jumpMessages(s2 <- runJump(mp, cp, jumpParams()))
+  expect_equal(restoredList(warm$raw), c("jB init", "jC init", "jD init"))
+  m <- unlist(strsplit(warm$raw, "\n", fixed = TRUE))
+  idC <- sub("^.*jC init\\s+\\(([0-9a-f]+)\\).*$", "\\1", grep("2\\.\\s+jC init", m, value = TRUE))
+  expect_length(idC, 1L)
+  expect_false(any(idC %in% loaded))
+  expect_equal(s2$d, 7)
+})
