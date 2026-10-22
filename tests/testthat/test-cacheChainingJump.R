@@ -843,8 +843,8 @@ jumpTest("a jump keeps the landing module's current value of a param not in its 
 })
 
 ## An event that changes its own params (`P(sim, "x") <- ...`) is reproduced by a hit on its
-## entry, but a jump does not load the entries it skips. So a jump may land on such an entry,
-## and never skips past one; the params come out as in a run without chaining.
+## entry; a jump that skips the entry restores them from it, as it restores the objects it made.
+## The params come out as in a run without chaining.
 jumpTest("a jump keeps the params a skipped event changed itself", {
   skip_on_cran()
   testInit("terra", opts = jumpOpts)
@@ -865,7 +865,80 @@ jumpTest("a jump keeps the params a skipped event changed itself", {
   cp <- file.path(tmpdir, "on")
   runJump(mp, cp, jumpParams())
   warm <- jumpMessages(s2 <- runJump(mp, cp, jumpParams()))
-  expect_equal(restoredList(warm$raw), c("jB init", "jC init"))
+  expect_equal(restoredList(warm$raw), c("jB init", "jC init", "jD init"))
   expect_identical(params(s2)$jC[c("k", "note")], params(ref)$jC[c("k", "note")])
   expect_equal(stateOf(s2)$objs, stateOf(ref)$objs)
+})
+
+## A param an event changed itself is restored like an object it produced: from the last skipped
+## entry that changed it. So the jump does not stop at such an entry; stopping there started a new
+## chain, and the next events digested again the inputs the first chain hit had already digested.
+jumpTest("a jump skips events that changed their own params and restores the params", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  prm <- 'defineParameter(".useCache", "character", NA, NA, NA, ""),
+          defineParameter("note", "character", "", NA, NA, "", cacheKey = FALSE)'
+  ## jC (skipped) and jD (landed on) each set their own `note`, which is not in their keys; jD
+  ##   also reads `ext`, an input the chain did not produce, like jB
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("cc", "numeric", ""))',
+            'sim$cc <- sim$b * 2; P(sim, "note") <- "set by jC"', params = prm)
+  mkJumpMod(mp, "jD", 'bindrows(expectsInput("cc", "numeric", ""), expectsInput("ext", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""))',
+            'sim$d <- sim$cc + sim$ext; P(sim, "note") <- "set by jD"', params = prm)
+  ref <- runJump(mp, file.path(tmpdir, "off"), lapply(jumpParams(), modifyList, list(.useCache = NA)),
+                 chaining = FALSE)
+  expect_identical(c(params(ref)$jC$note, params(ref)$jD$note), c("set by jC", "set by jD"))
+
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  ## count the digests of `ext`: once per chain hit (a walk shares that hit's memo)
+  nDigestExt <- 0L
+  orig <- .chainExternalInputsMatch
+  testthat::local_mocked_bindings(.chainExternalInputsMatch = function(sim, module, postTags, produced,
+                                                                         userObjects = NULL, digests = NULL) {
+    if ("ext" %in% sim@depends@dependencies[[module]]@inputObjects$objectName &&
+        !(is.environment(digests) && exists("ext", envir = digests, inherits = FALSE)))
+      nDigestExt <<- nDigestExt + 1L
+    orig(sim, module, postTags, produced, userObjects, digests)
+  })
+  warm <- jumpMessages(s2 <- runJump(mp, cp, jumpParams()))
+  ## one jump, through jC to jD: jC's entry did not stop it
+  expect_equal(restoredList(warm$raw), c("jB init", "jC init", "jD init"))
+  expect_equal(nDigestExt, 1L)
+  expect_identical(c(params(s2)$jC$note, params(s2)$jD$note), c("set by jC", "set by jD"))
+  expect_equal(stateOf(s2)$objs, stateOf(ref)$objs)
+})
+
+## A skipped entry with nothing left to give -- its event changed no params and no `mod` objects, and
+## a later step restored all its outputs -- is not loaded: its tags say so. An empty name list once
+## turned into one blank name (`paste(module, character(0))` is "module "), which looked like a
+## `mod` object or param still to restore, so every such entry was loaded.
+jumpTest("a jump does not load a skipped entry that has nothing left to give", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  jumpFixture(mp)
+  ## jC declares `d` but does not write it; jD, landed on, does
+  mkJumpMod(mp, "jC", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""))', "NULL")
+  mkJumpMod(mp, "jD", 'bindrows(expectsInput("b", "numeric", ""))',
+            'bindrows(createsOutput("d", "numeric", ""))', "sim$d <- sim$b + 1")
+  cp <- file.path(tmpdir, "on")
+  runJump(mp, cp, jumpParams())
+  loaded <- character()
+  origLoad <- reproducible::loadFromCache
+  testthat::local_mocked_bindings(loadFromCache = function(cachePath, cacheId, ...) {
+    loaded <<- c(loaded, cacheId)
+    origLoad(cachePath = cachePath, cacheId = cacheId, ...)
+  }, .package = "reproducible")
+  warm <- jumpMessages(s2 <- runJump(mp, cp, jumpParams()))
+  expect_equal(restoredList(warm$raw), c("jB init", "jC init", "jD init"))
+  m <- unlist(strsplit(warm$raw, "\n", fixed = TRUE))
+  idC <- sub("^.*jC init\\s+\\(([0-9a-f]+)\\).*$", "\\1", grep("2\\.\\s+jC init", m, value = TRUE))
+  expect_length(idC, 1L)
+  expect_false(any(idC %in% loaded))
+  expect_equal(s2$d, 7)
 })
