@@ -610,3 +610,20 @@ test_that("saveFiles() writes terra objects to .rds that can be read back", {
   expect_s4_class(sim2$vIn, "SpatVector")
   expect_equal(terra::values(sim2$lIn$r)[, 1], 1:6)
 })
+
+test_that("saveFiles() replaces a raster output a previous run wrote", {
+  skip_if_not_installed("terra")
+  testInit(smcc = FALSE)
+
+  r <- terra::rast(terra::ext(0, 3, 0, 2), res = 1, vals = 1:6)
+  runOnce <- function(r) {
+    sim <- simInit(times = list(start = 0, end = 1), objects = list(r = r),
+                   paths = list(outputPath = tmpdir))
+    outputs(sim) <- data.frame(objectName = "r", saveTime = 1, fun = "writeRaster", package = "terra")
+    spades(sim, .plots = NA)
+  }
+  sim <- runOnce(r)
+  expect_equal(terra::values(terra::rast(outputs(sim)$file))[, 1], 1:6)
+  sim <- runOnce(r * 10) # the same file again, as a rerun into the same outputPath does
+  expect_equal(terra::values(terra::rast(outputs(sim)$file))[, 1], (1:6) * 10)
+})
