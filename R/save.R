@@ -164,6 +164,9 @@ saveFiles <- function(sim) {
           args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
             isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
           }))])
+          ## a rerun into the same outputPath replaces its own outputs, as saveRDS does
+          if (identical(outputs(sim)[["fun"]][i], "writeRaster") && is.null(args$overwrite))
+            args$overwrite <- TRUE
 
           ## The actual save line
           if (outputs(sim)[["fun"]][i] %in% .serialiseSaveFuns) {
