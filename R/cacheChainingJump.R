@@ -669,8 +669,10 @@ lastEventDetails <- "lastEventDetails"
   synsOf <- outsOf <- vector("list", n)
   for (i in rev(seq_len(n - 1L))) {
     tagsI <- .chainEntryTags(jump$cacheId[i], cachePath)
-    ## of its declared outputs, those its event changed (`eventObjectsChanged`), as a hit restores; all
-    ##   of them for an entry without the tag
+    ## of its declared outputs, those its event changed (`eventObjectsChanged`), as a hit restores. An
+    ##   entry without the tag is loaded for every declared object no later step restored, and the
+    ##   objects its event changed (its own `.Cache` record) are read from it before anything is restored
+    ##   (an `expectsInput` its event only read would otherwise put the entry's old copy over the live one)
     objChanged <- .chainReadObjChanged(tagsI)
     want <- .chainOutputs(sim, jump$module[i], jump$event[i])
     if (!is.null(objChanged)) want <- intersect(want, objChanged)
@@ -686,6 +688,10 @@ lastEventDetails <- "lastEventDetails"
       if (is(simI, "simList")) {
         synsOf[[i]] <- list(lapply(simI@.xData[[objSynName]], function(g) unname(unlist(g))))
         outsOf[[i]] <- list(simI@outputs)
+        if (is.null(objChanged)) {
+          objChanged <- .chainEntryChanged(simI)
+          want <- intersect(want, objChanged)
+        }
         have <- intersect(want, ls(simI@.xData, all.names = TRUE))
         if (length(have))
           list2env(mget(have, envir = simI@.xData), envir = sim@.xData)
@@ -707,7 +713,6 @@ lastEventDetails <- "lastEventDetails"
         wantPar <- intersect(wantPar, names(simI@params[[jump$module[i]]]))
         sim@params[[jump$module[i]]][wantPar] <- simI@params[[jump$module[i]]][wantPar]
         laterPar <- union(laterPar, .chainNameKeys(jump$module[i], wantPar))
-        if (is.null(objChanged)) objChanged <- .chainEntryChanged(simI)
       } else {
         messageCache("cacheChaining: could not load skipped entry ", jump$cacheId[i], " (",
                      jump$module[i], " ", jump$event[i], "); its outputs are not restored",

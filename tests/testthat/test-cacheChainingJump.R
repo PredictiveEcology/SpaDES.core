@@ -1037,3 +1037,45 @@ jumpTest("a jump over entries saved without the objects-changed tag loads them, 
   expect_true(idC %in% j$loaded)
   expect_equal(fullState(j$sim), fullState(ref))
 })
+
+## Overwrite objects in a saved cache entry's simList, as an entry made by an earlier run would hold them
+staleEntry <- function(cp, cacheId, ...) {
+  f <- reproducible::CacheStoredFile(cp, cacheId)
+  entry <- readRDS(f)
+  list2env(list(...), envir = entry@.xData)
+  saveRDS(entry, f)
+  me <- reproducible:::memoiseEnv(cp) # a memoised copy would hide the change
+  rm(list = ls(me, all.names = TRUE), envir = me)
+}
+
+## An entry saved without the `eventObjectsChanged` tag has no list of what its event changed, so the
+## jump used to restore every object its `.inputObjects` declares, an `expectsInput` it only READ included,
+## from the entry's own (older) copy over the live one. The jump now reads what the entry changed
+## (`attr(, ".Cache")$changed`) from the loaded entry and restores only that, as a hit does. Here ioC's
+## `.inputObjects` reads `a` (made by ioA, a genuine hit before the jump) and creates `cc`; its entry's copy of `a`
+## is made stale.
+jumpTest("a jump over an untagged .inputObjects entry restores what its event changed, not what it read", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "iomods"); dir.create(mp, showWarnings = FALSE)
+  ioJumpFixture(mp)
+  mkIOJumpMod(mp, "ioC", 'bindrows(expectsInput("a", "numeric", ""), expectsInput("b", "numeric", ""))',
+              'bindrows(createsOutput("cc", "numeric", ""))', "sim$cc <- sim$b * 2")
+  cp <- file.path(tmpdir, "io")
+  runIOJump(mp, cp)
+  sc <- reproducible::showCache(cp, verbose = -2)
+  idC <- unique(sc$cacheId[sc$tagKey == "function" & grepl("^\\.inputObjects", sc$tagValue) &
+                           sc$cacheId %in% sc$cacheId[sc$tagKey == "eventObjectsChanged" &
+                                                      sc$tagValue == "objChg1\tcc"]])
+  expect_length(idC, 1L)
+  ## an entry saved before the tag existed, whose copy of `a` is stale
+  reproducible::.updateTagsRepo(cacheId = idC, cachePath = cp, tagKey = "eventObjectsChanged",
+                               tagValue = "oldEntry")
+  staleEntry(cp, idC, a = 999)
+
+  got <- jumpMessages(sim <- runIOJump(mp, cp))
+  expect_match(got$jumps, "restored 3 cached events in one step")
+  expect_equal(sim$a, 1)  # the live copy, made by ioA; not the entry's 999
+  expect_equal(sim$cc, 12) # what ioC's event changed is still restored from its entry
+  expect_equal(sim$d, 13)
+})
