@@ -591,3 +591,16 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
 
   if (leafOnly) unique(basename(dirs)) else dirs
 }
+
+#' Did `Cache()` newly compute this object, or load it from the cache?
+#'
+#' `Cache()` records this in `attr(x, ".Cache")$newCache`. The entry is absent when caching was
+#' off or not recorded; then neither is known, and both helpers return `FALSE`.
+#'
+#' @param x An object returned by `Cache()`.
+#' @return A length-one logical. `.newlyCached()` is `TRUE` only if `newCache` is `TRUE`;
+#'   `.loadedFromCache()` is `TRUE` only if it is `FALSE`.
+#' @noRd
+.newlyCached <- function(x) isTRUE(attr(x, ".Cache")$newCache)
+
+.loadedFromCache <- function(x) isFALSE(attr(x, ".Cache")$newCache)

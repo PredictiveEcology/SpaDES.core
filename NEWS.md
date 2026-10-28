@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Bug fixes
+
+* A simulation no longer stops with "missing value where TRUE/FALSE needed" when the `.Cache` attribute of an event's result has no `newCache` entry. `.chainRan()` and `restartOrSimInitAndSpades()` now count that as 'not newly computed'. The reads of `attr(, ".Cache")$newCache` now all go through `.newlyCached()` / `.loadedFromCache()` (`.chainRan()`, `restartOrSimInitAndSpades()`, `Plots()`), so a missing entry cannot yield `NA` or `logical(0)` again. `test-cacheChainingRan.R`.
+
 ## Enhancements
 
 * A cacheChaining jump no longer loads a skipped cache entry for a declared output its event did not change. A hit restores only the objects its event changed (`lsObjectsChanged()`), but the jump loaded a skipped entry whenever it declared an output no later step restored. Each new entry now records those names in an `eventObjectsChanged` tag, and `.chainJumpFinish()` loads an entry only for a declared output the tag names. On a FireSense cache about three quarters of the bytes jumps loaded were such entries (`fireSense_spreadFit estimateThreshold`, `fireSense_dataPrepPredict .inputObjects`). An entry saved without the tag is loaded as before. `test-cacheChainingJump.R`.

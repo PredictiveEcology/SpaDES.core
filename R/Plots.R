@@ -602,9 +602,9 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
     message("Plots did not complete; clearing the cached record")
     })
 
-  ret <- attr(cached, ".Cache")$newCache %in% TRUE
+  ret <- .newlyCached(cached)
   attributes(ret) <- attributes(cached)
-  if (ret %in% FALSE) { # means it doesn't need a new plotting
+  if (.loadedFromCache(cached)) { # means it doesn't need a new plotting
     sc <- showCacheFast(cacheId = cacheId(cached))
     files <- sc[tagKey %in% tagKeySavedFile]$tagValue
     digs <- .robustDigest(asPath(filenamesForSave))
