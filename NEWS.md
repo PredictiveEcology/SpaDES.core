@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Dependency changes
+
+* SpaDES.core now needs R >= 4.4 (was 4.3), the oldest R version its checks run on (#511).
+
 ## Enhancements
 
 * A cacheChaining jump no longer loads a skipped cache entry for a declared output its event did not change. A hit restores only the objects its event changed (`lsObjectsChanged()`), but the jump loaded a skipped entry whenever it declared an output no later step restored. Each new entry now records those names in an `eventObjectsChanged` tag, and `.chainJumpFinish()` loads an entry only for a declared output the tag names. On a FireSense cache about three quarters of the bytes jumps loaded were such entries (`fireSense_spreadFit estimateThreshold`, `fireSense_dataPrepPredict .inputObjects`). An entry saved without the tag is loaded as before. `test-cacheChainingJump.R`.
