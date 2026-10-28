@@ -15,3 +15,13 @@ test_that(".chainRan treats a missing newCache as 'not newly computed'", {
   expect_false(.chainRan(mk(newCache = TRUE), FALSE, noJump))
   expect_false(.chainRan(mk(newCache = TRUE), TRUE, list(jump = 1)))
 })
+
+test_that(".newlyCached and .loadedFromCache are never NA or length zero", {
+  withNC <- function(v) structure(1, .Cache = list(newCache = v))
+  expect_identical(c(.newlyCached(withNC(TRUE)), .loadedFromCache(withNC(TRUE))), c(TRUE, FALSE))
+  expect_identical(c(.newlyCached(withNC(FALSE)), .loadedFromCache(withNC(FALSE))), c(FALSE, TRUE))
+  for (x in list(withNC(NULL), structure(1, .Cache = list()), 1, NULL)) {
+    expect_identical(.newlyCached(x), FALSE)
+    expect_identical(.loadedFromCache(x), FALSE)
+  }
+})

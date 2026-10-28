@@ -55,7 +55,7 @@
 ## Did the event that just went through Cache() actually run (a new cache entry), with no jump taken?
 ## Only then is there anything to record about what it did.
 .chainRan <- function(sim, cacheIt, chaining)
-  isTRUE(cacheIt) && is.null(chaining$jump) && isTRUE(attr(sim, ".Cache")$newCache)
+  isTRUE(cacheIt) && is.null(chaining$jump) && .newlyCached(sim)
 
 ## The delta to record for the event that just went through Cache(); NULL unless it ran.
 .chainDeltaIfRan <- function(sim, cacheIt, chaining, eventsPreCall, eventTime) {

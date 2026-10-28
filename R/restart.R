@@ -816,7 +816,7 @@ restartOrSimInitAndSpades <- function(ll, file,
   pathsOrig <- ll$paths
   ll$paths <- sapply(ll$paths, grep, invert = TRUE, value = TRUE, pattern = tempdir(), simplify = TRUE)
   fn <- function(ll) ll
-  cached <- isFALSE(attr(reproducible::Cache(fn(ll), .functionName = "restartOrSimInitAndSpades"), ".Cache")$newCache)
+  cached <- .loadedFromCache(reproducible::Cache(fn(ll), .functionName = "restartOrSimInitAndSpades"))
   if (isTRUE(reset))
     cached <- FALSE
   ll$paths <- pathsOrig

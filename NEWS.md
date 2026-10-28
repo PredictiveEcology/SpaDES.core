@@ -2,7 +2,7 @@
 
 ## Bug fixes
 
-* A simulation no longer stops with "missing value where TRUE/FALSE needed" when the `.Cache` attribute of an event's result has no `newCache` entry. `.chainRan()` and `restartOrSimInitAndSpades()` now count that as 'not newly computed'. `test-cacheChainingRan.R`.
+* A simulation no longer stops with "missing value where TRUE/FALSE needed" when the `.Cache` attribute of an event's result has no `newCache` entry. `.chainRan()` and `restartOrSimInitAndSpades()` now count that as 'not newly computed'. The reads of `attr(, ".Cache")$newCache` now all go through `.newlyCached()` / `.loadedFromCache()` (`.chainRan()`, `restartOrSimInitAndSpades()`, `Plots()`), so a missing entry cannot yield `NA` or `logical(0)` again. `test-cacheChainingRan.R`.
 
 ## Enhancements
 
