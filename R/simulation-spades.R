@@ -1451,9 +1451,6 @@ setMethod(
       if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(msg)
       } else {
-        if (isTRUE(any(grepl("\b", msg)))) {
-          msg <- paste0("\b", gsub("\b *", " ", msg), "\b")
-        }
         message(loggingMessage(msg))
       }
       # This will "muffle" the original message
@@ -2478,6 +2475,11 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     # Prepend the middle
     if (isTRUE(any(grepl("\b", mess)))) {
       # noNew <- TRUE
+      # Done here, not in the callers, so the simInit and spades message handlers cannot differ:
+      #   the continuation marker `\b` (reproducible's "done! took: ...") stays first, and the
+      #   `\b` characters and the spaces after them become one space
+      mess <- gsub("\b *", " ", mess)
+      mess[1] <- paste0("\b", mess[1])
       mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
     } else {
       messPoss <- paste0(middleFix, " ", mess)

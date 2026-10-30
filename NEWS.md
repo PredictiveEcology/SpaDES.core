@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+* The "done! took: ..." message that reproducible prints after "cropping...", "projecting..." and the like (`postProcessTo()`, so `prepInputs()`) no longer has a blank line after it when it is printed during an event. The `spades()` message handler wrapped it in a second `\b`, which `loggingMessage()` did not strip, so each one printed as `\b` on a line of its own. The `\b` handling now lives in `loggingMessage()`, so the `simInit()` and `spades()` message handlers cannot differ; a `\b` message in `simInit()` now also reads `\b done!` (a space after the `\b`), as it did in events. `test-progressThrottle.R`.
+
 * A simulation no longer stops with "missing value where TRUE/FALSE needed" when the `.Cache` attribute of an event's result has no `newCache` entry. `.chainRan()` and `restartOrSimInitAndSpades()` now count that as 'not newly computed'. The reads of `attr(, ".Cache")$newCache` now all go through `.newlyCached()` / `.loadedFromCache()` (`.chainRan()`, `restartOrSimInitAndSpades()`, `Plots()`), so a missing entry cannot yield `NA` or `logical(0)` again. `test-cacheChainingRan.R`.
 
 ## Enhancements
