@@ -1452,7 +1452,7 @@ setMethod(
         logging::loginfo(msg)
       } else {
         if (isTRUE(any(grepl("\b", msg)))) {
-          msg <- paste0("\b", gsub("\b *", " ", msg), "\b")
+          msg <- paste0("\b", gsub("\b *", " ", msg))
         }
         message(loggingMessage(msg))
       }

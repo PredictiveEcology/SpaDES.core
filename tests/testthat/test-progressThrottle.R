@@ -261,3 +261,35 @@ test_that("a non-dynamic tick after a dynamic one does not error on a NULL .prog
   expect_true(res)
   expect_s3_class(pe$.progressLastShown, "POSIXct")
 })
+
+test_that("a message continued with '\\b' (reproducible's 'done! took:') leaves no blank line in an event", {
+  testInit(smcc = FALSE, debug = FALSE)
+  tmpdir <- file.path(tempdir(), "bsMod")
+  dir.create(tmpdir, showWarnings = FALSE)
+  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+  newModule("bsMod", tmpdir, open = FALSE)
+  f <- file.path(tmpdir, "bsMod", "bsMod.R")
+  src <- readLines(f)
+  iInit <- grep("^Init <- function", src)
+  src <- append(src, c(
+    '  message("cropping...")',
+    '  message("\\bdone! took:  6.57 secs")',
+    '  message("after")'
+  ), after = iInit)
+  writeLines(src, f)
+
+  sim <- simInit(modules = "bsMod", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1))
+  msgs <- character()
+  withCallingHandlers(
+    spades(sim, events = "init"),
+    message = function(m) {
+      msgs <<- c(msgs, m$message)
+      invokeRestart("muffleMessage")
+    }
+  )
+  iDone <- grep("done! took", msgs)
+  expect_length(iDone, 1L)
+  # the old handler left a second "\b" after the newline, which printed as a blank line
+  expect_false(grepl("\n\b", msgs[iDone], fixed = TRUE))
+})
