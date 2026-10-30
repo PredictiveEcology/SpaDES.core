@@ -293,3 +293,13 @@ test_that("a message continued with '\\b' (reproducible's 'done! took:') leaves 
   # the old handler left a second "\b" after the newline, which printed as a blank line
   expect_false(grepl("\n\b", msgs[iDone], fixed = TRUE))
 })
+
+test_that("loggingMessage() treats a '\\b' continuation the same for the simInit and spades handlers", {
+  testInit(smcc = FALSE, debug = FALSE)
+  withr::local_options(spades.messagingNumCharsModule = 0)
+  msg <- "\bdone! took:  6.57 secs\n"
+  expect_identical(loggingMessage(msg), "\b done! took: 6.57 secs")
+  expect_identical(loggingMessage(msg, prefix = prefixSimInit), loggingMessage(msg))
+  # nested handlers see an already-normalised message and leave it alone
+  expect_identical(loggingMessage(loggingMessage(msg)), loggingMessage(msg))
+})
