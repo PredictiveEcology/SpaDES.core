@@ -187,8 +187,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     # All packages are guaranteed already loaded in this session; skip the
     # Require() call in loadPkgs which can hang non-interruptibly (dyn.load on
     # an NFS-backed .so) when packages are touched again unnecessarily.
-    opts <- options(spades.loadReqdPkgs = FALSE)
-    on.exit(options(opts), add = TRUE)
+    attr(sim, ".reqdPkgsLoaded") <- TRUE # as simInitAndSpades() does; not an option, which nested simInit()s would see
     ## reuse the `events` filter from the interrupted spades call (issue #354),
     ## unless the user supplied a new one to restartSpades(...)
     dots <- list(...)

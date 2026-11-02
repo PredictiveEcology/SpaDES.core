@@ -1232,8 +1232,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   #                paths = objsSimInit$paths, inputs = objsSimInit$inputs,
   #                outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
   #                notOlderThan = objsSimInit$notOlderThan, ...)
-  opts <- options(spades.loadReqdPkgs = FALSE)
-  on.exit(options(opts), add = TRUE)
+  ## simInit() has just loaded the packages: spades() need not load them again. A mark on this simList,
+  ## not options(spades.loadReqdPkgs = FALSE), which stayed set while the events ran, so a simInit()
+  ## inside an event (a nested simulation) did not load its own modules' packages.
+  attr(sim, ".reqdPkgsLoaded") <- TRUE
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   passedArgsToSpades <- as.list(match.call(spades))[-1]
