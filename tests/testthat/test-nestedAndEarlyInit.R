@@ -51,3 +51,40 @@ test_that("spades.loadReqdPkgs = FALSE set by the user still skips loading, nest
                           paths = list(modulePath = tmpdir))
   expect_false(sim$initResult_inner)
 })
+
+## A module whose init runs during simInit() (its outputs are needed by later .inputObjects) used to
+## lose any object with a name starting with "." that it set: only objs() (which leaves those out) was
+## copied back. fireSense_ELFs sets `.ELFind` that way; the fit modules then found none (2026-11-02).
+test_that("an object with a '.' name set by an init run during simInit() reaches the simList", {
+  testInit(opts = list(spades.allowInitDuringSimInit = TRUE))
+  for (m in c("first", "second")) dir.create(file.path(tmpdir, m), showWarnings = FALSE)
+  writeLines('
+defineModule(sim, list(name = "first", description = "", keywords = "",
+  authors = person(c("A"), "B", email = "a@b.com", role = c("aut", "cre")),
+  childModules = character(0), version = list(first = "0.0.1"),
+  spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", NA, NA, NA, "")),
+  inputObjects = bindrows(expectsInput(".runId", "character", "")),
+  outputObjects = bindrows(createsOutput("area", "numeric", ""))))
+doEvent.first <- function(sim, eventTime, eventType, debug = FALSE) {
+  if (eventType == "init") { sim$.runId <- "abc"; sim$area <- 1 }
+  invisible(sim)
+}', file.path(tmpdir, "first", "first.R"))
+  writeLines('
+defineModule(sim, list(name = "second", description = "", keywords = "",
+  authors = person(c("A"), "B", email = "a@b.com", role = c("aut", "cre")),
+  childModules = character(0), version = list(second = "0.0.1"),
+  spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", NA, NA, NA, "")),
+  inputObjects = bindrows(expectsInput("area", "numeric", ""), expectsInput(".runId", "character", "")),
+  outputObjects = bindrows(createsOutput("seenRunId", "character", ""))))
+doEvent.second <- function(sim, eventTime, eventType, debug = FALSE) invisible(sim)
+.inputObjects <- function(sim) { sim$seenRunId <- if (is.null(sim$.runId)) "none" else sim$.runId; sim }
+', file.path(tmpdir, "second", "second.R"))
+  sim <- simInit(modules = list("first", "second"), times = list(start = 0, end = 0),
+                 paths = list(modulePath = tmpdir))
+  expect_identical(sim$.runId, "abc")
+  expect_identical(sim$seenRunId, "abc")     # .inputObjects of `second` ran after `first`'s init
+})

@@ -2181,6 +2181,13 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       attr(sim, lastEventDetails) <- attr(simAltOut, lastEventDetails)
 
       list2env(objs(simAltOut), envir(sim))
+      ## objs() leaves out names starting with ".", so an object a module declares with one (e.g.,
+      ## fireSense's `.ELFind`) and sets in these inits did not reach `sim`. The "._" internals follow.
+      declared <- unlist(lapply(depends(simAltOut)@dependencies, function(d)
+        c(d@inputObjects$objectName, d@outputObjects$objectName)), use.names = FALSE)
+      dotDeclared <- intersect(grep("^\\.[^_]", unique(declared), value = TRUE),
+                               ls(envir(simAltOut), all.names = TRUE))
+      list2env(mget(dotDeclared, envir = envir(simAltOut)), envir(sim))
 
       dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
       ## the ledger is merged, not replaced: `sim` keeps the environment reproducible.urlLog
