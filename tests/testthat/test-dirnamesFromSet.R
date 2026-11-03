@@ -114,3 +114,40 @@ test_that("dirnamesFromSet unpadded output is the same for subfolders as for pla
   expect_identical(dirnamesFromSet(files, set = 1:10, leafOnly = FALSE),
                    c("out/rep1", "out/rep2", "out/rep10"))
 })
+
+## bare-number replicate folders (SpaDES.project::pathBuild() with the field label off)
+
+test_that("dirnamesFromSet finds bare-number replicate folders when no prefixed ones exist", {
+  files <- c("/o/6.4/NRV/16/burnMap.tif", "/o/6.4/NRV/2/burnMap.tif", "/o/6.4/NRV/10/x.tif")
+
+  expect_identical(dirnamesFromSet(files, set = 1:20), c("2", "10", "16"))
+  expect_identical(dirnamesFromSet(files, set = 1:20, leafOnly = FALSE),
+                   c("/o/6.4/NRV/2", "/o/6.4/NRV/10", "/o/6.4/NRV/16"))
+})
+
+test_that("dirnamesFromSet picks the replicate, not an SSP number above it", {
+  files <- c("/mnt/fast/outputs/6.4/NRV/370/16/burnMap_year3020.tif")
+
+  expect_identical(dirnamesFromSet(files, set = 16L), "16")
+  expect_identical(dirnamesFromSet(files, set = 16L, leafOnly = FALSE),
+                   "/mnt/fast/outputs/6.4/NRV/370/16")
+})
+
+test_that("dirnamesFromSet gives the bare replicate folder for files in a numeric subfolder", {
+  files <- c("/o/NRV/370/16/2020/x.tif", "/o/NRV/370/16/y.tif")
+
+  expect_identical(dirnamesFromSet(files, set = 1:20), "16")
+  expect_identical(dirnamesFromSet(files, set = 1:20, leafOnly = FALSE), "/o/NRV/370/16")
+})
+
+test_that("dirnamesFromSet ignores bare-number folders when prefixed ones exist", {
+  files <- c("/o/370/rep1/a.tif", "/o/370/rep3/a.tif", "/o/16/b.tif", "/o/2/b.tif")
+
+  expect_identical(dirnamesFromSet(files, set = 1:20), c("rep1", "rep3"))
+  expect_identical(dirnamesFromSet(files, set = 1:20, leafOnly = FALSE),
+                   c("/o/370/rep1", "/o/370/rep3"))
+})
+
+test_that("dirnamesFromSet returns nothing when neither layout matches", {
+  expect_identical(dirnamesFromSet(c("/o/a/x.tif", "/o/99/x.tif"), set = 1:3), character(0))
+})

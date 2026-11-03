@@ -551,7 +551,12 @@ isAre <- function(l, v) {
 #'
 #' @param files character vector of file paths.
 #' @param set integer vector of candidate ids to keep.
-#' @param prefix character. The directory name prefix preceding each id.
+#' @param prefix character. The directory name prefix preceding each id. If no
+#'   `<prefix><id>` directory occurs in `files`, directories
+#'   named by the bare number (e.g. `out/16/`, as `SpaDES.project::pathBuild()` writes
+#'   them with the field label off) are used instead; for each file the deepest
+#'   all-digit directory with an id in `set` is taken, so `out/370/16/x.tif` gives `16`.
+#'   `<prefix><id>` directories always take precedence.
 #' @param leafOnly logical. If `TRUE` (the default), only the single directory
 #'   name is returned, e.g. `"rep1"`, spelled as it is in `files` (so `"rep01"`
 #'   stays `"rep01"`). If `FALSE`, the full replicate directory path is returned,
@@ -584,6 +589,24 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
   dirs <- sub(repPattern, "\\1", files[keep])
   ids <- as.integer(sub(repPattern, "\\2", files[keep]))
   inSet <- ids %in% set
+  if (!any(keep)) {
+    ## no `<prefix><N>` folder at all: bare `<N>` folders, taking for each file its deepest all-digit
+    ## directory with an id in `set` (so `370/16/x.tif` gives `16`, `16/2020/x.tif` gives `16`)
+    digitDirs <- gregexpr("/[0-9]+(?=/)", files, perl = TRUE)
+    found <- Map(function(f, m) {
+      if (m[1] == -1L) return(NULL)
+      ends <- as.integer(m) + attr(m, "match.length") - 1L
+      starts <- as.integer(m) + 1L
+      inSetHere <- as.integer(substring(f, starts, ends)) %in% set
+      if (!any(inSetHere)) return(NULL)
+      last <- max(which(inSetHere))
+      list(dir = substr(f, 1L, ends[last]), id = as.integer(substring(f, starts[last], ends[last])))
+    }, files, digitDirs)
+    found <- found[!vapply(found, is.null, logical(1))]
+    dirs <- vapply(found, `[[`, character(1), "dir", USE.NAMES = FALSE)
+    ids <- vapply(found, `[[`, integer(1), "id", USE.NAMES = FALSE)
+    inSet <- rep(TRUE, length(ids))
+  }
   dirs <- dirs[inSet]
   ids <- ids[inSet]
   firsts <- !duplicated(dirs)
