@@ -1232,8 +1232,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   #                paths = objsSimInit$paths, inputs = objsSimInit$inputs,
   #                outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
   #                notOlderThan = objsSimInit$notOlderThan, ...)
-  opts <- options(spades.loadReqdPkgs = FALSE)
-  on.exit(options(opts), add = TRUE)
+  ## simInit() has just loaded the packages: spades() need not load them again. A mark on this simList,
+  ## not options(spades.loadReqdPkgs = FALSE), which stayed set while the events ran, so a simInit()
+  ## inside an event (a nested simulation) did not load its own modules' packages.
+  attr(sim, ".reqdPkgsLoaded") <- TRUE
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   passedArgsToSpades <- as.list(match.call(spades))[-1]
@@ -2179,6 +2181,13 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       attr(sim, lastEventDetails) <- attr(simAltOut, lastEventDetails)
 
       list2env(objs(simAltOut), envir(sim))
+      ## objs() leaves out names starting with ".", so an object a module declares with one (e.g.,
+      ## fireSense's `.ELFind`) and sets in these inits did not reach `sim`. The "._" internals follow.
+      declared <- unlist(lapply(depends(simAltOut)@dependencies, function(d)
+        c(d@inputObjects$objectName, d@outputObjects$objectName)), use.names = FALSE)
+      dotDeclared <- intersect(grep("^\\.[^_]", unique(declared), value = TRUE),
+                               ls(envir(simAltOut), all.names = TRUE))
+      list2env(mget(dotDeclared, envir = envir(simAltOut)), envir(sim))
 
       dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
       ## the ledger is merged, not replaced: `sim` keeps the environment reproducible.urlLog

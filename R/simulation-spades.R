@@ -1045,8 +1045,11 @@ setMethod(
     }
 
 
-    ## need to recheck package loading because `simInit` may have been cached
-    if (getOption("spades.loadReqdPkgs", TRUE)) {
+    ## need to recheck package loading because `simInit` may have been cached; not when
+    ## simInitAndSpades() or restartSpades() marked this simList as having its packages loaded
+    pkgsLoaded <- isTRUE(attr(sim, ".reqdPkgsLoaded"))
+    attr(sim, ".reqdPkgsLoaded") <- NULL
+    if (getOption("spades.loadReqdPkgs", TRUE) && !pkgsLoaded) {
       pkgs <- packages(sim)
       loadPkgs(pkgs)
     }

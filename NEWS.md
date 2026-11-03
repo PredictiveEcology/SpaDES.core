@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+* An object whose name starts with `.` (declared by a module, e.g. fireSense's `.ELFind`) that a module sets in an `init` run during `simInit()` (`spades.allowInitDuringSimInit`) now reaches the `simList`: only `objs()`, which leaves such names out, was copied back. `test-nestedAndEarlyInit.R`.
+* A `simInit()` inside an event of `simInitAndSpades()` (a nested simulation, as `Biomass_borealDataPrep` runs `Biomass_core`) loads its modules' `reqdPkgs` again. `simInitAndSpades()` and `restartSpades()` set `options(spades.loadReqdPkgs = FALSE)` for their `spades()` call, so the option stayed `FALSE` while the events ran; `Biomass_core`'s `%>>%` (`fpCompare`) was then "not found" unless another module of the outer simulation listed `fpCompare`. They now mark the `simList` instead, and only that `spades()` call skips the reload. A `spades.loadReqdPkgs = FALSE` set by the user is unchanged. `test-nestedAndEarlyInit.R`.
 * A simulation no longer stops with "missing value where TRUE/FALSE needed" when the `.Cache` attribute of an event's result has no `newCache` entry. `.chainRan()` and `restartOrSimInitAndSpades()` now count that as 'not newly computed'. The reads of `attr(, ".Cache")$newCache` now all go through `.newlyCached()` / `.loadedFromCache()` (`.chainRan()`, `restartOrSimInitAndSpades()`, `Plots()`), so a missing entry cannot yield `NA` or `logical(0)` again. `test-cacheChainingRan.R`.
 
 ## Enhancements
