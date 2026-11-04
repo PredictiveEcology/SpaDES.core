@@ -1428,7 +1428,7 @@ setReplaceMethod(
        ## counted as stamped and was skipped. Match "_<unit><number>" at the end
        ## of the basename, which is what this function actually appends.
        bn <- tools::file_path_sans_ext(basename(as.character(sim@outputs$file)))
-       alreadyStamped <- grepl(paste0("_", txtTimeA, "[-0-9.]+$"), bn)
+       alreadyStamped <- grepl(.timeStampRegex(txtTimeA), bn)
 
        # Add time unit and saveTime to filename, without stripping extension
        wh <- !alreadyStamped & !alreadyOnDisk
