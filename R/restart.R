@@ -256,7 +256,7 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
     if (!length(mainFile)) {
       ## not on modulePath: the source text saveSimList() kept in the simList (moduleSource()),
       ## written to a temporary module folder and parsed from there like any other
-      src <- sim@.xData[[dotMods]][[module]][["._source"]]
+      src <- moduleSource(sim, module)[[module]]
       if (is.null(src)) {
         notFound <- c(notFound, module)
         next

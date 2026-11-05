@@ -256,7 +256,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   ## file-backed object that sits under it -- but under none of the sim's named
   ## paths -- can still be re-rooted on load instead of silently becoming NULL
   sim <- .wrap(sim, filebackedPath = NULL, paths = .wrapAnchors(sim, projectPath))
-  for (m in names(src)) assign("._source", src[[m]], envir = sim@.xData[[dotMods]][[m]])
+  for (m in names(src)) assign(dotModSource, src[[m]], envir = sim@.xData[[dotMods]][[m]])
   sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
@@ -1225,7 +1225,7 @@ absolutizePaths <- function(paths, projectPath, tempdir = tempdir()) {
 #'   that folder was a git checkout, else `NULL`.
 #' @export
 moduleSource <- function(sim, module = unlist(modules(sim), use.names = FALSE)) {
-  out <- lapply(setNames(nm = module), function(m) sim@.xData[[dotMods]][[m]][["._source"]])
+  out <- lapply(setNames(nm = module), function(m) sim@.xData[[dotMods]][[m]][[dotModSource]])
   out[lengths(out) > 0]
 }
 
@@ -1238,7 +1238,7 @@ moduleSource <- function(sim, module = unlist(modules(sim), use.names = FALSE)) 
   out <- lapply(setNames(nm = mods), function(m) {
     folder <- file.path(modulePath(sim, module = m), m)[1L]
     if (!file.exists(file.path(folder, paste0(m, ".R"))))
-      return(sim@.xData[[dotMods]][[m]][["._source"]])
+      return(moduleSource(sim, m)[[m]])
     files <- moduleCodeFiles(list(modulePath = dirname(folder)), m)
     files <- files[file.exists(files) & !dir.exists(files)]
     list(files = setNames(vapply(files, function(f) readChar(f, file.size(f), useBytes = TRUE), character(1)),

@@ -843,6 +843,7 @@ setupModObjsEnv <- function(sim, moduleName) {
 
 dotObjs <- ".modObjs"
 dotMods <- ".mods"
+dotModSource <- "._source" # in each .mods[[module]]: the source saveSimList() keeps (moduleSource())
 dotObjsAndMods <- c(dotObjs, dotMods)
 modAB <- "mod"
 ParAB <- "Par"
