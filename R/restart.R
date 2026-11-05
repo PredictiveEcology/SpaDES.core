@@ -215,6 +215,10 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
 #'   only `.modObjs` back into it, so without this a reloaded `simList` fails
 #'   with `object 'doEvent.<module>' not found`.
 #'
+#' A module's source is read from its folder on `modulePath`, which is the copy the
+#' user has (and may have edited). Only a module not found there is parsed from the
+#' source text `saveSimList()` kept in the `simList` ([moduleSource()]).
+#'
 #' Only the module's code is evaluated: the `defineModule()` item is skipped.
 #' Its metadata is already in the `simList` -- and for a loaded `simList` that
 #' metadata is *end-state*, so re-evaluating `defineModule()` would risk
@@ -241,14 +245,29 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
 
   notFound <- character()
   failed <- character()
+  fromStored <- character()
+  storedDir <- tempdir2(sub = .rndstr())
+  on.exit(unlink(storedDir, recursive = TRUE), add = TRUE)
 
   for (module in modules) {
     moduleFolder <- file.path(modulePath(sim, module = module), module)
     mainFile <- file.path(moduleFolder, paste0(module, ".R"))
     mainFile <- mainFile[file.exists(mainFile)]
     if (!length(mainFile)) {
-      notFound <- c(notFound, module)
-      next
+      ## not on modulePath: the source text saveSimList() kept in the simList (moduleSource()),
+      ## written to a temporary module folder and parsed from there like any other
+      src <- sim@.xData[[dotMods]][[module]][["._source"]]
+      if (is.null(src)) {
+        notFound <- c(notFound, module)
+        next
+      }
+      moduleFolder <- file.path(storedDir, module)
+      for (f in names(src$files)) {
+        dir.create(dirname(file.path(moduleFolder, f)), recursive = TRUE, showWarnings = FALSE)
+        writeLines(src$files[[f]], file.path(moduleFolder, f), sep = "", useBytes = TRUE)
+      }
+      mainFile <- file.path(moduleFolder, paste0(module, ".R"))
+      fromStored <- c(fromStored, module)
     }
     mainFile <- mainFile[1L]
 
@@ -295,15 +314,17 @@ restartSpades <- function(sim = NULL, module = NULL, numEvents = 1L, restart = T
       modEnv[["._parsedData"]] <- parsed[["._parsedData"]]
     modEnv[["._sourceFilename"]] <- basename(mainFile)
 
-    messageVerbose(cli::col_blue("Reparsing ", module, " source code"), verbose = verbose)
+    messageVerbose(cli::col_blue("Reparsing ", module, " source code",
+                                 if (module %in% fromStored) " (stored in the simList; not on modulePath)"),
+                   verbose = verbose)
   }
 
   if (length(notFound)) {
     warning("Could not find source code for module(s): ",
             paste(notFound, collapse = ", "), ".\n",
             "  The simList is loaded and can be inspected, but cannot be run. ",
-            "Supply the correct `modulePath` via `paths`, or save and load in ",
-            "an archive format, which bundles the module source.",
+            "Supply the correct `modulePath` via `paths`. A simList saved by this ",
+            "version of saveSimList() carries its module source (see moduleSource()).",
             call. = FALSE)
   }
   if (length(failed)) {

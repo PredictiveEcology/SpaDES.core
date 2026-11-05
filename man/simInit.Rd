@@ -177,7 +177,10 @@ events do not run. \code{sim$._alreadyRun} keeps the other elements of \code{alr
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
-specified in the arguments supplied.
+specified in the arguments supplied. \code{sim$._modulesGiven} records the modules as
+given: \verb{list(modules = <the modules argument, with its names, e.g. "account/repo@ref">, parents = <a list naming the children of each parent module>)}. A saved \code{simList} keeps
+it, so it says which parent modules a run used, although only their children are in
+\code{modules(sim)}.
 }
 \description{
 Create a new simulation object, the \code{sim} object (a \code{simList}).

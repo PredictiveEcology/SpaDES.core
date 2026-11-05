@@ -209,7 +209,11 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'   `modules` and the replayed `inputs`.
 #'
 #' @return A `simList` simulation object, pre-initialized from values
-#' specified in the arguments supplied.
+#' specified in the arguments supplied. `sim$._modulesGiven` records the modules as
+#' given: `list(modules = <the modules argument, with its names, e.g. "account/repo@ref">,
+#' parents = <a list naming the children of each parent module>)`. A saved `simList` keeps
+#' it, so it says which parent modules a run used, although only their children are in
+#' `modules(sim)`.
 #'
 #' @seealso [objectProvenance] for where the value of each object comes from.
 #' @seealso [spades()], [defineModule()] to get help on metadata elements,
@@ -539,6 +543,7 @@ setMethod(
     if (isTRUE(.useFileBackedAnchors(paths(sim))))
       on.exit(options(reproducible.fileBackedAnchors = NULL), add = TRUE)
 
+    modulesGiven <- unlist(modules) # as the user gave them, e.g. named by "account/repo@ref"
     names(modules) <- unlist(modules)
     adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 
@@ -606,6 +611,9 @@ setMethod(
 
       ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
       parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
+      sim@.xData[["._modulesGiven"]] <- list(
+        modules = modulesGiven,
+        parents = split(basename2(parentChildGraph$to), basename2(parentChildGraph$from)))
 
       timeunits <- findSmallestTU(sim, modulePaths, childModules)
 
