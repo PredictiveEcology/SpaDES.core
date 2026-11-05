@@ -249,10 +249,14 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
   ## does not abort the entire save; failed objects are saved as NULL with a warning.
   sim <- .wrapResiliently(sim, projectPath = projectPath)
+  ## Each module's source text goes into sim$.mods[[module]]$._source (moduleSource()) after
+  ## .wrap(), which, as the Cache path, keeps no module code: Cache entries never carry it.
+  src <- .moduleSources(sim)
   ## wrap remaining / non-file-backed; `projectPath` is offered as an anchor so a
   ## file-backed object that sits under it -- but under none of the sim's named
   ## paths -- can still be re-rooted on load instead of silently becoming NULL
   sim <- .wrap(sim, filebackedPath = NULL, paths = .wrapAnchors(sim, projectPath))
+  for (m in names(src)) assign(dotModSource, src[[m]], envir = sim@.xData[[dotMods]][[m]])
   sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
@@ -1198,4 +1202,74 @@ absolutizePaths <- function(paths, projectPath, tempdir = tempdir()) {
   p[corePaths] <- sapply(paths[corePaths], fs::path_abs, start = projectPath)
   p[tmpPaths] <- sapply(paths[tmpPaths], fs::path_abs, start = tempdir)
   lapply(p, normPath)
+}
+
+## ---- module source kept in a saved simList -------------------------------
+
+#' The module source a saved `simList` carries
+#'
+#' [saveSimList()] keeps the text of each module's code files (`<module>.R` and the files in
+#' its `R/` folder, as [moduleCodeFiles()] lists them) in the saved `simList`, at
+#' `sim$.mods[[module]]$._source`. [loadSimList()] parses a module from that text only when
+#' the module is not on `modulePath`; when it is, the copy on `modulePath` is used, because
+#' that is the source the user has. The text is in saved `simList` files only, never in
+#' [reproducible::Cache()] entries, and is not part of a `simList`'s cache key.
+#'
+#' @param sim A `simList`.
+#' @param module Character. The modules whose stored source to return; default all
+#'   modules of `sim`.
+#'
+#' @return A named list with one element per module that has stored source: `files`, the
+#'   text of each file, named by its path relative to the module folder; `path`, the module
+#'   folder it was read from; `version`, the module version; and `git`, `list(sha, ref)` if
+#'   that folder was a git checkout, else `NULL`.
+#' @export
+moduleSource <- function(sim, module = unlist(modules(sim), use.names = FALSE)) {
+  out <- lapply(setNames(nm = module), function(m) sim@.xData[[dotMods]][[m]][[dotModSource]])
+  out[lengths(out) > 0]
+}
+
+## What saveSimList() keeps of each module's source (see moduleSource()): read from the module's
+## folder on modulePath; a module not there keeps the text the simList already carries (it was
+## loaded from a save and parsed from that text).
+.moduleSources <- function(sim) {
+  deps <- depends(sim)@dependencies
+  mods <- unlist(modules(sim), use.names = FALSE)
+  out <- lapply(setNames(nm = mods), function(m) {
+    folder <- file.path(modulePath(sim, module = m), m)[1L]
+    if (!file.exists(file.path(folder, paste0(m, ".R"))))
+      return(moduleSource(sim, m)[[m]])
+    files <- moduleCodeFiles(list(modulePath = dirname(folder)), m)
+    files <- files[file.exists(files) & !dir.exists(files)]
+    list(files = setNames(vapply(files, function(f) readChar(f, file.size(f), useBytes = TRUE), character(1)),
+                          as.character(fs::path_rel(files, path.expand(folder)))),
+         path = normPath(folder), version = as.character(deps[[m]]@version), git = .gitCommit(folder))
+  })
+  out[lengths(out) > 0]
+}
+
+## The commit a module folder is at, if it is a git checkout of its own (a `.git` folder, or a
+## `.git` file naming the git dir of a submodule or worktree): `list(sha, ref)`, read from the git files
+## (no git call); `ref` is `NA` for a detached HEAD. `NULL` if the folder is not a checkout.
+.gitCommit <- function(folder) {
+  under <- function(dir, p) if (isAbsolutePath(p)) p else file.path(dir, p)
+  gitDir <- file.path(folder, ".git")
+  if (!file.exists(gitDir)) return(NULL)
+  if (!dir.exists(gitDir)) gitDir <- under(folder, sub("^gitdir: *", "", readLines(gitDir, 1L, warn = FALSE)))
+  if (!file.exists(file.path(gitDir, "HEAD"))) return(NULL) # e.g. a copied submodule
+  head <- readLines(file.path(gitDir, "HEAD"), 1L, warn = FALSE)
+  if (!startsWith(head, "ref: ")) return(list(sha = head, ref = NA_character_))
+  ref <- sub("^ref: *", "", head)
+  commonFile <- file.path(gitDir, "commondir")
+  common <- if (file.exists(commonFile)) under(gitDir, readLines(commonFile, 1L, warn = FALSE)) else gitDir
+  refFile <- file.path(common, ref)
+  packed <- file.path(common, "packed-refs")
+  sha <- if (file.exists(refFile)) {
+    readLines(refFile, 1L, warn = FALSE)
+  } else if (file.exists(packed)) {
+    sub(" .*$", "", grep(paste0(" ", ref, "$"), readLines(packed, warn = FALSE), value = TRUE)[1L])
+  } else {
+    NA_character_
+  }
+  list(sha = sha, ref = sub("^refs/heads/", "", ref))
 }

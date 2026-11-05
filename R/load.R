@@ -21,7 +21,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "RData", "load", "base",
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
-    "shp", "terra", "vect",
+    "shp", "vect", "terra",
     "tif", "rast", "terra",
     "txt", "read.table", "utils"
   )),
@@ -438,4 +438,57 @@ rasterCreate.default <- function(x, ...) {
     x <- terra::rast(x, ...)
   }
   x
+}
+
+## The "_<unit><time>" that `outputs<-` appends to a file's name (sans extension).
+.timeStampRegex <- function(unit) paste0("_", unit, "[-0-9.]+$")
+
+## simInit(alreadyRun = ): the `inputs` rows that load, from the run `alreadyRun$sim`, each
+## object a module of `sim` expects, a module of that run created and the user did not supply.
+## Per object: its latest save at or before start(sim) loads at start, each later one up to
+## end(sim) at its saveTime. A saved output without an objectName (registerOutputs()) is named
+## by its file, as `outputs<-` names it.
+.alreadyRunInputs <- function(sim, alreadyRun) {
+  ran <- alreadyRun$sim
+  if (!identical(timeunit(ran), timeunit(sim)))
+    stop("The time unit of `alreadyRun` (", timeunit(ran), ") differs from this simulation's (",
+         timeunit(sim), ").", call. = FALSE)
+  objNames <- function(s, slotName)
+    unique(unlist(lapply(depends(s)@dependencies, function(d) slot(d, slotName)$objectName)))
+  need <- setdiff(intersect(objNames(sim, "inputObjects"), objNames(ran, "outputObjects")),
+                  sim$.userSuppliedObjNames)
+  out <- outputs(ran)
+  out <- out[out$saved %in% TRUE, , drop = FALSE]
+  unnamed <- is.na(out$objectName)
+  out$objectName[unnamed] <- sub(.timeStampRegex(timeunit(ran)), "",
+                                 tools::file_path_sans_ext(basename(out$file[unnamed])))
+  st <- as.numeric(start(sim))
+  rows <- data.frame(objectName = out$objectName, file = out$file, loadTime = as.numeric(out$saveTime),
+                     stringsAsFactors = FALSE)
+  rows <- rows[rows$objectName %in% need & rows$loadTime <= as.numeric(end(sim)), , drop = FALSE]
+  rows <- rows[order(rows$objectName, rows$loadTime), , drop = FALSE]
+  before <- rows[rows$loadTime <= st, , drop = FALSE]
+  before <- before[!duplicated(before$objectName, fromLast = TRUE), , drop = FALSE] # the latest
+  before$loadTime <- rep(st, NROW(before))
+  rows <- rbind(before, rows[rows$loadTime > st, , drop = FALSE])
+  absent <- setdiff(need, rows$objectName)
+  if (length(absent))
+    stop("The modules of `alreadyRun` create ", paste(absent, collapse = ", "),
+         ", which this simulation's modules expect, but that run did not save ",
+         if (length(absent) > 1) "them" else "it", " at or before end(sim). To be replayed, ",
+         "an object must be saved in the run (its outputs).", call. = FALSE)
+  if (!NROW(rows)) return(rows)
+  if (!is.null(alreadyRun$fetch))
+    rows$file <- alreadyRun$fetch(rows$file)
+  .fillInputRows(rows, startTime = st)
+}
+
+## What sim$._alreadyRun keeps of simInit(alreadyRun = ): every element but the run's simList
+## and the fetch function, the run's modules (unless `alreadyRun` names them) and the
+## replayed `inputs`.
+.alreadyRunProvenance <- function(alreadyRun, replay) {
+  prov <- alreadyRun[setdiff(names(alreadyRun), c("sim", "fetch"))]
+  if (is.null(prov$modules))
+    prov$modules <- names(depends(alreadyRun$sim)@dependencies)
+  c(prov, list(inputs = replay))
 }

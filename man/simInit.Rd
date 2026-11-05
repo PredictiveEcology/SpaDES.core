@@ -158,13 +158,29 @@ see them). For convenience, these can be supplied without their package prefix,
 e.g., \code{lowMemory} can be specified instead of \code{spades.lowMemory}. In cases that
 share option name (\code{reproducible.verbose} and \code{Require.verbose} both exist),
 passing \code{verbose = FALSE} will set both. Obviously this may cause unexpected
-problems if a module is also expecting a value.}
+problems if a module is also expecting a value.
+One name is an argument instead: \code{alreadyRun}, a run already done whose saved outputs
+this simulation replays (default \code{NULL}, none). It is a list with \code{sim}, the run's saved
+\code{simList} (only its \code{depends()}, \code{outputs()} and time unit are used; it can be a shell
+whose objects are not loaded), and optionally \code{fetch}, a function that, given files of
+\code{outputs(sim)}, makes them local and returns their paths (e.g. from a remote archive).
+Each object that a module of this simulation expects (\code{expectsInput}), that a module of
+the run created (\code{createsOutput}) and that the user did not supply is loaded from the
+run's saved outputs as \code{inputs}: the latest save at or before \code{start} at \code{start}, then
+each later save up to \code{end} at its \code{saveTime}. Only those files are fetched. An object
+without such a save is an error: to be replayed it must be saved in the run (its
+\code{outputs}). The run's modules are not in \code{modules}, so their code is not read and their
+events do not run. \code{sim$._alreadyRun} keeps the other elements of \code{alreadyRun}, the run's
+\code{modules} and the replayed \code{inputs}.}
 
 \item{l}{A list of arguments to passed to \code{simInit}.}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
-specified in the arguments supplied.
+specified in the arguments supplied. \code{sim$._modulesGiven} records the modules as
+given: \verb{list(modules = <the modules argument, with its names, e.g. "account/repo@ref">, parents = <a list naming the children of each parent module>)}. A saved \code{simList} keeps
+it, so it says which parent modules a run used, although only their children are in
+\code{modules(sim)}.
 }
 \description{
 Create a new simulation object, the \code{sim} object (a \code{simList}).
