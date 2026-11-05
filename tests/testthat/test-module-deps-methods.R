@@ -173,12 +173,6 @@ test_that("depsEdgeList and depsGraph work", {
 })
 
 test_that("3 levels of parent and child modules load and show correctly", {
-  ## Unconditionally skipped on CRAN: this test asserts an exact count of
-  ## igraph::cluster_optimal() communities, which is sensitive to the
-  ## installed igraph version and to whether the local igraph build links
-  ## GLPK. CRAN's check farm has reproduced the assertion failure on
-  ## individual Linux configurations despite our platform-specific skips,
-  ## so we keep the test for local/CI runs but never run it on CRAN.
   skip_on_cran()
   skip_if_not_installed("ggplot2")
 
@@ -217,32 +211,17 @@ test_that("3 levels of parent and child modules load and show correctly", {
   xxx1 <- gsub(xxx, pattern = 'timeunit = "year"', replacement = 'timeunit = "month"')
   cat(xxx1, file = fileName, sep = "\n")
 
-  if (Sys.which("glpsol") == "") {
-    if (Sys.info()[['sysname']] == "Darwin") {
-      skip("GLPK not available on macOS")
-    } else if (Sys.info()[["sysname"]] == "Linux") {
-      skip("GLPK not available on Linux")
-    }
-  } else if (.Platform$OS.type == "windows" || Sys.info()[["sysname"]] == "Linux") {
-    ## igraph::cluster_optimal() returns a different number of communities
-    ## across igraph versions / platforms (originally observed on Windows CI,
-    ## also seen on some Linux installs once GLPK is on the PATH). Algorithm
-    ## sensitivity to igraph version, not a SpaDES.core bug.
-    skip("igraph cluster_optimal community count differs by igraph version/platform")
-  } else {
-    mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
-    mg <- moduleGraph(mySim, FALSE) ## will be list if successful; NULL if not (no igraph GLPK support)
-    if (is(mg, "list")) {
-      expect_true(is(mg$graph, "igraph"))
-      expect_true(is(mg$communities, "communities"))
-      expect_true(length(unique(mg$communities$member)) == 3)
-      comm <- try(communities(mg$communities)[["1"]])
-      if (!is(comm, "try-error")) {
-        expect_true(any(grepl("grandpar1", comm)))
-        expect_true(identical(basename(comm), c("grandpar1", "par1", "par2", "child1", "child2")))
-      }
-    }
-  }
+  ## cluster_optimal() needs igraph built with GLPK (not the glpsol program). How many
+  ## communities it finds differs by igraph version and platform, so only the structure is tested.
+  if (is(try(igraph::cluster_optimal(igraph::make_graph(~ A - B)), silent = TRUE), "try-error"))
+    skip("igraph was built without GLPK")
+  mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
+  mg <- moduleGraph(mySim, FALSE)
+  expect_true(is(mg, "list"))
+  expect_true(is(mg$graph, "igraph"))
+  expect_true(is(mg$communities, "communities"))
+  expect_setequal(basename(mg$communities$names), c("_INPUT_", "grandpar1", "par1", "par2", paste0("child", 1:6)))
+  expect_true(all(lengths(igraph::communities(mg$communities)) > 0))
 })
 
 test_that("Test cleaning up of desc in createsOutputs, expectsInputs, defineParameters", {
