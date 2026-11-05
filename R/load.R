@@ -21,7 +21,7 @@ utils::globalVariables(c("fun", "loadTime", "package"))
     "RData", "load", "base",
     "rds", "readRDS", "base",
     "RDS", "readRDS", "base",
-    "shp", "terra", "vect",
+    "shp", "vect", "terra",
     "tif", "rast", "terra",
     "txt", "read.table", "utils"
   )),
