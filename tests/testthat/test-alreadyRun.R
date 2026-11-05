@@ -1,22 +1,9 @@
-## simInit(archive = ): a new module receives an archived run's saved outputs at their save
-## times, without the archived modules running. The archive is a real run of `makesX`
+## simInit(alreadyRun = ): a new module receives a finished run's saved outputs at their save
+## times, without that run's modules running. The run is a real run of `makesX`
 ## (x = time, saved every 2 years); `fetch` copies files from a "remote" folder and records
 ## what it was asked for.
 
-writeTestModule <- function(path, name, io, events = "invisible(sim)") {
-  dir.create(file.path(path, name), recursive = TRUE, showWarnings = FALSE)
-  writeLines(c(
-    sprintf('defineModule(sim, list(name = "%s", description = "", keywords = "", authors = person("a", "b"),', name),
-    sprintf('  childModules = character(0), version = list(%s = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),', name),
-    '  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(), parameters = rbind(),',
-    sprintf('  %s))', io),
-    sprintf('doEvent.%s <- function(sim, eventTime, eventType) {', name),
-    events,
-    '}'),
-    file.path(path, name, paste0(name, ".R")))
-}
-
-archiveForTest <- function(tmpdir) {
+alreadyRunForTest <- function(tmpdir) {
   mp <- file.path(tmpdir, "modules")
   writeTestModule(mp, "makesX",
     'outputObjects = bindrows(createsOutput("x", "numeric", ""), createsOutput("y", "numeric", ""))',
@@ -36,7 +23,7 @@ archiveForTest <- function(tmpdir) {
                   paths = list(modulePath = mp, outputPath = file.path(tmpdir, "archOut")),
                   outputs = data.frame(objectName = "x", saveTime = seq(0, 8, by = 2)))
   arch <- spades(arch)
-  ## archives register outputs that modules wrote themselves: no objectName
+  ## archived runs register outputs that modules wrote themselves: no objectName
   o <- outputs(arch)
   o$objectName <- NA_character_
   outputs(arch) <- o
@@ -50,51 +37,51 @@ archiveForTest <- function(tmpdir) {
     file.copy(file.path(remote, basename(files)), files)
     files
   }
-  list(archive = list(sim = arch, fetch = fetch, run = "makesXrun"), asked = asked, modulePath = mp)
+  list(alreadyRun = list(sim = arch, fetch = fetch, run = "makesXrun"), asked = asked, modulePath = mp)
 }
 
-test_that("archive = NULL changes nothing", {
+test_that("alreadyRun = NULL changes nothing", {
   testInit()
-  a <- archiveForTest(tmpdir)
+  a <- alreadyRunForTest(tmpdir)
   sim <- simInit(times = list(start = 3, end = 7), modules = "usesX",
-                 paths = list(modulePath = a$modulePath), archive = NULL)
-  expect_false(exists("archive", envir = envir(sim), inherits = FALSE))
-  expect_null(sim$._archive)
+                 paths = list(modulePath = a$modulePath), alreadyRun = NULL)
+  expect_false(exists("alreadyRun", envir = envir(sim), inherits = FALSE))
+  expect_null(sim$._alreadyRun)
   expect_equal(NROW(inputs(sim)), 0)
 })
 
-test_that("a new module gets the archived saves: the latest at or before start, then each in the window", {
+test_that("a new module gets the run's saves: the latest at or before start, then each in the window", {
   testInit()
-  a <- archiveForTest(tmpdir)
+  a <- alreadyRunForTest(tmpdir)
   sim <- simInit(times = list(start = 3, end = 7), modules = "usesX",
-                 paths = list(modulePath = a$modulePath), archive = a$archive)
+                 paths = list(modulePath = a$modulePath), alreadyRun = a$alreadyRun)
   ## the save at 2 loads at start; 4 and 6 at their save times; 0 and 8 are not fetched
   expect_equal(inputs(sim)$objectName, rep("x", 3))
   expect_equal(as.numeric(inputs(sim)$loadTime), c(3, 4, 6))
   expect_equal(sort(a$asked$files), c("x_year2.rds", "x_year4.rds", "x_year6.rds"))
   expect_false("makesX" %in% unlist(modules(sim)))
-  expect_equal(sim$._archive$run, "makesXrun")
-  expect_equal(sim$._archive$modules, "makesX")
+  expect_equal(sim$._alreadyRun$run, "makesXrun")
+  expect_equal(sim$._alreadyRun$modules, "makesX")
   sim <- spades(sim)
   expect_equal(sim$seen, c(`3` = 2, `4` = 4, `5` = 4, `6` = 6, `7` = 6))
   expect_false("makesX" %in% completed(sim)$moduleName)
 })
 
-test_that("an object the archived modules created but did not save stops, naming it", {
+test_that("an object the run's modules created but did not save stops, naming it", {
   testInit()
-  a <- archiveForTest(tmpdir)
+  a <- alreadyRunForTest(tmpdir)
   expect_error(simInit(times = list(start = 3, end = 7), modules = "usesXY",
-                       paths = list(modulePath = a$modulePath), archive = a$archive),
+                       paths = list(modulePath = a$modulePath), alreadyRun = a$alreadyRun),
                "y.*must be saved")
-  ## a user-supplied object is not taken from the archive
+  ## a user-supplied object is not taken from the run
   sim <- simInit(times = list(start = 3, end = 7), modules = "usesXY",
-                 paths = list(modulePath = a$modulePath), archive = a$archive,
+                 paths = list(modulePath = a$modulePath), alreadyRun = a$alreadyRun,
                  objects = list(y = 1))
   expect_equal(unique(inputs(sim)$objectName[!is.na(inputs(sim)$file)]), "x")
-  ## nothing to take from the archive
+  ## nothing to take from the run
   sim <- simInit(times = list(start = 3, end = 7), modules = "usesXY",
-                 paths = list(modulePath = a$modulePath), archive = a$archive,
+                 paths = list(modulePath = a$modulePath), alreadyRun = a$alreadyRun,
                  objects = list(x = 1, y = 1))
   expect_true(all(is.na(inputs(sim)$file)))
-  expect_equal(sim$._archive$modules, "makesX")
+  expect_equal(sim$._alreadyRun$modules, "makesX")
 })

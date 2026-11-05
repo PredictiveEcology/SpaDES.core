@@ -194,18 +194,19 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'   share option name (`reproducible.verbose` and `Require.verbose` both exist),
 #'   passing `verbose = FALSE` will set both. Obviously this may cause unexpected
 #'   problems if a module is also expecting a value.
-#'   One name is an argument instead: `archive`, to replay an archived run (default `NULL`,
-#'   none). It is a list with `sim`, the run's saved `simList` (only its `depends()`,
-#'   `outputs()` and time unit are used; it can be a shell whose objects are not loaded), and
-#'   optionally `fetch`, a function that, given files of `outputs(sim)`, makes them local and
-#'   returns their paths (e.g. from a remote archive). Each object that a module of this
-#'   simulation expects (`expectsInput`), that an archived module created (`createsOutput`) and
-#'   that the user did not supply is loaded from the run's saved outputs as `inputs`: the latest
-#'   save at or before `start` at `start`, then each later save up to `end` at its `saveTime`.
-#'   Only those files are fetched. An object without such a save is an error: to be replayed it
-#'   must be saved in the archived simulation (its `outputs`). The archived modules are not in
-#'   `modules`, so their code is not read and their events do not run. `sim$._archive` keeps
-#'   the other elements of `archive`, the archived `modules` and the replayed `inputs`.
+#'   One name is an argument instead: `alreadyRun`, a run already done whose saved outputs
+#'   this simulation replays (default `NULL`, none). It is a list with `sim`, the run's saved
+#'   `simList` (only its `depends()`, `outputs()` and time unit are used; it can be a shell
+#'   whose objects are not loaded), and optionally `fetch`, a function that, given files of
+#'   `outputs(sim)`, makes them local and returns their paths (e.g. from a remote archive).
+#'   Each object that a module of this simulation expects (`expectsInput`), that a module of
+#'   the run created (`createsOutput`) and that the user did not supply is loaded from the
+#'   run's saved outputs as `inputs`: the latest save at or before `start` at `start`, then
+#'   each later save up to `end` at its `saveTime`. Only those files are fetched. An object
+#'   without such a save is an error: to be replayed it must be saved in the run (its
+#'   `outputs`). The run's modules are not in `modules`, so their code is not read and their
+#'   events do not run. `sim$._alreadyRun` keeps the other elements of `alreadyRun`, the run's
+#'   `modules` and the replayed `inputs`.
 #'
 #' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied.
@@ -386,9 +387,9 @@ setMethod(
       assign(._txtStartClockTime, dots[[._txtStartClockTime]])
       # ._startClockTime <- dots[[._txtStartClockTime]]
     dots[[._txtStartClockTime]] <- NULL
-    archive <- dots[["archive"]] # an argument (see `...`), not an object
-    dots[["archive"]] <- NULL
-    dotNames <- setdiff(...names(), c(._txtStartClockTime, "archive"))
+    alreadyRun <- dots[["alreadyRun"]] # an argument (see `...`), not an object
+    dots[["alreadyRun"]] <- NULL
+    dotNames <- setdiff(...names(), c(._txtStartClockTime, "alreadyRun"))
 
 
     # loggingMessage helpers
@@ -692,12 +693,12 @@ setMethod(
           unlist()
       }
 
-      ## replay an archived run: what the modules expect from it is loaded from its saved outputs
-      if (!is.null(archive)) {
-        replay <- .archiveReplayInputs(sim, archive)
+      ## replay a run already done: what the modules expect from it is loaded from its saved outputs
+      if (!is.null(alreadyRun)) {
+        replay <- .alreadyRunInputs(sim, alreadyRun)
         inputs <- rbind(inputs, replay)
         sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, replay$objectName)
-        sim@.xData[["._archive"]] <- .archiveProvenance(archive, replay)
+        sim@.xData[["._alreadyRun"]] <- .alreadyRunProvenance(alreadyRun, replay)
       }
 
       ## load core modules
