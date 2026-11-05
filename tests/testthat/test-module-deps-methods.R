@@ -213,10 +213,9 @@ test_that("3 levels of parent and child modules load and show correctly", {
 
   ## cluster_optimal() needs igraph built with GLPK (not the glpsol program). How many
   ## communities it finds differs by igraph version and platform, so only the structure is tested.
-  if (is(try(igraph::cluster_optimal(igraph::make_graph(~ A - B)), silent = TRUE), "try-error"))
-    skip("igraph was built without GLPK")
   mySim <- simInit(modules = list("grandpar1"), paths = list(modulePath = tmpdir))
-  mg <- moduleGraph(mySim, FALSE)
+  mg <- suppressMessages(moduleGraph(mySim, FALSE)) # NULL, with a message, without GLPK
+  if (is.null(mg)) skip("igraph was built without GLPK")
   expect_true(is(mg, "list"))
   expect_true(is(mg$graph, "igraph"))
   expect_true(is(mg$communities, "communities"))
