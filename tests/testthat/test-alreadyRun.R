@@ -67,12 +67,22 @@ test_that("a new module gets the run's saves: the latest at or before start, the
   expect_false("makesX" %in% completed(sim)$moduleName)
 })
 
-test_that("an object the run's modules created but did not save stops, naming it", {
+test_that("an object the run did not save comes from its simList (end-of-run value); in neither, it stops", {
   testInit()
   a <- alreadyRunForTest(tmpdir)
+  ## y was never saved as an output, but the run's simList has it (-8, its value at end 8)
+  sim <- simInit(times = list(start = 3, end = 7), modules = "usesXY",
+                 paths = list(modulePath = a$modulePath), alreadyRun = a$alreadyRun)
+  expect_equal(as.numeric(sim$y), -8)
+  expect_true("y" %in% sim$.userSuppliedObjNames)
+  expect_equal(sim$._alreadyRun$objects, "y")
+  expect_equal(unique(inputs(sim)$objectName), "x")
+  expect_false("y" %in% a$asked$files)
+  ## not in the simList either: stops, naming it
+  rm("y", envir = envir(a$alreadyRun$sim))
   expect_error(simInit(times = list(start = 3, end = 7), modules = "usesXY",
                        paths = list(modulePath = a$modulePath), alreadyRun = a$alreadyRun),
-               "y.*must be saved")
+               "create y.*neither saved it.*nor kept it in its simList")
   ## a user-supplied object is not taken from the run
   sim <- simInit(times = list(start = 3, end = 7), modules = "usesXY",
                  paths = list(modulePath = a$modulePath), alreadyRun = a$alreadyRun,
