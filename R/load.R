@@ -447,7 +447,8 @@ rasterCreate.default <- function(x, ...) {
 ## object a module of `sim` expects, a module of that run created and the user did not supply.
 ## Per object: its latest save at or before start(sim) loads at start, each later one up to
 ## end(sim) at its saveTime. A saved output without an objectName (registerOutputs()) is named
-## by its file, as `outputs<-` names it.
+## by its file, as `outputs<-` names it. An object with no such save but in the run's simList
+## is named in attr(, "objects"): simInit() takes its value at the end of the run.
 .alreadyRunInputs <- function(sim, alreadyRun) {
   ran <- alreadyRun$sim
   if (!identical(timeunit(ran), timeunit(sim)))
@@ -472,23 +473,29 @@ rasterCreate.default <- function(x, ...) {
   before$loadTime <- rep(st, NROW(before))
   rows <- rbind(before, rows[rows$loadTime > st, , drop = FALSE])
   absent <- setdiff(need, rows$objectName)
+  ## not saved as an output, but in the run's simList (its value at the end of the run)
+  fromSim <- absent[vapply(absent, exists, logical(1), envir = envir(ran), inherits = FALSE)]
+  absent <- setdiff(absent, fromSim)
   if (length(absent))
     stop("The modules of `alreadyRun` create ", paste(absent, collapse = ", "),
-         ", which this simulation's modules expect, but that run did not save ",
-         if (length(absent) > 1) "them" else "it", " at or before end(sim). To be replayed, ",
-         "an object must be saved in the run (its outputs).", call. = FALSE)
-  if (!NROW(rows)) return(rows)
-  if (!is.null(alreadyRun$fetch))
-    rows$file <- alreadyRun$fetch(rows$file)
-  .fillInputRows(rows, startTime = st)
+         ", which this simulation's modules expect, but that run neither saved ",
+         if (length(absent) > 1) "them" else "it", " at or before end(sim) nor kept ",
+         if (length(absent) > 1) "them" else "it", " in its simList.", call. = FALSE)
+  if (NROW(rows)) {
+    if (!is.null(alreadyRun$fetch))
+      rows$file <- alreadyRun$fetch(rows$file)
+    rows <- .fillInputRows(rows, startTime = st)
+  }
+  attr(rows, "objects") <- fromSim
+  rows
 }
 
 ## What sim$._alreadyRun keeps of simInit(alreadyRun = ): every element but the run's simList
-## and the fetch function, the run's modules (unless `alreadyRun` names them) and the
-## replayed `inputs`.
-.alreadyRunProvenance <- function(alreadyRun, replay) {
+## and the fetch function, the run's modules (unless `alreadyRun` names them), the
+## replayed `inputs` and the `objects` taken from the run's simList.
+.alreadyRunProvenance <- function(alreadyRun, replay, fromSim = character()) {
   prov <- alreadyRun[setdiff(names(alreadyRun), c("sim", "fetch"))]
   if (is.null(prov$modules))
     prov$modules <- names(depends(alreadyRun$sim)@dependencies)
-  c(prov, list(inputs = replay))
+  c(prov, list(inputs = replay, objects = fromSim))
 }

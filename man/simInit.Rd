@@ -168,8 +168,8 @@ Each object that a module of this simulation expects (\code{expectsInput}), that
 the run created (\code{createsOutput}) and that the user did not supply is loaded from the
 run's saved outputs as \code{inputs}: the latest save at or before \code{start} at \code{start}, then
 each later save up to \code{end} at its \code{saveTime}. Only those files are fetched. An object
-without such a save is an error: to be replayed it must be saved in the run (its
-\code{outputs}). The run's modules are not in \code{modules}, so their code is not read and their
+without such a save is taken from the run's \code{simList}, with its value at the end of
+that run; one in neither is an error. The run's modules are not in \code{modules}, so their code is not read and their
 events do not run. \code{sim$._alreadyRun} keeps the other elements of \code{alreadyRun}, the run's
 \code{modules} and the replayed \code{inputs}.}
 

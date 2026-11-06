@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+* `simInit(alreadyRun = )` now also gives the new modules an object the run created but never saved as a file, when the run's `simList` has it (e.g. `studyArea`, `climateYearRecord`), with its value at the end of that run; a message names them and `sim$._alreadyRun$objects` records them. It stopped on them before.
+
 * An object whose name starts with `.` (declared by a module, e.g. fireSense's `.ELFind`) that a module sets in an `init` run during `simInit()` (`spades.allowInitDuringSimInit`) now reaches the `simList`: only `objs()`, which leaves such names out, was copied back. `test-nestedAndEarlyInit.R`.
 * A `simInit()` inside an event of `simInitAndSpades()` (a nested simulation, as `Biomass_borealDataPrep` runs `Biomass_core`) loads its modules' `reqdPkgs` again. `simInitAndSpades()` and `restartSpades()` set `options(spades.loadReqdPkgs = FALSE)` for their `spades()` call, so the option stayed `FALSE` while the events ran; `Biomass_core`'s `%>>%` (`fpCompare`) was then "not found" unless another module of the outer simulation listed `fpCompare`. They now mark the `simList` instead, and only that `spades()` call skips the reload. A `spades.loadReqdPkgs = FALSE` set by the user is unchanged. `test-nestedAndEarlyInit.R`.
 * `dirnamesFromSet()` now finds replicate folders named by the bare number (`out/370/16/x.tif`, as `SpaDES.project::pathBuild()` writes them with the field label off). Before, only `<prefix><N>` folders (`rep16`) were recognised, so multi-mode summaries found no replicates. The bare-number fallback applies only when no `<prefix><N>` folder occurs in `files`; for each file the deepest all-digit directory with an id in `set` is used. Results for `<prefix><N>` layouts are unchanged. `test-dirnamesFromSet.R`.
