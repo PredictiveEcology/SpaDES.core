@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+* An error while evaluating a module's `defineModule` (e.g. a parameter default that calls a function that fails) now stops `simInit()` with the module name and the original message. It was turned into a warning, so `simInit()` then failed with "no applicable method for `@` applied to an object of class character" and the real message was lost among the warnings. `test-defineModuleError.R`.
 * `simInit(alreadyRun = )` now also gives the new modules an object the run created but never saved as a file, when the run's `simList` has it (e.g. `studyArea`, `climateYearRecord`), with its value at the end of that run; a message names them and `sim$._alreadyRun$objects` records them. It stopped on them before.
 
 * An object whose name starts with `.` (declared by a module, e.g. fireSense's `.ELFind`) that a module sets in an `init` run during `simInit()` (`spades.allowInitDuringSimInit`) now reaches the `simList`: only `objs()`, which leaves such names out, was copied back. `test-nestedAndEarlyInit.R`.
