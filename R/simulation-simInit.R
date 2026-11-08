@@ -207,6 +207,15 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'   that run; one in neither is an error. The run's modules are not in `modules`, so their code is not read and their
 #'   events do not run. `sim$._alreadyRun` keeps the other elements of `alreadyRun`, the run's
 #'   `modules` and the replayed `inputs`.
+#'   `alreadyRun` can also be several runs, a list of such runs (named by run; unnamed, they are
+#'   `"1"`, `"2"`, ...), for modules that summarise replicates (e.g. `mode = "multi"`). Then
+#'   nothing is replayed. `outputsDF` is the saved rows of every run's `outputs()`, bound, with a
+#'   column `run` (each run with `fetch` is fetched first), unless the user supplies it. An object
+#'   that a module expects and the user did not supply is taken from the runs' `simList`s
+#'   (end-of-run values, whichever module or user made it there) only if every run has it, not
+#'   `NULL`, with the same value (by `reproducible::.robustDigest()`); a message names the
+#'   others. `sim$._alreadyRun`
+#'   is then `list(runs = <each run as above>, objects = <names taken>, outputsDF = <logical>)`.
 #'
 #' @return A `simList` simulation object, pre-initialized from values
 #' specified in the arguments supplied. `sim$._modulesGiven` records the modules as
@@ -702,7 +711,23 @@ setMethod(
       }
 
       ## replay a run already done: what the modules expect from it is loaded from its saved outputs
-      if (!is.null(alreadyRun)) {
+      ## several runs: nothing is replayed; their outputs and the objects equal in all of them
+      if (!is.null(alreadyRun) && .alreadyRunIsMulti(alreadyRun)) {
+        multi <- .alreadyRunMulti(sim, alreadyRun)
+        list2env(multi$objects, envir = envir(sim))
+        if (!is.null(multi$outputsDF))
+          sim$outputsDF <- multi$outputsDF
+        taken <- c(names(multi$objects), if (!is.null(multi$outputsDF)) "outputsDF")
+        sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, taken)
+        messageVerbose("From the ", length(alreadyRun), " runs of `alreadyRun`: ",
+                       paste(taken, collapse = ", "),
+                       if (length(multi$differ))
+                         paste0("; not taken (they differ between runs or are not in each run's ",
+                                "simList): ", paste(multi$differ, collapse = ", ")),
+                       verbose = verbose)
+        sim@.xData[["._alreadyRun"]] <- list(runs = multi$runs, objects = names(multi$objects),
+                                             outputsDF = !is.null(multi$outputsDF))
+      } else if (!is.null(alreadyRun)) {
         replay <- .alreadyRunInputs(sim, alreadyRun)
         fromSim <- attr(replay, "objects")
         attr(replay, "objects") <- NULL

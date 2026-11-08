@@ -171,7 +171,16 @@ each later save up to \code{end} at its \code{saveTime}. Only those files are fe
 without such a save is taken from the run's \code{simList}, with its value at the end of
 that run; one in neither is an error. The run's modules are not in \code{modules}, so their code is not read and their
 events do not run. \code{sim$._alreadyRun} keeps the other elements of \code{alreadyRun}, the run's
-\code{modules} and the replayed \code{inputs}.}
+\code{modules} and the replayed \code{inputs}.
+\code{alreadyRun} can also be several runs, a list of such runs (named by run; unnamed, they are
+\code{"1"}, \code{"2"}, ...), for modules that summarise replicates (e.g. \code{mode = "multi"}). Then
+nothing is replayed. \code{outputsDF} is the saved rows of every run's \code{outputs()}, bound, with a
+column \code{run} (each run with \code{fetch} is fetched first), unless the user supplies it. An object
+that a module expects and the user did not supply is taken from the runs' \code{simList}s
+(end-of-run values, whichever module or user made it there) only if every run has it, not
+\code{NULL}, with the same value (by \code{reproducible::.robustDigest()}); a message names the
+others. \code{sim$._alreadyRun}
+is then \verb{list(runs = <each run as above>, objects = <names taken>, outputsDF = <logical>)}.}
 
 \item{l}{A list of arguments to passed to \code{simInit}.}
 }
