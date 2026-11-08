@@ -500,7 +500,7 @@ rasterCreate.default <- function(x, ...) {
 
 ## The objects the modules of `s` declare in `slotName` ("inputObjects" or "outputObjects")
 .moduleObjNames <- function(s, slotName)
-  unique(unlist(lapply(depends(s)@dependencies, function(d) slot(d, slotName)$objectName)))
+  unique(unlist(lapply(depends(s)@dependencies, function(d) if (!is.null(d)) slot(d, slotName)$objectName)))
 
 ## Is `alreadyRun` several runs (a list of runs, each `list(sim = <simList>, ...)`) rather than
 ## one? Stops if it is neither.
