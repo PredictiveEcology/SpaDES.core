@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+* `test-wrapSimListTags.R` no longer expects `clearCache()` to delete an entry's `.lock` files, which `reproducible` no longer removes (a lock may be held by another process).
 * An error while evaluating a module's `defineModule` (e.g. a parameter default that calls a function that fails) now stops `simInit()` with the module name and the original message. It was turned into a warning, so `simInit()` then failed with "no applicable method for `@` applied to an object of class character" and the real message was lost among the warnings. `test-defineModuleError.R`.
 * An object whose name starts with `.` (declared by a module, e.g. fireSense's `.ELFind`) that a module sets in an `init` run during `simInit()` (`spades.allowInitDuringSimInit`) now reaches the `simList`: only `objs()`, which leaves such names out, was copied back. `test-nestedAndEarlyInit.R`.
 * A `simInit()` inside an event of `simInitAndSpades()` (a nested simulation, as `Biomass_borealDataPrep` runs `Biomass_core`) loads its modules' `reqdPkgs` again. `simInitAndSpades()` and `restartSpades()` set `options(spades.loadReqdPkgs = FALSE)` for their `spades()` call, so the option stayed `FALSE` while the events ran; `Biomass_core`'s `%>>%` (`fpCompare`) was then "not found" unless another module of the outer simulation listed `fpCompare`. They now mark the `simList` instead, and only that `spades()` call skips the reload. A `spades.loadReqdPkgs = FALSE` set by the user is unchanged. `test-nestedAndEarlyInit.R`.
