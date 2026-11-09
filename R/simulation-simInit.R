@@ -203,8 +203,8 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'   the run created (`createsOutput`) and that the user did not supply is loaded from the
 #'   run's saved outputs as `inputs`: the latest save at or before `start` at `start`, then
 #'   each later save up to `end` at its `saveTime`. Only those files are fetched. An object
-#'   without such a save is an error: to be replayed it must be saved in the run (its
-#'   `outputs`). The run's modules are not in `modules`, so their code is not read and their
+#'   without such a save is taken from the run's `simList`, with its value at the end of
+#'   that run; one in neither is an error. The run's modules are not in `modules`, so their code is not read and their
 #'   events do not run. `sim$._alreadyRun` keeps the other elements of `alreadyRun`, the run's
 #'   `modules` and the replayed `inputs`.
 #'
@@ -704,9 +704,16 @@ setMethod(
       ## replay a run already done: what the modules expect from it is loaded from its saved outputs
       if (!is.null(alreadyRun)) {
         replay <- .alreadyRunInputs(sim, alreadyRun)
+        fromSim <- attr(replay, "objects")
+        attr(replay, "objects") <- NULL
+        for (obj in fromSim)
+          assign(obj, get(obj, envir = envir(alreadyRun$sim)), envir = envir(sim))
+        if (length(fromSim))
+          messageVerbose("From `alreadyRun`'s simList, at the end of that run (it saved no ",
+                         "file of them): ", paste(fromSim, collapse = ", "), verbose = verbose)
         inputs <- rbind(inputs, replay)
-        sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, replay$objectName)
-        sim@.xData[["._alreadyRun"]] <- .alreadyRunProvenance(alreadyRun, replay)
+        sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, replay$objectName, fromSim)
+        sim@.xData[["._alreadyRun"]] <- .alreadyRunProvenance(alreadyRun, replay, fromSim)
       }
 
       ## load core modules
