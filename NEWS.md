@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+* `simInit()` now widens `spades.messagingNumCharsModule` for the children of a parent module, not only the modules the user named, so child modules such as `fireSense_ELFs` and `fireSense_burn` no longer print under the same shortened name in log lines. `test-childModuleNameWidth.R`.
 * `simInit(alreadyRun = )` now also gives the new modules an object the run created but never saved as a file, when the run's `simList` has it (e.g. `studyArea`, `climateYearRecord`), with its value at the end of that run; a message names them and `sim$._alreadyRun$objects` records them. It stopped on them before.
 
 * `test-wrapSimListTags.R` no longer expects `clearCache()` to delete an entry's `.lock` files, which `reproducible` no longer removes (a lock may be held by another process).
