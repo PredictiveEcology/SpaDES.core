@@ -554,7 +554,6 @@ setMethod(
 
     modulesGiven <- unlist(modules) # as the user gave them, e.g. named by "account/repo@ref"
     names(modules) <- unlist(modules)
-    adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 
     # Check that modules exist in paths$modulePath
     modulePaths <- .checkModuleDirsAndFiles(modules = modules, modulePath = sim@paths$modulePath)
@@ -564,6 +563,7 @@ setMethod(
     modules <- as.list(unique(unlist(childModules))) # flat list of all modules
     names(modules) <- unlist(modules)
     modules <- lapply(modules, basename2)
+    adjustModuleNameSpacing(modules) # all modules, children included; changes options("spades.messagingNumCharsModule")
 
     moduleNames <- names(modules)
     names(moduleNames) <- moduleNames
