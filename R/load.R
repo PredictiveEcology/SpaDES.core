@@ -451,13 +451,7 @@ rasterCreate.default <- function(x, ...) {
 ## is named in attr(, "objects"): simInit() takes its value at the end of the run.
 .alreadyRunInputs <- function(sim, alreadyRun) {
   ran <- alreadyRun$sim
-  if (!identical(timeunit(ran), timeunit(sim)))
-    stop("The time unit of `alreadyRun` (", timeunit(ran), ") differs from this simulation's (",
-         timeunit(sim), ").", call. = FALSE)
-  objNames <- function(s, slotName)
-    unique(unlist(lapply(depends(s)@dependencies, function(d) slot(d, slotName)$objectName)))
-  need <- setdiff(intersect(objNames(sim, "inputObjects"), objNames(ran, "outputObjects")),
-                  sim$.userSuppliedObjNames)
+  need <- .alreadyRunNeed(sim, ran)
   out <- outputs(ran)
   out <- out[out$saved %in% TRUE, , drop = FALSE]
   unnamed <- is.na(out$objectName)
@@ -488,6 +482,78 @@ rasterCreate.default <- function(x, ...) {
   }
   attr(rows, "objects") <- fromSim
   rows
+}
+
+## The objects a module of `sim` expects, a module of the run `ran` created and the user did
+## not supply; stops if the run's time unit differs from `sim`'s.
+.alreadyRunNeed <- function(sim, ran) {
+  .alreadyRunTimeunit(sim, ran)
+  setdiff(intersect(.moduleObjNames(sim, "inputObjects"), .moduleObjNames(ran, "outputObjects")),
+          sim$.userSuppliedObjNames)
+}
+
+.alreadyRunTimeunit <- function(sim, ran) {
+  if (!identical(timeunit(ran), timeunit(sim)))
+    stop("The time unit of `alreadyRun` (", timeunit(ran), ") differs from this simulation's (",
+         timeunit(sim), ").", call. = FALSE)
+}
+
+## The objects the modules of `s` declare in `slotName` ("inputObjects" or "outputObjects")
+.moduleObjNames <- function(s, slotName)
+  unique(unlist(lapply(depends(s)@dependencies, function(d) if (!is.null(d)) slot(d, slotName)$objectName)))
+
+## Is `alreadyRun` several runs (a list of runs, each `list(sim = <simList>, ...)`) rather than
+## one? Stops if it is neither.
+.alreadyRunIsMulti <- function(alreadyRun) {
+  isRun <- function(x) is.list(x) && is(x[["sim"]], "simList")
+  if (isRun(alreadyRun)) return(FALSE)
+  if (is.list(alreadyRun) && length(alreadyRun) && all(vapply(alreadyRun, isRun, logical(1))))
+    return(TRUE)
+  stop("`alreadyRun` must be one run, list(sim = <simList>, fetch = <function or NULL>), ",
+       "or a list of such runs.", call. = FALSE)
+}
+
+## simInit(alreadyRun = <several runs>): nothing is replayed. `outputsDF` is every run's saved
+## outputs, bound, with a column `run` (the run's name), fetched first if the run has `fetch`;
+## NULL if the user supplied `outputsDF`. `objects`: each object a module of `sim` expects and
+## the user did not supply, that every run's simList holds, not NULL, with the same value (by
+## .robustDigest(); its end-of-run value), whichever module or user made it in the runs.
+## `differ`: the expected objects in some run's simList that are not taken.
+.alreadyRunMulti <- function(sim, runs) {
+  if (is.null(names(runs))) names(runs) <- as.character(seq_along(runs))
+  for (r in runs) .alreadyRunTimeunit(sim, r$sim)
+  need <- setdiff(.moduleObjNames(sim, "inputObjects"), c(sim$.userSuppliedObjNames, "outputsDF"))
+  inSome <- need[vapply(need, function(obj) any(vapply(runs, function(r)
+    exists(obj, envir = envir(r$sim), inherits = FALSE), logical(1))), logical(1))]
+  objects <- list()
+  for (obj in inSome) {
+    dig <- NULL
+    for (r in runs) {
+      e <- envir(r$sim)
+      val <- if (exists(obj, envir = e, inherits = FALSE)) get(obj, envir = e)
+      if (is.null(val)) { dig <- NA; break } # absent, or failed to load
+      d <- .robustDigest(val, quick = FALSE)
+      if (is.null(dig)) {
+        dig <- d
+        first <- val
+      } else if (!identical(d, dig)) {
+        dig <- NA
+        break
+      }
+    }
+    if (!identical(dig, NA)) objects[obj] <- list(first)
+  }
+  outputsDF <- if (!"outputsDF" %in% sim$.userSuppliedObjNames) {
+    rbindlist(Map(run = names(runs), r = runs, function(run, r) {
+      out <- outputs(r$sim)
+      out <- out[out$saved %in% TRUE, , drop = FALSE]
+      if (NROW(out) && !is.null(r$fetch))
+        out$file <- r$fetch(out$file)
+      cbind(as.data.table(out), run = rep(run, NROW(out)))
+    }), fill = TRUE)
+  }
+  list(objects = objects, differ = setdiff(inSome, names(objects)), outputsDF = outputsDF,
+       runs = lapply(runs, function(r) .alreadyRunProvenance(r, replay = NULL)))
 }
 
 ## What sim$._alreadyRun keeps of simInit(alreadyRun = ): every element but the run's simList
