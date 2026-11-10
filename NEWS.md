@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+* A message printed during `spades()` no longer hangs the run at 100% CPU when the code running at the time has its own variable `sim` that is not a `simList`: `loggingMessage()` restarted `.whereInStack("sim")` from the same frame forever. It now takes the innermost `simList` named `sim` on the call stack in one pass. `test-loggingMessageNonSimList.R`.
 * `simInit()` now widens `spades.messagingNumCharsModule` for the children of a parent module, not only the modules the user named, so child modules such as `fireSense_ELFs` and `fireSense_burn` no longer print under the same shortened name in log lines. `test-childModuleNameWidth.R`.
 * `simInit(alreadyRun = )` now also gives the new modules an object the run created but never saved as a file, when the run's `simList` has it (e.g. `studyArea`, `climateYearRecord`), with its value at the end of that run; a message names them and `sim$._alreadyRun$objects` records them. It stopped on them before.
 
