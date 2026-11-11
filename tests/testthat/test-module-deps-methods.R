@@ -244,7 +244,8 @@ test_that("Test cleaning up of desc in createsOutputs, expectsInputs, definePara
                  cn <- colnames(a)
                  cn <- tolower(gsub("param", "", cn))
                  actuallyIs <- tolower(sort(c("...", cn)))
-                 shouldBe <- tolower(sort(c(formalArgs(get(nam)))))
+                 ## `events` is a formal argument but a column only when given
+                 shouldBe <- tolower(sort(setdiff(formalArgs(get(nam)), "events")))
                  if (!grepl("Param", nam))
                    shouldBe <- sort(c(shouldBe, "othercol"))
                  expect_true(identical(actuallyIs, shouldBe))
