@@ -11,24 +11,17 @@
 ## `dt` and B changes it by reference. All three events are cached. `declare = FALSE`: no `events`.
 .writeEvMod <- function(mp, declare = TRUE) {
   ev <- function(x) if (declare) sprintf(', events = %s', x) else ""
-  d <- file.path(mp, "evMod")
-  dir.create(d, recursive = TRUE, showWarnings = FALSE)
-  writeLines(sprintf('
-defineModule(sim, list(name = "evMod", description = "", keywords = "", authors = person("A", "B"),
-  childModules = character(0), version = list(evMod = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
-  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list("data.table"),
-  parameters = rbind(
-    defineParameter("v", "numeric", 1, NA, NA, "what A writes into big"),
-    defineParameter(".useCache", "character", c("A", "B", "C"), NA, NA, "")),
-  inputObjects = bindrows(),
-  outputObjects = bindrows(
+  writeTestModule(mp, "evMod",
+    parameters = 'defineParameter("v", "numeric", 1, NA, NA, "what A writes into big"),
+    defineParameter(".useCache", "character", c("A", "B", "C"), NA, NA, "")',
+    reqdPkgs = '"data.table"',
+    io = sprintf('inputObjects = bindrows(), outputObjects = bindrows(
     createsOutput("big", "numeric", "written by A"%s),
     createsOutput("small", "numeric", "written by B"%s),
     createsOutput("tiny", "numeric", "written by C"%s),
-    createsOutput("dt", "data.table", "made by A, changed by reference by B"%s))))
-
-doEvent.evMod <- function(sim, eventTime, eventType, debug = FALSE) {
-  switch(eventType,
+    createsOutput("dt", "data.table", "made by A, changed by reference by B"%s))',
+                 ev('"A"'), ev('"B"'), ev('"C"'), ev('c("A", "B")')),
+    events = '  switch(eventType,
     init = {
       sim <- scheduleEvent(sim, start(sim), "evMod", "A", eventPriority = 6)
       sim <- scheduleEvent(sim, start(sim), "evMod", "B", eventPriority = 7)
@@ -37,9 +30,7 @@ doEvent.evMod <- function(sim, eventTime, eventType, debug = FALSE) {
     A = { sim$big <- P(sim)$v; sim$dt <- data.table::data.table(y = 0) },
     B = { sim$small <- runif(1); data.table::set(sim$dt, j = "y", value = 10) },
     C = { sim$tiny <- runif(1) })
-  invisible(sim)
-}
-', ev('"A"'), ev('"B"'), ev('"C"'), ev('c("A", "B")')), file.path(d, "evMod.R"))
+  invisible(sim)')
 }
 
 .runEvMod <- function(mp, cp, v, debug = FALSE) {
@@ -130,23 +121,12 @@ test_that("a hit on an entry saved before events were declared restores only the
 ## before modY declared `events` is hit after; it must not restore `X` either.
 .writeIOMods <- function(mp, declare = TRUE) {
   ev <- function(x) if (declare) sprintf(', events = "%s"', x) else ""
-  hdr <- 'defineModule(sim, list(name = "%s", description = "", keywords = "", authors = person("A", "B"),
-  childModules = character(0), version = list(%s = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),
-  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
-  parameters = rbind(%s), inputObjects = bindrows(), outputObjects = bindrows(%s)))
-doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) invisible(sim)
-.inputObjects <- function(sim) { %s; invisible(sim) }
-'
-  for (m in c("modX", "modY")) dir.create(file.path(mp, m), recursive = TRUE, showWarnings = FALSE)
-  writeLines(sprintf(hdr, "modX", "modX", 'defineParameter("v", "numeric", 1, NA, NA, "")',
-                     'createsOutput("X", "numeric", "")', "modX", "sim$X <- P(sim)$v"),
-             file.path(mp, "modX", "modX.R"))
-  writeLines(sprintf(hdr, "modY", "modY",
-                     'defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")',
-                     paste0('createsOutput("X", "numeric", ""', ev("init"), '), ',
-                            'createsOutput("yy", "numeric", ""', ev(".inputObjects"), ')'),
-                     "modY", "sim$yy <- runif(1)"),
-             file.path(mp, "modY", "modY.R"))
+  writeTestModule(mp, "modX", parameters = 'defineParameter("v", "numeric", 1, NA, NA, "")',
+                  io = 'outputObjects = bindrows(createsOutput("X", "numeric", ""))', dotInputObjects = "sim$X <- P(sim)$v")
+  writeTestModule(mp, "modY", parameters = 'defineParameter(".useCache", "character", ".inputObjects", NA, NA, "")',
+                  io = paste0('outputObjects = bindrows(createsOutput("X", "numeric", ""', ev("init"), '), ',
+                              'createsOutput("yy", "numeric", ""', ev(".inputObjects"), '))'),
+                  dotInputObjects = "sim$yy <- runif(1)")
 }
 
 .runIOMods <- function(mp, cp, v)
