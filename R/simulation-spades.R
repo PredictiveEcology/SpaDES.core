@@ -1552,7 +1552,9 @@ setMethod(
   # cacheIt <- cacheChaining || cacheIt
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]]) || cacheChaining) { # allow for super simple simList without a slot outputObjects
     expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
-    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    ## only the outputs this event type may write (createsOutput(events = )): its cache entry keeps,
+    ##   and its hit restores, no copy of an output another event of the module writes
+    createsOutputs <- .outputsOfEvent(sim@depends@dependencies[[cur[["moduleName"]]]], cur[["eventType"]])
 
     if (cacheIt) { # means that a module or event is to be cached
 
@@ -3076,7 +3078,7 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
                                   tagKey = .chainSynTag, tagValue = .chainSynText(sim))
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
-                                  tagKey = .chainObjTag, tagValue = .chainObjText(sim, moduleName))
+                                  tagKey = .chainObjTag, tagValue = .chainObjText(sim, moduleName, eventType))
   }
   ## The outputs rows this event added, on every new entry -- not only one with a previous entry to
   ##   chain from: a hit restores only those rows (.prepareOutput(), .chainOutAddedRows()), so the first

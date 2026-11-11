@@ -128,10 +128,10 @@
 .chainObjTag <- "eventObjectsChanged"
 .chainObjMarker <- "objChg1"
 
-.chainObjText <- function(sim, module) {
+.chainObjText <- function(sim, module, event) {
   deps <- sim@depends@dependencies
   changed <- lsObjectsChanged(ls(sim@.xData, all.names = TRUE), attr(sim, ".Cache")$changed,
-                              match(module, names(deps)), module, deps)
+                              match(module, names(deps)), module, deps, event)
   .chainNamesText(.chainObjMarker, changed)
 }
 
@@ -269,13 +269,13 @@
   list(eventTime = eventTime, moduleName = module, eventType = event, eventPriority = .normal())
 }
 
-## What an event can have produced: its module's `createsOutput`s; for `.inputObjects` also the
-## module's `expectsInput`s, which is what it exists to fill in (and what that Cache call lists
-## as `outputObjects`).
+## What an event can have produced: its module's `createsOutput`s that event may write
+## (.outputsOfEvent()); for `.inputObjects` also the module's `expectsInput`s, which is what it
+## exists to fill in (and what that Cache call lists as `outputObjects`).
 .chainOutputs <- function(sim, module, event) {
   dep <- sim@depends@dependencies[[module]]
   if (is.null(dep)) return(character())
-  out <- dep@outputObjects$objectName
+  out <- .outputsOfEvent(dep, event)
   if (identical(event, ".inputObjects")) out <- c(dep@inputObjects$objectName, out)
   unique(as.character(na.omit(out)))
 }
@@ -289,7 +289,8 @@
 }
 
 ## What a module's own cache entry actually restores to the live simList: of the objects the module
-## declares (`expectsInput`s and `createsOutput`s), those its event CHANGED (`changed`: the names in
+## declares (`expectsInput`s, and the `createsOutput`s its `event` may write, .outputsOfEvent()),
+## those its event CHANGED (`changed`: the names in
 ## `attr(entry, ".Cache")$changed`, .chainEntryChanged(), or the entry's `eventObjectsChanged` tag).
 ## `.prepareOutput()` (R/cache.R, `lsObjectsChanged()`) carries no other object out of a loaded entry: not an `expectsInput` the event merely read, and not a
 ## `createsOutput` it declares but did not write (Biomass_core declares `speciesLayers`, which
@@ -299,10 +300,10 @@
 ## be known exactly: used to decide what a LATER step in a jump has already (re)written --
 ## `.chainJumpFinish()`'s `later` -- never for `.chainOutputs()`'s other job of tracking what the
 ## chain as a whole has produced. Deciding it from the declaration instead lost the object.
-.chainRestored <- function(sim, changed, module) {
+.chainRestored <- function(sim, changed, module, event) {
   dep <- sim@depends@dependencies[[module]]
   if (is.null(dep)) return(character())
-  declared <- unique(as.character(na.omit(c(dep@inputObjects$objectName, dep@outputObjects$objectName))))
+  declared <- unique(as.character(na.omit(c(dep@inputObjects$objectName, .outputsOfEvent(dep, event)))))
   intersect(declared, changed)
 }
 
@@ -653,7 +654,7 @@ lastEventDetails <- "lastEventDetails"
   for (i in seq_len(n - 1L))
     .replayUrlLog(sim, cachePath, jump$cacheId[i], jump$module[i], jump$event[i])
   ## the landing entry's own hit has just been merged: `sim` carries that entry's `.Cache` attribute
-  later <- .chainRestored(sim, .chainEntryChanged(sim), jump$module[n])
+  later <- .chainRestored(sim, .chainEntryChanged(sim), jump$module[n], jump$event[n])
   ## A hit restores only the `mod` objects its event CHANGED (R/cache.R, `lsModObjectsChanged()`), the
   ##   landing hit included; the rest come from the live sim, where a `mod` object a skipped event of
   ##   the landing module made does not exist. So every skipped entry's changed `mod` objects are
@@ -720,7 +721,7 @@ lastEventDetails <- "lastEventDetails"
       }
     }
     ## what this entry restores, loaded or not: no earlier step's copy of it is wanted
-    later <- union(later, .chainRestored(sim, objChanged, jump$module[i]))
+    later <- union(later, .chainRestored(sim, objChanged, jump$module[i], jump$event[i]))
     modsDone <- union(modsDone, jump$module[i])
   }
   ## The synonyms each skipped event added, in the order they ran. A hit restores its entry's synonyms
