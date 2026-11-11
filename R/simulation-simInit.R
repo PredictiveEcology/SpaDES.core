@@ -1780,9 +1780,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         ##   `moduleSpecificInputObjects`, which also drives the cache KEY below
         ##   (`objectsToEvaluateForCaching`): an object that does not exist yet before
         ##   `.inputObjects` runs must never be digested into that key.
+        ##   Of the `createsOutput`s, only those `.inputObjects` may write (createsOutput(events = )).
         moduleSpecificOutputObjects <- union(
           moduleSpecificInputObjects,
-          na.omit(sim@depends@dependencies[[i]]@outputObjects[["objectName"]]))
+          na.omit(.outputsOfEvent(sim@depends@dependencies[[i]], ".inputObjects")))
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {

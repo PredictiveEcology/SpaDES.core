@@ -22,7 +22,10 @@ If there are extra spaces or carriage returns, these will be stripped,
 allowing for multi-line character strings without using \code{paste}
 or multiple quotes.}
 
-\item{...}{Other specifications of the output object.}
+\item{...}{Other specifications of the output object. One is used by
+\code{SpaDES.core}: \code{events}, a character vector of the event types that write the
+object (e.g. \code{events = "prepSpreadFitData"}; \code{".inputObjects"} for the module's
+\code{.inputObjects}). See section 'Which events write an output'.}
 }
 \value{
 A \code{data.frame} suitable to be passed to \code{outputObjects} in
@@ -31,13 +34,32 @@ a module's metadata.
 \description{
 Used to specify an output object's name, class, description and other specifications.
 }
+\section{Which events write an output}{
+
+When an event is cached (\code{.useCache}), its cache entry keeps the module's outputs,
+and a cache hit puts back those the event changed. Without \code{events}, every
+\code{createsOutput} that exists after the event and is not also an \code{expectsInput}
+counts as changed by it, whether or not the event wrote it. A hit on a later event
+can then put an old copy of an object an earlier event has just remade back over
+the new one. With \code{events}, an event's entry keeps, and its hit restores, only the
+outputs declared for its event type, plus those that declare no \code{events}. This
+applies also to entries saved before the module declared \code{events}, and to
+cacheChaining jumps. An object an event modifies but that is not declared for it is
+not restored on that event's cache hit. Adding or changing \code{events} changes the
+cache keys of the module's events (the \code{outputObjects} metadata is part of them),
+but not of its \code{.inputObjects}.
+}
+
 \examples{
 outputObjects <- bindrows(
   createsOutput(objectName = "outputObject1", objectClass = "character",
                 desc = "this is for example"),
   createsOutput(objectName = "outputObject2", objectClass = "numeric",
                 desc = "this is for example",
-                otherInformation = "I am the second output object")
+                otherInformation = "I am the second output object"),
+  createsOutput(objectName = "outputObject3", objectClass = "numeric",
+                desc = "written only by the events 'init' and 'grow'",
+                events = c("init", "grow"))
 )
 
 }

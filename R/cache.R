@@ -824,7 +824,7 @@ setMethod(
 
           changedObjs <- attr(simFromCache, ".Cache")$changed
           lsObjectEnv <- lsObjectsChanged(lsObjectEnv, changedObjs,
-                                          hasCurrModule, currModules, deps)
+                                          hasCurrModule, currModules, deps, eventType)
           hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
           changedModEnvObjs <- lsModObjectsChanged(namesAllMods, changedObjs, hasDotObjs)
 
@@ -1701,15 +1701,20 @@ buildDotObjectsList <- function(object, .objects) {
 }
 
 # changedFromCreatesOutputs <- function(hasCurrModule, deps, currModules, simFromCache) {
+## `eventType`: the event whose entry it is. Of the module's `createsOutput`s, only those that event
+##   may write (.outputsOfEvent()) are restored: `changed` of an entry saved before the module
+##   declared `createsOutput(events = )` names every createsOutput, written or not.
 lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
-                             currModules, deps) {
+                             currModules, deps, eventType = NULL) {
   createOutputs <- if (length(hasCurrModule)) {
-    deps[[hasCurrModule]]@outputObjects$objectName
+    .outputsOfEvent(deps[[hasCurrModule]], eventType)
   } else {
     aa <- lapply(deps, function(dep) dep@outputObjects$objectName)
     unique(unlist(aa))
   }
   createOutputs <- na.omit(createOutputs)
+  notThisEvent <- if (length(hasCurrModule))
+    setdiff(.outputsOfEvent(deps[[hasCurrModule]]), createOutputs)
 
   # add the environments for each module - allow local objects
   createOutputs <- c(createOutputs, currModules)
@@ -1730,7 +1735,8 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
   changedInputs <- expectsInputs[expectsInputs %in% names(changedObjs)]
 
   dotObjects <- startsWith(lsObjectEnv, ".")
-  dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs)
+  dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs) &
+    !lsObjectEnv %in% notThisEvent
 
   # lsObjectEnv --> this should only be objects that can be outputted, not expectsInputs
   out <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
