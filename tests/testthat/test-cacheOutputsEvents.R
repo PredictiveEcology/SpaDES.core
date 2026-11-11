@@ -169,3 +169,13 @@ for (declareFirst in c(TRUE, FALSE)) {
     expect_identical(s2$X, 2)      # was 1: the hit restored run 1's `X`
   })
 }
+
+test_that("createsOutput keeps events when a non-character argument dispatches to its ANY method", {
+  ## desc = NA (logical) reaches the "ANY" method, which dropped named `...`
+  out <- createsOutput("x", "numeric", NA, events = c("A", "B"))
+  expect_identical(unlist(out[[.txtOutputEvents]]), c("A", "B"))
+  ## an unnamed extra piece of `desc` is still pasted into it, once
+  out2 <- createsOutput("x", "numeric", NA, " more", events = "A")
+  expect_identical(out2$desc, "NA more")
+  expect_identical(unlist(out2[[.txtOutputEvents]]), "A")
+})

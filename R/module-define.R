@@ -692,8 +692,10 @@ setMethod(
                         desc = "ANY"),
   definition = function(objectName, objectClass, desc, ...) {
     desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
-    return(createsOutput(as.character(objectName), as.character(objectClass),
-                         as.character(desc)))
+    ## the unnamed `...` are now in `desc`; the named ones (e.g. `events`) go on as columns
+    dots <- list(...)
+    return(do.call(createsOutput, c(list(as.character(objectName), as.character(objectClass),
+                                         as.character(desc)), dots[nzchar(names(dots))])))
 })
 
 #' @export
