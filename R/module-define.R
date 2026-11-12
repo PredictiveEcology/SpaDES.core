@@ -637,10 +637,13 @@ setMethod(
 #'                  allowing for multi-line character strings without using `paste`
 #'                  or multiple quotes.
 #'
-#' @param ...          Other specifications of the output object. One is used by
-#'   `SpaDES.core`: `events`, a character vector of the event types that write the
-#'   object (e.g. `events = "prepSpreadFitData"`; `".inputObjects"` for the module's
-#'   `.inputObjects`). See section 'Which events write an output'.
+#' @param ...          Other specifications of the output object. Unnamed ones are
+#'   pasted onto `desc`; named ones become columns of the returned `data.frame`.
+#'
+#' @param events       `NULL` (default) or a character vector of the event types that
+#'   write the object (e.g. `events = "prepSpreadFitData"`; `".inputObjects"` for the
+#'   module's `.inputObjects`). Added as the column `events` only when not `NULL`.
+#'   See section 'Which events write an output'.
 #'
 #' @return A `data.frame` suitable to be passed to `outputObjects` in
 #' a module's metadata.
@@ -680,7 +683,7 @@ setMethod(
 #'
 setGeneric(
   "createsOutput",
-  function(objectName, objectClass, desc, ...) {
+  function(objectName, objectClass, desc, ..., events = NULL) {
     standardGeneric("createsOutput")
 })
 
@@ -690,12 +693,13 @@ setMethod(
   "createsOutput",
   signature = signature(objectName = "ANY", objectClass = "ANY",
                         desc = "ANY"),
-  definition = function(objectName, objectClass, desc, ...) {
+  definition = function(objectName, objectClass, desc, ..., events = NULL) {
     desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
-    ## the unnamed `...` are now in `desc`; the named ones (e.g. `events`) go on as columns
+    ## the unnamed `...` are now in `desc`; the named ones go on as columns
     dots <- list(...)
     return(do.call(createsOutput, c(list(as.character(objectName), as.character(objectClass),
-                                         as.character(desc)), dots[nzchar(names(dots))])))
+                                         as.character(desc)), dots[nzchar(names(dots))],
+                                    list(events = events))))
 })
 
 #' @export
@@ -704,16 +708,20 @@ setMethod(
   "createsOutput",
   signature = signature(objectName = "character", objectClass = "character",
                         desc = "character"),
-  definition = function(objectName, objectClass, desc, ...) {
+  definition = function(objectName, objectClass, desc, ..., events = NULL) {
+    if (!is.null(events) && !is.character(events))
+      stop("createsOutput for ", paste(objectName, collapse = ", "),
+           ": `events` must be a character vector of event types")
 
     desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
 
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (!is.null(names(templist)))
-      returnDataframe <- addNamedEntry(returnDataframe, templist[nzchar(names(templist))],
-                                       objectName, fn = "createsOutput")
+    templist <- templist[nzchar(names(templist))]
+    if (!is.null(events)) templist$events <- events
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName,
+                                     fn = "createsOutput")
     return(returnDataframe)
 })
 
