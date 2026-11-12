@@ -194,9 +194,35 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'   share option name (`reproducible.verbose` and `Require.verbose` both exist),
 #'   passing `verbose = FALSE` will set both. Obviously this may cause unexpected
 #'   problems if a module is also expecting a value.
+#'   One name is an argument instead: `alreadyRun`, a run already done whose saved outputs
+#'   this simulation replays (default `NULL`, none). It is a list with `sim`, the run's saved
+#'   `simList` (only its `depends()`, `outputs()` and time unit are used; it can be a shell
+#'   whose objects are not loaded), and optionally `fetch`, a function that, given files of
+#'   `outputs(sim)`, makes them local and returns their paths (e.g. from a remote archive).
+#'   Each object that a module of this simulation expects (`expectsInput`), that a module of
+#'   the run created (`createsOutput`) and that the user did not supply is loaded from the
+#'   run's saved outputs as `inputs`: the latest save at or before `start` at `start`, then
+#'   each later save up to `end` at its `saveTime`. Only those files are fetched. An object
+#'   without such a save is taken from the run's `simList`, with its value at the end of
+#'   that run; one in neither is an error. The run's modules are not in `modules`, so their code is not read and their
+#'   events do not run. `sim$._alreadyRun` keeps the other elements of `alreadyRun`, the run's
+#'   `modules` and the replayed `inputs`.
+#'   `alreadyRun` can also be several runs, a list of such runs (named by run; unnamed, they are
+#'   `"1"`, `"2"`, ...), for modules that summarise replicates (e.g. `mode = "multi"`). Then
+#'   nothing is replayed. `outputsDF` is the saved rows of every run's `outputs()`, bound, with a
+#'   column `run` (each run with `fetch` is fetched first), unless the user supplies it. An object
+#'   that a module expects and the user did not supply is taken from the runs' `simList`s
+#'   (end-of-run values, whichever module or user made it there) only if every run has it, not
+#'   `NULL`, with the same value (by `reproducible::.robustDigest()`); a message names the
+#'   others. `sim$._alreadyRun`
+#'   is then `list(runs = <each run as above>, objects = <names taken>, outputsDF = <logical>)`.
 #'
 #' @return A `simList` simulation object, pre-initialized from values
-#' specified in the arguments supplied.
+#' specified in the arguments supplied. `sim$._modulesGiven` records the modules as
+#' given: `list(modules = <the modules argument, with its names, e.g. "account/repo@ref">,
+#' parents = <a list naming the children of each parent module>)`. A saved `simList` keeps
+#' it, so it says which parent modules a run used, although only their children are in
+#' `modules(sim)`.
 #'
 #' @seealso [objectProvenance] for where the value of each object comes from.
 #' @seealso [spades()], [defineModule()] to get help on metadata elements,
@@ -374,7 +400,9 @@ setMethod(
       assign(._txtStartClockTime, dots[[._txtStartClockTime]])
       # ._startClockTime <- dots[[._txtStartClockTime]]
     dots[[._txtStartClockTime]] <- NULL
-    dotNames <- setdiff(...names(), ._txtStartClockTime)
+    alreadyRun <- dots[["alreadyRun"]] # an argument (see `...`), not an object
+    dots[["alreadyRun"]] <- NULL
+    dotNames <- setdiff(...names(), c(._txtStartClockTime, "alreadyRun"))
 
 
     # loggingMessage helpers
@@ -524,8 +552,8 @@ setMethod(
     if (isTRUE(.useFileBackedAnchors(paths(sim))))
       on.exit(options(reproducible.fileBackedAnchors = NULL), add = TRUE)
 
+    modulesGiven <- unlist(modules) # as the user gave them, e.g. named by "account/repo@ref"
     names(modules) <- unlist(modules)
-    adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 
     # Check that modules exist in paths$modulePath
     modulePaths <- .checkModuleDirsAndFiles(modules = modules, modulePath = sim@paths$modulePath)
@@ -535,6 +563,7 @@ setMethod(
     modules <- as.list(unique(unlist(childModules))) # flat list of all modules
     names(modules) <- unlist(modules)
     modules <- lapply(modules, basename2)
+    adjustModuleNameSpacing(modules) # all modules, children included; changes options("spades.messagingNumCharsModule")
 
     moduleNames <- names(modules)
     names(moduleNames) <- moduleNames
@@ -591,6 +620,9 @@ setMethod(
 
       ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
       parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
+      sim@.xData[["._modulesGiven"]] <- list(
+        modules = modulesGiven,
+        parents = split(basename2(parentChildGraph$to), basename2(parentChildGraph$from)))
 
       timeunits <- findSmallestTU(sim, modulePaths, childModules)
 
@@ -676,6 +708,37 @@ setMethod(
         names(sim@depends@dependencies) <- sim@depends@dependencies |>
           lapply(function(x) x@name) |>
           unlist()
+      }
+
+      ## replay a run already done: what the modules expect from it is loaded from its saved outputs
+      ## several runs: nothing is replayed; their outputs and the objects equal in all of them
+      if (!is.null(alreadyRun) && .alreadyRunIsMulti(alreadyRun)) {
+        multi <- .alreadyRunMulti(sim, alreadyRun)
+        list2env(multi$objects, envir = envir(sim))
+        if (!is.null(multi$outputsDF))
+          sim$outputsDF <- multi$outputsDF
+        taken <- c(names(multi$objects), if (!is.null(multi$outputsDF)) "outputsDF")
+        sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, taken)
+        messageVerbose("From the ", length(alreadyRun), " runs of `alreadyRun`: ",
+                       paste(taken, collapse = ", "),
+                       if (length(multi$differ))
+                         paste0("; not taken (they differ between runs or are not in each run's ",
+                                "simList): ", paste(multi$differ, collapse = ", ")),
+                       verbose = verbose)
+        sim@.xData[["._alreadyRun"]] <- list(runs = multi$runs, objects = names(multi$objects),
+                                             outputsDF = !is.null(multi$outputsDF))
+      } else if (!is.null(alreadyRun)) {
+        replay <- .alreadyRunInputs(sim, alreadyRun)
+        fromSim <- attr(replay, "objects")
+        attr(replay, "objects") <- NULL
+        for (obj in fromSim)
+          assign(obj, get(obj, envir = envir(alreadyRun$sim)), envir = envir(sim))
+        if (length(fromSim))
+          messageVerbose("From `alreadyRun`'s simList, at the end of that run (it saved no ",
+                         "file of them): ", paste(fromSim, collapse = ", "), verbose = verbose)
+        inputs <- rbind(inputs, replay)
+        sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, replay$objectName, fromSim)
+        sim@.xData[["._alreadyRun"]] <- .alreadyRunProvenance(alreadyRun, replay, fromSim)
       }
 
       ## load core modules
@@ -1232,8 +1295,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   #                paths = objsSimInit$paths, inputs = objsSimInit$inputs,
   #                outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
   #                notOlderThan = objsSimInit$notOlderThan, ...)
-  opts <- options(spades.loadReqdPkgs = FALSE)
-  on.exit(options(opts), add = TRUE)
+  ## simInit() has just loaded the packages: spades() need not load them again. A mark on this simList,
+  ## not options(spades.loadReqdPkgs = FALSE), which stayed set while the events ran, so a simInit()
+  ## inside an event (a nested simulation) did not load its own modules' packages.
+  attr(sim, ".reqdPkgsLoaded") <- TRUE
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   passedArgsToSpades <- as.list(match.call(spades))[-1]
@@ -1715,9 +1780,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         ##   `moduleSpecificInputObjects`, which also drives the cache KEY below
         ##   (`objectsToEvaluateForCaching`): an object that does not exist yet before
         ##   `.inputObjects` runs must never be digested into that key.
+        ##   Of the `createsOutput`s, only those `.inputObjects` may write (createsOutput(events = )).
         moduleSpecificOutputObjects <- union(
           moduleSpecificInputObjects,
-          na.omit(sim@depends@dependencies[[i]]@outputObjects[["objectName"]]))
+          na.omit(.outputsOfEvent(sim@depends@dependencies[[i]], ".inputObjects")))
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -2179,6 +2245,13 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       attr(sim, lastEventDetails) <- attr(simAltOut, lastEventDetails)
 
       list2env(objs(simAltOut), envir(sim))
+      ## objs() leaves out names starting with ".", so an object a module declares with one (e.g.,
+      ## fireSense's `.ELFind`) and sets in these inits did not reach `sim`. The "._" internals follow.
+      declared <- unlist(lapply(depends(simAltOut)@dependencies, function(d)
+        c(d@inputObjects$objectName, d@outputObjects$objectName)), use.names = FALSE)
+      dotDeclared <- intersect(grep("^\\.[^_]", unique(declared), value = TRUE),
+                               ls(envir(simAltOut), all.names = TRUE))
+      list2env(mget(dotDeclared, envir = envir(simAltOut)), envir(sim))
 
       dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
       ## the ledger is merged, not replaced: `sim` keeps the environment reproducible.urlLog

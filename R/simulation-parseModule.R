@@ -391,8 +391,8 @@ setMethod(
         withCallingHandlers(
           out <- tryCatch(eval(pf, envir = env), silent = TRUE,
                           error = function(e) {
-                            # convert errors to warnings # so can capture them outside
-                            warning(e$message)
+                            stop("Error evaluating defineModule for module '", mBase, "': ",
+                                 conditionMessage(e), call. = FALSE)
                           })
           , message = function(m) {
             messHere <<- c(messHere, m$message)
@@ -843,6 +843,7 @@ setupModObjsEnv <- function(sim, moduleName) {
 
 dotObjs <- ".modObjs"
 dotMods <- ".mods"
+dotModSource <- "._source" # in each .mods[[module]]: the source saveSimList() keeps (moduleSource())
 dotObjsAndMods <- c(dotObjs, dotMods)
 modAB <- "mod"
 ParAB <- "Par"

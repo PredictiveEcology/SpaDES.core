@@ -1045,8 +1045,11 @@ setMethod(
     }
 
 
-    ## need to recheck package loading because `simInit` may have been cached
-    if (getOption("spades.loadReqdPkgs", TRUE)) {
+    ## need to recheck package loading because `simInit` may have been cached; not when
+    ## simInitAndSpades() or restartSpades() marked this simList as having its packages loaded
+    pkgsLoaded <- isTRUE(attr(sim, ".reqdPkgsLoaded"))
+    attr(sim, ".reqdPkgsLoaded") <- NULL
+    if (getOption("spades.loadReqdPkgs", TRUE) && !pkgsLoaded) {
       pkgs <- packages(sim)
       loadPkgs(pkgs)
     }
@@ -1546,7 +1549,9 @@ setMethod(
   # cacheIt <- cacheChaining || cacheIt
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]]) || cacheChaining) { # allow for super simple simList without a slot outputObjects
     expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
-    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    ## only the outputs this event type may write (createsOutput(events = )): its cache entry keeps,
+    ##   and its hit restores, no copy of an output another event of the module writes
+    createsOutputs <- .outputsOfEvent(sim@depends@dependencies[[cur[["moduleName"]]]], cur[["eventType"]])
 
     if (cacheIt) { # means that a module or event is to be cached
 
@@ -2437,22 +2442,23 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     middleFix <- ""
     noNew <- FALSE
     if (numCharsMax > 0) {
-      sim2 <- list() # don't put a `sim` here because .whereInStack will find this one
-      while (!inherits(sim2, "simList")) {
-        simEnv <- .whereInStack("sim")
-        if (is.null(simEnv))
+      # innermost simList `sim` on the stack; a `sim` that is not a simList (e.g. a module
+      #   helper's local variable) is skipped. Not named `sim` so this frame is not found.
+      simFound <- NULL
+      for (fr in rev(sys.frames())) {
+        s <- get0("sim", envir = fr, inherits = FALSE)
+        if (inherits(s, "simList")) {
+          simFound <- s
           break
-        sim <- get0("sim", envir = simEnv, inherits = FALSE)
-        if (inherits(sim, "simList"))
-          sim2 <- sim
+        }
       }
 
-      if (!inherits(sim, "try-error") && !is.null(sim)) {
+      if (!is.null(simFound)) {
         # If this is a nested spades call, will have time already at start
         if (startsWith(mess, strftime(st, format = "%h%d"))) {
           noNew <- TRUE
         } else {
-          middleFix <- paste(sim[[._txtSimNesting]], collapse = "/")
+          middleFix <- paste(simFound[[._txtSimNesting]], collapse = "/")
         }
       }
     }
@@ -3074,7 +3080,7 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
                                   tagKey = .chainSynTag, tagValue = .chainSynText(sim))
     reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
-                                  tagKey = .chainObjTag, tagValue = .chainObjText(sim, moduleName))
+                                  tagKey = .chainObjTag, tagValue = .chainObjText(sim, moduleName, eventType))
   }
   ## The outputs rows this event added, on every new entry -- not only one with a previous entry to
   ##   chain from: a hit restores only those rows (.prepareOutput(), .chainOutAddedRows()), so the first

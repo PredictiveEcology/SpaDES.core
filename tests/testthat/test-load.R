@@ -462,3 +462,15 @@ test_that("Filenames for simList", {
 })
 
 
+
+test_that("a .shp input is read with terra::vect (fun and package were swapped)", {
+  testInit("terra")
+  v <- terra::vect(cbind(c(0, 1, 1, 0), c(0, 0, 1, 1)), type = "polygons", crs = "EPSG:4326")
+  shp <- file.path(tmpdir, "aPolygon.shp")
+  terra::writeVector(v, shp, overwrite = TRUE)
+
+  sim <- simInit(times = list(start = 0, end = 1), paths = list(outputPath = tmpdir),
+                 inputs = data.frame(file = shp, stringsAsFactors = FALSE))
+  expect_s4_class(sim$aPolygon, "SpatVector")
+  expect_identical(terra::geomtype(sim$aPolygon), "polygons")
+})
