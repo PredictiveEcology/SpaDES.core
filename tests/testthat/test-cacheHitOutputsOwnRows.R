@@ -92,3 +92,25 @@ test_that("an entry saved without the outputs tag restores all its rows, as befo
   s2 <- runReg(mp, cp, start = 2020)
   expect_true(all(c("foreign.rds", "byReg.rds") %in% files(s2)))
 })
+
+test_that("a file the cached event wrote goes to this run's outputPath, with its row", {
+  ## Biomass_speciesParameters' cached init draws a Plots() figure; a run that hit that entry kept the
+  ##   row with the other run's outputPath, so its archive held another rep's figure
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  mkInputObjectsMod(mp, "modFig", body = paste(
+    'f <- file.path(outputPath(sim), "figures", "fig.rds"); dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)',
+    'saveRDS(42, f)',
+    'sim@outputs <- outputsAppend(sim@outputs, saveTime = end(sim), file = f)', sep = "\n  "))
+  cp <- file.path(tmpdir, "cc")
+  run <- function(op) simInit(times = list(start = 2020, end = 2021), modules = list("modFig"),
+                              paths = list(modulePath = mp, cachePath = cp, outputPath = op))
+  op1 <- file.path(tmpdir, "rep1"); op2 <- file.path(tmpdir, "rep2")
+  run(op1)
+  s2 <- run(op2)                                   # modFig's .inputObjects is a cache hit
+  f2 <- as.character(outputs(s2)$file[basename(as.character(outputs(s2)$file)) == "fig.rds"])
+  expect_length(f2, 1L)
+  expect_true(fs::path_has_parent(f2, normPath(op2)))
+  expect_identical(readRDS(f2), 42)
+})
