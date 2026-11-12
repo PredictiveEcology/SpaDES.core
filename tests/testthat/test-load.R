@@ -474,3 +474,12 @@ test_that("a .shp input is read with terra::vect (fun and package were swapped)"
   expect_s4_class(sim$aPolygon, "SpatVector")
   expect_identical(terra::geomtype(sim$aPolygon), "polygons")
 })
+
+test_that("inputs(sim) gives objects' loadTime in the simulation's time unit, like other rows", {
+  testInit()
+  sim <- simInit(times = list(start = 2720, end = 3020, timeunit = "year"),
+                 objects = list(a = 1, b = "x"),
+                 inputs = data.frame(objectName = "d", loadTime = 2820, stringsAsFactors = FALSE))
+  lt <- inputs(sim)
+  expect_equal(lt$loadTime[match(c("a", "b", "d"), lt$objectName)], c(2720, 2720, 2820))
+})

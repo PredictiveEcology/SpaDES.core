@@ -230,7 +230,7 @@ setReplaceMethod(
      list2env(value, envir = sim@.xData)
      newInputs <- data.frame(
        objectName = names(value),
-       loadTime = as.numeric(sim@simtimes[["current"]]),
+       loadTime = as.numeric(time(sim)), # simulation time unit, as the other rows of inputs(sim)
        loaded = TRUE,
        stringsAsFactors = FALSE) |> .fillInputRows(startTime = start(sim))
      inputs(sim) <- rbind(inputs(sim), newInputs)
