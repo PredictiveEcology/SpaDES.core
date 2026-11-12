@@ -246,16 +246,26 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   ## metadata-only save and is not expecting portability.
   if (isTRUE(files)) .warnUnanchoredFiles(sim, projectPath = projectPath)
 
+  ## A lazy save keeps the files behind each file-backed object (user's or a module's `mod`
+  ## object) in the sidecar directory, as Cache() keeps them beside an entry
+  ## (<lazyDir>/cacheOutputs/), so the object loads anywhere like any other R object: a file
+  ## in a temporary, scratch or cache folder is otherwise saved as a path that only this
+  ## machine, and only for a while, can open. Other files (outputs, inputs, cache) are
+  ## governed by `files`, as before.
+  filebackedPath <- if (isTRUE(lazy)) .lazyDirName(filename) else NULL
+  if (!is.null(filebackedPath)) unlink(filebackedPath, recursive = TRUE)
+
   ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
   ## does not abort the entire save; failed objects are saved as NULL with a warning.
-  sim <- .wrapResiliently(sim, projectPath = projectPath)
+  sim <- .wrapResiliently(sim, projectPath = projectPath, filebackedPath = filebackedPath)
   ## Each module's source text goes into sim$.mods[[module]]$._source (moduleSource()) after
   ## .wrap(), which, as the Cache path, keeps no module code: Cache entries never carry it.
   src <- .moduleSources(sim)
   ## wrap remaining / non-file-backed; `projectPath` is offered as an anchor so a
   ## file-backed object that sits under it -- but under none of the sim's named
   ## paths -- can still be re-rooted on load instead of silently becoming NULL
-  sim <- .wrap(sim, filebackedPath = NULL, paths = .wrapAnchors(sim, projectPath))
+  sim <- .wrap(sim, filebackedPath = filebackedPath, paths = .wrapAnchors(sim, projectPath),
+               copyFiles = !is.null(filebackedPath))
   for (m in names(src)) assign(dotModSource, src[[m]], envir = sim@.xData[[dotMods]][[m]])
   sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
@@ -298,6 +308,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     ## and the dot-prefixed internals.
     lazyDir <- .lazyDirName(filename)
     lazyFiles <- .writeLazyObjs(sim, lazyDir, ext = ext)
+    lazyFiles <- c(lazyFiles, dir(reproducible::CacheStorageDir(lazyDir), full.names = TRUE))
 
     if (ext == "rds") {
       saveRDS(sim, file = filename)
@@ -859,6 +870,20 @@ recoverDataTableFromQs <- function(sim) {
   sim@.xData[[dotObjs]][[where]]
 }
 
+## Where the files behind a lazily saved file-backed object are: `dir` (they are in
+## <dir>/cacheOutputs/, fetched there first if need be), or NULL when the object has none
+## there (saved before saveSimList() kept them), and .unwrap() then uses its recorded paths.
+.lazyFilesDir <- function(obj, dir, fetch = NULL) {
+  tags <- attr(obj, "tags")
+  fns <- sub("^filenamesInCache:", "", grep("^filenamesInCache:", tags, value = TRUE))
+  fns <- unique(fns[nzchar(fns)])
+  if (!length(fns)) return(NULL)
+  stored <- file.path(reproducible::CacheStorageDir(dir), fns)
+  if (is.function(fetch))
+    for (f in stored[!file.exists(stored)]) try(fetch(f), silent = TRUE)
+  if (all(file.exists(stored))) dir else NULL
+}
+
 ## Everything that gets deferred, as a manifest.
 .lazyEntries <- function(sim) {
   ents <- list()
@@ -885,7 +910,7 @@ recoverDataTableFromQs <- function(sim) {
 ## written (manifest included), for the archive.
 .writeLazyObjs <- function(sim, dir, ext = "rds") {
   ents <- .lazyEntries(sim)
-  unlink(dir, recursive = TRUE)
+  ## saveSimList() cleared `dir` before wrapping, which may have put the objects' files in it
   if (!NROW(ents)) return(character())
 
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
@@ -925,7 +950,7 @@ recoverDataTableFromQs <- function(sim) {
       delayedAssign(.nm, tryCatch({
         obj <- .readOneLazy(.f, fetch = .fetch)
         obj <- .remapFileBackedObj(obj, .pp, .sp)
-        .unwrap(obj, filebackedPath = NULL, paths = .sp)
+        .unwrap(obj, filebackedPath = .lazyFilesDir(obj, dir, fetch = .fetch), paths = .sp)
       }, error = function(e) {
         warning("Could not load lazy object '", .nm, "' from '", .f, "': ",
                 conditionMessage(e), call. = FALSE)
@@ -996,7 +1021,7 @@ recoverDataTableFromQs <- function(sim) {
 ## inaccessible backing file does not abort saveSimList. Failed objects are
 ## replaced with NULL and a warning is issued; the subsequent monolithic
 ## .wrap(sim, ...) then succeeds on the remaining objects.
-.wrapResiliently <- function(sim, projectPath = NULL) {
+.wrapResiliently <- function(sim, projectPath = NULL, filebackedPath = NULL) {
   nms <- ls(sim@.xData, all.names = FALSE)
   simPaths <- .wrapAnchors(sim, projectPath)
   for (nm in nms) {
@@ -1004,7 +1029,8 @@ recoverDataTableFromQs <- function(sim) {
     fns <- tryCatch(Filenames(obj), error = function(e) character(0))
     if (length(fns) && any(nchar(fns) > 0L)) {
       sim@.xData[[nm]] <- tryCatch(
-        .wrap(obj, filebackedPath = NULL, paths = simPaths),
+        .wrap(obj, filebackedPath = filebackedPath, paths = simPaths,
+              copyFiles = !is.null(filebackedPath)),
         error = function(e) {
           warning("saveSimList: could not wrap '", nm,
                   "' (backing file inaccessible); saving as NULL.\n",
@@ -1062,6 +1088,15 @@ recoverDataTableFromQs <- function(sim) {
     simPaths
   } else {
     c(simPaths, list(projectPath = projectPath))
+  }
+  ## A list's elements carry their own tags: remap each like a single object. The
+  ## list-level route below rebuilt each element's path relative to the producer's
+  ## directory, which matched nothing on another machine ("replacement has length zero").
+  if (is(obj, "list") && all(vapply(obj, function(x) is.null(x) || !is.null(attr(x, "tags")),
+                                    logical(1)))) {
+    for (elem in seq_along(obj))
+      if (!is.null(obj[[elem]])) obj[[elem]] <- .remapFileBackedObj(obj[[elem]], projectPath, simPaths)
+    return(obj)
   }
   newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
   if (is(obj, "list")) {
