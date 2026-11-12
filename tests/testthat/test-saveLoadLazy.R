@@ -457,7 +457,30 @@ test_that("a lazy save keeps the files behind file-backed objects, so they load 
   expect_identical(vals(loaded@.xData[[".modObjs"]][["modA"]]$standAge), 1:9)
   ## an object that was in outputPath goes back to (this machine's) outputPath
   expect_true(fs::path_has_parent(terra::sources(loaded$inOutputs), pB$outputPath))
-  ## no file goes into this machine's cache
-  srcs <- c(terra::sources(loaded$inCache), terra::sources(loaded$aList$MAT))
-  expect_false(any(fs::path_has_parent(srcs, pB$cachePath)))
+  ## a file from a temporary place (cache, terra's folder) goes only into the sidecar directory,
+  ## never into this machine's cache or scratch
+  srcs <- c(terra::sources(loaded$inCache), terra::sources(loaded$inTerra), terra::sources(loaded$aList$MAT),
+            terra::sources(loaded@.xData[[".modObjs"]][["modA"]]$standAge))
+  expect_true(all(fs::path_has_parent(srcs, file.path(pB$outputPath, "sim_lazy"))))
+  expect_identical(terra::sources(loaded$aList$CMD), terra::sources(loaded$inOutputs))
+})
+
+test_that("a lazy save leaves the caller's file-backed objects where they are", {
+  skip_if_not_installed("terra")
+  td <- normPath(withr::local_tempdir())
+  p <- list(cachePath = file.path(td, "cache"), outputPath = file.path(td, "outputs"),
+            inputPath = file.path(td, "inputs"), modulePath = file.path(td, "modules"),
+            scratchPath = file.path(td, "scratch"))
+  lapply(p, dir.create, recursive = TRUE, showWarnings = FALSE)
+  sim <- new("simList")
+  paths(sim) <- p
+  f <- file.path(p$cachePath, "spat_1_2_a.tif")
+  sim@.xData[["inCache"]] <- terra::writeRaster(terra::rast(nrows = 2, ncols = 2, vals = 1:4), f)
+  saveSimList(sim, filename = file.path(p$outputPath, "sim.rds"), files = FALSE, lazy = TRUE,
+              projectPath = td)
+  expect_identical(normPath(terra::sources(sim$inCache)), normPath(f))
+  ## loaded on the same machine, with the original still there, it is not pointed back into the cache
+  loaded <- loadSimList(file.path(p$outputPath, "sim.rds"), projectPath = td)
+  expect_true(fs::path_has_parent(terra::sources(loaded$inCache), file.path(p$outputPath, "sim_lazy")))
+  expect_identical(as.vector(terra::values(loaded$inCache)), 1:4)
 })

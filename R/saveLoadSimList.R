@@ -253,7 +253,10 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   ## machine, and only for a while, can open. Other files (outputs, inputs, cache) are
   ## governed by `files`, as before.
   filebackedPath <- if (isTRUE(lazy)) .lazyDirName(filename) else NULL
-  if (!is.null(filebackedPath)) unlink(filebackedPath, recursive = TRUE)
+  if (!is.null(filebackedPath)) {
+    unlink(filebackedPath, recursive = TRUE)
+    sim <- .copyTransientFileBacked(sim, filebackedPath, projectPath)
+  }
 
   ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
   ## does not abort the entire save; failed objects are saved as NULL with a warning.
@@ -868,6 +871,49 @@ recoverDataTableFromQs <- function(sim) {
   if (!is.environment(sim@.xData[[dotObjs]][[where]]))
     sim@.xData[[dotObjs]][[where]] <- new.env(parent = emptyenv())
   sim@.xData[[dotObjs]][[where]]
+}
+
+## A file-backed object whose file is in a temporary place (cachePath, scratchPath, terraPath,
+## rasterPath, tempdir(), terra's temporary folder; the deepest folder holding the file decides),
+## or under none of the simList's other paths, projectPath or getwd(), has no home on another machine, or later on this one: it is copied
+## (reproducible::Copy()) into `dir`, so it is recorded relative to the sidecar directory and
+## restored only there. Others keep their paths, and are restored under the same paths of the
+## simList that loads them. Lists are done element by element. `sim` is saveSimList()'s clone.
+.copyTransientFileBacked <- function(sim, dir, projectPath) {
+  norm <- function(x) unique(normPath(unlist(x)[!is.na(unlist(x)) & nzchar(unlist(x))]))
+  pths <- paths(sim)
+  tmp <- norm(c(pths[intersect(c("cachePath", tmpPaths), names(pths))], tempdir(),
+                if (requireNamespace("terra", quietly = TRUE)) terra::terraOptions(print = FALSE)$tempdir))
+  kept <- norm(c(pths[setdiff(names(pths), c("cachePath", tmpPaths))], projectPath, getwd()))
+  isTransient <- function(x) {
+    fns <- tryCatch(Filenames(x, allowMultiple = TRUE), error = function(e) character())
+    fns <- normPath(fns[!is.na(fns) & nzchar(fns)])
+    ## the deepest folder that holds the file decides: a cache inside projectPath is temporary,
+    ## an outputPath inside tempdir() is not
+    deepest <- function(f, dirs) max(c(0L, nchar(dirs[fs::path_has_parent(f, dirs)])))
+    any(vapply(fns, function(f) deepest(f, tmp) >= deepest(f, kept), logical(1)))
+  }
+  to <- file.path(dir, "files")
+  modObjs <- sim@.xData[[dotObjs]]
+  envs <- c(list(sim@.xData), if (is.environment(modObjs))
+    Filter(is.environment, mget(ls(modObjs, all.names = TRUE), envir = modObjs)))
+  for (i in seq_along(envs)) {
+    env <- envs[[i]]
+    for (nm in ls(env, all.names = i > 1L)) { # the simList's own dot objects are its internals
+      if (bindingIsActive(nm, env)) next
+      obj <- get(nm, envir = env, inherits = FALSE)
+      if (is.environment(obj)) next
+      if (is.list(obj) && !is.data.frame(obj)) {
+        wh <- which(vapply(obj, isTransient, logical(1)))
+        if (!length(wh)) next
+        for (w in wh) obj[[w]] <- Copy(obj[[w]], filebackedDir = to)
+      } else if (isTransient(obj)) {
+        obj <- Copy(obj, filebackedDir = to)
+      } else next
+      assign(nm, obj, envir = env)
+    }
+  }
+  sim
 }
 
 ## Where the files behind a lazily saved file-backed object are: `dir` (they are in
