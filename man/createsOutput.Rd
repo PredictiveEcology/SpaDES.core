@@ -6,11 +6,11 @@
 \alias{createsOutput,character,character,character-method}
 \title{Define an output object of a module}
 \usage{
-createsOutput(objectName, objectClass, desc, ...)
+createsOutput(objectName, objectClass, desc, ..., events = NULL)
 
-\S4method{createsOutput}{ANY,ANY,ANY}(objectName, objectClass, desc, ...)
+\S4method{createsOutput}{ANY,ANY,ANY}(objectName, objectClass, desc, ..., events = NULL)
 
-\S4method{createsOutput}{character,character,character}(objectName, objectClass, desc, ...)
+\S4method{createsOutput}{character,character,character}(objectName, objectClass, desc, ..., events = NULL)
 }
 \arguments{
 \item{objectName}{Character string to define the output object's name.}
@@ -22,10 +22,13 @@ If there are extra spaces or carriage returns, these will be stripped,
 allowing for multi-line character strings without using \code{paste}
 or multiple quotes.}
 
-\item{...}{Other specifications of the output object. One is used by
-\code{SpaDES.core}: \code{events}, a character vector of the event types that write the
-object (e.g. \code{events = "prepSpreadFitData"}; \code{".inputObjects"} for the module's
-\code{.inputObjects}). See section 'Which events write an output'.}
+\item{...}{Other specifications of the output object. Unnamed ones are
+pasted onto \code{desc}; named ones become columns of the returned \code{data.frame}.}
+
+\item{events}{\code{NULL} (default) or a character vector of the event types that
+write the object (e.g. \code{events = "prepSpreadFitData"}; \code{".inputObjects"} for the
+module's \code{.inputObjects}). Added as the column \code{events} only when not \code{NULL}.
+See section 'Which events write an output'.}
 }
 \value{
 A \code{data.frame} suitable to be passed to \code{outputObjects} in
