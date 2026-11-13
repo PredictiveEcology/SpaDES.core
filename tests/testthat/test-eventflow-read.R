@@ -37,14 +37,48 @@ test_that(".ef_readModule signals a classed error for unparseable code", {
   expect_error(SpaDES.core:::.ef_readModule("noSuchMod", tmpdir), class = "moduleEventFlowError")
 })
 
-test_that(".ef_readModule errors when inputObjects or outputObjects cannot be read", {
+test_that(".ef_readModule skips object names that are not string constants", {
   testInit()
-  efModule(tmpdir, "badIn", inputs = 'expectsInput(noSuchFn("x"), "numeric", "d")', code = "")
-  efModule(tmpdir, "badOut", outputs = 'createsOutput(noSuchFn("x"), "numeric", "d")', code = "")
-  expect_error(SpaDES.core:::.ef_readModule("badIn", tmpdir), class = "moduleEventFlowError",
-               regexp = "inputObjects")
-  expect_error(SpaDES.core:::.ef_readModule("badOut", tmpdir), class = "moduleEventFlowError",
-               regexp = "outputObjects")
+  efModule(tmpdir, "codeIn", code = "", inputs = paste(
+    "expectsInput(noSuchFn(\"x\"), \"numeric\", \"d\"),",
+    "expectsInput(\"y\", \"numeric\", \"d\")"
+  ))
+  efModule(tmpdir, "codeOut", outputs = 'createsOutput(noSuchFn("x"), "numeric", "d")', code = "")
+  expect_identical(SpaDES.core:::.ef_readModule("codeIn", tmpdir)$meta$inputs, "y")
+  expect_identical(SpaDES.core:::.ef_readModule("codeOut", tmpdir)$meta$outputs, character(0))
+})
+
+test_that(".ef_readModule runs no code to read parameter names or the time unit", {
+  testInit()
+  f <- file.path(tmpdir, "keep.txt")
+  file.create(f)
+  code <- paste0("{file.remove(", deparse(f), "); \"a\"}")
+  efModule(tmpdir, "codeMod", timeunit = code, code = "",
+           params = paste0("defineParameter(", code, ", \"numeric\", 1, NA, NA, \"d\")"),
+           inputs = "expectsInput(\"x\", \"numeric\", \"d\")")
+  m <- SpaDES.core:::.ef_readModule("codeMod", tmpdir)
+  expect_true(file.exists(f))
+  expect_identical(m$meta$timeunit, NA_character_)
+  expect_length(m$meta$params, 0)
+  expect_identical(m$meta$inputs, "x")
+})
+
+test_that(".ef_readModule never sources the module to read its object tables", {
+  testInit()
+  marker <- file.path(tmpdir, "ran.txt")
+  ## evaluating outputObjects fails on `outClass`, and "P(sim)" in a desc once made
+  ## .parseModulePartial() fall back to simInit(), which sources the module
+  efModule(tmpdir, "srcMod",
+           outputs = paste(
+             "createsOutput(\"a\", outClass, \"from P(sim)$x\"),",
+             "createsOutput(\"b\", \"numeric\", \"plain\")"
+           ),
+           code = c(paste0("writeLines(\"ran\", ", deparse(marker), ")"),
+                    "outClass <- \"numeric\""))
+  ## whether or not the read succeeds, the module's code must not have run
+  m <- try(SpaDES.core:::.ef_readModule("srcMod", tmpdir), silent = TRUE)
+  expect_false(file.exists(marker))
+  expect_identical(m$meta$outputs, c("a", "b"))
 })
 
 test_that(".ef_readModule errors without a defineModule(), but reads a module with no events", {

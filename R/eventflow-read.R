@@ -1,7 +1,5 @@
 ## Static reader for event-flow documentation. It parses a module's source
-## files and metadata and finds the event dispatch; no module code is evaluated
-## (the metadata tables are the one exception, as `.parseModulePartial()`
-## evaluates them, as it does everywhere else in SpaDES.core).
+## files and metadata and finds the event dispatch; no module code is evaluated.
 
 ## Signal a condition that says why a module could not be read.
 .ef_stop <- function(module, msg) {
@@ -59,37 +57,29 @@
   fns
 }
 
-## parameters, inputs, outputs and timeunit from the defineModule() call, without
-## evaluating the parameter defaults (they are kept as expressions)
-.ef_readMeta <- function(module, mainFile) {
-  tmp <- .parseConditional(filename = mainFile)
-  dm <- tmp[["pf"]]
-  params <- list()
-  timeunit <- NA_character_
-  if (length(dm) == 0) .ef_stop(module, paste0("no defineModule() call in ", mainFile))
+## parameters, inputs, outputs and timeunit from the defineModule() call in `p`,
+## the parse of the main file (see `.cc_parseFile()`). Nothing is evaluated: a
+## parameter name, object name or time unit is read only when it is a string
+## constant (so the module template's `objectName = NA` placeholder rows are
+## left out), and the parameter defaults are kept as expressions.
+.ef_readMeta <- function(module, p) {
+  dm <- p$exprs[grepl("^defineModule", p$exprs)]
+  if (length(dm) == 0) .ef_stop(module, paste0("no defineModule() call in ", p$file))
   spec <- dm[[1]][[3]]
+  isText <- function(x) is.character(x) && length(x) == 1 && !is.na(x)
+  params <- list()
   tmplP <- function(name, class, default, min, max, desc, ...) NULL
   for (cl in .ef_findCalls(spec$parameters, "defineParameter")) {
     m <- match.call(tmplP, cl)
-    nm <- tryCatch(eval(m$name, baseenv()), error = function(e) NA_character_)
-    if (is.character(nm) && !is.na(nm)) params[nm] <- list(list(expr = m$default))
+    if (isText(m$name)) params[m$name] <- list(list(expr = m$default))
   }
-  tu <- tryCatch(eval(spec$timeunit, baseenv()), error = function(e) NA_character_)
-  if (is.character(tu) && length(tu) == 1) timeunit <- tu
-  objNames <- function(element) {
-    bad <- function(why) {
-      .ef_stop(module, paste0("cannot read ", element, " in ", mainFile, ": ", why))
-    }
-    ## .parseModulePartial() returns a "try-error" value for metadata it cannot evaluate
-    x <- tryCatch(.parseModulePartial(filename = mainFile, defineModuleElement = element),
-                  error = function(e) bad(conditionMessage(e)))
-    if (inherits(x, "try-error")) bad(conditionMessage(attr(x, "condition")))
-    ## the module template's placeholder rows have objectName = NA
-    nms <- unique(as.character(x$objectName))
-    nms[!is.na(nms) & nzchar(nms)]
+  objNames <- function(fn) {
+    nms <- unique(.cc_namesOfArg(p$doc, fn, "objectName"))
+    nms[nzchar(nms)]
   }
-  list(params = params, inputs = objNames("inputObjects"),
-       outputs = objNames("outputObjects"), timeunit = timeunit)
+  list(params = params, inputs = objNames("expectsInput"),
+       outputs = objNames("createsOutput"),
+       timeunit = if (isText(spec$timeunit)) spec$timeunit else NA_character_)
 }
 
 ## The line range of a block. The parser keeps the position of the `{` itself
@@ -188,7 +178,7 @@
     tryCatch(.cc_parseFile(f), error = function(e) .ef_stop(module, conditionMessage(e)))
   })
   fns <- .ef_readFns(parsed)
-  meta <- tryCatch(.ef_readMeta(module, mainFile),
+  meta <- tryCatch(.ef_readMeta(module, parsed[[match(path.expand(mainFile), files)]]),
                    error = function(e) .ef_stop(module, conditionMessage(e)))
 
   pre <- list()

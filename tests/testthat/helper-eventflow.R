@@ -2,14 +2,16 @@
 ## statically; nothing in them is ever evaluated, so they need not run.
 
 ## Write `<dir>/<name>/<name>.R`: a defineModule() call followed by `code`.
-## `params`, `inputs` and `outputs` are text spliced into bindrows(...).
-efModule <- function(dir, name, params = "", inputs = "", outputs = "", code) {
+## `params`, `inputs` and `outputs` are text spliced into bindrows(...), and
+## `timeunit` is the text of the time unit.
+efModule <- function(dir, name, params = "", inputs = "", outputs = "", code,
+                     timeunit = "\"year\"") {
   modDir <- file.path(dir, name)
   dir.create(modDir, recursive = TRUE, showWarnings = FALSE)
   lines <- c(
     "defineModule(sim, list(",
     paste0("  name = \"", name, "\","),
-    "  timeunit = \"year\",",
+    paste0("  timeunit = ", timeunit, ","),
     paste0("  parameters = bindrows(", params, "),"),
     paste0("  inputObjects = bindrows(", inputs, "),"),
     paste0("  outputObjects = bindrows(", outputs, ")"),
