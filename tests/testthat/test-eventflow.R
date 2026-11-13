@@ -52,3 +52,32 @@ test_that("a module with no events reads as having none", {
   efModule(tmpdir, "parentMod", code = "")
   expect_length(moduleEventFlow("parentMod", tmpdir)$default$events, 0)
 })
+test_that("an event reached only through a conditional event takes that event's condition", {
+  testInit()
+  efModule(tmpdir, "chainMod", code = c(
+    "doEvent.chainMod <- function(sim, eventTime, eventType) {",
+    "  switch(eventType,",
+    "    init = {",
+    "      if (nrow(sim$x) > 0) sim <- scheduleEvent(sim, start(sim), \"chainMod\", \"A\")",
+    "    },",
+    "    A = {",
+    "      sim <- scheduleEvent(sim, time(sim) + 1, \"chainMod\", \"B\")",
+    "    },",
+    "    B = {}",
+    "  )",
+    "  invisible(sim)",
+    "}"
+  ))
+  ev <- moduleEventFlow("chainMod", tmpdir)$default$events
+  expect_identical(ev$A[c("status", "cond")], list(status = "cond", cond = "nrow(sim$x) > 0"))
+  expect_identical(ev$B[c("status", "cond")], list(status = "cond", cond = "nrow(sim$x) > 0"))
+  expect_false(grepl("NA", SpaDES.core:::.ef_timingText(ev$B, "year")))
+})
+test_that(".ef_timingText prints no missing condition and no leading separator", {
+  testInit()
+  ev <- list(status = "cond", recurring = FALSE, firsts = data.frame(),
+             repeatStatus = NA_character_, cond = NA_character_)
+  expect_identical(SpaDES.core:::.ef_timingText(ev, "year"), "")
+  ev$cond <- "x is set"
+  expect_identical(SpaDES.core:::.ef_timingText(ev, "year"), "only if x is set")
+})

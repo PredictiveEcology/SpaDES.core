@@ -42,7 +42,8 @@ itself (\code{recurring}), at what \code{interval}, labelled with the parameter 
 expression that sets it (\code{intervalLabel}), and the status of that
 rescheduling (\code{repeatStatus});
 the records that schedule it from other events (\code{firsts}); the condition
-it runs under (\code{cond}); and whether it is a plotting or saving event
+it runs under (\code{cond}; for an event scheduled from a conditional event,
+that event's condition); and whether it is a plotting or saving event
 (\code{plotsave});}
 \item{\code{status}}{a named character vector, the status of every event;}
 \item{\code{initCalls}}{the module's functions that \code{init} calls, in order;}

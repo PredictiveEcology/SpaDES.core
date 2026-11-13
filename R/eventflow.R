@@ -223,12 +223,32 @@
   }
 
   others <- setdiff(evs, "init")
-  events <- lapply(others, function(ev) {
+  ## the records that schedule each event
+  recsTo <- lapply(others, function(ev) {
     r <- recs[own & recs$to %in% ev, , drop = FALSE]
     ## a record from another event runs only as far as that event does
     r$effStatus <- ifelse(r$from == ev, r$status,
                           names(rank)[pmin(rank[r$status], rank[eff(stat[r$from])]) + 1])
     if (stat[[ev]] != "off") r <- r[r$effStatus != "off" | r$from == ev, , drop = FALSE]
+    r
+  })
+  names(recsTo) <- others
+  ## The condition an event runs under. A record whose scheduler lowers its status
+  ## (an unconditional call from a conditional event) takes the scheduler's
+  ## condition, or "<scheduler> runs" when the scheduler has none.
+  condOf <- function(ev, seen = character()) {
+    r <- recsTo[[ev]]
+    if (is.null(r) || ev %in% seen) return(NA_character_)
+    cs <- r$cond
+    for (i in which(r$from != ev & rank[r$effStatus] < rank[r$status])) {
+      cs[i] <- condOf(r$from[i], c(seen, ev))
+      if (is.na(cs[i])) cs[i] <- paste(r$from[i], "runs")
+    }
+    cs <- cs[c(which(r$from != ev), which(r$from == ev & r$timeType == "after"))]
+    c(cs[!is.na(cs)], NA_character_)[1]
+  }
+  events <- lapply(others, function(ev) {
+    r <- recsTo[[ev]]
     self <- r[r$from == ev & r$timeType == "after", , drop = FALSE]
     first <- r[r$from != ev, , drop = FALSE]
     pr <- c(self$priority, first$priority)
@@ -243,7 +263,7 @@
       intervalLabel = if (nrow(self)) self$timeLabel[1] else NA_character_,
       repeatStatus = if (nrow(self)) self$status[1] else NA_character_,
       firsts = first,
-      cond = c(first$cond[!is.na(first$cond)], self$cond[!is.na(self$cond)])[1],
+      cond = condOf(ev),
       plotsave = plotsave
     )
   })
@@ -312,7 +332,8 @@
 #'     expression that sets it (`intervalLabel`), and the status of that
 #'     rescheduling (`repeatStatus`);
 #'     the records that schedule it from other events (`firsts`); the condition
-#'     it runs under (`cond`); and whether it is a plotting or saving event
+#'     it runs under (`cond`; for an event scheduled from a conditional event,
+#'     that event's condition); and whether it is a plotting or saving event
 #'     (`plotsave`);}
 #'   \item{`status`}{a named character vector, the status of every event;}
 #'   \item{`initCalls`}{the module's functions that `init` calls, in order;}
@@ -417,7 +438,8 @@ moduleEventFlow <- function(module, path) {
     }
   }
   if (identical(event$repeatStatus, "cond")) parts <- c(parts, "repeats only under some settings")
-  txt <- paste(parts, collapse = "; ")
-  if (identical(event$status, "cond")) txt <- paste0(txt, "; only if ", event$cond)
-  txt
+  if (identical(event$status, "cond") && length(event$cond) == 1 && !is.na(event$cond)) {
+    parts <- c(parts, paste("only if", event$cond))
+  }
+  paste(parts, collapse = "; ")
 }
