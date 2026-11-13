@@ -84,7 +84,9 @@
     x <- tryCatch(.parseModulePartial(filename = mainFile, defineModuleElement = element),
                   error = function(e) bad(conditionMessage(e)))
     if (inherits(x, "try-error")) bad(conditionMessage(attr(x, "condition")))
-    unique(as.character(x$objectName))
+    ## the module template's placeholder rows have objectName = NA
+    nms <- unique(as.character(x$objectName))
+    nms[!is.na(nms) & nzchar(nms)]
   }
   list(params = params, inputs = objNames("inputObjects"),
        outputs = objNames("outputObjects"), timeunit = timeunit)

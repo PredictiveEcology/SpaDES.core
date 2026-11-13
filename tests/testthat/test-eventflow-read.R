@@ -58,3 +58,19 @@ test_that(".ef_readModule errors without a defineModule(), but reads a module wi
   m <- SpaDES.core:::.ef_readModule("parentMod", tmpdir)
   expect_length(m$branches, 0)
 })
+
+test_that(".ef_readModule drops the template's NA placeholder object names", {
+  testInit()
+  d <- efModule(
+    tmpdir, "naMod",
+    inputs = paste(
+      "expectsInput(objectName = NA, objectClass = NA, desc = NA, sourceURL = NA),",
+      "expectsInput(\"x\", \"numeric\", \"an input\")"
+    ),
+    outputs = "createsOutput(objectName = NA, objectClass = NA, desc = NA)",
+    code = c("doEvent.naMod <- function(sim, eventTime, eventType) {", "  sim", "}")
+  )
+  m <- SpaDES.core:::.ef_readModule("naMod", dirname(d))
+  expect_identical(m$meta$inputs, "x")
+  expect_identical(m$meta$outputs, character(0))
+})

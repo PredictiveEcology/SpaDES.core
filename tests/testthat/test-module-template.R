@@ -320,4 +320,5 @@ test_that("a new module's Rmd knits with the event flow, index and figures", {
   ## is the note and there are no per-event figures
   expect_true(any(grepl("No objects in this module's metadata are read or written by its code", md, fixed = TRUE)))
   expect_false(any(grepl("Error|Warning", md)))
+  expect_false(any(grepl("NA\\.$", md)))
 })
