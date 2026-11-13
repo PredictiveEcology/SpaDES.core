@@ -62,6 +62,7 @@ Suggests:
     googledrive,
     httr,
     httr2,
+    kableExtra,
     knitr,
     lattice,
     lme4,

@@ -253,3 +253,74 @@
   )
   out
 }
+
+#' Show a module's object index as a table in a knitr document
+#'
+#' The objects a module reads and writes, with the code that writes each and the
+#' code that only reads it (see [moduleObjects()] with `byEvent = TRUE`), as a
+#' table for a knitr (e.g., Rmarkdown or Quarto) document. The table follows the
+#' output format: a long table in LaTeX (object names are never wrapped or
+#' hyphenated, and the table breaks across pages), an HTML table, or, for any
+#' other format, a pipe table with the groups as bold rows. Notes on what is
+#' left out come below the table. Needs the `knitr` package, and `kableExtra`
+#' for LaTeX and HTML output.
+#'
+#' @param x A `moduleEventFlow` object (see [moduleEventFlow()]), or the error
+#'   raised when reading it failed, which gives a note in place of the table.
+#' @param caption Character string. The table caption, or `NULL` for none.
+#'
+#' @return A table to print in the document (a `knitr_kable`), or, if `x` is an
+#'   error, a note.
+#'
+#' @export
+#' @rdname kableModuleObjects
+kableModuleObjects <- function(x, caption = NULL) {
+  if (inherits(x, "condition")) return(.ef_note(x))
+  if (!requireNamespace("knitr", quietly = TRUE)) {
+    stop("Package 'knitr' is needed to make the table; please install it.")
+  }
+  tab <- .ef_objectIndex(x)
+  grp <- attr(tab, "group")
+  notes <- paste(attr(tab, "notes"), collapse = " ")
+  fmt <- if (knitr::is_latex_output()) {
+    "latex"
+  } else if (knitr::is_html_output()) {
+    "html"
+  } else {
+    "pipe"
+  }
+  if (fmt == "pipe") {
+    parts <- lapply(unique(grp), function(g) {
+      head <- stats::setNames(data.frame(paste0("**", g, "**"), "", ""), names(tab))
+      rbind(head, tab[grp == g, ])
+    })
+    k <- knitr::kable(do.call(rbind, parts), format = "pipe", row.names = FALSE,
+                      caption = caption)
+    return(knitr::asis_output(paste(c(k, "", notes, ""), collapse = "\n")))
+  }
+  if (!requireNamespace("kableExtra", quietly = TRUE)) {
+    stop("Package 'kableExtra' is needed to make the table; please install it.")
+  }
+  k <- kableExtra::kbl(tab, format = fmt, booktabs = TRUE, longtable = fmt == "latex",
+                       linesep = "", caption = caption, row.names = FALSE)
+  k <- kableExtra::kable_styling(k, latex_options = "repeat_header", full_width = FALSE,
+                                 position = "left", font_size = if (fmt == "latex") 8)
+  if (fmt == "latex") {
+    ## Object names are code: column 1 is left to LaTeX to size, so a name never
+    ## wraps or hyphenates; columns 2 and 3 share the rest of the line.
+    ## kableExtra substitutes the spec with a regex, so each backslash is written
+    ## four times, and column_spec() takes one column at a time.
+    k <- kableExtra::column_spec(k, 1, latex_column_spec = ">{\\\\raggedright\\\\arraybackslash}l")
+    for (j in 2:3) {
+      k <- kableExtra::column_spec(
+        k, j, latex_column_spec = ">{\\\\raggedright\\\\arraybackslash}p{0.25\\\\linewidth}"
+      )
+    }
+  }
+  r <- rle(grp)
+  k <- kableExtra::pack_rows(k, index = stats::setNames(r$lengths, r$values))
+  if (nzchar(notes)) {
+    k <- kableExtra::footnote(k, general = notes, general_title = "", threeparttable = TRUE)
+  }
+  k
+}

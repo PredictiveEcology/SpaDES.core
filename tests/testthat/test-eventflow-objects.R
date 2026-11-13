@@ -79,3 +79,18 @@ test_that("moduleObjects(byEvent = TRUE) on a parent returns its children's rows
   expect_identical(nrow(e), 0L)
   expect_identical(names(e), c("module", "objectName", "group", "writtenBy", "readBy"))
 })
+
+test_that("kableModuleObjects fits LaTeX pages and degrades to a note", {
+  testInit(c("knitr", "kableExtra"))
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "latex")
+  tex <- as.character(kableModuleObjects(ef))
+  expect_match(tex, "\\begin{longtable}", fixed = TRUE)
+  expect_match(tex, ">{\\raggedright\\arraybackslash}l>{\\raggedright\\arraybackslash}p{0.25\\linewidth}", fixed = TRUE)
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "html")
+  expect_match(as.character(kableModuleObjects(ef)), "<table", fixed = TRUE)
+  e <- tryCatch(moduleEventFlow("nope", tmpdir), error = function(e) e)
+  expect_match(as.character(kableModuleObjects(e)), "Event flow not available")
+})
