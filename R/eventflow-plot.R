@@ -17,10 +17,10 @@ utils::globalVariables(c(
 
 .ef_orNA <- function(a, b) if (length(a) != 1 || is.na(a)) b else a
 
-## The font family for the figure: option `spades.eventFlowFont` if that font is installed,
-## otherwise the generic sans-serif family.
+## The font family for the figure: option `spades.eventFlowFont` (default "Noto Sans") if that
+## font is installed, otherwise the generic sans-serif family.
 .ef_font <- function() {
-  fam <- getOption("spades.eventFlowFont", "sans")
+  fam <- getOption("spades.eventFlowFont", "Noto Sans")
   if (!is.character(fam) || length(fam) != 1 || is.na(fam)) return("sans")
   if (fam %in% c("sans", "serif", "mono")) return(fam)
   if (requireNamespace("systemfonts", quietly = TRUE) &&

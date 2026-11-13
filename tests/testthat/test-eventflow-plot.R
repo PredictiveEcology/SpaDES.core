@@ -37,3 +37,15 @@ test_that("a failed read becomes a note, not an error", {
   expect_match(as.character(includeModuleEventFlow(moduleEventFlow("parentMod", tmpdir), "p.png")),
                "no events")
 })
+
+test_that(".ef_font() defaults to Noto Sans and falls back to sans when it is missing", {
+  testInit(c("systemfonts"))
+  withr::local_options(spades.eventFlowFont = "NoSuchFontFamilyXYZ")
+  expect_identical(.ef_font(), "sans")
+  withr::local_options(spades.eventFlowFont = NULL)
+  if ("Noto Sans" %in% systemfonts::system_fonts()$family) {
+    expect_identical(.ef_font(), "Noto Sans")
+  } else {
+    expect_identical(.ef_font(), "sans")
+  }
+})
