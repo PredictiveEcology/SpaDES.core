@@ -135,8 +135,10 @@ setMethod(
 #'             `context` is an optional character vector of module directories,
 #'             whose recurring events, other than plotting and saving, are drawn in grey
 #'             to show their order relative to the module's own. Requires the packages
-#'             `ggplot2`, `ragg` and `systemfonts`; the font is the installed family named
-#'             by `options(spades.eventFlowFont =)`, if any.
+#'             `ggplot2`, `ragg` and `systemfonts`. The font is the family named by
+#'             `options(spades.eventFlowFont =)` (default `"Noto Sans"`; see
+#'             [spadesOptions()]), or the generic `"sans"` family if that font is not
+#'             installed.
 #'
 #' @return For a `simList`, plots an event diagram as Gantt Chart, invisibly returning a `mermaid` object.
 #'         For a module, invisibly a list with the figure's `file`, its `height` in inches and

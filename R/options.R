@@ -97,6 +97,11 @@
 #'      will print the digest value of the `sim$rstLCC` after each event so a
 #'      user can monitor its changes.\cr
 #'
+#'   `spades.eventFlowFont` \tab `"Noto Sans"`
+#'     \tab The font family of the figures that [eventDiagram()] and [objectDiagram()]
+#'     draw from a module's code. If that font is not installed, the generic
+#'     `"sans"` family is used.\cr
+#'
 #'   `spades.futureEvents` \tab `FALSE`
 #'     \tab  If set to `TRUE`, the event simulator will attempt to spawn events
 #'     whose outputs are not needed (by other events in the `simList`) into a future.
@@ -362,6 +367,7 @@ spadesOptions <- function() {
     spades.debug = 1, ## TODO: is this the best default? see discussion in #5
     spades.dotInputObjects = TRUE,
     spades.DTthreads = 1L,
+    spades.eventFlowFont = "Noto Sans",
     spades.futureEvents = FALSE,
     spades.futurePlan = "callr",
     spades.inputPath = file.path(.spadesTempDir(), "inputs"),

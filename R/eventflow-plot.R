@@ -515,6 +515,9 @@ utils::globalVariables(c(
 
 .ef_note <- function(x) {
   msg <- if (inherits(x, "condition")) conditionMessage(x) else as.character(x)
+  ## one line of emphasis: a parse error runs over several lines (with a caret
+  ## line), and an asterisk in it would end the emphasis
+  msg <- gsub("\\*", "\\\\*", gsub("\\s+", " ", trimws(msg)))
   knitr::asis_output(paste0("*Event flow not available: ", msg, "*"))
 }
 
@@ -542,8 +545,7 @@ utils::globalVariables(c(
 #' @seealso [moduleEventFlow()], [eventDiagram()]
 includeModuleEventFlow <- function(x, file, width = 4.65) {
   if (inherits(x, "condition")) return(.ef_note(x))
-  f <- x$default
-  if (is.null(f) || (NROW(f$records) == 0 && !length(f$initCalls) && !isTRUE(f$hasInputObjects))) {
+  if (length(x$read$branches) == 0) {
     return(knitr::asis_output("*This module has no events.*"))
   }
   fp <- .ef_figurePath(file)

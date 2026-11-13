@@ -50,7 +50,18 @@
   st
 }
 
-.ef_isSchedule <- function(e) is.call(e) && identical(e[[1]], quote(scheduleEvent))
+## The name of the function a call calls: "f" for `f()`, `pkg::f()` and `pkg:::f()`;
+## "" when it is computed (`x$f()`, `(g)()`).
+.ef_head <- function(e) {
+  h <- e[[1]]
+  if (is.call(h) && length(h) == 3 &&
+      (identical(h[[1]], quote(`::`)) || identical(h[[1]], quote(`:::`)))) {
+    h <- h[[3]]
+  }
+  if (is.name(h)) as.character(h) else ""
+}
+
+.ef_isSchedule <- function(e) is.call(e) && .ef_head(e) == "scheduleEvent"
 
 .ef_noRecords <- function() {
   data.frame(from = character(), to = character(), toModule = character(),
@@ -117,7 +128,7 @@
 ## Anything else is walked into, except function definitions.
 .ef_walk <- function(e, st) {
   if (!is.call(e)) return(invisible())
-  h <- if (is.name(e[[1]])) as.character(e[[1]]) else ""
+  h <- .ef_head(e)
   if (h == "{") {
     for (x in as.list(e)[-1]) .ef_walk(x, st)
   } else if (h == "if") {

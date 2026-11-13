@@ -46,8 +46,10 @@ the module's directory. The event flow of the module is drawn from its code
 \code{context} is an optional character vector of module directories,
 whose recurring events, other than plotting and saving, are drawn in grey
 to show their order relative to the module's own. Requires the packages
-\code{ggplot2}, \code{ragg} and \code{systemfonts}; the font is the installed family named
-by \code{options(spades.eventFlowFont =)}, if any.}
+\code{ggplot2}, \code{ragg} and \code{systemfonts}. The font is the family named by
+\code{options(spades.eventFlowFont =)} (default \code{"Noto Sans"}; see
+\code{\link[=spadesOptions]{spadesOptions()}}), or the generic \code{"sans"} family if that font is not
+installed.}
 }
 \value{
 For a \code{simList}, plots an event diagram as Gantt Chart, invisibly returning a \code{mermaid} object.

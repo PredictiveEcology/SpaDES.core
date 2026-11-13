@@ -136,3 +136,20 @@ test_that("kableModuleObjects gives a pipe table, and a note when no object is t
     expect_match(as.character(res), "No objects in this module's metadata", fixed = TRUE)
   }
 })
+
+test_that("kableModuleObjects gives a note when making the table fails", {
+  testInit("knitr")
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  ef$default <- "not a flow"
+  expect_match(as.character(kableModuleObjects(ef)), "Event flow not available")
+})
+
+test_that("moduleObjects(sim, byEvent = TRUE) reads each module from the modulePath entry that has it", {
+  testInit()
+  noMods <- file.path(tmpdir, "noMods")
+  dir.create(noMods)
+  sim <- simInit(paths = list(modulePath = c(noMods, dirname(efFixtureFire(file.path(tmpdir, "mods"))))))
+  expect_length(modulePath(sim), 2)
+  mo <- moduleObjects(sim, module = "fireMod", byEvent = TRUE)
+  expect_true("burnMap" %in% mo$objectName)
+})

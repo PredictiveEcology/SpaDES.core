@@ -81,3 +81,21 @@ test_that(".ef_timingText prints no missing condition and no leading separator",
   ev$cond <- "x is set"
   expect_identical(SpaDES.core:::.ef_timingText(ev, "year"), "only if x is set")
 })
+test_that("scheduleEvent() called as SpaDES.core::scheduleEvent() is read as scheduling", {
+  testInit()
+  efModule(tmpdir, "nsMod", code = c(
+    "doEvent.nsMod <- function(sim, eventTime, eventType) {",
+    "  switch(eventType,",
+    "    init = {",
+    "      sim <- SpaDES.core::scheduleEvent(sim, start(sim), \"nsMod\", \"step\")",
+    "      SpaDES.core:::scheduleEvent(sim, end(sim), \"nsMod\", \"last\")",
+    "    },",
+    "    step = {},",
+    "    last = {}",
+    "  )",
+    "  invisible(sim)",
+    "}"
+  ))
+  st <- moduleEventFlow("nsMod", tmpdir)$default$status
+  expect_identical(st[c("step", "last")], c(step = "on", last = "on"))
+})

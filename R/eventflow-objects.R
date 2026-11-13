@@ -282,6 +282,12 @@ kableModuleObjects <- function(x, caption = NULL, lead = NULL) {
   if (!requireNamespace("knitr", quietly = TRUE)) {
     stop("Package 'knitr' is needed to make the table; please install it.")
   }
+  ## never fail the knit: an error making the table gives a note in its place
+  tryCatch(.ef_kableObjects(x, caption, lead), error = function(e) .ef_note(e))
+}
+
+## The table of kableModuleObjects() for the moduleEventFlow `x`.
+.ef_kableObjects <- function(x, caption, lead) {
   tab <- .ef_objectIndex(x)
   grp <- attr(tab, "group")
   notes <- paste(attr(tab, "notes"), collapse = " ")

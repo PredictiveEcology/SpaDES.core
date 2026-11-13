@@ -51,3 +51,27 @@ test_that(".ef_font() defaults to Noto Sans and falls back to sans when it is mi
     expect_identical(.ef_font(), "sans")
   }
 })
+
+test_that("a note is one line, with its asterisks escaped", {
+  testInit("knitr")
+  note <- as.character(SpaDES.core:::.ef_note(simpleError("unexpected '*'\n2: a *b\n   ^")))
+  expect_identical(note, "*Event flow not available: unexpected '\\*' 2: a \\*b ^*")
+})
+
+test_that("includeModuleEventFlow says a module has no events only when it has none", {
+  testInit(c("ggplot2", "ragg", "systemfonts", "knitr"))
+  ## init schedules nothing and calls no module function
+  efModule(tmpdir, "initOnly", code =
+    'doEvent.initOnly <- function(sim, eventTime, eventType) {
+       switch(eventType, init = { sim$x <- 1 })
+       invisible(sim)
+     }')
+  f <- file.path(tmpdir, "initOnly.png")
+  inc <- includeModuleEventFlow(moduleEventFlow("initOnly", tmpdir), f)
+  expect_false(grepl("no events", as.character(inc)))
+  expect_true(file.exists(f))
+  ## .inputObjects is not an event
+  efModule(tmpdir, "ioOnly", code = ".inputObjects <- function(sim) sim")
+  io <- includeModuleEventFlow(moduleEventFlow("ioOnly", tmpdir), file.path(tmpdir, "io.png"))
+  expect_match(as.character(io), "no events")
+})

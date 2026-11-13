@@ -20,10 +20,11 @@ gives a note in place of the figures.}
 \description{
 For a chunk with \code{results = "asis"} of a knitr (e.g., Rmarkdown or Quarto) document: draws
 one figure per piece of the module's code (see \code{\link[=objectDiagram]{objectDiagram()}}) and writes, for each, a
-heading, the line saying when it runs, and the figure. Figures of events the module no
-longer has are deleted from \code{figDir}. When a document build stages its figures in a
-directory (the knitr option \code{SpaDES.docs.stageDir}), the figures are written there under
-the knitr output directory.
+heading, the line saying when it runs, and the figure. So that figures of events the
+module no longer has do not linger, every \verb{<module>_io_*.png} file in \code{figDir} that this
+call did not write is deleted, including any made by hand. When a document build stages
+its figures in a directory (the knitr option \code{SpaDES.docs.stageDir}), the figures are
+written there under the knitr output directory.
 }
 \seealso{
 \code{\link[=objectDiagram]{objectDiagram()}}, \code{\link[=includeModuleEventFlow]{includeModuleEventFlow()}}

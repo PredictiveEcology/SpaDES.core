@@ -3544,8 +3544,13 @@ moduleObjects <- function(sim, module, path, byEvent = FALSE) {
       path <- getOption("spades.modulePath")
     }
     module <- unlist(unname(module))
+    ## modulePath can have several entries: read each module from the first that has it
+    pathOf <- function(mod) {
+      has <- file.exists(file.path(path, mod, paste0(mod, ".R")))
+      if (any(has)) path[which(has)[1]] else path[1]
+    }
     byEventRows <- function(mod, fromParent) {
-      idx <- tryCatch(.ef_objectIndex(moduleEventFlow(mod, path)),
+      idx <- tryCatch(.ef_objectIndex(moduleEventFlow(mod, pathOf(mod))),
                       moduleEventFlowError = function(e) if (fromParent) NULL else stop(e))
       if (is.null(idx)) return(NULL)
       data.table::data.table(
@@ -3555,7 +3560,7 @@ moduleObjects <- function(sim, module, path, byEvent = FALSE) {
     }
     ## a parent module declares no objects: report its children's, as the metadata route does
     out <- lapply(module, function(mod) {
-      leaves <- .leafModules(mod, path)
+      leaves <- .leafModules(mod, pathOf(mod))
       lapply(leaves, byEventRows, fromParent = !identical(leaves, mod))
     })
     out <- c(list(data.table::data.table(

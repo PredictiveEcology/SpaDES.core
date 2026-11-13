@@ -102,6 +102,11 @@ See also \code{?data.table::setDTthreads}.\cr
 will print the digest value of the \code{sim$rstLCC} after each event so a
 user can monitor its changes.\cr
 
+\code{spades.eventFlowFont} \tab \code{"Noto Sans"}
+\tab The font family of the figures that \code{\link[=eventDiagram]{eventDiagram()}} and \code{\link[=objectDiagram]{objectDiagram()}}
+draw from a module's code. If that font is not installed, the generic
+\code{"sans"} family is used.\cr
+
 \code{spades.futureEvents} \tab \code{FALSE}
 \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
 whose outputs are not needed (by other events in the \code{simList}) into a future.
