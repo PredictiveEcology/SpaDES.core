@@ -291,3 +291,33 @@ test_that("newModule() writes no absolute paths into the generated module", {
   tmpl <- readLines(file.path(mpath, "tests", "testthat", "test-template.R"))
   expect_length(grep('modulePath = file.path("..", "..", "..")', tmpl, fixed = TRUE), 1)
 })
+
+test_that("the module Rmd template has the generated event sections", {
+  testInit(smcc = FALSE)
+  newModule("efTmpl", tmpdir, open = FALSE)
+  rmd <- readLines(file.path(tmpdir, "efTmpl", "efTmpl.Rmd"))
+  expect_true(any(grepl("SpaDES.core::includeModuleEventFlow(ef, \"figures/efTmpl_eventFlow.png\")", rmd, fixed = TRUE)))
+  expect_true(any(grepl("SpaDES.core::kableModuleObjects(ef", rmd, fixed = TRUE)))
+  expect_true(any(grepl("SpaDES.core::moduleEventFigures(ef", rmd, fixed = TRUE)))
+  chunks <- grep("^```\\{r event(Flow|Objects|Figures)-", rmd, value = TRUE)
+  expect_length(chunks, 3)
+  expect_true(all(grepl("cache = FALSE", chunks, fixed = TRUE)))
+})
+
+test_that("a new module's Rmd knits with the event flow, index and figures", {
+  testInit(c("rmarkdown", "bookdown", "knitr", "kableExtra", "ggplot2", "ragg", "systemfonts"), smcc = FALSE)
+  skip_on_cran(); skip_if_offline()  # the template's setup chunk downloads a badge
+  newModule("efKnit", tmpdir, open = FALSE)
+  ## the template's YAML names this bibliography, which newModule() does not create
+  dir.create(file.path(tmpdir, "efKnit", "citations"), showWarnings = FALSE)
+  file.create(file.path(tmpdir, "efKnit", "citations", "references_efKnit.bib"))
+  rmd <- file.path(tmpdir, "efKnit", "efKnit.Rmd")
+  rmarkdown::render(rmd, quiet = TRUE)
+  md <- readLines(file.path(tmpdir, "efKnit", "efKnit.md"))
+  expect_true(file.exists(file.path(tmpdir, "efKnit", "figures", "efKnit_eventFlow.png")))
+  expect_true(any(grepl("figures/efKnit_eventFlow.png", md, fixed = TRUE)))
+  ## a new module's code touches none of the template's placeholder objects, so the index
+  ## is the note and there are no per-event figures
+  expect_true(any(grepl("No objects in this module's metadata are read or written by its code", md, fixed = TRUE)))
+  expect_false(any(grepl("Error|Warning", md)))
+})

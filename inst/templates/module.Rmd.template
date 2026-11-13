@@ -86,6 +86,21 @@ knitr::kable(df_pkgs, caption = "List of (ref:{{{name2}}}) required packages.") 
 
 Describe what happens for each event type.
 
+```{r eventFlow-{{{name2}}}, echo = FALSE, eval = TRUE, cache = FALSE, out.width = "100%", fig.pos = "H", fig.cap = "(ref:{{{name2}}}) events, as read from the module code with its default parameters."}
+ef <- tryCatch(SpaDES.core::moduleEventFlow("{{{name}}}", path = ".."), error = function(e) e)
+SpaDES.core::includeModuleEventFlow(ef, "figures/{{{name}}}_eventFlow.png")
+```
+
+Table \@ref(tab:eventObjects-{{{name2}}}) lists, for each object, the code that writes it and the code that only reads it.
+
+```{r eventObjects-{{{name2}}}, echo = FALSE, eval = TRUE, cache = FALSE}
+SpaDES.core::kableModuleObjects(ef, caption = "Where each object of (ref:{{{name2}}}) is written and read, in run order.")
+```
+
+```{r eventFigures-{{{name2}}}, echo = FALSE, eval = TRUE, cache = FALSE, results = "asis"}
+SpaDES.core::moduleEventFigures(ef, figDir = "figures", level = 4)
+```
+
 ### Plotting
 
 Write what is plotted.
