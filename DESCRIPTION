@@ -114,6 +114,7 @@ Collate:
     'codecheck-rules.R'
     'eventflow-read.R'
     'eventflow-eval.R'
+    'eventflow.R'
     'convertToPackage.R'
     'copy.R'
     'debugging.R'
