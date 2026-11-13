@@ -66,20 +66,24 @@
   dm <- tmp[["pf"]]
   params <- list()
   timeunit <- NA_character_
-  if (length(dm) > 0) {
-    spec <- dm[[1]][[3]]
-    tmplP <- function(name, class, default, min, max, desc, ...) NULL
-    for (cl in .ef_findCalls(spec$parameters, "defineParameter")) {
-      m <- match.call(tmplP, cl)
-      nm <- tryCatch(eval(m$name, baseenv()), error = function(e) NA_character_)
-      if (is.character(nm) && !is.na(nm)) params[nm] <- list(list(expr = m$default))
-    }
-    tu <- tryCatch(eval(spec$timeunit, baseenv()), error = function(e) NA_character_)
-    if (is.character(tu) && length(tu) == 1) timeunit <- tu
+  if (length(dm) == 0) .ef_stop(module, paste0("no defineModule() call in ", mainFile))
+  spec <- dm[[1]][[3]]
+  tmplP <- function(name, class, default, min, max, desc, ...) NULL
+  for (cl in .ef_findCalls(spec$parameters, "defineParameter")) {
+    m <- match.call(tmplP, cl)
+    nm <- tryCatch(eval(m$name, baseenv()), error = function(e) NA_character_)
+    if (is.character(nm) && !is.na(nm)) params[nm] <- list(list(expr = m$default))
   }
+  tu <- tryCatch(eval(spec$timeunit, baseenv()), error = function(e) NA_character_)
+  if (is.character(tu) && length(tu) == 1) timeunit <- tu
   objNames <- function(element) {
+    bad <- function(why) {
+      .ef_stop(module, paste0("cannot read ", element, " in ", mainFile, ": ", why))
+    }
+    ## .parseModulePartial() returns a "try-error" value for metadata it cannot evaluate
     x <- tryCatch(.parseModulePartial(filename = mainFile, defineModuleElement = element),
-                  error = function(e) NULL)
+                  error = function(e) bad(conditionMessage(e)))
+    if (inherits(x, "try-error")) bad(conditionMessage(attr(x, "condition")))
     unique(as.character(x$objectName))
   }
   list(params = params, inputs = objNames("inputObjects"),
@@ -191,7 +195,10 @@
       branches <- lapply(disp$branches, .ef_branch, file = fns[[deName]]$file)
     }
   } else {
-    perEvent <- names(fns)[startsWith(names(fns), prefix) & nchar(names(fns)) > nchar(prefix)]
+    perEvent <- {
+      nms <- names(fns) %||% character()
+      nms[startsWith(nms, prefix) & nchar(nms) > nchar(prefix)]
+    }
     for (nm in perEvent) {
       b <- .ef_branch(fns[[nm]]$body, fns[[nm]]$file)
       if (is.call(b)) attr(b, "lines") <- c(fns[[nm]]$first, fns[[nm]]$last)

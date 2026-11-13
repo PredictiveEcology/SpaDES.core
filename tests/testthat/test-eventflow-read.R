@@ -29,3 +29,25 @@ test_that(".ef_readModule signals a classed error for unparseable code", {
   expect_error(SpaDES.core:::.ef_readModule("badMod", tmpdir), class = "moduleEventFlowError")
   expect_error(SpaDES.core:::.ef_readModule("noSuchMod", tmpdir), class = "moduleEventFlowError")
 })
+
+test_that(".ef_readModule errors when inputObjects or outputObjects cannot be read", {
+  testInit()
+  efModule(tmpdir, "badIn", inputs = 'expectsInput(noSuchFn("x"), "numeric", "d")', code = "")
+  efModule(tmpdir, "badOut", outputs = 'createsOutput(noSuchFn("x"), "numeric", "d")', code = "")
+  expect_error(SpaDES.core:::.ef_readModule("badIn", tmpdir), class = "moduleEventFlowError",
+               regexp = "inputObjects")
+  expect_error(SpaDES.core:::.ef_readModule("badOut", tmpdir), class = "moduleEventFlowError",
+               regexp = "outputObjects")
+})
+
+test_that(".ef_readModule errors without a defineModule(), but reads a module with no events", {
+  testInit()
+  dir.create(file.path(tmpdir, "noDef"))
+  writeLines("doEvent.noDef <- function(sim, eventTime, eventType) sim",
+             file.path(tmpdir, "noDef", "noDef.R"))
+  expect_error(SpaDES.core:::.ef_readModule("noDef", tmpdir), class = "moduleEventFlowError",
+               regexp = "defineModule")
+  efModule(tmpdir, "parentMod", code = "")
+  m <- SpaDES.core:::.ef_readModule("parentMod", tmpdir)
+  expect_length(m$branches, 0)
+})
