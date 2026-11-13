@@ -90,10 +90,15 @@
        outputs = objNames("outputObjects"), timeunit = timeunit)
 }
 
-## The line range of a block, from the srcref the parser keeps on `{`.
+## The line range of a block. The parser keeps the position of the `{` itself
+## first in `srcref`, then one for each statement, so the span runs from the
+## first to the last of them (the closing brace is on the last line or just after).
 .ef_lines <- function(x) {
-  sr <- if (is.call(x) && identical(x[[1]], quote(`{`))) attr(x, "srcref")[[1]]
-  if (is.null(sr)) c(NA_integer_, NA_integer_) else as.integer(c(sr[1], sr[3]))
+  if (!(is.call(x) && identical(x[[1]], quote(`{`)))) return(c(NA_integer_, NA_integer_))
+  srs <- Filter(function(s) inherits(s, "srcref"), attr(x, "srcref"))
+  if (!length(srs)) return(c(NA_integer_, NA_integer_))
+  as.integer(c(min(vapply(srs, function(s) s[1], numeric(1))),
+               max(vapply(srs, function(s) s[3], numeric(1)))))
 }
 
 .ef_branch <- function(x, file) {

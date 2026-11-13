@@ -115,6 +115,7 @@ Collate:
     'eventflow-read.R'
     'eventflow-eval.R'
     'eventflow.R'
+    'eventflow-objects.R'
     'convertToPackage.R'
     'copy.R'
     'debugging.R'

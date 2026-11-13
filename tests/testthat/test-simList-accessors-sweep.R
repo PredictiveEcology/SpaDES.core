@@ -274,6 +274,15 @@ test_that("moduleObjects reports a module's declared inputs and outputs", {
   expect_setequal(unique(mo$type), c("input", "output"))
 })
 
+test_that("moduleObjects() without sim or module is an error, not browser()", {
+  testInit()
+  ## `.whereInStack()` returns NULL when no frame holds a `sim`; if one did, the test could not
+  ## reach the error
+  expect_null(reproducible::.whereInStack("sim"))
+  f <- function() moduleObjects()
+  expect_error(f(), "needs `sim`, or `module` and `path`")
+})
+
 test_that("moduleObjects works from a simList too", {
   skip_on_cran()
   testInit(sampleModReqdPkgs)

@@ -3506,23 +3506,51 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
 #' @inheritParams inputObjects
 #'
+#' @param byEvent Logical. If `TRUE`, `moduleObjects()` reads the module's code
+#'   (see [moduleEventFlow()]) instead of only its metadata, and reports which
+#'   code writes and reads each object. Default `FALSE`.
+#'
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
 #' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
 #' will be determined either from a `simList` or from the module source code.
+#' With `byEvent = TRUE` it instead returns a data.table with one row per object
+#' that the module's code uses, and columns `module`, `objectName`, `group`
+#' (`"Inputs"`, `"Inputs the module also updates"` or `"Outputs"`), `writtenBy` and
+#' `readBy` (the events and set-up code that write, or only read, the object, in run
+#' order, with the run mode where an event runs in only some modes).
 #'
 #' @export
 #' @importFrom data.table set rbindlist setcolorder
 #' @importFrom reproducible .whereInStack
 #' @rdname objects
-moduleObjects <- function(sim, module, path) {
+moduleObjects <- function(sim, module, path, byEvent = FALSE) {
   simTry <- NULL # can't set `sim = NULL` because `.whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      browser()
       simTry <- suppressWarnings(try(get("sim", .whereInStack("sim")), silent = TRUE))
+      if (inherits(simTry, "try-error") || is.null(simTry))
+        stop("moduleObjects() needs `sim`, or `module` and `path`.", call. = FALSE)
     }
     sim <- simTry
+  }
+
+  if (isTRUE(byEvent)) {
+    if (!is.null(sim)) {
+      path <- modulePath(sim)
+      if (missing(module)) module <- modules(sim)
+    } else if (missing(path)) {
+      path <- getOption("spades.modulePath")
+    }
+    module <- unlist(unname(module))
+    out <- lapply(module, function(mod) {
+      idx <- .ef_objectIndex(moduleEventFlow(mod, path))
+      data.table::data.table(
+        module = rep(mod, nrow(idx)), objectName = idx$Object, group = attr(idx, "group"),
+        writtenBy = idx[["Written by"]], readBy = idx[["Read by"]]
+      )
+    })
+    return(rbindlist(out)[])
   }
 
   if (!is.null(sim)) {

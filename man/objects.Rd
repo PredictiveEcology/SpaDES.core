@@ -18,7 +18,7 @@ objs(sim) <- value
 
 \S4method{objs}{simList}(sim) <- value
 
-moduleObjects(sim, module, path)
+moduleObjects(sim, module, path, byEvent = FALSE)
 
 findObjects(objects, sim, module, path)
 }
@@ -34,6 +34,10 @@ findObjects(objects, sim, module, path)
 \item{path}{The path to the module., i.e., the \code{modulePath}.
 Only relevant if \code{sim} not supplied.}
 
+\item{byEvent}{Logical. If \code{TRUE}, \code{moduleObjects()} reads the module's code
+(see \code{\link[=moduleEventFlow]{moduleEventFlow()}}) instead of only its metadata, and reports which
+code writes and reads each object. Default \code{FALSE}.}
+
 \item{objects}{A character vector of length >= 1 with name(s) of objects to look
 for in the metadata. This is used in a \code{grep}, meaning it will do partial
 matching (e.g., \code{"studyArea"} will find \code{"studyArea"} and \code{"studyAreaLarge"}).
@@ -45,6 +49,11 @@ Returns or sets a list of objects in the \code{simList} environment.
 \code{moduleObjects} returns a data.table with 4 columns, \code{module}, \code{objectName}, \code{type}, and \code{desc},
 pulled directly from the object metadata in the \code{createsOutputs} and \code{expectsInputs}. These
 will be determined either from a \code{simList} or from the module source code.
+With \code{byEvent = TRUE} it instead returns a data.table with one row per object
+that the module's code uses, and columns \code{module}, \code{objectName}, \code{group}
+(\code{"Inputs"}, \code{"Inputs the module also updates"} or \code{"Outputs"}), \code{writtenBy} and
+\code{readBy} (the events and set-up code that write, or only read, the object, in run
+order, with the run mode where an event runs in only some modes).
 
 \code{findObjects} returns a data.table similar to \code{moduleObjects}, but with only the
 objects provided by \code{objects}.
