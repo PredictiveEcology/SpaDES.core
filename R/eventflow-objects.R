@@ -289,6 +289,11 @@ kableModuleObjects <- function(x, caption = NULL) {
   } else {
     "pipe"
   }
+  if (!nrow(tab)) {
+    ## never fail the knit: say so, and give the notes
+    msg <- "*No objects in this module's metadata are read or written by its code.*"
+    return(knitr::asis_output(paste(c(msg, "", notes, ""), collapse = "\n")))
+  }
   if (fmt == "pipe") {
     parts <- lapply(unique(grp), function(g) {
       head <- stats::setNames(data.frame(paste0("**", g, "**"), "", ""), names(tab))

@@ -94,3 +94,24 @@ test_that("kableModuleObjects fits LaTeX pages and degrades to a note", {
   e <- tryCatch(moduleEventFlow("nope", tmpdir), error = function(e) e)
   expect_match(as.character(kableModuleObjects(e)), "Event flow not available")
 })
+
+test_that("kableModuleObjects gives a pipe table, and a note when no object is traced", {
+  testInit(c("knitr", "kableExtra"))
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "docx")
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  expect_match(as.character(kableModuleObjects(ef)), "**Inputs**", fixed = TRUE)
+
+  efModule(tmpdir, "idleMod", inputs = 'expectsInput("unusedObj", "data.frame", "")', code =
+    'doEvent.idleMod <- function(sim, eventTime, eventType) {
+       switch(eventType, init = { invisible(NULL) })
+       invisible(sim)
+     }')
+  idle <- moduleEventFlow("idleMod", tmpdir)
+  for (to in c("latex", "html", "docx")) {
+    knitr::opts_knit$set(rmarkdown.pandoc.to = to)
+    expect_no_error(res <- kableModuleObjects(idle))
+    expect_match(as.character(res), "No objects in this module's metadata", fixed = TRUE)
+  }
+})
