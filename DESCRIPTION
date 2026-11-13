@@ -113,6 +113,7 @@ Collate:
     'codecheck-report.R'
     'codecheck-rules.R'
     'eventflow-read.R'
+    'eventflow-eval.R'
     'convertToPackage.R'
     'copy.R'
     'debugging.R'
