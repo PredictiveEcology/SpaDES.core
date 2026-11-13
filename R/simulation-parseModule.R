@@ -375,12 +375,6 @@ setMethod(
         }
 
         # Evaluate defineModule into the sim environment
-        # Capture messages which will be about defineParameter at the moment
-        on.exit({
-          if (!exists("finishedClean"))
-            try(mess)
-        })
-
         #mess <- capture.output({
         numExptedArgs <- length(formalArgs(defineModule)) + 1
         if (length(pf[[1]]) > (numExptedArgs)) {
@@ -568,7 +562,6 @@ setMethod(
       }
     }
 
-    finishedClean <- TRUE
     return(sim)
   })
 
