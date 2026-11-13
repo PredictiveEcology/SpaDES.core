@@ -8,6 +8,36 @@ test_that(".ef_safeEval never runs functions outside the allowlist", {
   expect_s3_class(SpaDES.core:::.ef_safeEval(quote(sim$burnMap > 1), st$sandbox), "ef_unknown")
 })
 
+test_that(".ef_safeEval cannot reach a function outside the allowlist by any route", {
+  testInit()
+  f <- tempfile(); writeLines("x", f)
+  st <- SpaDES.core:::.ef_state(SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir))))
+  bad <- list(
+    bquote({ g <- file.remove; g(.(f)) }),
+    bquote({ c <- file.remove; c(.(f)) }),
+    bquote({ P <- file.remove; P(.(f)) }),
+    bquote(list(g = file.remove)$g(.(f))),
+    bquote(.BaseNamespaceEnv$file.remove(.(f))),
+    bquote(.GlobalEnv$file.remove(.(f))),
+    bquote(base::file.remove(.(f))),
+    bquote((file.remove)(.(f))),
+    quote(end(sim) <- 5)
+  )
+  for (e in bad) {
+    expect_s3_class(SpaDES.core:::.ef_safeEval(e, new.env(parent = st$sandbox)), "ef_unknown")
+    expect_true(file.exists(f))
+  }
+})
+
+test_that("a parameter default cannot rebind the sandbox", {
+  testInit()
+  modDir <- efModule(tmpdir, "rebMod",
+    params = "defineParameter(\"a\", \"numeric\", {P <- 1; 2}, NA, NA, \"x\")",
+    code = "doEvent.rebMod <- function(sim, eventTime, eventType, priority) NULL")
+  st <- SpaDES.core:::.ef_state(SpaDES.core:::.ef_readModule("rebMod", dirname(modDir)))
+  expect_true(is.function(st$sandbox$P))
+})
+
 test_that("params(sim)<- rewrites are tracked", {
   testInit()
   st <- SpaDES.core:::.ef_state(SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir))))

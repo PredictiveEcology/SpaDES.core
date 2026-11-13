@@ -36,6 +36,19 @@
   unique(out)
 }
 
+## Is there a call whose head is not a plain symbol?
+.ef_hasComputedHead <- function(e) {
+  rec <- function(x) {
+    if (!is.call(x)) return(FALSE)
+    if (!is.name(x[[1]])) return(TRUE)
+    for (j in seq_along(x)[-1]) {
+      if (!.ef_isEmptyArg(x[[j]]) && rec(x[[j]])) return(TRUE)
+    }
+    FALSE
+  }
+  rec(e)
+}
+
 ## `sim$x` and `sim[["x"]]` are simulation data, which a static read cannot know.
 .ef_rewriteSimAccess <- function(e) {
   if (!is.call(e)) return(e)
@@ -56,6 +69,8 @@
 ## evaluation fails or warns, return `.ef_unknown`.
 .ef_safeEval <- function(expr, env) {
   if (!all(.ef_calledFns(expr) %in% .ef_allowed)) return(.ef_unknown)
+  ## a call through a computed function (`x$f()`, `(g)()`) is never evaluated
+  if (.ef_hasComputedHead(expr)) return(.ef_unknown)
   tryCatch(
     eval(.ef_rewriteSimAccess(expr), env),
     error = function(err) .ef_unknown,
@@ -66,7 +81,15 @@
 ## The environment that expressions are evaluated in. `store` holds the module's
 ## current parameter values, the simulation start/end and the current time.
 .ef_makeSandbox <- function(modName, store) {
-  sb <- new.env(parent = baseenv())
+  ## Nothing but the allowlist can be found from here: the parent is empty, so
+  ## neither base functions outside the list, the global environment, nor
+  ## replacement functions such as `end<-` resolve.
+  sb <- new.env(parent = emptyenv())
+  standIns <- c("P", "params", "start", "end", "time", "currentModule", "anyPlotting",
+                ".first", ".last", ".normal", ".highest", ".lowest")
+  for (n in c(setdiff(.ef_allowed, standIns), "$<-", "[[<-", "[<-")) {
+    sb[[n]] <- if (n == "setNames") stats::setNames else get(n, envir = baseenv())
+  }
   sb$sim <- structure(list(), class = "fakesim")
   sb$P <- function(sim, param, module) {
     if (missing(param)) store$pars else store$pars[[param]]
@@ -108,7 +131,8 @@
   sb <- .ef_makeSandbox(mod$name, store)
   for (p in names(mod$meta$params)) {
     d <- mod$meta$params[[p]]$expr
-    v <- if (is.null(d)) NULL else .ef_safeEval(d, sb)
+    ## a default is evaluated in a throwaway child, so it cannot rebind the sandbox
+    v <- if (is.null(d)) NULL else .ef_safeEval(d, new.env(parent = sb))
     if (is.null(v)) store$pars[p] <- list(NULL) else store$pars[[p]] <- v
   }
   store$moduleDefaults <- store$pars
