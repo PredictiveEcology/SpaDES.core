@@ -2,7 +2,7 @@
 
 ## Bug fixes
 
-* An error in a module's `defineModule()` call (e.g. a parameter default that fails) is now reported once, as itself. `.parseModule()` also printed "Error in .parseModule(...) : object 'mess' not found" from a leftover `on.exit(try(mess))`, whose `mess` is never created; on the first `simInit()` of a run it printed that line six times or more and hid which module failed. `test-parseModule-error.R`.
+* An error in a module's `defineModule()` call (e.g. a parameter default that fails) is now reported once, as itself. `.parseModule()` also printed "Error in .parseModule(...) : object 'mess' not found" from a leftover `on.exit(try(mess))`, whose `mess` does not exist yet when `defineModule()` fails; on the first `simInit()` of a run it printed that line six times or more and hid which module failed. `test-defineModuleError.R`.
 
 * The "done! took: ..." message that reproducible prints after "cropping...", "projecting..." and the like (`postProcessTo()`, so `prepInputs()`) no longer has a blank line after it when it is printed during an event. The `spades()` message handler wrapped it in a second `\b`, which `loggingMessage()` did not strip, so each one printed as `\b` on a line of its own. The `\b` handling now lives in `loggingMessage()`, so the `simInit()` and `spades()` message handlers cannot differ; a `\b` message in `simInit()` now also reads `\b done!` (a space after the `\b`), as it did in events. `test-progressThrottle.R`.
 
