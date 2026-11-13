@@ -15,6 +15,13 @@ test_that(".ef_readModule handles switch fall-through and pre-dispatch statement
   expect_identical(m$branches$Growth, m$branches$Grow2)
   expect_length(m$pre, 2)
   expect_false(anyNA(attr(m$branches$init, "lines")))
+  ## a multi-line block spans its first to its last line
+  m2 <- SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir)))
+  ln <- attr(m2$branches$init, "lines")
+  expect_gt(diff(ln), 0)
+  sched <- grep("scheduleEvent", readLines(m2$files[1]))
+  expect_true(all(sched[sched <= ln[2]] >= ln[1]))
+  expect_gte(ln[2], max(sched[1:4]))
 })
 
 test_that(".ef_readModule reads per-event doEvent functions", {

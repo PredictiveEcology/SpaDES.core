@@ -36,7 +36,8 @@ Only relevant if \code{sim} not supplied.}
 
 \item{byEvent}{Logical. If \code{TRUE}, \code{moduleObjects()} reads the module's code
 (see \code{\link[=moduleEventFlow]{moduleEventFlow()}}) instead of only its metadata, and reports which
-code writes and reads each object. Default \code{FALSE}.}
+code writes and reads each object; a parent module reports its children's
+objects. Default \code{FALSE}.}
 
 \item{objects}{A character vector of length >= 1 with name(s) of objects to look
 for in the metadata. This is used in a \code{grep}, meaning it will do partial

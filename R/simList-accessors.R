@@ -3508,7 +3508,8 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 #'
 #' @param byEvent Logical. If `TRUE`, `moduleObjects()` reads the module's code
 #'   (see [moduleEventFlow()]) instead of only its metadata, and reports which
-#'   code writes and reads each object. Default `FALSE`.
+#'   code writes and reads each object; a parent module reports its children's
+#'   objects. Default `FALSE`.
 #'
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
@@ -3543,13 +3544,24 @@ moduleObjects <- function(sim, module, path, byEvent = FALSE) {
       path <- getOption("spades.modulePath")
     }
     module <- unlist(unname(module))
-    out <- lapply(module, function(mod) {
-      idx <- .ef_objectIndex(moduleEventFlow(mod, path))
+    byEventRows <- function(mod, fromParent) {
+      idx <- tryCatch(.ef_objectIndex(moduleEventFlow(mod, path)),
+                      moduleEventFlowError = function(e) if (fromParent) NULL else stop(e))
+      if (is.null(idx)) return(NULL)
       data.table::data.table(
-        module = rep(mod, nrow(idx)), objectName = idx$Object, group = attr(idx, "group"),
+        module = rep(mod, nrow(idx)), objectName = idx$Object, group = as.character(attr(idx, "group")),
         writtenBy = idx[["Written by"]], readBy = idx[["Read by"]]
       )
+    }
+    ## a parent module declares no objects: report its children's, as the metadata route does
+    out <- lapply(module, function(mod) {
+      leaves <- .leafModules(mod, path)
+      lapply(leaves, byEventRows, fromParent = !identical(leaves, mod))
     })
+    out <- c(list(data.table::data.table(
+      module = character(), objectName = character(), group = character(),
+      writtenBy = character(), readBy = character()
+    )), unlist(out, recursive = FALSE))
     return(rbindlist(out)[])
   }
 

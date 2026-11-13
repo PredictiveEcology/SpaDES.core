@@ -34,3 +34,48 @@ test_that("moduleObjects(byEvent = TRUE) lists writers and readers with defaults
   expect_identical(row("burnMap")$readBy, "summarySingle (single), summaryMulti (multi)")
   expect_identical(row("fireReturnInterval")$group, "Inputs the module also updates")
 })
+
+## a parent module: defineModule() with childModules and no inputObjects or outputObjects
+efParent <- function(dir, name, children) {
+  modDir <- file.path(dir, name)
+  dir.create(modDir, recursive = TRUE, showWarnings = FALSE)
+  writeLines(c(
+    "defineModule(sim, list(",
+    paste0("  name = \"", name, "\","),
+    "  timeunit = \"year\",",
+    paste0("  childModules = c(", paste0("\"", children, "\"", collapse = ", "), ")"),
+    "))"
+  ), file.path(modDir, paste0(name, ".R")))
+  modDir
+}
+
+test_that("moduleEventFlow() reads a parent module, with no events", {
+  testInit()
+  efParent(tmpdir, "parentMod", c("kidA", "kidB"))
+  ef <- moduleEventFlow("parentMod", tmpdir)
+  expect_length(ef$default$events, 0)
+  expect_identical(ef$read$meta$inputs, character())
+  expect_identical(ef$read$meta$outputs, character())
+})
+
+test_that("moduleObjects(byEvent = TRUE) on a parent returns its children's rows", {
+  testInit()
+  for (k in c("kidA", "kidB")) {
+    efModule(tmpdir, k, outputs = sprintf('createsOutput("%sOut", "data.frame", "")', k), code =
+      sprintf('doEvent.%s <- function(sim, eventTime, eventType) {
+         switch(eventType, init = { sim$%sOut <- data.frame(a = 1) })
+         invisible(sim)
+       }', k, k))
+  }
+  efParent(tmpdir, "parentMod", c("kidA", "kidB"))
+  mo <- moduleObjects(module = "parentMod", path = tmpdir, byEvent = TRUE)
+  expect_identical(names(mo), c("module", "objectName", "group", "writtenBy", "readBy"))
+  expect_identical(mo$module, c("kidA", "kidB"))
+  expect_identical(mo$objectName, c("kidAOut", "kidBOut"))
+
+  ## a parent whose children cannot be read gives an empty table with the same columns
+  efParent(tmpdir, "lonely", "noSuchKid")
+  e <- moduleObjects(module = "lonely", path = tmpdir, byEvent = TRUE)
+  expect_identical(nrow(e), 0L)
+  expect_identical(names(e), c("module", "objectName", "group", "writtenBy", "readBy"))
+})
