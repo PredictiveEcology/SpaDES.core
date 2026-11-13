@@ -69,7 +69,7 @@
 ## ---------------------------------------------------------------------------
 
 ## Parse one module source file (or a vector of source lines) into:
-##   list(doc = xml2 document, file = file)
+##   list(doc = xml2 document, file = file, exprs = the parsed expressions)
 .cc_parseFile <- function(file = NULL, text = NULL) {
   .cc_needPkgs()
   if (is.null(text)) {
@@ -78,7 +78,8 @@
     parsed <- parse(text = text, keep.source = TRUE)
   }
   xml <- xmlparsedata::xml_parse_data(parsed, includeText = TRUE)
-  list(doc = xml2::read_xml(xml), file = if (is.null(file)) "<text>" else file)
+  list(doc = xml2::read_xml(xml), file = if (is.null(file)) "<text>" else file,
+       exprs = parsed)
 }
 
 .cc_needPkgs <- function() {
