@@ -122,6 +122,7 @@ Collate:
     'eventStops.R'
     'eventflow-eval.R'
     'eventflow-objects.R'
+    'eventflow-plot-objects.R'
     'eventflow-plot.R'
     'eventflow-read.R'
     'eventflow.R'

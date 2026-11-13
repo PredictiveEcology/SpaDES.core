@@ -285,6 +285,31 @@ setMethod(
     )
 })
 
+#' @param module Character string. The name of the module.
+#' @param path Character string. The directory holding the module's directory.
+#' @param figDir Character string. The directory to write the figures to.
+#' @param width Numeric. The width of the figures in inches.
+#' @param titles Logical. Whether each figure carries its own title and timing line.
+#'
+#' @details
+#' With `module` and `path` and no `sim`, `objectDiagram()` draws, for each piece of the
+#' module's code (`.inputObjects`, `init` and the functions it calls, and each event), one
+#' figure of the objects it reads (blue, top left), updates (green, passing through) and writes
+#' (brown, bottom right), and of the module parameters it uses (top). The module's code is
+#' read, not run (see [moduleEventFlow()]).
+#'
+#' @return For `module` and `path`, a character vector of the figure files, named by the piece
+#'   of code, with the figure heights in inches as attribute `"heights"`.
+#' @export
+#' @rdname objectDiagram
+setMethod(
+  "objectDiagram",
+  signature(sim = "missing"),
+  definition = function(sim, module, path, figDir = "figures", width = 4.65, titles = TRUE, ...) {
+    .ef_plotObjects(moduleEventFlow(module, path), figDir, width, titles)
+  }
+)
+
 #' Simulation module dependency diagram
 #'
 #' Create a network diagram illustrating the simplified module dependencies of a
