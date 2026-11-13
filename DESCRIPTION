@@ -70,6 +70,7 @@ Suggests:
     pkgload,
     png,
     RColorBrewer (>= 1.1-2),
+    ragg,
     raster (>= 2.5-8),
     rmarkdown,
     roxygen2,
@@ -78,6 +79,7 @@ Suggests:
     rstudioapi,
     sp,
     SpaDES.tools (>= 2.1.1),
+    systemfonts,
     tcltk,
     testthat (>= 1.0.2),
     withr
@@ -120,6 +122,7 @@ Collate:
     'eventStops.R'
     'eventflow-eval.R'
     'eventflow-objects.R'
+    'eventflow-plot.R'
     'eventflow-read.R'
     'eventflow.R'
     'simulation-parseModule.R'

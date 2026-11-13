@@ -5,6 +5,7 @@
 \alias{eventDiagram,simList,numeric,character-method}
 \alias{eventDiagram,simList,missing,character-method}
 \alias{eventDiagram,simList,missing,missing-method}
+\alias{eventDiagram,missing,missing,missing-method}
 \title{Simulation event diagram}
 \usage{
 eventDiagram(sim, n, startDate, ...)
@@ -14,6 +15,18 @@ eventDiagram(sim, n, startDate, ...)
 \S4method{eventDiagram}{simList,missing,character}(sim, n, startDate, ...)
 
 \S4method{eventDiagram}{simList,missing,missing}(sim, n, startDate, ...)
+
+\S4method{eventDiagram}{missing,missing,missing}(
+  sim,
+  n,
+  startDate,
+  module,
+  path,
+  file,
+  width = 4.65,
+  context = NULL,
+  ...
+)
 }
 \arguments{
 \item{sim}{A \code{simList} object (typically corresponding to a completed simulation).}
@@ -24,9 +37,22 @@ eventDiagram(sim, n, startDate, ...)
 
 \item{...}{Additional arguments passed to \code{mermaid}.
 Useful for specifying \code{height} and \code{width}.}
+
+\item{module, path, file, width, context}{For the method with none of \code{sim}, \code{n} and
+\code{startDate}: \code{module} is a module name and \code{path} the directory that contains
+the module's directory. The event flow of the module is drawn from its code
+(see \code{\link[=moduleEventFlow]{moduleEventFlow()}}; the module is not run) as a PNG file \code{file},
+\code{width} inches wide (by default the text width of a PDF page).
+\code{context} is an optional character vector of module directories,
+whose recurring events, other than plotting and saving, are drawn in grey
+to show their order relative to the module's own. Requires the packages
+\code{ggplot2}, \code{ragg} and \code{systemfonts}; the font is the installed family named
+by \code{options(spades.eventFlowFont =)}, if any.}
 }
 \value{
-Plots an event diagram as Gantt Chart, invisibly returning a \code{mermaid} object.
+For a \code{simList}, plots an event diagram as Gantt Chart, invisibly returning a \code{mermaid} object.
+For a module, invisibly a list with the figure's \code{file}, its \code{height} in inches and
+the laid-out \code{rows}.
 }
 \description{
 Create a Gantt Chart representing the events in a completed simulation.

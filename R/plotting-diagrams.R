@@ -127,7 +127,20 @@ setMethod(
 #' @param ...  Additional arguments passed to `mermaid`.
 #'             Useful for specifying `height` and `width`.
 #'
-#' @return Plots an event diagram as Gantt Chart, invisibly returning a `mermaid` object.
+#' @param module,path,file,width,context  For the method with none of `sim`, `n` and
+#'             `startDate`: `module` is a module name and `path` the directory that contains
+#'             the module's directory. The event flow of the module is drawn from its code
+#'             (see [moduleEventFlow()]; the module is not run) as a PNG file `file`,
+#'             `width` inches wide (by default the text width of a PDF page).
+#'             `context` is an optional character vector of module directories,
+#'             whose recurring events, other than plotting and saving, are drawn in grey
+#'             to show their order relative to the module's own. Requires the packages
+#'             `ggplot2`, `ragg` and `systemfonts`; the font is the installed family named
+#'             by `options(spades.eventFlowFont =)`, if any.
+#'
+#' @return For a `simList`, plots an event diagram as Gantt Chart, invisibly returning a `mermaid` object.
+#'         For a module, invisibly a list with the figure's `file`, its `height` in inches and
+#'         the laid-out `rows`.
 #'
 #' @seealso `DiagrammeR::mermaid`.
 #'
@@ -205,6 +218,15 @@ setMethod(
   definition = function(sim, startDate, ...) {
     d <- as.Date(start(sim), format(Sys.time(), "%Y-%m-%d")) |> as.character()
     eventDiagram(sim = sim, n = NROW(completed(sim)), startDate = d, ...)
+})
+
+#' @export
+#' @rdname eventDiagram
+setMethod(
+  "eventDiagram",
+  signature(sim = "missing", n = "missing", startDate = "missing"),
+  definition = function(sim, n, startDate, module, path, file, width = 4.65, context = NULL, ...) {
+    .ef_plotFlow(moduleEventFlow(module, path), file, width = width, context = context)
 })
 
 #' Simulation object dependency diagram
