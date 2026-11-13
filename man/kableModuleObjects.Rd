@@ -4,17 +4,21 @@
 \alias{kableModuleObjects}
 \title{Show a module's object index as a table in a knitr document}
 \usage{
-kableModuleObjects(x, caption = NULL)
+kableModuleObjects(x, caption = NULL, lead = NULL)
 }
 \arguments{
 \item{x}{A \code{moduleEventFlow} object (see \code{\link[=moduleEventFlow]{moduleEventFlow()}}), or the error
 raised when reading it failed, which gives a note in place of the table.}
 
 \item{caption}{Character string. The table caption, or \code{NULL} for none.}
+
+\item{lead}{Character string. Text to put before the table, such as a sentence
+that refers to it, or \code{NULL} for none. It is left out when there is no table,
+so a cross-reference to the table never dangles.}
 }
 \value{
 A table to print in the document (a \code{knitr_kable}), or, if \code{x} is an
-error, a note.
+error, a note. With \code{lead}, the table is returned printed, after the text.
 }
 \description{
 The objects a module reads and writes, with the code that writes each and the

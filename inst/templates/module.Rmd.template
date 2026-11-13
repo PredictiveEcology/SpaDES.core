@@ -91,10 +91,9 @@ ef <- tryCatch(SpaDES.core::moduleEventFlow("{{{name}}}", path = ".."), error = 
 SpaDES.core::includeModuleEventFlow(ef, "figures/{{{name}}}_eventFlow.png")
 ```
 
-Table \@ref(tab:eventObjects-{{{name2}}}) lists, for each object, the code that writes it and the code that only reads it.
-
 ```{r eventObjects-{{{name2}}}, echo = FALSE, eval = TRUE, cache = FALSE}
-SpaDES.core::kableModuleObjects(ef, caption = "Where each object of (ref:{{{name2}}}) is written and read, in run order.")
+SpaDES.core::kableModuleObjects(ef, caption = "Where each object of (ref:{{{name2}}}) is written and read, in run order.",
+                                lead = "Table \\@ref(tab:eventObjects-{{{name2}}}) lists, for each object, the code that writes it and the code that only reads it.")
 ```
 
 ```{r eventFigures-{{{name2}}}, echo = FALSE, eval = TRUE, cache = FALSE, results = "asis"}

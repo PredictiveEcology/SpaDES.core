@@ -268,13 +268,16 @@
 #' @param x A `moduleEventFlow` object (see [moduleEventFlow()]), or the error
 #'   raised when reading it failed, which gives a note in place of the table.
 #' @param caption Character string. The table caption, or `NULL` for none.
+#' @param lead Character string. Text to put before the table, such as a sentence
+#'   that refers to it, or `NULL` for none. It is left out when there is no table,
+#'   so a cross-reference to the table never dangles.
 #'
 #' @return A table to print in the document (a `knitr_kable`), or, if `x` is an
-#'   error, a note.
+#'   error, a note. With `lead`, the table is returned printed, after the text.
 #'
 #' @export
 #' @rdname kableModuleObjects
-kableModuleObjects <- function(x, caption = NULL) {
+kableModuleObjects <- function(x, caption = NULL, lead = NULL) {
   if (inherits(x, "condition")) return(.ef_note(x))
   if (!requireNamespace("knitr", quietly = TRUE)) {
     stop("Package 'knitr' is needed to make the table; please install it.")
@@ -301,7 +304,7 @@ kableModuleObjects <- function(x, caption = NULL) {
     })
     k <- knitr::kable(do.call(rbind, parts), format = "pipe", row.names = FALSE,
                       caption = caption)
-    return(knitr::asis_output(paste(c(k, "", notes, ""), collapse = "\n")))
+    return(.ef_lead(knitr::asis_output(paste(c(k, "", notes, ""), collapse = "\n")), lead))
   }
   if (!requireNamespace("kableExtra", quietly = TRUE)) {
     stop("Package 'kableExtra' is needed to make the table; please install it.")
@@ -327,5 +330,13 @@ kableModuleObjects <- function(x, caption = NULL) {
   if (nzchar(notes)) {
     k <- kableExtra::footnote(k, general = notes, general_title = "", threeparttable = TRUE)
   }
-  k
+  .ef_lead(k, lead)
+}
+
+## Put `lead` before the table `k`. The table is printed here, as knitr would print
+## it, so the result keeps what printing adds (kableExtra's HTML dependencies).
+.ef_lead <- function(k, lead) {
+  if (is.null(lead)) return(k)
+  out <- knitr::knit_print(k)
+  knitr::asis_output(paste0(lead, "\n\n", out), meta = attr(out, "knit_meta"))
 }

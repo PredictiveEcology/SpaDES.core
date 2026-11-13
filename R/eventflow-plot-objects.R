@@ -208,10 +208,11 @@ moduleEventFigures <- function(x, figDir = "figures", level = 4) {
     cat(.ef_note(files), "\n")
     return(invisible(NULL))
   }
-  ## figures of events that no longer exist
+  ## figures of events that no longer exist; compared by file name, as list.files()
+  ## expands a leading `~` that `files` keeps
   old <- list.files(fp$write, pattern = "\\.png$", full.names = TRUE)
   old <- old[startsWith(basename(old), paste0(x$read$name, "_io_"))]
-  unlink(setdiff(old, files))
+  unlink(old[!basename(old) %in% basename(files)])
 
   h <- attr(files, "heights")
   latex <- knitr::is_latex_output()

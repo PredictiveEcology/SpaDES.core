@@ -298,6 +298,9 @@ test_that("the module Rmd template has the generated event sections", {
   rmd <- readLines(file.path(tmpdir, "efTmpl", "efTmpl.Rmd"))
   expect_true(any(grepl("SpaDES.core::includeModuleEventFlow(ef, \"figures/efTmpl_eventFlow.png\")", rmd, fixed = TRUE)))
   expect_true(any(grepl("SpaDES.core::kableModuleObjects(ef", rmd, fixed = TRUE)))
+  ## the sentence that refers to the table is passed as `lead`, so it comes only with a table
+  expect_true(any(grepl('lead = "Table \\\\@ref(tab:eventObjects-efTmpl)', rmd, fixed = TRUE)))
+  expect_false(any(grepl("^Table \\\\@ref\\(tab:eventObjects", rmd)))
   expect_true(any(grepl("SpaDES.core::moduleEventFigures(ef", rmd, fixed = TRUE)))
   chunks <- grep("^```\\{r event(Flow|Objects|Figures)-", rmd, value = TRUE)
   expect_length(chunks, 3)
@@ -321,4 +324,9 @@ test_that("a new module's Rmd knits with the event flow, index and figures", {
   expect_true(any(grepl("No objects in this module's metadata are read or written by its code", md, fixed = TRUE)))
   expect_false(any(grepl("Error|Warning", md)))
   expect_false(any(grepl("NA\\.$", md)))
+  ## no sentence refers to the table that is not there; bookdown writes <strong>??</strong>
+  ## for a reference it cannot resolve
+  expect_false(any(grepl("@ref(tab:eventObjects", md, fixed = TRUE)))
+  html <- readLines(file.path(tmpdir, "efKnit", "efKnit.html"), warn = FALSE)
+  expect_false(any(grepl("<strong>??</strong>", html, fixed = TRUE)))
 })

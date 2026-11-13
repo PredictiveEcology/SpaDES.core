@@ -20,8 +20,10 @@ test_that("context draws other modules' events; an uninstalled font falls back",
 
 test_that("includeModuleEventFlow writes into the staging directory when staged", {
   testInit(c("ggplot2", "ragg", "systemfonts", "knitr"))
-  old <- knitr::opts_knit$get()
-  withr::defer(knitr::opts_knit$set(old))
+  ## setting the old options back would leave the staging directory set, and a later
+  ## knit (test-module-template.R) would write its figures there
+  oldOut <- knitr::opts_knit$get("output.dir")
+  withr::defer(knitr::opts_knit$set(SpaDES.docs.stageDir = NULL, output.dir = oldOut))
   knitr::opts_knit$set(SpaDES.docs.stageDir = "staged/fireMod", output.dir = tmpdir)
   ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
   inc <- includeModuleEventFlow(ef, "figures/fireMod_eventFlow.png")

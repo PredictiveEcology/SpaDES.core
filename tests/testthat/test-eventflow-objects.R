@@ -95,6 +95,27 @@ test_that("kableModuleObjects fits LaTeX pages and degrades to a note", {
   expect_match(as.character(kableModuleObjects(e)), "Event flow not available")
 })
 
+test_that("kableModuleObjects puts the lead sentence before a table, never before a note", {
+  testInit(c("knitr", "kableExtra"))
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  efModule(tmpdir, "idleMod", inputs = 'expectsInput("unusedObj", "data.frame", "")', code =
+    'doEvent.idleMod <- function(sim, eventTime, eventType) {
+       switch(eventType, init = { invisible(NULL) })
+       invisible(sim)
+     }')
+  idle <- moduleEventFlow("idleMod", tmpdir)
+  e <- tryCatch(moduleEventFlow("nope", tmpdir), error = function(e) e)
+  lead <- "Table 1 lists the objects."
+  for (to in c("latex", "html", "docx")) {
+    knitr::opts_knit$set(rmarkdown.pandoc.to = to)
+    expect_true(startsWith(as.character(kableModuleObjects(ef, lead = lead)), paste0(lead, "\n\n")))
+    expect_false(grepl(lead, as.character(kableModuleObjects(idle, lead = lead)), fixed = TRUE))
+    expect_false(grepl(lead, as.character(kableModuleObjects(e, lead = lead)), fixed = TRUE))
+  }
+})
+
 test_that("kableModuleObjects gives a pipe table, and a note when no object is traced", {
   testInit(c("knitr", "kableExtra"))
   old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
