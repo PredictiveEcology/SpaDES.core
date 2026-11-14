@@ -1,5 +1,5 @@
 test_that("default flow of an if-chain module with a run mode", {
-  testInit()
+  testInit(efPkgs)
   ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
   expect_s3_class(ef, "moduleEventFlow")
   ev <- ef$default$events
@@ -15,7 +15,7 @@ test_that("default flow of an if-chain module with a run mode", {
   expect_identical(ef$modes$multi$status[c("Burn", "summaryMulti")], c(Burn = "off", summaryMulti = "on"))
 })
 test_that("switch module: locals, data-dependent conditions, fall-through, unscheduled", {
-  testInit()
+  testInit(efPkgs)
   ef <- moduleEventFlow("vegMod", dirname(efFixtureVeg(tmpdir)))
   ev <- ef$default$events
   expect_identical(ev$summaryStart[c("status", "cond")], list(status = "off", cond = "depends on calcSummary"))
@@ -26,34 +26,34 @@ test_that("switch module: locals, data-dependent conditions, fall-through, unsch
   expect_null(ef$modeParam)
 })
 test_that("per-event doEvent functions and the newModule() template both read", {
-  testInit(smcc = FALSE)
+  testInit(efPkgs, smcc = FALSE)
   expect_true(moduleEventFlow("evMod", dirname(efFixtureEvents(tmpdir)))$default$events$step$recurring)
   newModule("tmplMod", tmpdir, open = FALSE)
   ef <- moduleEventFlow("tmplMod", tmpdir)
   expect_setequal(names(ef$default$status), c("init", "plot", "save", "event1", "event2"))
 })
 test_that("module code is never run while reading", {
-  testInit()
+  testInit(efPkgs)
   f <- tempfile(); writeLines("x", f); d <- tempfile(); dir.create(d)
   efModule(tmpdir, "unsafeMod", code = sprintf(
     'doEvent.unsafeMod <- function(sim, eventTime, eventType) {
        switch(eventType, init = {
-         x <- unlink("%s", recursive = TRUE)
-         if (file.remove("%s")) sim <- scheduleEvent(sim, start(sim), "unsafeMod", "a")
+         x <- unlink(%s, recursive = TRUE)
+         if (file.remove(%s)) sim <- scheduleEvent(sim, start(sim), "unsafeMod", "a")
        }, a = {})
        invisible(sim)
-     }', d, f))
+     }', deparse(d), deparse(f)))
   ef <- moduleEventFlow("unsafeMod", tmpdir)
   expect_true(file.exists(f)); expect_true(dir.exists(d))
   expect_identical(ef$default$events$a$status, "cond")
 })
 test_that("a module with no events reads as having none", {
-  testInit()
+  testInit(efPkgs)
   efModule(tmpdir, "parentMod", code = "")
   expect_length(moduleEventFlow("parentMod", tmpdir)$default$events, 0)
 })
 test_that("an event reached only through a conditional event takes that event's condition", {
-  testInit()
+  testInit(efPkgs)
   efModule(tmpdir, "chainMod", code = c(
     "doEvent.chainMod <- function(sim, eventTime, eventType) {",
     "  switch(eventType,",
@@ -82,7 +82,7 @@ test_that(".ef_timingText prints no missing condition and no leading separator",
   expect_identical(SpaDES.core:::.ef_timingText(ev, "year"), "only if x is set")
 })
 test_that("scheduleEvent() called as SpaDES.core::scheduleEvent() is read as scheduling", {
-  testInit()
+  testInit(efPkgs)
   efModule(tmpdir, "nsMod", code = c(
     "doEvent.nsMod <- function(sim, eventTime, eventType) {",
     "  switch(eventType,",

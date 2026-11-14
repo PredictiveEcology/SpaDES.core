@@ -1,5 +1,5 @@
 test_that("code units list reads, updates, writes and parameters in run order", {
-  testInit()
+  testInit(efPkgs)
   ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
   u <- SpaDES.core:::.ef_codeUnits(ef)
   ids <- vapply(u, `[[`, "", "id")
@@ -14,7 +14,7 @@ test_that("code units list reads, updates, writes and parameters in run order", 
 })
 
 test_that("a read of an object the same code first creates is not a read", {
-  testInit()
+  testInit(efPkgs)
   efModule(tmpdir, "rwMod", outputs = 'createsOutput("tab", "data.frame", "")', code =
     'doEvent.rwMod <- function(sim, eventTime, eventType) {
        switch(eventType, init = { sim$tab <- data.frame(a = 1); sim$tab$b <- sim$tab$a })
@@ -25,7 +25,7 @@ test_that("a read of an object the same code first creates is not a read", {
 })
 
 test_that("moduleObjects(byEvent = TRUE) lists writers and readers with defaults and modes", {
-  testInit()
+  testInit(efPkgs)
   mo <- moduleObjects(module = "fireMod", path = dirname(efFixtureFire(tmpdir)), byEvent = TRUE)
   expect_identical(names(mo), c("module", "objectName", "group", "writtenBy", "readBy"))
   row <- function(o) mo[mo$objectName == o, ]
@@ -50,7 +50,7 @@ efParent <- function(dir, name, children) {
 }
 
 test_that("moduleEventFlow() reads a parent module, with no events", {
-  testInit()
+  testInit(efPkgs)
   efParent(tmpdir, "parentMod", c("kidA", "kidB"))
   ef <- moduleEventFlow("parentMod", tmpdir)
   expect_length(ef$default$events, 0)
@@ -59,7 +59,7 @@ test_that("moduleEventFlow() reads a parent module, with no events", {
 })
 
 test_that("moduleObjects(byEvent = TRUE) on a parent returns its children's rows", {
-  testInit()
+  testInit(efPkgs)
   for (k in c("kidA", "kidB")) {
     efModule(tmpdir, k, outputs = sprintf('createsOutput("%sOut", "data.frame", "")', k), code =
       sprintf('doEvent.%s <- function(sim, eventTime, eventType) {
@@ -80,8 +80,18 @@ test_that("moduleObjects(byEvent = TRUE) on a parent returns its children's rows
   expect_identical(names(e), c("module", "objectName", "group", "writtenBy", "readBy"))
 })
 
+test_that("moduleObjects(byEvent = TRUE) on a parent stops when the reader lacks a package", {
+  testInit(efPkgs)
+  efModule(tmpdir, "kidA", code = "")
+  efParent(tmpdir, "parentMod", "kidA")
+  testthat::local_mocked_bindings(.ef_needPkgs = function(pkgs, what) {
+    stop("Package 'xmlparsedata' is required to ", what)
+  })
+  expect_error(moduleObjects(module = "parentMod", path = tmpdir, byEvent = TRUE), "xmlparsedata")
+})
+
 test_that("kableModuleObjects fits LaTeX pages and degrades to a note", {
-  testInit(c("knitr", "kableExtra"))
+  testInit(c(efPkgs, "knitr", "kableExtra"))
   ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
   old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
   withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
@@ -96,7 +106,7 @@ test_that("kableModuleObjects fits LaTeX pages and degrades to a note", {
 })
 
 test_that("kableModuleObjects puts the lead sentence before a table, never before a note", {
-  testInit(c("knitr", "kableExtra"))
+  testInit(c(efPkgs, "knitr", "kableExtra"))
   old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
   withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
   ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
@@ -117,7 +127,7 @@ test_that("kableModuleObjects puts the lead sentence before a table, never befor
 })
 
 test_that("kableModuleObjects gives a pipe table, and a note when no object is traced", {
-  testInit(c("knitr", "kableExtra"))
+  testInit(c(efPkgs, "knitr", "kableExtra"))
   old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
   withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
   knitr::opts_knit$set(rmarkdown.pandoc.to = "docx")
@@ -138,14 +148,14 @@ test_that("kableModuleObjects gives a pipe table, and a note when no object is t
 })
 
 test_that("kableModuleObjects gives a note when making the table fails", {
-  testInit("knitr")
+  testInit(c(efPkgs, "knitr"))
   ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
   ef$default <- "not a flow"
   expect_match(as.character(kableModuleObjects(ef)), "Event flow not available")
 })
 
 test_that("moduleObjects(sim, byEvent = TRUE) reads each module from the modulePath entry that has it", {
-  testInit()
+  testInit(efPkgs)
   noMods <- file.path(tmpdir, "noMods")
   dir.create(noMods)
   sim <- simInit(paths = list(modulePath = c(noMods, dirname(efFixtureFire(file.path(tmpdir, "mods"))))))

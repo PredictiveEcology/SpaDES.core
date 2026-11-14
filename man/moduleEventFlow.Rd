@@ -72,10 +72,13 @@ parameter is used.
 }
 \examples{
 \donttest{
-tmpdir <- file.path(tempdir(), "moduleEventFlowExample")
-newModule("myModule", tmpdir, open = FALSE)
-ef <- moduleEventFlow("myModule", tmpdir)
-ef$default$status
-unlink(tmpdir, recursive = TRUE)
+if (requireNamespace("xmlparsedata", quietly = TRUE) &&
+    requireNamespace("xml2", quietly = TRUE)) {
+  tmpdir <- file.path(tempdir(), "moduleEventFlowExample")
+  newModule("myModule", tmpdir, open = FALSE)
+  ef <- moduleEventFlow("myModule", tmpdir)
+  ef$default$status
+  unlink(tmpdir, recursive = TRUE)
+}
 }
 }

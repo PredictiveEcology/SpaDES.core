@@ -27,14 +27,18 @@ utils::globalVariables(c(
       fam %in% systemfonts::system_fonts()$family) fam else "sans"
 }
 
-## width in inches of the widest line of each string, as ragg will draw it
+## resolution of the figures (dpi); text is measured at it
+.ef_dpi <- 300
+
+## width in inches of the widest line of each string, measured as ragg measures it when it
+## draws the figure: with textshaping, at the figure's resolution
 .ef_tw <- function(s, pt, family = .ef_font(), bold = FALSE) {
   if (!length(s)) return(0)
   k <- if (bold) 1.07 else 1
   vapply(s, function(x) {
     lines <- strsplit(x, "\n", fixed = TRUE)[[1]]
     if (!length(lines)) return(0)
-    k * max(systemfonts::string_width(lines, family = family, size = pt, res = 72)) / 72
+    k * max(textshaping::text_width(lines, family = family, size = pt, res = .ef_dpi)) / .ef_dpi
   }, numeric(1), USE.NAMES = FALSE)
 }
 
@@ -211,11 +215,7 @@ utils::globalVariables(c(
 ## recurring, non-plot events are drawn in grey, for their order relative to this module's.
 ## Returns invisibly the file, the figure height in inches and the laid-out rows.
 .ef_plotFlow <- function(x, file, width = 4.65, context = NULL) {
-  for (pkg in c("ggplot2", "ragg", "systemfonts")) {
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-      stop("Package '", pkg, "' is required to draw an event flow; please install it.")
-    }
-  }
+  .ef_needPkgs(c("ggplot2", "ragg", "systemfonts", "textshaping"), "draw an event flow")
   fam <- .ef_font()
   ctx <- lapply(context, function(d) {
     d <- normalizePath(d, mustWork = FALSE)
@@ -490,7 +490,7 @@ utils::globalVariables(c(
                                lineheight = 0.95, family = fam)
   }
   dir.create(dirname(file), recursive = TRUE, showWarnings = FALSE)
-  ggplot2::ggsave(file, g, width = width, height = height, units = "in", dpi = 300,
+  ggplot2::ggsave(file, g, width = width, height = height, units = "in", dpi = .ef_dpi,
                   device = ragg::agg_png, bg = "white")
   invisible(list(file = file, height = height, rows = rows))
 }

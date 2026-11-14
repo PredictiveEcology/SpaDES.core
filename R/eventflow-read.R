@@ -158,6 +158,17 @@
   NULL
 }
 
+## Stop, naming the first of `pkgs` that is not installed and what it is needed to do.
+## A plain error, not `moduleEventFlowError`, so a parent module's missing package is not
+## taken for an unreadable child.
+.ef_needPkgs <- function(pkgs, what) {
+  for (pkg in pkgs) {
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      stop("Package '", pkg, "' is required to ", what, "; please install it.", call. = FALSE)
+    }
+  }
+}
+
 ## Read a module's sources, metadata and event dispatch, statically.
 ##
 ## Returns list(name, path, files, parsed, fns, meta, pre, branches):
@@ -168,8 +179,10 @@
 ##             "lines" (c(first, last), NA when unknown)
 ## A module with no `doEvent.<module>` but per-event `doEvent.<module>.<event>`
 ## functions has those as its branches; one with neither has none.
-## Errors with class `moduleEventFlowError` when the module cannot be read.
+## Errors with class `moduleEventFlowError` when the module cannot be read, and with a plain
+## error when xmlparsedata or xml2 is not installed.
 .ef_readModule <- function(module, path) {
+  .ef_needPkgs(c("xmlparsedata", "xml2"), "read a module's code")
   mainFile <- file.path(path, module, paste0(module, ".R"))
   if (!file.exists(mainFile)) .ef_stop(module, paste0("no file ", mainFile))
   files <- moduleCodeFiles(list(modulePath = path), module)

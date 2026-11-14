@@ -1,5 +1,5 @@
 test_that(".ef_readModule finds if-chain branches, wrapped functions and metadata", {
-  testInit()
+  testInit(efPkgs)
   m <- SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir)))
   expect_identical(names(m$branches), c("init", "Burn", "summarySingle", "summaryMulti", "save"))
   expect_true(all(c("Init", "Burn", ".inputObjects") %in% names(m$fns)))
@@ -9,7 +9,7 @@ test_that(".ef_readModule finds if-chain branches, wrapped functions and metadat
 })
 
 test_that(".ef_readModule handles switch fall-through and pre-dispatch statements", {
-  testInit()
+  testInit(efPkgs)
   m <- SpaDES.core:::.ef_readModule("vegMod", dirname(efFixtureVeg(tmpdir)))
   expect_identical(names(m$branches), c("init", "Dispersal", "Growth", "Grow2", "summaryStart", "orphan"))
   expect_identical(m$branches$Growth, m$branches$Grow2)
@@ -25,20 +25,20 @@ test_that(".ef_readModule handles switch fall-through and pre-dispatch statement
 })
 
 test_that(".ef_readModule reads per-event doEvent functions", {
-  testInit()
+  testInit(efPkgs)
   m <- SpaDES.core:::.ef_readModule("evMod", dirname(efFixtureEvents(tmpdir)))
   expect_identical(names(m$branches), c("init", "step"))
 })
 
 test_that(".ef_readModule signals a classed error for unparseable code", {
-  testInit()
+  testInit(efPkgs)
   d <- efModule(tmpdir, "badMod", code = "doEvent.badMod <- function(sim, eventTime, eventType) {")
   expect_error(SpaDES.core:::.ef_readModule("badMod", tmpdir), class = "moduleEventFlowError")
   expect_error(SpaDES.core:::.ef_readModule("noSuchMod", tmpdir), class = "moduleEventFlowError")
 })
 
 test_that(".ef_readModule skips object names that are not string constants", {
-  testInit()
+  testInit(efPkgs)
   efModule(tmpdir, "codeIn", code = "", inputs = paste(
     "expectsInput(noSuchFn(\"x\"), \"numeric\", \"d\"),",
     "expectsInput(\"y\", \"numeric\", \"d\")"
@@ -49,7 +49,7 @@ test_that(".ef_readModule skips object names that are not string constants", {
 })
 
 test_that(".ef_readModule runs no code to read parameter names or the time unit", {
-  testInit()
+  testInit(efPkgs)
   f <- file.path(tmpdir, "keep.txt")
   file.create(f)
   code <- paste0("{file.remove(", deparse(f), "); \"a\"}")
@@ -64,7 +64,7 @@ test_that(".ef_readModule runs no code to read parameter names or the time unit"
 })
 
 test_that(".ef_readModule never sources the module to read its object tables", {
-  testInit()
+  testInit(efPkgs)
   marker <- file.path(tmpdir, "ran.txt")
   ## evaluating outputObjects fails on `outClass`, and "P(sim)" in a desc once made
   ## .parseModulePartial() fall back to simInit(), which sources the module
@@ -82,7 +82,7 @@ test_that(".ef_readModule never sources the module to read its object tables", {
 })
 
 test_that(".ef_readModule errors without a defineModule(), but reads a module with no events", {
-  testInit()
+  testInit(efPkgs)
   dir.create(file.path(tmpdir, "noDef"))
   writeLines("doEvent.noDef <- function(sim, eventTime, eventType) sim",
              file.path(tmpdir, "noDef", "noDef.R"))
@@ -94,7 +94,7 @@ test_that(".ef_readModule errors without a defineModule(), but reads a module wi
 })
 
 test_that(".ef_readModule drops the template's NA placeholder object names", {
-  testInit()
+  testInit(efPkgs)
   d <- efModule(
     tmpdir, "naMod",
     inputs = paste(

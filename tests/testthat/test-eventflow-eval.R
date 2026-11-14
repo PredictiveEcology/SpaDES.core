@@ -1,5 +1,5 @@
 test_that(".ef_safeEval never runs functions outside the allowlist", {
-  testInit()
+  testInit(efPkgs)
   f <- tempfile(); writeLines("x", f)
   st <- SpaDES.core:::.ef_state(SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir))))
   expect_s3_class(SpaDES.core:::.ef_safeEval(bquote(file.remove(.(f))), st$sandbox), "ef_unknown")
@@ -9,7 +9,7 @@ test_that(".ef_safeEval never runs functions outside the allowlist", {
 })
 
 test_that(".ef_safeEval cannot reach a function outside the allowlist by any route", {
-  testInit()
+  testInit(efPkgs)
   f <- tempfile(); writeLines("x", f)
   st <- SpaDES.core:::.ef_state(SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir))))
   bad <- list(
@@ -30,7 +30,7 @@ test_that(".ef_safeEval cannot reach a function outside the allowlist by any rou
 })
 
 test_that("a parameter default cannot rebind the sandbox", {
-  testInit()
+  testInit(efPkgs)
   modDir <- efModule(tmpdir, "rebMod",
     params = "defineParameter(\"a\", \"numeric\", {P <- 1; 2}, NA, NA, \"x\")",
     code = "doEvent.rebMod <- function(sim, eventTime, eventType, priority) NULL")
@@ -39,7 +39,7 @@ test_that("a parameter default cannot rebind the sandbox", {
 })
 
 test_that("params(sim)<- rewrites are tracked", {
-  testInit()
+  testInit(efPkgs)
   st <- SpaDES.core:::.ef_state(SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir))))
   e <- new.env(parent = st$sandbox)
   SpaDES.core:::.ef_safeEval(quote(params(sim)$fireMod$fireTimestep <- 5L), e)
@@ -48,7 +48,7 @@ test_that("params(sim)<- rewrites are tracked", {
 })
 
 test_that(".ef_classifyTime classifies recurring, start-relative, end and NA times", {
-  testInit()
+  testInit(efPkgs)
   m <- SpaDES.core:::.ef_readModule("fireMod", dirname(efFixtureFire(tmpdir)))
   st <- SpaDES.core:::.ef_stateFor(m)  # list(env, store, mod, prov) at init
   tt <- SpaDES.core:::.ef_classifyTime(quote(time(sim) + P(sim)$fireTimestep), st)
@@ -60,7 +60,7 @@ test_that(".ef_classifyTime classifies recurring, start-relative, end and NA tim
 })
 
 test_that(".ef_condText reads like a setting, and names the parameters behind locals", {
-  testInit()
+  testInit(efPkgs)
   m <- SpaDES.core:::.ef_readModule("vegMod", dirname(efFixtureVeg(tmpdir)))
   st <- SpaDES.core:::.ef_stateFor(m)
   expect_identical(SpaDES.core:::.ef_condText(quote(!is.na(P(sim)$.saveInitialTime)), st), ".saveInitialTime is set")

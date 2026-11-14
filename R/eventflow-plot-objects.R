@@ -11,11 +11,7 @@ utils::globalVariables("name")
 ## the document's own heading names the code (an embedded figure).
 ## Returns the files, named by unit id, with the figure heights in inches as attribute "heights".
 .ef_plotObjects <- function(x, figDir, width = 4.65, titles = TRUE) {
-  for (pkg in c("ggplot2", "ragg", "systemfonts")) {
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-      stop("Package '", pkg, "' is required to draw an event flow; please install it.")
-    }
-  }
+  .ef_needPkgs(c("ggplot2", "ragg", "systemfonts", "textshaping"), "draw an event flow")
   fam <- .ef_font()
   COL <- .ef_colors
   aes <- ggplot2::aes
@@ -171,7 +167,7 @@ utils::globalVariables("name")
     }
     used <- c(used, nm)
     f <- file.path(figDir, paste0(nm, ".png"))
-    ggplot2::ggsave(f, g, width = width, height = height, units = "in", dpi = 300,
+    ggplot2::ggsave(f, g, width = width, height = height, units = "in", dpi = .ef_dpi,
                     device = ragg::agg_png, bg = "white")
     files[cl$id] <- f
     heights[cl$id] <- height

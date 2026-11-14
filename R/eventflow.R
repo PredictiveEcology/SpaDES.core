@@ -354,11 +354,14 @@
 #' @export
 #' @examples
 #' \donttest{
-#' tmpdir <- file.path(tempdir(), "moduleEventFlowExample")
-#' newModule("myModule", tmpdir, open = FALSE)
-#' ef <- moduleEventFlow("myModule", tmpdir)
-#' ef$default$status
-#' unlink(tmpdir, recursive = TRUE)
+#' if (requireNamespace("xmlparsedata", quietly = TRUE) &&
+#'     requireNamespace("xml2", quietly = TRUE)) {
+#'   tmpdir <- file.path(tempdir(), "moduleEventFlowExample")
+#'   newModule("myModule", tmpdir, open = FALSE)
+#'   ef <- moduleEventFlow("myModule", tmpdir)
+#'   ef$default$status
+#'   unlink(tmpdir, recursive = TRUE)
+#' }
 #' }
 moduleEventFlow <- function(module, path) {
   if (!is.character(module) || length(module) != 1 || is.na(module)) {

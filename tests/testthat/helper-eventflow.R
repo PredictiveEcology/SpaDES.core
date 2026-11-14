@@ -1,6 +1,9 @@
 ## Fixture modules for the event-flow tests. They are written to disk and read
 ## statically; nothing in them is ever evaluated, so they need not run.
 
+## the packages (Suggests) the event-flow reader needs, for testInit()
+efPkgs <- c("xmlparsedata", "xml2")
+
 ## Write `<dir>/<name>/<name>.R`: a defineModule() call followed by `code`.
 ## `params`, `inputs` and `outputs` are text spliced into bindrows(...), and
 ## `timeunit` is the text of the time unit.

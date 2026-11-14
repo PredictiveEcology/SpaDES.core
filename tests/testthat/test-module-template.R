@@ -308,7 +308,8 @@ test_that("the module Rmd template has the generated event sections", {
 })
 
 test_that("a new module's Rmd knits with the event flow, index and figures", {
-  testInit(c("rmarkdown", "bookdown", "knitr", "kableExtra", "ggplot2", "ragg", "systemfonts"), smcc = FALSE)
+  testInit(c(efPkgs, "rmarkdown", "bookdown", "knitr", "kableExtra", "ggplot2", "ragg", "systemfonts",
+             "textshaping"), smcc = FALSE)
   skip_on_cran(); skip_if_offline()  # the template's setup chunk downloads a badge
   newModule("efKnit", tmpdir, open = FALSE)
   ## the template's YAML names this bibliography, which newModule() does not create
