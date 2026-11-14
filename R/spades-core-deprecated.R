@@ -13,6 +13,10 @@
 #'
 #' These functions have been moved to other packages.
 #'
+#' @return These functions are defunct here and are called for their side effect of
+#'   signalling a deprecation message pointing at the package that now provides them.
+#'   They return `NULL`, invisibly.
+#'
 #' @export
 #' @param ... Unused.
 #' @rdname deprecated

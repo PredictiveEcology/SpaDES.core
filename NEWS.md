@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Dependency changes
+
+* `Require` now needs to be at least version 2.0.0 (was 1.0.1).
+
 ## Bug fixes
 
 * `moduleObjects()` with neither `sim` nor `module` no longer stops in `browser()`.
