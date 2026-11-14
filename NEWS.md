@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Dependency changes
+
+* `Require` now needs to be at least version 2.0.0 (was 1.0.1).
+
 ## Bug fixes
 
 * `moduleObjects()` with neither `sim` nor `module` no longer stops in `browser()`.
@@ -836,9 +840,6 @@
 
 * The `caribouMovement` sample module no longer requires `sf`, which it never
   used.
-
-* `Require` now needs to be at least version 2.0.0. The previous minimum
-  (1.0.1) was long out of date with the functions actually used.
 
 ## Bug fixes
 
