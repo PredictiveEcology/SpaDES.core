@@ -32,9 +32,11 @@ test_that("a call without events gives the same data.frame as before", {
   x <- createsOutput("o", "numeric", "d1 ", "d2", other = "z")
   expect_identical(colnames(x), c("objectName", "objectClass", "desc", "other"))
   expect_false("events" %in% colnames(createsOutput("o", "numeric", "d")))
-  skip_if_not(file.exists(Sys.getenv("CREATESOUTPUT_BEFORE")))
-  before <- readRDS(Sys.getenv("CREATESOUTPUT_BEFORE"))
-  expect_identical(before$a, x)
-  expect_identical(before$b, createsOutput(c("o", "p"), "numeric", "d"))
-  expect_identical(before$c, createsOutput(1, 2, "d"))
+  ## the tables SpaDES.core returned before `events` was added (#525)
+  expect_identical(x, data.frame(objectName = "o", objectClass = "numeric", desc = "d1 d2",
+                                 other = I(list("z"))))
+  expect_identical(createsOutput(c("o", "p"), "numeric", "d"),
+                   data.frame(objectName = c("o", "p"), objectClass = "numeric", desc = "d"))
+  expect_identical(createsOutput(1, 2, "d"),
+                   data.frame(objectName = "1", objectClass = "2", desc = "d"))
 })
