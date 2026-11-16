@@ -949,8 +949,13 @@ setMethod(
               added$file[under] <- newFns
             }
           }
-          simPost@outputs <- .mergeCachedOutputs(
-            simPost@outputs, added[!added$objectName %in% outputsFromTheseMods, ])
+          ## An entry without the outputs tag gives the saving run's whole table, with rows for these
+          ##   modules' outputs that this run has its own copies of (e.g. from simInit(outputs = )): leave
+          ##   those out, as before the tag. With the tag, `added` is only what the event added, and a row
+          ##   it registered for its own module's output (registerOutputs(objectName = )) is restored too.
+          if (is.na(.chainReadOutAddedN(sc)))
+            added <- added[!added$objectName %in% outputsFromTheseMods, ]
+          simPost@outputs <- .mergeCachedOutputs(simPost@outputs, added)
 
         }
 

@@ -127,7 +127,22 @@ setMethod(
 #' @param ...  Additional arguments passed to `mermaid`.
 #'             Useful for specifying `height` and `width`.
 #'
-#' @return Plots an event diagram as Gantt Chart, invisibly returning a `mermaid` object.
+#' @param module,path,file,width,context  For the method with none of `sim`, `n` and
+#'             `startDate`: `module` is a module name and `path` the directory that contains
+#'             the module's directory. The event flow of the module is drawn from its code
+#'             (see [moduleEventFlow()]; the module is not run) as a PNG file `file`,
+#'             `width` inches wide (by default the text width of a PDF page).
+#'             `context` is an optional character vector of module directories,
+#'             whose recurring events, other than plotting and saving, are drawn in grey
+#'             to show their order relative to the module's own. Requires the packages
+#'             `ggplot2`, `ragg` and `systemfonts`. The font is the family named by
+#'             `options(spades.eventFlowFont =)` (default `"Noto Sans"`; see
+#'             [spadesOptions()]), or the generic `"sans"` family if that font is not
+#'             installed.
+#'
+#' @return For a `simList`, plots an event diagram as Gantt Chart, invisibly returning a `mermaid` object.
+#'         For a module, invisibly a list with the figure's `file`, its `height` in inches and
+#'         the laid-out `rows`.
 #'
 #' @seealso `DiagrammeR::mermaid`.
 #'
@@ -207,6 +222,15 @@ setMethod(
     eventDiagram(sim = sim, n = NROW(completed(sim)), startDate = d, ...)
 })
 
+#' @export
+#' @rdname eventDiagram
+setMethod(
+  "eventDiagram",
+  signature(sim = "missing", n = "missing", startDate = "missing"),
+  definition = function(sim, n, startDate, module, path, file, width = 4.65, context = NULL, ...) {
+    .ef_plotFlow(moduleEventFlow(module, path), file, width = width, context = context)
+})
+
 #' Simulation object dependency diagram
 #'
 #' Create a sequence diagram illustrating the data object dependencies of a
@@ -262,6 +286,31 @@ setMethod(
       )
     )
 })
+
+#' @param module Character string. The name of the module.
+#' @param path Character string. The directory holding the module's directory.
+#' @param figDir Character string. The directory to write the figures to.
+#' @param width Numeric. The width of the figures in inches.
+#' @param titles Logical. Whether each figure carries its own title and timing line.
+#'
+#' @details
+#' With `module` and `path` and no `sim`, `objectDiagram()` draws, for each piece of the
+#' module's code (`.inputObjects`, `init` and the functions it calls, and each event), one
+#' figure of the objects it reads (blue, top left), updates (green, passing through) and writes
+#' (brown, bottom right), and of the module parameters it uses (top). The module's code is
+#' read, not run (see [moduleEventFlow()]).
+#'
+#' @return For `module` and `path`, a character vector of the figure files, named by the piece
+#'   of code, with the figure heights in inches as attribute `"heights"`.
+#' @export
+#' @rdname objectDiagram
+setMethod(
+  "objectDiagram",
+  signature(sim = "missing"),
+  definition = function(sim, module, path, figDir = "figures", width = 4.65, titles = TRUE, ...) {
+    .ef_plotObjects(moduleEventFlow(module, path), figDir, width, titles)
+  }
+)
 
 #' Simulation module dependency diagram
 #'

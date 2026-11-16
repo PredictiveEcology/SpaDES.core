@@ -3,11 +3,22 @@
 \name{objectDiagram}
 \alias{objectDiagram}
 \alias{objectDiagram,simList-method}
+\alias{objectDiagram,missing-method}
 \title{Simulation object dependency diagram}
 \usage{
 objectDiagram(sim, ...)
 
 \S4method{objectDiagram}{simList}(sim, ...)
+
+\S4method{objectDiagram}{missing}(
+  sim,
+  module,
+  path,
+  figDir = "figures",
+  width = 4.65,
+  titles = TRUE,
+  ...
+)
 }
 \arguments{
 \item{sim}{A \code{simList} object (typically corresponding to a
@@ -15,14 +26,34 @@ completed simulation).}
 
 \item{...}{Additional arguments passed to \code{DiagrammeR::mermaid}.
 Useful for specifying \code{height} and \code{width}.}
+
+\item{module}{Character string. The name of the module.}
+
+\item{path}{Character string. The directory holding the module's directory.}
+
+\item{figDir}{Character string. The directory to write the figures to.}
+
+\item{width}{Numeric. The width of the figures in inches.}
+
+\item{titles}{Logical. Whether each figure carries its own title and timing line.}
 }
 \value{
 Plots a sequence diagram, invisibly returning a \code{DiagrammeR::mermaid} object.
+
+For \code{module} and \code{path}, a character vector of the figure files, named by the piece
+of code, with the figure heights in inches as attribute \code{"heights"}.
 }
 \description{
 Create a sequence diagram illustrating the data object dependencies of a
 simulation. Offers a more detailed view of specific objects than does
 plotting the \code{depsEdgeList} directly with \code{\link[=moduleDiagram]{moduleDiagram()}}.
+}
+\details{
+With \code{module} and \code{path} and no \code{sim}, \code{objectDiagram()} draws, for each piece of the
+module's code (\code{.inputObjects}, \code{init} and the functions it calls, and each event), one
+figure of the objects it reads (blue, top left), updates (green, passing through) and writes
+(brown, bottom right), and of the module parameters it uses (top). The module's code is
+read, not run (see \code{\link[=moduleEventFlow]{moduleEventFlow()}}).
 }
 \examples{
 \donttest{

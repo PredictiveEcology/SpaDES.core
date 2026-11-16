@@ -12,8 +12,8 @@ Description: Provides the core framework for a discrete event system to
 URL:
     https://spades-core.predictiveecology.org/,
     https://github.com/PredictiveEcology/SpaDES.core
-Date: 2026-11-12
-Version: 3.2.1.9066
+Date: 2026-11-16
+Version: 3.2.1.9069
 Authors@R: c(
     person("Alex M", "Chubaty", , "achubaty@for-cast.ca", role = c("aut"),
            comment = c(ORCID = "0000-0001-7146-8135")),
@@ -48,6 +48,7 @@ Imports:
     whisker
 Suggests:
     archive,
+    bookdown,
     CircStats,
     xml2,
     xmlparsedata,
@@ -62,6 +63,7 @@ Suggests:
     googledrive,
     httr,
     httr2,
+    kableExtra,
     knitr,
     lattice,
     lme4,
@@ -70,6 +72,7 @@ Suggests:
     pkgload,
     png,
     RColorBrewer (>= 1.1-2),
+    ragg,
     raster (>= 2.5-8),
     rmarkdown,
     roxygen2,
@@ -78,8 +81,10 @@ Suggests:
     rstudioapi,
     sp,
     SpaDES.tools (>= 2.1.1),
+    systemfonts,
     tcltk,
     testthat (>= 1.0.2),
+    textshaping,
     withr
 Remotes:
     PredictiveEcology/Require@development,
@@ -118,6 +123,12 @@ Collate:
     'dotParameters.R'
     'downloadData.R'
     'eventStops.R'
+    'eventflow-eval.R'
+    'eventflow-objects.R'
+    'eventflow-plot-objects.R'
+    'eventflow-plot.R'
+    'eventflow-read.R'
+    'eventflow.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'
     'load.R'

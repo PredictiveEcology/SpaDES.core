@@ -3506,23 +3506,68 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
 #' @inheritParams inputObjects
 #'
+#' @param byEvent Logical. If `TRUE`, `moduleObjects()` reads the module's code
+#'   (see [moduleEventFlow()]) instead of only its metadata, and reports which
+#'   code writes and reads each object; a parent module reports its children's
+#'   objects. Default `FALSE`.
+#'
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
 #' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
 #' will be determined either from a `simList` or from the module source code.
+#' With `byEvent = TRUE` it instead returns a data.table with one row per object
+#' that the module's code uses, and columns `module`, `objectName`, `group`
+#' (`"Inputs"`, `"Inputs the module also updates"` or `"Outputs"`), `writtenBy` and
+#' `readBy` (the events and set-up code that write, or only read, the object, in run
+#' order, with the run mode where an event runs in only some modes).
 #'
 #' @export
 #' @importFrom data.table set rbindlist setcolorder
 #' @importFrom reproducible .whereInStack
 #' @rdname objects
-moduleObjects <- function(sim, module, path) {
+moduleObjects <- function(sim, module, path, byEvent = FALSE) {
   simTry <- NULL # can't set `sim = NULL` because `.whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      browser()
       simTry <- suppressWarnings(try(get("sim", .whereInStack("sim")), silent = TRUE))
+      if (inherits(simTry, "try-error") || is.null(simTry))
+        stop("moduleObjects() needs `sim`, or `module` and `path`.", call. = FALSE)
     }
     sim <- simTry
+  }
+
+  if (isTRUE(byEvent)) {
+    if (!is.null(sim)) {
+      path <- modulePath(sim)
+      if (missing(module)) module <- modules(sim)
+    } else if (missing(path)) {
+      path <- getOption("spades.modulePath")
+    }
+    module <- unlist(unname(module))
+    ## modulePath can have several entries: read each module from the first that has it
+    pathOf <- function(mod) {
+      has <- file.exists(file.path(path, mod, paste0(mod, ".R")))
+      if (any(has)) path[which(has)[1]] else path[1]
+    }
+    byEventRows <- function(mod, fromParent) {
+      idx <- tryCatch(.ef_objectIndex(moduleEventFlow(mod, pathOf(mod))),
+                      moduleEventFlowError = function(e) if (fromParent) NULL else stop(e))
+      if (is.null(idx)) return(NULL)
+      data.table::data.table(
+        module = rep(mod, nrow(idx)), objectName = idx$Object, group = as.character(attr(idx, "group")),
+        writtenBy = idx[["Written by"]], readBy = idx[["Read by"]]
+      )
+    }
+    ## a parent module declares no objects: report its children's, as the metadata route does
+    out <- lapply(module, function(mod) {
+      leaves <- .leafModules(mod, pathOf(mod))
+      lapply(leaves, byEventRows, fromParent = !identical(leaves, mod))
+    })
+    out <- c(list(data.table::data.table(
+      module = character(), objectName = character(), group = character(),
+      writtenBy = character(), readBy = character()
+    )), unlist(out, recursive = FALSE))
+    return(rbindlist(out)[])
   }
 
   if (!is.null(sim)) {

@@ -1,0 +1,220 @@
+## Static reader for event-flow documentation. It parses a module's source
+## files and metadata and finds the event dispatch; no module code is evaluated.
+
+## Signal a condition that says why a module could not be read.
+.ef_stop <- function(module, msg) {
+  stop(structure(
+    class = c("moduleEventFlowError", "error", "condition"),
+    list(message = paste0("Cannot read module '", module, "': ", msg), call = NULL)
+  ))
+}
+
+## `f <- function(...)`, or a wrapped one such as `f <- compiler::cmpfun(function(...))`.
+## Returns the `function` call, or NULL.
+.ef_fnDef <- function(rhs) {
+  if (!is.call(rhs)) return(NULL)
+  if (identical(rhs[[1]], quote(`function`))) return(rhs)
+  if (length(rhs) >= 2 && is.call(rhs[[2]]) && identical(rhs[[2]][[1]], quote(`function`))) {
+    return(rhs[[2]])
+  }
+  NULL
+}
+
+.ef_isEmptyArg <- function(x) identical(x, quote(expr = ))
+
+## All calls to one of `heads` anywhere inside `e`.
+.ef_findCalls <- function(e, heads) {
+  out <- list()
+  rec <- function(x) {
+    if (!is.call(x)) return(invisible())
+    h <- x[[1]]
+    if (is.name(h) && as.character(h) %in% heads) out[[length(out) + 1L]] <<- x
+    for (j in seq_along(x)) {
+      if (!.ef_isEmptyArg(x[[j]])) rec(x[[j]])
+    }
+  }
+  rec(e)
+  out
+}
+
+## Named functions defined at the top level of the parsed files.
+.ef_readFns <- function(parsed) {
+  fns <- list()
+  for (p in parsed) {
+    ex <- p$exprs
+    srs <- attr(ex, "srcref")
+    for (i in seq_along(ex)) {
+      e <- ex[[i]]
+      if (!is.call(e) || !as.character(e[[1]])[1] %in% c("<-", "=") || !is.name(e[[2]])) next
+      fd <- .ef_fnDef(e[[3]])
+      if (is.null(fd)) next
+      fns[[as.character(e[[2]])]] <- list(
+        body = fd[[3]], file = p$file,
+        first = srs[[i]][1], last = srs[[i]][3]
+      )
+    }
+  }
+  fns
+}
+
+## parameters, inputs, outputs and timeunit from the defineModule() call in `p`,
+## the parse of the main file (see `.cc_parseFile()`). Nothing is evaluated: a
+## parameter name, object name or time unit is read only when it is a string
+## constant (so the module template's `objectName = NA` placeholder rows are
+## left out), and the parameter defaults are kept as expressions.
+.ef_readMeta <- function(module, p) {
+  dm <- p$exprs[grepl("^defineModule", p$exprs)]
+  if (length(dm) == 0) .ef_stop(module, paste0("no defineModule() call in ", p$file))
+  spec <- dm[[1]][[3]]
+  isText <- function(x) is.character(x) && length(x) == 1 && !is.na(x)
+  params <- list()
+  tmplP <- function(name, class, default, min, max, desc, ...) NULL
+  for (cl in .ef_findCalls(spec$parameters, "defineParameter")) {
+    m <- match.call(tmplP, cl)
+    if (isText(m$name)) params[m$name] <- list(list(expr = m$default))
+  }
+  objNames <- function(fn) {
+    nms <- unique(.cc_namesOfArg(p$doc, fn, "objectName"))
+    nms[nzchar(nms)]
+  }
+  list(params = params, inputs = objNames("expectsInput"),
+       outputs = objNames("createsOutput"),
+       timeunit = if (isText(spec$timeunit)) spec$timeunit else NA_character_)
+}
+
+## The line range of a block. The parser keeps the position of the `{` itself
+## first in `srcref`, then one for each statement, so the span runs from the
+## first to the last of them (the closing brace is on the last line or just after).
+.ef_lines <- function(x) {
+  if (!(is.call(x) && identical(x[[1]], quote(`{`)))) return(c(NA_integer_, NA_integer_))
+  srs <- Filter(function(s) inherits(s, "srcref"), attr(x, "srcref"))
+  if (!length(srs)) return(c(NA_integer_, NA_integer_))
+  as.integer(c(min(vapply(srs, function(s) s[1], numeric(1))),
+               max(vapply(srs, function(s) s[3], numeric(1)))))
+}
+
+.ef_branch <- function(x, file) {
+  if (is.call(x)) {
+    attr(x, "file") <- file
+    attr(x, "lines") <- .ef_lines(x)
+  }
+  x
+}
+
+## Find the `eventType` dispatch in the body of doEvent.<module>: a switch(), or
+## an if / else if chain on `eventType == "name"`. Returns the statements before
+## it (`pre`) and the code of each event (`branches`); switch fall-through
+## (`Growth = , Grow2 = {...}`) gives both names the same code.
+.ef_findDispatch <- function(body) {
+  stmts <- as.list(body)[-1]
+  findSwitch <- function(s) {
+    if (!is.call(s)) return(NULL)
+    if (identical(s[[1]], quote(switch)) && identical(s[[2]], quote(eventType))) return(s)
+    if (as.character(s[[1]])[1] %in% c("<-", "=", "return", "invisible", "(")) {
+      for (j in seq_along(s)[-1]) {
+        r <- findSwitch(s[[j]])
+        if (!is.null(r)) return(r)
+      }
+    }
+    NULL
+  }
+  eventValue <- function(cond) {
+    if (is.call(cond) && identical(cond[[1]], quote(`==`))) {
+      if (identical(cond[[2]], quote(eventType)) && is.character(cond[[3]])) return(cond[[3]])
+      if (identical(cond[[3]], quote(eventType)) && is.character(cond[[2]])) return(cond[[2]])
+    }
+    NULL
+  }
+  for (i in seq_along(stmts)) {
+    s <- stmts[[i]]
+    sw <- findSwitch(s)
+    if (!is.null(sw)) {
+      xs <- as.list(sw)[-(1:2)]
+      nms <- names(xs) %||% rep("", length(xs))
+      br <- list()
+      pend <- character()
+      for (k in seq_along(xs)) {
+        if (!nzchar(nms[k])) next
+        if (.ef_isEmptyArg(xs[[k]])) {
+          pend <- c(pend, nms[k])
+          next
+        }
+        for (n in c(pend, nms[k])) br[n] <- list(xs[[k]])
+        pend <- character()
+      }
+      return(list(pre = stmts[seq_len(i - 1)], branches = br))
+    }
+    if (is.call(s) && identical(s[[1]], quote(`if`)) && !is.null(eventValue(s[[2]]))) {
+      br <- list()
+      while (is.call(s) && identical(s[[1]], quote(`if`))) {
+        v <- eventValue(s[[2]])
+        if (is.null(v)) break
+        br[v] <- list(s[[3]])
+        s <- if (length(s) == 4) s[[4]] else NULL
+      }
+      return(list(pre = stmts[seq_len(i - 1)], branches = br))
+    }
+  }
+  NULL
+}
+
+## Stop, naming the first of `pkgs` that is not installed and what it is needed to do.
+## A plain error, not `moduleEventFlowError`, so a parent module's missing package is not
+## taken for an unreadable child.
+.ef_needPkgs <- function(pkgs, what) {
+  for (pkg in pkgs) {
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      stop("Package '", pkg, "' is required to ", what, "; please install it.", call. = FALSE)
+    }
+  }
+}
+
+## Read a module's sources, metadata and event dispatch, statically.
+##
+## Returns list(name, path, files, parsed, fns, meta, pre, branches):
+##   fns:      named list(body, file, first, last) of the top-level functions
+##   meta:     list(params = named list(expr), inputs, outputs, timeunit)
+##   pre:      statements of doEvent.<module> before the dispatch
+##   branches: named list of the code of each event, with attributes "file" and
+##             "lines" (c(first, last), NA when unknown)
+## A module with no `doEvent.<module>` but per-event `doEvent.<module>.<event>`
+## functions has those as its branches; one with neither has none.
+## Errors with class `moduleEventFlowError` when the module cannot be read, and with a plain
+## error when xmlparsedata or xml2 is not installed.
+.ef_readModule <- function(module, path) {
+  .ef_needPkgs(c("xmlparsedata", "xml2"), "read a module's code")
+  mainFile <- file.path(path, module, paste0(module, ".R"))
+  if (!file.exists(mainFile)) .ef_stop(module, paste0("no file ", mainFile))
+  files <- moduleCodeFiles(list(modulePath = path), module)
+  files <- files[file.exists(files)]
+  parsed <- lapply(files, function(f) {
+    tryCatch(.cc_parseFile(f), error = function(e) .ef_stop(module, conditionMessage(e)))
+  })
+  fns <- .ef_readFns(parsed)
+  meta <- tryCatch(.ef_readMeta(module, parsed[[match(path.expand(mainFile), files)]]),
+                   error = function(e) .ef_stop(module, conditionMessage(e)))
+
+  pre <- list()
+  branches <- list()
+  prefix <- makeEventFn(module, "")
+  deName <- substr(prefix, 1L, nchar(prefix) - 1L)
+  if (!is.null(fns[[deName]])) {
+    disp <- .ef_findDispatch(fns[[deName]]$body)
+    if (!is.null(disp)) {
+      pre <- disp$pre
+      branches <- lapply(disp$branches, .ef_branch, file = fns[[deName]]$file)
+    }
+  } else {
+    perEvent <- {
+      nms <- names(fns) %||% character()
+      nms[startsWith(nms, prefix) & nchar(nms) > nchar(prefix)]
+    }
+    for (nm in perEvent) {
+      b <- .ef_branch(fns[[nm]]$body, fns[[nm]]$file)
+      if (is.call(b)) attr(b, "lines") <- c(fns[[nm]]$first, fns[[nm]]$last)
+      branches[[substring(nm, nchar(prefix) + 1L)]] <- b
+    }
+  }
+  list(name = module, path = path, files = files, parsed = parsed, fns = fns,
+       meta = meta, pre = pre, branches = branches)
+}

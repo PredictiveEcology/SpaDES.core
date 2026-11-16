@@ -7,11 +7,14 @@ test_that("an error in a defineModule parameter default names the module and the
   txt[i] <- sub("defineParameter\\(\".plotInitialTime\", \"numeric\", [^,]+,",
                 "defineParameter(\".plotInitialTime\", \"numeric\", stop(\"boom\"),", txt[i])
   writeLines(txt, f)
-  err <- tryCatch(
-    suppressWarnings(simInit(modules = "badDefault", paths = list(modulePath = tmp))),
-    error = function(e) conditionMessage(e))
+  msgs <- capture.output(type = "message",
+    err <- tryCatch(
+      suppressWarnings(simInit(modules = "badDefault", paths = list(modulePath = tmp))),
+      error = function(e) conditionMessage(e)))
   expect_type(err, "character")
   expect_match(err, "badDefault")
   expect_match(err, "boom")
   expect_no_match(err, "out@depends|no applicable method")
+  ## the leftover on.exit(try(mess)) in .parseModule() printed this on every defineModule() error
+  expect_false(any(grepl("object 'mess' not found", msgs, fixed = TRUE)))
 })
