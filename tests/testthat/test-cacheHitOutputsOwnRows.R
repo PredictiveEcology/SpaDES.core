@@ -114,3 +114,26 @@ test_that("a file the cached event wrote goes to this run's outputPath, with its
   expect_true(fs::path_has_parent(f2, normPath(op2)))
   expect_identical(readRDS(f2), 42)
 })
+
+test_that("a cache hit restores the rows the cached event added for its own module's outputs", {
+  ## a module that saves one of its own outputs and registers it under that object's name
+  ##   (registerOutputs(objectName = )): the hit kept the file but dropped the row, as rows naming the
+  ##   module's own outputs were left out of the merge, which only an entry without the outputs tag needs
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  op <- file.path(tmpdir, "out")
+  mkInputObjectsMod(mp, "modOwn", body = paste(
+    'cat("ran\\n", file = file.path(outputPath(sim), "ranCount.txt"), append = TRUE)',
+    'f <- file.path(outputPath(sim), "modOwnOut.rds"); saveRDS(sim$modOwnOut, f)',
+    'sim <- registerOutputs(filename = f, sim = sim, objectName = "modOwnOut")', sep = "\n  "))
+  cp <- file.path(tmpdir, "cc")
+  run <- function() simInit(times = list(start = 2020, end = 2021), modules = list("modOwn"),
+                            paths = list(modulePath = mp, cachePath = cp, outputPath = op))
+  s1 <- run()
+  s2 <- run()                                      # modOwn's .inputObjects is a cache hit
+  expect_length(readLines(file.path(op, "ranCount.txt")), 1L)
+  expect_identical(files(s1), "modOwnOut.rds")
+  expect_identical(outputs(s2)$objectName, "modOwnOut")
+  expect_identical(files(s2), "modOwnOut.rds")
+})
