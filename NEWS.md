@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+* `inputs(sim)$loadTime` is in the simulation's time unit for every row. Objects passed to `simInit(objects = )` (or set with `objs<-`) were given in seconds (e.g. 85836672000 for year 2720) beside rows in years, so a module reading it (canClimateData, for the years a rerun serves) got wrong times. The table now stores `loadTime` in seconds (attribute `unit = "second"`), as the simulation clock does, and `inputs()` converts it to the simulation's unit; `inputs<-` takes the simulation's unit (or the unit in a `unit` attribute). A `simList` saved before, without the attribute, reads as before. `test-load.R`.
 * `moduleObjects()` with neither `sim` nor `module` no longer stops in `browser()`.
 
 * An error in a module's `defineModule()` call (e.g. a parameter default that fails) is now reported once, as itself. `.parseModule()` also printed "Error in .parseModule(...) : object 'mess' not found" from a leftover `on.exit(try(mess))`, whose `mess` does not exist yet when `defineModule()` fails; on the first `simInit()` of a run it printed that line six times or more and hid which module failed. `test-defineModuleError.R`.
