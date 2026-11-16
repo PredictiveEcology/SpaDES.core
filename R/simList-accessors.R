@@ -230,7 +230,7 @@ setReplaceMethod(
      list2env(value, envir = sim@.xData)
      newInputs <- data.frame(
        objectName = names(value),
-       loadTime = as.numeric(time(sim)), # simulation time unit, as the other rows of inputs(sim)
+       loadTime = as.numeric(time(sim)), # the simulation's unit, as inputs(sim) gives the other rows
        loaded = TRUE,
        stringsAsFactors = FALSE) |> .fillInputRows(startTime = start(sim))
      inputs(sim) <- rbind(inputs(sim), newInputs)
@@ -1101,28 +1101,13 @@ setGeneric("inputs", function(sim) {
 setMethod("inputs",
           signature = "simList",
           definition = function(sim) {
-
-            simUnit <- sim@simtimes[["timeunit"]]
-            loadTimeUnit <- attr(sim@inputs$loadTime, "unit")
-            if (is.null(loadTimeUnit)) loadTimeUnit <- simUnit
-            out <- if (is.na(pmatch(loadTimeUnit, simUnit)) &
-                       (length(sim@inputs$loadTime) > 0)) {
-              # note the above line captures empty loadTime,
-              # whereas is.na does not
-              if (any(!is.na(sim@inputs$loadTime))) {
-                if (!is.null(sim@inputs$loadTime)) {
-                  obj <- copy(sim@inputs) # don't change original sim
-                  set(obj, NULL, j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.xData))
-                  #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.xData)]
-                  obj[]
-                }
-              } else {
-                sim@inputs
-              }
-            } else {
-              sim@inputs
+            ## loadTime is stored in seconds (attribute "unit"); it is given in the simulation's unit.
+            ## A table without the attribute (a simList saved before) is already in that unit.
+            out <- sim@inputs
+            lt <- out$loadTime
+            if (!is.null(attr(lt, "unit"))) {
+              out$loadTime <- as.numeric(convertTimeunit(lt, timeunit(sim), sim@.xData))
             }
-
             return(out)
 })
 
@@ -1153,7 +1138,16 @@ setReplaceMethod(
         }
         value <- data.frame(value, stringsAsFactors = FALSE)
       }
+      ## loadTime arrives in the simulation's unit (as inputs() gives it), unless it has a "unit"
+      ## attribute; it is stored in seconds, as the simulation's clock is.
+      ltUnit <- attr(value$loadTime, "unit")
+      if (is.null(ltUnit)) ltUnit <- timeunit(sim)
       sim@inputs <- .fillInputRows(value, start(sim))
+      lt <- as.numeric(sim@inputs$loadTime)
+      attr(lt, "unit") <- ltUnit
+      lt <- as.numeric(convertTimeunit(lt, "second", sim@.xData))
+      attr(lt, "unit") <- "second"
+      sim@inputs$loadTime <- lt
     } else {
       sim@inputs <- value
     }
@@ -1178,10 +1172,9 @@ setReplaceMethod(
       if (any(is.na(sim@inputs[["loaded"]]))) {
         if (!all(is.na(sim@inputs[["loadTime"]]))) {
           newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
-          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
 
           for (nT in newTime) {
-            attributes(nT)$unit <- timeunit(sim)
+            attributes(nT)$unit <- "second"
             sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
           }
           toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),

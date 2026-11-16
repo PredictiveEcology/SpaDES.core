@@ -1606,7 +1606,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     } else {
       newInputs <- data.frame(
         objectName = objNames,
-        loadTime = as.numeric(sim@simtimes[["current"]]),
+        loadTime = as.numeric(time(sim)), # the simulation's unit, as inputs(sim) gives the other rows
         stringsAsFactors = FALSE
       ) |>
         .fillInputRows(startTime = start(sim))

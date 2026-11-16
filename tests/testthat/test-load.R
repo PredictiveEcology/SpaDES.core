@@ -475,11 +475,18 @@ test_that("a .shp input is read with terra::vect (fun and package were swapped)"
   expect_identical(terra::geomtype(sim$aPolygon), "polygons")
 })
 
-test_that("inputs(sim) gives objects' loadTime in the simulation's time unit, like other rows", {
+test_that("inputs(sim) gives loadTime in the simulation's unit; it is stored in seconds", {
   testInit()
   sim <- simInit(times = list(start = 2720, end = 3020, timeunit = "year"),
                  objects = list(a = 1, b = "x"),
                  inputs = data.frame(objectName = "d", loadTime = 2820, stringsAsFactors = FALSE))
   lt <- inputs(sim)
+  ## objects passed in were in seconds (85836672000) beside the other rows in years
   expect_equal(lt$loadTime[match(c("a", "b", "d"), lt$objectName)], c(2720, 2720, 2820))
+  expect_identical(attr(sim@inputs$loadTime, "unit"), "second")
+  expect_equal(as.numeric(sim@inputs$loadTime[sim@inputs$objectName == "d"]),
+               as.numeric(convertTimeunit(structure(2820, unit = "year"), "second", envir(sim))))
+  ## what inputs() gives can be set back unchanged
+  inputs(sim) <- inputs(sim)
+  expect_equal(inputs(sim)$loadTime, lt$loadTime)
 })
