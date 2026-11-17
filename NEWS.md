@@ -2,6 +2,8 @@
 
 ## Bug fixes
 
+* A new module's `.Rmd` (from `newModule()`) knits without internet. Its setup chunk downloaded the "Made with Markdown" badge from img.shields.io on every knit, so knitting failed offline (e.g. on a cluster) or when the site did not answer; the badge is now linked, not downloaded. `test-module-template.R` failed on CI this way (SpaDES.core#535).
+
 * `inputs(sim)$loadTime` is in the simulation's time unit for every row. Objects passed to `simInit(objects = )` (or set with `objs<-`) were given in seconds (e.g. 85836672000 for year 2720) beside rows in years, so a module reading it (canClimateData, for the years a rerun serves) got wrong times. The table now stores `loadTime` in seconds (attribute `unit = "second"`), as the simulation clock does, and `inputs()` converts it to the simulation's unit; `inputs<-` takes the simulation's unit (or the unit in a `unit` attribute). A `simList` saved before, without the attribute, reads as before. `test-load.R`.
 * `moduleObjects()` with neither `sim` nor `module` no longer stops in `browser()`.
 
