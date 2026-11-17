@@ -2,6 +2,7 @@
 
 ## Bug fixes
 
+* The `save` module no longer schedules a save from an `outputs(sim)` row that is already saved (`saved = TRUE`, e.g. a `Plots()` figure). Such a row records a file already written, and a cache hit restores it with the `saveTime` of the run that made the entry; when that run started earlier, the run stopped with "You have tried to schedule an event before start(sim) ... (spades event in save module)" (FireSense hindcasts: `.inputObjects` registering a `Plots()` row). Only rows still to be saved are scheduled. `test-cacheHitOutputsOwnRows.R`.
 * `inputs(sim)$loadTime` is in the simulation's time unit for every row. Objects passed to `simInit(objects = )` (or set with `objs<-`) were given in seconds (e.g. 85836672000 for year 2720) beside rows in years, so a module reading it (canClimateData, for the years a rerun serves) got wrong times. The table now stores `loadTime` in seconds (attribute `unit = "second"`), as the simulation clock does, and `inputs()` converts it to the simulation's unit; `inputs<-` takes the simulation's unit (or the unit in a `unit` attribute). A `simList` saved before, without the attribute, reads as before. `test-load.R`.
 * `moduleObjects()` with neither `sim` nor `module` no longer stops in `browser()`.
 
