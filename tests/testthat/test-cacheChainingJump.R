@@ -1079,3 +1079,26 @@ jumpTest("a jump over an untagged .inputObjects entry restores what its event ch
   expect_equal(sim$cc, 12) # what ioC's event changed is still restored from its entry
   expect_equal(sim$d, 13)
 })
+
+## A row restored by a jump: ioC (skipped by the jump) registers a saved file at time(sim), as Plots() does.
+## A run with a later start must still run: the row is a record of a file already written, never scheduled.
+jumpTest("an outputs row restored by a jump from a run with an earlier start does not stop the run", {
+  skip_on_cran()
+  testInit("terra", opts = jumpOpts)
+  mp <- file.path(tmpdir, "iomods"); dir.create(mp, showWarnings = FALSE)
+  ioJumpFixture(mp)
+  mkIOJumpMod(mp, "ioC", 'bindrows(expectsInput("b", "numeric", ""))',
+              'bindrows(createsOutput("cc", "numeric", ""))',
+              'sim$cc <- sim$b * 2; sim <- registerOutputs(file.path(outputPath(sim), "jCout.rds"))')
+  cp <- file.path(tmpdir, "io")
+  run <- function(start) {
+    withr::local_options(spades.cacheChaining = TRUE)
+    simInit(times = list(start = start, end = start + 1), params = ioJumpParams(), objects = list(ext = 5),
+            modules = list("ioA", "ioB", "ioC", "ioD"), paths = list(modulePath = mp, cachePath = cp))
+  }
+  run(1)
+  warm <- jumpMessages(s <- run(11))
+  expect_match(warm$jumps, "restored 3 cached events in one step")
+  expect_true("jCout.rds" %in% basename(as.character(outputs(s)$file)))
+  expect_no_error(spades(s, debug = FALSE))
+})

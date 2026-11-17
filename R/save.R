@@ -6,7 +6,7 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
     ## Only rows still to be saved: a row with `saved = TRUE` records a file already written (e.g. by
     ##   `Plots()`, via outputsAppend()), possibly at a time before start(sim) when the row was restored
     ##   from a cache entry made by a run with an earlier start; it is never scheduled.
-    toSave <- which(!outputs(sim)[["saved"]] %in% TRUE)
+    toSave <- which(.toSave(sim))
     if (length(toSave) > 0) {
       firstSave <- min(outputs(sim)[["saveTime"]][toSave], na.rm = TRUE)
       firstSaveWh <- toSave[which.min(outputs(sim)[["saveTime"]][toSave])]
@@ -127,6 +127,10 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
 #'
 #'   options(opts) # clean up
 #' }}
+## The outputs(sim) rows still to be saved: `saved` is NA. One rule for scheduling and for saving, so a row
+##   is never scheduled that saveFiles() would not save.
+.toSave <- function(sim) is.na(outputs(sim)[["saved"]])
+
 saveFiles <- function(sim) {
   curTime <- time(sim, sim@simtimes[["timeunit"]])
   ## extract the current module name that called this function
@@ -155,7 +159,7 @@ saveFiles <- function(sim) {
   }
 
   if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
-    wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
+    wh <- which(outputs(sim)$saveTime == curTime & .toSave(sim))
     for (i in wh) {
       objExists <- exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)
       isSimList <- identical(outputs(sim)[["objectName"]][i], "sim")
@@ -197,7 +201,7 @@ saveFiles <- function(sim) {
 
   ## Schedule an event for the next time in the saveTime column
   if (any(is.na(outputs(sim)[["saved"]][outputs(sim)$saveTime > curTime]))) {
-    isNA <- is.na(outputs(sim)$saved)
+    isNA <- .toSave(sim)
     nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
     nextTimeWh <- which.min(outputs(sim)[["saveTime"]][isNA])
     if ("eventPriority" %in% colnames(outputs(sim))) {
