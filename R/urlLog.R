@@ -107,12 +107,25 @@ urlLog.simList <- function(x, which = c("function", "module", "url"), ...) {
 ## Cache() hit, but with the module + event of the entry rather than the current event. A
 ## cacheChaining jump restores the entries of the events it skips with loadFromCache(),
 ## which does not replay URL tags, and never dispatches those events, so nothing else
-## records their downloads. reproducible exports no replay function: the record and the
-## (fn, url, cacheId) de-duplication are reproducible's own (.urlLogRecord(),
-## .writeSessionRecord()), so a url already in the ledger is not added twice.
+## records their downloads. reproducible's own replay (.replayUrlTags(), reproducible >=
+## 3.2.1.9089) writes each url with its own fields, to the session ledger too, and to any
+## enclosing Cache(); with an older reproducible the urls are rebuilt here from the tags.
 .replayUrlLog <- function(sim, cachePath, cacheId, module, event) {
   log <- envir(sim)$._urlLog
   if (!is.environment(log)) return(invisible())
+  prevOpt <- options(reproducible.urlLog = log)
+  prevExtra <- log$extra
+  on.exit({
+    options(prevOpt)
+    log$extra <- prevExtra
+  }, add = TRUE)
+  log$extra <- list(module = module, event = event)
+  replay <- tryCatch(utils::getFromNamespace(".replayUrlTags", "reproducible"),
+                     error = function(e) NULL)
+  if (is.function(replay)) {
+    replay(cacheId, cachePath)
+    return(invisible())
+  }
   sc <- tryCatch(reproducible::showCache(cachePath, cacheId = cacheId, verbose = -2),
                  error = function(e) NULL)
   if (is.null(sc) || NROW(sc) == 0L) return(invisible())
@@ -121,13 +134,6 @@ urlLog.simList <- function(x, which = c("function", "module", "url"), ...) {
   fn <- reproducible::extractFromCache(sc, "reproducible.urlFn", ifNot = "prepInputs")[1L]
   mkRecord <- utils::getFromNamespace(".urlLogRecord", "reproducible")
   write <- utils::getFromNamespace(".writeSessionRecord", "reproducible")
-  prevOpt <- options(reproducible.urlLog = log)
-  prevExtra <- log$extra
-  on.exit({
-    options(prevOpt)
-    log$extra <- prevExtra
-  }, add = TRUE)
-  log$extra <- list(module = module, event = event)
   for (u in urls)
     write(mkRecord(fn = fn, url = u, cacheId = cacheId))
   invisible()

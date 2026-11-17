@@ -216,3 +216,44 @@ test_that("an event's changed-object list never carries the ledger from a cache 
   expect_false("._urlLog" %in% out)
   expect_true("got" %in% out)
 })
+
+test_that("an event cached around an inner Cache(prepInputs()) hit replays the download on its own hit", {
+  skip_if_not(exists(".replayUrlTags", asNamespace("reproducible")),
+              "needs reproducible with nested-hit url propagation")
+  testInit(opts = list(reproducible.useMemoise = FALSE, spades.urlLog = TRUE))
+  src <- file.path(tmpdir, "src.txt")
+  writeLines("hello", src)
+  m <- "nestMod"
+  dir.create(file.path(tmpdir, m), showWarnings = FALSE)
+  writeLines(c(
+    'defineModule(sim, list(name = "nestMod", description = "", keywords = "", authors = person("a", "b"),',
+    '  childModules = character(0), version = list(nestMod = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),',
+    '  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list("reproducible"),',
+    '  parameters = bindrows(defineParameter("k", "numeric", 1, NA, NA, "")),',
+    '  inputObjects = bindrows(), outputObjects = bindrows(createsOutput("got", "character", ""),',
+    '  createsOutput("k", "numeric", ""))))',
+    'doEvent.nestMod <- function(sim, eventTime, eventType) {',
+    '  if (eventType == "init") {',
+    sprintf('    sim$got <- reproducible::Cache(reproducible::prepInputs(url = "file://%s", targetFile = "src.txt",', src),
+    '      destinationPath = file.path(outputPath(sim), "dl"), fun = NA))',
+    '    sim$k <- P(sim)$k',
+    '  }',
+    '  invisible(sim)',
+    '}'), file.path(tmpdir, m, paste0(m, ".R")))
+  run <- function(k) {
+    reproducible::clearUrlLog()
+    simInitAndSpades(modules = m, times = list(start = 0, end = 0),
+                     params = list(nestMod = list(.useCache = "init", k = k)),
+                     paths = list(modulePath = tmpdir, cachePath = file.path(tmpdir, "cache"),
+                                  outputPath = file.path(tmpdir, "out")))
+  }
+  run(1)                        # event and inner prepInputs both computed
+  run(2)                        # event recomputed; the inner Cache(prepInputs()) is a hit
+  s <- run(2)                   # event hit
+  ul <- urlLog(s, which = c("module", "event", "url"))
+  expect_true(NROW(ul) >= 1L)
+  expect_true(all(grepl("src.txt$", ul$url)))
+  expect_identical(unique(ul$module), m)
+  sess <- reproducible::prepInputsLog()
+  expect_true(any(grepl("src.txt$", vapply(sess, `[[`, "", "url"))))
+})
