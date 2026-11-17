@@ -39,7 +39,7 @@ Imports:
     lobstr,
     methods,
     qs2,
-    Require (>= 1.0.1),
+    Require (>= 2.0.0),
     rlang,
     stats,
     terra (>= 1.7-46),

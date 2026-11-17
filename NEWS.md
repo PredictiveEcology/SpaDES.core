@@ -1,5 +1,9 @@
 # SpaDES.core (development version)
 
+## Dependency changes
+
+* `Require` now needs to be at least version 2.0.0 (was 1.0.1).
+
 ## Bug fixes
 
 * The `save` module no longer schedules a save from an `outputs(sim)` row that is already saved (`saved = TRUE`, e.g. a `Plots()` figure). Such a row records a file already written, and a cache hit restores it with the `saveTime` of the run that made the entry; when that run started earlier, the run stopped with "You have tried to schedule an event before start(sim) ... (spades event in save module)" (FireSense hindcasts: `.inputObjects` registering a `Plots()` row). Only rows still to be saved are scheduled. `test-cacheHitOutputsOwnRows.R`.
