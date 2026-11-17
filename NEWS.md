@@ -2,6 +2,7 @@
 
 ## Dependency changes
 
+* SpaDES.core now needs R >= 4.4 (was 4.3), the oldest R version its checks run on (#511).
 * `Require` now needs to be at least version 2.0.0 (was 1.0.1).
 
 ## Bug fixes
