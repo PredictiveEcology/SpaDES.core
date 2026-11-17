@@ -34,6 +34,10 @@ only \code{.modObjs} back into it, so without this a reloaded \code{simList} fai
 with \verb{object 'doEvent.<module>' not found}.
 }
 
+A module's source is read from its folder on \code{modulePath}, which is the copy the
+user has (and may have edited). Only a module not found there is parsed from the
+source text \code{saveSimList()} kept in the \code{simList} (\code{\link[=moduleSource]{moduleSource()}}).
+
 Only the module's code is evaluated: the \code{defineModule()} item is skipped.
 Its metadata is already in the \code{simList} -- and for a loaded \code{simList} that
 metadata is \emph{end-state}, so re-evaluating \code{defineModule()} would risk

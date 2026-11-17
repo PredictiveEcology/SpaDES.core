@@ -375,12 +375,6 @@ setMethod(
         }
 
         # Evaluate defineModule into the sim environment
-        # Capture messages which will be about defineParameter at the moment
-        on.exit({
-          if (!exists("finishedClean"))
-            try(mess)
-        })
-
         #mess <- capture.output({
         numExptedArgs <- length(formalArgs(defineModule)) + 1
         if (length(pf[[1]]) > (numExptedArgs)) {
@@ -391,8 +385,8 @@ setMethod(
         withCallingHandlers(
           out <- tryCatch(eval(pf, envir = env), silent = TRUE,
                           error = function(e) {
-                            # convert errors to warnings # so can capture them outside
-                            warning(e$message)
+                            stop("Error evaluating defineModule for module '", mBase, "': ",
+                                 conditionMessage(e), call. = FALSE)
                           })
           , message = function(m) {
             messHere <<- c(messHere, m$message)
@@ -568,7 +562,6 @@ setMethod(
       }
     }
 
-    finishedClean <- TRUE
     return(sim)
   })
 
@@ -843,6 +836,7 @@ setupModObjsEnv <- function(sim, moduleName) {
 
 dotObjs <- ".modObjs"
 dotMods <- ".mods"
+dotModSource <- "._source" # in each .mods[[module]]: the source saveSimList() keeps (moduleSource())
 dotObjsAndMods <- c(dotObjs, dotMods)
 modAB <- "mod"
 ParAB <- "Par"

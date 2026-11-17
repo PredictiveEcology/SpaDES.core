@@ -312,7 +312,8 @@ setMethod(
       x$outputObjects <- ._outputObjectsDF()
     } else {
       if (is(x$outputObjects, "data.frame")) {
-        cnTooMany <- colnames(x$outputObjects) %in% colnames(._outputObjectsDF())
+        ## `events` (createsOutput(events = )) is the one optional column
+        cnTooMany <- colnames(x$outputObjects) %in% c(colnames(._outputObjectsDF()), .txtOutputEvents)
         cnTooFew <- colnames(._outputObjectsDF()) %in% colnames(x$outputObjects)
         if (!all(cnTooMany) || !all(cnTooFew)) {
           anExtra <- colnames(x$outputObjects)[!cnTooMany]
@@ -636,10 +637,30 @@ setMethod(
 #'                  allowing for multi-line character strings without using `paste`
 #'                  or multiple quotes.
 #'
-#' @param ...          Other specifications of the output object.
+#' @param ...          Other specifications of the output object. Unnamed ones are
+#'   pasted onto `desc`; named ones become columns of the returned `data.frame`.
+#'
+#' @param events       `NULL` (default) or a character vector of the event types that
+#'   write the object (e.g. `events = "prepSpreadFitData"`; `".inputObjects"` for the
+#'   module's `.inputObjects`). Added as the column `events` only when not `NULL`.
+#'   See section 'Which events write an output'.
 #'
 #' @return A `data.frame` suitable to be passed to `outputObjects` in
 #' a module's metadata.
+#'
+#' @section Which events write an output:
+#' When an event is cached (`.useCache`), its cache entry keeps the module's outputs,
+#' and a cache hit puts back those the event changed. Without `events`, every
+#' `createsOutput` that exists after the event and is not also an `expectsInput`
+#' counts as changed by it, whether or not the event wrote it. A hit on a later event
+#' can then put an old copy of an object an earlier event has just remade back over
+#' the new one. With `events`, an event's entry keeps, and its hit restores, only the
+#' outputs declared for its event type, plus those that declare no `events`. This
+#' applies also to entries saved before the module declared `events`, and to
+#' cacheChaining jumps. An object an event modifies but that is not declared for it is
+#' not restored on that event's cache hit. Adding or changing `events` changes the
+#' cache keys of the module's events (the `outputObjects` metadata is part of them),
+#' but not of its `.inputObjects`.
 #'
 #' @seealso [objectProvenance] for how a declared output interacts with
 #'   user-supplied objects.
@@ -654,12 +675,15 @@ setMethod(
 #'                 desc = "this is for example"),
 #'   createsOutput(objectName = "outputObject2", objectClass = "numeric",
 #'                 desc = "this is for example",
-#'                 otherInformation = "I am the second output object")
+#'                 otherInformation = "I am the second output object"),
+#'   createsOutput(objectName = "outputObject3", objectClass = "numeric",
+#'                 desc = "written only by the events 'init' and 'grow'",
+#'                 events = c("init", "grow"))
 #' )
 #'
 setGeneric(
   "createsOutput",
-  function(objectName, objectClass, desc, ...) {
+  function(objectName, objectClass, desc, ..., events = NULL) {
     standardGeneric("createsOutput")
 })
 
@@ -669,10 +693,13 @@ setMethod(
   "createsOutput",
   signature = signature(objectName = "ANY", objectClass = "ANY",
                         desc = "ANY"),
-  definition = function(objectName, objectClass, desc, ...) {
+  definition = function(objectName, objectClass, desc, ..., events = NULL) {
     desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
-    return(createsOutput(as.character(objectName), as.character(objectClass),
-                         as.character(desc)))
+    ## the unnamed `...` are now in `desc`; the named ones go on as columns
+    dots <- list(...)
+    return(do.call(createsOutput, c(list(as.character(objectName), as.character(objectClass),
+                                         as.character(desc)), dots[nzchar(names(dots))],
+                                    list(events = events))))
 })
 
 #' @export
@@ -681,16 +708,20 @@ setMethod(
   "createsOutput",
   signature = signature(objectName = "character", objectClass = "character",
                         desc = "character"),
-  definition = function(objectName, objectClass, desc, ...) {
+  definition = function(objectName, objectClass, desc, ..., events = NULL) {
+    if (!is.null(events) && !is.character(events))
+      stop("createsOutput for ", paste(objectName, collapse = ", "),
+           ": `events` must be a character vector of event types")
 
     desc <- rmExtraSpacesEOLCollapse(append(list(desc), list(...)))
 
     returnDataframe <- data.frame(cbind(objectName, objectClass, desc),
                                   stringsAsFactors = FALSE)
     templist <- list(...)
-    if (!is.null(names(templist)))
-      returnDataframe <- addNamedEntry(returnDataframe, templist[nzchar(names(templist))],
-                                       objectName, fn = "createsOutput")
+    templist <- templist[nzchar(names(templist))]
+    if (!is.null(events)) templist$events <- events
+    returnDataframe <- addNamedEntry(returnDataframe, templist, objectName,
+                                     fn = "createsOutput")
     return(returnDataframe)
 })
 

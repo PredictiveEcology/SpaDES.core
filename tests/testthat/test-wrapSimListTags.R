@@ -33,5 +33,7 @@ test_that("a cached .inputObjects with a file-backed raster tags its file, and c
   storage <- reproducible::CacheStorageDir(cp)
   expect_true(length(dir(storage, pattern = paste0("^", id, "_"))) > 0)
   clearCache(cp, cacheId = id, ask = FALSE, verbose = -2)
-  expect_length(dir(storage, pattern = paste0("^", id)), 0L)
+  ## lock files are not the entry's files; clearCache() leaves them alone (a lock may be held)
+  left <- dir(storage, pattern = paste0("^", id))
+  expect_length(left[!endsWith(left, ".lock")], 0L)
 })

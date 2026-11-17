@@ -230,7 +230,7 @@ setReplaceMethod(
      list2env(value, envir = sim@.xData)
      newInputs <- data.frame(
        objectName = names(value),
-       loadTime = as.numeric(sim@simtimes[["current"]]),
+       loadTime = as.numeric(time(sim)), # the simulation's unit, as inputs(sim) gives the other rows
        loaded = TRUE,
        stringsAsFactors = FALSE) |> .fillInputRows(startTime = start(sim))
      inputs(sim) <- rbind(inputs(sim), newInputs)
@@ -646,6 +646,11 @@ P.simList <- function(sim, param, module) {
 #' Which modules a global parameter reaches is described in [simInit()] and [dotParameters].
 #'
 #' @inheritParams params
+#'
+#' @return For `globals()` and `G()`, a named list of the global parameters, i.e., the
+#'   `.globals` element of the `params` slot. For the replacement methods
+#'   `globals<-` and `G<-`, the updated `simList`, with any module parameters that
+#'   take their value from a global re-synchronised.
 #'
 #' @family functions to access elements of a 'simList' object
 #' @seealso [SpaDES.core-package], specifically the section 1.2.1 on Simulation Parameters.
@@ -1101,28 +1106,13 @@ setGeneric("inputs", function(sim) {
 setMethod("inputs",
           signature = "simList",
           definition = function(sim) {
-
-            simUnit <- sim@simtimes[["timeunit"]]
-            loadTimeUnit <- attr(sim@inputs$loadTime, "unit")
-            if (is.null(loadTimeUnit)) loadTimeUnit <- simUnit
-            out <- if (is.na(pmatch(loadTimeUnit, simUnit)) &
-                       (length(sim@inputs$loadTime) > 0)) {
-              # note the above line captures empty loadTime,
-              # whereas is.na does not
-              if (any(!is.na(sim@inputs$loadTime))) {
-                if (!is.null(sim@inputs$loadTime)) {
-                  obj <- copy(sim@inputs) # don't change original sim
-                  set(obj, NULL, j = "loadTime", convertTimeunit(obj$loadTime, obj$unit, sim@.xData))
-                  #obj[, loadTime := convertTimeunit(loadTime, unit, sim@.xData)]
-                  obj[]
-                }
-              } else {
-                sim@inputs
-              }
-            } else {
-              sim@inputs
+            ## loadTime is stored in seconds (attribute "unit"); it is given in the simulation's unit.
+            ## A table without the attribute (a simList saved before) is already in that unit.
+            out <- sim@inputs
+            lt <- out$loadTime
+            if (!is.null(attr(lt, "unit"))) {
+              out$loadTime <- as.numeric(convertTimeunit(lt, timeunit(sim), sim@.xData))
             }
-
             return(out)
 })
 
@@ -1153,7 +1143,16 @@ setReplaceMethod(
         }
         value <- data.frame(value, stringsAsFactors = FALSE)
       }
+      ## loadTime arrives in the simulation's unit (as inputs() gives it), unless it has a "unit"
+      ## attribute; it is stored in seconds, as the simulation's clock is.
+      ltUnit <- attr(value$loadTime, "unit")
+      if (is.null(ltUnit)) ltUnit <- timeunit(sim)
       sim@inputs <- .fillInputRows(value, start(sim))
+      lt <- as.numeric(sim@inputs$loadTime)
+      attr(lt, "unit") <- ltUnit
+      lt <- as.numeric(convertTimeunit(lt, "second", sim@.xData))
+      attr(lt, "unit") <- "second"
+      sim@inputs$loadTime <- lt
     } else {
       sim@inputs <- value
     }
@@ -1178,10 +1177,9 @@ setReplaceMethod(
       if (any(is.na(sim@inputs[["loaded"]]))) {
         if (!all(is.na(sim@inputs[["loadTime"]]))) {
           newTime <- sim@inputs[["loadTime"]][is.na(sim@inputs$loaded)]
-          attributes(newTime)$unit <- sim@simtimes[["timeunit"]]
 
           for (nT in newTime) {
-            attributes(nT)$unit <- timeunit(sim)
+            attributes(nT)$unit <- "second"
             sim <- scheduleEvent(sim, nT, "load", "inputs", .first() - 1)
           }
           toRemove <- duplicated(rbindlist(list(current(sim), events(sim))),
@@ -1428,7 +1426,7 @@ setReplaceMethod(
        ## counted as stamped and was skipped. Match "_<unit><number>" at the end
        ## of the basename, which is what this function actually appends.
        bn <- tools::file_path_sans_ext(basename(as.character(sim@outputs$file)))
-       alreadyStamped <- grepl(paste0("_", txtTimeA, "[-0-9.]+$"), bn)
+       alreadyStamped <- grepl(.timeStampRegex(txtTimeA), bn)
 
        # Add time unit and saveTime to filename, without stripping extension
        wh <- !alreadyStamped & !alreadyOnDisk
@@ -3081,6 +3079,13 @@ setMethod(
 #' @inheritParams P
 #' @param path The path to the module., i.e., the `modulePath`.
 #'    Only relevant if `sim` not supplied.
+#'
+#' @return The requested metadata: for a single module, the metadata itself
+#'   (`inputObjects()` and `outputObjects()` give a `data.frame`, `reqdPkgs()` a
+#'   character vector); for several modules, a list with one such element per
+#'   module, named by module. `outputObjectNames()` and `documentation()` return a
+#'   list. `sessInfo()` returns the `sessionInfo()` recorded in the `simList`.
+#'
 #' @include simList-class.R
 #' @export
 #' @rdname simList-accessors-metadata
@@ -3506,23 +3511,68 @@ elapsedTime.simList <- function(x, byEvent = TRUE, units = "auto", ...) {
 
 #' @inheritParams inputObjects
 #'
+#' @param byEvent Logical. If `TRUE`, `moduleObjects()` reads the module's code
+#'   (see [moduleEventFlow()]) instead of only its metadata, and reports which
+#'   code writes and reads each object; a parent module reports its children's
+#'   objects. Default `FALSE`.
+#'
 #' @return
 #' `moduleObjects` returns a data.table with 4 columns, `module`, `objectName`, `type`, and `desc`,
 #' pulled directly from the object metadata in the `createsOutputs` and `expectsInputs`. These
 #' will be determined either from a `simList` or from the module source code.
+#' With `byEvent = TRUE` it instead returns a data.table with one row per object
+#' that the module's code uses, and columns `module`, `objectName`, `group`
+#' (`"Inputs"`, `"Inputs the module also updates"` or `"Outputs"`), `writtenBy` and
+#' `readBy` (the events and set-up code that write, or only read, the object, in run
+#' order, with the run mode where an event runs in only some modes).
 #'
 #' @export
 #' @importFrom data.table set rbindlist setcolorder
 #' @importFrom reproducible .whereInStack
 #' @rdname objects
-moduleObjects <- function(sim, module, path) {
+moduleObjects <- function(sim, module, path, byEvent = FALSE) {
   simTry <- NULL # can't set `sim = NULL` because `.whereInStack`; also next line check
   if (missing(sim)) {
     if (missing(module)) {
-      browser()
       simTry <- suppressWarnings(try(get("sim", .whereInStack("sim")), silent = TRUE))
+      if (inherits(simTry, "try-error") || is.null(simTry))
+        stop("moduleObjects() needs `sim`, or `module` and `path`.", call. = FALSE)
     }
     sim <- simTry
+  }
+
+  if (isTRUE(byEvent)) {
+    if (!is.null(sim)) {
+      path <- modulePath(sim)
+      if (missing(module)) module <- modules(sim)
+    } else if (missing(path)) {
+      path <- getOption("spades.modulePath")
+    }
+    module <- unlist(unname(module))
+    ## modulePath can have several entries: read each module from the first that has it
+    pathOf <- function(mod) {
+      has <- file.exists(file.path(path, mod, paste0(mod, ".R")))
+      if (any(has)) path[which(has)[1]] else path[1]
+    }
+    byEventRows <- function(mod, fromParent) {
+      idx <- tryCatch(.ef_objectIndex(moduleEventFlow(mod, pathOf(mod))),
+                      moduleEventFlowError = function(e) if (fromParent) NULL else stop(e))
+      if (is.null(idx)) return(NULL)
+      data.table::data.table(
+        module = rep(mod, nrow(idx)), objectName = idx$Object, group = as.character(attr(idx, "group")),
+        writtenBy = idx[["Written by"]], readBy = idx[["Read by"]]
+      )
+    }
+    ## a parent module declares no objects: report its children's, as the metadata route does
+    out <- lapply(module, function(mod) {
+      leaves <- .leafModules(mod, pathOf(mod))
+      lapply(leaves, byEventRows, fromParent = !identical(leaves, mod))
+    })
+    out <- c(list(data.table::data.table(
+      module = character(), objectName = character(), group = character(),
+      writtenBy = character(), readBy = character()
+    )), unlist(out, recursive = FALSE))
+    return(rbindlist(out)[])
   }
 
   if (!is.null(sim)) {

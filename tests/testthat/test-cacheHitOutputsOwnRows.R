@@ -92,3 +92,92 @@ test_that("an entry saved without the outputs tag restores all its rows, as befo
   s2 <- runReg(mp, cp, start = 2020)
   expect_true(all(c("foreign.rds", "byReg.rds") %in% files(s2)))
 })
+
+test_that("a file the cached event wrote goes to this run's outputPath, with its row", {
+  ## Biomass_speciesParameters' cached init draws a Plots() figure; a run that hit that entry kept the
+  ##   row with the other run's outputPath, so its archive held another rep's figure
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  mkInputObjectsMod(mp, "modFig", body = paste(
+    'f <- file.path(outputPath(sim), "figures", "fig.rds"); dir.create(dirname(f), recursive = TRUE, showWarnings = FALSE)',
+    'saveRDS(42, f)',
+    'sim@outputs <- outputsAppend(sim@outputs, saveTime = end(sim), file = f)', sep = "\n  "))
+  cp <- file.path(tmpdir, "cc")
+  run <- function(op) simInit(times = list(start = 2020, end = 2021), modules = list("modFig"),
+                              paths = list(modulePath = mp, cachePath = cp, outputPath = op))
+  op1 <- file.path(tmpdir, "rep1"); op2 <- file.path(tmpdir, "rep2")
+  run(op1)
+  s2 <- run(op2)                                   # modFig's .inputObjects is a cache hit
+  f2 <- as.character(outputs(s2)$file[basename(as.character(outputs(s2)$file)) == "fig.rds"])
+  expect_length(f2, 1L)
+  expect_true(fs::path_has_parent(f2, normPath(op2)))
+  expect_identical(readRDS(f2), 42)
+})
+
+test_that("a cache hit restores the rows the cached event added for its own module's outputs", {
+  ## a module that saves one of its own outputs and registers it under that object's name
+  ##   (registerOutputs(objectName = )): the hit kept the file but dropped the row, as rows naming the
+  ##   module's own outputs were left out of the merge, which only an entry without the outputs tag needs
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  op <- file.path(tmpdir, "out")
+  mkInputObjectsMod(mp, "modOwn", body = paste(
+    'cat("ran\\n", file = file.path(outputPath(sim), "ranCount.txt"), append = TRUE)',
+    'f <- file.path(outputPath(sim), "modOwnOut.rds"); saveRDS(sim$modOwnOut, f)',
+    'sim <- registerOutputs(filename = f, sim = sim, objectName = "modOwnOut")', sep = "\n  "))
+  cp <- file.path(tmpdir, "cc")
+  run <- function() simInit(times = list(start = 2020, end = 2021), modules = list("modOwn"),
+                            paths = list(modulePath = mp, cachePath = cp, outputPath = op))
+  s1 <- run()
+  s2 <- run()                                      # modOwn's .inputObjects is a cache hit
+  expect_length(readLines(file.path(op, "ranCount.txt")), 1L)
+  expect_identical(files(s1), "modOwnOut.rds")
+  expect_identical(outputs(s2)$objectName, "modOwnOut")
+  expect_identical(files(s2), "modOwnOut.rds")
+})
+
+## A row with `saved = TRUE` records a file already written (e.g. Plots(), outputsAppend()); the save
+##   module must never schedule from it. A row restored from a cache entry made by a run with an earlier
+##   start has a saveTime before start(sim), and scheduling it stopped the run.
+runAt <- function(mp, cp, start, mod = "modReg", ...)
+  simInit(times = list(start = start, end = start + 2), modules = mod, ...,
+          paths = list(modulePath = mp, cachePath = cp, outputPath = file.path(dirname(cp), "out")))
+
+test_that("a cache hit at a later start does not schedule a save from a restored, already-saved row", {
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  ## a Plots()-like row, at time(sim)
+  mkInputObjectsMod(mp, "modReg", body =
+    'sim@outputs <- outputsAppend(sim@outputs, saveTime = time(sim), file = file.path(outputPath(sim), "fig.rds"))')
+  cp <- file.path(tmpdir, "cc")
+  runAt(mp, cp, 2020)  # miss
+  s2 <- runAt(mp, cp, 2030)  # hit, later start
+  expect_true("fig.rds" %in% files(s2))
+  expect_no_error(spades(s2, debug = FALSE))
+  expect_equal(as.numeric(outputs(s2)$saveTime), 2020)  # a record, kept as it was
+})
+
+test_that("an already-saved row dated before start(sim) is not scheduled in a fresh simInit", {
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  mkInputObjectsMod(mp, "modReg", useCache = "FALSE", body =
+    'sim@outputs <- outputsAppend(sim@outputs, saveTime = start(sim) - 5, file = file.path(outputPath(sim), "fig.rds"))')
+  s <- runAt(mp, file.path(tmpdir, "cc"), 2030)
+  expect_no_error(spades(s, debug = FALSE))
+})
+
+test_that("a row still to be saved is saved at its time", {
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  mkInputObjectsMod(mp, "modReg", useCache = "FALSE", body = "")
+  s <- runAt(mp, file.path(tmpdir, "cc"), 2030,
+             outputs = data.frame(objectName = "modRegOut", saveTime = 2031))
+  s <- spades(s, debug = FALSE)
+  expect_true(all(file.exists(as.character(outputs(s)$file))))
+  expect_true(all(outputs(s)$saved))
+})

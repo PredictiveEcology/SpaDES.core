@@ -69,6 +69,26 @@ setMethod("._outputObjectsDF",
             return(out.df)
 })
 
+## The optional `outputObjects` column, `createsOutput(events = )`, naming the events that write
+## an output. A module without it has no such column, so its metadata (and cache keys) are unchanged.
+.txtOutputEvents <- "events"
+
+## The `createsOutput`s of module metadata `dep` that `event` may write: those whose `events`
+## include it, and those declaring no `events` (any event may write them). What a cached event
+## saves, records as changed and restores (.runEvent(), .runModuleInputObjects(),
+## lsObjectsChanged(), .chainOutputs(), .chainRestored()). `event = NULL`: all of them.
+.outputsOfEvent <- function(dep, event = NULL) {
+  out <- dep@outputObjects$objectName
+  evs <- dep@outputObjects[[.txtOutputEvents]]
+  if (!is.null(evs) && length(event) == 1L) {
+    out <- out[vapply(evs, function(e) {
+      e <- na.omit(unlist(e))
+      !length(e) || event %in% e
+    }, logical(1))]
+  }
+  out
+}
+
 ################################################################################
 #' The `.moduleDeps` class
 #'

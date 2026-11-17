@@ -429,6 +429,11 @@ test_that("loadSimList warns, rather than errors, when module source is gone", {
   sim <- suppressMessages(simWithModule(tmpdir))
   f <- file.path(tmpdir, "sim.rds")
   suppressMessages(saveSimList(sim, f))
+  ## a simList saved without its module source, as saveSimList() saved them before it kept it
+  ## (test-saveModuleSource.R: with it, the module is parsed from it)
+  saved <- readRDS(f)
+  rm("._source", envir = saved@.xData$.mods$randomLandscapes)
+  saveRDS(saved, f)
 
   ## the metadata-only use case: the module path no longer exists
   unlink(file.path(modulePath(sim), "randomLandscapes"), recursive = TRUE)

@@ -824,7 +824,7 @@ setMethod(
 
           changedObjs <- attr(simFromCache, ".Cache")$changed
           lsObjectEnv <- lsObjectsChanged(lsObjectEnv, changedObjs,
-                                          hasCurrModule, currModules, deps)
+                                          hasCurrModule, currModules, deps, eventType)
           hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
           changedModEnvObjs <- lsModObjectsChanged(namesAllMods, changedObjs, hasDotObjs)
 
@@ -933,8 +933,29 @@ setMethod(
           ##   the run that saved the entry had: those can be another run's, saved before this
           ##   run's start(sim) -- see .chainOutAddedRows()
           added <- .chainOutAddedRows(object@outputs, sc)
-          simPost@outputs <- .mergeCachedOutputs(
-            simPost@outputs, added[!added$objectName %in% outputsFromTheseMods, ])
+          ## A file the cached event wrote (e.g. a Plots() figure) is in the outputPath of the run that
+          ##   made the entry: put it, and its row, in this run's outputPath, as if the event had run here.
+          ##   Before, the row kept the other run's path, and outTar() bundled that run's file.
+          from <- simFromCache@paths[["outputPath"]]
+          to <- outputPath(simPost)
+          if (NROW(added) && length(from) && nzchar(from) && !identical(normPath(from), normPath(to))) {
+            fns <- as.character(added$file)
+            under <- !is.na(fns) & fs::path_has_parent(fns, from)
+            if (any(under)) {
+              newFns <- file.path(to, fs::path_rel(fns[under], from))
+              copy <- file.exists(fns[under]) & !file.exists(newFns)
+              for (d in unique(dirname(newFns[copy]))) dir.create(d, recursive = TRUE, showWarnings = FALSE)
+              if (any(copy)) linkOrCopy(fns[under][copy], newFns[copy], verbose = verbose - 1)
+              added$file[under] <- newFns
+            }
+          }
+          ## An entry without the outputs tag gives the saving run's whole table, with rows for these
+          ##   modules' outputs that this run has its own copies of (e.g. from simInit(outputs = )): leave
+          ##   those out, as before the tag. With the tag, `added` is only what the event added, and a row
+          ##   it registered for its own module's output (registerOutputs(objectName = )) is restored too.
+          if (is.na(.chainReadOutAddedN(sc)))
+            added <- added[!added$objectName %in% outputsFromTheseMods, ]
+          simPost@outputs <- .mergeCachedOutputs(simPost@outputs, added)
 
         }
 
@@ -1227,8 +1248,8 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   objTmp <- .wrapOrUnwrapSimListAts(objTmp, .wrap)
 
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
-  objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose)
-  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose)
+  objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose, ...)
+  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose, ...)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
@@ -1701,15 +1722,20 @@ buildDotObjectsList <- function(object, .objects) {
 }
 
 # changedFromCreatesOutputs <- function(hasCurrModule, deps, currModules, simFromCache) {
+## `eventType`: the event whose entry it is. Of the module's `createsOutput`s, only those that event
+##   may write (.outputsOfEvent()) are restored: `changed` of an entry saved before the module
+##   declared `createsOutput(events = )` names every createsOutput, written or not.
 lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
-                             currModules, deps) {
+                             currModules, deps, eventType = NULL) {
   createOutputs <- if (length(hasCurrModule)) {
-    deps[[hasCurrModule]]@outputObjects$objectName
+    .outputsOfEvent(deps[[hasCurrModule]], eventType)
   } else {
     aa <- lapply(deps, function(dep) dep@outputObjects$objectName)
     unique(unlist(aa))
   }
   createOutputs <- na.omit(createOutputs)
+  notThisEvent <- if (length(hasCurrModule))
+    setdiff(.outputsOfEvent(deps[[hasCurrModule]]), createOutputs)
 
   # add the environments for each module - allow local objects
   createOutputs <- c(createOutputs, currModules)
@@ -1730,7 +1756,8 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
   changedInputs <- expectsInputs[expectsInputs %in% names(changedObjs)]
 
   dotObjects <- startsWith(lsObjectEnv, ".")
-  dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs)
+  dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs) &
+    !lsObjectEnv %in% notThisEvent
 
   # lsObjectEnv --> this should only be objects that can be outputted, not expectsInputs
   out <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |

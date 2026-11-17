@@ -11,7 +11,12 @@ dirnamesFromSet(files, set, prefix = "rep", leafOnly = TRUE)
 
 \item{set}{integer vector of candidate ids to keep.}
 
-\item{prefix}{character. The directory name prefix preceding each id.}
+\item{prefix}{character. The directory name prefix preceding each id. If no
+\verb{<prefix><id>} directory occurs in \code{files}, directories
+named by the bare number (e.g. \verb{out/16/}, as \code{SpaDES.project::pathBuild()} writes
+them with the field label off) are used instead; for each file the deepest
+all-digit directory with an id in \code{set} is taken, so \code{out/370/16/x.tif} gives \code{16}.
+\verb{<prefix><id>} directories always take precedence.}
 
 \item{leafOnly}{logical. If \code{TRUE} (the default), only the single directory
 name is returned, e.g. \code{"rep1"}, spelled as it is in \code{files} (so \code{"rep01"}

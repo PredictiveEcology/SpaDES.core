@@ -42,6 +42,11 @@ will be included in the archive.
 Defaults to \code{FALSE} as this could be large, and may include many out of date elements.
 See Details.}
 }
+\value{
+These functions are defunct here and are called for their side effect of
+signalling a deprecation message pointing at the package that now provides them.
+They return \code{NULL}, invisibly.
+}
 \description{
 \code{zipSimList} will save the \code{simList} and file-backed \verb{Raster*} objects, plus,
 optionally, files identified in \code{outputs(sim)} and \code{inputs(sim)}.
