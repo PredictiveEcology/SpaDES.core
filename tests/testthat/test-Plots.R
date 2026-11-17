@@ -549,3 +549,71 @@ test_that("Plots(useCache = TRUE) with caching switched off plots, and does not 
   ## the cache was not emptied on the way out
   expect_identical(NROW(showCache(tmpCache, verbose = -2)[tagKey == "function"]), 1L)
 })
+
+## A module that wraps Plots() in its own Cache() (to skip building `data` when nothing has changed)
+## loses the figure's outputs(sim) row on a hit: Plots() never runs (fireSense_dataPrepFit's
+## "Historical Fire Maps", 2026-11-17). Plots(useCache = TRUE, .cacheExtra = ) is the in-Plots way:
+## the record is keyed on `.cacheExtra` and read before `data` is evaluated.
+test_that("Plots(useCache = TRUE, .cacheExtra = ) skips `data` on a hit and still records the file", {
+  skip_on_cran()
+  testInit(opts = list(reproducible.useMemoise = FALSE))
+  newModule("test", tmpdir, open = FALSE)
+  withr::local_options(reproducible.cacheSaveFormat = "qs2", plotsTestBuilds = 0L, plotsTestKey = "v1")
+
+  cat(file = file.path(tmpdir, "test", "test.R"), '
+    defineModule(sim, list(
+      name = "test", description = NA, keywords = NA,
+      authors = person("A", "B"), childModules = character(0),
+      version = list(test = "0.0.1"),
+      timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year",
+      citation = list(), documentation = list(), reqdPkgs = list(),
+      parameters = rbind(defineParameter(".plots", "character", "png", NA, NA, "")),
+      inputObjects = bindrows(), outputObjects = bindrows()
+    ))
+    doEvent.test <- function(sim, eventTime, eventType, debug = FALSE) {
+      switch(eventType,
+        init = {
+          build <- function() {
+            options(plotsTestBuilds = getOption("plotsTestBuilds") + 1L)
+            1:10
+          }
+          Plots(data = build(), filename = "lazy_test", # no `fn`: its default comes from `data`
+                .plotInitialTime = NA, useCache = TRUE, .cacheExtra = getOption("plotsTestKey"))
+        }
+      )
+      return(invisible(sim))
+    }
+  ', fill = TRUE)
+
+  run <- function() {
+    sim <- simInit(modules = "test",
+                   paths = list(modulePath = tmpdir, outputPath = file.path(tmpdir, "outputs"),
+                                cachePath = tmpCache),
+                   times = list(start = 0, end = 1, timeunit = "year"))
+    suppressMessages(spades(sim, debug = FALSE))
+  }
+  png <- file.path(tmpdir, "outputs", "figures", "test", "lazy_test.png")
+  pngRows <- function(s) outputs(s)[basename(outputs(s)$file) == "lazy_test.png", ]
+
+  s1 <- run()
+  expect_identical(getOption("plotsTestBuilds"), 1L)
+  expect_true(file.exists(png))
+  expect_identical(NROW(pngRows(s1)), 1L)
+
+  s2 <- run() # hit: `data` is not built, the row is still recorded
+  expect_identical(getOption("plotsTestBuilds"), 1L)
+  expect_identical(NROW(pngRows(s2)), 1L)
+  expect_true(pngRows(s2)$saved)
+  expect_identical(normPath(pngRows(s2)$file), normPath(png))
+  expect_identical(pngRows(s2)$fun, pngRows(s1)$fun)
+
+  options(plotsTestKey = "v2") # a new key draws it again
+  s3 <- run()
+  expect_identical(getOption("plotsTestBuilds"), 2L)
+  expect_identical(NROW(pngRows(s3)), 1L)
+
+  unlink(png) # a missing file draws it again
+  s4 <- run()
+  expect_identical(getOption("plotsTestBuilds"), 3L)
+  expect_true(file.exists(png))
+})
