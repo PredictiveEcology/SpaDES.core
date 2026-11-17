@@ -3,9 +3,13 @@ utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 ## Just checks for paths, creates them if they do not exist
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    if (NROW(outputs(sim)) > 0) {
-      firstSave <- min(outputs(sim)[["saveTime"]], na.rm = TRUE)
-      firstSaveWh <- which.min(outputs(sim)[["saveTime"]])
+    ## Only rows still to be saved: a row with `saved = TRUE` records a file already written (e.g. by
+    ##   `Plots()`, via outputsAppend()), possibly at a time before start(sim) when the row was restored
+    ##   from a cache entry made by a run with an earlier start; it is never scheduled.
+    toSave <- which(!outputs(sim)[["saved"]] %in% TRUE)
+    if (length(toSave) > 0) {
+      firstSave <- min(outputs(sim)[["saveTime"]][toSave], na.rm = TRUE)
+      firstSaveWh <- toSave[which.min(outputs(sim)[["saveTime"]][toSave])]
       if ("eventPriority" %in% colnames(outputs(sim))) {
         firstPriority <- outputs(sim)[["eventPriority"]][firstSaveWh]
       }
