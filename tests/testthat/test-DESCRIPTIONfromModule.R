@@ -410,6 +410,12 @@ test_that("moduleCoverage() measures the testthat suite, and the result can be t
   ## which percent_coverage() cannot read: "vector size cannot be infinite".
   skip_on_cran()
   skip_if_not_installed("covr")
+  ## Not inside a covr run. The module's test process loads the outer run's
+  ## instrumented SpaDES.core as well as modE2E, and covr >= 4.0.0 keeps one
+  ## counters file per process: the outer trace is saved against modE2E's
+  ## counters file, which is deleted when the inner run ends, so the outer run
+  ## fails with "Can't read coverage trace file .../modE2E/R/covr_counters.rds".
+  skip_if(inCovr(), "a nested covr run breaks the enclosing one (covr >= 4.0.0)")
   skip_if_not_installed("pkgload")
   skip_if_not_installed("roxygen2")
   withr::local_options(spades.moduleDocument = FALSE)
