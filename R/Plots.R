@@ -434,8 +434,10 @@ Plots <- function(data, fn, filename,
           names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
           Plot(ggListToScreen, addTo = gg$labels$title)
         } else {
-          if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
-              !is(gg, ".quickPlot")) {
+          ## only an object that draws when printed (ggplot, patchwork, lattice, a recorded plot); a
+          ## base-graphics fn has already drawn, and printing what it returns (e.g. its data, invisibly)
+          ## dumped that to the console
+          if (inherits(gg, c("gg", "ggplot", "trellis", "recordedplot")) && !is(gg, ".quickPlot")) {
             print(gg)
           }
         }
