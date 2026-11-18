@@ -240,6 +240,18 @@ test_that("Plots - modern wrapper (usePlot = FALSE) screen path + dispatch", {
   expect_no_error(Plots(data = ras, types = "screen", fn = myFn))
   expect_identical(callCount$n, 1L)
 
+  # A base-graphics fn's return value is not printed: fireSense_ELFs' plotting fns return their
+  # (invisible) input, and Plots() printed every raster of it to the console.
+  retFn <- function(x, ...) {
+    terra::plot(x)
+    invisible(list(rasCentered = list(x)))
+  }
+  printed <- utils::capture.output(Plots(data = ras, types = "screen", fn = retFn))
+  expect_false(any(grepl("rasCentered|SpatRaster", printed)))
+  ## as fireSense_ELFs calls it: no `data`, the fn's arguments by name
+  printed <- utils::capture.output(Plots(fn = retFn, x = ras, types = "screen"))
+  expect_false(any(grepl("rasCentered|SpatRaster", printed)))
+
   # Default dispatch: SpatRaster / SpatVector route to terra::plot without error.
   expect_no_error(Plots(data = ras, types = "screen"))
   expect_no_error(Plots(data = vec, types = "screen"))
