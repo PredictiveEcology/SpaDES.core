@@ -16,6 +16,7 @@ Plots(
   deviceArgs = list(),
   envir = parent.frame(),
   useCache = FALSE,
+  .cacheExtra = NULL,
   ...
 )
 }
@@ -63,6 +64,14 @@ a \code{call}. Normally, this should be left at its default, \code{parent.frame(
 \item{useCache}{Logical or character vector. If \code{TRUE}, caching is enabled for
 all non-screen output types. If a character vector, caching is enabled only
 for the matching \code{types}. Default is \code{FALSE}.}
+
+\item{.cacheExtra}{Used only with \code{useCache}. Any object that changes whenever the figure
+would change, e.g., the \code{cacheId} or digest of what \code{data} is made from. When given, the
+cache record is keyed on it instead of on \code{data}, and is checked before \code{data} is evaluated,
+so on a hit \code{data} is never built (unless \code{types} includes \code{"raw"}). The saved files are still
+checked against the record and added to \code{outputs(sim)}. Use this instead of wrapping \code{Plots()}
+in \code{Cache()}: on a \code{Cache()} hit \code{Plots()} does not run, so the files are not added to
+\code{outputs(sim)}.}
 
 \item{...}{Anything needed by \code{fn}, all named.}
 }
