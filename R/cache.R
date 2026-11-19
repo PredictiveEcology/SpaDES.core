@@ -1607,7 +1607,13 @@ upgradeModsToXdata <- function(envirHash, upgradeModsToXdata, moduleFunctionEnvi
         envirHashNew2 <- list()
         for (un in uniqNams) {
           wh <- which(un == nehn)
-          envirHashNew2 <- append(envirHashNew2, list(Reduce(modifyList, envirHashNew[wh])) |> setNames(un))
+          # Only the module entries are lists; an object with the same name as a module
+          # (e.g., sim$climateYear from the climateYear module) is a digest string, which
+          # modifyList() cannot merge. Keep it as its own entry.
+          isList <- vapply(envirHashNew[wh], is.list, logical(1))
+          if (any(isList))
+            envirHashNew2 <- append(envirHashNew2, list(Reduce(modifyList, envirHashNew[wh[isList]])) |> setNames(un))
+          envirHashNew2 <- append(envirHashNew2, envirHashNew[wh[!isList]])
         }
         envirHashNew <- envirHashNew2
         # wh <- which(nehn %in% nehn[dups])
