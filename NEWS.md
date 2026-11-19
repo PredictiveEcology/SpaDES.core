@@ -7,6 +7,8 @@
 
 ## Bug fixes
 
+* `Cache()` of a `simList` no longer fails with "is.list(x) is not TRUE" when an object has the same name as a module, e.g. `sim$climateYear` from the climateYear module. Hashing tried to merge the object with the module's entry; it now keeps them apart.
+
 * `Plots()` no longer prints what a base-graphics `fn` returns. It printed any return value of an `fn` other than `plot`/`terra::plot`, so a function returning its data (even invisibly) dumped it to the console, e.g. every raster of fireSense_ELFs' ELF list. Only an object that draws when printed (ggplot, patchwork, lattice, a recorded plot) is printed.
 
 * A new module's `.Rmd` (from `newModule()`) knits without internet. Its setup chunk downloaded the "Made with Markdown" badge from img.shields.io on every knit, so knitting failed offline (e.g. on a cluster) or when the site did not answer; the badge is now linked, not downloaded. `test-module-template.R` failed on CI this way (SpaDES.core#535).

@@ -782,6 +782,23 @@ doEvent.%s <- function(sim, eventTime, eventType) { %s; invisible(sim) }
   expect_equal(run()$seen, c(x = 1, dt = 1)) # memoised hit
 })
 
+test_that(".robustDigest of a simList with an object named like a module", {
+  ## Regression: an object with the same name as a module (the climateYear module creates
+  ## sim$climateYear) made upgradeModsToXdata() merge a digest string with the module's
+  ## list: "is.list(x) is not TRUE".
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testSameName", tmpdir, open = FALSE)
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = "testSameName")
+  mySim$testSameName <- 1
+  expect_no_error(d1 <- .robustDigest(mySim))
+  expect_identical(.robustDigest(mySim), d1)
+  mySim$testSameName <- 2
+  expect_false(identical(.robustDigest(mySim), d1)) # the object is still part of the digest
+})
+
 test_that(".robustDigest of a simList that contains itself finishes", {
   ## Regression: a simList reachable from its own environment (here directly, and through a
   ## module environment, as an evalWithActiveCode() leak left it) recursed through
