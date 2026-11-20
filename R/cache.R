@@ -162,19 +162,9 @@ setMethod(
     ## Replace the .list slot with the hashes of the slots
     object@.Data <- envirHash
 
-    ## Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
-    ##  i.e., if the same file is located in a different place, that is ok
-    object@paths <- list()
-
     # Remove event queue from digest. The queue will be put back into the sim at the end (.prepareOutput),
     #    but it doesn't matter what it is for digesting
     # object@events <- list()
-
-    # don't cache contents of output because file may already exist
-    if (NROW(object@outputs)) {
-      object@outputs$file <- basename(object@outputs$file)
-      object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs2 or rds; doesn't matter for Cache
-    }
 
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
@@ -201,19 +191,8 @@ setMethod(
       }
     }
 
-    # Strip absolute module paths before digesting. A module's path is carried as
-    # the *name* of its `object@modules` entry, and as the *name* of each event's
-    # `moduleName` (a named character: name = full path, value = module name).
-    # Those paths differ across machines/OSs, so they split the cacheId -- the
-    # same identical run on Linux vs Windows produced different `sim.modules` and
-    # `sim.events.moduleName` hashes (diagnosed via CacheDigest's preDigest), so
-    # `init`/event results could not be shared via a (cloud) cache, even though
-    # only the module *name* (not its install location) is relevant to caching.
-    # `.inputObjects` was unaffected because its classOptions use the basename and
-    # exclude the event queue. (Same cross-OS rationale as the parameters/desc
-    # removals above.)
-    object@modules <- lapply(object@modules, unname)
-    names(object@modules) <- NULL
+    # Strip absolute module paths from the events too (`moduleName` is a named character:
+    # name = full path, value = module name); see .simArgsForDigest() for why
     if (length(object@events)) {
       object@events <- lapply(object@events, function(e) {
         if (!is.null(e[["moduleName"]])) e[["moduleName"]] <- unname(e[["moduleName"]])
@@ -257,8 +236,13 @@ setMethod(
       }
 
     }
-    object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
-    object@params <- .sortDotsUnderscoreFirst(object@params)
+    ## the same rules as the key of a whole simInit()/simInitAndSpades() call
+    simArgs <- .simArgsForDigest(list(paths = object@paths, outputs = object@outputs,
+                                      modules = object@modules, params = object@params))
+    object@paths <- simArgs$paths
+    object@outputs <- simArgs$outputs
+    object@modules <- simArgs$modules
+    object@params <- simArgs$params
 
     # globals
     if (!is.null(classOptions$.globals)) {
@@ -410,6 +394,38 @@ setMethod(
     }
     userTags
   })
+
+## How the cache key treats `paths`, `outputs`, `modules` and `params`, wherever they come from: the
+## slots of a simList (.robustDigest() above) or the arguments of a whole simInit() /
+## simInitAndSpades() call (.cacheWholeRun()). `x` is a list holding any of them.
+.simArgsForDigest <- function(x) {
+  ## Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
+  ##  i.e., if the same file is located in a different place, that is ok
+  if (!is.null(x$paths)) x$paths <- list()
+
+  # don't cache contents of output because file may already exist
+  if (NROW(x$outputs) && !is.null(x$outputs$file)) { # simInit() arguments may give no `file`
+    x$outputs$file <- basename(x$outputs$file)
+    x$outputs$file <- tools::file_path_sans_ext(x$outputs$file) # could be qs2 or rds; doesn't matter for Cache
+  }
+
+  # Strip absolute module paths before digesting. A module's path is carried as
+  # the *name* of its `modules` entry. Those paths differ across machines/OSs, so
+  # they split the cacheId -- the same identical run on Linux vs Windows produced
+  # different `sim.modules` hashes (diagnosed via CacheDigest's preDigest), so
+  # `init`/event results could not be shared via a (cloud) cache, even though
+  # only the module *name* (not its install location) is relevant to caching.
+  if (!is.null(x$modules)) {
+    x$modules <- lapply(x$modules, unname)
+    names(x$modules) <- NULL
+  }
+
+  if (!is.null(x$params)) {
+    x$params <- lapply(x$params, function(p) .sortDotsUnderscoreFirst(p))
+    x$params <- .sortDotsUnderscoreFirst(x$params)
+  }
+  x
+}
 
 if (!isGeneric(".cacheMessage")) {
   setGeneric(".cacheMessage", function(object, functionName, fromMemoise, verbose) {

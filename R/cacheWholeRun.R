@@ -10,8 +10,7 @@
 ##   they are, so the entry only works on this machine.
 ## "portable": the result is saved with saveSimList(files = TRUE), its inputs and outputs included,
 ##   to an archive in the cache folder; a cache hit unpacks it with loadSimList() into the working
-##   directory (the project). The key uses paths relative to the working directory, so the entry
-##   works on another machine that has the same project layout.
+##   directory (the project). Paths are not in the key, so the entry works on another machine.
 
 ._txtPortableRun <- "spades.portableRun"
 
@@ -45,10 +44,10 @@
 }
 
 ## Run `fnName` (simInit, spades or simInitAndSpades) with `args` through Cache(). `untracked`
-## are arguments that do not change the result (debug, progress, notOlderThan); `paths` enters the
-## key without the temporary ones (`tmpPaths`, new each session), and relative to the working
-## directory when portable. `sim` is the simList of a spades() call: its digest already holds the
-## module code, so none is added.
+## are arguments that do not change the result (debug, progress, notOlderThan). `paths`, `outputs`,
+## `modules` and `params` enter the key as a simList's slots do (.simArgsForDigest()), so e.g. paths
+## are not in it. `inputs` are: unlike in a simList, the objects they name are not loaded yet. `sim`
+## is the simList of a spades() call: its digest already holds the module code, so none is added.
 .cacheWholeRun <- function(fnName, args, mode, untracked = list()) {
   portable <- identical(mode, "portable")
   extra <- list(mode = mode)
@@ -56,14 +55,11 @@
     paths <- args$paths
     if (is.null(paths) || is.null(paths$modulePath)) paths <- modifyList(as.list(getPaths()), as.list(paths))
     extra$code <- .moduleCodeDigest(paths$modulePath, args$modules)
-    if (!is.null(args$paths)) {
-      keyPaths <- args$paths[!names(args$paths) %in% tmpPaths]
-      if (portable) keyPaths <- lapply(keyPaths, function(p) makeRelative(p, getwd()))
-      extra$paths <- keyPaths
-      untracked$paths <- args$paths
-      args$paths <- NULL
-    }
   }
+  simArgs <- intersect(names(args), c("paths", "outputs", "modules", "params"))
+  extra$simArgs <- .simArgsForDigest(args[simArgs])
+  untracked[simArgs] <- args[simArgs]
+  args[simArgs] <- NULL
   sim <- Cache(.wholeRun(fnName = fnName, args = args, untracked = untracked, portable = portable),
                omitArgs = "untracked", .cacheExtra = extra, .functionName = fnName,
                notOlderThan = untracked$notOlderThan)

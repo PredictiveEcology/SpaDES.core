@@ -50,7 +50,7 @@ test_that("simInitAndSpades(cache = TRUE) reruns when module code changes; .useC
   expect_true(.loadedFromCache(simInitAndSpades2(wrArgs(tmpdir, cache = TRUE))))
 })
 
-test_that("the temporary paths (new each session) are not in the whole-run cache key", {
+test_that("paths are not in the whole-run cache key, as in a simList's; params are", {
   testInit(smcc = FALSE, opts = list(reproducible.useMemoise = FALSE))
   withr::local_options(reproducible.cachePath = tmpCache)
   wrMod(file.path(tmpdir, "modules"))
@@ -63,10 +63,14 @@ test_that("the temporary paths (new each session) are not in the whole-run cache
 
   expect_true(.newlyCached(simInitAndSpades2(withTmp("session1"))))
   expect_true(.loadedFromCache(simInitAndSpades2(withTmp("session2"))))
-  ## a path that is not temporary is still in the key
   a <- withTmp("session2")
   a$paths$outputPath <- file.path(tmpdir, "outputs2")
+  expect_true(.loadedFromCache(simInitAndSpades2(a)))
+  ## the key is the simList digest's: params, sorted, are in it
+  a$params <- list(wr1 = list(.useCache = FALSE, .plots = NA))
   expect_true(.newlyCached(simInitAndSpades2(a)))
+  a$params <- list(wr1 = list(.plots = NA, .useCache = FALSE))
+  expect_true(.loadedFromCache(simInitAndSpades2(a)))
 })
 
 test_that("simInit(cache = TRUE) caches the whole simInit, keyed on module code", {
