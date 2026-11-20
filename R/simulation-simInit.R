@@ -194,6 +194,9 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'   share option name (`reproducible.verbose` and `Require.verbose` both exist),
 #'   passing `verbose = FALSE` will set both. Obviously this may cause unexpected
 #'   problems if a module is also expecting a value.
+#'   `cache` is an argument too: `TRUE` (same as `"local"`) or `"portable"` caches the
+#'   whole `simInit()` call; see the `cache` argument of [spades()]. `.useCache` is
+#'   the same argument under another name.
 #'   One name is an argument instead: `alreadyRun`, a run already done whose saved outputs
 #'   this simulation replays (default `NULL`, none). It is a list with `sim`, the run's saved
 #'   `simList` (only its `depends()`, `outputs()` and time unit are used; it can be a shell
@@ -402,7 +405,18 @@ setMethod(
     dots[[._txtStartClockTime]] <- NULL
     alreadyRun <- dots[["alreadyRun"]] # an argument (see `...`), not an object
     dots[["alreadyRun"]] <- NULL
-    dotNames <- setdiff(...names(), c(._txtStartClockTime, "alreadyRun"))
+    ## `cache` and `.useCache` are arguments (see `...`), not objects: cache the whole simInit()
+    cacheMode <- .wholeRunCacheMode(dots[["cache"]], dots[[".useCache"]])
+    dots[c("cache", ".useCache")] <- NULL
+    if (!isFALSE(cacheMode)) {
+      untracked <- list(notOlderThan = if (!missing(notOlderThan)) notOlderThan,
+                        debug = dots[["debug"]], alreadyRun = alreadyRun)
+      dots[["debug"]] <- NULL
+      args <- c(list(times = times, params = params, modules = modules, objects = objects,
+                     paths = paths, inputs = inputs, outputs = outputs, loadOrder = loadOrder), dots)
+      return(.cacheWholeRun("simInit", args, cacheMode, untracked = Filter(Negate(is.null), untracked)))
+    }
+    dotNames <- setdiff(...names(), c(._txtStartClockTime, "alreadyRun", "cache", ".useCache"))
 
 
     # loggingMessage helpers
@@ -1261,6 +1275,18 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   ## spades() no longer takes .plotInitialTime, and this function forwards to it
   ## by matching spades()'s formals, so catch it here rather than dropping it
   .warnPlotInitialTimeArg(...names())
+
+  ## `cache` (or `.useCache` in `...`) caches the whole call, simInit() included
+  cacheMode <- .wholeRunCacheMode(if (!missing(cache)) cache,
+                                  if (".useCache" %in% ...names()) ...elt(match(".useCache", ...names())))
+  if (!isFALSE(cacheMode)) {
+    args <- as.list(match.call())[-1]
+    args[c("cache", ".useCache")] <- NULL
+    args <- lapply(args, eval, envir = parent.frame())
+    untrackedNames <- intersect(names(args), c("debug", "progress", "notOlderThan"))
+    return(.cacheWholeRun("simInitAndSpades", args[setdiff(names(args), untrackedNames)],
+                          cacheMode, untracked = args[untrackedNames]))
+  }
 
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
   lsAllNames <- ls(all.names = TRUE)

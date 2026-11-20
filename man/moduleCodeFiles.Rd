@@ -4,7 +4,7 @@
 \alias{moduleCodeFiles}
 \title{Extract the full file paths for R source code}
 \usage{
-moduleCodeFiles(paths, modules)
+moduleCodeFiles(paths, modules, childModules = FALSE, nonR = FALSE)
 }
 \arguments{
 \item{paths}{An optional named list with up to 4 named elements,
@@ -18,6 +18,13 @@ for the simulation.
 Note: the module name should correspond to the R source file from which the module is loaded.
 Example: a module named "caribou" will be sourced form the file \file{caribou.R},
 located at the specified \code{modulePath(simList)} (see below).}
+
+\item{childModules}{Logical. If \code{TRUE}, also list the files of each module's
+\code{childModules}, and of theirs.}
+
+\item{nonR}{Logical. If \code{TRUE}, also list code files in other languages
+(e.g., \code{.py}, \code{.cpp}) anywhere in the module folder, except under \verb{data/}
+and \verb{tests/}.}
 }
 \value{
 character vector of file paths.

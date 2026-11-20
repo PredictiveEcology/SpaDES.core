@@ -1222,6 +1222,8 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
                           outputObjects = NULL, cacheId = NULL,
                           ..., cachePath) {
   filebackedPath <- .filebackedPath(filebackedPath, missing(filebackedPath), cachePath, missing(cachePath))
+  if (isTRUE(attr(obj, ._txtPortableRun))) # a whole run with cache = "portable"; see R/cacheWholeRun.R
+    return(.wrapPortableRun(obj, filebackedPath, cacheId, verbose))
 
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
   modules <- TRUE

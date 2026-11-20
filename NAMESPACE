@@ -3,6 +3,7 @@
 S3method(.unwrap,.moduleDeps)
 S3method(.unwrap,.simDeps)
 S3method(.unwrap,simList)
+S3method(.unwrap,spadesPortableRun)
 S3method(.wrap,.moduleDeps)
 S3method(.wrap,.simDeps)
 S3method(.wrap,simList)

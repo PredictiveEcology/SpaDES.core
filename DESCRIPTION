@@ -109,6 +109,7 @@ Collate:
     'cache.R'
     'cacheChainingJump.R'
     'cacheKeyReachable.R'
+    'cacheWholeRun.R'
     'check.R'
     'priority.R'
     'checkpoint.R'

@@ -159,6 +159,9 @@ e.g., \code{lowMemory} can be specified instead of \code{spades.lowMemory}. In c
 share option name (\code{reproducible.verbose} and \code{Require.verbose} both exist),
 passing \code{verbose = FALSE} will set both. Obviously this may cause unexpected
 problems if a module is also expecting a value.
+\code{cache} is an argument too: \code{TRUE} (same as \code{"local"}) or \code{"portable"} caches the
+whole \code{simInit()} call; see the \code{cache} argument of \code{\link[=spades]{spades()}}. \code{.useCache} is
+the same argument under another name.
 One name is an argument instead: \code{alreadyRun}, a run already done whose saved outputs
 this simulation replays (default \code{NULL}, none). It is a list with \code{sim}, the run's saved
 \code{simList} (only its \code{depends()}, \code{outputs()} and time unit are used; it can be a shell

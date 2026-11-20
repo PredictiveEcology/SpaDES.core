@@ -279,6 +279,16 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     if (any(empties)) {
       fns <- fns[!empties]
     }
+    ## files the run saved, and files it read: these alone also make an archive
+    otherFns <- c()
+    if (isTRUE(outputs)) {
+      os <- outputs(sim)
+      if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE, ]$file)
+    }
+    if (isTRUE(inputs)) {
+      ins <- inputs(sim)
+      if (NROW(ins)) otherFns <- c(otherFns, ins[ins$loaded %in% TRUE, ]$file)
+    }
   }
 
   ## This forces it to be qs2 (if not rds) instead of zip or tar.gz
@@ -319,17 +329,8 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       qs2::qs_save(sim, file = filename, nthreads = getOption("spades.qsThreads", 1))
     }
 
-    if (isTRUE(files) && length(fns)) {
+    if (isTRUE(files) && (length(fns) || length(otherFns))) {
       fileToDelete <- filename
-      otherFns <- c()
-      if (isTRUE(outputs)) {
-        os <- outputs(sim)
-        if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE, ]$file)
-      }
-      if (isTRUE(inputs)) {
-        ins <- inputs(sim)
-        if (NROW(ins)) otherFns <- c(otherFns, ins[ins$loaded %in% TRUE, ]$file)
-      }
 
       srcFiles <- mapply(mod = modules(sim), mp = modulePath(sim),
                          function(mod, mp) {
@@ -390,25 +391,8 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       srcFiles <- tmpSrcFiles
     }
 
-    if (length(fns)) {
+    if (length(fns) || length(otherFns)) {
       fileToDelete <- filename
-
-      otherFns <- c()
-      if (isTRUE(outputs)) {
-        os <- outputs(sim)
-        if (NROW(os)) {
-          outputFNs <- os[os$saved %in% TRUE, ]$file
-          otherFns <- c(otherFns, outputFNs)
-        }
-      }
-      inputFNs <- NULL
-      if (isTRUE(inputs)) {
-        ins <- inputs(sim)
-        if (NROW(ins)) {
-          inputFNs <- ins[ins$loaded %in% TRUE, ]$file
-          otherFns <- c(otherFns, inputFNs)
-        }
-      }
 
       allFns <- c(fns, otherFns, srcFilesRel)
       if (!is.null(symlinks)) {
