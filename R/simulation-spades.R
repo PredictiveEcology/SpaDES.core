@@ -688,10 +688,20 @@ scheduleConditionalEvent <- function(sim,
 #'                 character (`"graphical"`, `"text"`) or numeric indicating
 #'                 the number of update intervals to show in a graphical progress bar.
 #'
-#' @param cache Logical. If `TRUE`, then the `spades` call will be cached.
+#' @param cache Logical or character. If `TRUE` (same as `"local"`), then the `spades` call
+#'              will be cached.
 #'              This means that if the call is made again with the same `simList`,
 #'              then `spades` will return the return value from the previous run
 #'              of that exact same `simList`. Default `FALSE`. See Details.
+#'              The cached `simList` points at its input and output files where they are, so
+#'              the entry only works on this machine; a cache hit whose output files are gone
+#'              warns and still returns the `simList`. `"portable"` also saves those files with
+#'              [saveSimList()] into the cache, and a hit unpacks them with [loadSimList()]
+#'              into the working directory, so the entry can be used on another machine.
+#'              In [simInitAndSpades()] and [simInit()] (where it is passed in `...`), `cache`
+#'              caches the whole call, and the key includes the content of each module's code
+#'              files (child modules and non-R files too), so editing a module reruns.
+#'              `.useCache` in `...` is the same argument under another name.
 #'              See also the vignette on caching for examples.
 #'
 #' @param .saveInitialTime Numeric. Temporarily override the `.saveInitialTime`
@@ -800,12 +810,11 @@ scheduleConditionalEvent <- function(sim,
 #' This can be set to an event name, which will cache that event, or a logical,
 #' which will cache *every* event in that module. Event and module caching
 #' makes most sense when the event or module only runs once, such as an initialization
-#' or data preparation event/module. Caching an entire simulation is actually just
-#' a function call to `simInitAndSpades`, for example. So, simply writing
-#' `Cache(simInitAndSpades, modules = ...)` will effectively cache a whole simulation.
-#' Finally for experiments, it is just like a function call:
-#' `Cache(simInitandExperiment, ...)`. The final way Caching can be done is in
-#' `experiment` or `spades`, by setting the `cache` argument.
+#' or data preparation event/module. To cache an entire simulation, use
+#' `simInitAndSpades(..., cache = TRUE)`. Do not wrap it in `Cache()` instead: there the
+#' modules are only names, so an edit to a module's code does not rerun it.
+#' The final way Caching can be done is in `experiment` or `spades`, by setting the
+#' `cache` argument.
 #'
 #' If `cache` is TRUE, this allows for a seamless way to "save" results
 #' of a simulation. The  user does not have to intentionally do any saving manually.
@@ -955,6 +964,17 @@ setMethod(
   definition = function(sim, debug, progress, cache, .saveInitialTime,
                         notOlderThan, events, .plots, ...) {
     .warnPlotInitialTimeArg(...names())
+
+    ## `.useCache` is the `cache` argument under another name
+    if (".useCache" %in% ...names()) {
+      dots <- list(...)
+      mode <- .wholeRunCacheMode(NULL, dots[[".useCache"]])
+      dots[[".useCache"]] <- NULL
+      return(doCallSafe("spades", c(list(sim = sim, debug = debug, progress = progress,
+                                       cache = if (isFALSE(mode)) FALSE else mode,
+                                       .saveInitialTime = .saveInitialTime, notOlderThan = notOlderThan,
+                                       events = events, .plots = .plots), dots)))
+    }
 
     ## set the options; then set them back on exit
     optsFromDots <- dealWithOptions(sim = sim, dotNames = ...names())
@@ -1499,18 +1519,20 @@ setMethod(
       ##   they go to the session log and never reach the sim; see R/urlLog.R
       .urlLogToken <- .installUrlLog(sim)
       on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
+      out <- Cache(spades(sim = sim,
+                          debug = debug,
+                          progress = progress,
+                          .saveInitialTime = .saveInitialTime,
+                          omitArgs = omitArgs,
+                          notOlderThan = notOlderThan,
+                          events = events,
+                          .plots = .plots,
+                          cache = FALSE,
+                          ...
+      ))
+      if (.loadedFromCache(out)) .warnMissingOutputs(out)
       return(
-        Cache(spades(sim = sim,
-                     debug = debug,
-                     progress = progress,
-                     .saveInitialTime = .saveInitialTime,
-                     omitArgs = omitArgs,
-                     notOlderThan = notOlderThan,
-                     events = events,
-                     .plots = .plots,
-                     cache = FALSE,
-                     ...
-        ))
+        out
         # do.call(quote = TRUE, Cache,
         #         args = append(
         #           list(
@@ -1541,6 +1563,24 @@ setMethod(
         )
       )
     }
+})
+
+#' @rdname spades
+setMethod(
+  "spades",
+  signature(cache = "character"),
+  definition = function(sim, debug, progress, cache, .saveInitialTime, notOlderThan = NULL,
+                        events, .plots, ...) {
+    mode <- .wholeRunCacheMode(cache)
+    if (identical(mode, "local"))
+      return(spades(sim, debug = debug, progress = progress, cache = TRUE,
+                    .saveInitialTime = .saveInitialTime, notOlderThan = notOlderThan,
+                    events = events, .plots = .plots, ...))
+    .urlLogToken <- .installUrlLog(sim) # as in the cache = TRUE method
+    on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
+    .cacheWholeRun("spades", c(list(sim = sim, .saveInitialTime = .saveInitialTime, events = events,
+                                    .plots = .plots), list(...)),
+                   mode, untracked = list(debug = debug, progress = progress, notOlderThan = notOlderThan))
 })
 
 #' @keywords internal

@@ -5,6 +5,7 @@
 \alias{spades}
 \alias{spades,simList,ANY,ANY,missing-method}
 \alias{spades,ANY,ANY,ANY,logical-method}
+\alias{spades,ANY,ANY,ANY,character-method}
 \title{\code{spades2} is a convenience wrapper for \code{do.call(spades, listOfArgs)},
 i.e., a user can pass a list of all the arguments.}
 \usage{
@@ -45,6 +46,18 @@ spades(
   .plots = getOption("spades.plots", NULL),
   ...
 )
+
+\S4method{spades}{ANY,ANY,ANY,character}(
+  sim,
+  debug = getOption("spades.debug"),
+  progress = NA,
+  cache,
+  .saveInitialTime = NULL,
+  notOlderThan = NULL,
+  events = NULL,
+  .plots = getOption("spades.plots", NULL),
+  ...
+)
 }
 \arguments{
 \item{l}{A list of arguments to passed to \code{spades}.}
@@ -59,10 +72,20 @@ Default is to use the value in \code{getOption("spades.debug")}.}
 character (\code{"graphical"}, \code{"text"}) or numeric indicating
 the number of update intervals to show in a graphical progress bar.}
 
-\item{cache}{Logical. If \code{TRUE}, then the \code{spades} call will be cached.
+\item{cache}{Logical or character. If \code{TRUE} (same as \code{"local"}), then the \code{spades} call
+will be cached.
 This means that if the call is made again with the same \code{simList},
 then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
+The cached \code{simList} points at its input and output files where they are, so
+the entry only works on this machine; a cache hit whose output files are gone
+warns and still returns the \code{simList}. \code{"portable"} also saves those files with
+\code{\link[=saveSimList]{saveSimList()}} into the cache, and a hit unpacks them with \code{\link[=loadSimList]{loadSimList()}}
+into the working directory, so the entry can be used on another machine.
+In \code{\link[=simInitAndSpades]{simInitAndSpades()}} and \code{\link[=simInit]{simInit()}} (where it is passed in \code{...}), \code{cache}
+caches the whole call, and the key includes the content of each module's code
+files (child modules and non-R files too), so editing a module reruns.
+\code{.useCache} in \code{...} is the same argument under another name.
 See also the vignette on caching for examples.}
 
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.saveInitialTime}
@@ -179,12 +202,11 @@ the first argument of Cache. For events or modules, set the module \code{paramet
 This can be set to an event name, which will cache that event, or a logical,
 which will cache \emph{every} event in that module. Event and module caching
 makes most sense when the event or module only runs once, such as an initialization
-or data preparation event/module. Caching an entire simulation is actually just
-a function call to \code{simInitAndSpades}, for example. So, simply writing
-\code{Cache(simInitAndSpades, modules = ...)} will effectively cache a whole simulation.
-Finally for experiments, it is just like a function call:
-\code{Cache(simInitandExperiment, ...)}. The final way Caching can be done is in
-\code{experiment} or \code{spades}, by setting the \code{cache} argument.
+or data preparation event/module. To cache an entire simulation, use
+\code{simInitAndSpades(..., cache = TRUE)}. Do not wrap it in \code{Cache()} instead: there the
+modules are only names, so an edit to a module's code does not rerun it.
+The final way Caching can be done is in \code{experiment} or \code{spades}, by setting the
+\code{cache} argument.
 
 If \code{cache} is TRUE, this allows for a seamless way to "save" results
 of a simulation. The  user does not have to intentionally do any saving manually.
