@@ -50,6 +50,25 @@ test_that("simInitAndSpades(cache = TRUE) reruns when module code changes; .useC
   expect_true(.loadedFromCache(simInitAndSpades2(wrArgs(tmpdir, cache = TRUE))))
 })
 
+test_that("the temporary paths (new each session) are not in the whole-run cache key", {
+  testInit(smcc = FALSE, opts = list(reproducible.useMemoise = FALSE))
+  withr::local_options(reproducible.cachePath = tmpCache)
+  wrMod(file.path(tmpdir, "modules"))
+  withTmp <- function(d) {
+    a <- wrArgs(tmpdir, cache = TRUE)
+    a$paths[c("scratchPath", "terraPath", "rasterPath")] <-
+      as.list(file.path(tmpdir, d, c("scratch", "terra", "raster")))
+    a
+  }
+
+  expect_true(.newlyCached(simInitAndSpades2(withTmp("session1"))))
+  expect_true(.loadedFromCache(simInitAndSpades2(withTmp("session2"))))
+  ## a path that is not temporary is still in the key
+  a <- withTmp("session2")
+  a$paths$outputPath <- file.path(tmpdir, "outputs2")
+  expect_true(.newlyCached(simInitAndSpades2(a)))
+})
+
 test_that("simInit(cache = TRUE) caches the whole simInit, keyed on module code", {
   testInit(smcc = FALSE, opts = list(reproducible.useMemoise = FALSE))
   withr::local_options(reproducible.cachePath = tmpCache)

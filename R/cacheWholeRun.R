@@ -46,8 +46,9 @@
 
 ## Run `fnName` (simInit, spades or simInitAndSpades) with `args` through Cache(). `untracked`
 ## are arguments that do not change the result (debug, progress, notOlderThan); `paths` enters the
-## key relative to the working directory when portable. `sim` is the simList of a spades() call:
-## its digest already holds the module code, so none is added.
+## key without the temporary ones (`tmpPaths`, new each session), and relative to the working
+## directory when portable. `sim` is the simList of a spades() call: its digest already holds the
+## module code, so none is added.
 .cacheWholeRun <- function(fnName, args, mode, untracked = list()) {
   portable <- identical(mode, "portable")
   extra <- list(mode = mode)
@@ -55,8 +56,10 @@
     paths <- args$paths
     if (is.null(paths) || is.null(paths$modulePath)) paths <- modifyList(as.list(getPaths()), as.list(paths))
     extra$code <- .moduleCodeDigest(paths$modulePath, args$modules)
-    if (portable && !is.null(args$paths)) {
-      extra$paths <- lapply(args$paths, function(p) makeRelative(p, getwd()))
+    if (!is.null(args$paths)) {
+      keyPaths <- args$paths[!names(args$paths) %in% tmpPaths]
+      if (portable) keyPaths <- lapply(keyPaths, function(p) makeRelative(p, getwd()))
+      extra$paths <- keyPaths
       untracked$paths <- args$paths
       args$paths <- NULL
     }
