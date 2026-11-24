@@ -2196,10 +2196,7 @@ loadPkgs <- function(reqdPkgs) {
       loadedPkgs <- if (attach) {
         lapply(allPkgs, function(p)
           withCallingHandlers(base::require(p, character.only = TRUE),
-                              warning = function(w) {
-                                attachMsgs[p] <<- conditionMessage(w)
-                                invokeRestart("muffleWarning")
-                              }))
+                              warning = function(w) attachMsgs[p] <<- conditionMessage(w)))
       } else {
         lapply(allPkgs, requireNamespace, quietly = TRUE)
       }
