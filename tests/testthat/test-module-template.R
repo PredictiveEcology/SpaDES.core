@@ -342,3 +342,18 @@ test_that("newModule creates the bibliography file its Rmd names, and keeps an e
   newModuleDocumentation("efRefs", tmpdir, open = FALSE)
   expect_identical(readLines(refs), "@misc{a, title = {A}}")
 })
+
+test_that("newModule() defines doEvent with `<-`", {
+  testInit()
+  newModule("eqTpl", tmpdir, open = FALSE)
+  newModule("eqTplEv", tmpdir, open = FALSE, events = list(init = {
+    sim <- Init(sim)
+  }))
+  ## with `events`, each event gets its own doEvent.<module>.<event> function
+  fns <- c(eqTpl = "doEvent.eqTpl", eqTplEv = "doEvent.eqTplEv.init")
+  for (nm in names(fns)) {
+    code <- readLines(file.path(tmpdir, nm, paste0(nm, ".R")))
+    expect_true(any(startsWith(code, paste0(fns[[nm]], " <- function("))), info = nm)
+    expect_false(any(grepl("^[.A-Za-z_][.A-Za-z0-9_]* *= *function", code)), info = nm)
+  }
+})

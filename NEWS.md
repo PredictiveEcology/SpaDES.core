@@ -7,6 +7,7 @@
 
 ## Bug fixes
 
+* The v2 code checker (`codeCheckModule()`, `options(spades.codeCheckEngine = "v2")`) and the event-flow reader (`moduleEventFlow()`, `moduleObjects(byEvent = TRUE)`) read `=` as they read `<-`. A `=` statement parses as `expr_or_assign_or_help`, not `expr`, so a function defined as `f = function(sim)` (as `newModule()` wrote `doEvent.<module>`) was attributed to no function, and `sim$x = value` counted as a read of `x`, `sim = scheduleEvent(...)` as not assigned to `sim`, and `x = 1` as no local assignment. The event-flow object table and per-event figures therefore left out what each event's own code reads and writes. `test-codecheck.R`, `test-eventflow-objects.R`.
 * SpaDES.core defined `%||%` four times, with three meanings of "missing"; the one in effect, from the last file collated, also took a left side of length 0 as missing. All four are gone and base R's `%||%` (R >= 4.4) is used (#530). No caller depended on the difference except event-flow evaluation, which still treats a parameter of length 0 as unknown, now explicitly.
 * `newModule()` creates `citations/references_<name>.bib`, the bibliography the new module's Rmd names; without it the Rmd did not knit ("File citations/references_<name>.bib not found") (#529). The file is empty, for the module's references, and an existing one is kept.
 
@@ -42,6 +43,7 @@
 
 ## Enhancements
 
+* `newModule()` defines `doEvent.<module>` with `<-`; it wrote `=`. The module code checks (`options(spades.moduleCodeChecks = TRUE)`) note a top-level function defined with `=`, e.g. "doEvent.m (line 40) is defined with `=`; use `<-`"; in the v2 engine this is the rule `fn_defined_with_equals`. `test-simulation.R`, `test-codecheck.R`, `test-module-template.R`.
 * `simInit()`, `spades()` and `simInitAndSpades()` (so `simInit2()` and `simInitAndSpades2()`) cache the whole call with `cache = TRUE`, or with `.useCache = TRUE` in `...` (e.g. `out$.useCache <- TRUE; simInitAndSpades2(out)`). The cache key includes the content of the modules' code files (child modules and non-R files too), so editing a module reruns. Wrapping the call in `Cache()` did not: there the modules are only names, so it returned the stale result. `cache = "portable"` also saves the run's input and output files into the cache with `saveSimList()`, and a hit unpacks them with `loadSimList()` into the working directory, so the entry can be used on another machine. A local hit whose output files are gone warns and returns the `simList`. `moduleCodeFiles()` has new arguments `childModules` and `nonR`. `test-cacheWholeRun.R`.
 
 * `Plots()` has a new argument, `.cacheExtra`, for `useCache`. When given, the figure's cache record is keyed on it instead of on `data`, and is checked before `data` is evaluated, so a hit does not build `data`; the saved files are still checked and added to `outputs(sim)`. It replaces wrapping `Plots()` in `Cache()` to skip a costly `data`, which lost the figure's `outputs(sim)` row on every hit because `Plots()` did not run (FireSense: `fireSense_dataPrepFit`'s "Historical Fire Maps"). `test-Plots.R`.

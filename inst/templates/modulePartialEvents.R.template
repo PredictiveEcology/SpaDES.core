@@ -1,7 +1,7 @@
 ## event types
 #   - type `init` is required for initialization
 
-doEvent.{{{name}}} = function(sim, eventTime, eventType) {
+doEvent.{{{name}}} <- function(sim, eventTime, eventType) {
   switch(
     eventType,
     init = {

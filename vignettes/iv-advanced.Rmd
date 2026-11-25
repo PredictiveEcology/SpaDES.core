@@ -107,6 +107,7 @@ Typical findings the checker flags:
 | `unresolved_accessor` | `sim[[expr]]` or `get(var, envir=envir(sim))` — can't be checked statically |
 | `must_return_sim` | `doEvent.*` not ending with `return(invisible(sim))` |
 | `must_assign_to_sim` | `scheduleEvent(...)` or `saveFiles(...)` not assigned back to `sim` |
+| `fn_defined_with_equals` | a top-level function defined with `=` (`f = function(...)`); use `<-` |
 | `module_named_object` | `sim$<moduleName> <- ...` (forbidden) |
 | `conflicting_fn_unqualified` | bare `levels`/`scale`/`which.max` (ambiguous with `raster::`) |
 

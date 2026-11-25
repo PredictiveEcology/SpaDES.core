@@ -163,3 +163,15 @@ test_that("moduleObjects(sim, byEvent = TRUE) reads each module from the moduleP
   mo <- moduleObjects(sim, module = "fireMod", byEvent = TRUE)
   expect_true("burnMap" %in% mo$objectName)
 })
+
+test_that("an event's own reads and writes count when doEvent is defined with `=`", {
+  testInit(efPkgs)
+  efModule(tmpdir, "eqMod", inputs = 'expectsInput("a", "numeric", "")',
+           outputs = 'createsOutput("b", "numeric", "")', code =
+    'doEvent.eqMod = function(sim, eventTime, eventType) {
+       switch(eventType, init = { sim$b = sim$a + 1 })
+       invisible(sim)
+     }')
+  u <- SpaDES.core:::.ef_codeUnits(moduleEventFlow("eqMod", tmpdir))
+  expect_identical(u[[1]][c("reads", "writes")], list(reads = "a", writes = "b"))
+})

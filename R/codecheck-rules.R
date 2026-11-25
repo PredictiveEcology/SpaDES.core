@@ -30,6 +30,7 @@
   unresolved_accessor      = function(uses, meta) .ccr_unresolved_accessor(uses, meta),
   must_return_sim          = function(uses, meta) .ccr_must_return_sim(uses, meta),
   must_assign_to_sim       = function(uses, meta) .ccr_must_assign_to_sim(uses, meta),
+  fn_defined_with_equals   = function(uses, meta) .ccr_fn_defined_with_equals(uses, meta),
   module_named_object      = function(uses, meta) .ccr_module_named_object(uses, meta),
   conflicting_fn_unqualified = function(uses, meta) .ccr_conflicting_fn(uses, meta),
   clashing_module_fn       = function(uses, meta) .ccr_clashing_fn(uses, meta),
@@ -64,6 +65,7 @@
   unresolved_accessor        = "unresolved",
   must_return_sim            = "module functions",
   must_assign_to_sim         = "module functions",
+  fn_defined_with_equals     = "module functions",
   module_named_object        = "module functions",
   conflicting_fn_unqualified = "globals",
   clashing_module_fn         = "module functions",
@@ -446,6 +448,19 @@
                        message = sprintf("call to `%s()` in %s must be assigned to sim, e.g., `sim <- %s(sim, ...)`",
                                          u$name, u$fn, u$name),
                        suggestion = sprintf("change `%s(...)` to `sim <- %s(...)`", u$name, u$name))
+  }))
+}
+
+.ccr_fn_defined_with_equals <- function(uses, meta) {
+  bad <- uses[uses$kind == "eq_fn_def", , drop = FALSE]
+  if (nrow(bad) == 0) return(.cc_emptyFindings())
+  do.call(rbind, lapply(seq_len(nrow(bad)), function(i) {
+    u <- bad[i, ]
+    .cc_findingFromUse("fn_defined_with_equals", "note", meta$module, u,
+                       message = sprintf("function '%s' is defined with `=`; use `<-`, e.g., `%s <- function(...)`",
+                                         u$name, u$name),
+                       suggestion = sprintf("change `%s = function` to `%s <- function`",
+                                            u$name, u$name))
   }))
 }
 
