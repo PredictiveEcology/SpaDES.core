@@ -27,7 +27,8 @@ requires a non-empty \code{files}.}
 }
 \value{
 A character vector of directory names (or paths, if
-\code{leafOnly = FALSE}), ordered numerically by id.
+\code{leafOnly = FALSE}), ordered numerically by id and named by id, so
+\code{as.integer(names(x))} gives the replicate numbers (\code{"rep01"} is named \code{"1"}).
 }
 \description{
 Given a vector of file paths and a set of candidate integer ids, returns the
@@ -43,7 +44,14 @@ anything exists on disk.
 files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep2/x.tif")
 dirnamesFromSet(files, set = 1:10)
 dirnamesFromSet(files, set = 1:10, leafOnly = FALSE)
+as.integer(names(dirnamesFromSet(files, set = 1:10)))
+}
+\seealso{
+Other replicate helpers:
+\code{\link[=repFiles]{repFiles()}},
+\code{\link[=tagReplicate]{tagReplicate()}}
 }
 \author{
 Eliot McIntire
 }
+\concept{replicate helpers}

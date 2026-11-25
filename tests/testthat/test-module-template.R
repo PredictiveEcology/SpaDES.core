@@ -312,9 +312,6 @@ test_that("a new module's Rmd knits with the event flow, index and figures", {
              "textshaping"), smcc = FALSE)
   skip_on_cran(); skip_if_offline()  # the template's setup chunk downloads a badge
   newModule("efKnit", tmpdir, open = FALSE)
-  ## the template's YAML names this bibliography, which newModule() does not create
-  dir.create(file.path(tmpdir, "efKnit", "citations"), showWarnings = FALSE)
-  file.create(file.path(tmpdir, "efKnit", "citations", "references_efKnit.bib"))
   rmd <- file.path(tmpdir, "efKnit", "efKnit.Rmd")
   rmarkdown::render(rmd, quiet = TRUE)
   md <- readLines(file.path(tmpdir, "efKnit", "efKnit.md"))
@@ -330,4 +327,18 @@ test_that("a new module's Rmd knits with the event flow, index and figures", {
   expect_false(any(grepl("@ref(tab:eventObjects", md, fixed = TRUE)))
   html <- readLines(file.path(tmpdir, "efKnit", "efKnit.html"), warn = FALSE)
   expect_false(any(grepl("<strong>??</strong>", html, fixed = TRUE)))
+})
+
+test_that("newModule creates the bibliography file its Rmd names, and keeps an existing one", {
+  testInit(smcc = FALSE)
+  newModule("efRefs", tmpdir, open = FALSE)
+  rmd <- readLines(file.path(tmpdir, "efRefs", "efRefs.Rmd"))
+  bib <- sub("^bibliography:[[:space:]]*", "", grep("^bibliography:", rmd, value = TRUE))
+  expect_identical(bib, "citations/references_efRefs.bib")
+  refs <- file.path(tmpdir, "efRefs", bib)
+  expect_true(file.exists(refs))
+  ## written again, the module's own references stay
+  writeLines("@misc{a, title = {A}}", refs)
+  newModuleDocumentation("efRefs", tmpdir, open = FALSE)
+  expect_identical(readLines(refs), "@misc{a, title = {A}}")
 })
