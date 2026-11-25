@@ -565,22 +565,25 @@ isAre <- function(l, v) {
 #'   requires a non-empty `files`.
 #'
 #' @return A character vector of directory names (or paths, if
-#'   `leafOnly = FALSE`), ordered numerically by id.
+#'   `leafOnly = FALSE`), ordered numerically by id and named by id, so
+#'   `as.integer(names(x))` gives the replicate numbers (`"rep01"` is named `"1"`).
 #'
 #' @author Eliot McIntire
 #' @export
 #' @rdname dirnamesFromSet
+#' @family replicate helpers
 #'
 #' @examples
 #' files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep2/x.tif")
 #' dirnamesFromSet(files, set = 1:10)
 #' dirnamesFromSet(files, set = 1:10, leafOnly = FALSE)
+#' as.integer(names(dirnamesFromSet(files, set = 1:10)))
 dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
   if (length(files) == 0) {
     if (!leafOnly) {
       stop("`leafOnly = FALSE` requires `files`: there is no path to take a dirname of.")
     }
-    return(paste0(prefix, set))
+    return(stats::setNames(paste0(prefix, set), set))
   }
 
   ## the path up to and including the rep directory, so files in its subfolders give the same one
@@ -610,9 +613,94 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
   dirs <- dirs[inSet]
   ids <- ids[inSet]
   firsts <- !duplicated(dirs)
-  dirs <- dirs[firsts][order(ids[firsts])]
+  ord <- order(ids[firsts])
+  dirs <- dirs[firsts][ord]
+  ids <- ids[firsts][ord]
 
-  if (leafOnly) unique(basename(dirs)) else dirs
+  out <- if (leafOnly) basename(dirs) else dirs
+  firsts <- !duplicated(out)
+  stats::setNames(out[firsts], ids[firsts])
+}
+
+#' The file of each replicate
+#'
+#' For each replicate directory, the path of the file named `filename` in it.
+#' With `files` (e.g. the `file` column of the replicate runs' `outputs(sim)`,
+#' or the paths given to [dirnamesFromSet()]), the path is taken from `files`,
+#' matching both the directory and the file name exactly, so that `rep1` does
+#' not also pick up `rep10`'s file; a replicate with no such file, or more than
+#' one, is an error. Without `files`, the path is built from the directory.
+#'
+#' @param repDirs character. Replicate directories, e.g.
+#'   `dirnamesFromSet(files, set, leafOnly = FALSE)`.
+#' @param filename character(1). The file's name, e.g. `"burnMap_year1000.tif"`.
+#' @param files character, or `NULL`. Known file paths to take the result from.
+#'
+#' @return A character vector with one path per replicate, named as `repDirs`
+#'   is (by replicate id, for `dirnamesFromSet()`'s result).
+#'
+#' @export
+#' @family replicate helpers
+#'
+#' @examples
+#' files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep1/fire.csv")
+#' dirs <- dirnamesFromSet(files, set = c(1, 10), leafOnly = FALSE)
+#' repFiles(dirs, "burnMap.tif", files)
+repFiles <- function(repDirs, filename, files = NULL) {
+  out <- if (is.null(files)) {
+    file.path(repDirs, filename)
+  } else {
+    vapply(repDirs, function(d) {
+      f <- files[dirname(files) == d & basename(files) == filename]
+      if (length(f) != 1L) {
+        stop("expected one ", filename, " in ", d, " in `files`; found ", length(f), call. = FALSE)
+      }
+      f
+    }, character(1), USE.NAMES = FALSE)
+  }
+  names(out) <- names(repDirs)
+  out
+}
+
+#' Set the replicate of a table read from one replicate's outputs
+#'
+#' Sets column `col` of `x` to `id`, the replicate whose outputs `x` was read
+#' from (e.g. a name of [dirnamesFromSet()]'s result). Rows whose `col` is
+#' missing take `id`. Rows naming another replicate are an error: the run that
+#' wrote them was told the wrong replicate, and its rows would otherwise count
+#' for the replicate they name, while their own replicate looked empty.
+#' Values are compared as text, so `1` and `"1"` agree.
+#'
+#' @param x a `data.frame` or `data.table`.
+#' @param id the replicate, length 1.
+#' @param col character(1). The replicate column of `x`.
+#' @param source character, or `NULL`. Where `x` was read from, for the error.
+#'
+#' @return `x`, with `col` set to `id` in every row (a `data.table` is modified
+#'   in place).
+#'
+#' @export
+#' @family replicate helpers
+#'
+#' @examples
+#' tagReplicate(data.frame(rep = c(NA, 2L), size = 1:2), id = 2L)
+tagReplicate <- function(x, id, col = "rep", source = NULL) {
+  stopifnot(length(id) == 1L, length(col) == 1L)
+  cur <- x[[col]]
+  if (!is.null(cur)) {
+    other <- unique(cur[!is.na(cur) & as.character(cur) != as.character(id)])
+    if (length(other)) {
+      stop(if (!is.null(source)) paste0(source, ": "), "rows for replicate ",
+           paste(other, collapse = ", "), " in the outputs of replicate ", id,
+           "; was its run told the wrong replicate?", call. = FALSE)
+    }
+  }
+  if (data.table::is.data.table(x)) {
+    data.table::set(x, j = col, value = rep(id, nrow(x)))
+  } else {
+    x[[col]] <- rep(id, nrow(x))
+  }
+  x
 }
 
 #' Did `Cache()` newly compute this object, or load it from the cache?
