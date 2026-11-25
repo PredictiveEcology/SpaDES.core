@@ -46,7 +46,11 @@ it runs under (\code{cond}; for an event scheduled from a conditional event,
 that event's condition); and whether it is a plotting or saving event
 (\code{plotsave});}
 \item{\code{status}}{a named character vector, the status of every event;}
-\item{\code{initCalls}}{the module's functions that \code{init} calls, in order;}
+\item{\code{initCalls}}{the module's functions that \code{init} calls and that run
+with these parameters, or may (status "on" or "cond"), in order;}
+\item{\code{initCallStatus}}{a \code{data.frame} of every module function that
+\code{init}'s code calls, in order: \code{fn}, \code{status} ("on", "cond" or "off") and
+the condition that switches it off or is unknown (\code{cond});}
 \item{\code{hasInputObjects}}{whether the module has an \code{.inputObjects} function.}
 }
 }

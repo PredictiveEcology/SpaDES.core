@@ -156,6 +156,7 @@
   if (is.null(out)) {
     out <- new.env()
     out$recs <- list()
+    out$calls <- list()
     out$modeLits <- list()
   }
   list(env = env, store = store, mod = mod, guards = list(), exec = TRUE, from = ev,

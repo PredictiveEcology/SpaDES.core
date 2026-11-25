@@ -117,14 +117,29 @@
   }
 
   init <- mod$branches[["init"]]
-  calls <- x$default$initCalls
+  ## init's calls that run, or may, in each run mode
+  runIn <- lapply(flows, function(f) f$initCalls %||% character())
+  calls <- unique(unlist(runIn))
+  inModes <- lapply(calls, function(f) which(vapply(runIn, function(cs) f %in% cs, logical(1))))
+  modeOf <- vapply(inModes, function(i) {
+    if (is.null(x$modes) || length(i) == length(flows)) NA_character_ else
+      paste(names(flows)[i], collapse = ", ")
+  }, character(1))
   n <- length(calls)
-  if (n >= 2) {
+  if (n >= 2 || any(!is.na(modeOf))) {
     for (k in seq_len(n)) {
       f <- calls[k]
-      add(paste0("init_", f), paste0(f, "()"), paste0("init: ", f, "()"), "set-up",
-          sprintf("init event, step %d of %d", k, n),
-          .ef_unitIO(uses, mod, fns = c(f, .ef_reachable(call(f), mod)), own = FALSE))
+      ## numbered among the calls of the first run mode it runs in
+      cs <- runIn[[inModes[[k]][1]]]
+      sub <- if (length(cs) >= 2) {
+        sprintf("init event, step %d of %d", match(f, cs), length(cs))
+      } else {
+        "called by the init event"
+      }
+      if (!is.na(modeOf[k])) sub <- paste0(x$modeParam, " = \"", modeOf[k], "\": ", sub)
+      add(paste0("init_", f), paste0(f, "()"), paste0("init: ", f, "()"), "set-up", sub,
+          .ef_unitIO(uses, mod, fns = c(f, .ef_reachable(call(f), mod)), own = FALSE),
+          mode = modeOf[k])
     }
     ## the init code outside the functions it calls
     own <- .ef_unitIO(uses, mod, branch = init)
@@ -133,8 +148,9 @@
           "the init event's own code, outside the functions it calls", own)
     }
   } else if (!is.null(init)) {
+    fns <- unique(c(calls, unlist(lapply(calls, function(f) .ef_reachable(call(f), mod)))))
     add("init", "init", "init", "set-up", "the init event",
-        .ef_unitIO(uses, mod, branch = init, fns = .ef_reachable(init, mod)))
+        .ef_unitIO(uses, mod, branch = init, fns = fns))
   }
 
   ## the events that run in some run mode, in the order of the event-flow figure
@@ -195,6 +211,12 @@
   flows <- if (is.null(x$modes)) list(x$default) else x$modes
   onEv <- unique(unlist(lapply(flows, function(f) names(f$status)[f$status %in% c("on", "cond")])))
   offEv <- setdiff(names(x$default$status)[x$default$status != "unscheduled"], c(onEv, "init"))
+  ## init's calls that are off in every run mode
+  offCalls <- Reduce(intersect, lapply(flows, function(f) {
+    cs <- f$initCallStatus
+    if (is.null(cs)) character() else cs$fn[cs$status == "off"]
+  }))
+  offEv <- c(if (length(offCalls)) paste0(offCalls, "()"), offEv)
   grpLevels <- c("Inputs", "Inputs the module also updates", "Outputs")
   ins <- meta$inputs
   outs <- meta$outputs
