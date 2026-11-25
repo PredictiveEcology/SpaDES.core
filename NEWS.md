@@ -7,6 +7,7 @@
 
 ## Bug fixes
 
+* `simInit()` now stops, naming the package and the reason, when a module's `reqdPkgs` entry is installed but cannot be attached (e.g. its namespace is already loaded from another library at another version). It used to carry on and fail later with "could not find function". A `reqdPkgs` entry that is not installed still only warns, as before.
 * SpaDES.core defined `%||%` four times, with three meanings of "missing"; the one in effect, from the last file collated, also took a left side of length 0 as missing. All four are gone and base R's `%||%` (R >= 4.4) is used (#530). No caller depended on the difference except event-flow evaluation, which still treats a parameter of length 0 as unknown, now explicitly.
 * `newModule()` creates `citations/references_<name>.bib`, the bibliography the new module's Rmd names; without it the Rmd did not knit ("File citations/references_<name>.bib not found") (#529). The file is empty, for the module's references, and an existing one is kept.
 

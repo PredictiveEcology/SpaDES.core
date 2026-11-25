@@ -2181,6 +2181,7 @@ loadPkgs <- function(reqdPkgs) {
     allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
 
     attach <- getOption("spades.reqdPkgsAttach", TRUE)
+    attachMsgs <- character()
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
       Require(allPkgs, require = attach, standAlone = FALSE, upgrade = FALSE)
@@ -2193,12 +2194,41 @@ loadPkgs <- function(reqdPkgs) {
     } else {
       allPkgs <- unique(Require::extractPkgName(allPkgs))
       loadedPkgs <- if (attach) {
-        lapply(allPkgs, base::require, character.only = TRUE)
+        lapply(allPkgs, function(p)
+          withCallingHandlers(base::require(p, character.only = TRUE),
+                              warning = function(w) attachMsgs[p] <<- conditionMessage(w)))
       } else {
         lapply(allPkgs, requireNamespace, quietly = TRUE)
       }
     }
+    if (attach) stopIfNotAttached(allPkgs, attachMsgs)
   }
+}
+
+# A reqdPkg that is installed but did not attach (e.g., its namespace is already loaded from another
+# library, at another version, and cannot be unloaded) must stop simInit here, not fail later with
+# "could not find function". One that is not installed keeps require()'s warning, as before: a simList
+# can be built, inspected or loaded without every module package.
+stopIfNotAttached <- function(pkgs, attachMsgs = character()) {
+  pkgs <- unique(Require::extractPkgName(pkgs))
+  pkgs <- pkgs[!is.na(pkgs) & nzchar(pkgs)]
+  notAttached <- pkgs[!pkgs %in% sub("^package:", "", search())]
+  installed <- vapply(notAttached, function(p) nzchar(system.file(package = p)), logical(1))
+  notAttached <- notAttached[notAttached %in% loadedNamespaces() | installed]
+  if (length(notAttached)) {
+    details <- vapply(notAttached, function(p) {
+      loadedVer <- if (p %in% loadedNamespaces()) as.character(utils::packageVersion(p)) else NA_character_
+      libVer <- tryCatch(as.character(utils::packageVersion(p, lib.loc = .libPaths())),
+                         error = function(e) NA_character_)
+      paste0(p,
+             if (!is.na(attachMsgs[p])) paste0(": ", attachMsgs[p]),
+             if (!is.na(loadedVer) && !is.na(libVer) && loadedVer != libVer)
+               paste0(" (loaded version ", loadedVer, " differs from ", libVer, " in .libPaths(); ",
+                      "restart R with the intended library first in .libPaths())"))
+    }, character(1))
+    stop("These reqdPkgs could not be attached: ", paste(details, collapse = "; "), call. = FALSE)
+  }
+  invisible(NULL)
 }
 
 #' @importFrom Require messageVerbose
