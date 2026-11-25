@@ -5,87 +5,6 @@
 * SpaDES.core now needs R >= 4.4 (was 4.3), the oldest R version its checks run on (#511).
 * `Require` now needs to be at least version 2.0.0 (was 1.0.1).
 
-## Bug fixes
-
-* `simInit()` now stops, naming the package and the reason, when a module's `reqdPkgs` entry is installed but cannot be attached (e.g. its namespace is already loaded from another library at another version). It used to carry on and fail later with "could not find function". A `reqdPkgs` entry that is not installed still only warns, as before.
-* The event-flow figure (`eventDiagram()`, `includeModuleEventFlow()`) draws the module functions that `init` calls only where they run. It drew every call in `init`'s code in the set-up of every run mode, one after the other, even calls in alternative branches or switched off by default (e.g. fireSense_summary's `hindcastFigures()` and `InitMulti()`, which run only in multi mode). Calls that run in every mode stay in the set-up, the others are drawn in their modes' frames, and calls off in every mode are listed with the events that are off. In `moduleEventFlow()`, `initCalls` keeps only the calls that run (or may), and the new `initCallStatus` gives each call's status and condition; the per-event figures and the object index follow them. `test-eventflow.R`, `test-eventflow-plot.R`, `test-eventflow-objects.R`.
-* The v2 code checker (`codeCheckModule()`, `options(spades.codeCheckEngine = "v2")`) and the event-flow reader (`moduleEventFlow()`, `moduleObjects(byEvent = TRUE)`) read `=` as they read `<-`. A `=` statement parses as `expr_or_assign_or_help`, not `expr`, so a function defined as `f = function(sim)` (as `newModule()` wrote `doEvent.<module>`) was attributed to no function, and `sim$x = value` counted as a read of `x`, `sim = scheduleEvent(...)` as not assigned to `sim`, and `x = 1` as no local assignment. The event-flow object table and per-event figures therefore left out what each event's own code reads and writes. `test-codecheck.R`, `test-eventflow-objects.R`.
-* SpaDES.core defined `%||%` four times, with three meanings of "missing"; the one in effect, from the last file collated, also took a left side of length 0 as missing. All four are gone and base R's `%||%` (R >= 4.4) is used (#530). No caller depended on the difference except event-flow evaluation, which still treats a parameter of length 0 as unknown, now explicitly.
-* `newModule()` creates `citations/references_<name>.bib`, the bibliography the new module's Rmd names; without it the Rmd did not knit ("File citations/references_<name>.bib not found") (#529). The file is empty, for the module's references, and an existing one is kept.
-
-* `Cache()` of a `simList` no longer fails with "is.list(x) is not TRUE" when an object has the same name as a module, e.g. `sim$climateYear` from the climateYear module. Hashing tried to merge the object with the module's entry; it now keeps them apart.
-
-* `Plots()` no longer prints what a base-graphics `fn` returns. It printed any return value of an `fn` other than `plot`/`terra::plot`, so a function returning its data (even invisibly) dumped it to the console, e.g. every raster of fireSense_ELFs' ELF list. Only an object that draws when printed (ggplot, patchwork, lattice, a recorded plot) is printed.
-
-* A new module's `.Rmd` (from `newModule()`) knits without internet. Its setup chunk downloaded the "Made with Markdown" badge from img.shields.io on every knit, so knitting failed offline (e.g. on a cluster) or when the site did not answer; the badge is now linked, not downloaded. `test-module-template.R` failed on CI this way (SpaDES.core#535).
-* The `save` module no longer schedules a save from an `outputs(sim)` row that is already saved (`saved = TRUE`, e.g. a `Plots()` figure). Such a row records a file already written, and a cache hit restores it with the `saveTime` of the run that made the entry; when that run started earlier, the run stopped with "You have tried to schedule an event before start(sim) ... (spades event in save module)" (FireSense hindcasts: `.inputObjects` registering a `Plots()` row). Only rows still to be saved are scheduled. `test-cacheHitOutputsOwnRows.R`.
-* `inputs(sim)$loadTime` is in the simulation's time unit for every row. Objects passed to `simInit(objects = )` (or set with `objs<-`) were given in seconds (e.g. 85836672000 for year 2720) beside rows in years, so a module reading it (canClimateData, for the years a rerun serves) got wrong times. The table now stores `loadTime` in seconds (attribute `unit = "second"`), as the simulation clock does, and `inputs()` converts it to the simulation's unit; `inputs<-` takes the simulation's unit (or the unit in a `unit` attribute). A `simList` saved before, without the attribute, reads as before. `test-load.R`.
-* `moduleObjects()` with neither `sim` nor `module` no longer stops in `browser()`.
-
-* An error in a module's `defineModule()` call (e.g. a parameter default that fails) is now reported once, as itself. `.parseModule()` also printed "Error in .parseModule(...) : object 'mess' not found" from a leftover `on.exit(try(mess))`, whose `mess` does not exist yet when `defineModule()` fails; on the first `simInit()` of a run it printed that line six times or more and hid which module failed. `test-defineModuleError.R`.
-
-* The "done! took: ..." message that reproducible prints after "cropping...", "projecting..." and the like (`postProcessTo()`, so `prepInputs()`) no longer has a blank line after it when it is printed during an event. The `spades()` message handler wrapped it in a second `\b`, which `loggingMessage()` did not strip, so each one printed as `\b` on a line of its own. The `\b` handling now lives in `loggingMessage()`, so the `simInit()` and `spades()` message handlers cannot differ; a `\b` message in `simInit()` now also reads `\b done!` (a space after the `\b`), as it did in events. `test-progressThrottle.R`.
-
-* A file-backed object (e.g. a `SpatRaster`) in a `simList` saved with `saveSimList(lazy = TRUE)` now loads anywhere like any other object. Its files are kept with it, in the sidecar directory (`<file>_lazy/cacheOutputs/`), and restored where its paths say when it is first used. A file in a temporary place (`cachePath`, `scratchPath`, `terraPath`, `rasterPath`, `tempdir()`, terra's temporary folder) or under none of the `simList`'s other paths, `projectPath` or `getwd()`, is restored only in the sidecar directory, never into a cache or scratch folder; `loadSimList(fetch = )` fetches them as it does the object. Before, only its path was kept (`files = FALSE`, as `SpaDES.project::outSave()` saves), so an object whose file was in a cache, scratch or temporary folder loaded as `NULL` on another machine. A list of file-backed objects (e.g. `historicalClimateRasters`) loaded elsewhere also failed with "replacement has length zero"; each element is now remapped by its own paths. `test-saveLoadLazy.R`.
-* On an event cache hit, a file the cached event wrote and added to `outputs(sim)` (e.g. a `Plots()` figure) is now copied to this run's `outputPath`, and its row points there. It kept the path in the `outputPath` of the run that made the entry, so a saved run's archive held another run's figure. `test-cacheHitOutputsOwnRows.R`.
-* On an event cache hit, a row the cached event added to `outputs(sim)` for one of its own module's outputs (e.g. `registerOutputs(filename = f, objectName = "pde")`) is now restored. It was dropped, though its file was kept, so a run that hit the entry did not list that file in its outputs. Rows naming the module's own outputs are now left out only for an entry saved before the `eventOutputsAdded` tag, whose rows are the saving run's whole table. `test-cacheHitOutputsOwnRows.R`.
-* A cached event no longer has to put back old copies of objects it never makes. Its cache entry kept, and its cache hit restored, every `createsOutput` of its module that is not also an `expectsInput`, whether or not the event wrote it, so a later event's hit put an old copy back over an object an earlier event had just remade (FireSense: `fireSense_dataPrepFit`'s `prepIgnitionFitData` restored an old `fireBufferedListDT` after `prepSpreadFitData` had rebuilt it). A module can now say which events write an output: `createsOutput("x", "data.table", "...", events = "prepSpreadFitData")` (one or more event types; `".inputObjects"` for the module's `.inputObjects`). An event's entry then keeps, and its hit or a cacheChaining jump restores, only the outputs declared for its event type, plus those that declare no `events`. Entries saved before a module declared `events` are restored the same way. A module that declares no `events` behaves, and is keyed, exactly as before; adding `events` changes the cache keys of the module's events (the `outputObjects` metadata is in them), not those of its `.inputObjects`. Older versions of SpaDES.core accept and ignore the column. `createsOutput()` called with an argument that is not character (e.g. `desc = NA`) dropped its named arguments, `events` included; it now keeps them. `test-cacheOutputsEvents.R`.
-* A message printed during `spades()` no longer hangs the run at 100% CPU when the code running at the time has its own variable `sim` that is not a `simList`: `loggingMessage()` restarted `.whereInStack("sim")` from the same frame forever. It now takes the innermost `simList` named `sim` on the call stack in one pass. `test-loggingMessageNonSimList.R`.
-* `simInit()` now widens `spades.messagingNumCharsModule` for the children of a parent module, not only the modules the user named, so child modules such as `fireSense_ELFs` and `fireSense_burn` no longer print under the same shortened name in log lines. `test-childModuleNameWidth.R`.
-* `simInit(alreadyRun = )` now also gives the new modules an object the run created but never saved as a file, when the run's `simList` has it (e.g. `studyArea`, `climateYearRecord`), with its value at the end of that run; a message names them and `sim$._alreadyRun$objects` records them. It stopped on them before.
-
-* The `moduleCoverage()` test in `test-DESCRIPTIONfromModule.R` is skipped inside a covr run. With covr 4.0.0 its nested coverage run made the enclosing one fail at the end with "Can't read coverage trace file .../modE2E/R/covr_counters.rds": the module's test process also loads the outer run's instrumented SpaDES.core, and covr now keeps one counters file per process, so the outer trace pointed at modE2E's counters, deleted when the inner run ended. The test still runs in `R CMD check` and `devtools::test()`.
-* `test-wrapSimListTags.R` no longer expects `clearCache()` to delete an entry's `.lock` files, which `reproducible` no longer removes (a lock may be held by another process).
-* An error while evaluating a module's `defineModule` (e.g. a parameter default that calls a function that fails) now stops `simInit()` with the module name and the original message. It was turned into a warning, so `simInit()` then failed with "no applicable method for `@` applied to an object of class character" and the real message was lost among the warnings. `test-defineModuleError.R`.
-* An object whose name starts with `.` (declared by a module, e.g. fireSense's `.ELFind`) that a module sets in an `init` run during `simInit()` (`spades.allowInitDuringSimInit`) now reaches the `simList`: only `objs()`, which leaves such names out, was copied back. `test-nestedAndEarlyInit.R`.
-* A `simInit()` inside an event of `simInitAndSpades()` (a nested simulation, as `Biomass_borealDataPrep` runs `Biomass_core`) loads its modules' `reqdPkgs` again. `simInitAndSpades()` and `restartSpades()` set `options(spades.loadReqdPkgs = FALSE)` for their `spades()` call, so the option stayed `FALSE` while the events ran; `Biomass_core`'s `%>>%` (`fpCompare`) was then "not found" unless another module of the outer simulation listed `fpCompare`. They now mark the `simList` instead, and only that `spades()` call skips the reload. A `spades.loadReqdPkgs = FALSE` set by the user is unchanged. `test-nestedAndEarlyInit.R`.
-* `dirnamesFromSet()` now finds replicate folders named by the bare number (`out/370/16/x.tif`, as `SpaDES.project::pathBuild()` writes them with the field label off). Before, only `<prefix><N>` folders (`rep16`) were recognised, so multi-mode summaries found no replicates. The bare-number fallback applies only when no `<prefix><N>` folder occurs in `files`; for each file the deepest all-digit directory with an id in `set` is used. Results for `<prefix><N>` layouts are unchanged. `test-dirnamesFromSet.R`.
-* A simulation no longer stops with "missing value where TRUE/FALSE needed" when the `.Cache` attribute of an event's result has no `newCache` entry. `.chainRan()` and `restartOrSimInitAndSpades()` now count that as 'not newly computed'. The reads of `attr(, ".Cache")$newCache` now all go through `.newlyCached()` / `.loadedFromCache()` (`.chainRan()`, `restartOrSimInitAndSpades()`, `Plots()`), so a missing entry cannot yield `NA` or `logical(0)` again. `test-cacheChainingRan.R`.
-* `saveSimList()` now archives the files in `outputs(sim)` and `inputs(sim)` when the `simList` has no file-backed object. It archived only when there was one, so a `simList` of plain objects was saved without its output files. `test-cacheWholeRun.R`.
-
-## Enhancements
-
-* `newModule()` defines `doEvent.<module>` with `<-`; it wrote `=`. The module code checks (`options(spades.moduleCodeChecks = TRUE)`) note a top-level function defined with `=`, e.g. "doEvent.m (line 40) is defined with `=`; use `<-`"; in the v2 engine this is the rule `fn_defined_with_equals`. `test-simulation.R`, `test-codecheck.R`, `test-module-template.R`.
-* `simInit()`, `spades()` and `simInitAndSpades()` (so `simInit2()` and `simInitAndSpades2()`) cache the whole call with `cache = TRUE`, or with `.useCache = TRUE` in `...` (e.g. `out$.useCache <- TRUE; simInitAndSpades2(out)`). The cache key includes the content of the modules' code files (child modules and non-R files too), so editing a module reruns. Wrapping the call in `Cache()` did not: there the modules are only names, so it returned the stale result. `cache = "portable"` also saves the run's input and output files into the cache with `saveSimList()`, and a hit unpacks them with `loadSimList()` into the working directory, so the entry can be used on another machine. A local hit whose output files are gone warns and returns the `simList`. `moduleCodeFiles()` has new arguments `childModules` and `nonR`. `test-cacheWholeRun.R`.
-
-* `Plots()` has a new argument, `.cacheExtra`, for `useCache`. When given, the figure's cache record is keyed on it instead of on `data`, and is checked before `data` is evaluated, so a hit does not build `data`; the saved files are still checked and added to `outputs(sim)`. It replaces wrapping `Plots()` in `Cache()` to skip a costly `data`, which lost the figure's `outputs(sim)` row on every hit because `Plots()` did not run (FireSense: `fireSense_dataPrepFit`'s "Historical Fire Maps"). `test-Plots.R`.
-
-* New `moduleEventFlow()` reads a module's events from its code without running it: which events it has, which of them schedule which, when, and at what priority. `eventDiagram()` and `objectDiagram()` accept a module and path instead of a `simList`: `eventDiagram()` draws the module's event flow, and `objectDiagram()` the objects that each event and `.inputObjects` read and write, and the parameters they use. `moduleObjects(byEvent = TRUE)` lists the code that writes and the code that reads each object. New knit helpers `includeModuleEventFlow()`, `kableModuleObjects()` and `moduleEventFigures()` put these in a module's Rmd; new module Rmds (`newModule()`) show the event flow, the object index and per-event figures, generated at knit time. `test-module-template.R`.
-* `createsOutput()` now has `events` as a named argument (`createsOutput(objectName, objectClass, desc, ..., events = NULL)`), documented under its own `@param`, instead of being picked out of `...`. It must be character (an error otherwise) and is added as a column only when not `NULL`, so a call without it returns the same `data.frame` as before. Positional calls are unchanged. `test-createsOutputEvents.R`.
-* `simInit(alreadyRun = )` takes several runs, a list of runs (each `list(sim, fetch)`), for modules that summarise replicates (NRV_summary, burnSummaries with `mode = "multi"`). Nothing is replayed. `outputsDF` is the saved rows of every run's `outputs()`, bound, with a column `run`; a run with `fetch` is fetched first. An object a module expects and the user did not supply is taken from the runs' simLists (whichever module or user made it there, e.g. `studyAreaReporting`, `sppEquiv`) only when every run has it with the same value; a message names the others. One run works as before. `test-alreadyRun.R`.
-* A saved `simList` carries its modules' source: `saveSimList()` keeps the text of each module's code files (`<module>.R` and `R/*`, as `moduleCodeFiles()` lists them), the folder they came from, the module version and, for a git checkout, its commit and branch, in `sim$.mods[[module]]$._source`; new `moduleSource(sim)` returns it. `loadSimList()` parses a module that is not on `modulePath` from that text, so the `simList` runs without its modules; a module on `modulePath` is still parsed from there, the copy the user has. The text is added after `.wrap()`, the step `Cache()` also uses, so Cache entries never carry module source or functions and cache keys are unchanged (`._`-prefixed objects are not digested). `simInit()` also records the modules as given, with their names (e.g. `"account/repo@ref"`), and each parent module's children in `sim$._modulesGiven`; parents are not in `modules(sim)`, so a saved run did not say which it used. `test-saveModuleSource.R`.
-* `simInit(alreadyRun = )` replays a run already done: a simulation of new modules gets, as `inputs`, the outputs the run saved of each object a new module expects and a module of the run created, without the run's modules' code being read or their events run. `alreadyRun` is `list(sim = <the run's saved simList, or its shell>, fetch = <optional function making its output files local>)`, as `SpaDES.project::setupProject(alreadyRun = )` returns it in `out$alreadyRun`, so `simInitAndSpades2(out)` works. The latest save at or before `start` loads at `start`, each later save up to `end` at its `saveTime`, and only those files are fetched. An expected object the run's modules created but did not save stops `simInit()`, naming it. `sim$._alreadyRun` records the run's modules and the replayed `inputs`. The default `alreadyRun = NULL` changes nothing. `test-alreadyRun.R`.
-* A cacheChaining jump no longer loads a skipped cache entry for a declared output its event did not change. A hit restores only the objects its event changed (`lsObjectsChanged()`), but the jump loaded a skipped entry whenever it declared an output no later step restored. Each new entry now records those names in an `eventObjectsChanged` tag, and `.chainJumpFinish()` loads an entry only for a declared output the tag names. On a FireSense cache about three quarters of the bytes jumps loaded were such entries (`fireSense_spreadFit estimateThreshold`, `fireSense_dataPrepPredict .inputObjects`). An entry saved without the tag is loaded as before. `test-cacheChainingJump.R`.
-* A cacheChaining jump no longer stops at an event that changed its own parameters (`P(sim, "x") <- ...`; Biomass_core init, canClimateData, fireSense_spreadFit). Stopping there started a new chain, so the next events digested again inputs the first chain hit had already digested. A jump now restores such a parameter like an object a skipped event produced: from the last skipped entry whose `eventParamsChanged` tag names it (`.chainJumpFinish()`). Entries written by 3.2.1.9050 carry that tag and work as they are; an entry without it restores no parameters, as a hit on it does. A jump also no longer loads a skipped entry that has nothing left to give: an empty list of changed `mod` objects was read as one blank name still to restore (`.chainNameKeys()`). `test-cacheChainingJump.R`.
-* A cacheChaining jump no longer digests the same input twice, and no longer loads the same cache entry twice. The external inputs of each skipped event (those the chain did not produce) are checked against the entry's `preDigest` tags; the chain hit's own check and every link of the walk each digested them afresh, so a module's inputs were digested once per link (twice for a two-event jump of one module), and a shared input once per module of a long jump. The digests are now memoised for one hit and its walk (`cacheChainingSetup()` makes the memo, `.chainExternalInputsMatch()` fills and reads it). `.chainJumpFinish()` loaded a skipped entry a second time to read its object synonyms and outputs rows when the entry lacked the tags that record them; it now keeps what its first pass loaded. Measured on a FireSense phase-1 run (ELF 6.4, every event cached, 33 events restored by 8 jumps): the time before the "restored N cached events" messages fell from 48.7 s to 36.6 s and the restores after them from 42.4 s to 37.1 s; the two-link jump through `fireSense_dataPrepFit prepEscapeFitData` fell from 11.6 s to 5.6 s. What remains is each module's inputs digested once per jump (serialising in-memory rasters and tables) and the entry loads themselves. `test-cacheChainingDigestMemo.R`.
-* A module's `version` is no longer part of the cache key of its `.inputObjects`, its events, cacheChaining or a whole-`simList` call. A code change is already in the key through the bodies of the module's functions, so the version only made a version bump with no code change (`Bump to x.y.z`) re-run every cached event of the module. The version stays in `@depends`, and a cache hit returns the current module's version. The `reqdPkgs` strings are still in the key. Cache entries made by earlier versions of SpaDES.core are missed once, because their keys change. `test-cacheChainingMetadata.R` now expects a version-only change to keep a chain, and a function-body or `reqdPkgs` change to break it.
-
-## Bug fixes
-
-* A cacheChaining jump over a skipped entry saved without the `eventObjectsChanged` tag (any entry made before 9c8f6e3e) restored every object its module declares, an `expectsInput` its `.inputObjects` only read included, from the entry's own copy over the live one. The live copy, restored by an earlier step, was replaced by an old one, so every later event digested a stale object and missed or hit the wrong entries (FireSense: `ignitionFirePoints` in `fireSense_summary .inputObjects`). `.chainJumpFinish()` now reads what such an entry's event changed (`attr(, ".Cache")$changed`) from the loaded entry, before restoring, and restores only those objects, as an entry with the tag and a plain hit do. `test-cacheChainingJump.R`.
-* A run whose `outputs` save a raster with `fun = "writeRaster"` stopped with "[writeRaster] file exists" when rerun into the same `outputPath`. `saveFiles()` now passes `overwrite = TRUE` unless the `outputs` row sets `overwrite` itself, so a rerun replaces its own files, as it already did for `saveRDS`. `test-save.R`.
-* After a cacheChaining jump, the module the jump landed on kept the values its cache entry was saved with for parameters that are not part of the key (`cacheKey = FALSE`, `.useCacheArgs` `omitParams`, or not read by the event under `spades.cacheKeyReachable`), so a run label set through `.globals` came back from an older run (FireSense: `fireSense_spreadFit` got `fitFileSuffix = ""`). A hit restored all of a module's parameters from the entry, and `simInit()` and `.runEvent()` then put back the live values for the module the call started from, which in a jump is not the one restored. A hit now decides once, in `.prepareOutput()`, for the module whose entry it is: it takes from the entry the parameters in the key and those the event itself changed, and keeps the live value of every other one; the two put-backs are gone. An event that changes its own parameters (`P(sim, "x") <- ...`) now keeps the change for a parameter outside the key, run fresh or from the cache (the put-back reverted it); the change is recorded in a new `eventParamsChanged` tag, and a jump may land on such an entry but not skip past it. `test-cacheHitParams.R`, `test-cacheChainingJump.R`.
-* A plain (non-chaining) cache hit on an event collapsed a duplicate the run had really scheduled. `.prepareOutput()` merged the queue stored in the entry with the live queue and called `unique()` on the union (`.mergeEventQueues()`, added in #457 to stop a hit duplicating an event the live run already had), so two identical queued events (a module calling `scheduleEvent()` twice with the same time, priority and type: fireSense_spreadFit init, burnSummaries init, NRV_summary init) became one. The queue is part of every later event's cacheId, so after the hit every later event missed and was re-saved with the collapsed queue; the next identical run collapsed one step further, and a fully cached run was reached only after one run per such hit. The doubled event also ran once instead of twice. A hit now replays the entry's own `eventQueueDelta` tag onto the live queue, as a cacheChaining jump does (`.chainReadDelta()`, `.chainApplyDelta()`), so the queue after a hit is the one the real run had. An entry saved before the tag existed still uses `.mergeEventQueues()`, which now adds a cached event once per copy the cached queue has beyond the live queue: #457's case (an event in both queues, not added by the cached event) still comes out once. `test-cacheHitEventQueueMultiplicity.R`, `test-prepareOutputEventDedupe.R`.
-* A cacheChaining jump stopped at any event of a module whose earlier, skipped event had created a `mod` object, and the run started a second jump at the next event (FireSense: `fireSense_dataPrepFit prepIgnitionFitData` sets `mod$allYears`, so a 3-event jump was followed by a 2-event jump; `fireSense_spreadFit spreadFitPrepare` sets `mod$covsX1000`, so two consecutive chained events were each restored on their own). The chain digest (`nonObjectsForCacheChaining()`) looked up the module's `mod` object names in the module's function environment, where they are not, so each became an NA-named `NULL` and the digest changed with the set of `mod` objects present; a jump rebuilds that digest before the skipped events are restored, so it never matched. The digest now takes only names bound in the function environment. A jump also restores the `mod` objects every skipped event changed (a hit restores only its own event's changes, so one made by a skipped event of the landing module was lost), read from a new `eventModObjectsChanged` tag; an entry without the tag is loaded to find out. The `eventQueueDelta` and `eventObjectSynonyms` tags are now written on every new entry, not only on one with a previous entry to chain from. One-time cost: the recorded chain links of a module that had `mod` objects when its events ran have a new digest, so the first run after this change takes ordinary cache hits at those events and re-records the links; the next run chains and jumps as before. `test-cacheChainingJumpModObjects.R`.
-* Caching the `.inputObjects` of a module that calls `compiler::cmpfun()` at top level (Biomass_core) ran for minutes at full CPU and then stopped with "C stack usage ... is too close to the limit". Since the `globalVariables()` fix below, module code was evaluated in an environment holding `.packageName`, where `compiler::cmpfun()` fails ("namespace found within global environments"); `evalWithActiveCode()` then reran the expression as active code in an environment holding the caller's `sim`, and copied that `sim` into the module environment. The simList then contained itself, and its digest recursed without end. `.packageName` is now set only for the `globalVariables()` calls themselves, the active-code pass no longer leaves `sim` in the module environment, and the `simList` method of `.robustDigest()` skips a simList already being digested further up (as reproducible's environment method does), so a self-referencing simList digests in finite time. Digests of other simLists are unchanged.
-* A cacheChaining jump lost an object a skipped event had produced when a later module in the jump declared it as a `createsOutput` but did not write it (Biomass_core declares `speciesLayers`, which `Biomass_borealDataPrep`'s `.inputObjects` makes): the jump took the later module's declaration as that object already restored, but a cache entry restores only the objects its event changed, so nothing supplied it and the FireSense run stopped in `Biomass_borealDataPrep` init with "'speciesLayers' are missing". A jump now decides what a later step restored from what that entry's event changed (`.chainRestored()`), as a cache hit does.
-* A cache hit on an event (or `.inputObjects`) merged every `outputs(sim)` row of the cached simList into the live run, including rows the run that saved the entry already had from other modules (e.g. a `Plots()` figure). When a run with a later `start(sim)` hit such an entry, the foreign row's `saveTime` fell before its start and `spades()` stopped with "You have tried to schedule an event before start(sim)". A hit (and a cacheChaining jump) now restores only the rows the cached event itself added, read from the `eventOutputsAdded` tag, which is now written on every new entry rather than only on entries that chain from a previous one. Entries saved without the tag restore all their rows, as before.
-* A module whose `R/` files call `globalVariables()` at top level (the `R CMD check` idiom, and the normal one once `convertToPackage()` makes the module a package) failed in `simInit()` with "The namespace for package "SpaDES.core" is locked; no changes in the global variables list may be made". Module code is evaluated in an environment whose top-level environment was the SpaDES.core namespace, so `globalVariables()` tried to change it. That environment is now its own top-level environment while the module code is evaluated, so the call succeeds and changes nothing outside the module.
-
-* `convertToPackage()` imported every package in `reqdPkgs` whole, so two packages exporting the same name (`Require` and `SpaDES.core`, `data.table` and `purrr`) made installing the converted module warn "replacing previous import", and `R CMD check` report a WARNING. A name exported by several packages is now imported only from the package that already won it, with `import(pkg, except = ...)` for the others, so no name is bound to a different function than before.
-
-* `convertToPackage()` skipped packages named in an explicit `importFrom()` by matching their names as an unanchored regular expression, so `importFrom(sp, ...)` also dropped `spatstat.geom`, and a `.` in a name matched any character. Package names are now extracted from the `importFrom()` line (quoted or not) and compared exactly.
-
-* `dirnamesFromSet()` returned the wrong folder in two cases. With `leafOnly = FALSE`, a file in a subfolder of a replicate (`out/rep1/figures/plot.png`) gave `out/rep1/figures` instead of `out/rep1`. With `leafOnly = TRUE`, a zero-padded folder (`rep01`) came back as `rep1`. It now returns the replicate directory, with its padding as on disk.
-
-* `time(sim) <- value` failed with "unable to find an inherited method" when terra was attached after SpaDES.core, because SpaDES.core defined its own `time<-` generic next to terra's. SpaDES.core now adds its `simList` method to terra's generic and re-exports it, so it works in either attach order.
-
-* With `spades.cacheChaining = TRUE`, a run that read a cache entry while another process was recording a chain link on it failed with `argument specifying columns received non-existing column(s): cols[4]='event'`. A link is now recorded as one tag (`eventChainLink_<postCacheId>`), so one locked write records all of it; the entry's tags are read under that lock; and an incomplete or unreadable link means no jump, never an error. Links recorded as six `cacheChaining_*` tags are still read when complete.
-
-## Deprecated
-
-* `downloadModule()` is deprecated in favour of `SpaDES.project::getModule()`, which fetches a module from its own GitHub repository at a branch, a version tag or its latest release, with its child modules. `downloadModule()` reads `.zip` files from `PredictiveEcology/SpaDES-modules`, which holds a few older modules and has had no new module `.zip` files since 2022, so current modules (fireSense, LandR Biomass) could not be downloaded with it. It still works for those older modules, with one deprecation warning per call.
-
 ## New features
 
 * `dirnamesFromSet()` names its result by replicate id, so `as.integer(names(x))` gives the replicate numbers (`"rep01"` is named `"1"`), instead of each caller parsing them from the folder names. The values are unchanged; a test comparing them with `expect_identical()` needs `unname()`.
@@ -104,102 +23,10 @@
   event says when it overrides `.useCache`. One helper, `.eventIsCached()` (R/helpers.R), now makes the
   decision for events and for `.inputObjects`. The row in `?dotParameters` is to follow once #482 merges.
 
-# SpaDES.core 3.2.1.9036
-
-## Bug fixes
-
-* With `spades.cacheChaining = TRUE`, a chained event or `.inputObjects` cache hit ignored changes to the module's metadata values (`version`, `reqdPkgs`, ...), which the ordinary event cache key does digest, so it restored the entry recorded before the change. The chain key now includes those values. Existing chains are broken once.
-
-# SpaDES.core 3.2.1.9035
-
-## Enhancements
-
-* `.globals` now sets only the universal dot parameters (`.plots`, `.seed`, `.showSimilar`, `.useCache`, `.useCacheArgs`) in modules that do not declare them; `.knownDotParams` is that list. `.plotInterval`, `.saveInitialTime`, `.saveInterval`, `.useCloud` and `.useParallel` (and `.plotInitialTime`, already excluded) now reach only modules that declare them, as does `.rep`. `.seed` and `.showSimilar` now reach every module. `?dotParameters` states the rule.
-
-## Bug fixes
-
-* `loadSimList()` reads a `.zip` archive on Linux and macOS again. `archiveExtract()` renamed every archive to `.tar.gz` before reading it, so a simList saved on Windows failed with "cannot open file '<name>.tar.gz'".
-
-## Documentation
-
-* New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
-  with its default and effect, including `.studyAreaName` and `.rep`, which SpaDES.project sets. It is linked from
-  `defineParameter()`, `newModule()` and the package overview.
-
-# SpaDES.core 3.2.1.9034
-
-## Bug fixes
-
-* The `simList` methods of `.wrap()` and `.unwrap()` (R/cache.R) take `filebackedPath` instead of `cachePath`,
-  following reproducible, where the first path argument is not only a cache location. `cachePath` still works,
-  silently for now. Calls inside SpaDES.core use the new name. Needs reproducible >= 3.2.1.9062.
-* `saveFiles()` saved `.rds` outputs with `base::saveRDS`, which keeps only the external pointer of a
-  terra `SpatRaster`/`SpatVector`, so `readRDS()` returned an unusable object ("external pointer is not
-  valid"). `saveFiles()` now passes the object through `reproducible::.wrap()` before `saveRDS`, `qs::qsave`
-  and `qs2::qs_save`, and `inputs` applies `.unwrap()` after `readRDS`, `qs::qread` and `qs2::qs_read`
-  (also for terra objects inside a list). A file-backed `SpatRaster` is wrapped with
-  `copyFiles = TRUE`, so its file is copied next to the `.rds` (in `cacheOutputs/`) and the output
-  is self-contained; this needs reproducible >= 3.2.1.9062. Read such a file manually with
-  `reproducible::.unwrap(readRDS(f), filebackedPath = dirname(f))`.
-
-# SpaDES.core 3.2.1.9033
-
-## Bug fixes
-
-* A synonym that a cached event adds with `objectSynonyms()` (e.g., in a module's `init`) was lost on a
-  cache hit when the `simList` already had synonyms: the change was not recorded, so only the pre-event
-  synonyms were rebuilt. `.prepareOutput()` now rebuilds the synonyms of both the live `simList` and the
-  cache entry. A cacheChaining jump applies the synonyms of each event it skips as well (the
-  `eventObjectSynonyms` tag on the entry, or the entry itself if it has no tag), so the `simList` after a
-  jump has the synonyms a non-jumping run has. The same holds for `outputs(sim)` rows a skipped event
-  added: a skipped entry that added rows (`eventOutputsAdded` tag, or no tag) is loaded and merged as a hit would.
-* cacheChaining jumps almost never engaged in the `.inputObjects` phase. `.chainWalk()`
-  (R/cacheChainingJump.R) stopped at any entry without a recorded `eventQueueDelta`, and
-  `.inputObjects` entries saved before the delta existed are cache hits that never re-run, so they never
-  gained one. An `.inputObjects` event schedules nothing and runs at `start(sim)`, so its delta is known:
-  the walk now uses that implied delta. Event-phase entries without a delta still stop the jump.
-
-# SpaDES.core 3.2.1.9032
-
-## New features
-
 * `urlLog(sim)` (a method of `reproducible::urlLog()`, which needs reproducible >= 3.2.1.9054) returns the
   per-run download ledger -- every `prepInputs()`/`preProcess()` URL access made during `simInit()`/`spades()`
   with the module and event that made it -- as a `data.table`, with the same column names as
   `urlLog()` on a cache path.
-
-## Bug fixes
-
-* The ledger (`envir(sim)$._urlLog`) lost records in three places. `simInit()` with
-  `spades.allowInitDuringSimInit = TRUE` replaced the outer sim's ledger with that of the second sim that ran
-  the early `init` events (R/simulation-simInit.R); the two are now merged. A cacheChaining jump never
-  recorded the URLs of the events it skipped, and tagged the landing event's URLs with the module and event
-  the jump started from (R/cacheChainingJump.R); each skipped entry's URL tags are now replayed with that
-  event's own module and event. `spades(cache = TRUE)` collected the run's URLs in the outer `Cache()`, which
-  wrote them to the session log instead of the sim (R/simulation-spades.R). A whole-`spades()` cache hit now
-  merges the entry's records into the live ledger, and an event hit never takes `._urlLog` from the entry
-  (`lsObjectsChanged()`, R/cache.R). The ledger is still kept out of `.robustDigest()`.
-
-# SpaDES.core 3.2.1.9031
-
-## Bug fixes
-
-* A cacheChaining jump installed the event queue stored in the entry it landed on
-  (`.prepareOutput()`, R/cache.R). That queue belongs to the run that saved the entry, and
-  `.inputObjects` entries are shared by runs with different module sets, so a run whose modules had
-  been renamed queued the old names and failed in `.runModuleInputObjects()` ("attempt to select less
-  than one element in get1index"); a module present only in the live run could also lose its events.
-  The queue after a jump is now the live queue with the skipped events removed and what each of them
-  scheduled added. Each cached event stores its own queue change (an `eventQueueDelta` tag, written
-  when the event runs), the walk replays those link by link, and it only skips an event that is next
-  in the live queue as replayed so far. An entry saved before this change has no delta: a jump stops
-  before it and that event is an ordinary single-event cache hit. The delta also records the event's
-  own time in seconds, which replaces the `eventTime` tag (in the simList's unit at record time) as the
-  time a jump reports for a skipped event.
-
-# SpaDES.core 3.2.1.9030
-
-## New features
 
 * New option `spades.reqdPkgsAttach` (default `TRUE`, i.e., no change). With `FALSE`, a module's
   `reqdPkgs` are loaded, and installed if needed, but no longer attached to the search path for every
@@ -213,32 +40,6 @@
   another module, or by the user, must list them in its own `reqdPkgs` or use `pkg::fn`. `FALSE` is
   intended to become the default after further testing.
 
-# SpaDES.core 3.2.1.9028
-
-## Bug fixes
-
-* A cacheChaining jump over several cached events announced its events three times, and the `Cache()`
-  messages named the event the jump started from. It now prints one line, "cacheChaining: restored
-  <n> cached events in one step", followed by the numbered list of events; "Using cacheChaining ..."
-  is left to a chain of one event. The "Object to retrieve" and "Loaded!" lines name the landing
-  event's function, and the "cacheId passed to override automatic digesting" message is suppressed
-  for a chained call (with reproducible >= 3.2.1.9051; older versions still print it).
-* "New objects created:" no longer prints `<char>` above the names and the `newObjects` header again
-  below them when there are more than 20 names.
-
-# SpaDES.core 3.2.1.9027
-
-## Bug fixes
-
-* `moduleMetadata()` on a parent module whose children are on disk returned `NULL`/`NA` for the parent's
-  own `name`, `version`, `description`, `authors` etc., because `simInit()` expands the parent and drops
-  its row. Those fields now come from the parent's file; the children's `parameters`, `inputObjects`,
-  `outputObjects` and `reqdPkgs` are aggregated as before.
-
-# SpaDES.core 3.2.1.9026
-
-## New features
-
 * A parent module's `childModules` may list GitHub specs (`"owner/repo@branch"`, `"owner/repo"`,
   `"name@branch"`) as well as plain names, so a parent can say where each child comes from
   (`SpaDES.project::setupProject()` fetches them). SpaDES.core uses the module name, i.e. the
@@ -246,209 +47,6 @@
   a parent (`.identifyChildModules()`), `defineModule()`'s check that each child exists,
   `moduleMetadata()` on a parent, `newModule(type = "parent")`'s `version` list, and
   `downloadModule()`'s child lookups. Plain names behave as before.
-
-## Bug fixes
-
-* `newModule(type = "parent")` wrote an unparseable module file when the `children` (or the
-  resulting `version` list) were long enough for `dput()`/`deparse()` to wrap over several lines.
-* `downloadModule()` could not check a local module's version when `version` is a named list (the
-  format since SpaDES 1.3.1.9044), so it errored on any parent whose children are already local.
-
-# SpaDES.core 3.2.1.9025
-
-## Bug fixes
-
-* With `spades.cacheChaining = TRUE`, a module with a list-valued `expectsInput` never chained, even
-  when nothing had changed. `.chainExternalInputsMatch()` (`R/cacheChainingJump.R`) looked the
-  input's recorded digest up under its bare name (`sim..list.<object>`), but `Cache()` records a
-  list element by element (`sim..list.<object>.<element>`), so the input always read as "not
-  recorded" and the run printed "an input ... has changed; not chaining". It now flattens the
-  current digest the way `Cache()` names the tags and compares the two as multisets.
-
-## Changes
-
-* The cacheChaining jump message now says what happened: "Using cacheChaining: restored 2 events from
-  the cache (NRV_summary init, Biomass_summary init); continuing with the next scheduled event".
-  It lists every restored event, including the one the jump lands on; the old text ("skipping ahead
-  over 1 cached event to Biomass_summary init") read as if the last event would run next. Behaviour
-  is unchanged.
-
-# SpaDES.core 3.2.1.9024
-
-## Bug fixes
-
-* Regression test for a memoised cached event (`reproducible.useMemoise = TRUE`, `.useCache =
-  "init"`) that writes a file-backed raster: `makeMemoisable.simList()` (`R/cache.R:1308`) calls
-  `Copy(sim)` on the unwrapped simList, and until reproducible's `fix/cache-file-copies` branch
-  (`>= 3.2.1.9050`, now the `Imports` floor) that `Copy()` wrote a "<name>_1.tif" beside the
-  original file, so two processes sharing an output folder overwrote each other's copy.
-
-# SpaDES.core 3.2.1.9023
-
-## Bug fixes
-
-* With `spades.cacheChaining = TRUE`, a jump landing on a module's `.inputObjects` could drop an
-  `expectsInput` that a skipped module in between had produced, when the landing module only read
-  that object and never reassigned it. The landing entry's own cache hit only restores objects it
-  actually changed (`.prepareOutput()`'s `lsObjectsChanged()`, `R/cache.R`), so an unchanged,
-  merely-read `expectsInput` is not among them; a normal (non-jumped) run never shows this because
-  the live simList already has that object, supplied by whichever module produced it, running just
-  before -- a jump skips that module, so nothing else supplies it. `.chainJumpFinish()`
-  (`R/cacheChainingJump.R`) treated every one of the landing module's declared `expectsInput`s as
-  already restored; it now only assumes that for the module's own `createsOutput`s
-  (new `.chainCreates()`), so a merely-read input is still recovered from the skipped module that
-  actually produced it. Only `.inputObjects` jumps were affected; the event-jump path already
-  used `createsOutput` only.
-
-# SpaDES.core 3.2.1.9022
-
-## Minor improvements
-
-* A cacheChaining jump's message now lists the events it skipped, numbered in the order they
-  would have run, each with its cache ID (`.chainJumpPrepare()`), so a reader can see what
-  was recovered instead of just the count.
-
-# SpaDES.core 3.2.1.9021
-
-## Bug fixes
-
-* With `spades.cacheChaining = TRUE`, `cacheChainingPost()` added EVERY cached event's outputs
-  to `produced` -- the set of objects a later chain link may trust without re-digesting --
-  including events that were not themselves restored from the recorded chain (a fresh
-  recompute, or an ordinary digest-based cache hit). A downstream module's genuine chain hit
-  could then skip re-digesting an object that a fresh recompute upstream had actually changed,
-  and silently return a stale cached result. `cacheChainingPost()` now only adds an event's
-  outputs to `produced` when that event was itself a chain hit or was jumped over/landed on by
-  a jump; any other cached event's outputs are removed from `produced` instead.
-
-# SpaDES.core 3.2.1.9020
-
-## Bug fixes
-
-* A cache HIT on a module's `.inputObjects` no longer drops an object that module set but
-  declared only via `createsOutput` (not also `expectsInput`). `.runModuleInputObjects()`
-  passed only the module's own declared `expectsInput` names as the `outputObjects` argument
-  to the `Cache()` call wrapping `.inputObjects`, which decides what a cache hit restores; an
-  output-only object was never in that set and silently vanished from the simList on reload (a
-  cache miss never showed this, since it returns the live, freshly computed sim). A separate
-  `moduleSpecificOutputObjects`, the union of the module's own inputs and outputs, is now used
-  for that argument; the cache key itself is unaffected.
-
-# SpaDES.core 3.2.1.9019
-
-## Bug fixes
-
-* A cached `.inputObjects` entry no longer saves `simInit()`'s transient resume state
-  (`sim@.xData[["._simInitContext"]]`, `._rmo`). `.wrap.simList()` copied it into the saved
-  `simList` raw, without `.wrap()`ing it, so a terra object passed to `simInit()` via
-  `objects =`/`inputs =` was saved unwrapped and came back with a dead pointer
-  ("external pointer is not valid") the next time the entry was loaded. `.unwrap.simList()`
-  also drops the state if a pre-existing cache entry still has it, and `.runEvent()` restores
-  the live `sim`'s own `._simInitContext` if a cache hit replaces `sim`'s environment.
-
-# SpaDES.core 3.2.1.9018
-
-## Bug fixes
-
-* With `reproducible.useMemoise = TRUE`, a `cacheChaining` jump followed by a plain cached event on the same entry,
-  in the same session, failed with "did not return a simList (got an object of class "list")". The jump reads
-  skipped entries with `reproducible::loadFromCache()`, which memoised them in a form `Cache()` did not read back.
-  Fixed in reproducible; requires reproducible >= 3.2.1.9044. The cacheChaining jump tests now run with memoise off
-  and on.
-* With `reproducible.useMemoise = TRUE`, a later event could change the memoised copy of a cached event, so the next
-  run in the same session got wrong values from that cached event, with no error. `makeMemoisable.simList()` now
-  `Copy()`s the `simList`, so objects changed in place (e.g. a `data.table` with `:=`) are copied too; reproducible
-  3.2.1.9044 now memoises every entry through `makeMemoisable()`.
-
-# SpaDES.core 3.2.1.9017
-
-## Bug fixes
-
-* A cached `simList` now names its files in the cache entry's tags, as a cached list does. `.wrap.simList()` wraps
-  its objects with reproducible's `.wrap()`, which collects the tags of what it wraps (a file-backed raster's
-  `origFilename`, `filenamesInCache`, ...), but `list2env()` then dropped them, so `showCache()`, `clearCache()` and
-  the cloud cache could not see the files of, e.g., a cached `.inputObjects`. Existing cache entries still load.
-
-# SpaDES.core 3.2.1.9016
-
-## Bug fixes
-
-* `suppliedElsewhere()` now reads `where` by value. It took it from `match.call()`, unevaluated, so
-  `where = c("sim", "user")` was read as "c", "sim", "user": the "c" matched "cyclic", and the future-init
-  check the caller had left out ran anyway. A module then saw an object as supplied by another module's init
-  event and skipped its own default. `where = <a variable>` stopped with "where must be ...".
-
-# SpaDES.core 3.2.1.9015
-
-
-## Bug fixes
-
-* The `.seed` module parameter now restores the session's random number stream after the seeded
-  event, including when the event errors, as `?simInit` documents. `doEvent()` assigned the saved `.Random.seed` to a local variable,
-  so every later event, and the session after `spades()`, kept drawing from the event's fixed seed.
-* An event's cacheId no longer depends on whether `outputs(sim)$arguments` is an `AsIs` column or a
-  plain list. `.robustDigest()`'s `simList` method drops the outputs *rows* for a module-level call
-  and then digests what survives -- the column structure: names, order and class. `arguments` is
-  `AsIs` when rows were added through `outputsAppend()`, which wraps the column with `I()` so
-  `rbindlist()` will bind it, and a plain list otherwise, so with the rows gone that class was
-  essentially all the digest saw. The same event consequently got two different cacheIds depending
-  only on how its outputs happened to be built. Seen in a FireSense run: across 2395 cache entries
-  the `sim.outputs` component took exactly two values, `5d0cef838b366d87` and `fd0dc16cc74b5a3c`,
-  spread across unrelated modules, so warm caches missed and events re-ran. The class is now
-  normalised before digesting; the outputs' contents still affect the cacheId as before.
-* `newModule()` no longer writes a `NEWS.md` whose heading contradicts the version it declares. The
-  generated file said `# <moduleName> 0.0.1 (<date>)` -- a released version, and a release date --
-  while the generated module code declared `version = list(<moduleName> = "0.0.0.9000")`.
-  `defineModule(version = ...)` is a module's only version record, so every new module started out of
-  step with itself. The heading is now `# <moduleName> (development version)`, the convention
-  `usethis::use_news_md()` uses for packages, and takes a version and a date when the module is first
-  released.
-
-* `newModule(type = "parent")` now gives its children the same starting version it gives itself.
-  Children were hard-coded to `"0.0.1"` while the parent took `moduleDefaults[["version"]]`
-  (`"0.0.0.9000"`), so a new parent's metadata disagreed with each child's own module file.
-
-* `newModule()` no longer writes absolute paths into a generated module. Three templates
-  interpolated the path the module was created at, which `checkPath()` returns absolute: the four
-  metadata table chunks and the `downloadData()` advice in `module.Rmd.template`, the `cd` line in
-  `README.template`, and `modulePath` in `test-template.R.template`. Those paths resolved nowhere but
-  the machine that ran `newModule()`, so a generated module's own `render-module-rmd` CI, the pkgdown
-  site built by `moduleRmdToVignette()`, any manual assembled by `SpaDES.docs::prepManualRmds()`, and
-  its own unit tests all read a directory that was not there. The `.Rmd` now uses `".."` throughout,
-  matching the subtitle and authors lines that already did; the unit test template uses
-  `file.path("..", "..", "..")`, relative to `tests/testthat/`.
-
-# SpaDES.core 3.2.1.9013
-
-## Bug fixes
-
-* Recovering an event from the cache no longer leaves a duplicated event in the queue. When
-  `.prepareOutput()` merged the queue the cached run had with the live one, it first wrote a sort key
-  into every event -- `2` on the cached events, `1` on the live ones -- and only then called
-  `unique()`, stripping the key again after sorting. An event sitting in both queues was therefore not
-  identical at the moment `unique()` ran, survived as a duplicate, and re-emerged with the key removed:
-  two byte-identical events. The merge now de-duplicates before any sort key exists and takes the
-  tie-break from provenance instead of from a field written into the event.
-
-  The effect compounded, because the event queue is part of an event's cacheId: a warm hit on one event
-  returned a queue with a duplicate, so the next event digested a different `sim.events`, got a
-  different cacheId, and missed. A warm cache turned itself cold. Measured on a FireSense cache, of the
-  entries identical in every digest component except the event queue, 17 of 17 differed by exactly one
-  event and in every case it was a duplicate of one already queued -- never a new event -- across
-  `burnSummaries`, `Biomass_summary`, `Biomass_speciesData`, `Biomass_speciesParameters`, `NRV_summary`,
-  `fireSense_dataPrepFit`, `fireSense_dataPrepPredict`, `fireSense_IgnitionFit` and
-  `fireSense_IgnitionPredict`.
-
-* `cacheChaining` stopped chaining for good once a link had been recorded twice under the same
-  cache entry -- e.g. first by an earlier version, whose digest differs. The reader flattened a
-  link's recordings into one row, so the repeated tags were renamed (`digestNonObjects.1`, ...)
-  and only the oldest was compared, and the writer then appended another copy on every run. A
-  link's tags are now replaced rather than appended, and its newest recording is the one read, so
-  a cache left in that state chains again after its next run.
-
-# SpaDES.core 3.2.1.9011
-
-## New features
 
 * `cacheChaining` now follows a recorded chain to its end. When the previous event was recovered
   from the cache and the chain recorded from there matches several consecutive cached events, the
@@ -461,58 +59,6 @@
   `end(sim)` would act on, and does not happen while `spades.evalPostEvent` is set. No new
   option: it is part of `spades.cacheChaining = TRUE`.
 
-## Bug fixes
-
-* `cacheChaining` keyed a chain link on the previous entry plus the module's code and
-  parameters only. That fixes every input the chain produced, but not an input the module
-  reads from outside the chain -- an object supplied at `simInit()`, or written by an uncached
-  event -- so the same chain followed by a different such object returned the entry computed
-  from the old one. Those inputs are now digested and compared with what the entry recorded
-  before a link is used.
-* The chain digest (`digestNonObjects`) is now computed from the deparsed module functions
-  and unnamed atomic values. Digesting the closures folded in the module environment, whose
-  contents change during a run, and `setDT()` stripped names from a shared vector by reference,
-  so the same code could digest differently at record time and at replay time. Chains recorded
-  by earlier versions do not match the new digest and are re-recorded on the next run.
-
-# SpaDES.core 3.2.1.9010
-
-## Bug fixes
-
-* On an event cache hit, outputs recorded with `registerOutputs()` were lost except one per
-  save time: merging the cached `outputs(sim)` dropped duplicates while ignoring `file`, and
-  those rows differ only by `file`. Duplicates are now matched on the file's basename, so
-  the same file saved under a different `outputPath` is still recorded once.
-* The `moduleRmdToVignette()` example no longer carries a `\dontrun{}` block that installs the
-  package rendition and builds its \pkg{pkgdown} site. Run under `--run-dontrun` (as
-  \pkg{reproducible}'s downstream check does), it failed: the runner has no \pkg{pkgdown}, and the
-  rendition does not install anyway because its `Authors@R` is written as
-  `structure(..., class = "person")`, which R rejects (see `?convertToPackage`). Those two lines
-  are now shown in the function's description instead.
-
-# SpaDES.core 3.2.1.9009
-
-## Bug fixes
-
-* `Plots(useCache = TRUE)` failed with "argument is of length zero" when caching was switched off
-  (`reproducible.useCache = FALSE`, which `spades.useCache = "eventsOnly"` sets inside `spades()`): the
-  cache record it consults does not exist then. It now simply plots. Its exit handler also ran
-  `clearCache(cacheId = NULL)` in that case, which empties the whole cache; the handler is now only
-  registered when there is a record to clear.
-
-# SpaDES.core 3.2.1.9008
-
-## Bug fixes
-
-* The progress-tick handler no longer fails with "argument is of length zero" when a
-  non-dynamic progress frame follows a dynamic (`\r`) one -- e.g. a Google Drive download
-  inside an event followed by an extraction. The dynamic frame now records
-  `.progressLastShown` as well, and the throttle tolerates it being unset.
-
-# SpaDES.core 3.2.1.9006
-
-## New features
-
 * New option `spades.useCache` chooses how caching applies inside `simInit()` and `spades()`
   without touching module code: `"all"` (the default, and the previous behaviour), `"eventsOnly"`
   (the modules' `.useCache` events and `.inputObjects` are cached, including in a `simInit()`
@@ -522,104 +68,12 @@
   57 GB (the per-ELF cohort-building chain) was never read back, while the event caches were
   19 GB and are what makes a retry after a failure resume rather than restart.
 
-# SpaDES.core 3.2.1.9005
-
-## New features
-
 * New `moduleRmdToVignette()` adds a module's `<module>.Rmd` to its package rendition
   as `vignettes/<module>.Rmd`, so a pkgdown site built from
   `convertToPackage(destinationPath = )` can publish the module's documentation as an
   article. It repoints the template's `".."` module path in R code (not in prose), adds
   `pkgdown: as_is: true` so bookdown's table cross-references still resolve, and copies
   `citations/` and `figures/` alongside. See PredictiveEcology/SpaDES-modules#40.
-
-## Bug fixes
-
-* With `options(spades.cacheChaining = TRUE)`, an event could skip straight to the cacheId
-  recorded after the previous event even when its `.useCacheArgs` had changed. A chained
-  cacheId bypasses Cache()'s digest, so a `.cacheExtra` (or `omitArgs`) meant to change the
-  key had no effect: the event kept returning the entry recorded before the change. The
-  `.useCacheArgs` that affect the key are now part of what the chain matches on, for events
-  and `.inputObjects`.
-
-# SpaDES.core 3.2.1.9002
-
-## Bug fixes
-
-* After a Cache hit on `.inputObjects` or an event, the params that are not cached on
-  (`.useCache`, `.useCacheArgs`, `.useCloud`) were put back by position, using an index
-  built on the module's current param names but applied to the cached param list. Adding
-  or removing one of those params does not change the cacheId, so an older cache entry
-  still hits, and its values shifted: a module that gained `.useCloud` ahead of
-  `.useCacheArgs` got `.useCacheArgs = TRUE` and the next cached event stopped with
-  "subscript out of bounds"; the reverse handed `.useCloud` the `.useCacheArgs` list.
-  They are now put back by name.
-
-# SpaDES.core 3.2.1.9002
-
-## Bug fixes
-
-* `moduleCoverage()` did not measure a module's tests, and its result could not be
-  tallied. It ran covr's default `type = "tests"`, i.e. only the top-level `tests/*.R`;
-  a module has no `tests/testthat.R`, so its testthat suite never ran, while a stale
-  top-level script (such as an old `tests/Test_<module>.R`) did, and failed the whole
-  run. It now runs `tests/testthat/` against the instrumented package. Separately, the
-  remapped coverage carried a plain `srcfile`, which `covr::percent_coverage()` cannot
-  read ("vector size cannot be infinite"); it now carries a `srcfilecopy`. And coverage
-  on a module's own `R/*.R` files kept the temporary build directory's path, which
-  nothing in the repository matches; it is now mapped to the module's `R/` directory.
-  Only code the tests call directly is counted: `simInit()`/`spades()` evaluate a
-  module's functions from `<module>.R`, not from the instrumented package.
-
-* `documentModule()` wrote the header of `R/READONLYFromMainModuleFile.R` without a
-  trailing newline, so the first line of the module file was welded onto the last `#%`
-  comment line. Harmless when that line is itself a comment, which is why it went
-  unnoticed; a module whose first line is code lost that line into a comment.
-
-* `documentModule()` located the `defineModule()` block to cut with
-  `grep("defineModule", gpd$text)`, which matches every mention rather than the call, so
-  the result can have more than one row. `a:b` on the two-column result then used only
-  the first element of each and warned (`numerical expression has 2 elements: only the
-  first used`). It happened to produce the right range; it was not choosing it. The
-  widest spanning row is now selected explicitly, and the cut range is recorded in the
-  generated file's header as `#% removedLines: <start>-<end>` so coverage can be mapped
-  back from it.
-
-
-* the cache chain is now RECORDED whether or not `options(spades.cacheChaining = )` is
-  set; the option decides only whether a recorded chain is USED. Recording used to be
-  gated too, so a pass run with the option off left no tags behind and the later pass --
-  the one that would actually benefit -- had nothing to chain from. That required knowing
-  in advance, on the first pass, that chaining would be wanted later. Recording costs a
-  `CacheDigest()` of the module's functions plus one tag write: measured at about 4 ms per
-  event (2.7 ms + 1.1 ms), against events that run for seconds or longer.
-
-* `spades(events = )` also accepts two reserved entries, `.stopBefore` and
-  `.stopAfter`, which specify a *barrier* rather than a whitelist: every event the
-  modules schedule runs as usual and the call ends at the named event. Each takes
-  the same form as `events` itself, e.g.
-  `events = list(.stopBefore = list(myModule = "run"))`. This is for the case a
-  whitelist cannot express -- "run whatever is scheduled, but do not cross this
-  line" -- since the schedule of a discrete event simulation is emergent and so
-  cannot be enumerated in advance. A `.stopBefore` event does not run and stays on
-  the queue, so the returned `simList` resumes from exactly that point.
-* `stoppedAt()` reports whether a `spades()` call ended at such a barrier, and
-  which one. Needed because a barrier stop is otherwise hard to distinguish from a
-  completed run: `.stopBefore` leaves the clock and queue untouched, so calling
-  again with the same barrier returns an equivalent object, and `.stopAfter` leaves
-  the `simList` reporting itself finished with events still queued. The record's
-  `time` is the barrier event's own scheduled time, in the `simList`'s time units, so
-  it is comparable with `time()` and `end()`; `moduleName` and `eventType` are plain
-  unnamed scalars.
-* `options(spades.cacheChaining = TRUE)` fixes: an uncached `.inputObjects` no
-  longer leaves the previous module's `cacheId` on the `simList`, which could
-  chain a later module off a state that no longer described it; and all chains
-  recorded against one cache entry are now found, not only the first.
-* a module's `.inputObjects` now runs when the module declares no `expectsInput`.
-  It was skipped, because `all(logical(0))` is `TRUE` and so a module declaring
-  nothing fell into the "user already supplied everything needed" case.
-
-## New features
 
 * `moduleCoverage()` reports a module's test coverage against `<module>.R`. It replaces a
   stub whose body began `stop("This is a stub that is not intended for use")` -- while the
@@ -686,51 +140,6 @@
   at once, and `singleDESCRIPTION = TRUE` aggregates them into one file with
   redundancies trimmed.
 
-## Bug fixes
-
-* `convertToPackage()` wrote `Description: paste <text>` whenever a module's
-  `description` was a `paste()` call -- metadata is captured unevaluated, and the
-  call was being deparsed into the field. Module metadata fields are now
-  evaluated.
-* `convertToPackage()` read a module's version as `eval(md$version[[2]])`, which
-  assumes the metadata's `version = list(<module> = "x.y.z")` has exactly that
-  shape. It now looks the module up by name and falls back safely.
-
-## Internal
-
-* `convertToPackage()`'s DESCRIPTION half was an independent second implementation
-  of the same translation carried by `SpaDES.project::makeDESCRIPTION()`. It now
-  delegates to `DESCRIPTIONfromModule()`, keeping only the NAMESPACE `@import`
-  stub (`writeImportSpadesCore()`) that is genuinely its own concern.
-  `SpaDES.project::makeDESCRIPTION()` delegates to the same function.
-
-# SpaDES.core 3.2.1.9001 (development version)
-
-## Continuous integration
-
-* `use_gha()` now writes a short workflow that calls the shared
-  `render-module-rmd` workflow in `PredictiveEcology/actions`, instead of a
-  77-line copy of the job itself. New modules therefore reference one thing that
-  can be updated centrally, rather than freezing four action versions into the
-  repository on the day it is created. A survey of the 74 module repositories
-  carrying the old file (PredictiveEcology/actions#36) found them split across
-  two generations that had drifted apart, pinning those actions at `v0`,
-  `v0.0.1` or `v0.2`; those pins are the main obstacle to retiring the old tags.
-  The shared workflow also fixes four things that were wrong in every generated
-  copy: the `[skip-ci]` guard read the oldest commit of a push and was absent
-  entirely on pull requests; there was no setting to cancel superseded runs; the
-  `apt-get` step had no update, retries or timeout; and the commit step ran on
-  pull requests, where it could not succeed and failed silently every time.
-
-## Bug fixes
-
-* `outputs<-` no longer renames a file that `registerOutputs()` recorded, and no
-  longer treats the time unit appearing anywhere in a *path* as meaning the
-  filename is already time-stamped. Both left `outputs(sim)$file` naming files that
-  do not exist.
-
-## New features
-
 * `startEnd()` returns a `simList`'s `start` and `end` times as a single named
   numeric of length 2.
 * `resolveSimYears()` resolves a module's `simYears` parameter against the
@@ -752,29 +161,6 @@
   code, which dominates the load time of a lazily saved `simList`. The result is
   inspect-only: objects (including `mod`) are still bound lazily, but it cannot be
   passed to `spades()`.
-
-## Bug fixes
-
-* `saveSimList()`/`loadSimList()`: the warning for a file-backed object whose
-  backing file is inaccessible no longer prefixes the underlying message with
-  `Error:`, which read as a failure when the load in fact continued.
-* `loadSimList()` is now much faster for simulations that carry large module
-  objects (`mod`). Reparsing module source code copied the `.mods` environment
-  with `Copy()`, which forced each module's `mod` and `Par` active bindings;
-  forcing `mod` materializes `.modObjs[[currentModule(sim)]]`, so the entire
-  per-module object store was deep copied once per module environment, for every
-  parsed file of every module. It is now copied with `.cloneEnvDeep()`, which
-  re-attaches active bindings instead of evaluating them. On a `simList` holding
-  a 9.5 GB `mod` object, a single `.mods` copy went from 174 s to under 0.01 s,
-  and the whole `loadSimList()` call from 627 s to 152 s.
-
-* `saveSimList(lazy = TRUE)` no longer loses module (`mod`) objects.
-  `loadSimList()` deleted every `.modObjs` binding when it detected a lazy save,
-  on the assumption that they were per-module copies of file-backed objects that
-  `spades()` would rebuild. Any `mod` state a module was keeping was therefore
-  silently dropped on a lazy round trip.
-
-## New features
 
 * `saveSimList(lazy = TRUE)` now defers module (`mod`) objects as well as user
   objects, and writes each object to its own file under a sibling
@@ -798,7 +184,476 @@
   The previous `<filename>_xData.rdx`/`.rdb` layout is gone; `lazy = TRUE` was
   never released, so nothing on disk depends on it.
 
-# SpaDES.core 3.2.0
+## Enhancements
+
+* `newModule()` defines `doEvent.<module>` with `<-`; it wrote `=`. The module code checks (`options(spades.moduleCodeChecks = TRUE)`) note a top-level function defined with `=`, e.g. "doEvent.m (line 40) is defined with `=`; use `<-`"; in the v2 engine this is the rule `fn_defined_with_equals`. `test-simulation.R`, `test-codecheck.R`, `test-module-template.R`.
+* `simInit()`, `spades()` and `simInitAndSpades()` (so `simInit2()` and `simInitAndSpades2()`) cache the whole call with `cache = TRUE`, or with `.useCache = TRUE` in `...` (e.g. `out$.useCache <- TRUE; simInitAndSpades2(out)`). The cache key includes the content of the modules' code files (child modules and non-R files too), so editing a module reruns. Wrapping the call in `Cache()` did not: there the modules are only names, so it returned the stale result. `cache = "portable"` also saves the run's input and output files into the cache with `saveSimList()`, and a hit unpacks them with `loadSimList()` into the working directory, so the entry can be used on another machine. A local hit whose output files are gone warns and returns the `simList`. `moduleCodeFiles()` has new arguments `childModules` and `nonR`. `test-cacheWholeRun.R`.
+
+* `Plots()` has a new argument, `.cacheExtra`, for `useCache`. When given, the figure's cache record is keyed on it instead of on `data`, and is checked before `data` is evaluated, so a hit does not build `data`; the saved files are still checked and added to `outputs(sim)`. It replaces wrapping `Plots()` in `Cache()` to skip a costly `data`, which lost the figure's `outputs(sim)` row on every hit because `Plots()` did not run (FireSense: `fireSense_dataPrepFit`'s "Historical Fire Maps"). `test-Plots.R`.
+
+* New `moduleEventFlow()` reads a module's events from its code without running it: which events it has, which of them schedule which, when, and at what priority. `eventDiagram()` and `objectDiagram()` accept a module and path instead of a `simList`: `eventDiagram()` draws the module's event flow, and `objectDiagram()` the objects that each event and `.inputObjects` read and write, and the parameters they use. `moduleObjects(byEvent = TRUE)` lists the code that writes and the code that reads each object. New knit helpers `includeModuleEventFlow()`, `kableModuleObjects()` and `moduleEventFigures()` put these in a module's Rmd; new module Rmds (`newModule()`) show the event flow, the object index and per-event figures, generated at knit time. `test-module-template.R`.
+* `createsOutput()` now has `events` as a named argument (`createsOutput(objectName, objectClass, desc, ..., events = NULL)`), documented under its own `@param`, instead of being picked out of `...`. It must be character (an error otherwise) and is added as a column only when not `NULL`, so a call without it returns the same `data.frame` as before. Positional calls are unchanged. `test-createsOutputEvents.R`.
+* `simInit(alreadyRun = )` takes several runs, a list of runs (each `list(sim, fetch)`), for modules that summarise replicates (NRV_summary, burnSummaries with `mode = "multi"`). Nothing is replayed. `outputsDF` is the saved rows of every run's `outputs()`, bound, with a column `run`; a run with `fetch` is fetched first. An object a module expects and the user did not supply is taken from the runs' simLists (whichever module or user made it there, e.g. `studyAreaReporting`, `sppEquiv`) only when every run has it with the same value; a message names the others. One run works as before. `test-alreadyRun.R`.
+* A saved `simList` carries its modules' source: `saveSimList()` keeps the text of each module's code files (`<module>.R` and `R/*`, as `moduleCodeFiles()` lists them), the folder they came from, the module version and, for a git checkout, its commit and branch, in `sim$.mods[[module]]$._source`; new `moduleSource(sim)` returns it. `loadSimList()` parses a module that is not on `modulePath` from that text, so the `simList` runs without its modules; a module on `modulePath` is still parsed from there, the copy the user has. The text is added after `.wrap()`, the step `Cache()` also uses, so Cache entries never carry module source or functions and cache keys are unchanged (`._`-prefixed objects are not digested). `simInit()` also records the modules as given, with their names (e.g. `"account/repo@ref"`), and each parent module's children in `sim$._modulesGiven`; parents are not in `modules(sim)`, so a saved run did not say which it used. `test-saveModuleSource.R`.
+* `simInit(alreadyRun = )` replays a run already done: a simulation of new modules gets, as `inputs`, the outputs the run saved of each object a new module expects and a module of the run created, without the run's modules' code being read or their events run. `alreadyRun` is `list(sim = <the run's saved simList, or its shell>, fetch = <optional function making its output files local>)`, as `SpaDES.project::setupProject(alreadyRun = )` returns it in `out$alreadyRun`, so `simInitAndSpades2(out)` works. The latest save at or before `start` loads at `start`, each later save up to `end` at its `saveTime`, and only those files are fetched. An expected object the run's modules created but did not save stops `simInit()`, naming it. `sim$._alreadyRun` records the run's modules and the replayed `inputs`. The default `alreadyRun = NULL` changes nothing. `test-alreadyRun.R`.
+* A cacheChaining jump no longer loads a skipped cache entry for a declared output its event did not change. A hit restores only the objects its event changed (`lsObjectsChanged()`), but the jump loaded a skipped entry whenever it declared an output no later step restored. Each new entry now records those names in an `eventObjectsChanged` tag, and `.chainJumpFinish()` loads an entry only for a declared output the tag names. On a FireSense cache about three quarters of the bytes jumps loaded were such entries (`fireSense_spreadFit estimateThreshold`, `fireSense_dataPrepPredict .inputObjects`). An entry saved without the tag is loaded as before. `test-cacheChainingJump.R`.
+* A cacheChaining jump no longer stops at an event that changed its own parameters (`P(sim, "x") <- ...`; Biomass_core init, canClimateData, fireSense_spreadFit). Stopping there started a new chain, so the next events digested again inputs the first chain hit had already digested. A jump now restores such a parameter like an object a skipped event produced: from the last skipped entry whose `eventParamsChanged` tag names it (`.chainJumpFinish()`). Entries written by 3.2.1.9050 carry that tag and work as they are; an entry without it restores no parameters, as a hit on it does. A jump also no longer loads a skipped entry that has nothing left to give: an empty list of changed `mod` objects was read as one blank name still to restore (`.chainNameKeys()`). `test-cacheChainingJump.R`.
+* A cacheChaining jump no longer digests the same input twice, and no longer loads the same cache entry twice. The external inputs of each skipped event (those the chain did not produce) are checked against the entry's `preDigest` tags; the chain hit's own check and every link of the walk each digested them afresh, so a module's inputs were digested once per link (twice for a two-event jump of one module), and a shared input once per module of a long jump. The digests are now memoised for one hit and its walk (`cacheChainingSetup()` makes the memo, `.chainExternalInputsMatch()` fills and reads it). `.chainJumpFinish()` loaded a skipped entry a second time to read its object synonyms and outputs rows when the entry lacked the tags that record them; it now keeps what its first pass loaded. Measured on a FireSense phase-1 run (ELF 6.4, every event cached, 33 events restored by 8 jumps): the time before the "restored N cached events" messages fell from 48.7 s to 36.6 s and the restores after them from 42.4 s to 37.1 s; the two-link jump through `fireSense_dataPrepFit prepEscapeFitData` fell from 11.6 s to 5.6 s. What remains is each module's inputs digested once per jump (serialising in-memory rasters and tables) and the entry loads themselves. `test-cacheChainingDigestMemo.R`.
+* A module's `version` is no longer part of the cache key of its `.inputObjects`, its events, cacheChaining or a whole-`simList` call. A code change is already in the key through the bodies of the module's functions, so the version only made a version bump with no code change (`Bump to x.y.z`) re-run every cached event of the module. The version stays in `@depends`, and a cache hit returns the current module's version. The `reqdPkgs` strings are still in the key. Cache entries made by earlier versions of SpaDES.core are missed once, because their keys change. `test-cacheChainingMetadata.R` now expects a version-only change to keep a chain, and a function-body or `reqdPkgs` change to break it.
+
+* `.globals` now sets only the universal dot parameters (`.plots`, `.seed`, `.showSimilar`, `.useCache`, `.useCacheArgs`) in modules that do not declare them; `.knownDotParams` is that list. `.plotInterval`, `.saveInitialTime`, `.saveInterval`, `.useCloud` and `.useParallel` (and `.plotInitialTime`, already excluded) now reach only modules that declare them, as does `.rep`. `.seed` and `.showSimilar` now reach every module. `?dotParameters` states the rule.
+
+## Minor improvements
+
+* A cacheChaining jump's message now lists the events it skipped, numbered in the order they
+  would have run, each with its cache ID (`.chainJumpPrepare()`), so a reader can see what
+  was recovered instead of just the count.
+
+## Changes
+
+* The cacheChaining jump message now says what happened: "Using cacheChaining: restored 2 events from
+  the cache (NRV_summary init, Biomass_summary init); continuing with the next scheduled event".
+  It lists every restored event, including the one the jump lands on; the old text ("skipping ahead
+  over 1 cached event to Biomass_summary init") read as if the last event would run next. Behaviour
+  is unchanged.
+
+## Bug fixes
+
+* `simInit()` now stops, naming the package and the reason, when a module's `reqdPkgs` entry is installed but cannot be attached (e.g. its namespace is already loaded from another library at another version). It used to carry on and fail later with "could not find function". A `reqdPkgs` entry that is not installed still only warns, as before.
+* The event-flow figure (`eventDiagram()`, `includeModuleEventFlow()`) draws the module functions that `init` calls only where they run. It drew every call in `init`'s code in the set-up of every run mode, one after the other, even calls in alternative branches or switched off by default (e.g. fireSense_summary's `hindcastFigures()` and `InitMulti()`, which run only in multi mode). Calls that run in every mode stay in the set-up, the others are drawn in their modes' frames, and calls off in every mode are listed with the events that are off. In `moduleEventFlow()`, `initCalls` keeps only the calls that run (or may), and the new `initCallStatus` gives each call's status and condition; the per-event figures and the object index follow them. `test-eventflow.R`, `test-eventflow-plot.R`, `test-eventflow-objects.R`.
+* The v2 code checker (`codeCheckModule()`, `options(spades.codeCheckEngine = "v2")`) and the event-flow reader (`moduleEventFlow()`, `moduleObjects(byEvent = TRUE)`) read `=` as they read `<-`. A `=` statement parses as `expr_or_assign_or_help`, not `expr`, so a function defined as `f = function(sim)` (as `newModule()` wrote `doEvent.<module>`) was attributed to no function, and `sim$x = value` counted as a read of `x`, `sim = scheduleEvent(...)` as not assigned to `sim`, and `x = 1` as no local assignment. The event-flow object table and per-event figures therefore left out what each event's own code reads and writes. `test-codecheck.R`, `test-eventflow-objects.R`.
+* SpaDES.core defined `%||%` four times, with three meanings of "missing"; the one in effect, from the last file collated, also took a left side of length 0 as missing. All four are gone and base R's `%||%` (R >= 4.4) is used (#530). No caller depended on the difference except event-flow evaluation, which still treats a parameter of length 0 as unknown, now explicitly.
+* `newModule()` creates `citations/references_<name>.bib`, the bibliography the new module's Rmd names; without it the Rmd did not knit ("File citations/references_<name>.bib not found") (#529). The file is empty, for the module's references, and an existing one is kept.
+
+* `Cache()` of a `simList` no longer fails with "is.list(x) is not TRUE" when an object has the same name as a module, e.g. `sim$climateYear` from the climateYear module. Hashing tried to merge the object with the module's entry; it now keeps them apart.
+
+* `Plots()` no longer prints what a base-graphics `fn` returns. It printed any return value of an `fn` other than `plot`/`terra::plot`, so a function returning its data (even invisibly) dumped it to the console, e.g. every raster of fireSense_ELFs' ELF list. Only an object that draws when printed (ggplot, patchwork, lattice, a recorded plot) is printed.
+
+* A new module's `.Rmd` (from `newModule()`) knits without internet. Its setup chunk downloaded the "Made with Markdown" badge from img.shields.io on every knit, so knitting failed offline (e.g. on a cluster) or when the site did not answer; the badge is now linked, not downloaded. `test-module-template.R` failed on CI this way (SpaDES.core#535).
+* The `save` module no longer schedules a save from an `outputs(sim)` row that is already saved (`saved = TRUE`, e.g. a `Plots()` figure). Such a row records a file already written, and a cache hit restores it with the `saveTime` of the run that made the entry; when that run started earlier, the run stopped with "You have tried to schedule an event before start(sim) ... (spades event in save module)" (FireSense hindcasts: `.inputObjects` registering a `Plots()` row). Only rows still to be saved are scheduled. `test-cacheHitOutputsOwnRows.R`.
+* `inputs(sim)$loadTime` is in the simulation's time unit for every row. Objects passed to `simInit(objects = )` (or set with `objs<-`) were given in seconds (e.g. 85836672000 for year 2720) beside rows in years, so a module reading it (canClimateData, for the years a rerun serves) got wrong times. The table now stores `loadTime` in seconds (attribute `unit = "second"`), as the simulation clock does, and `inputs()` converts it to the simulation's unit; `inputs<-` takes the simulation's unit (or the unit in a `unit` attribute). A `simList` saved before, without the attribute, reads as before. `test-load.R`.
+* `moduleObjects()` with neither `sim` nor `module` no longer stops in `browser()`.
+
+* An error in a module's `defineModule()` call (e.g. a parameter default that fails) is now reported once, as itself. `.parseModule()` also printed "Error in .parseModule(...) : object 'mess' not found" from a leftover `on.exit(try(mess))`, whose `mess` does not exist yet when `defineModule()` fails; on the first `simInit()` of a run it printed that line six times or more and hid which module failed. `test-defineModuleError.R`.
+
+* The "done! took: ..." message that reproducible prints after "cropping...", "projecting..." and the like (`postProcessTo()`, so `prepInputs()`) no longer has a blank line after it when it is printed during an event. The `spades()` message handler wrapped it in a second `\b`, which `loggingMessage()` did not strip, so each one printed as `\b` on a line of its own. The `\b` handling now lives in `loggingMessage()`, so the `simInit()` and `spades()` message handlers cannot differ; a `\b` message in `simInit()` now also reads `\b done!` (a space after the `\b`), as it did in events. `test-progressThrottle.R`.
+
+* A file-backed object (e.g. a `SpatRaster`) in a `simList` saved with `saveSimList(lazy = TRUE)` now loads anywhere like any other object. Its files are kept with it, in the sidecar directory (`<file>_lazy/cacheOutputs/`), and restored where its paths say when it is first used. A file in a temporary place (`cachePath`, `scratchPath`, `terraPath`, `rasterPath`, `tempdir()`, terra's temporary folder) or under none of the `simList`'s other paths, `projectPath` or `getwd()`, is restored only in the sidecar directory, never into a cache or scratch folder; `loadSimList(fetch = )` fetches them as it does the object. Before, only its path was kept (`files = FALSE`, as `SpaDES.project::outSave()` saves), so an object whose file was in a cache, scratch or temporary folder loaded as `NULL` on another machine. A list of file-backed objects (e.g. `historicalClimateRasters`) loaded elsewhere also failed with "replacement has length zero"; each element is now remapped by its own paths. `test-saveLoadLazy.R`.
+* On an event cache hit, a file the cached event wrote and added to `outputs(sim)` (e.g. a `Plots()` figure) is now copied to this run's `outputPath`, and its row points there. It kept the path in the `outputPath` of the run that made the entry, so a saved run's archive held another run's figure. `test-cacheHitOutputsOwnRows.R`.
+* On an event cache hit, a row the cached event added to `outputs(sim)` for one of its own module's outputs (e.g. `registerOutputs(filename = f, objectName = "pde")`) is now restored. It was dropped, though its file was kept, so a run that hit the entry did not list that file in its outputs. Rows naming the module's own outputs are now left out only for an entry saved before the `eventOutputsAdded` tag, whose rows are the saving run's whole table. `test-cacheHitOutputsOwnRows.R`.
+* A cached event no longer has to put back old copies of objects it never makes. Its cache entry kept, and its cache hit restored, every `createsOutput` of its module that is not also an `expectsInput`, whether or not the event wrote it, so a later event's hit put an old copy back over an object an earlier event had just remade (FireSense: `fireSense_dataPrepFit`'s `prepIgnitionFitData` restored an old `fireBufferedListDT` after `prepSpreadFitData` had rebuilt it). A module can now say which events write an output: `createsOutput("x", "data.table", "...", events = "prepSpreadFitData")` (one or more event types; `".inputObjects"` for the module's `.inputObjects`). An event's entry then keeps, and its hit or a cacheChaining jump restores, only the outputs declared for its event type, plus those that declare no `events`. Entries saved before a module declared `events` are restored the same way. A module that declares no `events` behaves, and is keyed, exactly as before; adding `events` changes the cache keys of the module's events (the `outputObjects` metadata is in them), not those of its `.inputObjects`. Older versions of SpaDES.core accept and ignore the column. `createsOutput()` called with an argument that is not character (e.g. `desc = NA`) dropped its named arguments, `events` included; it now keeps them. `test-cacheOutputsEvents.R`.
+* A message printed during `spades()` no longer hangs the run at 100% CPU when the code running at the time has its own variable `sim` that is not a `simList`: `loggingMessage()` restarted `.whereInStack("sim")` from the same frame forever. It now takes the innermost `simList` named `sim` on the call stack in one pass. `test-loggingMessageNonSimList.R`.
+* `simInit()` now widens `spades.messagingNumCharsModule` for the children of a parent module, not only the modules the user named, so child modules such as `fireSense_ELFs` and `fireSense_burn` no longer print under the same shortened name in log lines. `test-childModuleNameWidth.R`.
+* `simInit(alreadyRun = )` now also gives the new modules an object the run created but never saved as a file, when the run's `simList` has it (e.g. `studyArea`, `climateYearRecord`), with its value at the end of that run; a message names them and `sim$._alreadyRun$objects` records them. It stopped on them before.
+
+* The `moduleCoverage()` test in `test-DESCRIPTIONfromModule.R` is skipped inside a covr run. With covr 4.0.0 its nested coverage run made the enclosing one fail at the end with "Can't read coverage trace file .../modE2E/R/covr_counters.rds": the module's test process also loads the outer run's instrumented SpaDES.core, and covr now keeps one counters file per process, so the outer trace pointed at modE2E's counters, deleted when the inner run ended. The test still runs in `R CMD check` and `devtools::test()`.
+* `test-wrapSimListTags.R` no longer expects `clearCache()` to delete an entry's `.lock` files, which `reproducible` no longer removes (a lock may be held by another process).
+* An error while evaluating a module's `defineModule` (e.g. a parameter default that calls a function that fails) now stops `simInit()` with the module name and the original message. It was turned into a warning, so `simInit()` then failed with "no applicable method for `@` applied to an object of class character" and the real message was lost among the warnings. `test-defineModuleError.R`.
+* An object whose name starts with `.` (declared by a module, e.g. fireSense's `.ELFind`) that a module sets in an `init` run during `simInit()` (`spades.allowInitDuringSimInit`) now reaches the `simList`: only `objs()`, which leaves such names out, was copied back. `test-nestedAndEarlyInit.R`.
+* A `simInit()` inside an event of `simInitAndSpades()` (a nested simulation, as `Biomass_borealDataPrep` runs `Biomass_core`) loads its modules' `reqdPkgs` again. `simInitAndSpades()` and `restartSpades()` set `options(spades.loadReqdPkgs = FALSE)` for their `spades()` call, so the option stayed `FALSE` while the events ran; `Biomass_core`'s `%>>%` (`fpCompare`) was then "not found" unless another module of the outer simulation listed `fpCompare`. They now mark the `simList` instead, and only that `spades()` call skips the reload. A `spades.loadReqdPkgs = FALSE` set by the user is unchanged. `test-nestedAndEarlyInit.R`.
+* `dirnamesFromSet()` now finds replicate folders named by the bare number (`out/370/16/x.tif`, as `SpaDES.project::pathBuild()` writes them with the field label off). Before, only `<prefix><N>` folders (`rep16`) were recognised, so multi-mode summaries found no replicates. The bare-number fallback applies only when no `<prefix><N>` folder occurs in `files`; for each file the deepest all-digit directory with an id in `set` is used. Results for `<prefix><N>` layouts are unchanged. `test-dirnamesFromSet.R`.
+* A simulation no longer stops with "missing value where TRUE/FALSE needed" when the `.Cache` attribute of an event's result has no `newCache` entry. `.chainRan()` and `restartOrSimInitAndSpades()` now count that as 'not newly computed'. The reads of `attr(, ".Cache")$newCache` now all go through `.newlyCached()` / `.loadedFromCache()` (`.chainRan()`, `restartOrSimInitAndSpades()`, `Plots()`), so a missing entry cannot yield `NA` or `logical(0)` again. `test-cacheChainingRan.R`.
+* `saveSimList()` now archives the files in `outputs(sim)` and `inputs(sim)` when the `simList` has no file-backed object. It archived only when there was one, so a `simList` of plain objects was saved without its output files. `test-cacheWholeRun.R`.
+
+* A cacheChaining jump over a skipped entry saved without the `eventObjectsChanged` tag (any entry made before 9c8f6e3e) restored every object its module declares, an `expectsInput` its `.inputObjects` only read included, from the entry's own copy over the live one. The live copy, restored by an earlier step, was replaced by an old one, so every later event digested a stale object and missed or hit the wrong entries (FireSense: `ignitionFirePoints` in `fireSense_summary .inputObjects`). `.chainJumpFinish()` now reads what such an entry's event changed (`attr(, ".Cache")$changed`) from the loaded entry, before restoring, and restores only those objects, as an entry with the tag and a plain hit do. `test-cacheChainingJump.R`.
+* A run whose `outputs` save a raster with `fun = "writeRaster"` stopped with "[writeRaster] file exists" when rerun into the same `outputPath`. `saveFiles()` now passes `overwrite = TRUE` unless the `outputs` row sets `overwrite` itself, so a rerun replaces its own files, as it already did for `saveRDS`. `test-save.R`.
+* After a cacheChaining jump, the module the jump landed on kept the values its cache entry was saved with for parameters that are not part of the key (`cacheKey = FALSE`, `.useCacheArgs` `omitParams`, or not read by the event under `spades.cacheKeyReachable`), so a run label set through `.globals` came back from an older run (FireSense: `fireSense_spreadFit` got `fitFileSuffix = ""`). A hit restored all of a module's parameters from the entry, and `simInit()` and `.runEvent()` then put back the live values for the module the call started from, which in a jump is not the one restored. A hit now decides once, in `.prepareOutput()`, for the module whose entry it is: it takes from the entry the parameters in the key and those the event itself changed, and keeps the live value of every other one; the two put-backs are gone. An event that changes its own parameters (`P(sim, "x") <- ...`) now keeps the change for a parameter outside the key, run fresh or from the cache (the put-back reverted it); the change is recorded in a new `eventParamsChanged` tag, and a jump may land on such an entry but not skip past it. `test-cacheHitParams.R`, `test-cacheChainingJump.R`.
+* A plain (non-chaining) cache hit on an event collapsed a duplicate the run had really scheduled. `.prepareOutput()` merged the queue stored in the entry with the live queue and called `unique()` on the union (`.mergeEventQueues()`, added in #457 to stop a hit duplicating an event the live run already had), so two identical queued events (a module calling `scheduleEvent()` twice with the same time, priority and type: fireSense_spreadFit init, burnSummaries init, NRV_summary init) became one. The queue is part of every later event's cacheId, so after the hit every later event missed and was re-saved with the collapsed queue; the next identical run collapsed one step further, and a fully cached run was reached only after one run per such hit. The doubled event also ran once instead of twice. A hit now replays the entry's own `eventQueueDelta` tag onto the live queue, as a cacheChaining jump does (`.chainReadDelta()`, `.chainApplyDelta()`), so the queue after a hit is the one the real run had. An entry saved before the tag existed still uses `.mergeEventQueues()`, which now adds a cached event once per copy the cached queue has beyond the live queue: #457's case (an event in both queues, not added by the cached event) still comes out once. `test-cacheHitEventQueueMultiplicity.R`, `test-prepareOutputEventDedupe.R`.
+* A cacheChaining jump stopped at any event of a module whose earlier, skipped event had created a `mod` object, and the run started a second jump at the next event (FireSense: `fireSense_dataPrepFit prepIgnitionFitData` sets `mod$allYears`, so a 3-event jump was followed by a 2-event jump; `fireSense_spreadFit spreadFitPrepare` sets `mod$covsX1000`, so two consecutive chained events were each restored on their own). The chain digest (`nonObjectsForCacheChaining()`) looked up the module's `mod` object names in the module's function environment, where they are not, so each became an NA-named `NULL` and the digest changed with the set of `mod` objects present; a jump rebuilds that digest before the skipped events are restored, so it never matched. The digest now takes only names bound in the function environment. A jump also restores the `mod` objects every skipped event changed (a hit restores only its own event's changes, so one made by a skipped event of the landing module was lost), read from a new `eventModObjectsChanged` tag; an entry without the tag is loaded to find out. The `eventQueueDelta` and `eventObjectSynonyms` tags are now written on every new entry, not only on one with a previous entry to chain from. One-time cost: the recorded chain links of a module that had `mod` objects when its events ran have a new digest, so the first run after this change takes ordinary cache hits at those events and re-records the links; the next run chains and jumps as before. `test-cacheChainingJumpModObjects.R`.
+* Caching the `.inputObjects` of a module that calls `compiler::cmpfun()` at top level (Biomass_core) ran for minutes at full CPU and then stopped with "C stack usage ... is too close to the limit". Since the `globalVariables()` fix below, module code was evaluated in an environment holding `.packageName`, where `compiler::cmpfun()` fails ("namespace found within global environments"); `evalWithActiveCode()` then reran the expression as active code in an environment holding the caller's `sim`, and copied that `sim` into the module environment. The simList then contained itself, and its digest recursed without end. `.packageName` is now set only for the `globalVariables()` calls themselves, the active-code pass no longer leaves `sim` in the module environment, and the `simList` method of `.robustDigest()` skips a simList already being digested further up (as reproducible's environment method does), so a self-referencing simList digests in finite time. Digests of other simLists are unchanged.
+* A cacheChaining jump lost an object a skipped event had produced when a later module in the jump declared it as a `createsOutput` but did not write it (Biomass_core declares `speciesLayers`, which `Biomass_borealDataPrep`'s `.inputObjects` makes): the jump took the later module's declaration as that object already restored, but a cache entry restores only the objects its event changed, so nothing supplied it and the FireSense run stopped in `Biomass_borealDataPrep` init with "'speciesLayers' are missing". A jump now decides what a later step restored from what that entry's event changed (`.chainRestored()`), as a cache hit does.
+* A cache hit on an event (or `.inputObjects`) merged every `outputs(sim)` row of the cached simList into the live run, including rows the run that saved the entry already had from other modules (e.g. a `Plots()` figure). When a run with a later `start(sim)` hit such an entry, the foreign row's `saveTime` fell before its start and `spades()` stopped with "You have tried to schedule an event before start(sim)". A hit (and a cacheChaining jump) now restores only the rows the cached event itself added, read from the `eventOutputsAdded` tag, which is now written on every new entry rather than only on entries that chain from a previous one. Entries saved without the tag restore all their rows, as before.
+* A module whose `R/` files call `globalVariables()` at top level (the `R CMD check` idiom, and the normal one once `convertToPackage()` makes the module a package) failed in `simInit()` with "The namespace for package "SpaDES.core" is locked; no changes in the global variables list may be made". Module code is evaluated in an environment whose top-level environment was the SpaDES.core namespace, so `globalVariables()` tried to change it. That environment is now its own top-level environment while the module code is evaluated, so the call succeeds and changes nothing outside the module.
+
+* `convertToPackage()` imported every package in `reqdPkgs` whole, so two packages exporting the same name (`Require` and `SpaDES.core`, `data.table` and `purrr`) made installing the converted module warn "replacing previous import", and `R CMD check` report a WARNING. A name exported by several packages is now imported only from the package that already won it, with `import(pkg, except = ...)` for the others, so no name is bound to a different function than before.
+
+* `convertToPackage()` skipped packages named in an explicit `importFrom()` by matching their names as an unanchored regular expression, so `importFrom(sp, ...)` also dropped `spatstat.geom`, and a `.` in a name matched any character. Package names are now extracted from the `importFrom()` line (quoted or not) and compared exactly.
+
+* `dirnamesFromSet()` returned the wrong folder in two cases. With `leafOnly = FALSE`, a file in a subfolder of a replicate (`out/rep1/figures/plot.png`) gave `out/rep1/figures` instead of `out/rep1`. With `leafOnly = TRUE`, a zero-padded folder (`rep01`) came back as `rep1`. It now returns the replicate directory, with its padding as on disk.
+
+* `time(sim) <- value` failed with "unable to find an inherited method" when terra was attached after SpaDES.core, because SpaDES.core defined its own `time<-` generic next to terra's. SpaDES.core now adds its `simList` method to terra's generic and re-exports it, so it works in either attach order.
+
+* With `spades.cacheChaining = TRUE`, a run that read a cache entry while another process was recording a chain link on it failed with `argument specifying columns received non-existing column(s): cols[4]='event'`. A link is now recorded as one tag (`eventChainLink_<postCacheId>`), so one locked write records all of it; the entry's tags are read under that lock; and an incomplete or unreadable link means no jump, never an error. Links recorded as six `cacheChaining_*` tags are still read when complete.
+
+* With `spades.cacheChaining = TRUE`, a chained event or `.inputObjects` cache hit ignored changes to the module's metadata values (`version`, `reqdPkgs`, ...), which the ordinary event cache key does digest, so it restored the entry recorded before the change. The chain key now includes those values. Existing chains are broken once.
+
+* `loadSimList()` reads a `.zip` archive on Linux and macOS again. `archiveExtract()` renamed every archive to `.tar.gz` before reading it, so a simList saved on Windows failed with "cannot open file '<name>.tar.gz'".
+
+* The `simList` methods of `.wrap()` and `.unwrap()` (R/cache.R) take `filebackedPath` instead of `cachePath`,
+  following reproducible, where the first path argument is not only a cache location. `cachePath` still works,
+  silently for now. Calls inside SpaDES.core use the new name. Needs reproducible >= 3.2.1.9062.
+* `saveFiles()` saved `.rds` outputs with `base::saveRDS`, which keeps only the external pointer of a
+  terra `SpatRaster`/`SpatVector`, so `readRDS()` returned an unusable object ("external pointer is not
+  valid"). `saveFiles()` now passes the object through `reproducible::.wrap()` before `saveRDS`, `qs::qsave`
+  and `qs2::qs_save`, and `inputs` applies `.unwrap()` after `readRDS`, `qs::qread` and `qs2::qs_read`
+  (also for terra objects inside a list). A file-backed `SpatRaster` is wrapped with
+  `copyFiles = TRUE`, so its file is copied next to the `.rds` (in `cacheOutputs/`) and the output
+  is self-contained; this needs reproducible >= 3.2.1.9062. Read such a file manually with
+  `reproducible::.unwrap(readRDS(f), filebackedPath = dirname(f))`.
+
+* A synonym that a cached event adds with `objectSynonyms()` (e.g., in a module's `init`) was lost on a
+  cache hit when the `simList` already had synonyms: the change was not recorded, so only the pre-event
+  synonyms were rebuilt. `.prepareOutput()` now rebuilds the synonyms of both the live `simList` and the
+  cache entry. A cacheChaining jump applies the synonyms of each event it skips as well (the
+  `eventObjectSynonyms` tag on the entry, or the entry itself if it has no tag), so the `simList` after a
+  jump has the synonyms a non-jumping run has. The same holds for `outputs(sim)` rows a skipped event
+  added: a skipped entry that added rows (`eventOutputsAdded` tag, or no tag) is loaded and merged as a hit would.
+* cacheChaining jumps almost never engaged in the `.inputObjects` phase. `.chainWalk()`
+  (R/cacheChainingJump.R) stopped at any entry without a recorded `eventQueueDelta`, and
+  `.inputObjects` entries saved before the delta existed are cache hits that never re-run, so they never
+  gained one. An `.inputObjects` event schedules nothing and runs at `start(sim)`, so its delta is known:
+  the walk now uses that implied delta. Event-phase entries without a delta still stop the jump.
+
+* The ledger (`envir(sim)$._urlLog`) lost records in three places. `simInit()` with
+  `spades.allowInitDuringSimInit = TRUE` replaced the outer sim's ledger with that of the second sim that ran
+  the early `init` events (R/simulation-simInit.R); the two are now merged. A cacheChaining jump never
+  recorded the URLs of the events it skipped, and tagged the landing event's URLs with the module and event
+  the jump started from (R/cacheChainingJump.R); each skipped entry's URL tags are now replayed with that
+  event's own module and event. `spades(cache = TRUE)` collected the run's URLs in the outer `Cache()`, which
+  wrote them to the session log instead of the sim (R/simulation-spades.R). A whole-`spades()` cache hit now
+  merges the entry's records into the live ledger, and an event hit never takes `._urlLog` from the entry
+  (`lsObjectsChanged()`, R/cache.R). The ledger is still kept out of `.robustDigest()`.
+
+* A cacheChaining jump installed the event queue stored in the entry it landed on
+  (`.prepareOutput()`, R/cache.R). That queue belongs to the run that saved the entry, and
+  `.inputObjects` entries are shared by runs with different module sets, so a run whose modules had
+  been renamed queued the old names and failed in `.runModuleInputObjects()` ("attempt to select less
+  than one element in get1index"); a module present only in the live run could also lose its events.
+  The queue after a jump is now the live queue with the skipped events removed and what each of them
+  scheduled added. Each cached event stores its own queue change (an `eventQueueDelta` tag, written
+  when the event runs), the walk replays those link by link, and it only skips an event that is next
+  in the live queue as replayed so far. An entry saved before this change has no delta: a jump stops
+  before it and that event is an ordinary single-event cache hit. The delta also records the event's
+  own time in seconds, which replaces the `eventTime` tag (in the simList's unit at record time) as the
+  time a jump reports for a skipped event.
+
+* A cacheChaining jump over several cached events announced its events three times, and the `Cache()`
+  messages named the event the jump started from. It now prints one line, "cacheChaining: restored
+  <n> cached events in one step", followed by the numbered list of events; "Using cacheChaining ..."
+  is left to a chain of one event. The "Object to retrieve" and "Loaded!" lines name the landing
+  event's function, and the "cacheId passed to override automatic digesting" message is suppressed
+  for a chained call (with reproducible >= 3.2.1.9051; older versions still print it).
+* "New objects created:" no longer prints `<char>` above the names and the `newObjects` header again
+  below them when there are more than 20 names.
+
+* `moduleMetadata()` on a parent module whose children are on disk returned `NULL`/`NA` for the parent's
+  own `name`, `version`, `description`, `authors` etc., because `simInit()` expands the parent and drops
+  its row. Those fields now come from the parent's file; the children's `parameters`, `inputObjects`,
+  `outputObjects` and `reqdPkgs` are aggregated as before.
+
+* `newModule(type = "parent")` wrote an unparseable module file when the `children` (or the
+  resulting `version` list) were long enough for `dput()`/`deparse()` to wrap over several lines.
+* `downloadModule()` could not check a local module's version when `version` is a named list (the
+  format since SpaDES 1.3.1.9044), so it errored on any parent whose children are already local.
+
+* With `spades.cacheChaining = TRUE`, a module with a list-valued `expectsInput` never chained, even
+  when nothing had changed. `.chainExternalInputsMatch()` (`R/cacheChainingJump.R`) looked the
+  input's recorded digest up under its bare name (`sim..list.<object>`), but `Cache()` records a
+  list element by element (`sim..list.<object>.<element>`), so the input always read as "not
+  recorded" and the run printed "an input ... has changed; not chaining". It now flattens the
+  current digest the way `Cache()` names the tags and compares the two as multisets.
+
+* Regression test for a memoised cached event (`reproducible.useMemoise = TRUE`, `.useCache =
+  "init"`) that writes a file-backed raster: `makeMemoisable.simList()` (`R/cache.R:1308`) calls
+  `Copy(sim)` on the unwrapped simList, and until reproducible's `fix/cache-file-copies` branch
+  (`>= 3.2.1.9050`, now the `Imports` floor) that `Copy()` wrote a "<name>_1.tif" beside the
+  original file, so two processes sharing an output folder overwrote each other's copy.
+
+* With `spades.cacheChaining = TRUE`, a jump landing on a module's `.inputObjects` could drop an
+  `expectsInput` that a skipped module in between had produced, when the landing module only read
+  that object and never reassigned it. The landing entry's own cache hit only restores objects it
+  actually changed (`.prepareOutput()`'s `lsObjectsChanged()`, `R/cache.R`), so an unchanged,
+  merely-read `expectsInput` is not among them; a normal (non-jumped) run never shows this because
+  the live simList already has that object, supplied by whichever module produced it, running just
+  before -- a jump skips that module, so nothing else supplies it. `.chainJumpFinish()`
+  (`R/cacheChainingJump.R`) treated every one of the landing module's declared `expectsInput`s as
+  already restored; it now only assumes that for the module's own `createsOutput`s
+  (new `.chainCreates()`), so a merely-read input is still recovered from the skipped module that
+  actually produced it. Only `.inputObjects` jumps were affected; the event-jump path already
+  used `createsOutput` only.
+
+* With `spades.cacheChaining = TRUE`, `cacheChainingPost()` added EVERY cached event's outputs
+  to `produced` -- the set of objects a later chain link may trust without re-digesting --
+  including events that were not themselves restored from the recorded chain (a fresh
+  recompute, or an ordinary digest-based cache hit). A downstream module's genuine chain hit
+  could then skip re-digesting an object that a fresh recompute upstream had actually changed,
+  and silently return a stale cached result. `cacheChainingPost()` now only adds an event's
+  outputs to `produced` when that event was itself a chain hit or was jumped over/landed on by
+  a jump; any other cached event's outputs are removed from `produced` instead.
+
+* A cache HIT on a module's `.inputObjects` no longer drops an object that module set but
+  declared only via `createsOutput` (not also `expectsInput`). `.runModuleInputObjects()`
+  passed only the module's own declared `expectsInput` names as the `outputObjects` argument
+  to the `Cache()` call wrapping `.inputObjects`, which decides what a cache hit restores; an
+  output-only object was never in that set and silently vanished from the simList on reload (a
+  cache miss never showed this, since it returns the live, freshly computed sim). A separate
+  `moduleSpecificOutputObjects`, the union of the module's own inputs and outputs, is now used
+  for that argument; the cache key itself is unaffected.
+
+* A cached `.inputObjects` entry no longer saves `simInit()`'s transient resume state
+  (`sim@.xData[["._simInitContext"]]`, `._rmo`). `.wrap.simList()` copied it into the saved
+  `simList` raw, without `.wrap()`ing it, so a terra object passed to `simInit()` via
+  `objects =`/`inputs =` was saved unwrapped and came back with a dead pointer
+  ("external pointer is not valid") the next time the entry was loaded. `.unwrap.simList()`
+  also drops the state if a pre-existing cache entry still has it, and `.runEvent()` restores
+  the live `sim`'s own `._simInitContext` if a cache hit replaces `sim`'s environment.
+
+* With `reproducible.useMemoise = TRUE`, a `cacheChaining` jump followed by a plain cached event on the same entry,
+  in the same session, failed with "did not return a simList (got an object of class "list")". The jump reads
+  skipped entries with `reproducible::loadFromCache()`, which memoised them in a form `Cache()` did not read back.
+  Fixed in reproducible; requires reproducible >= 3.2.1.9044. The cacheChaining jump tests now run with memoise off
+  and on.
+* With `reproducible.useMemoise = TRUE`, a later event could change the memoised copy of a cached event, so the next
+  run in the same session got wrong values from that cached event, with no error. `makeMemoisable.simList()` now
+  `Copy()`s the `simList`, so objects changed in place (e.g. a `data.table` with `:=`) are copied too; reproducible
+  3.2.1.9044 now memoises every entry through `makeMemoisable()`.
+
+* A cached `simList` now names its files in the cache entry's tags, as a cached list does. `.wrap.simList()` wraps
+  its objects with reproducible's `.wrap()`, which collects the tags of what it wraps (a file-backed raster's
+  `origFilename`, `filenamesInCache`, ...), but `list2env()` then dropped them, so `showCache()`, `clearCache()` and
+  the cloud cache could not see the files of, e.g., a cached `.inputObjects`. Existing cache entries still load.
+
+* `suppliedElsewhere()` now reads `where` by value. It took it from `match.call()`, unevaluated, so
+  `where = c("sim", "user")` was read as "c", "sim", "user": the "c" matched "cyclic", and the future-init
+  check the caller had left out ran anyway. A module then saw an object as supplied by another module's init
+  event and skipped its own default. `where = <a variable>` stopped with "where must be ...".
+
+* The `.seed` module parameter now restores the session's random number stream after the seeded
+  event, including when the event errors, as `?simInit` documents. `doEvent()` assigned the saved `.Random.seed` to a local variable,
+  so every later event, and the session after `spades()`, kept drawing from the event's fixed seed.
+* An event's cacheId no longer depends on whether `outputs(sim)$arguments` is an `AsIs` column or a
+  plain list. `.robustDigest()`'s `simList` method drops the outputs *rows* for a module-level call
+  and then digests what survives -- the column structure: names, order and class. `arguments` is
+  `AsIs` when rows were added through `outputsAppend()`, which wraps the column with `I()` so
+  `rbindlist()` will bind it, and a plain list otherwise, so with the rows gone that class was
+  essentially all the digest saw. The same event consequently got two different cacheIds depending
+  only on how its outputs happened to be built. Seen in a FireSense run: across 2395 cache entries
+  the `sim.outputs` component took exactly two values, `5d0cef838b366d87` and `fd0dc16cc74b5a3c`,
+  spread across unrelated modules, so warm caches missed and events re-ran. The class is now
+  normalised before digesting; the outputs' contents still affect the cacheId as before.
+* `newModule()` no longer writes a `NEWS.md` whose heading contradicts the version it declares. The
+  generated file said `# <moduleName> 0.0.1 (<date>)` -- a released version, and a release date --
+  while the generated module code declared `version = list(<moduleName> = "0.0.0.9000")`.
+  `defineModule(version = ...)` is a module's only version record, so every new module started out of
+  step with itself. The heading is now `# <moduleName> (development version)`, the convention
+  `usethis::use_news_md()` uses for packages, and takes a version and a date when the module is first
+  released.
+
+* `newModule(type = "parent")` now gives its children the same starting version it gives itself.
+  Children were hard-coded to `"0.0.1"` while the parent took `moduleDefaults[["version"]]`
+  (`"0.0.0.9000"`), so a new parent's metadata disagreed with each child's own module file.
+
+* `newModule()` no longer writes absolute paths into a generated module. Three templates
+  interpolated the path the module was created at, which `checkPath()` returns absolute: the four
+  metadata table chunks and the `downloadData()` advice in `module.Rmd.template`, the `cd` line in
+  `README.template`, and `modulePath` in `test-template.R.template`. Those paths resolved nowhere but
+  the machine that ran `newModule()`, so a generated module's own `render-module-rmd` CI, the pkgdown
+  site built by `moduleRmdToVignette()`, any manual assembled by `SpaDES.docs::prepManualRmds()`, and
+  its own unit tests all read a directory that was not there. The `.Rmd` now uses `".."` throughout,
+  matching the subtitle and authors lines that already did; the unit test template uses
+  `file.path("..", "..", "..")`, relative to `tests/testthat/`.
+
+* Recovering an event from the cache no longer leaves a duplicated event in the queue. When
+  `.prepareOutput()` merged the queue the cached run had with the live one, it first wrote a sort key
+  into every event -- `2` on the cached events, `1` on the live ones -- and only then called
+  `unique()`, stripping the key again after sorting. An event sitting in both queues was therefore not
+  identical at the moment `unique()` ran, survived as a duplicate, and re-emerged with the key removed:
+  two byte-identical events. The merge now de-duplicates before any sort key exists and takes the
+  tie-break from provenance instead of from a field written into the event.
+
+  The effect compounded, because the event queue is part of an event's cacheId: a warm hit on one event
+  returned a queue with a duplicate, so the next event digested a different `sim.events`, got a
+  different cacheId, and missed. A warm cache turned itself cold. Measured on a FireSense cache, of the
+  entries identical in every digest component except the event queue, 17 of 17 differed by exactly one
+  event and in every case it was a duplicate of one already queued -- never a new event -- across
+  `burnSummaries`, `Biomass_summary`, `Biomass_speciesData`, `Biomass_speciesParameters`, `NRV_summary`,
+  `fireSense_dataPrepFit`, `fireSense_dataPrepPredict`, `fireSense_IgnitionFit` and
+  `fireSense_IgnitionPredict`.
+
+* `cacheChaining` stopped chaining for good once a link had been recorded twice under the same
+  cache entry -- e.g. first by an earlier version, whose digest differs. The reader flattened a
+  link's recordings into one row, so the repeated tags were renamed (`digestNonObjects.1`, ...)
+  and only the oldest was compared, and the writer then appended another copy on every run. A
+  link's tags are now replaced rather than appended, and its newest recording is the one read, so
+  a cache left in that state chains again after its next run.
+
+* `cacheChaining` keyed a chain link on the previous entry plus the module's code and
+  parameters only. That fixes every input the chain produced, but not an input the module
+  reads from outside the chain -- an object supplied at `simInit()`, or written by an uncached
+  event -- so the same chain followed by a different such object returned the entry computed
+  from the old one. Those inputs are now digested and compared with what the entry recorded
+  before a link is used.
+* The chain digest (`digestNonObjects`) is now computed from the deparsed module functions
+  and unnamed atomic values. Digesting the closures folded in the module environment, whose
+  contents change during a run, and `setDT()` stripped names from a shared vector by reference,
+  so the same code could digest differently at record time and at replay time. Chains recorded
+  by earlier versions do not match the new digest and are re-recorded on the next run.
+
+* On an event cache hit, outputs recorded with `registerOutputs()` were lost except one per
+  save time: merging the cached `outputs(sim)` dropped duplicates while ignoring `file`, and
+  those rows differ only by `file`. Duplicates are now matched on the file's basename, so
+  the same file saved under a different `outputPath` is still recorded once.
+* The `moduleRmdToVignette()` example no longer carries a `\dontrun{}` block that installs the
+  package rendition and builds its \pkg{pkgdown} site. Run under `--run-dontrun` (as
+  \pkg{reproducible}'s downstream check does), it failed: the runner has no \pkg{pkgdown}, and the
+  rendition does not install anyway because its `Authors@R` is written as
+  `structure(..., class = "person")`, which R rejects (see `?convertToPackage`). Those two lines
+  are now shown in the function's description instead.
+
+* `Plots(useCache = TRUE)` failed with "argument is of length zero" when caching was switched off
+  (`reproducible.useCache = FALSE`, which `spades.useCache = "eventsOnly"` sets inside `spades()`): the
+  cache record it consults does not exist then. It now simply plots. Its exit handler also ran
+  `clearCache(cacheId = NULL)` in that case, which empties the whole cache; the handler is now only
+  registered when there is a record to clear.
+
+* The progress-tick handler no longer fails with "argument is of length zero" when a
+  non-dynamic progress frame follows a dynamic (`\r`) one -- e.g. a Google Drive download
+  inside an event followed by an extraction. The dynamic frame now records
+  `.progressLastShown` as well, and the throttle tolerates it being unset.
+
+* With `options(spades.cacheChaining = TRUE)`, an event could skip straight to the cacheId
+  recorded after the previous event even when its `.useCacheArgs` had changed. A chained
+  cacheId bypasses Cache()'s digest, so a `.cacheExtra` (or `omitArgs`) meant to change the
+  key had no effect: the event kept returning the entry recorded before the change. The
+  `.useCacheArgs` that affect the key are now part of what the chain matches on, for events
+  and `.inputObjects`.
+
+* After a Cache hit on `.inputObjects` or an event, the params that are not cached on
+  (`.useCache`, `.useCacheArgs`, `.useCloud`) were put back by position, using an index
+  built on the module's current param names but applied to the cached param list. Adding
+  or removing one of those params does not change the cacheId, so an older cache entry
+  still hits, and its values shifted: a module that gained `.useCloud` ahead of
+  `.useCacheArgs` got `.useCacheArgs = TRUE` and the next cached event stopped with
+  "subscript out of bounds"; the reverse handed `.useCloud` the `.useCacheArgs` list.
+  They are now put back by name.
+
+* `moduleCoverage()` did not measure a module's tests, and its result could not be
+  tallied. It ran covr's default `type = "tests"`, i.e. only the top-level `tests/*.R`;
+  a module has no `tests/testthat.R`, so its testthat suite never ran, while a stale
+  top-level script (such as an old `tests/Test_<module>.R`) did, and failed the whole
+  run. It now runs `tests/testthat/` against the instrumented package. Separately, the
+  remapped coverage carried a plain `srcfile`, which `covr::percent_coverage()` cannot
+  read ("vector size cannot be infinite"); it now carries a `srcfilecopy`. And coverage
+  on a module's own `R/*.R` files kept the temporary build directory's path, which
+  nothing in the repository matches; it is now mapped to the module's `R/` directory.
+  Only code the tests call directly is counted: `simInit()`/`spades()` evaluate a
+  module's functions from `<module>.R`, not from the instrumented package.
+
+* `documentModule()` wrote the header of `R/READONLYFromMainModuleFile.R` without a
+  trailing newline, so the first line of the module file was welded onto the last `#%`
+  comment line. Harmless when that line is itself a comment, which is why it went
+  unnoticed; a module whose first line is code lost that line into a comment.
+
+* `documentModule()` located the `defineModule()` block to cut with
+  `grep("defineModule", gpd$text)`, which matches every mention rather than the call, so
+  the result can have more than one row. `a:b` on the two-column result then used only
+  the first element of each and warned (`numerical expression has 2 elements: only the
+  first used`). It happened to produce the right range; it was not choosing it. The
+  widest spanning row is now selected explicitly, and the cut range is recorded in the
+  generated file's header as `#% removedLines: <start>-<end>` so coverage can be mapped
+  back from it.
+
+
+* the cache chain is now RECORDED whether or not `options(spades.cacheChaining = )` is
+  set; the option decides only whether a recorded chain is USED. Recording used to be
+  gated too, so a pass run with the option off left no tags behind and the later pass --
+  the one that would actually benefit -- had nothing to chain from. That required knowing
+  in advance, on the first pass, that chaining would be wanted later. Recording costs a
+  `CacheDigest()` of the module's functions plus one tag write: measured at about 4 ms per
+  event (2.7 ms + 1.1 ms), against events that run for seconds or longer.
+
+* `spades(events = )` also accepts two reserved entries, `.stopBefore` and
+  `.stopAfter`, which specify a *barrier* rather than a whitelist: every event the
+  modules schedule runs as usual and the call ends at the named event. Each takes
+  the same form as `events` itself, e.g.
+  `events = list(.stopBefore = list(myModule = "run"))`. This is for the case a
+  whitelist cannot express -- "run whatever is scheduled, but do not cross this
+  line" -- since the schedule of a discrete event simulation is emergent and so
+  cannot be enumerated in advance. A `.stopBefore` event does not run and stays on
+  the queue, so the returned `simList` resumes from exactly that point.
+* `stoppedAt()` reports whether a `spades()` call ended at such a barrier, and
+  which one. Needed because a barrier stop is otherwise hard to distinguish from a
+  completed run: `.stopBefore` leaves the clock and queue untouched, so calling
+  again with the same barrier returns an equivalent object, and `.stopAfter` leaves
+  the `simList` reporting itself finished with events still queued. The record's
+  `time` is the barrier event's own scheduled time, in the `simList`'s time units, so
+  it is comparable with `time()` and `end()`; `moduleName` and `eventType` are plain
+  unnamed scalars.
+* `options(spades.cacheChaining = TRUE)` fixes: an uncached `.inputObjects` no
+  longer leaves the previous module's `cacheId` on the `simList`, which could
+  chain a later module off a state that no longer described it; and all chains
+  recorded against one cache entry are now found, not only the first.
+* a module's `.inputObjects` now runs when the module declares no `expectsInput`.
+  It was skipped, because `all(logical(0))` is `TRUE` and so a module declaring
+  nothing fell into the "user already supplied everything needed" case.
+
+* `convertToPackage()` wrote `Description: paste <text>` whenever a module's
+  `description` was a `paste()` call -- metadata is captured unevaluated, and the
+  call was being deparsed into the field. Module metadata fields are now
+  evaluated.
+* `convertToPackage()` read a module's version as `eval(md$version[[2]])`, which
+  assumes the metadata's `version = list(<module> = "x.y.z")` has exactly that
+  shape. It now looks the module up by name and falls back safely.
+
+* `outputs<-` no longer renames a file that `registerOutputs()` recorded, and no
+  longer treats the time unit appearing anywhere in a *path* as meaning the
+  filename is already time-stamped. Both left `outputs(sim)$file` naming files that
+  do not exist.
+
+* `saveSimList()`/`loadSimList()`: the warning for a file-backed object whose
+  backing file is inaccessible no longer prefixes the underlying message with
+  `Error:`, which read as a failure when the load in fact continued.
+* `loadSimList()` is now much faster for simulations that carry large module
+  objects (`mod`). Reparsing module source code copied the `.mods` environment
+  with `Copy()`, which forced each module's `mod` and `Par` active bindings;
+  forcing `mod` materializes `.modObjs[[currentModule(sim)]]`, so the entire
+  per-module object store was deep copied once per module environment, for every
+  parsed file of every module. It is now copied with `.cloneEnvDeep()`, which
+  re-attaches active bindings instead of evaluating them. On a `simList` holding
+  a 9.5 GB `mod` object, a single `.mods` copy went from 174 s to under 0.01 s,
+  and the whole `loadSimList()` call from 627 s to 152 s.
+
+* `saveSimList(lazy = TRUE)` no longer loses module (`mod`) objects.
+  `loadSimList()` deleted every `.modObjs` binding when it detected a lazy save,
+  on the assumption that they were per-module copies of file-backed objects that
+  `spades()` would rebuild. Any `mod` state a module was keeping was therefore
+  silently dropped on a lazy round trip.
+
+## Deprecated
+
+* `downloadModule()` is deprecated in favour of `SpaDES.project::getModule()`, which fetches a module from its own GitHub repository at a branch, a version tag or its latest release, with its child modules. `downloadModule()` reads `.zip` files from `PredictiveEcology/SpaDES-modules`, which holds a few older modules and has had no new module `.zip` files since 2022, so current modules (fireSense, LandR Biomass) could not be downloaded with it. It still works for those older modules, with one deprecation warning per call.
+
+## Documentation
+
+* New help topic `?dotParameters` lists every "dot" module parameter (`.plots`, `.useCache`, `.seed`, ...)
+  with its default and effect, including `.studyAreaName` and `.rep`, which SpaDES.project sets. It is linked from
+  `defineParameter()`, `newModule()` and the package overview.
+
+## Internal
+
+* `convertToPackage()`'s DESCRIPTION half was an independent second implementation
+  of the same translation carried by `SpaDES.project::makeDESCRIPTION()`. It now
+  delegates to `DESCRIPTIONfromModule()`, keeping only the NAMESPACE `@import`
+  stub (`writeImportSpadesCore()`) that is genuinely its own concern.
+  `SpaDES.project::makeDESCRIPTION()` delegates to the same function.
+
+## Continuous integration
+
+* `use_gha()` now writes a short workflow that calls the shared
+  `render-module-rmd` workflow in `PredictiveEcology/actions`, instead of a
+  77-line copy of the job itself. New modules therefore reference one thing that
+  can be updated centrally, rather than freezing four action versions into the
+  repository on the day it is created. A survey of the 74 module repositories
+  carrying the old file (PredictiveEcology/actions#36) found them split across
+  two generations that had drifted apart, pinning those actions at `v0`,
+  `v0.0.1` or `v0.2`; those pins are the main obstacle to retiring the old tags.
+  The shared workflow also fixes four things that were wrong in every generated
+  copy: the `[skip-ci]` guard read the oldest commit of a push and was absent
+  entirely on pull requests; there was no setting to cancel superseded runs; the
+  `apt-get` step had no update, retries or timeout; and the commit step ran on
+  pull requests, where it could not succeed and failed silently every time.
+
+# SpaDES.core 3.2.1
 
 ## New features
 
@@ -868,6 +723,9 @@
 
 * The `caribouMovement` sample module no longer requires `sf`, which it never
   used.
+
+* `Require` now needs to be at least version 2.0.0. The previous minimum
+  (1.0.1) was long out of date with the functions actually used.
 
 ## Bug fixes
 
