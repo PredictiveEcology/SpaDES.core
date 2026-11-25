@@ -86,3 +86,19 @@ test_that(".ef_tw measures text as ragg draws it, at the figures' resolution", {
     "summarySingle", gp = grid::gpar(fontsize = 7.5, fontfamily = fam))), "in", valueOnly = TRUE)
   expect_equal(SpaDES.core:::.ef_tw("summarySingle", 7.5, fam), w, tolerance = 0.01)
 })
+
+test_that("init's calls are drawn in the run modes they run in, and listed as off when off in all", {
+  testInit(c(efPkgs, "ggplot2", "ragg", "systemfonts", "textshaping"))
+  ef <- moduleEventFlow("initMod", dirname(efFixtureInit(tmpdir)))
+  rows <- SpaDES.core:::.ef_modeRows(ef)
+  init <- rows[rows$label == "init", ]
+  expect_identical(init$mode, c(NA, "multi"))
+  expect_identical(init$detail, c("calls Setup()", "calls Multi()"))
+  off <- rows[rows$band == "off", ]
+  expect_true(any(grepl("Hindcast()", off$label, fixed = TRUE)))
+  expect_false(any(grepl("Hindcast", rows$detail[rows$band != "off"])))
+  ## and it draws
+  f <- file.path(tmpdir, "initMod.png")
+  eventDiagram(module = "initMod", path = tmpdir, file = f)
+  expect_true(file.exists(f))
+})

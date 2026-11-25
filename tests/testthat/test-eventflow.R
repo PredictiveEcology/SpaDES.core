@@ -99,3 +99,14 @@ test_that("scheduleEvent() called as SpaDES.core::scheduleEvent() is read as sch
   st <- moduleEventFlow("nsMod", tmpdir)$default$status
   expect_identical(st[c("step", "last")], c(step = "on", last = "on"))
 })
+
+test_that("init's calls to module functions carry the conditions around them", {
+  testInit(efPkgs)
+  ef <- moduleEventFlow("initMod", dirname(efFixtureInit(tmpdir)))
+  expect_identical(ef$modes$single$initCalls, "Setup")
+  expect_identical(ef$modes$multi$initCalls, c("Setup", "Multi"))
+  st <- ef$modes$multi$initCallStatus
+  expect_identical(st$fn, c("Setup", "Hindcast", "Multi"))
+  expect_identical(st$status, c("on", "off", "on"))
+  expect_match(st$cond[2], "hindcastYear")
+})

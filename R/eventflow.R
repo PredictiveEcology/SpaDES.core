@@ -71,6 +71,54 @@
              stringsAsFactors = FALSE)
 }
 
+## Whether code under the conditions around it runs ("on"), runs under some
+## settings ("cond") or not ("off"), with the innermost condition that switches it
+## off or is unknown (`cond`), and the text of every condition (`text`).
+.ef_guardStatus <- function(st) {
+  vals <- vapply(st$guards, function(g) g$value, logical(1))
+  gtxt <- vapply(st$guards, function(g) g$text, character(1))
+  status <- if (any(vals %in% FALSE)) "off" else if (anyNA(vals)) "cond" else "on"
+  cond <- switch(status,
+    off = gtxt[max(which(vals %in% FALSE))],
+    cond = gtxt[max(which(is.na(vals)))],
+    NA_character_
+  )
+  list(status = status, cond = cond, text = gtxt)
+}
+
+## Record the module's own functions that `e` calls, with whether they run.
+.ef_recordCalls <- function(e, st) {
+  fns <- .ef_moduleCalls(e, st$mod)
+  if (!length(fns)) return(invisible())
+  g <- .ef_guardStatus(st)
+  out <- st$out
+  out$calls[[length(out$calls) + 1L]] <- data.frame(
+    from = st$from, fn = fns, status = g$status, cond = g$cond, stringsAsFactors = FALSE
+  )
+  invisible()
+}
+
+## One row per module function an event calls, in order: the highest status of
+## its calls (on > cond > off) and that call's condition. A function in `all`
+## that the walk never reached (e.g. called in a function defined in the event)
+## may or may not run: "cond".
+.ef_callStatus <- function(recs, all = character()) {
+  none <- data.frame(fn = character(), status = character(), cond = character(),
+                     stringsAsFactors = FALSE)
+  rank <- c(off = 0, cond = 1, on = 2)
+  rows <- lapply(unique(c(recs$fn, all)), function(f) {
+    r <- recs[recs$fn == f, , drop = FALSE]
+    if (!nrow(r)) {
+      return(data.frame(fn = f, status = "cond", cond = NA_character_, stringsAsFactors = FALSE))
+    }
+    k <- which.max(rank[r$status])
+    data.frame(fn = f, status = r$status[k], cond = r$cond[k], stringsAsFactors = FALSE)
+  })
+  out <- do.call(rbind, c(list(none), rows))
+  rownames(out) <- NULL
+  out
+}
+
 ## Record one scheduleEvent() call: what it schedules, when, at what priority,
 ## and whether it runs ("on"), runs under some settings ("cond") or not ("off")
 ## given the conditions around it.
@@ -83,15 +131,11 @@
   modn <- if (is.null(m$moduleName)) st$mod$name else .ef_safeEval(m$moduleName, st$env)
   pr <- if (is.null(m$eventPriority)) .normal() else .ef_safeEval(m$eventPriority, st$env)
   tm <- .ef_classifyTime(m$eventTime, st)
-  vals <- vapply(st$guards, function(g) g$value, logical(1))
-  gtxt <- vapply(st$guards, function(g) g$text, character(1))
   ## the innermost condition that switches it off, or that is unknown
-  status <- if (any(vals %in% FALSE)) "off" else if (anyNA(vals)) "cond" else "on"
-  cond <- switch(status,
-    off = gtxt[max(which(vals %in% FALSE))],
-    cond = gtxt[max(which(is.na(vals)))],
-    NA_character_
-  )
+  g <- .ef_guardStatus(st)
+  status <- g$status
+  cond <- g$cond
+  gtxt <- g$text
   ## scheduleEvent() skips an NA time, so a time parameter that defaults to NA is off
   pv <- if (is.list(st$store$pars) && identical(tm$params, tm$label)) st$store$pars[[tm$label]]
   if (status != "off" && tm$type == "at" && length(pv) == 1 && is.atomic(pv) && is.na(pv)) {
@@ -117,7 +161,8 @@
   invisible()
 }
 
-## Walk the code of an event, recording each scheduleEvent() call.
+## Walk the code of an event, recording each scheduleEvent() call and each call
+## to one of the module's own functions.
 ##   `if`: a condition true with the parameters read walks its `then` branch as
 ##     it is and its `else` branch as off; false, the reverse; unknown, both as
 ##     conditional.
@@ -132,6 +177,8 @@
   if (h == "{") {
     for (x in as.list(e)[-1]) .ef_walk(x, st)
   } else if (h == "if") {
+    ## a call in the condition runs whenever the `if` is reached
+    .ef_recordCalls(e[[2]], st)
     v <- .ef_safeEval(e[[2]], st$env)
     v <- if (is.logical(v) && length(v) == 1 && !is.na(v)) v else NA
     txt <- .ef_condText(e[[2]], st)
@@ -154,6 +201,7 @@
     }
   } else if (h %in% c("<-", "=")) {
     if (.ef_isSchedule(e[[3]])) return(.ef_recordSchedule(e[[3]], st))
+    .ef_recordCalls(e[[3]], st)
     if (!st$exec) return(invisible())
     lhs <- e[[2]]
     if (is.name(lhs)) {
@@ -177,6 +225,7 @@
     st$exec <- FALSE
     .ef_walk(e[[length(e)]], st)
   } else if (h != "function") {
+    if (nzchar(h)) .ef_recordCalls(as.call(list(as.name(h))), st)
     for (j in seq_along(e)[-1]) {
       if (!.ef_isEmptyArg(e[[j]])) .ef_walk(e[[j]], st)
     }
@@ -210,6 +259,11 @@
   }
   recs <- if (length(out$recs)) do.call(rbind, out$recs) else .ef_noRecords()
   own <- is.na(recs$toModule) | recs$toModule == mod$name
+  ## the module functions init's code calls, and whether each runs
+  calls <- if (length(out$calls)) do.call(rbind, out$calls) else
+    data.frame(from = character(), fn = character(), status = character(), cond = character())
+  initCallStatus <- .ef_callStatus(calls[calls$from == "init", , drop = FALSE],
+                                   .ef_moduleCalls(br[["init"]], mod))
 
   ## Event status: init runs; an event runs if something that runs schedules it.
   ## Status only rises (off < cond < on), so this settles within 2 passes per event.
@@ -284,7 +338,8 @@
     records = recs,
     events = events,
     status = stat,
-    initCalls = .ef_moduleCalls(br[["init"]], mod),
+    initCalls = initCallStatus$fn[initCallStatus$status %in% c("on", "cond")],
+    initCallStatus = initCallStatus,
     hasInputObjects = ".inputObjects" %in% names(mod$fns)
   )
   list(flow = flow, modeLits = out$modeLits %||% list(), defaults = store$moduleDefaults)
@@ -347,7 +402,11 @@
 #'     that event's condition); and whether it is a plotting or saving event
 #'     (`plotsave`);}
 #'   \item{`status`}{a named character vector, the status of every event;}
-#'   \item{`initCalls`}{the module's functions that `init` calls, in order;}
+#'   \item{`initCalls`}{the module's functions that `init` calls and that run
+#'     with these parameters, or may (status "on" or "cond"), in order;}
+#'   \item{`initCallStatus`}{a `data.frame` of every module function that
+#'     `init`'s code calls, in order: `fn`, `status` ("on", "cond" or "off") and
+#'     the condition that switches it off or is unknown (`cond`);}
 #'   \item{`hasInputObjects`}{whether the module has an `.inputObjects` function.}
 #' }
 #'

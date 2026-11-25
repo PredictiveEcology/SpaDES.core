@@ -175,3 +175,17 @@ test_that("an event's own reads and writes count when doEvent is defined with `=
   u <- SpaDES.core:::.ef_codeUnits(moduleEventFlow("eqMod", tmpdir))
   expect_identical(u[[1]][c("reads", "writes")], list(reads = "a", writes = "b"))
 })
+
+test_that("init's code units follow the run modes its calls run in", {
+  testInit(efPkgs)
+  ef <- moduleEventFlow("initMod", dirname(efFixtureInit(tmpdir)))
+  u <- SpaDES.core:::.ef_codeUnits(ef)
+  ids <- vapply(u, `[[`, "", "id")
+  expect_false("init_Hindcast" %in% ids)
+  names(u) <- ids
+  expect_identical(u$init_Multi$mode, "multi")
+  expect_identical(u$init_Multi[c("reads", "writes")], list(reads = "a", writes = "b"))
+  expect_identical(u$init_Multi$sub, 'mode = "multi": init event, step 2 of 2')
+  idx <- SpaDES.core:::.ef_objectIndex(ef)
+  expect_match(attr(idx, "notes")[1], "off with the default parameters: Hindcast()", fixed = TRUE)
+})

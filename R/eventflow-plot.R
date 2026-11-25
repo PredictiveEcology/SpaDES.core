@@ -8,7 +8,7 @@ utils::globalVariables(c(
 ))
 
 .ef_colors <- list(
-  setup = "#dbe9f6", start = "#e8f0f8", cycle = "#e3f1e3", end = "#ece5f4", times = "#f3eee4",
+  setup = "#dbe9f6", init = "#dbe9f6", start = "#e8f0f8", cycle = "#e3f1e3", end = "#ece5f4", times = "#f3eee4",
   off = "#f1f1f1", edge = "#01665e", text = "#2b2121", detail = "grey30", grey = "grey60",
   context = "grey93"
 )
@@ -95,13 +95,33 @@ utils::globalVariables(c(
 
 ## ---- rows of the timestep-cycle figure ------------------------------------------------------
 
+## "f(), g() (if x is set)": calls to module functions, each that runs only under
+## some setting followed by that setting. `status` is a flow's `initCallStatus`.
+.ef_callsText <- function(fns, status = NULL) {
+  txt <- vapply(fns, function(f) {
+    s <- if (is.null(status)) NULL else status[status$fn == f, , drop = FALSE]
+    if (NROW(s) && s$status[1] == "cond" && !is.na(s$cond[1])) {
+      paste0(f, "() (if ", s$cond[1], ")")
+    } else {
+      paste0(f, "()")
+    }
+  }, character(1))
+  paste(txt, collapse = ", ")
+}
+
 ## `fl` is one flow of a moduleEventFlow object, `tu` its time unit and `context` a list of
-## moduleEventFlow objects of other modules.
-.ef_flowRows <- function(fl, tu, context = list(), expandInit = NA, offOnly = NULL) {
+## moduleEventFlow objects of other modules. `initCalls` are the calls shown in the set-up,
+## and `offCalls` (named by function, holding the setting that runs it) those listed as off.
+.ef_flowRows <- function(fl, tu, context = list(), expandInit = NA, offOnly = NULL,
+                         initCalls = fl$initCalls, offCalls = NULL) {
   ev <- fl$events
   live <- Filter(function(e) e$status %in% c("on", "cond"), ev)
   off <- Filter(function(e) e$status == "off", ev)
   if (!is.null(offOnly)) off <- ev[intersect(offOnly, names(ev))]
+  cs <- fl$initCallStatus
+  if (is.null(offCalls) && !is.null(cs)) {
+    offCalls <- stats::setNames(cs$cond[cs$status == "off"], cs$fn[cs$status == "off"])
+  }
   rec <- Filter(function(e) isTRUE(e$recurring), live)
   once <- Filter(function(e) !isTRUE(e$recurring), live)
   ## when a one-off event runs: only at the start, only at the end, or at other set times
@@ -117,7 +137,7 @@ utils::globalVariables(c(
   atEnd <- Filter(function(e) when(e) == "end", once)
   ## init-only modules show the module functions init calls, in order, when there are two or more
   if (is.na(expandInit)) expandInit <- length(rec) == 0
-  expandInit <- expandInit && length(fl$initCalls) >= 2
+  expandInit <- expandInit && length(initCalls) >= 2
 
   row <- function(band, label, detail = "", priority = NA, status = "on", kind = "event",
                   font = "plain") {
@@ -130,11 +150,14 @@ utils::globalVariables(c(
     add(row("setup", ".inputObjects",
             "during simInit: supplies a default for each input not provided by the user or another module"))
   }
-  calls <- if (length(fl$initCalls)) paste0(fl$initCalls, "()", collapse = ", ") else ""
+  calls <- .ef_callsText(initCalls, cs)
   add(row("setup", "init", if (expandInit) "calls, in order:" else
     if (nzchar(calls)) paste("calls", calls) else ""))
   if (expandInit) {
-    for (f in fl$initCalls) add(row("setup", paste0(f, "()"), kind = "step", font = "mono"))
+    for (f in initCalls) {
+      s <- if (is.null(cs)) "on" else .ef_orNA(cs$status[cs$fn == f][1], "on")
+      add(row("setup", paste0(f, "()"), status = s, kind = "step", font = "mono"))
+    }
   }
   ord <- function(l) l[order(vapply(l, function(e) .ef_orNA(e$priority, 5), numeric(1)), names(l))]
   for (e in ord(atStart)) {
@@ -161,13 +184,14 @@ utils::globalVariables(c(
   for (e in ord(atEnd)) {
     add(row("end", e$event, .ef_timingText(e, tu), e$priority, e$status))
   }
-  ## events that the default parameters switch off, grouped by the setting that would run them
-  if (length(off)) {
-    why <- vapply(off, function(e) .ef_orNA(e$cond, "unknown"), character(1))
-    for (w in unique(why)) {
-      add(row("off", paste(names(off)[why == w], collapse = ", "),
-              if (startsWith(w, "depends on")) w else paste("runs if", w), kind = "off"))
-    }
+  ## events, and init's calls, that the default parameters switch off, grouped by the
+  ## setting that would run them
+  offNames <- c(names(off), if (length(offCalls)) paste0(names(offCalls), "()"))
+  why <- c(vapply(off, function(e) .ef_orNA(e$cond, "unknown"), character(1)),
+           vapply(unname(offCalls), function(w) .ef_orNA(w, "unknown"), character(1)))
+  for (w in unique(why)) {
+    add(row("off", paste(offNames[why == w], collapse = ", "),
+            if (startsWith(w, "depends on")) w else paste("runs if", w), kind = "off"))
   }
   rows <- do.call(rbind, rows)
   attr(rows, "unscheduled") <- names(Filter(function(e) e$status == "unscheduled", ev))
@@ -187,12 +211,31 @@ utils::globalVariables(c(
   }, logical(1)))
   if (is.na(expandInit)) expandInit <- !anyRec
   offAll <- Reduce(intersect, lapply(x$modes, function(f) names(f$status)[f$status == "off"]))
-  base <- .ef_flowRows(x$default, tu, context, expandInit, offOnly = offAll)
+  ## init's calls: those that run in every mode go in the set-up, the others in their
+  ## modes' frames, and those off in every mode with the events that are off
+  shared <- Reduce(intersect, lapply(x$modes, function(f) f$initCalls %||% character()))
+  shared <- c(intersect(x$default$initCalls, shared), setdiff(shared, x$default$initCalls))
+  offCalls <- Reduce(intersect, lapply(x$modes, function(f) {
+    cs <- f$initCallStatus
+    if (is.null(cs)) character() else cs$fn[cs$status == "off"]
+  }))
+  dcs <- x$default$initCallStatus
+  offCalls <- stats::setNames(if (length(offCalls)) dcs$cond[match(offCalls, dcs$fn)] else
+    character(), offCalls)
+  base <- .ef_flowRows(x$default, tu, context, expandInit, offOnly = offAll,
+                       initCalls = shared, offCalls = offCalls)
   out <- base[base$band == "setup", ]
   out$mode <- NA_character_
   for (m in names(x$modes)) {
-    r <- .ef_flowRows(x$modes[[m]], tu, context, expandInit = FALSE)
+    fl <- x$modes[[m]]
+    r <- .ef_flowRows(fl, tu, context, expandInit = FALSE)
     r <- r[!(r$band %in% c("setup", "off")), ]
+    own <- setdiff(fl$initCalls, shared)
+    if (length(own)) {
+      r <- rbind(data.frame(band = "init", label = "init",
+                            detail = paste("calls", .ef_callsText(own, fl$initCallStatus)),
+                            priority = NA, status = "on", kind = "event", font = "plain"), r)
+    }
     if (!nrow(r)) {
       r <- data.frame(band = "start", label = "(nothing scheduled)", detail = "", priority = NA,
                       status = "on", kind = "event", font = "plain")
@@ -229,6 +272,7 @@ utils::globalVariables(c(
   p <- x$modeParam
   bandTitle <- c(
     setup = "Set-up: simInit and the init event",
+    init = "In the init event",
     start = "Once, at the start",
     cycle = paste0("Each ", tu, ", in priority order (lower numbers first)"),
     times = "At other set times",
@@ -339,7 +383,7 @@ utils::globalVariables(c(
                paste0("runs with the default parameters (for that ", p, ")"),
              "runs only under some data or settings", "another module's event, shown for order")
   )
-  present <- unique(rows$status[rows$kind == "event"])
+  present <- unique(rows$status[rows$kind %in% c("event", "step")])
   leg <- leg[leg$key %in% c(present, if (any(rows$kind == "context")) "context"), ]
   lx <- xs$band0 + 0.02
   ly <- y - 0.20
@@ -383,7 +427,7 @@ utils::globalVariables(c(
     if (r$kind == "off") next
     if (r$kind == "step") {
       P$add(.ef_rrect(xs$step0, xs$step1, r$y - r$h / 2 + 0.025, r$y + r$h / 2 - 0.025,
-                      r = 0.035), "white", "#7fa9c9")
+                      r = 0.035), "white", "#7fa9c9", if (r$status == "cond") "22" else "solid")
       next
     }
     if (!is.na(r$priority)) {

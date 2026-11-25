@@ -140,3 +140,49 @@ efFixtureEvents <- function(dir) {
     )
   )
 }
+
+## init calls one function in every run mode, one only in multi mode, and one
+## (Hindcast) that the default parameters switch off in every mode
+efFixtureInit <- function(dir) {
+  efModule(
+    dir, "initMod",
+    params = paste(
+      "defineParameter(\"mode\", \"character\", \"single\", NA, NA, \"run mode\"),",
+      "defineParameter(\"hindcastYear\", \"numeric\", NA, NA, NA, \"hindcast year\")"
+    ),
+    inputs = paste(
+      "expectsInput(\"a\", \"numeric\", \"\"),",
+      "expectsInput(\"h\", \"numeric\", \"\")"
+    ),
+    outputs = "createsOutput(\"b\", \"numeric\", \"\")",
+    code = c(
+      "doEvent.initMod <- function(sim, eventTime, eventType) {",
+      "  switch(",
+      "    eventType,",
+      "    init = {",
+      "      sim <- Setup(sim)",
+      "      if (P(sim)$mode == \"single\") {",
+      "        sim <- scheduleEvent(sim, end(sim), \"initMod\", \"save\")",
+      "      } else if (P(sim)$mode == \"multi\" && !is.na(P(sim)$hindcastYear)) {",
+      "        sim <- Hindcast(sim)",
+      "      } else if (P(sim)$mode == \"multi\") {",
+      "        sim <- Multi(sim)",
+      "      }",
+      "    },",
+      "    save = {}",
+      "  )",
+      "  invisible(sim)",
+      "}",
+      "",
+      "Setup <- function(sim) sim",
+      "Hindcast <- function(sim) {",
+      "  h <- sim$h",
+      "  sim",
+      "}",
+      "Multi <- function(sim) {",
+      "  sim$b <- sim$a",
+      "  sim",
+      "}"
+    )
+  )
+}
