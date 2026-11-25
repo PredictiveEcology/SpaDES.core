@@ -293,5 +293,3 @@ checkModuleMetadata <- function(file, stopOnFirst = FALSE) {
   x <- gsub("\\s+", " ", x)
   if (nchar(x) > 80L) paste0(substr(x, 1, 77), "...") else x
 }
-
-`%||%` <- function(a, b) if (is.null(a) || (length(a) == 0L)) b else a

@@ -57,8 +57,6 @@ doEvent.%s <- function(sim, eventTime, eventType, debug = FALSE) {
   )
 }
 
-`%||%` <- function(a, b) if (is.null(a)) b else a
-
 #' Run the `.inputObjects` golden scenarios and return their normalized snapshots
 #'
 #' @param tmpdir A writable directory for the modules/paths.

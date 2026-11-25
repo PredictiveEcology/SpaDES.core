@@ -136,3 +136,8 @@ test_that("FilterRecursive works", {
 
   expect_equivalent(FilterRecursive(length, oldFns), list())
 })
+
+test_that("SpaDES.core uses base R's %||%, not a definition of its own (#530)", {
+  ## four package-level definitions with different meanings of missing; only the last collated took effect
+  expect_identical(get("%||%", envir = asNamespace("SpaDES.core")), base::`%||%`)
+})

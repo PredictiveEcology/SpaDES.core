@@ -249,7 +249,10 @@
   ev$.END <- 0
   ev$.NOW <- 0
   for (p in s$params) {
-    assign(p, st$store$pars[[p]] %||% .ef_unknown, envir = ev)
+    ## a parameter with no value, or a value of length 0, is unknown: the `%||%` this used treated a
+    ## length-0 value as missing (#530), and base R's does not
+    v <- st$store$pars[[p]]
+    assign(p, if (length(v)) v else .ef_unknown, envir = ev)
   }
   val <- .ef_safeEval(s$expr, ev)
   val <- if (is.numeric(val) && length(val) == 1) val else NA_real_
