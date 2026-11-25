@@ -104,8 +104,6 @@
   )
 }
 
-`%||%` <- function(a, b) if (is.null(a) || (length(a) == 1 && is.na(a))) b else a
-
 ## Find the enclosing top-level function-definition expression for a node, and
 ## return its bound name (the SYMBOL on the LHS of the `<-` that defines it),
 ## or NA if the node isn't inside a named function.
