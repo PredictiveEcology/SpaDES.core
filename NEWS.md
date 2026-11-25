@@ -7,6 +7,7 @@
 
 ## Bug fixes
 
+* SpaDES.core defined `%||%` four times, with three meanings of "missing"; the one in effect, from the last file collated, also took a left side of length 0 as missing. All four are gone and base R's `%||%` (R >= 4.4) is used (#530). No caller depended on the difference except event-flow evaluation, which still treats a parameter of length 0 as unknown, now explicitly.
 * `newModule()` creates `citations/references_<name>.bib`, the bibliography the new module's Rmd names; without it the Rmd did not knit ("File citations/references_<name>.bib not found") (#529). The file is empty, for the module's references, and an existing one is kept.
 
 * `Cache()` of a `simList` no longer fails with "is.list(x) is not TRUE" when an object has the same name as a module, e.g. `sim$climateYear` from the climateYear module. Hashing tried to merge the object with the module's entry; it now keeps them apart.

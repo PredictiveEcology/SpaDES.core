@@ -717,8 +717,6 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
 ) {
   stopifnot(inherits(p, "ggplot"))
   
-  `%||%` <- function(x, y) if (is.null(x)) y else x
-  
   as_label_safe <- function(x) {
     if (is.null(x)) return(NULL)
     tryCatch(rlang::as_label(x), error = function(e) NULL)
@@ -868,5 +866,3 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
   out <- sort_list_recursive(out)
   out
 }
-      
-`%||%` <- function(x, y) if (is.null(x)) y else x
