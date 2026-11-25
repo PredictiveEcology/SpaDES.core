@@ -2205,12 +2205,16 @@ loadPkgs <- function(reqdPkgs) {
   }
 }
 
-# A reqdPkg that did not attach (e.g., its namespace is already loaded from another library, at another
-# version, and cannot be unloaded) must stop simInit here, not fail later with "could not find function".
+# A reqdPkg that is installed but did not attach (e.g., its namespace is already loaded from another
+# library, at another version, and cannot be unloaded) must stop simInit here, not fail later with
+# "could not find function". One that is not installed keeps require()'s warning, as before: a simList
+# can be built, inspected or loaded without every module package.
 stopIfNotAttached <- function(pkgs, attachMsgs = character()) {
   pkgs <- unique(Require::extractPkgName(pkgs))
   pkgs <- pkgs[!is.na(pkgs) & nzchar(pkgs)]
   notAttached <- pkgs[!pkgs %in% sub("^package:", "", search())]
+  installed <- vapply(notAttached, function(p) nzchar(system.file(package = p)), logical(1))
+  notAttached <- notAttached[notAttached %in% loadedNamespaces() | installed]
   if (length(notAttached)) {
     details <- vapply(notAttached, function(p) {
       loadedVer <- if (p %in% loadedNamespaces()) as.character(utils::packageVersion(p)) else NA_character_

@@ -7,7 +7,7 @@
 
 ## Bug fixes
 
-* `simInit()` now stops, naming the package and the reason, when a module's `reqdPkgs` entry cannot be attached (e.g. its namespace is already loaded from another library at another version). It used to carry on and fail later with "could not find function".
+* `simInit()` now stops, naming the package and the reason, when a module's `reqdPkgs` entry is installed but cannot be attached (e.g. its namespace is already loaded from another library at another version). It used to carry on and fail later with "could not find function". A `reqdPkgs` entry that is not installed still only warns, as before.
 
 * `Cache()` of a `simList` no longer fails with "is.list(x) is not TRUE" when an object has the same name as a module, e.g. `sim$climateYear` from the climateYear module. Hashing tried to merge the object with the module's entry; it now keeps them apart.
 
