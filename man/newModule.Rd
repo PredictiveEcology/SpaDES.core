@@ -92,6 +92,8 @@ All files will be created within a subdirectory named \code{name} within the \co
     |_ data/            # directory for all included data
       |_ CHECKSUMS.txt  # contains checksums for data files
     |_ tests/           # contains unit tests for module code
+    |_ citations/       # the references the module's documentation cites
+      |_ references_<name>.bib  # empty; named by the Rmd's `bibliography:`
     |_ citation.bib     # bibtex citation for the module
     |_ LICENSE          # describes module's legal usage
     |_ README.md        # provide overview of key aspects

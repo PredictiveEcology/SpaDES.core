@@ -7,6 +7,8 @@
 
 ## Bug fixes
 
+* `newModule()` creates `citations/references_<name>.bib`, the bibliography the new module's Rmd names; without it the Rmd did not knit ("File citations/references_<name>.bib not found") (#529). The file is empty, for the module's references, and an existing one is kept.
+
 * `Cache()` of a `simList` no longer fails with "is.list(x) is not TRUE" when an object has the same name as a module, e.g. `sim$climateYear` from the climateYear module. Hashing tried to merge the object with the module's entry; it now keeps them apart.
 
 * `Plots()` no longer prints what a base-graphics `fn` returns. It printed any return value of an `fn` other than `plot`/`terra::plot`, so a function returning its data (even invisibly) dumped it to the console, e.g. every raster of fireSense_ELFs' ELF list. Only an object that draws when printed (ggplot, patchwork, lattice, a recorded plot) is printed.
