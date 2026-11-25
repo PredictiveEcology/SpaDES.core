@@ -48,6 +48,8 @@ openIsRequested <- function(open, suff) {
 #'     |_ data/            # directory for all included data
 #'       |_ CHECKSUMS.txt  # contains checksums for data files
 #'     |_ tests/           # contains unit tests for module code
+#'     |_ citations/       # the references the module's documentation cites
+#'       |_ references_<name>.bib  # empty; named by the Rmd's `bibliography:`
 #'     |_ citation.bib     # bibtex citation for the module
 #'     |_ LICENSE          # describes module's legal usage
 #'     |_ README.md        # provide overview of key aspects
@@ -497,6 +499,13 @@ setMethod(
     )
     moduleCiteTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "citation.bib.template"))
     writeLines(whisker.render(moduleCiteTemplate, moduleCite), filenameCitation)
+
+    ### Make the references file the Rmd's `bibliography:` names; without it the Rmd does not knit
+    ### (pandoc: "File citations/references_<name>.bib not found"). Empty, for the module's references;
+    ### an existing one is kept.
+    filenameRefs <- file.path(checkPath(file.path(nestedPath, "citations"), create = TRUE),
+                              paste0("references_", name, ".bib"))
+    if (!file.exists(filenameRefs)) file.create(filenameRefs)
 
     ### Make LICENSE file
     licenseTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "LICENSE.template"))
