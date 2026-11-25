@@ -574,3 +574,52 @@ F <- function(sim) {
   expect_equal(nrow(bad), 1L)
   expect_equal(bad$name, "scheduleEvent")
 })
+
+test_that("`=` definitions and assignments are read as `<-` ones are", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+Init = function(sim) {
+  a = sim$x1
+  sim$y1 = a
+  sim[["y2"]] = P(sim)$p1
+  if (TRUE) sim$y3 = 3
+  sim = scheduleEvent(sim, 1, "m", "e")
+  sim
+}
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  acc <- uses[uses$kind %in% c("sim_get", "sim_assign"), , drop = FALSE]
+  expect_setequal(paste(acc$kind, acc$name, acc$fn),
+                  c("sim_get x1 Init", "sim_assign y1 Init", "sim_assign y2 Init",
+                    "sim_assign y3 Init"))
+  expect_identical(uses$fn[uses$kind == "param"], "Init")
+  expect_identical(uses$fn[uses$kind == "return_sim"], "Init")
+  expect_false(any(uses$kind == "assign_to_sim"))
+  expect_true("a" %in% uses$name[uses$kind == "local_assign" & uses$fn %in% "Init"])
+})
+
+test_that("fn_defined_with_equals notes a top-level function defined with `=`", {
+  skip_if_not_installed("xmlparsedata")
+  skip_if_not_installed("xml2")
+  src <- '
+doEvent.m = function(sim, eventTime, eventType) {
+  sim
+}
+Init <- function(sim) {
+  f = function(x) x
+  sim
+}
+x = 1
+'
+  uses <- .cc_collectModule(text = src, currentModule = "m")
+  meta <- list(module = "m", inputs = character(), outputs = character(),
+               params = character(), otherModuleParams = list(), moduleEnv = NULL)
+  f <- .cc_runRules(uses, meta)
+  f <- f[f$id == "fn_defined_with_equals", , drop = FALSE]
+  ## only the top-level function: not a local function, not a value
+  expect_identical(f$name, "doEvent.m")
+  expect_identical(f$line, 2L)
+  expect_identical(f$severity, "note")
+  expect_match(f$message, "doEvent.m <- function", fixed = TRUE)
+})

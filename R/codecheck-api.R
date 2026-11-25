@@ -67,7 +67,9 @@
 #'     `param_used_other_module`.
 #'   \item **module functions** — `must_return_sim` (a `doEvent.*` must return
 #'     `sim`), `must_assign_to_sim`, `module_named_object` (`sim$<module>`
-#'     collides with the module name), `clashing_module_fn`.
+#'     collides with the module name), `clashing_module_fn`,
+#'     `fn_defined_with_equals` (note: a top-level function defined with `=`;
+#'     use `<-`).
 #'   \item **globals** — `conflicting_fn_unqualified` (a bare function name
 #'     collides with a `raster::` namesake; qualify it, e.g. `raster::scale`).
 #'   \item **unresolved** — `unresolved_accessor` (an accessor whose name could

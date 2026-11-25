@@ -96,6 +96,11 @@
 ## XML helpers
 ## ---------------------------------------------------------------------------
 
+## A statement that is a `=` assignment (`f = function(...)`, `sim$x = 1`)
+## parses as `expr_or_assign_or_help` (R >= 4.0; `equal_assign` before), not as
+## `expr`, so code that climbs to or through an assignment accepts all three.
+.cc_exprNodes <- c("expr", "expr_or_assign_or_help", "equal_assign")
+
 ## Extract source position from an xml node.
 .cc_pos <- function(node) {
   list(
@@ -122,7 +127,7 @@
   cur <- fnExpr
   repeat {
     parent <- xml2::xml_parent(cur)
-    if (length(parent) == 0 || xml2::xml_name(parent) != "expr") {
+    if (length(parent) == 0 || !xml2::xml_name(parent) %in% .cc_exprNodes) {
       return(NA_character_)
     }
     kids <- xml2::xml_children(parent)
@@ -159,7 +164,7 @@
 ## child is one of LEFT_ASSIGN / RIGHT_ASSIGN / EQ_ASSIGN.
 .cc_isLhsOfAssign <- function(node) {
   parent <- xml2::xml_parent(node)
-  if (xml2::xml_name(parent) != "expr") return(FALSE)
+  if (!xml2::xml_name(parent) %in% .cc_exprNodes) return(FALSE)
   kids <- xml2::xml_children(parent)
   ## must be the first expr child
   exprKids <- which(xml2::xml_name(kids) == "expr")
@@ -530,7 +535,7 @@
   fnDefs <- xml2::xml_find_all(doc, "//expr[FUNCTION]")
   for (fnExpr in fnDefs) {
     parent <- xml2::xml_parent(fnExpr)
-    if (xml2::xml_name(parent) != "expr") next
+    if (!xml2::xml_name(parent) %in% .cc_exprNodes) next
     nameNode <- xml2::xml_find_first(parent, "expr[1]/SYMBOL")
     if (length(nameNode) == 0 || is.na(xml2::xml_text(nameNode))) next
     nm <- xml2::xml_text(nameNode)
@@ -538,7 +543,7 @@
     kids <- xml2::xml_children(fnExpr)
     body <- kids[[length(kids)]]
     ## If body is a `{...}` expr, take its last sub-expr; else body itself.
-    bodyKids <- xml2::xml_find_all(body, "expr")
+    bodyKids <- xml2::xml_find_all(body, "expr | expr_or_assign_or_help | equal_assign")
     last <- if (length(bodyKids) > 0) bodyKids[[length(bodyKids)]] else body
     if (.cc_isReturnSim(last)) {
       pos <- .cc_pos(last)
@@ -576,6 +581,37 @@
   Recall(arg)
 }
 
+## Top-level functions defined with `=` (`f = function(...)`) in a parse-data
+## table from utils::getParseData(): their names and lines. Used by both code
+## check engines.
+.cc_eqFnDefs <- function(pd) {
+  none <- data.frame(name = character(), line = integer(), stringsAsFactors = FALSE)
+  if (!is.data.frame(pd) || !nrow(pd)) return(none)
+  top <- pd$id[pd$parent == 0]
+  eq <- pd[pd$token == "EQ_ASSIGN" & pd$parent %in% top, , drop = FALSE]
+  out <- lapply(eq$parent, function(p) {
+    kids <- pd[pd$parent == p & pd$token == "expr", , drop = FALSE]
+    kids <- kids[order(kids$line1, kids$col1), , drop = FALSE]
+    if (nrow(kids) != 2) return(NULL)
+    lhs <- pd[pd$parent == kids$id[1], , drop = FALSE]
+    isFn <- any(pd$parent == kids$id[2] & pd$token == "FUNCTION")
+    if (nrow(lhs) != 1 || lhs$token != "SYMBOL" || !isFn) return(NULL)
+    data.frame(name = lhs$text, line = as.integer(kids$line1[1]), stringsAsFactors = FALSE)
+  })
+  do.call(rbind, c(list(none), out))
+}
+
+## One Use per top-level function defined with `=`; the rule
+## fn_defined_with_equals turns them into notes.
+.cc_collect_eqFnDefs <- function(parsed) {
+  defs <- .cc_eqFnDefs(utils::getParseData(parsed$exprs, includeText = TRUE))
+  if (nrow(defs) == 0) return(.cc_emptyUses())
+  do.call(rbind, lapply(seq_len(nrow(defs)), function(i) {
+    .cc_use("eq_fn_def", name = defs$name[i], fn = defs$name[i], file = parsed$file,
+            line = defs$line[i], resolved = TRUE)
+  }))
+}
+
 ## scheduleEvent / saveFiles — must assign back to sim.
 ##
 ## Emits a Use for every call site that is NOT assigned to sim. Rule turns
@@ -594,7 +630,7 @@
       ## has LEFT_ASSIGN and the LHS expr's only SYMBOL child is "sim".
       parent <- xml2::xml_parent(n)
       ok <- FALSE
-      if (xml2::xml_name(parent) == "expr") {
+      if (xml2::xml_name(parent) %in% .cc_exprNodes) {
         kids <- xml2::xml_children(parent)
         nms <- xml2::xml_name(kids)
         if (any(nms %in% c("LEFT_ASSIGN", "EQ_ASSIGN", "RIGHT_ASSIGN"))) {
@@ -742,6 +778,7 @@
     uses[[length(uses) + 1]] <- .cc_collect_params(p, currentModule)
     uses[[length(uses) + 1]] <- .cc_collect_returnSim(p)
     uses[[length(uses) + 1]] <- .cc_collect_assignToSim(p)
+    uses[[length(uses) + 1]] <- .cc_collect_eqFnDefs(p)
     uses[[length(uses) + 1]] <- .cc_collect_globalsConflicts(p)
     uses[[length(uses) + 1]] <- .cc_collect_localAndBulk(p)
     uses[[length(uses) + 1]] <- .cc_collect_nsCalls(p)
@@ -774,7 +811,8 @@
   }
   ## `name <- ...` / `name = ...` (LHS is a single bare SYMBOL)
   for (n in xml2::xml_find_all(
-    doc, "//expr[(LEFT_ASSIGN or EQ_ASSIGN) and expr[1][SYMBOL and count(*)=1]]")) {
+    doc, paste0("//*[self::expr or self::expr_or_assign_or_help or self::equal_assign]",
+                "[(LEFT_ASSIGN or EQ_ASSIGN) and expr[1][SYMBOL and count(*)=1]]"))) {
     sym <- xml2::xml_find_first(n, "expr[1]/SYMBOL")
     if (length(sym) > 0) out[[length(out) + 1]] <- emit("local_assign", xml2::xml_text(sym), n)
   }

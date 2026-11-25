@@ -657,6 +657,23 @@ test_that("conflicting function types", {
   expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
 })
 
+test_that("module code checks note a function defined with `=`", {
+  testInit(sampleModReqdPkgs, smcc = TRUE)
+
+  m <- "child5"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(tmpdir, m, paste0(m, ".R"))
+  xxx <- readLines(fileName)
+  i <- grep(paste0("^doEvent\\.", m, " (<-|=) function"), xxx)
+  expect_length(i, 1L)
+  xxx[i] <- sub(" <- function", " = function", xxx[i])
+  writeLines(xxx, fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  expect_true(any(grepl(paste0(m, ": module code: doEvent\\.", m, " \\(line ", i,
+                               "\\) is defined with `=`"), mm)))
+})
+
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
   testInit("ggplot2", smcc = TRUE)
   m <- "test"

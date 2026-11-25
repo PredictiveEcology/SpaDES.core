@@ -90,7 +90,9 @@ assigned), \code{out_used_undeclared} (\verb{sim$x <-} but not in \code{outputOb
 \code{param_used_other_module}.
 \item \strong{module functions} — \code{must_return_sim} (a \verb{doEvent.*} must return
 \code{sim}), \code{must_assign_to_sim}, \code{module_named_object} (\verb{sim$<module>}
-collides with the module name), \code{clashing_module_fn}.
+collides with the module name), \code{clashing_module_fn},
+\code{fn_defined_with_equals} (note: a top-level function defined with \code{=};
+use \verb{<-}).
 \item \strong{globals} — \code{conflicting_fn_unqualified} (a bare function name
 collides with a \verb{raster::} namesake; qualify it, e.g. \code{raster::scale}).
 \item \strong{unresolved} — \code{unresolved_accessor} (an accessor whose name could
