@@ -539,6 +539,11 @@ isAre <- function(l, v) {
   singularPlural(c("is", "are"), l, v)
 }
 
+## `x` with each "\" replaced by "/". Purely textual, one character for one, so positions in `x` and
+## its spelling elsewhere are kept; unlike normalizePath() or fs::path_norm(), nothing is resolved,
+## so a result is still a prefix of the caller's own strings.
+.fwdSlashes <- function(x) gsub("\\", "/", x, fixed = TRUE)
+
 #' Directory names drawn from a set of ids
 #'
 #' Given a vector of file paths and a set of candidate integer ids, returns the
@@ -547,7 +552,9 @@ isAre <- function(l, v) {
 #' have outputs, without loading any of them.
 #'
 #' This is a purely textual operation on the paths; it does not check whether
-#' anything exists on disk.
+#' anything exists on disk. Both forward slashes and backslashes are taken as
+#' folder separators, so Windows paths are recognised; the folders returned are
+#' spelled as they are in `files`.
 #'
 #' @param files character vector of file paths.
 #' @param set integer vector of candidate ids to keep.
@@ -586,16 +593,21 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
     return(stats::setNames(paste0(prefix, set), set))
   }
 
+  ## matched with "/" for "\" (a Windows path can hold both, e.g. a tempdir() with "/rep1" appended).
+  ## Not fs::path_tidy(): it also collapses "//" and drops a trailing "/", changing lengths, so a folder
+  ## could no longer be cut from its file by position. `src` is the file each folder came from.
+  nf <- .fwdSlashes(files)
   ## the path up to and including the rep directory, so files in its subfolders give the same one
   repPattern <- paste0("(.*/", prefix, "(\\d+))/.*")
-  keep <- grepl(repPattern, files)
-  dirs <- sub(repPattern, "\\1", files[keep])
-  ids <- as.integer(sub(repPattern, "\\2", files[keep]))
+  keep <- grepl(repPattern, nf)
+  dirs <- sub(repPattern, "\\1", nf[keep])
+  ids <- as.integer(sub(repPattern, "\\2", nf[keep]))
+  src <- files[keep]
   inSet <- ids %in% set
   if (!any(keep)) {
     ## no `<prefix><N>` folder at all: bare `<N>` folders, taking for each file its deepest all-digit
     ## directory with an id in `set` (so `370/16/x.tif` gives `16`, `16/2020/x.tif` gives `16`)
-    digitDirs <- gregexpr("/[0-9]+(?=/)", files, perl = TRUE)
+    digitDirs <- gregexpr("/[0-9]+(?=/)", nf, perl = TRUE)
     found <- Map(function(f, m) {
       if (m[1] == -1L) return(NULL)
       ends <- as.integer(m) + attr(m, "match.length") - 1L
@@ -604,20 +616,26 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
       if (!any(inSetHere)) return(NULL)
       last <- max(which(inSetHere))
       list(dir = substr(f, 1L, ends[last]), id = as.integer(substring(f, starts[last], ends[last])))
-    }, files, digitDirs)
-    found <- found[!vapply(found, is.null, logical(1))]
+    }, nf, digitDirs)
+    hit <- !vapply(found, is.null, logical(1))
+    found <- found[hit]
+    src <- files[hit]
     dirs <- vapply(found, `[[`, character(1), "dir", USE.NAMES = FALSE)
     ids <- vapply(found, `[[`, integer(1), "id", USE.NAMES = FALSE)
     inSet <- rep(TRUE, length(ids))
   }
   dirs <- dirs[inSet]
+  src <- src[inSet]
   ids <- ids[inSet]
   firsts <- !duplicated(dirs)
   ord <- order(ids[firsts])
   dirs <- dirs[firsts][ord]
+  src <- src[firsts][ord]
   ids <- ids[firsts][ord]
 
-  out <- if (leafOnly) basename(dirs) else dirs
+  ## `nf` has the same characters at the same places as `files`, so the first nchar(dir) characters of
+  ## a folder's file are that folder as spelled in `files`
+  out <- if (leafOnly) basename(dirs) else substr(src, 1L, nchar(dirs))
   firsts <- !duplicated(out)
   stats::setNames(out[firsts], ids[firsts])
 }
@@ -650,8 +668,14 @@ repFiles <- function(repDirs, filename, files = NULL) {
   out <- if (is.null(files)) {
     file.path(repDirs, filename)
   } else {
+    ## both sides through fs::path_tidy(), which is textual ("/" for "\", "//" collapsed, no trailing "/"):
+    ## on Windows dirname() gives "/" for "\", which a `repDirs` element can still hold (e.g. a tempdir()
+    ## with "/rep1" appended). Tidied before dirname(), which splits at "\" only on Windows.
+    tidied <- unclass(fs::path_tidy(files))
+    fileDirs <- dirname(tidied)
+    fileNames <- basename(tidied)
     vapply(repDirs, function(d) {
-      f <- files[dirname(files) == d & basename(files) == filename]
+      f <- files[fileDirs == unclass(fs::path_tidy(d)) & fileNames == filename]
       if (length(f) != 1L) {
         stop("expected one ", filename, " in ", d, " in `files`; found ", length(f), call. = FALSE)
       }
