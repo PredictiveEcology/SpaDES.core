@@ -593,8 +593,9 @@ dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
     return(stats::setNames(paste0(prefix, set), set))
   }
 
-  ## matched with "/" for "\" (a Windows path can hold both, e.g. a tempdir() with "/rep1" appended);
-  ## `src` is the file each folder came from, to give it back as spelled there
+  ## matched with "/" for "\" (a Windows path can hold both, e.g. a tempdir() with "/rep1" appended).
+  ## Not fs::path_tidy(): it also collapses "//" and drops a trailing "/", changing lengths, so a folder
+  ## could no longer be cut from its file by position. `src` is the file each folder came from.
   nf <- .fwdSlashes(files)
   ## the path up to and including the rep directory, so files in its subfolders give the same one
   repPattern <- paste0("(.*/", prefix, "(\\d+))/.*")
@@ -667,13 +668,14 @@ repFiles <- function(repDirs, filename, files = NULL) {
   out <- if (is.null(files)) {
     file.path(repDirs, filename)
   } else {
-    ## "/" for "\" on both sides: dirname() gives "/" for "\" on Windows, which a `repDirs` element
-    ## can still hold (e.g. a tempdir() with "/rep1" appended)
-    nf <- .fwdSlashes(files)
-    fileDirs <- dirname(nf)
-    fileNames <- basename(nf)
+    ## both sides through fs::path_tidy(), which is textual ("/" for "\", "//" collapsed, no trailing "/"):
+    ## on Windows dirname() gives "/" for "\", which a `repDirs` element can still hold (e.g. a tempdir()
+    ## with "/rep1" appended). Tidied before dirname(), which splits at "\" only on Windows.
+    tidied <- unclass(fs::path_tidy(files))
+    fileDirs <- dirname(tidied)
+    fileNames <- basename(tidied)
     vapply(repDirs, function(d) {
-      f <- files[fileDirs == .fwdSlashes(d) & fileNames == filename]
+      f <- files[fileDirs == unclass(fs::path_tidy(d)) & fileNames == filename]
       if (length(f) != 1L) {
         stop("expected one ", filename, " in ", d, " in `files`; found ", length(f), call. = FALSE)
       }

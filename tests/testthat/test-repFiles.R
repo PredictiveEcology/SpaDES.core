@@ -38,3 +38,9 @@ test_that("repFiles matches the folders dirnamesFromSet finds in backslash-only 
   dirs <- dirnamesFromSet(files, set = c(1, 10), leafOnly = FALSE)
   expect_identical(repFiles(dirs, "burnMap.tif", files), c(`1` = files[1], `10` = files[2]))
 })
+
+test_that("repFiles matches a folder written with a doubled or a trailing slash", {
+  files <- c("out/rep1/burnMap.tif", "out/rep2/burnMap.tif", "out//rep3/burnMap.tif")
+  expect_identical(repFiles(c(`1` = "out//rep1", `2` = "out/rep2/", `3` = "out/rep3"), "burnMap.tif", files),
+                   c(`1` = "out/rep1/burnMap.tif", `2` = "out/rep2/burnMap.tif", `3` = "out//rep3/burnMap.tif"))
+})
