@@ -33,8 +33,7 @@ test_that("repFiles matches folders whose path mixes \\ and / separators", {
                    c(`1` = "C:\\tmp\\x/rep1/fire.csv", `10` = "C:\\tmp\\x/rep10/fire.csv"))
 })
 
-test_that("repFiles matches the folders dirnamesFromSet finds in backslash-only paths on Windows", {
-  skip_if_not(.Platform$OS.type == "windows", "dirname() splits paths at \\ only on Windows")
+test_that("repFiles matches the folders dirnamesFromSet finds in backslash-only paths", {
   files <- c("C:\\tmp\\x\\rep1\\burnMap.tif", "C:\\tmp\\x\\rep10\\burnMap.tif", "C:\\tmp\\x\\rep1\\fire.csv")
   dirs <- dirnamesFromSet(files, set = c(1, 10), leafOnly = FALSE)
   expect_identical(repFiles(dirs, "burnMap.tif", files), c(`1` = files[1], `10` = files[2]))
