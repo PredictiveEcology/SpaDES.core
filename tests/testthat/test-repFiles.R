@@ -19,3 +19,23 @@ test_that("repFiles builds the paths from the directories without `files`", {
                    c(`1` = "out/rep01/a.tif", `2` = "out/rep02/a.tif"))
   expect_identical(repFiles(character(0), "a.tif"), character(0))
 })
+
+test_that("repFiles matches folders whose path mixes \\ and / separators", {
+  ## a Windows tempdir() holds "\" and file.path() appends "/rep1"; dirname() of the files there
+  ## gives "/" throughout on Windows, so comparing it with the folder as written matched nothing
+  d <- c(`1` = "C:\\tmp\\x/rep1", `10` = "C:\\tmp\\x/rep10")
+  files <- c(file.path(d, "burnMap.tif"), file.path(d, "fire.csv"))
+  expect_identical(repFiles(d, "burnMap.tif", files),
+                   c(`1` = "C:\\tmp\\x/rep1/burnMap.tif", `10` = "C:\\tmp\\x/rep10/burnMap.tif"))
+  dirs <- dirnamesFromSet(files, set = c(1, 10), leafOnly = FALSE)
+  expect_identical(dirs, d)
+  expect_identical(repFiles(dirs, "fire.csv", files),
+                   c(`1` = "C:\\tmp\\x/rep1/fire.csv", `10` = "C:\\tmp\\x/rep10/fire.csv"))
+})
+
+test_that("repFiles matches the folders dirnamesFromSet finds in backslash-only paths on Windows", {
+  skip_if_not(.Platform$OS.type == "windows", "dirname() splits paths at \\ only on Windows")
+  files <- c("C:\\tmp\\x\\rep1\\burnMap.tif", "C:\\tmp\\x\\rep10\\burnMap.tif", "C:\\tmp\\x\\rep1\\fire.csv")
+  dirs <- dirnamesFromSet(files, set = c(1, 10), leafOnly = FALSE)
+  expect_identical(repFiles(dirs, "burnMap.tif", files), c(`1` = files[1], `10` = files[2]))
+})

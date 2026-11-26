@@ -164,3 +164,24 @@ test_that("dirnamesFromSet names each directory by its replicate id", {
   bare <- c("/o/NRV/370/16/burnMap.tif", "/o/NRV/370/2/burnMap.tif")
   expect_identical(as.integer(names(dirnamesFromSet(bare, set = 1:20))), c(2L, 16L))
 })
+
+## Windows paths: "\" separates folders too, alone or mixed with "/"
+
+test_that("dirnamesFromSet takes \\ as a separator, returning the folders as spelled in `files`", {
+  mixed <- c("C:\\tmp\\x/rep1/a.tif", "C:\\tmp\\x/rep10/a.tif", "C:\\tmp\\x/rep2/figures/p.png")
+  expect_identical(dirnamesFromSet(mixed, set = 1:10), c(`1` = "rep1", `2` = "rep2", `10` = "rep10"))
+  expect_identical(dirnamesFromSet(mixed, set = 1:10, leafOnly = FALSE),
+                   c(`1` = "C:\\tmp\\x/rep1", `2` = "C:\\tmp\\x/rep2", `10` = "C:\\tmp\\x/rep10"))
+
+  back <- c("C:\\tmp\\x\\rep02\\a.tif", "C:\\tmp\\x\\rep01\\figures\\p.png", "C:\\tmp\\x\\rep01/b.tif")
+  expect_identical(dirnamesFromSet(back, set = 1:2), c(`1` = "rep01", `2` = "rep02"))
+  expect_identical(dirnamesFromSet(back, set = 1:2, leafOnly = FALSE),
+                   c(`1` = "C:\\tmp\\x\\rep01", `2` = "C:\\tmp\\x\\rep02"))
+})
+
+test_that("dirnamesFromSet finds bare-number replicate folders separated by \\", {
+  files <- c("C:\\o\\NRV\\370\\16\\burnMap.tif", "C:\\o\\NRV\\370\\2/x.tif", "C:\\o\\NRV\\370\\2\\2020\\y.tif")
+  expect_identical(dirnamesFromSet(files, set = 1:20), c(`2` = "2", `16` = "16"))
+  expect_identical(dirnamesFromSet(files, set = 1:20, leafOnly = FALSE),
+                   c(`2` = "C:\\o\\NRV\\370\\2", `16` = "C:\\o\\NRV\\370\\16"))
+})

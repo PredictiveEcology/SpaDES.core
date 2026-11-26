@@ -38,7 +38,9 @@ have outputs, without loading any of them.
 }
 \details{
 This is a purely textual operation on the paths; it does not check whether
-anything exists on disk.
+anything exists on disk. Both forward slashes and backslashes are taken as
+folder separators, so Windows paths are recognised; the folders returned are
+spelled as they are in \code{files}.
 }
 \examples{
 files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep2/x.tif")
