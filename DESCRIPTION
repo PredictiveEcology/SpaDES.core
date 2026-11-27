@@ -130,6 +130,7 @@ Collate:
     'eventflow-plot.R'
     'eventflow-read.R'
     'eventflow.R'
+    'interchange-formats.R'
     'simulation-parseModule.R'
     'simulation-simInit.R'
     'load.R'
