@@ -60,6 +60,40 @@ test_that("module templates work", {
   # test_file(file.path(mpath, "tests", "testthat", "test-template.R")) # TODO: make it work
 })
 
+test_that("newModule writes a NEWS.md heading that agrees with the version it declares", {
+  testInit(smcc = FALSE)
+
+  moduleName <- "myModule"
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE)
+
+  declared <- moduleMetadata(module = moduleName, path = tmpdir)[["version"]]
+  heading <- grep("^# ", readLines(file.path(tmpdir, moduleName, "NEWS.md")), value = TRUE)[1]
+
+  ## an unreleased version (x.y.z.9000) takes usethis' development heading
+  expected <- if (length(unclass(declared)[[1]]) > 3L) {
+    "(development version)"
+  } else {
+    as.character(declared)
+  }
+  expect_identical(heading, paste("#", moduleName, expected))
+})
+
+test_that("newModule gives a child module the same starting version as its parent", {
+  testInit(smcc = FALSE)
+
+  newModule("myChild", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE)
+  newModule("myParent", tmpdir, open = FALSE, unitTests = FALSE, useGitHub = FALSE,
+            type = "parent", children = "myChild")
+
+  ## moduleMetadata() collapses `version` to the module's own, so read it unparsed
+  versions <- .parseModulePartial(
+    filename = file.path(tmpdir, "myParent", "myParent.R"),
+    defineModuleElement = "version"
+  )
+
+  expect_identical(versions[["myChild"]], versions[["myParent"]])
+})
+
 test_that("empty defineModule", {
   testInit()
 
@@ -215,4 +249,111 @@ test_that("moduleReqdPkgs returns an empty data.frame for a module with no reqdP
   expect_s3_class(pkgs, "data.frame")
   expect_identical(nrow(pkgs), 0L)
   expect_identical(names(pkgs), c("packageName", "minVersion"))
+})
+
+test_that("newModule() writes no absolute paths into the generated module", {
+  testInit(smcc = FALSE)
+
+  moduleName <- "myModule"
+  newModule(moduleName, tmpdir, open = FALSE, unitTests = TRUE, useGitHub = FALSE)
+  mpath <- file.path(tmpdir, moduleName)
+
+  ## a generated module is committed to its own repository and built on a machine
+  ## that is not the author's, so no file in it may name the directory it was
+  ## created in
+  generated <- list.files(mpath, recursive = TRUE, full.names = TRUE, all.files = TRUE,
+                          no.. = TRUE)
+  generated <- generated[!dir.exists(generated)]
+  offenders <- Filter(
+    function(f) any(grepl(basename(tmpdir), readLines(f, warn = FALSE), fixed = TRUE)),
+    generated
+  )
+  expect_identical(basename(offenders), character(0))
+
+  rmd <- readLines(file.path(mpath, paste0(moduleName, ".Rmd")))
+
+  ## the four metadata tables resolve the module from beside it, matching the
+  ## subtitle and authors lines. This is the form moduleRmdToVignette() repoints
+  ## to "../.." and SpaDES.docs::prepManualRmds() sets `root.dir` for; neither
+  ## can do anything with an absolute path
+  expect_length(
+    grep(paste0('<- SpaDES.core::module[A-Za-z]+\\("', moduleName, '", "\\.\\."\\)'), rmd),
+    4
+  )
+  expect_length(grep("path = '..')", rmd, fixed = TRUE), 2)
+
+  ## the prose advises the reader with the same relative path the code uses
+  expect_length(
+    grep(paste0('`downloadData("', moduleName, '", "..")`'), rmd, fixed = TRUE), 1
+  )
+
+  ## the generated unit test resolves modulePath from tests/testthat/
+  tmpl <- readLines(file.path(mpath, "tests", "testthat", "test-template.R"))
+  expect_length(grep('modulePath = file.path("..", "..", "..")', tmpl, fixed = TRUE), 1)
+})
+
+test_that("the module Rmd template has the generated event sections", {
+  testInit(smcc = FALSE)
+  newModule("efTmpl", tmpdir, open = FALSE)
+  rmd <- readLines(file.path(tmpdir, "efTmpl", "efTmpl.Rmd"))
+  expect_true(any(grepl("SpaDES.core::includeModuleEventFlow(ef, \"figures/efTmpl_eventFlow.png\")", rmd, fixed = TRUE)))
+  expect_true(any(grepl("SpaDES.core::kableModuleObjects(ef", rmd, fixed = TRUE)))
+  ## the sentence that refers to the table is passed as `lead`, so it comes only with a table
+  expect_true(any(grepl('lead = "Table \\\\@ref(tab:eventObjects-efTmpl)', rmd, fixed = TRUE)))
+  expect_false(any(grepl("^Table \\\\@ref\\(tab:eventObjects", rmd)))
+  expect_true(any(grepl("SpaDES.core::moduleEventFigures(ef", rmd, fixed = TRUE)))
+  chunks <- grep("^```\\{r event(Flow|Objects|Figures)-", rmd, value = TRUE)
+  expect_length(chunks, 3)
+  expect_true(all(grepl("cache = FALSE", chunks, fixed = TRUE)))
+})
+
+test_that("a new module's Rmd knits with the event flow, index and figures", {
+  testInit(c(efPkgs, "rmarkdown", "bookdown", "knitr", "kableExtra", "ggplot2", "ragg", "systemfonts",
+             "textshaping"), smcc = FALSE)
+  skip_on_cran(); skip_if_offline()  # the template's setup chunk downloads a badge
+  newModule("efKnit", tmpdir, open = FALSE)
+  rmd <- file.path(tmpdir, "efKnit", "efKnit.Rmd")
+  rmarkdown::render(rmd, quiet = TRUE)
+  md <- readLines(file.path(tmpdir, "efKnit", "efKnit.md"))
+  expect_true(file.exists(file.path(tmpdir, "efKnit", "figures", "efKnit_eventFlow.png")))
+  expect_true(any(grepl("figures/efKnit_eventFlow.png", md, fixed = TRUE)))
+  ## a new module's code touches none of the template's placeholder objects, so the index
+  ## is the note and there are no per-event figures
+  expect_true(any(grepl("No objects in this module's metadata are read or written by its code", md, fixed = TRUE)))
+  expect_false(any(grepl("Error|Warning", md)))
+  expect_false(any(grepl("NA\\.$", md)))
+  ## no sentence refers to the table that is not there; bookdown writes <strong>??</strong>
+  ## for a reference it cannot resolve
+  expect_false(any(grepl("@ref(tab:eventObjects", md, fixed = TRUE)))
+  html <- readLines(file.path(tmpdir, "efKnit", "efKnit.html"), warn = FALSE)
+  expect_false(any(grepl("<strong>??</strong>", html, fixed = TRUE)))
+})
+
+test_that("newModule creates the bibliography file its Rmd names, and keeps an existing one", {
+  testInit(smcc = FALSE)
+  newModule("efRefs", tmpdir, open = FALSE)
+  rmd <- readLines(file.path(tmpdir, "efRefs", "efRefs.Rmd"))
+  bib <- sub("^bibliography:[[:space:]]*", "", grep("^bibliography:", rmd, value = TRUE))
+  expect_identical(bib, "citations/references_efRefs.bib")
+  refs <- file.path(tmpdir, "efRefs", bib)
+  expect_true(file.exists(refs))
+  ## written again, the module's own references stay
+  writeLines("@misc{a, title = {A}}", refs)
+  newModuleDocumentation("efRefs", tmpdir, open = FALSE)
+  expect_identical(readLines(refs), "@misc{a, title = {A}}")
+})
+
+test_that("newModule() defines doEvent with `<-`", {
+  testInit()
+  newModule("eqTpl", tmpdir, open = FALSE)
+  newModule("eqTplEv", tmpdir, open = FALSE, events = list(init = {
+    sim <- Init(sim)
+  }))
+  ## with `events`, each event gets its own doEvent.<module>.<event> function
+  fns <- c(eqTpl = "doEvent.eqTpl", eqTplEv = "doEvent.eqTplEv.init")
+  for (nm in names(fns)) {
+    code <- readLines(file.path(tmpdir, nm, paste0(nm, ".R")))
+    expect_true(any(startsWith(code, paste0(fns[[nm]], " <- function("))), info = nm)
+    expect_false(any(grepl("^[.A-Za-z_][.A-Za-z0-9_]* *= *function", code)), info = nm)
+  }
 })

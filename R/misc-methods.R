@@ -424,13 +424,42 @@ bindrows <- function(...) {
 #' This can be used e.g., for Caching, to identify which files have changed.
 #'
 #' @inheritParams simInit
+#' @param childModules Logical. If `TRUE`, also list the files of each module's
+#'   `childModules`, and of theirs.
+#' @param nonR Logical. If `TRUE`, also list code files in other languages
+#'   (e.g., `.py`, `.cpp`) anywhere in the module folder, except under `data/`
+#'   and `tests/`.
 #'
 #' @return character vector of file paths.
 #'
 #' @export
-moduleCodeFiles <- function(paths, modules) {
-  path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
+moduleCodeFiles <- function(paths, modules, childModules = FALSE, nonR = FALSE) {
+  if (childModules)
+    modules <- unique(unlist(lapply(modules, .moduleAndDescendants, path = paths$modulePath)))
+  files <- path.expand(c(dir(file.path(paths$modulePath, modules, "R"), full.names = TRUE),
     file.path(paths$modulePath, modules, paste0(modules, ".R"))))
+  if (nonR) {
+    modDirs <- file.path(paths$modulePath, modules)
+    modDirs <- modDirs[dir.exists(modDirs)]
+    subDirs <- setdiff(list.dirs(modDirs, recursive = FALSE),
+                       file.path(rep(modDirs, each = 2), c("data", "tests")))
+    other <- c(dir(modDirs, pattern = .nonRCodeExts, full.names = TRUE),
+               dir(subDirs, pattern = .nonRCodeExts, full.names = TRUE, recursive = TRUE))
+    files <- unique(c(files, path.expand(other)))
+  }
+  files
+}
+
+## Extensions of module code that is not R; a change to one of these files changes the module
+.nonRCodeExts <- "\\.(py|jl|c|cc|cpp|h|hpp|f|f90|stan|sh)$"
+
+## A module and, recursively, its childModules; a cyclic childModules entry stops at the repeat
+.moduleAndDescendants <- function(module, path, seen = character()) {
+  if (module %in% seen) return(character())
+  path <- path[dir.exists(file.path(path, module))][1L]
+  if (is.na(path)) return(module)
+  kids <- .childModuleName(.childModules(module, path))
+  c(module, unlist(lapply(kids, .moduleAndDescendants, path = path, seen = c(seen, module))))
 }
 
 #' Recursively Filter a list

@@ -11,17 +11,24 @@ dirnamesFromSet(files, set, prefix = "rep", leafOnly = TRUE)
 
 \item{set}{integer vector of candidate ids to keep.}
 
-\item{prefix}{character. The directory name prefix preceding each id.}
+\item{prefix}{character. The directory name prefix preceding each id. If no
+\verb{<prefix><id>} directory occurs in \code{files}, directories
+named by the bare number (e.g. \verb{out/16/}, as \code{SpaDES.project::pathBuild()} writes
+them with the field label off) are used instead; for each file the deepest
+all-digit directory with an id in \code{set} is taken, so \code{out/370/16/x.tif} gives \code{16}.
+\verb{<prefix><id>} directories always take precedence.}
 
 \item{leafOnly}{logical. If \code{TRUE} (the default), only the single directory
-name is returned, e.g. \code{"rep1"} -- the \code{basename()} of the \code{dirname()}. If
-\code{FALSE}, the full directory path is returned, e.g. \code{"out/rep1"}. Note that
+name is returned, e.g. \code{"rep1"}, spelled as it is in \code{files} (so \code{"rep01"}
+stays \code{"rep01"}). If \code{FALSE}, the full replicate directory path is returned,
+e.g. \code{"out/rep1"}, also when \code{files} are in its subfolders. Note that
 a full path can only be recovered from \code{files}, so \code{leafOnly = FALSE}
 requires a non-empty \code{files}.}
 }
 \value{
 A character vector of directory names (or paths, if
-\code{leafOnly = FALSE}), ordered numerically by id.
+\code{leafOnly = FALSE}), ordered numerically by id and named by id, so
+\code{as.integer(names(x))} gives the replicate numbers (\code{"rep01"} is named \code{"1"}).
 }
 \description{
 Given a vector of file paths and a set of candidate integer ids, returns the
@@ -31,13 +38,22 @@ have outputs, without loading any of them.
 }
 \details{
 This is a purely textual operation on the paths; it does not check whether
-anything exists on disk.
+anything exists on disk. Both forward slashes and backslashes are taken as
+folder separators, so Windows paths are recognised; the folders returned are
+spelled as they are in \code{files}.
 }
 \examples{
 files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep2/x.tif")
 dirnamesFromSet(files, set = 1:10)
 dirnamesFromSet(files, set = 1:10, leafOnly = FALSE)
+as.integer(names(dirnamesFromSet(files, set = 1:10)))
+}
+\seealso{
+Other replicate helpers:
+\code{\link[=repFiles]{repFiles()}},
+\code{\link[=tagReplicate]{tagReplicate()}}
 }
 \author{
 Eliot McIntire
 }
+\concept{replicate helpers}

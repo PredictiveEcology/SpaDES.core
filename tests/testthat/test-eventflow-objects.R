@@ -1,0 +1,191 @@
+test_that("code units list reads, updates, writes and parameters in run order", {
+  testInit(efPkgs)
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  u <- SpaDES.core:::.ef_codeUnits(ef)
+  ids <- vapply(u, `[[`, "", "id")
+  expect_identical(ids, c(".inputObjects", "init", "Burn", "summarySingle", "summaryMulti"))
+  names(u) <- ids
+  expect_identical(u$.inputObjects[c("reads", "writes")],
+                   list(reads = character(), writes = "flammableMap"))
+  expect_true("fireReturnInterval" %in% intersect(u$init$reads, u$init$writes)) # an input: kept
+  expect_identical(u$Burn[c("reads", "writes", "params")],
+                   list(reads = "flammableMap", writes = "burnMap", params = "fireTimestep"))
+  expect_identical(u$summaryMulti$mode, "multi")
+})
+
+test_that("a read of an object the same code first creates is not a read", {
+  testInit(efPkgs)
+  efModule(tmpdir, "rwMod", outputs = 'createsOutput("tab", "data.frame", "")', code =
+    'doEvent.rwMod <- function(sim, eventTime, eventType) {
+       switch(eventType, init = { sim$tab <- data.frame(a = 1); sim$tab$b <- sim$tab$a })
+       invisible(sim)
+     }')
+  u <- SpaDES.core:::.ef_codeUnits(moduleEventFlow("rwMod", tmpdir))
+  expect_identical(u[[1]][c("reads", "writes")], list(reads = character(), writes = "tab"))
+})
+
+test_that("moduleObjects(byEvent = TRUE) lists writers and readers with defaults and modes", {
+  testInit(efPkgs)
+  mo <- moduleObjects(module = "fireMod", path = dirname(efFixtureFire(tmpdir)), byEvent = TRUE)
+  expect_identical(names(mo), c("module", "objectName", "group", "writtenBy", "readBy"))
+  row <- function(o) mo[mo$objectName == o, ]
+  expect_identical(row("flammableMap")$writtenBy, ".inputObjects (default)")
+  expect_identical(row("burnMap")$writtenBy, "Burn (single)")
+  expect_identical(row("burnMap")$readBy, "summarySingle (single), summaryMulti (multi)")
+  expect_identical(row("fireReturnInterval")$group, "Inputs the module also updates")
+})
+
+## a parent module: defineModule() with childModules and no inputObjects or outputObjects
+efParent <- function(dir, name, children) {
+  modDir <- file.path(dir, name)
+  dir.create(modDir, recursive = TRUE, showWarnings = FALSE)
+  writeLines(c(
+    "defineModule(sim, list(",
+    paste0("  name = \"", name, "\","),
+    "  timeunit = \"year\",",
+    paste0("  childModules = c(", paste0("\"", children, "\"", collapse = ", "), ")"),
+    "))"
+  ), file.path(modDir, paste0(name, ".R")))
+  modDir
+}
+
+test_that("moduleEventFlow() reads a parent module, with no events", {
+  testInit(efPkgs)
+  efParent(tmpdir, "parentMod", c("kidA", "kidB"))
+  ef <- moduleEventFlow("parentMod", tmpdir)
+  expect_length(ef$default$events, 0)
+  expect_identical(ef$read$meta$inputs, character())
+  expect_identical(ef$read$meta$outputs, character())
+})
+
+test_that("moduleObjects(byEvent = TRUE) on a parent returns its children's rows", {
+  testInit(efPkgs)
+  for (k in c("kidA", "kidB")) {
+    efModule(tmpdir, k, outputs = sprintf('createsOutput("%sOut", "data.frame", "")', k), code =
+      sprintf('doEvent.%s <- function(sim, eventTime, eventType) {
+         switch(eventType, init = { sim$%sOut <- data.frame(a = 1) })
+         invisible(sim)
+       }', k, k))
+  }
+  efParent(tmpdir, "parentMod", c("kidA", "kidB"))
+  mo <- moduleObjects(module = "parentMod", path = tmpdir, byEvent = TRUE)
+  expect_identical(names(mo), c("module", "objectName", "group", "writtenBy", "readBy"))
+  expect_identical(mo$module, c("kidA", "kidB"))
+  expect_identical(mo$objectName, c("kidAOut", "kidBOut"))
+
+  ## a parent whose children cannot be read gives an empty table with the same columns
+  efParent(tmpdir, "lonely", "noSuchKid")
+  e <- moduleObjects(module = "lonely", path = tmpdir, byEvent = TRUE)
+  expect_identical(nrow(e), 0L)
+  expect_identical(names(e), c("module", "objectName", "group", "writtenBy", "readBy"))
+})
+
+test_that("moduleObjects(byEvent = TRUE) on a parent stops when the reader lacks a package", {
+  testInit(efPkgs)
+  efModule(tmpdir, "kidA", code = "")
+  efParent(tmpdir, "parentMod", "kidA")
+  testthat::local_mocked_bindings(.ef_needPkgs = function(pkgs, what) {
+    stop("Package 'xmlparsedata' is required to ", what)
+  })
+  expect_error(moduleObjects(module = "parentMod", path = tmpdir, byEvent = TRUE), "xmlparsedata")
+})
+
+test_that("kableModuleObjects fits LaTeX pages and degrades to a note", {
+  testInit(c(efPkgs, "knitr", "kableExtra"))
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "latex")
+  tex <- as.character(kableModuleObjects(ef))
+  expect_match(tex, "\\begin{longtable}", fixed = TRUE)
+  expect_match(tex, ">{\\raggedright\\arraybackslash}l>{\\raggedright\\arraybackslash}p{0.25\\linewidth}", fixed = TRUE)
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "html")
+  expect_match(as.character(kableModuleObjects(ef)), "<table", fixed = TRUE)
+  e <- tryCatch(moduleEventFlow("nope", tmpdir), error = function(e) e)
+  expect_match(as.character(kableModuleObjects(e)), "Event flow not available")
+})
+
+test_that("kableModuleObjects puts the lead sentence before a table, never before a note", {
+  testInit(c(efPkgs, "knitr", "kableExtra"))
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  efModule(tmpdir, "idleMod", inputs = 'expectsInput("unusedObj", "data.frame", "")', code =
+    'doEvent.idleMod <- function(sim, eventTime, eventType) {
+       switch(eventType, init = { invisible(NULL) })
+       invisible(sim)
+     }')
+  idle <- moduleEventFlow("idleMod", tmpdir)
+  e <- tryCatch(moduleEventFlow("nope", tmpdir), error = function(e) e)
+  lead <- "Table 1 lists the objects."
+  for (to in c("latex", "html", "docx")) {
+    knitr::opts_knit$set(rmarkdown.pandoc.to = to)
+    expect_true(startsWith(as.character(kableModuleObjects(ef, lead = lead)), paste0(lead, "\n\n")))
+    expect_false(grepl(lead, as.character(kableModuleObjects(idle, lead = lead)), fixed = TRUE))
+    expect_false(grepl(lead, as.character(kableModuleObjects(e, lead = lead)), fixed = TRUE))
+  }
+})
+
+test_that("kableModuleObjects gives a pipe table, and a note when no object is traced", {
+  testInit(c(efPkgs, "knitr", "kableExtra"))
+  old <- knitr::opts_knit$get("rmarkdown.pandoc.to")
+  withr::defer(knitr::opts_knit$set(rmarkdown.pandoc.to = old))
+  knitr::opts_knit$set(rmarkdown.pandoc.to = "docx")
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  expect_match(as.character(kableModuleObjects(ef)), "**Inputs**", fixed = TRUE)
+
+  efModule(tmpdir, "idleMod", inputs = 'expectsInput("unusedObj", "data.frame", "")', code =
+    'doEvent.idleMod <- function(sim, eventTime, eventType) {
+       switch(eventType, init = { invisible(NULL) })
+       invisible(sim)
+     }')
+  idle <- moduleEventFlow("idleMod", tmpdir)
+  for (to in c("latex", "html", "docx")) {
+    knitr::opts_knit$set(rmarkdown.pandoc.to = to)
+    expect_no_error(res <- kableModuleObjects(idle))
+    expect_match(as.character(res), "No objects in this module's metadata", fixed = TRUE)
+  }
+})
+
+test_that("kableModuleObjects gives a note when making the table fails", {
+  testInit(c(efPkgs, "knitr"))
+  ef <- moduleEventFlow("fireMod", dirname(efFixtureFire(tmpdir)))
+  ef$default <- "not a flow"
+  expect_match(as.character(kableModuleObjects(ef)), "Event flow not available")
+})
+
+test_that("moduleObjects(sim, byEvent = TRUE) reads each module from the modulePath entry that has it", {
+  testInit(efPkgs)
+  noMods <- file.path(tmpdir, "noMods")
+  dir.create(noMods)
+  sim <- simInit(paths = list(modulePath = c(noMods, dirname(efFixtureFire(file.path(tmpdir, "mods"))))))
+  expect_length(modulePath(sim), 2)
+  mo <- moduleObjects(sim, module = "fireMod", byEvent = TRUE)
+  expect_true("burnMap" %in% mo$objectName)
+})
+
+test_that("an event's own reads and writes count when doEvent is defined with `=`", {
+  testInit(efPkgs)
+  efModule(tmpdir, "eqMod", inputs = 'expectsInput("a", "numeric", "")',
+           outputs = 'createsOutput("b", "numeric", "")', code =
+    'doEvent.eqMod = function(sim, eventTime, eventType) {
+       switch(eventType, init = { sim$b = sim$a + 1 })
+       invisible(sim)
+     }')
+  u <- SpaDES.core:::.ef_codeUnits(moduleEventFlow("eqMod", tmpdir))
+  expect_identical(u[[1]][c("reads", "writes")], list(reads = "a", writes = "b"))
+})
+
+test_that("init's code units follow the run modes its calls run in", {
+  testInit(efPkgs)
+  ef <- moduleEventFlow("initMod", dirname(efFixtureInit(tmpdir)))
+  u <- SpaDES.core:::.ef_codeUnits(ef)
+  ids <- vapply(u, `[[`, "", "id")
+  expect_false("init_Hindcast" %in% ids)
+  names(u) <- ids
+  expect_identical(u$init_Multi$mode, "multi")
+  expect_identical(u$init_Multi[c("reads", "writes")], list(reads = "a", writes = "b"))
+  expect_identical(u$init_Multi$sub, 'mode = "multi": init event, step 2 of 2')
+  idx <- SpaDES.core:::.ef_objectIndex(ef)
+  expect_match(attr(idx, "notes")[1], "off with the default parameters: Hindcast()", fixed = TRUE)
+})

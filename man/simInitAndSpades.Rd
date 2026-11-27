@@ -85,9 +85,10 @@ load order will be determined automatically.}
 
 \item{notOlderThan}{A time, as in from \code{Sys.time()}. This is passed into
 the \code{Cache} function that wraps \code{.inputObjects}.
-If the module uses the \code{.useCache} parameter and it is
-set to \code{TRUE} or \code{".inputObjects"},
-then the \code{.inputObjects} will be cached.
+If the module's \code{.useCache} parameter (see \link{dotParameters}) is
+\code{TRUE} or includes \code{".inputObjects"},
+then the \code{.inputObjects} will be cached, unless the module
+lists \code{".inputObjects"} in its \code{.neverCache} parameter.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
@@ -100,16 +101,27 @@ Default is to use the value in \code{getOption("spades.debug")}.}
 character (\code{"graphical"}, \code{"text"}) or numeric indicating
 the number of update intervals to show in a graphical progress bar.}
 
-\item{cache}{Logical. If \code{TRUE}, then the \code{spades} call will be cached.
+\item{cache}{Logical or character. If \code{TRUE} (same as \code{"local"}), then the \code{spades} call
+will be cached.
 This means that if the call is made again with the same \code{simList},
 then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
+The cached \code{simList} points at its input and output files where they are, so
+the entry only works on this machine; a cache hit whose output files are gone
+warns and still returns the \code{simList}. \code{"portable"} also saves those files with
+\code{\link[=saveSimList]{saveSimList()}} into the cache, and a hit unpacks them with \code{\link[=loadSimList]{loadSimList()}}
+into the working directory, so the entry can be used on another machine.
+In \code{\link[=simInitAndSpades]{simInitAndSpades()}} and \code{\link[=simInit]{simInit()}} (where it is passed in \code{...}), \code{cache}
+caches the whole call, and the key includes the content of each module's code
+files (child modules and non-R files too), so editing a module reruns.
+\code{.useCache} in \code{...} is the same argument under another name.
 See also the vignette on caching for examples.}
 
-\item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link[=Plots]{Plots()}} for possible values. Setting this without \code{"screen"} turns
-off all plotting; setting it with \code{"screen"} triggers plotting for any
-module that uses this parameter, and has no effect on modules that do not.
+\item{.plots}{Character. Sets the \code{.plots} parameter (see \link{dotParameters}) in
+all modules for this call. See \code{\link[=Plots]{Plots()}} for possible values. Setting this
+without \code{"screen"} turns off all plotting; setting it with \code{"screen"} triggers
+plotting for any module that uses this parameter, and has no effect on modules
+that do not.
 
 This replaces the \code{.plotInitialTime} argument, which was removed. Use
 \code{.plots = NA} where you previously used \code{.plotInitialTime = NA}. The
@@ -117,7 +129,7 @@ This replaces the \code{.plotInitialTime} argument, which was removed. Use
 per module through \code{params}.}
 
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.saveInitialTime}
-parameter for all modules. See Details.}
+parameter (see \link{dotParameters}) for all modules. See Details.}
 
 \item{events}{A character vector or a named list of character vectors. If specified,
 the simulations will only do the events indicated here. If a named list, the names

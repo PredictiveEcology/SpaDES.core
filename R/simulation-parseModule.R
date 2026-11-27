@@ -262,7 +262,10 @@ setMethod(
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         tmp <- .parseConditional(envir = envir, filename = filename)
         activeCode <- list()
-        sim <- newEnvsByModule(sim, mBase)  # sets up the module environment and the .objects sub environment
+        sim <- newEnvsByModule(sim, mBase,   # sets up the module environment and the .objects sub environment
+                               reqdPkgs = .parseModulePartial(filename = filename,
+                                                              defineModuleElement = "reqdPkgs",
+                                                              envir = envir))
         # sim@.xData$.mods[[mBase]] <- new.env(parent = asNamespace("SpaDES.core"))
         # attr(sim@.xData$.mods[[mBase]], "name") <- mBase
         # sim@.xData$.mods[[mBase]]$.objects <- new.env(parent = emptyenv())
@@ -372,12 +375,6 @@ setMethod(
         }
 
         # Evaluate defineModule into the sim environment
-        # Capture messages which will be about defineParameter at the moment
-        on.exit({
-          if (!exists("finishedClean"))
-            try(mess)
-        })
-
         #mess <- capture.output({
         numExptedArgs <- length(formalArgs(defineModule)) + 1
         if (length(pf[[1]]) > (numExptedArgs)) {
@@ -388,8 +385,8 @@ setMethod(
         withCallingHandlers(
           out <- tryCatch(eval(pf, envir = env), silent = TRUE,
                           error = function(e) {
-                            # convert errors to warnings # so can capture them outside
-                            warning(e$message)
+                            stop("Error evaluating defineModule for module '", mBase, "': ",
+                                 conditionMessage(e), call. = FALSE)
                           })
           , message = function(m) {
             messHere <<- c(messHere, m$message)
@@ -565,7 +562,6 @@ setMethod(
       }
     }
 
-    finishedClean <- TRUE
     return(sim)
   })
 
@@ -628,7 +624,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   ll <- local({
     lapply(parsedModuleNoDefineModule,
-                 function(x) tryCatch(eval(x, envir = tmpEnvir),
+                 function(x) tryCatch(eval(x, envir = .evalEnvFor(x, tmpEnvir)),
                                       error = function(x) "ERROR"))
   })
 
@@ -639,7 +635,7 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
 
   activeCode <- unlist(lapply(ll, function(x) identical("ERROR", x)))
 
-  rm("sim", envir = tmpEnvir)
+  rm(list = "sim", envir = tmpEnvir)
   list2env(as.list(tmpEnvir, all.names = TRUE), envir = envir)
   rm(tmpEnvir)
 
@@ -649,11 +645,29 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
     # env <- new.env(parent = asNamespace("SpaDES.core"));
     env$sim <- sim#simCopy
     aa <- lapply(parsedModuleNoDefineModule[activeCode], function(ac) {
-      eval(ac, envir = env)
+      eval(ac, envir = .evalEnvFor(ac, env))
     })
+    ## `sim` is the caller's simList: left in the module environment, the simList would contain
+    ## itself, and digesting it (e.g. Cache of .inputObjects) recurses until the C stack runs out
+    rm(list = "sim", envir = env)
     list2env(as.list(env, all.names = TRUE), envir)
   }
   activeCode
+}
+
+## The environment to evaluate one top-level expression of module code in. A top-level
+## `globalVariables()` call (the R CMD check idiom) registers its names in `topenv()`, which is
+## the locked SpaDES.core namespace here, so it errors. It runs in a throwaway child environment
+## holding `.packageName`, which makes that child its own `topenv()`. Only those calls: with
+## `.packageName` in the main environment, `compiler::cmpfun()` at top level fails ("namespace
+## found within global environments"), and the expression is then rerun as active code.
+.evalEnvFor <- function(x, envir) {
+  isGV <- is.call(x) && (identical(x[[1]], as.name("globalVariables")) ||
+                           identical(x[[1]], quote(utils::globalVariables)))
+  if (!isGV) return(envir)
+  gvEnv <- new.env(parent = envir)
+  gvEnv$.packageName <- "SpaDES module"
+  gvEnv
 }
 
 #' Extract the user-defined `.inputObjects` function from a module
@@ -772,8 +786,8 @@ evalWithActiveCode <- function(parsedModuleNoDefineModule, envir, parentFrame = 
   return(isPack)
 }
 
-newEnvsByModule <- function(sim, modu) {
-  sim@.xData$.mods[[modu]] <- new.env(parent = asNamespace("SpaDES.core"))
+newEnvsByModule <- function(sim, modu, reqdPkgs = .moduleReqdPkgs(sim, modu)) {
+  sim@.xData$.mods[[modu]] <- new.env(parent = .moduleImportsEnv(reqdPkgs, modu))
   attr(sim@.xData$.mods[[modu]], "name") <- modu
 
   if (FALSE) {
@@ -822,6 +836,7 @@ setupModObjsEnv <- function(sim, moduleName) {
 
 dotObjs <- ".modObjs"
 dotMods <- ".mods"
+dotModSource <- "._source" # in each .mods[[module]]: the source saveSimList() keeps (moduleSource())
 dotObjsAndMods <- c(dotObjs, dotMods)
 modAB <- "mod"
 ParAB <- "Par"

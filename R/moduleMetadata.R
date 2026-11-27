@@ -124,11 +124,18 @@ setMethod(
   kids[!is.na(kids) & nzchar(kids)]
 }
 
+## A `childModules` entry may be a GitHub spec -- "owner/repo@branch", "owner/repo"
+## or "name@branch" -- or a plain module name. The module is the repository name,
+## without owner, branch or version spec (the same parsing as `Require`).
+.childModuleName <- function(x) {
+  extractPkgName(unname(as.character(x)))
+}
+
 ## Depth-first expansion of a parent's children down to the modules that have no
 ## children of their own. `seen` stops a cyclic `childModules` entry looping.
 .leafModules <- function(module, path, seen = character()) {
   if (module %in% seen) return(character())
-  kids <- .childModules(module, path)
+  kids <- .childModuleName(.childModules(module, path))
   if (length(kids) == 0) return(module)
   unlist(lapply(kids, .leafModules, path = path, seen = c(seen, module)))
 }
@@ -145,6 +152,15 @@ setMethod(
   ## with it childModules -- can come back empty; take it from the file instead
   if ("childModules" %in% defineModuleListItems && length(unlist(metadata[["childModules"]])) == 0)
     metadata[["childModules"]] <- kids
+
+  ## ... and likewise the parent's other own fields (name, version, description, authors, ...)
+  aggregated <- c("childModules", "parameters", "inputObjects", "outputObjects", "reqdPkgs")
+  for (item in setdiff(defineModuleListItems, aggregated)) {
+    own <- tryCatch(eval(.parseModulePartial(filename = file.path(path, module, paste0(module, ".R")),
+                                             defineModuleElement = item)),
+                    error = function(e) NULL)
+    if (!is.null(own)) metadata[[item]] <- own
+  }
 
   leaves <- unique(setdiff(.leafModules(module, path), module))
   if (length(leaves) == 0) return(metadata)

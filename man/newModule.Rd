@@ -38,7 +38,8 @@ function definitions (which will be added to the \code{simList}) or one or
 more of the following:\cr\cr
 \describe{
 \item{\code{children}}{Required when \code{type = "parent"}. A character vector
-specifying the names of child modules.}
+specifying the names of child modules, or GitHub specs such as
+\code{"owner/repo@branch"} (see \code{childModules} in \code{\link[=defineModule]{defineModule()}}).}
 \item{\code{open}}{Logical. Should the new module file be opened after creation?
 Default \code{TRUE}.}
 \item{\code{type}}{Character string specifying one of \code{"child"} (default),
@@ -80,6 +81,9 @@ wrapper around \code{newModuleCode} and \code{newModuleDocumentation}.
 \code{newModuleDocumentation} will create the other files.
 }
 \details{
+The generated module declares several "dot" parameters (\code{.plots}, \code{.useCache}, ...);
+see \link{dotParameters}.
+
 All files will be created within a subdirectory named \code{name} within the \code{path}:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{  <path>/
@@ -88,6 +92,8 @@ All files will be created within a subdirectory named \code{name} within the \co
     |_ data/            # directory for all included data
       |_ CHECKSUMS.txt  # contains checksums for data files
     |_ tests/           # contains unit tests for module code
+    |_ citations/       # the references the module's documentation cites
+      |_ references_<name>.bib  # empty; named by the Rmd's `bibliography:`
     |_ citation.bib     # bibtex citation for the module
     |_ LICENSE          # describes module's legal usage
     |_ README.md        # provide overview of key aspects

@@ -46,7 +46,7 @@ test_that("simulation runs with new Cache chaining", {
         capture_messages(mySims[[iter]] <- simInit(times, params, modules,
                                                    objects = list(), paths) |>
                            spades(debug = TRUE, .plots = NA))
-      test[[iter]] <- grep("cacheId passed to override", mess[[iter]])
+      test[[iter]] <- grep("Using cacheChaining \\.\\.\\.|cacheChaining: restored", mess[[iter]])
       testEvalPostEvent[[iter]] <- length(grep("ThisMess", mess[[iter]])) ==
         (NROW(completed(mySims[[iter]])) -
            length(modules(mySims[[iter]])) +  # rm all 3 .inputObjects
@@ -174,7 +174,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(all("fireSpread" %in% events(mySimEvent8)$moduleName)) # didn't run any fireSpread events b/c misspelled
 
   mySimEvent9 <- simInitAndSpades(times, params, modules, objects = list(), paths,
-                        debug = FALSE, .plotInitialTime = NA, events = "init")
+                        debug = FALSE, .plots = NA, events = "init")
   compped <- completed(mySimEvent9)
   compped <- compped[!compped$eventType %in% ".inputObjects"]
   expect_true(all("init" == compped$eventType))
@@ -183,7 +183,7 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   # Test times
   #  Set end time to WAY after the init events
   mySimEvent10 <- simInitAndSpades(times = list(start = 0, end = 10), params, modules, objects = list(), paths,
-                                  debug = FALSE, .plotInitialTime = NA, events = "init")
+                                  debug = FALSE, .plots = NA, events = "init")
   compped <- completed(mySimEvent10)
   compped <- compped[!compped$eventType %in% ".inputObjects"]
   expect_true(time(mySimEvent10) == end(mySimEvent10)) # it is at 10, the end
@@ -217,6 +217,34 @@ test_that("simulation runs with simInit and spades with set.seed; events arg", {
   expect_true(any(grepl("not specified", mess)))
 
   expect_true(all(file.exists(outputs(mySimEvent12Out)$file[outputs(mySimEvent12Out)$saved])))
+})
+
+test_that(".seed sets the event seed and restores the session RNG stream after", {
+  skip_on_cran()
+  testInit(sampleModReqdPkgs)
+
+  runSeeded <- function(seed, nx = 20) {
+    params <- list(randomLandscapes = list(.plotInitialTime = NA, .plotInterval = NA,
+                                           nx = nx, ny = 20, .seed = list(init = seed)))
+    sim <- simInit(times = list(start = 0, end = 0), modules = "randomLandscapes",
+                   params = params, paths = list(modulePath = getSampleModules(tmpdir)))
+    set.seed(1)
+    if (nx == 0) { # init errors
+      expect_error(spades(sim, debug = FALSE))
+      return(list(nextDraw = runif(1)))
+    }
+    sim <- spades(sim, debug = FALSE)
+    list(map = terra::values(sim$landscape), nextDraw = runif(1))
+  }
+  a <- runSeeded(321)
+  b <- runSeeded(321)
+  c <- runSeeded(999)
+  expect_identical(a$map, b$map)
+  expect_false(identical(a$map, c$map))
+  ## after the event, the session stream no longer depends on the event seed
+  expect_identical(a$nextDraw, c$nextDraw)
+  ## ... also when the seeded event errors
+  expect_identical(runSeeded(321, nx = 0)$nextDraw, runSeeded(999, nx = 0)$nextDraw)
 })
 
 test_that("spades calls - diff't signatures", {
@@ -311,6 +339,21 @@ test_that("simInit with R subfolder scripts", {
     if (is.environment(mySim@.xData$.mods[[x]])) ls(envir = mySim@.xData$.mods[[x]], all.names = TRUE)
   })), pattern = "^a$")) == 1)
   expect_true(mySim@.xData$.mods$child1$a(2) == 3) # Fns
+})
+
+test_that("a module R/ file may call globalVariables() at top level", {
+  testInit()
+
+  ## the R CMD check idiom for a module that can become a package (convertToPackage);
+  ## it used to try to change the locked SpaDES.core namespace and stop simInit
+  newModule("child1", ".", open = FALSE)
+  cat(file = file.path("child1", "R", "globals.R"),
+      'globalVariables(c("col1", "col2"))',
+      'utils::globalVariables("col3")',
+      "a <- function(x) x + 1", sep = "\n")
+  expect_no_error(mySim <- simInit(modules = "child1", paths = list(modulePath = tmpdir)))
+  expect_identical(mySim@.xData$.mods$child1$a(2), 3)
+  expect_false(exists(".packageName", envir = mySim@.xData$.mods$child1, inherits = FALSE))
 })
 
 test_that("simInit with .globals but no modules does not error (#empty-deps)", {
@@ -612,6 +655,23 @@ test_that("conflicting function types", {
   expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
   x1 <- moduleOutputs(m, dirname(dirname(fileName)))
   expect_false(any(unlist(lapply(x1, function(v) grepl("  |\n", v)))))
+})
+
+test_that("module code checks note a function defined with `=`", {
+  testInit(sampleModReqdPkgs, smcc = TRUE)
+
+  m <- "child5"
+  newModule(m, tmpdir, open = FALSE)
+  fileName <- file.path(tmpdir, m, paste0(m, ".R"))
+  xxx <- readLines(fileName)
+  i <- grep(paste0("^doEvent\\.", m, " (<-|=) function"), xxx)
+  expect_length(i, 1L)
+  xxx[i] <- sub(" <- function", " = function", xxx[i])
+  writeLines(xxx, fileName)
+
+  mm <- capture_messages(simInit(paths = list(modulePath = tmpdir), modules = m))
+  expect_true(any(grepl(paste0(m, ": module code: doEvent\\.", m, " \\(line ", i,
+                               "\\) is defined with `=`"), mm)))
 })
 
 test_that("scheduleEvent with NA logical in a non-standard parameter", {
@@ -938,7 +998,7 @@ test_that("debug using logging", {
     mess2 <- capture.output(type = "output", {
       mySim2 <- spades(Copy(mySim),
                        debug = list("console" = list(level = 10), debug = 1),
-                       .plotInitialTime = NA)
+                       .plots = NA)
     })
   })
   expect_false(any(grepl("total elpsd", mess1))) # using new mechanism console
@@ -953,7 +1013,7 @@ test_that("debug using logging", {
                        debug = list("console" = list(level = 5),
                                     "file" = list(file = tmpfile),
                                     debug = 1),
-                       .plotInitialTime = NA)
+                       .plots = NA)
     })
   })
 
@@ -981,7 +1041,7 @@ test_that("debug using logging", {
       suppressMessages({
         mySim2 <- spades(Copy(mySim),
                          debug = list("console" = list(level = "INFO"), debug = 1),
-                         .plotInitialTime = NA)
+                         .plots = NA)
       })
     })
   })

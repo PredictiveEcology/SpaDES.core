@@ -278,3 +278,24 @@ LoadedMgsCheck <- function(msg, event) {
 grepDotInputObjectsModule <- function(m) {
   paste0(".inputObjects.+", m, ".+.inputObjects")
 }
+
+## A minimal module `name` in `path`: `io` is the inputObjects/outputObjects part of its metadata,
+## `events` the body of its doEvent, `children` its childModules (a parent module), `parameters` the
+## arguments of its `rbind()` of `defineParameter()`s, `reqdPkgs` the elements of its `reqdPkgs`
+## list, and `dotInputObjects` the body of its `.inputObjects` (none if "").
+writeTestModule <- function(path, name, io = "", events = "invisible(sim)", children = character(0),
+                            parameters = "", reqdPkgs = "", dotInputObjects = "") {
+  dir.create(file.path(path, name), recursive = TRUE, showWarnings = FALSE)
+  writeLines(c(
+    sprintf('defineModule(sim, list(name = "%s", description = "", keywords = "", authors = person("a", "b"),', name),
+    sprintf('  childModules = %s, version = list(%s = "0.0.1"), timeframe = as.POSIXlt(c(NA, NA)),',
+            paste(deparse(children), collapse = ""), name),
+    sprintf('  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(%s), parameters = rbind(%s)',
+            reqdPkgs, parameters),
+    sprintf('  %s))', if (nzchar(io)) paste0(", ", io) else ""),
+    sprintf('doEvent.%s <- function(sim, eventTime, eventType) {', name),
+    events,
+    '}',
+    if (nzchar(dotInputObjects)) sprintf('.inputObjects <- function(sim) { %s; invisible(sim) }', dotInputObjects)),
+    file.path(path, name, paste0(name, ".R")))
+}

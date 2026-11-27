@@ -19,7 +19,7 @@ test_that("parameters(asDF = TRUE) stacks every module's definitions into one fr
 
   expect_s3_class(p, "data.frame")
   expect_identical(names(p),
-                   c("paramName", "paramClass", "default", "min", "max", "paramDesc"))
+                   c("paramName", "paramClass", "default", "min", "max", "paramDesc", "cacheKey"))
   expect_gt(NROW(p), 0L)
   ## parameters from both modules are present
   expect_true(all(c("nx", "ny") %in% p$paramName))

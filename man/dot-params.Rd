@@ -7,21 +7,9 @@
 .knownDotParams
 }
 \description{
-These are common parameter names that are reserved for specific use within modules.
-}
-\details{
-\itemize{
-\item \code{.plotInitialTime}: the initial time for plotting;
-\item \code{.plotInterval}: the interval between plots;
-\item \code{.plots}: the types of plots to create (see \code{types} argument in \code{\link[=Plots]{Plots()}});
-\item \code{.saveInitialTime}: the initial time for saving;
-\item \code{.saveInterval}: the interval between saves;
-\item \code{.useCache}: whether to use caching, or which events to cache;
-\item \code{.useCacheArgs}: optional named list (keyed by event name) of extra arguments
-passed to \code{\link[reproducible:Cache]{reproducible::Cache()}} for that event (e.g. \code{cacheId},
-\code{useCloud}, \code{cloudFolderID}); enables a developer to pin a fixed cloud
-cache key for a deterministic event;
-\item \code{.useParallel}: whether to use parallel processing, or the number of parallel cores to use;
-}
+The universal dot parameters: SpaDES.core itself acts on each one for every module,
+without module code, so \code{.globals} sets them in every module, whether or not the
+module declares them. Other dot parameters reach only modules that declare them.
+What each one does is described in \link{dotParameters}.
 }
 \keyword{internal}

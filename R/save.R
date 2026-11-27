@@ -3,9 +3,13 @@ utils::globalVariables(c("attached", "fun", "package", "saved", "saveTime"))
 ## Just checks for paths, creates them if they do not exist
 doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   if (eventType == "init") {
-    if (NROW(outputs(sim)) > 0) {
-      firstSave <- min(outputs(sim)[["saveTime"]], na.rm = TRUE)
-      firstSaveWh <- which.min(outputs(sim)[["saveTime"]])
+    ## Only rows still to be saved: a row with `saved = TRUE` records a file already written (e.g. by
+    ##   `Plots()`, via outputsAppend()), possibly at a time before start(sim) when the row was restored
+    ##   from a cache entry made by a run with an earlier start; it is never scheduled.
+    toSave <- which(.toSave(sim))
+    if (length(toSave) > 0) {
+      firstSave <- min(outputs(sim)[["saveTime"]][toSave], na.rm = TRUE)
+      firstSaveWh <- toSave[which.min(outputs(sim)[["saveTime"]][toSave])]
       if ("eventPriority" %in% colnames(outputs(sim))) {
         firstPriority <- outputs(sim)[["eventPriority"]][firstSaveWh]
       }
@@ -29,11 +33,15 @@ doEvent.save <- function(sim, eventTime, eventType, debug = FALSE) {
   return(invisible(sim))
 }
 
+## The outputs(sim) rows still to be saved: `saved` is NA. One rule for scheduling and for saving, so a row
+##   is never scheduled that saveFiles() would not save.
+.toSave <- function(sim) is.na(outputs(sim)[["saved"]])
+
 ##############################################################
 #' Save objects using `.saveObjects` in `params` slot of `simInit`
 #'
-#' In the [simInit()] call, a parameter called `.saveObjects` can be provided in
-#' each module.
+#' In the [simInit()] call, a parameter called `.saveObjects` (see [dotParameters]) can be
+#' provided in each module.
 #' This must be a character string vector of all object names to save. These objects will
 #' then be saved whenever a call to `saveFiles` is made.
 #'
@@ -150,8 +158,8 @@ saveFiles <- function(sim) {
       data.frame()
   }
 
-  if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved)]) > 0) {
-    wh <- which(outputs(sim)$saveTime == curTime & is.na(outputs(sim)$saved))
+  if (NROW(outputs(sim)[["saved"]][outputs(sim)$saveTime == curTime & .toSave(sim)]) > 0) {
+    wh <- which(outputs(sim)$saveTime == curTime & .toSave(sim))
     for (i in wh) {
       objExists <- exists(outputs(sim)[["objectName"]][i], envir = sim@.xData)
       isSimList <- identical(outputs(sim)[["objectName"]][i], "sim")
@@ -164,8 +172,14 @@ saveFiles <- function(sim) {
           args <- suppressWarnings(args[!unlist(lapply(args, function(j) {
             isTRUE(tryCatch(is.na(j), error = function(e) FALSE))
           }))])
+          ## a rerun into the same outputPath replaces its own outputs, as saveRDS does
+          if (identical(outputs(sim)[["fun"]][i], "writeRaster") && is.null(args$overwrite))
+            args$overwrite <- TRUE
 
           ## The actual save line
+          if (outputs(sim)[["fun"]][i] %in% .serialiseSaveFuns) {
+            args[[1]] <- .wrap(args[[1]], filebackedPath = dirname(outputs(sim)[["file"]][i]), copyFiles = TRUE)
+          }
           do.call(outputs(sim)[["fun"]][i], args = args,
                   envir = getNamespace(outputs(sim)[["package"]][i]))
 
@@ -186,8 +200,8 @@ saveFiles <- function(sim) {
   }
 
   ## Schedule an event for the next time in the saveTime column
-  if (any(is.na(outputs(sim)[["saved"]][outputs(sim)$saveTime > curTime]))) {
-    isNA <- is.na(outputs(sim)$saved)
+  if (any(.toSave(sim) & outputs(sim)$saveTime > curTime, na.rm = TRUE)) {
+    isNA <- .toSave(sim)
     nextTime <- min(outputs(sim)[["saveTime"]][isNA], na.rm = TRUE)
     nextTimeWh <- which.min(outputs(sim)[["saveTime"]][isNA])
     if ("eventPriority" %in% colnames(outputs(sim))) {
@@ -206,6 +220,11 @@ saveFiles <- function(sim) {
   }
   return(invisible(sim))
 }
+
+## Functions that serialise the R object as is: a terra `SpatRaster`/`SpatVector` then keeps only an
+## external pointer and cannot be read back. Wrap before saving (`.wrap`) and `.unwrap` after reading.
+.serialiseSaveFuns <- c("saveRDS", "qsave", "qs_save")
+.serialiseLoadFuns <- c("readRDS", "qread", "qs_read")
 
 #' File extensions map
 #'
@@ -310,7 +329,7 @@ simFile <- function(name, path, time = NULL, ext = "rds") {
 #'     \tab [outputs()] \cr
 #'   The `.saveObjects` parameter plus [saveFiles()] called from a module's own
 #'     save event, timed by the `.saveInitialTime` and `.saveInterval`
-#'     parameters. \tab The **module developer**, for users of that module
+#'     parameters (see [dotParameters]). \tab The **module developer**, for users of that module
 #'     \tab [saveFiles()] \cr
 #'   Plain `saveRDS()`/`save()` inside module code. \tab The **module
 #'     developer**, unconditionally -- the least modular option, since the user

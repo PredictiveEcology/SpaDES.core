@@ -35,7 +35,7 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #'     }
 #'
 #' To turn off plotting both to screen and disk, set both
-#' `.plotInititalTime = NA` and `.plots = NA` or any other
+#' `.plotInitialTime = NA` and `.plots = NA` (see [dotParameters]) or any other
 #' value that will not trigger a TRUE with a `grepl` with the `types`
 #' argument (e.g., `""` will omit all saving).
 #'
@@ -72,6 +72,14 @@ ggplotClassesCanHandle <- c("eps", "ps", "tex", "pdf", "jpeg", "tiff", "png", "b
 #' @param useCache Logical or character vector. If `TRUE`, caching is enabled for
 #'   all non-screen output types. If a character vector, caching is enabled only
 #'   for the matching `types`. Default is `FALSE`.
+#'
+#' @param .cacheExtra Used only with `useCache`. Any object that changes whenever the figure
+#'   would change, e.g., the `cacheId` or digest of what `data` is made from. When given, the
+#'   cache record is keyed on it instead of on `data`, and is checked before `data` is evaluated,
+#'   so on a hit `data` is never built (unless `types` includes `"raw"`). The saved files are still
+#'   checked against the record and added to `outputs(sim)`. Use this instead of wrapping `Plots()`
+#'   in `Cache()`: on a `Cache()` hit `Plots()` does not run, so the files are not added to
+#'   `outputs(sim)`.
 #'
 #' @param envir The environment where the `data` argument should be evaluated if it is
 #'   a `call`. Normally, this should be left at its default, `parent.frame()`.
@@ -165,7 +173,7 @@ Plots <- function(data, fn, filename,
                   .plotInitialTime = quote(params(sim)[[currentModule(sim)]]$.plotInitialTime),
                   ggsaveArgs = list(), usePlot = getOption("spades.PlotsUsePlot", FALSE),
                   deviceArgs = list(), envir = parent.frame(), useCache = FALSE,
-                  ...) {
+                  .cacheExtra = NULL, ...) {
   simIsIn <- NULL
   if (any(is(types, "call") || is(path, "call") || is(.plotInitialTime, "call"))) {
     simIsIn <- parent.frame() # try for simplicity sake... though the .whereInStack would get this too
@@ -220,24 +228,6 @@ Plots <- function(data, fn, filename,
   ## has to be "screen" in .plots and also .plotInitialTime, if set, must be non-NA. Best way is don't set.
   needScreen <- !isTRUE(is.na(.plotInitialTime)) && any(grepl("screen", types))
 
-  if (missing(data)) {
-    data <- NULL
-  } else {
-    if (is.call(data))
-      data <- eval(data, envir)
-  }
-  if (missing(fn)) {
-    if (isTRUE(usePlot)) {
-      fn <- Plot
-    } else {
-      if (inherits(data, c("SpatRaster", "SpatVector", "sf", "Raster", "sp")))
-        fn <- terra::plot
-      else
-        fn <- plot
-    }
-  }
-  fnIsPlot <- identical(fn, Plot) # || identical(fn, plot) || identical(fn, terra::plot)
-
   saveTypes <- setdiff(types, "screen")
   filenamesForSave <- character(length(saveTypes)) |> setNames(saveTypes)
   funsUsed <- character(length(saveTypes)) |> setNames(saveTypes)
@@ -263,21 +253,66 @@ Plots <- function(data, fn, filename,
         path <- eval(path, envir = simIsIn)
     }
 
+    if (is.null(simIsIn) && is.call(path))
+      path <- "."
     if (is(path, "character")) {
       checkPath(path, create = TRUE)
     }
-
-    if (needSaveRaw) {
-      if (is(data, "Raster") || is(data, "SpatRaster")) {
-        filenamesForSave[["raw"]] <- file.path(path, paste0(filename, "_data.tif"))
-        funsUsed[["raw"]] <- "terra::writeRaster"
-      } else {
-        filenamesForSave[["raw"]] <- file.path(path, paste0(filename, "_data.qs2"))
-        funsUsed[["raw"]] <- "qs2::qs_save"
-      }
-    }
+    filenameStart <- file.path(path, filename)
   }
   objChar <- "object"
+
+  needNewPlot <- TRUE
+  hasNonScreenTypes <- length(saveTypes) > 0
+  useCache <- hasNonScreenTypes && (isTRUE(useCache) || length(intersect(types, useCache)) > 0)
+  cacheChecked <- FALSE
+  ## With `.cacheExtra`, the cache record is keyed on it in place of `data`, and is read here, before
+  ##   `data` is evaluated: on a hit, `data` is never built. "raw" saves `data` itself, and its file
+  ##   name depends on the class of `data`, so it is checked below, after `data`.
+  if (useCache && !is.null(.cacheExtra) && !needSaveRaw) {
+    filenamesForSave[] <- .figureFilename(filenameStart, saveTypes)
+    useCacheNNP <- useCacheNeedNewPlot(filenamesForSave, ...) # creates a TRUE if it needs new plot
+    cacheId <- cacheId(useCacheNNP)
+    needNewPlot <- useCacheNNP
+    cacheChecked <- TRUE
+    if (!needNewPlot) {
+      if (exists("sim", inherits = FALSE)) {
+        funsUsed[] <- .savedFigureFuns(cacheId, saveTypes)
+        sim <- .recordSavedFigures(sim, filenamesForSave, funsUsed, character(0), needNewPlot, ...)
+        assign("sim", sim, envir = simIsIn)
+      }
+      on.exit() # clear the clearCache
+      return(invisible(NULL))
+    }
+  }
+
+  if (missing(data)) {
+    data <- NULL
+  } else {
+    if (is.call(data))
+      data <- eval(data, envir)
+  }
+  if (missing(fn)) {
+    if (isTRUE(usePlot)) {
+      fn <- Plot
+    } else {
+      if (inherits(data, c("SpatRaster", "SpatVector", "sf", "Raster", "sp")))
+        fn <- terra::plot
+      else
+        fn <- plot
+    }
+  }
+  fnIsPlot <- identical(fn, Plot) # || identical(fn, plot) || identical(fn, terra::plot)
+
+  if (needSaveRaw) {
+    if (is(data, "Raster") || is(data, "SpatRaster")) {
+      filenamesForSave[["raw"]] <- file.path(path, paste0(filename, "_data.tif"))
+      funsUsed[["raw"]] <- "terra::writeRaster"
+    } else {
+      filenamesForSave[["raw"]] <- file.path(path, paste0(filename, "_data.qs2"))
+      funsUsed[["raw"]] <- "qs2::qs_save"
+    }
+  }
 
   # Setup one special case of gg
   gg <- NULL
@@ -286,35 +321,25 @@ Plots <- function(data, fn, filename,
   }
 
   if (needSave) {
-    if (is.null(simIsIn)) {
-      if (is.call(path)) {
-        path <- "."
-      }
-    }
-    filenameStart <- file.path(path, filename)
     if (fnIsPlot || ( !is(gg, "gg") && !is(data, "gg")) ) {
       for (bsf in intersect(baseClassesCanHandle, types)) {
-        filenamesForSave[[bsf]] <- paste0(filenameStart, ".", bsf)
+        filenamesForSave[[bsf]] <- .figureFilename(filenameStart, bsf)
         funsUsed[[bsf]] <- .guessPkgFun(bsf)
       }
     } else {
       for (ggsf in intersect(ggplotClassesCanHandle, types)) {
-        filenamesForSave[[ggsf]] <- paste0(filenameStart, ".", ggsf)
+        filenamesForSave[[ggsf]] <- .figureFilename(filenameStart, ggsf)
         funsUsed[[ggsf]] <- "ggplot2::ggsave"
       }
     }
 
     if (any(grepl(objChar, types))) {
-      filenamesForSave[[objChar]] <- paste0(filenameStart, "_gg.qs2")
+      filenamesForSave[[objChar]] <- .figureFilename(filenameStart, objChar)
       funsUsed[[objChar]] <- "qs2::qs_save"
     }
   }
 
-  needNewPlot <- TRUE
-  
-  hasNonScreenTypes <- length(setdiff(types, "screen")) > 0
-  useCache <- hasNonScreenTypes && (isTRUE(useCache) || length(intersect(types, useCache)) > 0)
-  if (useCache) {
+  if (useCache && !cacheChecked) {
     useCacheNNP <- useCacheNeedNewPlot(filenamesForSave, ...) # creates a TRUE if it needs new plot
     cacheId <- cacheId(useCacheNNP)
     needNewPlot <- useCacheNNP
@@ -409,8 +434,10 @@ Plots <- function(data, fn, filename,
           names(ggListToScreen) <- gsub(names(ggListToScreen), pattern = " |(\\\n)|[[:punct:]]", replacement = "_")
           Plot(ggListToScreen, addTo = gg$labels$title)
         } else {
-          if ((!(identical(fn, plot) || identical(fn, terra::plot)) || is(gg, "gg")) &&
-              !is(gg, ".quickPlot")) {
+          ## only an object that draws when printed (ggplot, patchwork, lattice, a recorded plot); a
+          ## base-graphics fn has already drawn, and printing what it returns (e.g. its data, invisibly)
+          ## dumped that to the console
+          if (inherits(gg, c("gg", "ggplot", "trellis", "recordedplot")) && !is(gg, ".quickPlot")) {
             print(gg)
           }
         }
@@ -478,25 +505,8 @@ Plots <- function(data, fn, filename,
   }
 
   if (needSave || needSaveRaw) {
-    if (exists("sim", inherits = FALSE)) {
-      for (i in seq(filenamesForSave)) {
-        if (filenamesForSave[i] %in% failedFiles) next
-
-        sim@outputs <- outputsAppend(
-          outputs = sim@outputs, saveTime = time(sim),
-          objectName = tools::file_path_sans_ext(basename(filenamesForSave[i])),
-          file = filenamesForSave[i],
-          fun = funsUsed[i],
-          ...
-        )
-        sim <- rmDups(sim)
-
-        if (needNewPlot)
-          message("Saved figure to: ", filenamesForSave[i])
-        else
-          message("Previously saved figure (", filenamesForSave[i], ") still valid")
-      }
-    }
+    if (exists("sim", inherits = FALSE))
+      sim <- .recordSavedFigures(sim, filenamesForSave, funsUsed, failedFiles, needNewPlot, ...)
   }
 
   if (useCache) {
@@ -504,8 +514,12 @@ Plots <- function(data, fn, filename,
     for (i in seq(filenamesForSave)) {
       type <- typesNoScreen[i]
       filenameSaved <- .robustDigest(asPath(filenamesForSave[i]))[[1]]
-      if (needNewPlot)
+      if (needNewPlot && !is.null(cacheId)) { # NULL when caching is off: no record to tag
+        ## read back on a `.cacheExtra` hit, which returns before `data` would say which fun it was;
+        ##   written first, as a hit needs the savedFile tags
+        .addTagsRepo(cacheId, cachePath = cachePath(sim), tagKey = tagKeySavedFun, tagValue = paste0(type, ":", funsUsed[i]))
         .addTagsRepo(cacheId, cachePath = cachePath(sim), tagKey = tagKeySavedFile, tagValue = paste0(type, ":", filenameSaved))
+      }
     }
   }
 
@@ -576,7 +590,17 @@ evalAttempt <- function(subs, envir) {
 
 
 useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
-  allArgs <- mget(formalArgs(Plots), envir = envir)
+  argNames <- formalArgs(Plots)
+  ## `.cacheExtra` stands in for `data`, which is not evaluated (see Plots()); nor is a missing `fn`,
+  ##   whose default is set from `data`
+  if (is.null(envir$.cacheExtra)) {
+    argNames <- setdiff(argNames, ".cacheExtra") # keys as before the argument existed
+  } else {
+    argNames <- setdiff(argNames, "data")
+    if (eval(quote(missing(fn)), envir))
+      argNames <- setdiff(argNames, "fn")
+  }
+  allArgs <- mget(argNames, envir = envir)
   # check dots
   mc <- match.call(Plots, sys.call(-1), expand.dots = TRUE)[-1]
   allNamed <- names(mc) %in% formalArgs(Plots)
@@ -591,16 +615,21 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
     allArgs[["data"]] <- .robustDigest(metadata)
   }
   cached <- list(allArgs) |> Cache(.functionName = paste0("Plots_", basename(filenamesForSave[[1]])))
+  ## With caching off (reproducible.useCache = FALSE, e.g. under spades.useCache = "eventsOnly")
+  ## Cache() hands the list straight back: no ".Cache" attribute, no cacheId. There is then nothing
+  ## to consult and nothing to clear -- and clearCache(cacheId = NULL) would empty the WHOLE cache
+  ## on the way out -- so the answer is simply "plot".
+  cid <- cacheId(cached)
+  if (is.null(cid)) return(TRUE)
   reproducible:::on.exit2({
-    clearCache(cacheId = cacheId(cached), ask = FALSE, verbose = FALSE)
+    clearCache(cacheId = cid, ask = FALSE, verbose = FALSE)
     message("Plots did not complete; clearing the cached record")
     })
-  
-  ret <- attr(cached, ".Cache")$newCache %in% TRUE
+
+  ret <- .newlyCached(cached)
   attributes(ret) <- attributes(cached)
-  if (ret %in% FALSE) { # means it doesn't need a new plotting
-    sc <- showCacheFast(cacheId = cacheId(cached))
-    files <- sc[tagKey %in% tagKeySavedFile]$tagValue
+  if (.loadedFromCache(cached)) { # means it doesn't need a new plotting
+    files <- .figureTags(cacheId(cached), tagKeySavedFile)
     digs <- .robustDigest(asPath(filenamesForSave))
     digsToCompare <- paste0(names(digs), ":", unname(digs))
     if (!all(files %in% digsToCompare)) {# don't have the correct files
@@ -612,6 +641,45 @@ useCacheNeedNewPlot <- function(filenamesForSave, envir = parent.frame(), ...) {
 }
 
 tagKeySavedFile <- "savedFile"
+tagKeySavedFun <- "savedFun"
+
+## Append the saved figure files to outputs(sim), as `saved = TRUE` rows.
+.recordSavedFigures <- function(sim, filenamesForSave, funsUsed, failedFiles, needNewPlot, ...) {
+  for (i in seq(filenamesForSave)) {
+    if (filenamesForSave[i] %in% failedFiles) next
+
+    sim@outputs <- outputsAppend(
+      outputs = sim@outputs, saveTime = time(sim),
+      objectName = tools::file_path_sans_ext(basename(filenamesForSave[i])),
+      file = filenamesForSave[i],
+      fun = funsUsed[i],
+      ...
+    )
+    sim <- rmDups(sim)
+
+    if (needNewPlot)
+      message("Saved figure to: ", filenamesForSave[i])
+    else
+      message("Previously saved figure (", filenamesForSave[i], ") still valid")
+  }
+  sim
+}
+
+.figureTags <- function(cacheId, tagKeyWanted) {
+  showCacheFast(cacheId = cacheId)[tagKey %in% tagKeyWanted]$tagValue
+}
+
+## The file a figure of each type is saved to (the "object" type is the plot object)
+.figureFilename <- function(filenameStart, type) {
+  paste0(filenameStart, ifelse(type == "object", "_gg.qs2", paste0(".", type)))
+}
+
+## The function that saved each type, from the cache record's `savedFun` tags (NA if the record has none).
+.savedFigureFuns <- function(cacheId, types) {
+  tv <- .figureTags(cacheId, tagKeySavedFun)
+  funs <- setNames(sub("^[^:]*:", "", tv), sub(":.*$", "", tv))
+  unname(funs[types])
+}
 
 
 
@@ -648,8 +716,6 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
     #hash_fun = function(x) digest::digest(x, algo = "xxhash64")
 ) {
   stopifnot(inherits(p, "ggplot"))
-  
-  `%||%` <- function(x, y) if (is.null(x)) y else x
   
   as_label_safe <- function(x) {
     if (is.null(x)) return(NULL)
@@ -800,5 +866,3 @@ strip_ggplot_metadata <- canonicalize_ggplot <- function(
   out <- sort_list_recursive(out)
   out
 }
-      
-`%||%` <- function(x, y) if (is.null(x)) y else x

@@ -715,7 +715,7 @@ test_that("caching simInitAndSpades specifically", {
       }
       set.seed(42)
       mySimEvent[[i]] <- fn(modules = modules, paths = paths, times = times,
-                            .plotInitialTime = NA) |>
+                            .plots = NA) |>
         Cache(.cacheExtra = asPath(dir(paths$modulePath, recursive = TRUE, full.names = T)))
       if (identical(i, 2L))
         expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
@@ -738,7 +738,7 @@ test_that("caching simInitAndSpades specifically", {
             "newFun <- function(sim) return(invisible(sim))")
       }
       mySimEvent[[i]] <- do.call(fn, list(l = list(modules = modules, paths = paths, times = times,
-                                                   .plotInitialTime = NA))) |>
+                                                   .plots = NA))) |>
         Cache(.cacheExtra = asPath(dir(paths$modulePath, recursive = TRUE, full.names = T)))
       if (identical(i, 2L))
         expect_identical(cacheId(mySimEvent[[1]]), cacheId(mySimEvent[[2]]))
@@ -747,4 +747,102 @@ test_that("caching simInitAndSpades specifically", {
     }
 
   }
+})
+
+## With memoise on, the memoised copy of a cached event must be a snapshot. mA's cached init sets
+## x = 1 and dt$a = 1; its later, uncached `bump` replaces x and modifies dt in place (by reference,
+## as data.table code usually does). mB records both after mA's init. A memoised hit in the next run
+## must still give mB the values mA's init made.
+test_that("a later event does not change the memoised copy of a cached event", {
+  skip_on_cran()
+  testInit(opts = list(reproducible.useMemoise = TRUE, spades.cacheChaining = FALSE))
+  mp <- file.path(tmpdir, "mods")
+  mk <- function(name, body, outs) {
+    d <- file.path(mp, name); dir.create(d, recursive = TRUE, showWarnings = FALSE)
+    writeLines(sprintf('
+defineModule(sim, list(name = "%s", description = "", keywords = "",
+  authors = person("A", "B"), childModules = character(0), version = list(%s = "0.0.1"),
+  timeframe = as.POSIXlt(c(NA, NA)), timeunit = "year", citation = list(), documentation = list(),
+  reqdPkgs = list(), parameters = rbind(defineParameter(".useCache", "character", NA, NA, NA, "")),
+  inputObjects = NULL, outputObjects = %s))
+doEvent.%s <- function(sim, eventTime, eventType) { %s; invisible(sim) }
+', name, name, outs, name, body), file.path(d, paste0(name, ".R")))
+  }
+  mk("mA", 'switch(eventType,
+    init = { sim$x <- 1; sim$dt <- data.table::data.table(a = 1)
+             sim <- scheduleEvent(sim, time(sim) + 1, "mA", "bump") },
+    bump = { sim$x <- 999; data.table::set(sim$dt, j = "a", value = 999) })',
+     'bindrows(createsOutput("x", "numeric", ""), createsOutput("dt", "data.table", ""))')
+  mk("mB", 'if (eventType == "init") sim$seen <- c(x = sim$x, dt = sim$dt$a)',
+     'createsOutput("seen", "numeric", "")')
+  run <- function() simInitAndSpades(times = list(start = 0, end = 2), modules = list("mA", "mB"),
+                                     params = list(mA = list(.useCache = "init")), loadOrder = c("mA", "mB"),
+                                     paths = list(modulePath = mp, cachePath = file.path(tmpdir, "cache")))
+  expect_equal(run()$seen, c(x = 1, dt = 1)) # first run: memoises mA init
+  expect_equal(run()$seen, c(x = 1, dt = 1)) # memoised hit
+})
+
+test_that(".robustDigest of a simList with an object named like a module", {
+  ## Regression: an object with the same name as a module (the climateYear module creates
+  ## sim$climateYear) made upgradeModsToXdata() merge a digest string with the module's
+  ## list: "is.list(x) is not TRUE".
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testSameName", tmpdir, open = FALSE)
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = "testSameName")
+  mySim$testSameName <- 1
+  expect_no_error(d1 <- .robustDigest(mySim))
+  expect_identical(.robustDigest(mySim), d1)
+  mySim$testSameName <- 2
+  expect_false(identical(.robustDigest(mySim), d1)) # the object is still part of the digest
+})
+
+test_that(".robustDigest of a simList that contains itself finishes", {
+  ## Regression: a simList reachable from its own environment (here directly, and through a
+  ## module environment, as an evalWithActiveCode() leak left it) recursed through
+  ## digestEnviros() until the C stack ran out.
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testSelfDigest", tmpdir, open = FALSE)
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = "testSelfDigest")
+  mySim$a <- 1
+  d0 <- .robustDigest(mySim)
+  expect_identical(.robustDigest(mySim), d0)
+
+  mySim$self <- mySim
+  expect_no_error(d1 <- .robustDigest(mySim))
+  expect_identical(.robustDigest(mySim), d1)
+  rm("self", envir = envir(mySim))
+  expect_identical(.robustDigest(mySim), d0)
+
+  mySim$lst <- list(list(mySim))
+  expect_no_error(.robustDigest(mySim))
+  rm("lst", envir = envir(mySim))
+
+  modEnv <- mySim@.xData[[".mods"]][["testSelfDigest"]]
+  modEnv$sim <- mySim
+  expect_no_error(.robustDigest(mySim, .objects = c("a", ".mods$testSelfDigest")))
+  expect_no_error(.robustDigest(mySim))
+})
+
+test_that("caching .inputObjects of a module with top-level compiler::cmpfun() works", {
+  ## Regression (#496): `sim` was left in the module environment of a module whose code calls
+  ## compiler::cmpfun() at top level (Biomass_core), and digesting the result of its cached
+  ## .inputObjects recursed until "node stack overflow" / "C stack usage ... too close to the limit".
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testCmpfunCache", tmpdir, open = FALSE)
+  cat(file = file.path(tmpdir, "testCmpfunCache", "R", "compiled.R"),
+      "f <- compiler::cmpfun(function(x) x + 1)", sep = "\n")
+  expect_no_error(
+    mySim <- simInit(times = list(start = 0, end = 0),
+                     paths = list(modulePath = tmpdir, cachePath = tmpCache),
+                     modules = "testCmpfunCache",
+                     params = list(testCmpfunCache = list(.useCache = ".inputObjects")))
+  )
+  expect_false(exists("sim", envir = mySim@.xData[[".mods"]][["testCmpfunCache"]], inherits = FALSE))
 })

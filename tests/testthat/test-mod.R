@@ -928,3 +928,34 @@ test_that("evalWithActiveCode does not force the mod active binding", {
   ## and the caller's store is untouched
   expect_identical(mySim@.xData[[".modObjs"]][["testActiveBinding"]]$big, bigObj)
 })
+
+test_that("module code does not leave `sim` in the module environment", {
+  ## Regression: evalWithActiveCode() re-runs a top-level expression that fails in its first pass
+  ## ("active code") in an environment holding the caller's `sim`, then copied that whole
+  ## environment, `sim` included, into the module environment. Caching the module's
+  ## .inputObjects then digested the simList inside itself until the C stack ran out.
+  testInit(smcc = FALSE, debug = FALSE)
+
+  newModule("testNoSimLeak", tmpdir, open = FALSE)
+  ## compiler::cmpfun() at top level (as Biomass_core does) failed in the first pass while that
+  ## pass's environment held `.packageName` (compiler: "namespace found within global environments")
+  cat(file = file.path(tmpdir, "testNoSimLeak", "R", "compiled.R"),
+      "f <- compiler::cmpfun(function(x) x + 1)",
+      "globalVariables('col1')", sep = "\n")
+  mySim <- simInit(times = list(start = 0, end = 0),
+                   paths = list(modulePath = tmpdir),
+                   modules = "testNoSimLeak")
+  modEnv <- mySim@.xData[[".mods"]][["testNoSimLeak"]]
+  expect_identical(modEnv$f(1), 2)
+  expect_false(exists("sim", envir = modEnv, inherits = FALSE))
+
+  ## genuinely active code: fails in the first pass, runs in the second
+  rm(list = intersect("sim", ls(modEnv, all.names = TRUE)), envir = modEnv)
+  parentFrame <- new.env()
+  parentFrame$zzOnlyInParentFrame <- 1
+  code <- parse(text = "y <- zzOnlyInParentFrame")
+  active <- SpaDES.core:::evalWithActiveCode(code, modEnv, parentFrame = parentFrame, sim = mySim)
+  expect_true(active)
+  expect_identical(modEnv$y, 1)
+  expect_false(exists("sim", envir = modEnv, inherits = FALSE))
+})

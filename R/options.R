@@ -42,12 +42,33 @@
 #'      \tab The default local directory in which to cache simulation outputs.
 #'   Default is a temporary directory (typically `/tmp/RtmpXXX/SpaDES/cache`).\cr
 #'
+#'   `spades.useCache` \tab `"all"`
+#'      \tab How caching applies inside [simInit()] and [spades()]. `"all"`: events and
+#'      `.inputObjects` are cached as each module's `.useCache` parameter (see [dotParameters]) asks, and
+#'      `Cache()` calls inside module code follow `reproducible.useCache`. `"eventsOnly"`:
+#'      the `.useCache` events are cached (also in a `simInit()` nested inside an event),
+#'      but `Cache()` calls inside module code are skipped. `"off"`: nothing is cached.
+#'      The numbers `2`, `1` and `0` mean the same three, in that order.\cr
+#'
 #'   `spades.cacheChaining` \tab `FALSE`
 #'      \tab If set to `TRUE`, then sequential events that are cached can re-use
 #'      their `digest` step. The second event will only digest the functions and
 #'      parameters, but not objects. Every event will add a tag or remove that tag
 #'      if it is cached or not cached, so this will not mistakenly `cacheChain` when
 #'      it isn't appropriate.\cr
+#'
+#'   `spades.cacheKeyReachable` \tab `FALSE`
+#'      \tab If `TRUE`, a cached event's (or `.inputObjects`') cache key holds only the
+#'      module parameters and module functions its code can reach: its branch of
+#'      `doEvent.<module>`, then the module functions that calls, to any depth, the
+#'      parameters they read (`P(sim)$x`, `Par$x`, `P(sim, "x")`,
+#'      `params(sim)[[currentModule(sim)]]$x`, ...) and `.seed`. The module `version`
+#'      and `reqdPkgs` are left out, as the function bodies carry code changes. When
+#'      the code does something that cannot be read statically (`eval()` of code, `get()`
+#'      of a computed name, `P(sim)` passed to a package function, ...), that event keeps
+#'      the full key. Parameters left out keep their current values after a cache hit.
+#'      With `showSimilar`, a message says what each key was narrowed to, or why not.
+#'      Changes every narrowed event's cacheId once.\cr
 #'
 #'   `spades.codeCheckEngine` \tab `"v1"`
 #'     \tab Which module code checker `simInit()` uses when
@@ -75,6 +96,11 @@
 #'      (`.inputObjects` included), e.g., `quote(print(.robustDigest(sim$rstLCC)))`
 #'      will print the digest value of the `sim$rstLCC` after each event so a
 #'      user can monitor its changes.\cr
+#'
+#'   `spades.eventFlowFont` \tab `"Noto Sans"`
+#'     \tab The font family of the figures that [eventDiagram()] and [objectDiagram()]
+#'     draw from a module's code. If that font is not installed, the generic
+#'     `"sans"` family is used.\cr
 #'
 #'   `spades.futureEvents` \tab `FALSE`
 #'     \tab  If set to `TRUE`, the event simulator will attempt to spawn events
@@ -162,8 +188,8 @@
 #'     \tab The default local directory in which to save simulation outputs.\cr
 #'
 #'   `spades.plots`
-#'     \tab The value of this will passed to `.plots` within every module; it will thus
-#'     override all module parameter values for `.plots`. This can, e.g., be used
+#'     \tab The value of this will be passed to `.plots` (see [dotParameters]) within every
+#'     module; it will thus override all module parameter values for `.plots`. This can, e.g., be used
 #'     to turn off all plotting.
 #'     \tab The default is `NULL`, meaning accept the module-level parameter.\cr
 #'
@@ -187,6 +213,18 @@
 #'   module's `.inputObjects` runs, so an interrupted `simInit` can be recovered
 #'   with `restartSimInit` (see `?restartSimInit`).
 #'   There is a message which describes how to find that.\cr
+#'
+#'   `spades.reqdPkgsAttach` \tab `TRUE`
+#'     \tab Whether a module's `reqdPkgs` are attached (`library`) to the search path,
+#'     for every module and the user's session (`TRUE`, the historical behaviour).
+#'     If `FALSE`, they are loaded (and installed if needed) but not attached;
+#'     instead each module's code sees the exports of its own `reqdPkgs`, and of the
+#'     packages those `Depends` on, as a package sees its `@import`s, so one module's
+#'     packages do not affect other modules or the session. When two of a module's
+#'     packages export the same name, the one listed later in `reqdPkgs` is used, as
+#'     when attaching. Module code that relied on another module's, or the user's,
+#'     attached packages must then use `pkg::fn` or list the package in its own
+#'     `reqdPkgs`. `FALSE` is intended to become the default.\cr
 #'
 #'   `spades.reqdPkgsDontLoad` \tab `NULL` \tab Specify any packages that should not
 #'   be \emph{loaded} i.e., no `library` or `require`, but they should be installed if
@@ -322,11 +360,14 @@ spadesOptions <- function() {
     spades.allowInitDuringSimInit = FALSE,
     spades.browserOnError = FALSE,
     spades.cacheChaining = FALSE,
+    spades.cacheKeyReachable = FALSE,
     spades.compressionLevel = 1L,
+    spades.useCache = "all",
     # spades.cachePath = reproCachePath,
     spades.debug = 1, ## TODO: is this the best default? see discussion in #5
     spades.dotInputObjects = TRUE,
     spades.DTthreads = 1L,
+    spades.eventFlowFont = "Noto Sans",
     spades.futureEvents = FALSE,
     spades.futurePlan = "callr",
     spades.inputPath = file.path(.spadesTempDir(), "inputs"),
@@ -349,6 +390,7 @@ spadesOptions <- function() {
     spades.evalPostEvent = NULL,
     spades.qsThreads = 1L,
     spades.recoveryMode = 1,
+    spades.reqdPkgsAttach = TRUE,
     spades.reqdPkgsDontLoad = NULL,
     spades.restartRInterval = 0,
     spades.restartR.clearFiles = TRUE,

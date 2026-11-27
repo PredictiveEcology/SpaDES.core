@@ -6,6 +6,10 @@
 #' @rdname pkgEnv
 .pkgEnv <- new.env(parent = emptyenv())
 
+## Modules' imports environments (see `.moduleImportsEnv()`), by package vector.
+## Kept apart from `.pkgEnv`, which `spades()` copies to futures.
+.moduleImportsCache <- new.env(parent = emptyenv())
+
 #' The `SpaDES.core` variable to switch between quick and robust checking
 #'
 #' A variable that can be use by module developers and model users to switch between

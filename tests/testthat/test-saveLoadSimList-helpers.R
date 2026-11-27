@@ -96,6 +96,24 @@ test_that("archiveWrite and archiveExtract round-trip files relative to projectP
   expect_true(any(grepl("sim\\.qs2$", out)))
 })
 
+test_that("archiveExtract reads a .zip as a .zip, not as a .tar.gz", {
+  ## A simList saved on Windows is a .zip. archiveExtract() used to rename any
+  ## archive to .tar.gz before reading it, so loadSimList() failed with
+  ## "cannot open file '<name>.tar.gz'" on Linux and macOS.
+  skip_if_not_installed("archive")
+  skip_on_os("windows")
+  testInit()
+
+  proj <- withr::local_tempdir()
+  writeLines("world", file.path(proj, "sim.rds"))
+  arch <- file.path(withr::local_tempdir(), "bundle.zip")
+  withr::with_dir(proj, archive::archive_write_files(arch, "sim.rds", format = "zip"))
+
+  out <- SpaDES.core:::archiveExtract(arch, exdir = withr::local_tempdir())
+  expect_true(any(grepl("sim\\.rds$", out)))
+  expect_identical(readLines(out[grepl("sim\\.rds$", out)]), "world")
+})
+
 ## ---- deprecation text ---------------------------------------------------
 
 test_that("warnDeprecFileBacked returns the right text for each deprecated arg", {

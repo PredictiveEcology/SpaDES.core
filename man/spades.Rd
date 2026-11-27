@@ -5,6 +5,7 @@
 \alias{spades}
 \alias{spades,simList,ANY,ANY,missing-method}
 \alias{spades,ANY,ANY,ANY,logical-method}
+\alias{spades,ANY,ANY,ANY,character-method}
 \title{\code{spades2} is a convenience wrapper for \code{do.call(spades, listOfArgs)},
 i.e., a user can pass a list of all the arguments.}
 \usage{
@@ -45,6 +46,18 @@ spades(
   .plots = getOption("spades.plots", NULL),
   ...
 )
+
+\S4method{spades}{ANY,ANY,ANY,character}(
+  sim,
+  debug = getOption("spades.debug"),
+  progress = NA,
+  cache,
+  .saveInitialTime = NULL,
+  notOlderThan = NULL,
+  events = NULL,
+  .plots = getOption("spades.plots", NULL),
+  ...
+)
 }
 \arguments{
 \item{l}{A list of arguments to passed to \code{spades}.}
@@ -59,14 +72,24 @@ Default is to use the value in \code{getOption("spades.debug")}.}
 character (\code{"graphical"}, \code{"text"}) or numeric indicating
 the number of update intervals to show in a graphical progress bar.}
 
-\item{cache}{Logical. If \code{TRUE}, then the \code{spades} call will be cached.
+\item{cache}{Logical or character. If \code{TRUE} (same as \code{"local"}), then the \code{spades} call
+will be cached.
 This means that if the call is made again with the same \code{simList},
 then \code{spades} will return the return value from the previous run
 of that exact same \code{simList}. Default \code{FALSE}. See Details.
+The cached \code{simList} points at its input and output files where they are, so
+the entry only works on this machine; a cache hit whose output files are gone
+warns and still returns the \code{simList}. \code{"portable"} also saves those files with
+\code{\link[=saveSimList]{saveSimList()}} into the cache, and a hit unpacks them with \code{\link[=loadSimList]{loadSimList()}}
+into the working directory, so the entry can be used on another machine.
+In \code{\link[=simInitAndSpades]{simInitAndSpades()}} and \code{\link[=simInit]{simInit()}} (where it is passed in \code{...}), \code{cache}
+caches the whole call, and the key includes the content of each module's code
+files (child modules and non-R files too), so editing a module reruns.
+\code{.useCache} in \code{...} is the same argument under another name.
 See also the vignette on caching for examples.}
 
 \item{.saveInitialTime}{Numeric. Temporarily override the \code{.saveInitialTime}
-parameter for all modules. See Details.}
+parameter (see \link{dotParameters}) for all modules. See Details.}
 
 \item{notOlderThan}{Date or time. Passed to \code{reproducible::Cache} to update the cache.
 Default is \code{NULL}, meaning don't update the cache.
@@ -120,10 +143,11 @@ end: \code{.stopBefore} leaves the clock and queue untouched, so calling again w
 the same barrier returns an equivalent object, and \code{.stopAfter} leaves the
 \code{simList} reporting itself finished with events still queued.}
 
-\item{.plots}{Character. Sets the parameter of this name in all modules.
-See \code{\link[=Plots]{Plots()}} for possible values. Setting this without \code{"screen"} turns
-off all plotting; setting it with \code{"screen"} triggers plotting for any
-module that uses this parameter, and has no effect on modules that do not.
+\item{.plots}{Character. Sets the \code{.plots} parameter (see \link{dotParameters}) in
+all modules for this call. See \code{\link[=Plots]{Plots()}} for possible values. Setting this
+without \code{"screen"} turns off all plotting; setting it with \code{"screen"} triggers
+plotting for any module that uses this parameter, and has no effect on modules
+that do not.
 
 This replaces the \code{.plotInitialTime} argument, which was removed. Use
 \code{.plots = NA} where you previously used \code{.plotInitialTime = NA}. The
@@ -173,17 +197,16 @@ experiment calls (see \url{https://github.com/PredictiveEcology/SpaDES.experimen
 can be cached and mixtures of all of these will work. For functions, simply
 wrap the call with \code{Cache}, moving the original function name into
 the first argument of Cache. For events or modules, set the module \code{parameters},
-\code{.useCache}, e.g.,
-\code{simInit(..., parameters = list(myModule = list(.useCache = "init")))}.
+\code{.useCache} (see \link{dotParameters}), e.g.,
+\code{simInit(..., params = list(myModule = list(.useCache = "init")))}.
 This can be set to an event name, which will cache that event, or a logical,
 which will cache \emph{every} event in that module. Event and module caching
 makes most sense when the event or module only runs once, such as an initialization
-or data preparation event/module. Caching an entire simulation is actually just
-a function call to \code{simInitAndSpades}, for example. So, simply writing
-\code{Cache(simInitAndSpades, modules = ...)} will effectively cache a whole simulation.
-Finally for experiments, it is just like a function call:
-\code{Cache(simInitandExperiment, ...)}. The final way Caching can be done is in
-\code{experiment} or \code{spades}, by setting the \code{cache} argument.
+or data preparation event/module. To cache an entire simulation, use
+\code{simInitAndSpades(..., cache = TRUE)}. Do not wrap it in \code{Cache()} instead: there the
+modules are only names, so an edit to a module's code does not rerun it.
+The final way Caching can be done is in \code{experiment} or \code{spades}, by setting the
+\code{cache} argument.
 
 If \code{cache} is TRUE, this allows for a seamless way to "save" results
 of a simulation. The  user does not have to intentionally do any saving manually.
@@ -193,6 +216,12 @@ been rerun. Use this with caution, as it will return exactly the result from
 a previous run, even if there is stochasticity internally.
 Caching is only based on the input \code{simList.}
 See also the vignette on caching for examples.
+
+A module whose events run for their side effects can list them in its \code{.neverCache}
+parameter (a character vector of event names, possibly \code{".inputObjects"}). \code{.neverCache}
+wins over every form of \code{.useCache} (\code{TRUE}, event names, a time), whether the module, the
+user or \code{.globals} set it, and it is not part of the event cache key. Being declared-only,
+\code{.globals} sets it only in modules that declare it.
 }
 
 \section{\code{debug}}{

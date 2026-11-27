@@ -313,8 +313,8 @@ all.equal.simList <- function(target, current, ...) {
   rm(list = objNamesTarget, envir = envir(target))
   rm(list = objNamesCurrent, envir = envir(current))
 
-  target1 <- .wrap(target, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
-  current1 <- .wrap(current, cachePath = getwd()) # deals with SpatVector/SpatRaster etc.
+  target1 <- .wrap(target, filebackedPath = getwd()) # deals with SpatVector/SpatRaster etc.
+  current1 <- .wrap(current, filebackedPath = getwd()) # deals with SpatVector/SpatRaster etc.
   all.equal.default(target1, current1, ...)
 }
 
@@ -392,31 +392,124 @@ noEventWarning <- function(sim) {
 ._txtSimNesting <- "._simNesting"
 ._txtDotUseCache <- ".useCache"
 ._txtDotUseCacheArgs <- ".useCacheArgs"
+._txtDotNeverCache <- ".neverCache"
+
+#' Should a module event be cached?
+#'
+#' The one place that turns a module's `.useCache` and `.neverCache` parameters into a
+#' caching decision, for events in `.runEvent()` and for `.inputObjects` in `simInit()`.
+#' `.useCache` may be `TRUE`, `FALSE`, `NULL`, a character vector of event names or a
+#' `POSIXt` (cache every event, and refresh entries older than that time). `.neverCache`
+#' (a character vector of event names, possibly `".inputObjects"`) wins over every form of
+#' `.useCache`, whoever set it: the module, the user or `.globals`. When `.useCache` asked to
+#' cache an event that `.neverCache` lists, one message per module and event is shown for each
+#' `simInit()` or `spades()` call.
+#'
+#' @param params The module's parameter list, i.e., `sim@params[[moduleName]]`.
+#' @param eventType Event name, e.g., `"init"` or `".inputObjects"`.
+#' @param moduleName,verbose Used only for the message; no message if `moduleName` is `NULL`.
+#' @return A list with `cache` (logical) and `notOlderThan` (a `POSIXt`, or `NULL`).
+#' @keywords internal
+#' @noRd
+.eventIsCached <- function(params, eventType, moduleName = NULL,
+                           verbose = getOption("reproducible.verbose")) {
+  a <- params[[._txtDotUseCache]]
+  cache <- FALSE
+  notOlderThan <- NULL
+  if (!is.null(a) && !identical(FALSE, a)) {
+    if (isTRUE(a) || eventType %in% a) {
+      cache <- TRUE
+    } else if (inherits(a, "POSIXt")) {
+      cache <- TRUE
+      notOlderThan <- a
+    }
+  }
+  if (cache && eventType %in% params[[._txtDotNeverCache]]) {
+    if (!is.null(moduleName)) {
+      key <- paste(moduleName, eventType)
+      if (!key %in% .pkgEnv$neverCacheMsgd) {
+        .pkgEnv$neverCacheMsgd <- c(.pkgEnv$neverCacheMsgd, key)
+        messageVerbose("Module ", moduleName, " event ", eventType, " is not cached, ",
+                       "because the module lists it in `.neverCache`", verbose = verbose)
+      }
+    }
+    cache <- FALSE
+    notOlderThan <- NULL
+  }
+  list(cache = cache, notOlderThan = notOlderThan)
+}
+
+## How caching applies inside simInit() and spades(), from options(spades.useCache):
+##   "all"        events per each module's `.useCache`; Cache() calls inside module code follow
+##                `reproducible.useCache` (the default, and the behaviour before this option)
+##   "eventsOnly" events per `.useCache`, with `useCache = TRUE` passed explicitly so a simInit()
+##                nested inside an event still caches its events; `reproducible.useCache` is set to
+##                FALSE for the run, so Cache() calls inside module code are skipped
+##   "off"        no event caching, and Cache() calls inside module code are skipped
+##   0, 1, 2      the same three, in that order: 0 = "off", 1 = "eventsOnly", 2 = "all"
+## Returns: events (logical: wrap events in Cache at all), useCache (value to pass to Cache(), or
+## NULL to leave it to the option) and inner (value for reproducible.useCache during the run, or
+## NULL to leave it alone).
+.spadesUseCache <- function(opt = getOption("spades.useCache", "all")) {
+  levels <- c("off", "eventsOnly", "all")
+  if (is.numeric(opt)) {
+    if (!opt %in% 0:2) stop("options(spades.useCache) must be 0, 1 or 2 when numeric (= ",
+                            paste(dQuote(levels, FALSE), collapse = ", "), ")")
+    opt <- levels[opt + 1]
+  }
+  opt <- match.arg(opt, levels)
+  switch(opt,
+         all = list(events = TRUE, useCache = NULL, inner = NULL),
+         eventsOnly = list(events = TRUE, useCache = TRUE, inner = FALSE),
+         off = list(events = FALSE, useCache = FALSE, inner = FALSE))
+}
 ._txtDotUseCloud <- ".useCloud"
 
 #' Reserved module parameter names
 #'
-#' These are common parameter names that are reserved for specific use within modules.
-#'
-#' - `.plotInitialTime`: the initial time for plotting;
-#' - `.plotInterval`: the interval between plots;
-#' - `.plots`: the types of plots to create (see `types` argument in [Plots()]);
-#' - `.saveInitialTime`: the initial time for saving;
-#' - `.saveInterval`: the interval between saves;
-#' - `.useCache`: whether to use caching, or which events to cache;
-#' - `.useCacheArgs`: optional named list (keyed by event name) of extra arguments
-#'   passed to [reproducible::Cache()] for that event (e.g. `cacheId`,
-#'   `useCloud`, `cloudFolderID`); enables a developer to pin a fixed cloud
-#'   cache key for a deterministic event;
-#' - `.useParallel`: whether to use parallel processing, or the number of parallel cores to use;
+#' The universal dot parameters: SpaDES.core itself acts on each one for every module,
+#' without module code, so `.globals` sets them in every module, whether or not the
+#' module declares them. Other dot parameters reach only modules that declare them.
+#' What each one does is described in [dotParameters].
 #'
 #' @keywords internal
 #' @rdname dot-params
-.knownDotParams <- c(".plotInitialTime", ".plotInterval",
-                     ".plots",
-                     ".saveInitialTime", ".saveInterval",
-                     ._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
-                     ".useParallel") ## TODO: add others here, e.g. .studyAreaName?
+## Rule: a dot parameter is universal iff SpaDES.core itself acts on it for every module.
+.knownDotParams <- c(".plots", ".seed", ".showSimilar", ._txtDotUseCache, ._txtDotUseCacheArgs)
+
+## Left out of the event cache key: they change how an event is cached, not its result
+paramsDontCacheOn <- c(._txtDotUseCache, ._txtDotUseCacheArgs, ._txtDotUseCloud,
+                       ._txtDotNeverCache)
+
+## The column of a module's parameter table (defineParameter()) saying whether a parameter is
+## part of the module's cache keys
+._txtCacheKey <- "cacheKey"
+
+## `.useCacheArgs[[event]]$omitParams`: module parameters that only label a run (a run name, a
+## replicate number, a file-name suffix), so one event leaves them out of its cache key as well.
+._txtOmitParams <- "omitParams"
+
+## The names of `module`'s params that are not part of `eventType`'s cache key (an event,
+## ".inputObjects", or the cacheChaining rebuild of either): `paramsDontCacheOn`; the params the
+## module defined with `defineParameter(cacheKey = FALSE)` (every event; a table without the
+## column, saved before it existed, has every param keyed on); and the `omitParams` that
+## `.useCacheArgs` gives for this event (set by the module's defaults or by the run). After a
+## cache hit all of these keep their current values, not the cached ones.
+.paramsNotCachedOn <- function(sim, module, eventType) {
+  params <- sim@params[[module]]
+  dep <- sim@depends@dependencies[[module]]
+  notKeyed <- if (!is.null(dep)) dep@parameters$paramName[dep@parameters[[._txtCacheKey]] %in% FALSE]
+  omit <- params[[._txtDotUseCacheArgs]][[eventType]][[._txtOmitParams]]
+  intersect(names(params), c(paramsDontCacheOn, notKeyed, as.character(omit)))
+}
+
+## The `.useCacheArgs` of one event that are passed to Cache(): all but `omitParams`
+.extraCacheArgsFor <- function(params, eventType) {
+  extraCacheArgs <- params[[._txtDotUseCacheArgs]][[eventType]]
+  if (!is.list(extraCacheArgs)) return(list())
+  extraCacheArgs[[._txtOmitParams]] <- NULL
+  extraCacheArgs
+}
 
 
 ## Singular/plural message grammar ---------------------------------------------
@@ -446,6 +539,11 @@ isAre <- function(l, v) {
   singularPlural(c("is", "are"), l, v)
 }
 
+## `x` with each "\" replaced by "/". Purely textual, one character for one, so positions in `x` and
+## its spelling elsewhere are kept; unlike normalizePath() or fs::path_norm(), nothing is resolved,
+## so a result is still a prefix of the caller's own strings.
+.fwdSlashes <- function(x) gsub("\\", "/", x, fixed = TRUE)
+
 #' Directory names drawn from a set of ids
 #'
 #' Given a vector of file paths and a set of candidate integer ids, returns the
@@ -454,47 +552,190 @@ isAre <- function(l, v) {
 #' have outputs, without loading any of them.
 #'
 #' This is a purely textual operation on the paths; it does not check whether
-#' anything exists on disk.
+#' anything exists on disk. Both forward slashes and backslashes are taken as
+#' folder separators, so Windows paths are recognised; the folders returned are
+#' spelled as they are in `files`.
 #'
 #' @param files character vector of file paths.
 #' @param set integer vector of candidate ids to keep.
-#' @param prefix character. The directory name prefix preceding each id.
+#' @param prefix character. The directory name prefix preceding each id. If no
+#'   `<prefix><id>` directory occurs in `files`, directories
+#'   named by the bare number (e.g. `out/16/`, as `SpaDES.project::pathBuild()` writes
+#'   them with the field label off) are used instead; for each file the deepest
+#'   all-digit directory with an id in `set` is taken, so `out/370/16/x.tif` gives `16`.
+#'   `<prefix><id>` directories always take precedence.
 #' @param leafOnly logical. If `TRUE` (the default), only the single directory
-#'   name is returned, e.g. `"rep1"` -- the `basename()` of the `dirname()`. If
-#'   `FALSE`, the full directory path is returned, e.g. `"out/rep1"`. Note that
+#'   name is returned, e.g. `"rep1"`, spelled as it is in `files` (so `"rep01"`
+#'   stays `"rep01"`). If `FALSE`, the full replicate directory path is returned,
+#'   e.g. `"out/rep1"`, also when `files` are in its subfolders. Note that
 #'   a full path can only be recovered from `files`, so `leafOnly = FALSE`
 #'   requires a non-empty `files`.
 #'
 #' @return A character vector of directory names (or paths, if
-#'   `leafOnly = FALSE`), ordered numerically by id.
+#'   `leafOnly = FALSE`), ordered numerically by id and named by id, so
+#'   `as.integer(names(x))` gives the replicate numbers (`"rep01"` is named `"1"`).
 #'
 #' @author Eliot McIntire
 #' @export
 #' @rdname dirnamesFromSet
+#' @family replicate helpers
 #'
 #' @examples
 #' files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep2/x.tif")
 #' dirnamesFromSet(files, set = 1:10)
 #' dirnamesFromSet(files, set = 1:10, leafOnly = FALSE)
+#' as.integer(names(dirnamesFromSet(files, set = 1:10)))
 dirnamesFromSet <- function(files, set, prefix = "rep", leafOnly = TRUE) {
   if (length(files) == 0) {
     if (!leafOnly) {
       stop("`leafOnly = FALSE` requires `files`: there is no path to take a dirname of.")
     }
-    return(paste0(prefix, set))
+    return(stats::setNames(paste0(prefix, set), set))
   }
 
-  pattern <- paste0(".*/", prefix, "(\\d+)/.*")
-  keep <- grepl(pattern, files)
-  ids <- as.integer(sub(pattern, "\\1", files[keep]))
+  ## matched with "/" for "\" (a Windows path can hold both, e.g. a tempdir() with "/rep1" appended).
+  ## Not fs::path_tidy(): it also collapses "//" and drops a trailing "/", changing lengths, so a folder
+  ## could no longer be cut from its file by position. `src` is the file each folder came from.
+  nf <- .fwdSlashes(files)
+  ## the path up to and including the rep directory, so files in its subfolders give the same one
+  repPattern <- paste0("(.*/", prefix, "(\\d+))/.*")
+  keep <- grepl(repPattern, nf)
+  dirs <- sub(repPattern, "\\1", nf[keep])
+  ids <- as.integer(sub(repPattern, "\\2", nf[keep]))
+  src <- files[keep]
   inSet <- ids %in% set
-
-  if (leafOnly) {
-    paste0(prefix, sort(unique(ids[inSet])))
-  } else {
-    dirs <- dirname(files[keep][inSet])
-    ids <- ids[inSet]
-    firsts <- !duplicated(dirs)
-    dirs[firsts][order(ids[firsts])]
+  if (!any(keep)) {
+    ## no `<prefix><N>` folder at all: bare `<N>` folders, taking for each file its deepest all-digit
+    ## directory with an id in `set` (so `370/16/x.tif` gives `16`, `16/2020/x.tif` gives `16`)
+    digitDirs <- gregexpr("/[0-9]+(?=/)", nf, perl = TRUE)
+    found <- Map(function(f, m) {
+      if (m[1] == -1L) return(NULL)
+      ends <- as.integer(m) + attr(m, "match.length") - 1L
+      starts <- as.integer(m) + 1L
+      inSetHere <- as.integer(substring(f, starts, ends)) %in% set
+      if (!any(inSetHere)) return(NULL)
+      last <- max(which(inSetHere))
+      list(dir = substr(f, 1L, ends[last]), id = as.integer(substring(f, starts[last], ends[last])))
+    }, nf, digitDirs)
+    hit <- !vapply(found, is.null, logical(1))
+    found <- found[hit]
+    src <- files[hit]
+    dirs <- vapply(found, `[[`, character(1), "dir", USE.NAMES = FALSE)
+    ids <- vapply(found, `[[`, integer(1), "id", USE.NAMES = FALSE)
+    inSet <- rep(TRUE, length(ids))
   }
+  dirs <- dirs[inSet]
+  src <- src[inSet]
+  ids <- ids[inSet]
+  firsts <- !duplicated(dirs)
+  ord <- order(ids[firsts])
+  dirs <- dirs[firsts][ord]
+  src <- src[firsts][ord]
+  ids <- ids[firsts][ord]
+
+  ## `nf` has the same characters at the same places as `files`, so the first nchar(dir) characters of
+  ## a folder's file are that folder as spelled in `files`
+  out <- if (leafOnly) basename(dirs) else substr(src, 1L, nchar(dirs))
+  firsts <- !duplicated(out)
+  stats::setNames(out[firsts], ids[firsts])
 }
+
+#' The file of each replicate
+#'
+#' For each replicate directory, the path of the file named `filename` in it.
+#' With `files` (e.g. the `file` column of the replicate runs' `outputs(sim)`,
+#' or the paths given to [dirnamesFromSet()]), the path is taken from `files`,
+#' matching both the directory and the file name exactly, so that `rep1` does
+#' not also pick up `rep10`'s file; a replicate with no such file, or more than
+#' one, is an error. Without `files`, the path is built from the directory.
+#'
+#' @param repDirs character. Replicate directories, e.g.
+#'   `dirnamesFromSet(files, set, leafOnly = FALSE)`.
+#' @param filename character(1). The file's name, e.g. `"burnMap_year1000.tif"`.
+#' @param files character, or `NULL`. Known file paths to take the result from.
+#'
+#' @return A character vector with one path per replicate, named as `repDirs`
+#'   is (by replicate id, for `dirnamesFromSet()`'s result).
+#'
+#' @export
+#' @family replicate helpers
+#'
+#' @examples
+#' files <- c("out/rep1/burnMap.tif", "out/rep10/burnMap.tif", "out/rep1/fire.csv")
+#' dirs <- dirnamesFromSet(files, set = c(1, 10), leafOnly = FALSE)
+#' repFiles(dirs, "burnMap.tif", files)
+repFiles <- function(repDirs, filename, files = NULL) {
+  out <- if (is.null(files)) {
+    file.path(repDirs, filename)
+  } else {
+    ## both sides through fs::path_tidy(), which is textual ("/" for "\", "//" collapsed, no trailing "/"):
+    ## on Windows dirname() gives "/" for "\", which a `repDirs` element can still hold (e.g. a tempdir()
+    ## with "/rep1" appended). Tidied before dirname(), which splits at "\" only on Windows.
+    tidied <- unclass(fs::path_tidy(files))
+    fileDirs <- dirname(tidied)
+    fileNames <- basename(tidied)
+    vapply(repDirs, function(d) {
+      f <- files[fileDirs == unclass(fs::path_tidy(d)) & fileNames == filename]
+      if (length(f) != 1L) {
+        stop("expected one ", filename, " in ", d, " in `files`; found ", length(f), call. = FALSE)
+      }
+      f
+    }, character(1), USE.NAMES = FALSE)
+  }
+  names(out) <- names(repDirs)
+  out
+}
+
+#' Set the replicate of a table read from one replicate's outputs
+#'
+#' Sets column `col` of `x` to `id`, the replicate whose outputs `x` was read
+#' from (e.g. a name of [dirnamesFromSet()]'s result). Rows whose `col` is
+#' missing take `id`. Rows naming another replicate are an error: the run that
+#' wrote them was told the wrong replicate, and its rows would otherwise count
+#' for the replicate they name, while their own replicate looked empty.
+#' Values are compared as text, so `1` and `"1"` agree.
+#'
+#' @param x a `data.frame` or `data.table`.
+#' @param id the replicate, length 1.
+#' @param col character(1). The replicate column of `x`.
+#' @param source character, or `NULL`. Where `x` was read from, for the error.
+#'
+#' @return `x`, with `col` set to `id` in every row (a `data.table` is modified
+#'   in place).
+#'
+#' @export
+#' @family replicate helpers
+#'
+#' @examples
+#' tagReplicate(data.frame(rep = c(NA, 2L), size = 1:2), id = 2L)
+tagReplicate <- function(x, id, col = "rep", source = NULL) {
+  stopifnot(length(id) == 1L, length(col) == 1L)
+  cur <- x[[col]]
+  if (!is.null(cur)) {
+    other <- unique(cur[!is.na(cur) & as.character(cur) != as.character(id)])
+    if (length(other)) {
+      stop(if (!is.null(source)) paste0(source, ": "), "rows for replicate ",
+           paste(other, collapse = ", "), " in the outputs of replicate ", id,
+           "; was its run told the wrong replicate?", call. = FALSE)
+    }
+  }
+  if (data.table::is.data.table(x)) {
+    data.table::set(x, j = col, value = rep(id, nrow(x)))
+  } else {
+    x[[col]] <- rep(id, nrow(x))
+  }
+  x
+}
+
+#' Did `Cache()` newly compute this object, or load it from the cache?
+#'
+#' `Cache()` records this in `attr(x, ".Cache")$newCache`. The entry is absent when caching was
+#' off or not recorded; then neither is known, and both helpers return `FALSE`.
+#'
+#' @param x An object returned by `Cache()`.
+#' @return A length-one logical. `.newlyCached()` is `TRUE` only if `newCache` is `TRUE`;
+#'   `.loadedFromCache()` is `TRUE` only if it is `FALSE`.
+#' @noRd
+.newlyCached <- function(x) isTRUE(attr(x, ".Cache")$newCache)
+
+.loadedFromCache <- function(x) isFALSE(attr(x, ".Cache")$newCache)

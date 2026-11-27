@@ -44,8 +44,7 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'
 #' `params` can only contain updates to any parameters that are defined in
 #' the metadata of modules. Take the example of a module named, `Fire`, which
-#' has a parameter named `.plotInitialTime`. In the metadata of that module,
-#' it says `TRUE`. Here we can override that default with:
+#' has a parameter named `.plotInitialTime` (see [dotParameters]). Here we can override that default with:
 #' `list(Fire=list(.plotInitialTime=NA))`, effectively turning off plotting.
 #' Since this is a list of lists, one can override the module defaults for multiple
 #' parameters from multiple modules all at once, with say:
@@ -55,15 +54,12 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #' The `params` list can contain a list (named `.globals`) of named objects
 #' e.g., `.globals = list(climateURL = "https:\\something.com")` entry. Any and every
 #' module that has a parameter with that name (in this case `climateURL`) will be
-#' overridden with this value as passed.
+#' overridden with this value as passed. The universal dot parameters (`.plots`, `.seed`,
+#' `.showSimilar`, `.useCache`, `.useCacheArgs`) are set in every module, even one that does
+#' not declare them; see [dotParameters].
 #'
-#' `params` can be used to set the seed for a specific event in a module. This
-#' is done using the normal `params` argument, specifying `.seed` as a list
-#' where the elements are a numeric for the seed and the name is the event. Since
-#' parameters must be specific to a module, this creates a module and event specific
-#' seed e.g., `params = list(moduleName = list(.seed = list(init = 123)))` will
-#' set the `init` event of module named `moduleName` to 123. The RN stream
-#' will be reset to its state prior to the `set.seed` call after the event.
+#' `params` can set the seed for a specific event in a module, e.g.,
+#' `params = list(moduleName = list(.seed = list(init = 123)))`; see [dotParameters].
 #'
 #' We implement a discrete event simulation in a more modular fashion so it is
 #' easier to add modules to the simulation. We use S4 classes and methods,
@@ -175,9 +171,10 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'
 #' @param notOlderThan A time, as in from `Sys.time()`. This is passed into
 #'                     the `Cache` function that wraps `.inputObjects`.
-#'                     If the module uses the `.useCache` parameter and it is
-#'                     set to `TRUE` or `".inputObjects"`,
-#'                     then the `.inputObjects` will be cached.
+#'                     If the module's `.useCache` parameter (see [dotParameters]) is
+#'                     `TRUE` or includes `".inputObjects"`,
+#'                     then the `.inputObjects` will be cached, unless the module
+#'                     lists `".inputObjects"` in its `.neverCache` parameter.
 #'                     Setting `notOlderThan = Sys.time()` will cause the
 #'                     cached versions of `.inputObjects` to be refreshed,
 #'                     i.e., rerun.
@@ -197,9 +194,38 @@ utils::globalVariables(c(".", "Package", "hasVersionSpec"))
 #'   share option name (`reproducible.verbose` and `Require.verbose` both exist),
 #'   passing `verbose = FALSE` will set both. Obviously this may cause unexpected
 #'   problems if a module is also expecting a value.
+#'   `cache` is an argument too: `TRUE` (same as `"local"`) or `"portable"` caches the
+#'   whole `simInit()` call; see the `cache` argument of [spades()]. `.useCache` is
+#'   the same argument under another name.
+#'   One name is an argument instead: `alreadyRun`, a run already done whose saved outputs
+#'   this simulation replays (default `NULL`, none). It is a list with `sim`, the run's saved
+#'   `simList` (only its `depends()`, `outputs()` and time unit are used; it can be a shell
+#'   whose objects are not loaded), and optionally `fetch`, a function that, given files of
+#'   `outputs(sim)`, makes them local and returns their paths (e.g. from a remote archive).
+#'   Each object that a module of this simulation expects (`expectsInput`), that a module of
+#'   the run created (`createsOutput`) and that the user did not supply is loaded from the
+#'   run's saved outputs as `inputs`: the latest save at or before `start` at `start`, then
+#'   each later save up to `end` at its `saveTime`. Only those files are fetched. An object
+#'   without such a save is taken from the run's `simList`, with its value at the end of
+#'   that run; one in neither is an error. The run's modules are not in `modules`, so their code is not read and their
+#'   events do not run. `sim$._alreadyRun` keeps the other elements of `alreadyRun`, the run's
+#'   `modules` and the replayed `inputs`.
+#'   `alreadyRun` can also be several runs, a list of such runs (named by run; unnamed, they are
+#'   `"1"`, `"2"`, ...), for modules that summarise replicates (e.g. `mode = "multi"`). Then
+#'   nothing is replayed. `outputsDF` is the saved rows of every run's `outputs()`, bound, with a
+#'   column `run` (each run with `fetch` is fetched first), unless the user supplies it. An object
+#'   that a module expects and the user did not supply is taken from the runs' `simList`s
+#'   (end-of-run values, whichever module or user made it there) only if every run has it, not
+#'   `NULL`, with the same value (by `reproducible::.robustDigest()`); a message names the
+#'   others. `sim$._alreadyRun`
+#'   is then `list(runs = <each run as above>, objects = <names taken>, outputsDF = <logical>)`.
 #'
 #' @return A `simList` simulation object, pre-initialized from values
-#' specified in the arguments supplied.
+#' specified in the arguments supplied. `sim$._modulesGiven` records the modules as
+#' given: `list(modules = <the modules argument, with its names, e.g. "account/repo@ref">,
+#' parents = <a list naming the children of each parent module>)`. A saved `simList` keeps
+#' it, so it says which parent modules a run used, although only their children are in
+#' `modules(sim)`.
 #'
 #' @seealso [objectProvenance] for where the value of each object comes from.
 #' @seealso [spades()], [defineModule()] to get help on metadata elements,
@@ -377,7 +403,20 @@ setMethod(
       assign(._txtStartClockTime, dots[[._txtStartClockTime]])
       # ._startClockTime <- dots[[._txtStartClockTime]]
     dots[[._txtStartClockTime]] <- NULL
-    dotNames <- setdiff(...names(), ._txtStartClockTime)
+    alreadyRun <- dots[["alreadyRun"]] # an argument (see `...`), not an object
+    dots[["alreadyRun"]] <- NULL
+    ## `cache` and `.useCache` are arguments (see `...`), not objects: cache the whole simInit()
+    cacheMode <- .wholeRunCacheMode(dots[["cache"]], dots[[".useCache"]])
+    dots[c("cache", ".useCache")] <- NULL
+    if (!isFALSE(cacheMode)) {
+      untracked <- list(notOlderThan = if (!missing(notOlderThan)) notOlderThan,
+                        debug = dots[["debug"]], alreadyRun = alreadyRun)
+      dots[["debug"]] <- NULL
+      args <- c(list(times = times, params = params, modules = modules, objects = objects,
+                     paths = paths, inputs = inputs, outputs = outputs, loadOrder = loadOrder), dots)
+      return(.cacheWholeRun("simInit", args, cacheMode, untracked = Filter(Negate(is.null), untracked)))
+    }
+    dotNames <- setdiff(...names(), c(._txtStartClockTime, "alreadyRun", "cache", ".useCache"))
 
 
     # loggingMessage helpers
@@ -398,6 +437,15 @@ setMethod(
     on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
 
     opt <- options("encoding" = "UTF-8")
+
+    ## options(spades.useCache = "eventsOnly" / "off"): Cache() calls inside module code take
+    ## reproducible.useCache, so set it for the run; the .inputObjects call passes useCache explicitly
+    .pkgEnv$neverCacheMsgd <- NULL ## one `.neverCache` message per module and event, per call
+    innerUseCache <- .spadesUseCache()$inner
+    if (!is.null(innerUseCache)) {
+      optInner <- options(reproducible.useCache = innerUseCache)
+      on.exit(options(optInner), add = TRUE)
+    }
 
     # rcae <- get(reproducible.CacheAddressEnv)
     # optRcae <- do.call(options, list(envir(sim)) |> setNames(rcae))
@@ -518,8 +566,8 @@ setMethod(
     if (isTRUE(.useFileBackedAnchors(paths(sim))))
       on.exit(options(reproducible.fileBackedAnchors = NULL), add = TRUE)
 
+    modulesGiven <- unlist(modules) # as the user gave them, e.g. named by "account/repo@ref"
     names(modules) <- unlist(modules)
-    adjustModuleNameSpacing(modules) # changes options("spades.messagingNumCharsModule")
 
     # Check that modules exist in paths$modulePath
     modulePaths <- .checkModuleDirsAndFiles(modules = modules, modulePath = sim@paths$modulePath)
@@ -529,6 +577,7 @@ setMethod(
     modules <- as.list(unique(unlist(childModules))) # flat list of all modules
     names(modules) <- unlist(modules)
     modules <- lapply(modules, basename2)
+    adjustModuleNameSpacing(modules) # all modules, children included; changes options("spades.messagingNumCharsModule")
 
     moduleNames <- names(modules)
     names(moduleNames) <- moduleNames
@@ -585,6 +634,9 @@ setMethod(
 
       ## run this only once, at the highest level of the hierarchy, so before the parse tree happens
       parentChildGraph <- as.data.frame(buildParentChildGraph(sim, modules(sim), childModules = childModules))
+      sim@.xData[["._modulesGiven"]] <- list(
+        modules = modulesGiven,
+        parents = split(basename2(parentChildGraph$to), basename2(parentChildGraph$from)))
 
       timeunits <- findSmallestTU(sim, modulePaths, childModules)
 
@@ -670,6 +722,37 @@ setMethod(
         names(sim@depends@dependencies) <- sim@depends@dependencies |>
           lapply(function(x) x@name) |>
           unlist()
+      }
+
+      ## replay a run already done: what the modules expect from it is loaded from its saved outputs
+      ## several runs: nothing is replayed; their outputs and the objects equal in all of them
+      if (!is.null(alreadyRun) && .alreadyRunIsMulti(alreadyRun)) {
+        multi <- .alreadyRunMulti(sim, alreadyRun)
+        list2env(multi$objects, envir = envir(sim))
+        if (!is.null(multi$outputsDF))
+          sim$outputsDF <- multi$outputsDF
+        taken <- c(names(multi$objects), if (!is.null(multi$outputsDF)) "outputsDF")
+        sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, taken)
+        messageVerbose("From the ", length(alreadyRun), " runs of `alreadyRun`: ",
+                       paste(taken, collapse = ", "),
+                       if (length(multi$differ))
+                         paste0("; not taken (they differ between runs or are not in each run's ",
+                                "simList): ", paste(multi$differ, collapse = ", ")),
+                       verbose = verbose)
+        sim@.xData[["._alreadyRun"]] <- list(runs = multi$runs, objects = names(multi$objects),
+                                             outputsDF = !is.null(multi$outputsDF))
+      } else if (!is.null(alreadyRun)) {
+        replay <- .alreadyRunInputs(sim, alreadyRun)
+        fromSim <- attr(replay, "objects")
+        attr(replay, "objects") <- NULL
+        for (obj in fromSim)
+          assign(obj, get(obj, envir = envir(alreadyRun$sim)), envir = envir(sim))
+        if (length(fromSim))
+          messageVerbose("From `alreadyRun`'s simList, at the end of that run (it saved no ",
+                         "file of them): ", paste(fromSim, collapse = ", "), verbose = verbose)
+        inputs <- rbind(inputs, replay)
+        sim$.userSuppliedObjNames <- c(sim$.userSuppliedObjNames, replay$objectName, fromSim)
+        sim@.xData[["._alreadyRun"]] <- .alreadyRunProvenance(alreadyRun, replay, fromSim)
       }
 
       ## load core modules
@@ -1193,6 +1276,18 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   ## by matching spades()'s formals, so catch it here rather than dropping it
   .warnPlotInitialTimeArg(...names())
 
+  ## `cache` (or `.useCache` in `...`) caches the whole call, simInit() included
+  cacheMode <- .wholeRunCacheMode(if (!missing(cache)) cache,
+                                  if (".useCache" %in% ...names()) ...elt(match(".useCache", ...names())))
+  if (!isFALSE(cacheMode)) {
+    args <- as.list(match.call())[-1]
+    args[c("cache", ".useCache")] <- NULL
+    args <- lapply(args, eval, envir = parent.frame())
+    untrackedNames <- intersect(names(args), c("debug", "progress", "notOlderThan"))
+    return(.cacheWholeRun("simInitAndSpades", args[setdiff(names(args), untrackedNames)],
+                          cacheMode, untracked = args[untrackedNames]))
+  }
+
   # because Cache (and possibly others, we have to strip any other call wrapping simInitAndSpades)
   lsAllNames <- ls(all.names = TRUE)
   # lsAllNames <- lsAllNames[lsAllNames != "..."]
@@ -1226,8 +1321,10 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
   #                paths = objsSimInit$paths, inputs = objsSimInit$inputs,
   #                outputs = objsSimInit$outputs, loadOrder = objsSimInit$loadOrder,
   #                notOlderThan = objsSimInit$notOlderThan, ...)
-  opts <- options(spades.loadReqdPkgs = FALSE)
-  on.exit(options(opts), add = TRUE)
+  ## simInit() has just loaded the packages: spades() need not load them again. A mark on this simList,
+  ## not options(spades.loadReqdPkgs = FALSE), which stayed set while the events ran, so a simInit()
+  ## inside an event (a nested simulation) did not load its own modules' packages.
+  attr(sim, ".reqdPkgsLoaded") <- TRUE
   #sim <- do.call(simInit, objsSimInit) # serializes the objects
 
   passedArgsToSpades <- as.list(match.call(spades))[-1]
@@ -1269,7 +1366,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         x = modulesToSearch3[isParent],
         nam = dirname(names(modulesToSearch3[isParent])),
         function(x, nam) {
-          mods <- lapply(x, function(y) file.path(nam, y))
+          mods <- lapply(x, function(y) file.path(nam, .childModuleName(y)))
           names(mods) <- unlist(lapply(mods, basename2))
           .identifyChildModules(sim = sim, modules = mods, verbose = verbose)
         }
@@ -1535,7 +1632,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
     } else {
       newInputs <- data.frame(
         objectName = objNames,
-        loadTime = as.numeric(sim@simtimes[["current"]]),
+        loadTime = as.numeric(time(sim)), # the simulation's unit, as inputs(sim) gives the other rows
         stringsAsFactors = FALSE
       ) |>
         .fillInputRows(startTime = start(sim))
@@ -1669,18 +1766,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         }
         list2env(objectsToUse, envir = sim@.xData)
       }
-      a <- P(sim, ._txtDotUseCache, mBase)
-      if (!is.null(a)) {
-        if (!identical(FALSE, a)) {
-          if (isTRUE(a)) {
-            cacheIt <- TRUE
-          } else {
-            if (".inputObjects" %in% a) {
-              cacheIt <- TRUE
-            }
-          }
-        }
-      }
+      cacheIt <- .eventIsCached(sim@params[[mBase]], ".inputObjects", mBase,
+                                verbose = debugToVerbose(debug))$cache
+      if (!.spadesUseCache()$events) cacheIt <- FALSE # options(spades.useCache = "off")
 
       cur <- sim@current
       curModNam <- cur$moduleName
@@ -1710,6 +1798,18 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
         moduleSpecificInputObjects <- na.omit(moduleSpecificInputObjects)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, m)
         moduleSpecificInputObjects <- c(moduleSpecificInputObjects, paste0(dotMods, "$", m), paste0(dotObjs, "$", m))
+        ## `.inputObjects` may set an object it declares only via `createsOutput`, not
+        ##   `expectsInput` (e.g. a value no other module needs as an input). A cache HIT must
+        ##   restore that object too, or it silently vanishes from the simList on reload -- a
+        ##   cache MISS never showed this, since that returns the live, freshly computed sim
+        ##   rather than round-tripping through `.wrap()`/`.unwrap()`. Kept separate from
+        ##   `moduleSpecificInputObjects`, which also drives the cache KEY below
+        ##   (`objectsToEvaluateForCaching`): an object that does not exist yet before
+        ##   `.inputObjects` runs must never be digested into that key.
+        ##   Of the `createsOutput`s, only those `.inputObjects` may write (createsOutput(events = )).
+        moduleSpecificOutputObjects <- union(
+          moduleSpecificInputObjects,
+          na.omit(.outputsOfEvent(sim@depends@dependencies[[i]], ".inputObjects")))
 
         # ensure backwards compatibility with non-namespaced modules
         if (.isNamespaced(sim, mBase)) {
@@ -1760,7 +1860,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
 
           modParams <- sim@params[[mBase]]
           paramsDontCacheOnActual <- names(sim@params[[mBase]]) %in%
-            paramsDontCacheOn
+            .paramsNotCachedOn(sim, mBase, ".inputObjects")
           paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
 
           runFnCallAsExpr <- TRUE
@@ -1774,6 +1874,21 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             dependsSlots <- outputsRmDontNeedForCache(metadataToDigest, "outputObjects")
             # dependsSlots <- setdiff(dependsSlots, "outputObjects")
 
+            ## options(spades.cacheKeyReachable = TRUE): only what `.inputObjects` reaches
+            if (.isNamespaced(sim, mBase)) {
+              keyParts <- .narrowKeyParts(sim, sim@.xData[[dotMods]][[mBase]], mBase, ".inputObjects",
+                                          fns = reachable, modParamsFull = modParams,
+                                          dependsSlots = dependsSlots,
+                                          verbose = isTRUE(showSimilar) || .verboseKeyScope())
+              if (!identical(keyParts$fns, reachable))
+                objectsToEvaluateForCaching <- c(paste(mBase, keyParts$fns, sep = ":"),
+                                                 setdiff(objectsToEvaluateForCaching,
+                                                         paste(mBase, reachable, sep = ":")))
+              paramsDontCacheOnActual <- !keyParts$paramsInKey
+              paramsWoKnowns <- modParams[!paramsDontCacheOnActual]
+              dependsSlots <- keyParts$dependsSlots
+            }
+
             classOptions <- classOptionsForCache(events = FALSE, paramsWoKnowns, dependsSlots, mBase)
             # classOptions <- list(events = FALSE,
             #                      current = FALSE,
@@ -1783,8 +1898,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
             #                      depends = dependsSlots,
             #                      # .globals = globsWoKnowns,
             #                     modules = mBase)
-            extraCacheArgs <- sim@params[[mBase]][[._txtDotUseCacheArgs]][[".inputObjects"]]
-            if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+            extraCacheArgs <- .extraCacheArgsFor(sim@params[[mBase]], ".inputObjects")
             # Evaluate any quoted entries (e.g. `quote(P(sim)$.useCloud)`) here, while
             # `sim@current$moduleName` is `mBase` (set above), so module-context accessors
             # like P(sim) resolve to this module. Otherwise they would reach Cache() as
@@ -1798,7 +1912,7 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               FUN = quote(.inputObjects(sim)),
               .objects = quote(objectsToEvaluateForCaching),
               notOlderThan = quote(notOlderThan),
-              outputObjects = quote(moduleSpecificInputObjects),
+              outputObjects = quote(moduleSpecificOutputObjects),
               quick = quote(getOption("reproducible.quick", FALSE)),
               cachePath = quote(sim@paths$cachePath),
               classOptions = quote(classOptions),
@@ -1808,6 +1922,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                  "eventType:.inputObjects")),
               verbose = quote(verbose)
             )
+            ## "eventsOnly"/"off"/numeric pass useCache explicitly; "all" leaves it to reproducible.useCache
+            useCacheSpades <- .spadesUseCache()$useCache
+            if (!is.null(useCacheSpades)) defaultCacheArgs$useCache <- useCacheSpades
             fnCallAsExpr <- as.expression(as.call(c(list(quote(Cache)),
                                                     modifyList(defaultCacheArgs, extraCacheArgs))))
 
@@ -1817,7 +1934,9 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
               fnEnv <- sim@.xData[[dotMods]][[mBase]]
               prevCache <- attr(sim, "tags")
               # # take only functions; no objects; select because the functions have ":"
-              nonObjects <- nonObjectsForCacheChaining(objectsToEvaluateForCaching, fnEnv, classOptions)
+              nonObjects <- nonObjectsForCacheChaining(objectsToEvaluateForCaching, fnEnv, classOptions,
+                                                       sim@depends@dependencies[[mBase]],
+                                                       extraCacheArgs = extraCacheArgs)
 
               # fns2 <- extractFns(objectsToEvaluateForCaching)
               # nonObjects <- append(classOptions,
@@ -1830,27 +1949,37 @@ simInitAndSpades <- function(times, params, modules, objects, paths, inputs, out
                                              event = ".inputObjects",
                                              led = attr(sim, lastEventDetails),
                                              use = cacheChaining,
-                                             verbose = verbose)
+                                             verbose = verbose,
+                                             sim = sim,
+                                             userObjects = if (!missing(objects)) objects,
+                                             jumpControls = list())
               fnCallAsExpr <- chaining$fnCallAsExpr
+              if (!is.null(chaining$jump))
+                sim <- .chainJumpPrepare(sim, chaining$jump, verbose = verbose)
             }
 
+            eventsPreCall <- sim@events
+            outputsPreCall <- sim@outputs
             sim <- eval(fnCallAsExpr)
             .checkEventReturn(sim, mBase, ".inputObjects", fromCache = TRUE)
 
+            if (!is.null(chaining$jump))
+              sim <- .chainJumpFinish(sim, chaining$jump, cachePath = sim@paths$cachePath,
+                                      userObjects = if (!missing(objects)) objects,
+                                      verbose = verbose)
+            chainLast <- .chainLast(chaining$jump, mBase, ".inputObjects")
             sim <- cacheChainingPost(sim, cacheIt, prevCache,
                                      cacheIdOfSkip = chaining$cacheIdOfSkip,
                                      df = chaining$df,
-                                     moduleName = mBase,
-                                     eventType = ".inputObjects")
+                                     moduleName = chainLast$module,
+                                     eventType = chainLast$event,
+                                     queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
+                                                           sim@simtimes[["start"]]),
+                                     outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall),
+                                     paramsText = .chainParamsTextIfRan(sim, cacheIt, chaining, mBase,
+                                                                        pre = modParams))
 
           }
-
-          # put back the current values of params that were not cached on
-          if (sum(paramsDontCacheOnActual))
-            sim@params[[mBase]][paramsDontCacheOnActual] <- modParams[paramsDontCacheOnActual]
-
-
-
         }
       } else {
         # .modifySearchPath(pkgs = sim@depends@dependencies[[i]]@reqdPkgs)
@@ -2051,9 +2180,11 @@ loadPkgs <- function(reqdPkgs) {
     pkgsDontLoad <- getOption("spades.reqdPkgsDontLoad", NULL)
     allPkgs <- reqdPkgsDontLoad(allPkgs, pkgsDontLoad)
 
+    attach <- getOption("spades.reqdPkgsAttach", TRUE)
+    attachMsgs <- character()
     if (getOption("spades.useRequire")) {
       getCRANrepos(ind = 1) # running this first is neutral if it is set
-      Require(allPkgs, require = TRUE, standAlone = FALSE, upgrade = FALSE)
+      Require(allPkgs, require = attach, standAlone = FALSE, upgrade = FALSE)
       if (!is.null(pkgsDontLoad)) {
         verbose <- getOption("reproducible.verbose")
         Require::Require(pkgsDontLoad, require = FALSE, standAlone = FALSE,
@@ -2062,9 +2193,42 @@ loadPkgs <- function(reqdPkgs) {
       # RequireWithHandling(allPkgs, standAlone = FALSE, upgrade = FALSE)
     } else {
       allPkgs <- unique(Require::extractPkgName(allPkgs))
-      loadedPkgs <- lapply(allPkgs, base::require, character.only = TRUE)
+      loadedPkgs <- if (attach) {
+        lapply(allPkgs, function(p)
+          withCallingHandlers(base::require(p, character.only = TRUE),
+                              warning = function(w) attachMsgs[p] <<- conditionMessage(w)))
+      } else {
+        lapply(allPkgs, requireNamespace, quietly = TRUE)
+      }
     }
+    if (attach) stopIfNotAttached(allPkgs, attachMsgs)
   }
+}
+
+# A reqdPkg that is installed but did not attach (e.g., its namespace is already loaded from another
+# library, at another version, and cannot be unloaded) must stop simInit here, not fail later with
+# "could not find function". One that is not installed keeps require()'s warning, as before: a simList
+# can be built, inspected or loaded without every module package.
+stopIfNotAttached <- function(pkgs, attachMsgs = character()) {
+  pkgs <- unique(Require::extractPkgName(pkgs))
+  pkgs <- pkgs[!is.na(pkgs) & nzchar(pkgs)]
+  notAttached <- pkgs[!pkgs %in% sub("^package:", "", search())]
+  installed <- vapply(notAttached, function(p) nzchar(system.file(package = p)), logical(1))
+  notAttached <- notAttached[notAttached %in% loadedNamespaces() | installed]
+  if (length(notAttached)) {
+    details <- vapply(notAttached, function(p) {
+      loadedVer <- if (p %in% loadedNamespaces()) as.character(utils::packageVersion(p)) else NA_character_
+      libVer <- tryCatch(as.character(utils::packageVersion(p, lib.loc = .libPaths())),
+                         error = function(e) NA_character_)
+      paste0(p,
+             if (!is.na(attachMsgs[p])) paste0(": ", attachMsgs[p]),
+             if (!is.na(loadedVer) && !is.na(libVer) && loadedVer != libVer)
+               paste0(" (loaded version ", loadedVer, " differs from ", libVer, " in .libPaths(); ",
+                      "restart R with the intended library first in .libPaths())"))
+    }, character(1))
+    stop("These reqdPkgs could not be attached: ", paste(details, collapse = "; "), call. = FALSE)
+  }
+  invisible(NULL)
 }
 
 #' @importFrom Require messageVerbose
@@ -2137,8 +2301,19 @@ resolveDepsRunInitIfPoss <- function(sim, modules, paths, params, objects, input
       attr(sim, lastEventDetails) <- attr(simAltOut, lastEventDetails)
 
       list2env(objs(simAltOut), envir(sim))
+      ## objs() leaves out names starting with ".", so an object a module declares with one (e.g.,
+      ## fireSense's `.ELFind`) and sets in these inits did not reach `sim`. The "._" internals follow.
+      declared <- unlist(lapply(depends(simAltOut)@dependencies, function(d)
+        c(d@inputObjects$objectName, d@outputObjects$objectName)), use.names = FALSE)
+      dotDeclared <- intersect(grep("^\\.[^_]", unique(declared), value = TRUE),
+                               ls(envir(simAltOut), all.names = TRUE))
+      list2env(mget(dotDeclared, envir = envir(simAltOut)), envir(sim))
 
       dotUnderscoreObjs <- ls(pattern = "^._", envir(simAltOut), all.names = TRUE)
+      ## the ledger is merged, not replaced: `sim` keeps the environment reproducible.urlLog
+      ## points at, and the records it already holds
+      dotUnderscoreObjs <- setdiff(dotUnderscoreObjs, "._urlLog")
+      .mergeUrlLog(envir(sim)$._urlLog, envir(simAltOut)$._urlLog)
       list2env(mget(dotUnderscoreObjs, envir = envir(simAltOut)), envir(sim))
 
       loadOrder <- loadOrder[!loadOrder %in% canSafelyRunInit]
@@ -2178,10 +2353,9 @@ updateParamsSlotFromGlobals <- function(paramsOrig, paramsWithUpdates,
   }
   globalsUsed <- globalsUsedInModules <- NULL
   globalsDF <- list()
-  knownParamsWOdotPlotInitialTime <- setdiff(.knownDotParams, ".plotInitialTime")
   for (mod in setdiff(ls(paramsWithUpdates), unlist(.coreModules()))) { # don't include the dot paramsWithUpdates; just non hidden modules
     modParams <- modDefaultParams[[mod]]
-    modParams <- union(modParams, knownParamsWOdotPlotInitialTime)
+    modParams <- union(modParams, .knownDotParams)
     userOverrides <- if (is.null(dontUseGlobals[[mod]])) NULL else dontUseGlobals[[mod]]
     common <- intersect(modParams, names(paramsWithUpdates$.globals))
     common <- setdiff(common, names(userOverrides))
@@ -2227,7 +2401,12 @@ objectsCreatedPost <- function(sim, objsIsNullBefore, verbose = getOption("repro
 messageNewObjects <- function(newObjs, prefix = "New objects created:", verbose = getOption("reproducible.verbose")) {
   df <- data.frame(newObjects = names(newObjs))
   messageColoured(prefix, colour = "yellow", verbose = verbose)
-  messageDF(df, colour = "yellow", colnames = FALSE, verbose = verbose)
+  ## data.table repeats the column header at the foot of a table longer than 20 rows, and prints a
+  ##   type row (`<char>`); messageDF() strips only the first line, so format the rows here
+  if (isTRUE(1 <= verbose)) {
+    rows <- capture.output(print(as.data.table(df), col.names = "none", class = FALSE))
+    messageColoured(paste(rows, collapse = "\n"), colour = "yellow", verbose = verbose)
+  }
   setDT(df)
 }
 
@@ -2472,8 +2651,13 @@ debugToVerbose <- function(debug) {
 }
 
 
-metadataToDigest <- c("inputObjects", "outputObjects", "parameters","childModules", "loadOrder", "reqdPkgs",
-                      "spatialExtent", "timeframe", "timeunit", "version")
+## The `depends` slots a cache key digests besides the object tables. `version` is deliberately
+## absent: a code change is already in the key through the module's function bodies, so the version
+## only turned a bump with no code change into a miss. `@depends` keeps the version; it is just not
+## digested. Used for `.inputObjects`, events and cacheChaining (via `metadataToDigest`) and for the
+## whole-simList key (`.robustDigest,simList`).
+otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs", "spatialExtent", "timeframe", "timeunit")
+metadataToDigest <- c("inputObjects", "outputObjects", "parameters", otherDependsToDig)
 
 objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
   comps <- rbindlist(as.list(sim@completed)) # completed(sim)
@@ -2493,14 +2677,50 @@ objectsToUseUpdatesFromPrevInits <- function(sim, objectsToUse) {
 
 spadesDebugWidthDefault <- c(9, 10, 9, 13)
 
-nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions) {
-  fns2 <- extractFns(objectsToEvaluateForCaching)
-  nonObjects <- append(classOptions,
-                       as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
+## `classOptions$depends` names the metadata slots the ordinary event key digests, but a chain
+## key built from the names alone never changes when a slot's VALUE does (a raised `reqdPkgs`
+## floor). Give the chain the values of those slots. They are the ones the
+## ordinary key digests (.robustDigest,simList): "parameters" is not (its resolved values are
+## `classOptions$params`) and the `desc` columns of the object tables are not.
+.chainDependsValues <- function(dep, dependsSlots) {
+  slots <- setdiff(dependsSlots, "parameters")
+  vals <- lapply(slots, function(x) {
+    v <- slot(dep, x)
+    if (is.data.frame(v)) v[, grep("desc$", colnames(v), value = TRUE, invert = TRUE), drop = FALSE] else v
+  })
+  setNames(vals, slots)
 }
 
-classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, mBase) {
-  list(events = events,
+nonObjectsForCacheChaining <- function(objectsToEvaluateForCaching, fnEnv, classOptions,
+                                       dep, extraCacheArgs = NULL) {
+  fns2 <- extractFns(objectsToEvaluateForCaching)
+  ## Only names bound in the module's function environment: `objectsToEvaluateForCaching` also
+  ## lists the module's `mod` objects (for Cache()'s own digest), which live in `.modObjs`, not
+  ## here. Indexing `as.list(fnEnv)` by those names gave an NA-named NULL per `mod` object, so
+  ## the chain digest changed with the SET of `mod` objects present when it was computed. A jump
+  ## rebuilds the digest before the skipped events are restored (.chainNonObjects()), so a
+  ## skipped event that created a `mod` object broke the walk at every later event of its module.
+  fns2 <- fns2[fns2 %in% ls(fnEnv, all.names = TRUE)]
+  nonObjects <- append(classOptions,
+                       as.list(fnEnv, all.names = TRUE)[fns2]) #  the .inputObjects function
+  nonObjects <- append(nonObjects,
+                       list(.dependsValues = .chainDependsValues(dep, classOptions$depends)))
+  ## A chained cacheId makes Cache() skip its digest, so the `.useCacheArgs` that change what
+  ## Cache() keys on (`.cacheExtra`, `omitArgs`, ...) must be part of what the chain matches
+  ## on; otherwise changing them can never break the chain, and the event keeps returning the
+  ## entry recorded before the change. Arguments that do not affect the result are left out,
+  ## so they do not break chains for nothing.
+  keyArgs <- extraCacheArgs[setdiff(names(extraCacheArgs), .cacheArgsNotAffectingKey)]
+  if (length(keyArgs))
+    nonObjects <- append(nonObjects, list(.useCacheArgs = keyArgs))
+  nonObjects
+}
+
+.cacheArgsNotAffectingKey <- c("useCloud", "cloudFolderID", "userTags", "verbose", "showSimilar")
+
+classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, mBase,
+                                 eventCode = NULL) {
+  out <- list(events = events,
        current = FALSE,
        completed = FALSE,
        simtimes = FALSE,
@@ -2508,5 +2728,8 @@ classOptionsForCache <- function(events = FALSE, paramsWoKnowns, dependsSlots, m
        depends = dependsSlots,
        # .globals = globsWoKnowns,
        modules = mBase)
+  ## the event's branch of doEvent.<module>, when the key is narrowed (see .cacheKeyScope())
+  if (!is.null(eventCode)) out$eventCode <- eventCode
+  out
 }
 

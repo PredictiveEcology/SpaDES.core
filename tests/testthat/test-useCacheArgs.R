@@ -207,12 +207,7 @@ test_that(".useCacheArgs evaluates quoted entries on the .inputObjects path with
               info = "Quoted .useCacheArgs on .inputObjects must be eval'd with module context")
 })
 
-test_that(".useCacheArgs is excluded from the per-module cache digest", {
-  ## The grep("useCache", .knownDotParams) at simulation-spades.R:2367 should
-  ## auto-include .useCacheArgs in paramsDontCacheOn now that .useCacheArgs is
-  ## in .knownDotParams (helpers.R).
-  paramsDontCacheOn <- grep("useCache",
-                            SpaDES.core:::.knownDotParams, value = TRUE)
-  expect_true(".useCacheArgs" %in% paramsDontCacheOn)
-  expect_true(".useCache"     %in% paramsDontCacheOn)
+test_that(".useCacheArgs and .useCloud are excluded from the per-module cache digest", {
+  expect_true(all(c(".useCache", ".useCacheArgs", ".useCloud") %in%
+                    SpaDES.core:::paramsDontCacheOn))
 })

@@ -48,7 +48,7 @@ with the module code parsed into the \code{simList}}
 
 \item{verbose}{Logical or Numeric, follows \code{reproducible.verbose} value by default.}
 
-\item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plotInitialTime}. If the
+\item{...}{Passed to \code{spades}, e.g., \code{debug}, \code{.plots}. If the
 interrupted \code{spades()} call used an \code{events} filter (to run only certain
 events), the same filter is reused automatically on restart; pass a new
 \code{events} argument here to override it.}

@@ -32,10 +32,17 @@ G(sim) <- value
 
 \item{value}{The parameter value to be set (in the corresponding \code{module} and \code{param}).}
 }
+\value{
+For \code{globals()} and \code{G()}, a named list of the global parameters, i.e., the
+\code{.globals} element of the \code{params} slot. For the replacement methods
+\verb{globals<-} and \verb{G<-}, the updated \code{simList}, with any module parameters that
+take their value from a global re-synchronised.
+}
 \description{
 \code{globals}, and the alias \code{G}, accesses or sets the "globals"
 in the \code{simList}. This currently is not an explicit slot in the \code{simList},
 but it is a \code{.globals} element in the \code{params} slot of the \code{simList}.
+Which modules a global parameter reaches is described in \code{\link[=simInit]{simInit()}} and \link{dotParameters}.
 }
 \seealso{
 \link{SpaDES.core-package}, specifically the section 1.2.1 on Simulation Parameters.

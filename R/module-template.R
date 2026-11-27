@@ -36,6 +36,9 @@ openIsRequested <- function(open, suff) {
 #' `newModuleCode` will not generate the module code.
 #' `newModuleDocumentation` will create the other files.
 #'
+#' The generated module declares several "dot" parameters (`.plots`, `.useCache`, ...);
+#' see [dotParameters].
+#'
 #' All files will be created within a subdirectory named `name` within the `path`:
 #'
 #' ```
@@ -45,6 +48,8 @@ openIsRequested <- function(open, suff) {
 #'     |_ data/            # directory for all included data
 #'       |_ CHECKSUMS.txt  # contains checksums for data files
 #'     |_ tests/           # contains unit tests for module code
+#'     |_ citations/       # the references the module's documentation cites
+#'       |_ references_<name>.bib  # empty; named by the Rmd's `bibliography:`
 #'     |_ citation.bib     # bibtex citation for the module
 #'     |_ LICENSE          # describes module's legal usage
 #'     |_ README.md        # provide overview of key aspects
@@ -62,7 +67,8 @@ openIsRequested <- function(open, suff) {
 #'    more of the following:\cr\cr
 #' \describe{
 #'   \item{`children`}{Required when `type = "parent"`. A character vector
-#'   specifying the names of child modules.}
+#'   specifying the names of child modules, or GitHub specs such as
+#'   `"owner/repo@branch"` (see `childModules` in [defineModule()]).}
 #'   \item{`open`}{Logical. Should the new module file be opened after creation?
 #'   Default `TRUE`.}
 #'   \item{`type`}{Character string specifying one of `"child"` (default),
@@ -295,13 +301,14 @@ setMethod(
     children_char <- if (any(is.na(args$children)) || length(args$children) == 0L) {
       "character(0)"
     } else {
-      capture.output(dput(args$children))
+      ## dput() wraps a long vector over several lines; keep them all
+      paste(capture.output(dput(args$children)), collapse = "\n")
     }
 
     version <- list()
     version[[name]] <- moduleDefaults[["version"]]
     if (args$type == "parent")
-      lapply(args$children, function(x) version[[x]] <<- "0.0.1")
+      lapply(args$children, function(x) version[[.childModuleName(x)]] <<- moduleDefaults[["version"]])
 
     SpaDES.core.version <- as.character(utils::packageVersion("SpaDES.core"))
     DESCtxt <- readLines(system.file("DESCRIPTION", package = "SpaDES.core"))
@@ -398,7 +405,7 @@ setMethod(
       timeframe = deparse(moduleDefaults[["timeframe"]]),
       timeunit = deparse(moduleDefaults[["timeunit"]]),
       type = args$type,
-      versions = deparse(version)
+      versions = paste(deparse(version), collapse = "\n")
     )
     moduleTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "module.R.template"))
     writeLines(whisker.render(moduleTemplate, moduleData), filenameR)
@@ -492,6 +499,13 @@ setMethod(
     )
     moduleCiteTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "citation.bib.template"))
     writeLines(whisker.render(moduleCiteTemplate, moduleCite), filenameCitation)
+
+    ### Make the references file the Rmd's `bibliography:` names; without it the Rmd does not knit
+    ### (pandoc: "File citations/references_<name>.bib not found"). Empty, for the module's references;
+    ### an existing one is kept.
+    filenameRefs <- file.path(checkPath(file.path(nestedPath, "citations"), create = TRUE),
+                              paste0("references_", name, ".bib"))
+    if (!file.exists(filenameRefs)) file.create(filenameRefs)
 
     ### Make LICENSE file
     licenseTemplate <- readLines(file.path(.pkgEnv[["templatePath"]], "LICENSE.template"))

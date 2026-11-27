@@ -8,19 +8,49 @@
 #'
 #' `convertToPackage` will:
 #' \enumerate{
-#'   \item move any functions that were defined within the main module file
-#'   (`moduleName.R`) into the R folder, with the same name, but ending with `Fns.R`;
-#'   \item keep the `defineModule(...)` function call with all the metadata in
-#'         the same file, `moduleName.R`, but with all other content removed,
-#'         i.e., only the `defineModule(...)` will be here.
-#'   \item build documentation from all the \pkg{roxygen2} tags
-#'   \item places one \pkg{roxygen2} tag, `@export` in front of the `doEvent.moduleName`
-#'         function, so that the function can be found by `SpaDES.core`
-#'   \item All other functions will be kept "private", i.e., not exported, unless
-#'         the user manually adds `@export`, as per a normal package
-#'   \item will make a `DESCRIPTION` file from the SpaDES module metadata
-#'   \item will make a `NAMESPACE` file from the \pkg{roxygen2} tags (e.g., `@export`)
+#'   \item **copy** the functions defined in the main module file (`moduleName.R`)
+#'         into `R/READONLYFromMainModuleFile.R`. The main module file is **not**
+#'         modified: it still holds both `defineModule(...)` and the function
+#'         definitions afterwards. The `R/` copy is what package tooling
+#'         (`pkgload::load_all`, `covr`) sees; the module itself continues to be
+#'         parsed from `moduleName.R` as before. Only written when
+#'         `buildDocuments = TRUE`;
+#'   \item build documentation from all the \pkg{roxygen2} tags;
+#'   \item write a `DESCRIPTION` file from the SpaDES module metadata, via
+#'         [DESCRIPTIONfromModule()];
+#'   \item write `R/imports.R` with one `@import` per `reqdPkgs` entry;
+#'   \item write a `NAMESPACE` file from the \pkg{roxygen2} tags. Note this only
+#'         happens when `buildDocuments = TRUE`; with `FALSE` you get a
+#'         `DESCRIPTION` and `R/imports.R` but no `NAMESPACE` and no function
+#'         copies, which is *not* enough for `devtools::test()` or
+#'         `covr::package_coverage()` to work;
+#'   \item write an `.Rbuildignore`.
 #' }
+#'
+#' @section Testing a module as a package:
+#'
+#' `convertToPackage()` cannot be called from `tests/testthat/setup.R`:
+#' `devtools::test()` and `devtools::check()` both require a `DESCRIPTION` before
+#' `testthat` ever sources `setup.R`, so the conversion has to happen *before*
+#' they are called, not from inside them.
+#'
+#' Use `destinationPath` to build the package rendition somewhere disposable
+#' (e.g. `tempdir()`), leaving the module directory untouched:
+#'
+#' ```
+#' pkg <- convertToPackage("myModule", path = "..", destinationPath = tempdir())
+#' devtools::test(pkg)
+#' covr::package_coverage(pkg)
+#' ```
+#'
+#' Two things commonly block `R CMD INSTALL` (and therefore
+#' `covr::package_coverage()`) on the result, both inherited from the module:
+#' an `authors` field written as `structure(list(...), class = "person")` rather
+#' than a call to `person()`, which R rejects as an unsafe call in `Authors@R`;
+#' and the `tests/unitTests.R` file left behind by [newModule()], which
+#' `R CMD check` runs and which fails with `No test files found` because it
+#' hardcodes a relative path. [newModule()] also writes no `tests/testthat.R`,
+#' so without one `R CMD check` runs no tests at all.
 #'
 #' A user can continue to use the module code as before, i.e., by editing it and
 #' putting `browser()` etc. It will be parsed during `simInit`. Because the functions
@@ -121,9 +151,20 @@
 #' @param path Character string of `modulePath`. Defaults to  `getOption("spades.modulePath")`.
 #'
 #' @param buildDocuments A logical. If `TRUE`, the default, then the documentation
-#'   will be built, if any exists, using `roxygen2::roxygenise`.
+#'   will be built, if any exists, using `roxygen2::roxygenise`. Note that with
+#'   `FALSE` no `NAMESPACE` and no function copies are written, which is not
+#'   enough for `devtools::test()` or `covr::package_coverage()`.
 #'
-#' @return invoked for the side effect of converting a module to a package
+#' @param destinationPath Character string. Optional. If supplied, the module
+#'   directory is first copied to `file.path(destinationPath, module)` and the
+#'   package rendition is built *there*, leaving the original module untouched.
+#'   This is the non-destructive way to test or measure coverage on a module --
+#'   see the *Testing a module as a package* section. If `NULL` (default) the
+#'   module is converted in place, which is **not reversible**.
+#'
+#' @return Invoked for its side effects. Invisibly returns the path of the
+#'   directory that now holds the package rendition -- the module directory
+#'   itself, or the copy under `destinationPath`.
 #'
 #' @export
 #' @examples
@@ -134,13 +175,35 @@
 #' }
 #'
 convertToPackage <- function(module = NULL, path = getOption("spades.modulePath"),
-                             buildDocuments = TRUE) {
+                             buildDocuments = TRUE, destinationPath = NULL) {
+  # Validate the arguments before the optional dependencies: a caller who passes
+  # two modules should be told that, not that roxygen2 is missing.
+  module <- unlist(module)
+  if (length(module) != 1L)
+    stop("convertToPackage() converts one module at a time; got ", length(module))
+
   stopifnot(
     requireNamespace("pkgload", quietly = TRUE),
     requireNamespace("roxygen2", quietly = TRUE)
   )
 
-  mainModuleFile <- file.path(path, unlist(module), paste0(unlist(module), ".R"))
+  # Building into `destinationPath` leaves the module untouched. Everything below
+  # writes relative to `packageFolderName`, and documentModule() re-derives the
+  # main module file from it, so the whole module directory has to be copied --
+  # not just <module>.R -- for the copy to be a working package.
+  if (!is.null(destinationPath)) {
+    srcDir <- file.path(path, module)
+    if (!dir.exists(srcDir))
+      stop("no module directory at ", srcDir)
+    destDir <- file.path(destinationPath, module)
+    unlink(destDir, recursive = TRUE)
+    checkPath(destinationPath, create = TRUE)
+    if (!all(file.copy(srcDir, destinationPath, recursive = TRUE)))
+      stop("could not copy ", srcDir, " to ", destinationPath)
+    path <- destinationPath
+  }
+
+  mainModuleFile <- file.path(path, module, paste0(module, ".R"))
   packageFolderName <- dirname(mainModuleFile)
   aa <- parse(mainModuleFile, keep.source = TRUE)
   gpd <- getParseData(aa)
@@ -264,7 +327,7 @@ vignettes/.*\\.log$
   rbi <- unique(c(startCat, rbi, modFiles))
   cat(rbi, file = RBuildIgnoreFile, fill = TRUE, sep = "\n")
 
-  return(invisible())
+  invisible(packageFolderName)
 }
 
 filenameFromFunction <- function(packageFolderName, fn = "", subFolder = "", fileExt = ".R") {
@@ -289,17 +352,40 @@ writeImportSpadesCore <- function(deps, hasNamespaceFile, NAMESPACEFile,
   # Skip any package already covered by an explicit @importFrom.
   if (isTRUE(hasNamespaceFile)) {
     nsTxt <- readLines(NAMESPACEFile)
-    hasImportFrom <- grepl("importFrom", nsTxt)
-    if (any(hasImportFrom)) {
-      pkgsNotNeeded <- unique(gsub(".+\\((.+)\\,.+\\)", "\\1", nsTxt[hasImportFrom]))
-      namespaceImports <- grep(paste(pkgsNotNeeded, collapse = "|"),
-                               namespaceImports, invert = TRUE, value = TRUE)
-    }
+    importFromLines <- grep("^\\s*importFrom\\(", nsTxt, value = TRUE)
+    # package name = first argument, with any quotes or backticks removed
+    pkgsNotNeeded <- unique(gsub("^\\s*importFrom\\(\\s*[\"'`]?([^,\"'`[:space:]]+).*$", "\\1",
+                                 importFromLines))
+    namespaceImports <- setdiff(namespaceImports, pkgsNotNeeded)
   }
 
-  cat(paste0("#' @import ", namespaceImports, "\nNULL\n"), sep = "\n",
+  cat(paste0(importTags(namespaceImports), "\nNULL\n"), sep = "\n",
       file = filePathImportSpadesCore, fill = TRUE)
   invisible(namespaceImports)
+}
+
+# One roxygen import tag per package. A name exported by several packages makes
+# installing the package warn ("replacing previous import"), so it is imported
+# only from the package whose import() comes last in the NAMESPACE -- roxygen
+# sorts the lines in the C locale, i.e. by package name here -- which is the one
+# that wins when every package is imported whole. A package that is not
+# installed is imported whole, as before. S4 method tables (`.__T__`, `.__C__`)
+# are merged by R, never replaced, so they are not excluded.
+importTags <- function(pkgs) {
+  exports <- lapply(setNames(pkgs, pkgs), function(p)
+    grep("^\\.__[CT]__", tryCatch(getNamespaceExports(p), error = function(e) character()),
+         invert = TRUE, value = TRUE))
+  exports <- exports[order(names(exports), method = "radix")]
+  winner <- character()
+  for (p in names(exports)) winner[exports[[p]]] <- p
+  vapply(pkgs, function(p) {
+    lost <- exports[[p]][winner[exports[[p]]] != p]
+    if (length(lost))
+      paste0("#' @rawNamespace import(", p, ", except = c(",
+             paste0("\"", sort(lost), "\"", collapse = ", "), "))")
+    else
+      paste0("#' @import ", p)
+  }, character(1), USE.NAMES = FALSE)
 }
 
 
@@ -332,12 +418,29 @@ documentModule <- function(packageFolderName, gpd, linesWithDefModule) {
     }
     linesWithDefModule <- gpd[grep("defineModule", gpd$text) - 1, ][, c("line1", "line2")]
   }
+  # `grep("defineModule", gpd$text)` matches every mention, not just the call --
+  # a module that names defineModule in a comment yields >1 row. `a:b` on the
+  # two-column result then silently used only the first element of each and
+  # warned ("numerical expression has 2 elements"). Take the widest row that
+  # actually spans a block, explicitly.
+  defRange <- as.matrix(linesWithDefModule)
+  defRange <- defRange[which.max(defRange[, 2L] - defRange[, 1L]), , drop = TRUE]
+  defStart <- as.integer(defRange[[1L]])
+  defEnd <- as.integer(defRange[[2L]])
+
   if (!dir.exists(file.path(m, "R")))
     dir.create(file.path(m, "R"))
-  cat(paste0("#% Generated by SpaDES.core: do not edit by hand
-#% Please edit documentation in\n#%", mainModuleFile),
+  # The header must end in a newline. Without one, `cat(body, sep = "\n", append =
+  # TRUE)` welded the first line of the module onto the last header line, turning
+  # it into part of a `#%` comment -- silently dropping that line if it was code.
+  # `removedLines` records the deleted defineModule() block so coverage collected
+  # on this file can be mapped back onto the module file; see [moduleCoverage()].
+  cat(paste0("#% Generated by SpaDES.core: do not edit by hand\n",
+             "#% Please edit documentation in\n",
+             "#%", mainModuleFile, "\n",
+             "#% removedLines: ", defStart, "-", defEnd, "\n"),
       file = tmpSrcForDoc)
-  cat(rlaa[-(linesWithDefModule[[1]]:linesWithDefModule[[2]])], sep = "\n",
+  cat(rlaa[-(defStart:defEnd)], sep = "\n",
       file = tmpSrcForDoc, append = TRUE)
   # on.exit(unlink(tmpSrcForDoc))
   roxygen2::roxygenise(m, roclets = NULL) # This builds documentation, but also exports all functions ...

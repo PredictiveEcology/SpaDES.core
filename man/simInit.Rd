@@ -135,9 +135,10 @@ load order will be determined automatically.}
 
 \item{notOlderThan}{A time, as in from \code{Sys.time()}. This is passed into
 the \code{Cache} function that wraps \code{.inputObjects}.
-If the module uses the \code{.useCache} parameter and it is
-set to \code{TRUE} or \code{".inputObjects"},
-then the \code{.inputObjects} will be cached.
+If the module's \code{.useCache} parameter (see \link{dotParameters}) is
+\code{TRUE} or includes \code{".inputObjects"},
+then the \code{.inputObjects} will be cached, unless the module
+lists \code{".inputObjects"} in its \code{.neverCache} parameter.
 Setting \code{notOlderThan = Sys.time()} will cause the
 cached versions of \code{.inputObjects} to be refreshed,
 i.e., rerun.}
@@ -157,13 +158,41 @@ see them). For convenience, these can be supplied without their package prefix,
 e.g., \code{lowMemory} can be specified instead of \code{spades.lowMemory}. In cases that
 share option name (\code{reproducible.verbose} and \code{Require.verbose} both exist),
 passing \code{verbose = FALSE} will set both. Obviously this may cause unexpected
-problems if a module is also expecting a value.}
+problems if a module is also expecting a value.
+\code{cache} is an argument too: \code{TRUE} (same as \code{"local"}) or \code{"portable"} caches the
+whole \code{simInit()} call; see the \code{cache} argument of \code{\link[=spades]{spades()}}. \code{.useCache} is
+the same argument under another name.
+One name is an argument instead: \code{alreadyRun}, a run already done whose saved outputs
+this simulation replays (default \code{NULL}, none). It is a list with \code{sim}, the run's saved
+\code{simList} (only its \code{depends()}, \code{outputs()} and time unit are used; it can be a shell
+whose objects are not loaded), and optionally \code{fetch}, a function that, given files of
+\code{outputs(sim)}, makes them local and returns their paths (e.g. from a remote archive).
+Each object that a module of this simulation expects (\code{expectsInput}), that a module of
+the run created (\code{createsOutput}) and that the user did not supply is loaded from the
+run's saved outputs as \code{inputs}: the latest save at or before \code{start} at \code{start}, then
+each later save up to \code{end} at its \code{saveTime}. Only those files are fetched. An object
+without such a save is taken from the run's \code{simList}, with its value at the end of
+that run; one in neither is an error. The run's modules are not in \code{modules}, so their code is not read and their
+events do not run. \code{sim$._alreadyRun} keeps the other elements of \code{alreadyRun}, the run's
+\code{modules} and the replayed \code{inputs}.
+\code{alreadyRun} can also be several runs, a list of such runs (named by run; unnamed, they are
+\code{"1"}, \code{"2"}, ...), for modules that summarise replicates (e.g. \code{mode = "multi"}). Then
+nothing is replayed. \code{outputsDF} is the saved rows of every run's \code{outputs()}, bound, with a
+column \code{run} (each run with \code{fetch} is fetched first), unless the user supplies it. An object
+that a module expects and the user did not supply is taken from the runs' \code{simList}s
+(end-of-run values, whichever module or user made it there) only if every run has it, not
+\code{NULL}, with the same value (by \code{reproducible::.robustDigest()}); a message names the
+others. \code{sim$._alreadyRun}
+is then \verb{list(runs = <each run as above>, objects = <names taken>, outputsDF = <logical>)}.}
 
 \item{l}{A list of arguments to passed to \code{simInit}.}
 }
 \value{
 A \code{simList} simulation object, pre-initialized from values
-specified in the arguments supplied.
+specified in the arguments supplied. \code{sim$._modulesGiven} records the modules as
+given: \verb{list(modules = <the modules argument, with its names, e.g. "account/repo@ref">, parents = <a list naming the children of each parent module>)}. A saved \code{simList} keeps
+it, so it says which parent modules a run used, although only their children are in
+\code{modules(sim)}.
 }
 \description{
 Create a new simulation object, the \code{sim} object (a \code{simList}).
@@ -209,8 +238,7 @@ runs \code{.inputObjects} functions \tab from every module
 
 \code{params} can only contain updates to any parameters that are defined in
 the metadata of modules. Take the example of a module named, \code{Fire}, which
-has a parameter named \code{.plotInitialTime}. In the metadata of that module,
-it says \code{TRUE}. Here we can override that default with:
+has a parameter named \code{.plotInitialTime} (see \link{dotParameters}). Here we can override that default with:
 \code{list(Fire=list(.plotInitialTime=NA))}, effectively turning off plotting.
 Since this is a list of lists, one can override the module defaults for multiple
 parameters from multiple modules all at once, with say:
@@ -219,15 +247,12 @@ parameters from multiple modules all at once, with say:
 The \code{params} list can contain a list (named \code{.globals}) of named objects
 e.g., \code{.globals = list(climateURL = "https:\\\\something.com")} entry. Any and every
 module that has a parameter with that name (in this case \code{climateURL}) will be
-overridden with this value as passed.
+overridden with this value as passed. The universal dot parameters (\code{.plots}, \code{.seed},
+\code{.showSimilar}, \code{.useCache}, \code{.useCacheArgs}) are set in every module, even one that does
+not declare them; see \link{dotParameters}.
 
-\code{params} can be used to set the seed for a specific event in a module. This
-is done using the normal \code{params} argument, specifying \code{.seed} as a list
-where the elements are a numeric for the seed and the name is the event. Since
-parameters must be specific to a module, this creates a module and event specific
-seed e.g., \code{params = list(moduleName = list(.seed = list(init = 123)))} will
-set the \code{init} event of module named \code{moduleName} to 123. The RN stream
-will be reset to its state prior to the \code{set.seed} call after the event.
+\code{params} can set the seed for a specific event in a module, e.g.,
+\code{params = list(moduleName = list(.seed = list(init = 123)))}; see \link{dotParameters}.
 
 We implement a discrete event simulation in a more modular fashion so it is
 easier to add modules to the simulation. We use S4 classes and methods,

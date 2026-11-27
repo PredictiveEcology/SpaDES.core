@@ -33,6 +33,23 @@ setMethod(
   signature = "simList",
   definition = function(object, .objects, length, algo = "xxhash64", quick, classOptions) {
     # browser(expr = exists("._robustDigest_1"))
+    ## A simList reachable from its own environment (`sim$x <- sim`, or `sim` left in a module
+    ## environment) would recurse through digestEnviros() until the C stack runs out. Same rule
+    ## as reproducible's environment method (`prevEnvir`): an environment already being digested
+    ## further up this path is skipped. The record travels in its own `classOptions` element,
+    ## removed again here so the options this method reads are what the caller passed.
+    prevSimEnvirs <- classOptions[[.prevSimEnvirs]]
+    if (any(vapply(prevSimEnvirs, identical, logical(1), object@.xData)))
+      return(NULL)
+    if (isTRUE(classOptions[[.prevSimEnvirsWasNull]])) {
+      classOptions <- NULL
+    } else if (is.list(classOptions) && any(names(classOptions) %in% .prevSimEnvirs)) {
+      classOptions <- classOptions[!names(classOptions) %in% c(.prevSimEnvirs, .prevSimEnvirsWasNull)]
+    }
+    classOptionsInner <- classOptions
+    if (is.null(classOptionsInner)) classOptionsInner <- setNames(list(TRUE), .prevSimEnvirsWasNull)
+    classOptionsInner[[.prevSimEnvirs]] <- c(prevSimEnvirs, list(object@.xData))
+
     curMod <- currentModule(object)
 
     outerObjs <- ls(object@.xData, all.names = TRUE)
@@ -110,12 +127,12 @@ setMethod(
                            if (!is.null(.objects[[xDataDotModDotObj]][[moduleNam]]) && length(obj)) {
                              digestEnviros(obj, .objects[[xDataDotModDotObj]][[moduleNam]],
                                            allEnvsInSimList[[xDataDotModDotObj]][[moduleNam]],
-                                           algo, quick, length, classOptions)
+                                           algo, quick, length, classOptionsInner)
                            }
                          })
 
                        } else {
-                         out <- digestEnviros(objs, .objects[[".xData"]], allEnvsInSimList[[".xData"]], algo, quick, length, classOptions)
+                         out <- digestEnviros(objs, .objects[[".xData"]], allEnvsInSimList[[".xData"]], algo, quick, length, classOptionsInner)
                        }
                        out
                      })
@@ -145,19 +162,9 @@ setMethod(
     ## Replace the .list slot with the hashes of the slots
     object@.Data <- envirHash
 
-    ## Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
-    ##  i.e., if the same file is located in a different place, that is ok
-    object@paths <- list()
-
     # Remove event queue from digest. The queue will be put back into the sim at the end (.prepareOutput),
     #    but it doesn't matter what it is for digesting
     # object@events <- list()
-
-    # don't cache contents of output because file may already exist
-    if (NROW(object@outputs)) {
-      object@outputs$file <- basename(object@outputs$file)
-      object@outputs$file <- tools::file_path_sans_ext(object@outputs$file) # could be qs2 or rds; doesn't matter for Cache
-    }
 
     deps <- object@depends@dependencies
     for (i in seq_along(deps)) {
@@ -184,19 +191,8 @@ setMethod(
       }
     }
 
-    # Strip absolute module paths before digesting. A module's path is carried as
-    # the *name* of its `object@modules` entry, and as the *name* of each event's
-    # `moduleName` (a named character: name = full path, value = module name).
-    # Those paths differ across machines/OSs, so they split the cacheId -- the
-    # same identical run on Linux vs Windows produced different `sim.modules` and
-    # `sim.events.moduleName` hashes (diagnosed via CacheDigest's preDigest), so
-    # `init`/event results could not be shared via a (cloud) cache, even though
-    # only the module *name* (not its install location) is relevant to caching.
-    # `.inputObjects` was unaffected because its classOptions use the basename and
-    # exclude the event queue. (Same cross-OS rationale as the parameters/desc
-    # removals above.)
-    object@modules <- lapply(object@modules, unname)
-    names(object@modules) <- NULL
+    # Strip absolute module paths from the events too (`moduleName` is a named character:
+    # name = full path, value = module name); see .simArgsForDigest() for why
     if (length(object@events)) {
       object@events <- lapply(object@events, function(e) {
         if (!is.null(e[["moduleName"]])) e[["moduleName"]] <- unname(e[["moduleName"]])
@@ -232,7 +228,7 @@ setMethod(
       if (!is.null(classOptions["params"])) {
         object@params <- classOptions["params"] |> setNames(curMod)
       } else {
-        omitParams <- c(".showSimilar", ".useCache")
+        omitParams <- c(".showSimilar", ".useCache", ._txtDotNeverCache)
         object@params <- object@params[curMod]
         object@params[[curMod]] <- object@params[[curMod]][
           !names(object@params[[curMod]]) %in% omitParams
@@ -240,8 +236,13 @@ setMethod(
       }
 
     }
-    object@params <- lapply(object@params, function(x) .sortDotsUnderscoreFirst(x))
-    object@params <- .sortDotsUnderscoreFirst(object@params)
+    ## the same rules as the key of a whole simInit()/simInitAndSpades() call
+    simArgs <- .simArgsForDigest(list(paths = object@paths, outputs = object@outputs,
+                                      modules = object@modules, params = object@params))
+    object@paths <- simArgs$paths
+    object@outputs <- simArgs$outputs
+    object@modules <- simArgs$modules
+    object@params <- simArgs$params
 
     # globals
     if (!is.null(classOptions$.globals)) {
@@ -297,8 +298,6 @@ setMethod(
       # object@outputs <- object@outputs[object@outputs$objectName %in% outputsFromThisMod,]
     }
 
-    otherDependsToDig <- c("childModules", "loadOrder", "reqdPkgs",
-                           "spatialExtent", "timeframe", "timeunit", "version")
     dependsSecond <-
       .robustDigest(lapply(object@depends@dependencies,
                            function(mo) {
@@ -308,12 +307,24 @@ setMethod(
     obj[["depends"]] <- modifyList2(obj[["depends"]], dependsSecond)
     # obj[["depends"]] <- .robustDigest(object@depends@dependencies, algo = algo)
     obj <- .sortDotsUnderscoreFirst(obj)
-    obj["outputs"] <- .robustDigest(object@outputs[, c("objectName", "saveTime", "file", .txtArguments)],
-                                    quick = TRUE, algo = algo)
+    ## `arguments` is an `AsIs` column when the rows were added through `outputsAppend()`, which wraps
+    ## it with `I()` so `rbindlist()` will bind it, and a plain list when they were not. That is a
+    ## construction detail with no bearing on what an event computes -- but the rows are dropped just
+    ## above for a module-level call, so the column's CLASS is essentially all that reaches the digest.
+    ## It therefore split the cacheId of every event in every module: in a FireSense run, `sim.outputs`
+    ## took exactly two values across 2395 entries, `5d0cef838b366d87` (AsIs) and `fd0dc16cc74b5a3c`
+    ## (list), and warm caches missed for no reason. Normalise the class; contents still count.
+    outs <- object@outputs[, c("objectName", "saveTime", "file", .txtArguments)]
+    outs[[.txtArguments]] <- unclass(outs[[.txtArguments]])
+    obj["outputs"] <- .robustDigest(outs, quick = TRUE, algo = algo)
     if (!is.null(classOptions$depends)) { # this is used for Cache(.inputObjects(...))
       keep <- intersect(names(obj$depends[[curMod]]), classOptions$depends)
       obj$depends[[curMod]] <- obj$depends[[curMod]][keep]
     }
+    ## a narrowed event key (options(spades.cacheKeyReachable)) digests the event's own branch of
+    ##   doEvent.<module> in place of the whole function
+    if (!is.null(classOptions$eventCode))
+      obj$eventCode <- .robustDigest(classOptions$eventCode, algo = algo)
 
     if (!is.null(classOptions$events)) {
       if (FALSE %in% classOptions$events) obj$events <- NULL
@@ -383,6 +394,38 @@ setMethod(
     }
     userTags
   })
+
+## How the cache key treats `paths`, `outputs`, `modules` and `params`, wherever they come from: the
+## slots of a simList (.robustDigest() above) or the arguments of a whole simInit() /
+## simInitAndSpades() call (.cacheWholeRun()). `x` is a list holding any of them.
+.simArgsForDigest <- function(x) {
+  ## Remove paths (i.e., dirs) as they are not relevant -- it is only the files that are relevant
+  ##  i.e., if the same file is located in a different place, that is ok
+  if (!is.null(x$paths)) x$paths <- list()
+
+  # don't cache contents of output because file may already exist
+  if (NROW(x$outputs) && !is.null(x$outputs$file)) { # simInit() arguments may give no `file`
+    x$outputs$file <- basename(x$outputs$file)
+    x$outputs$file <- tools::file_path_sans_ext(x$outputs$file) # could be qs2 or rds; doesn't matter for Cache
+  }
+
+  # Strip absolute module paths before digesting. A module's path is carried as
+  # the *name* of its `modules` entry. Those paths differ across machines/OSs, so
+  # they split the cacheId -- the same identical run on Linux vs Windows produced
+  # different `sim.modules` hashes (diagnosed via CacheDigest's preDigest), so
+  # `init`/event results could not be shared via a (cloud) cache, even though
+  # only the module *name* (not its install location) is relevant to caching.
+  if (!is.null(x$modules)) {
+    x$modules <- lapply(x$modules, unname)
+    names(x$modules) <- NULL
+  }
+
+  if (!is.null(x$params)) {
+    x$params <- lapply(x$params, function(p) .sortDotsUnderscoreFirst(p))
+    x$params <- .sortDotsUnderscoreFirst(x$params)
+  }
+  x
+}
 
 if (!isGeneric(".cacheMessage")) {
   setGeneric(".cacheMessage", function(object, functionName, fromMemoise, verbose) {
@@ -633,6 +676,25 @@ setdiffNamedRecursive <- function(l1, l2, missingFill) {
   l1Different
 }
 
+## Merge the event queue recovered from the cache with the live one, so that events the cached event
+## scheduled are not lost. `keep` selects which of the cached events to consider: an event can only
+## have scheduled its own module's events. Only for an entry saved without an `eventQueueDelta` tag;
+## an entry with one has its delta replayed instead (.prepareOutput()).
+##
+## An event in both queues is added once per copy the cached queue has BEYOND the live queue: no more
+## (the cached queue also holds the events the live run already had, which must not be duplicated)
+## and no less (`unique()` on the union also collapsed a duplicate the live run had really scheduled,
+## which changed every later event's cacheId). Multiplicity is counted as the chain counts it
+## (.chainQueueKeys()), and the added events are queued as a replayed delta is (.chainApplyDelta()):
+## after the live events at equal eventTime and eventPriority, as scheduleEvent() would have.
+.mergeEventQueues <- function(cached, live, keep = TRUE) {
+  ## `cached[keep]` on an empty list pads rather than staying empty: a logical index longer than the
+  ## object yields list(NULL)
+  cached <- if (length(cached)) cached[keep] else cached
+  added <- cached[!.chainQueueKeys(cached) %in% .chainQueueKeys(live)]
+  .chainApplyDelta(live, list(add = added, remove = list()))
+}
+
 #' `.prepareOutput` for `simList` objects
 #'
 #' See [reproducible::.prepareOutput()].
@@ -714,13 +776,28 @@ setMethod(
 
         ## Step 1 -- copy the non-simEnv slots
         simPost <- Copy(simPre[[whSimList]], objects = FALSE)
+        wholeCall <- NROW(current(simPost)) == 0 # a spades()/simInit() call, not one event
 
-        ## This was unnecessary if the parameters never change; but they can
-        ##  -- but draw from Cache only from this module -- other modules may have
-        ##     changed during this simInit/spades call --> don't want their cached copies
-        ##   UNLESS they changed via the updateParamsFromGlobals mechanism!! Then DO want
-        ##   cached copy of other modules
-        simPost@params[currModules] <- simFromCache@params[currModules]
+        ## the entry's tags: what its event did to the queue, to its params, and which outputs rows it added
+        id <- cacheId(object)
+        sc <- if (length(id)) .chainEntryTags(id, cachePath)
+
+        ## Params: draw from Cache only for this module -- other modules may have changed during
+        ##   this simInit/spades call --> don't want their cached copies. Of this module's, only the
+        ##   ones the event set: those in the entry's key (equal to the live ones, unless the event
+        ##   changed them) and those its event recorded changing (`eventParamsChanged`). Every other
+        ##   param keeps its live value: one the key leaves out (.paramsNotCachedOn(), or not reached
+        ##   under spades.cacheKeyReachable) can differ from the value the entry was saved with. The
+        ##   module is the one whose entry this is, also when a cacheChaining jump lands on another
+        ##   module's entry. The live params are `simPre`'s: `simPost` lacks the module functions
+        ##   the key is read from.
+        eventType <- current(simPost)[["eventType"]]
+        fromEntry <- .chainReadParamsChanged(sc)
+        for (m in currModules) {
+          take <- intersect(union(.paramsInKey(simPre[[whSimList]], m, eventType), fromEntry),
+                            names(simFromCache@params[[m]]))
+          simPost@params[[m]][take] <- simFromCache@params[[m]][take]
+        }
         if (FALSE) {
           ## Eliot Dec 2023 -- removed this because it is already occuring during simInit;
           ##  also, user may have passed individual values for individual modules that should not
@@ -763,13 +840,14 @@ setMethod(
 
           changedObjs <- attr(simFromCache, ".Cache")$changed
           lsObjectEnv <- lsObjectsChanged(lsObjectEnv, changedObjs,
-                                          hasCurrModule, currModules, deps)
+                                          hasCurrModule, currModules, deps, eventType)
           hasDotObjs <- !is.null(simFromCache@.xData[[dotObjs]])
           changedModEnvObjs <- lsModObjectsChanged(namesAllMods, changedObjs, hasDotObjs)
 
         }
 
         # Copy all objects from createOutputs only -- all others take from simPre[[whSimList]]
+        lsObjectEnv <- setdiff(lsObjectEnv, "._urlLog") # the live ledger stays; see below
         list2env(mget(lsObjectEnv, envir = simFromCache@.xData), envir = simPost@.xData)
 
         otherModules <- setdiff(namesAllMods, currModules)
@@ -820,75 +898,80 @@ setMethod(
           ## means it is not in a spades call
           simPost@completed <- simFromCache@completed
         }
-        if (NROW(current(simPost)) == 0) {
+        if (!is.null(attr(simPre[[whSimList]], "cacheChainingJump"))) {
+          ## A cacheChaining jump: this entry is the state after the LAST of several skipped events.
+          ##   The queue is NOT the one stored in it -- that is the queue of whichever run saved the
+          ##   entry, and an entry is shared by runs with different module sets. `simPost` still has the
+          ##   live queue here; .chainJumpFinish() replaces it with the live queue as the skipped events
+          ##   would have left it (each event's own recorded delta; see .chainWalk()).
+          ## only the clock: start, end and timeunit are this run's, not those of the run that recorded
+          ##   the chain -- taking them all carried a recorded end(sim) past this run's own end
+          simPost@simtimes[["current"]] <- simFromCache@simtimes[["current"]]
+        } else if (NROW(current(simPost)) == 0) {
           # this is usually a spades call, i.e., not an event or module doEvent call
           simPost@events <- simFromCache@events
           simPost@simtimes <- simFromCache@simtimes
         } else {
-          # if this is FALSE, it means that events were added by the event
+          ## An event hit: the live queue (the event itself already off it) as the event would have
+          ##   left it. The entry records what its event did to the queue when it ran (the
+          ##   `eventQueueDelta` tag); replay it, as a cacheChaining jump does (.chainWalk()). The queue
+          ##   stored in the entry is not used: it is the saving run's whole queue, and merging it with
+          ##   the live one either duplicated the events the live run already had or, de-duplicated
+          ##   with unique(), collapsed a duplicate the live run had really scheduled.
+          delta <- if (!is.null(sc)) .chainReadDelta(sc)
+          if (!is.null(delta)) {
+            simPost@events <- .chainApplyDelta(simPost@events, delta)
+          } else {
+            ## an entry saved before the tag existed: the saving run's queue is all there is
+            esfc <- events(simFromCache)
 
-          esfc <- events(simFromCache)
-          cur <- current(simFromCache)
+            # anti-join to find new ones
+            eventsAddedByThisModuleDT <- esfc[!events(simPost), on = colnames(esfc)]
 
-          # anti-join to find new ones
-          eventsAddedByThisModuleDT <- esfc[!events(simPost), on = colnames(esfc)]
+            eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
 
-          eventsAddedByThisModule <- esfc$moduleName %in% currModules # can only add itself
-
-          if (NROW(eventsAddedByThisModuleDT)) {
-            # if (!isTRUE(all.equal(simFromCache@events, simPost@events))) {
-              b <- simFromCache@events
-              b <- lapply(b, function(x) {
-                x[["order"]] <- 2
-                x
-              })
-
-              d <- simPost@events
-              d <- lapply(d, function(x) {
-                x[["order"]] <- 1
-                x
-              })
-
-              a <- do.call(unique, args = alist(append(b[eventsAddedByThisModule], d)))
-              if (length(a)) {
-
-                # a <- do.call(unique,
-                #              args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
-                a1 <- rbindlist(a)
-                # f1 <- if (NROW(a1)) a[order(a1$eventTime, a1$eventPriority, a1$order)] else a1
-                f1 <- a[order(a1$eventTime, a1$eventPriority, a1$order)]
-                simPost@events <- lapply(f1, function(f) {
-                  f$order <- NULL
-                  f
-                })
-              }
-              # simPost@events <- do.call(unique,
-              #                           args = list(append(simFromCache@events[eventsAddedByThisModule], simPost@events)))
-            # }
+            if (NROW(eventsAddedByThisModuleDT)) {
+              simPost@events <- .mergeEventQueues(simFromCache@events, simPost@events,
+                                                  eventsAddedByThisModule)
+            }
           }
-          #simPost@events <- unique(rbindlist(list(simFromCache@events, simPost@events)))
         }
         simPost@current <- simFromCache@current
 
         # Outputs -- there may have been outputs added by another module that should be recovered
-        if (length(currModules) > 0) {
+        if (length(currModules) > 0 && NROW(object@outputs)) {
           outputsFromTheseMods <- lapply(currModules, function(cmod) {
             object@depends@dependencies[[cmod]]@outputObjects$objectName
           })
           outputsFromTheseMods <- unlist(outputsFromTheseMods)
 
-          ooo <- rbindlist(list(
-            simPost@outputs, object@outputs[!object@outputs$objectName %in% outputsFromTheseMods,]),
-            use.names = TRUE, fill = TRUE)
-          allowedColumnsForUnique <- (sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE
-          
-          # the file column must be changed to be the local one: there could be a different outputPath
-          #   so the file names will be slightly different if they include the outputPath
-          #   if they were being run in a different outputPath, but shared cachePath
-          allowedColumnsForUnique <- setdiff(names(ooo)[allowedColumnsForUnique], "file")
-          # because they were rbindlisted in order of simPost, then simCache (i.e., object), it will
-          #   keep the simPost, which is the local path
-          simPost@outputs <- unique(ooo, by = allowedColumnsForUnique)
+          ## only the rows the cached event itself added (its `eventOutputsAdded` tag), not every row
+          ##   the run that saved the entry had: those can be another run's, saved before this
+          ##   run's start(sim) -- see .chainOutAddedRows()
+          added <- .chainOutAddedRows(object@outputs, sc)
+          ## A file the cached event wrote (e.g. a Plots() figure) is in the outputPath of the run that
+          ##   made the entry: put it, and its row, in this run's outputPath, as if the event had run here.
+          ##   Before, the row kept the other run's path, and outTar() bundled that run's file.
+          from <- simFromCache@paths[["outputPath"]]
+          to <- outputPath(simPost)
+          if (NROW(added) && length(from) && nzchar(from) && !identical(normPath(from), normPath(to))) {
+            fns <- as.character(added$file)
+            under <- !is.na(fns) & fs::path_has_parent(fns, from)
+            if (any(under)) {
+              newFns <- file.path(to, fs::path_rel(fns[under], from))
+              copy <- file.exists(fns[under]) & !file.exists(newFns)
+              for (d in unique(dirname(newFns[copy]))) dir.create(d, recursive = TRUE, showWarnings = FALSE)
+              if (any(copy)) linkOrCopy(fns[under][copy], newFns[copy], verbose = verbose - 1)
+              added$file[under] <- newFns
+            }
+          }
+          ## An entry without the outputs tag gives the saving run's whole table, with rows for these
+          ##   modules' outputs that this run has its own copies of (e.g. from simInit(outputs = )): leave
+          ##   those out, as before the tag. With the tag, `added` is only what the event added, and a row
+          ##   it registered for its own module's output (registerOutputs(objectName = )) is restored too.
+          if (is.na(.chainReadOutAddedN(sc)))
+            added <- added[!added$objectName %in% outputsFromTheseMods, ]
+          simPost@outputs <- .mergeCachedOutputs(simPost@outputs, added)
 
         }
 
@@ -899,14 +982,26 @@ setMethod(
         keepFromOrig <- !(lsSimPreOrigEnv %in% ls(simPost@.xData, all.names = TRUE))
         list2env(mget(lsSimPreOrigEnv[keepFromOrig], envir = simPreOrigEnv), envir = simPost@.xData)
 
+        ## The download ledger (._urlLog) is the live run's: lsObjectsChanged() never takes it from
+        ##   the entry, so `simPost` holds the live environment. For a whole simInit()/spades() hit
+        ##   (no current event) the entry's records are merged in; for an event hit they reach the
+        ##   live ledger through reproducible's replay of the entry's reproducible.url* tags.
+        if (wholeCall)
+          .mergeUrlLog(envir(simPost)$._urlLog, envir(simFromCache)$._urlLog)
+
         # Deal with .mods
         # lsOrigModsEnv <- ls(simPreOrigEnv[[dotMods]], all.names = TRUE)
         # keepFromModsOrig <- !(lsOrigModsEnv %in% ls(simPost@.xData[[dotMods]], all.names = TRUE))
         # list2env(mget(lsOrigModsEnv[keepFromModsOrig], envir = simPreOrigEnv[[dotMods]]), envir = simPost@.xData[[dotMods]])
 
-        if (exists(".objectSynonyms", envir = simPost@.xData)) {
+        ## Synonyms the cached event added (e.g., objectSynonyms() in a module's init) are not in
+        ##   `changed` when the sim already had synonyms, so take them from the cache entry too.
+        cachedSyns <- if (exists(".objectSynonyms", envir = simFromCache@.xData, inherits = FALSE))
+          simFromCache@.xData$.objectSynonyms
+        if (exists(".objectSynonyms", envir = simPost@.xData) || length(cachedSyns)) {
           # objSyns <- lapply(attr(simPost$.objectSynonyms, "bindings"), function(x) unname(unlist(x)))
-          objSyns <- lapply(simPost$.objectSynonyms, function(x) unname(unlist(x)))
+          objSyns <- lapply(c(simPost$.objectSynonyms, cachedSyns), function(x) unname(unlist(x)))
+          objSyns <- unique(objSyns)
           # must remove the "other ones" first
           objNonCanonical <- unlist(lapply(objSyns, function(objs) objs[-1]))
           objNonCanonicalExist <- unlist(lapply(objNonCanonical, exists, envir = simPost@.xData))
@@ -1113,6 +1208,14 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   return(total)
 }
 
+## Transient state that simInit()/spades() keep only on the *live* sim: ._simInitContext
+## (restartSimInit()'s resume state, present only while simInit()'s .inputObjects phase is
+## running) and ._rmo (the recovery-mode accumulator, live only during a single simInit()/
+## spades() call). Neither has any meaning once reloaded from a cache entry, and
+## ._simInitContext can hold arbitrary user `objects` (e.g., SpatRaster/SpatVector) that
+## .wrap.simList() below never wraps -- see .wrap.simList()/.unwrap.simList().
+.transientSimStateNames <- c("._simInitContext", "._rmo")
+
 #' Methods for `.wrap` and `.unwrap`
 #'
 #'
@@ -1124,16 +1227,19 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
 #'            `DBIConnection` object (in order to clone an existing connection).
 #' @inheritParams reproducible::clearCache
 #' @inheritParams reproducible::.wrap
-#' @importFrom reproducible .wrap
+#' @importFrom reproducible .wrap .filebackedPath
 #' @include simList-class.R
 #' @export
 #' @rdname dealWithClass
-.wrap.simList <- function(obj, cachePath = getOption("reproducible.cachePath"),
+.wrap.simList <- function(obj, filebackedPath = getOption("reproducible.cachePath"),
                           preDigest, drv = getOption("reproducible.drv", NULL),
                           conn = getOption("reproducible.conn", NULL),
                           verbose = getOption("reproducible.verbose"),
                           outputObjects = NULL, cacheId = NULL,
-                          ...) {
+                          ..., cachePath) {
+  filebackedPath <- .filebackedPath(filebackedPath, missing(filebackedPath), cachePath, missing(cachePath))
+  if (isTRUE(attr(obj, ._txtPortableRun))) # a whole run with cache = "portable"; see R/cacheWholeRun.R
+    return(.wrapPortableRun(obj, filebackedPath, cacheId, verbose))
 
   # Copy everything (including . and ._) that is NOT a main object -- objects are the potentially very large things
   modules <- TRUE
@@ -1144,26 +1250,39 @@ objSize.simList <- function(x, quick = FALSE, recursive = FALSE, ...) {
   }
   objTmp <- Copy(obj, objects = 2, modules = modules, drv = drv, conn = conn, verbose = verbose)
 
+  ## Drop simInit()/spades()-only transient state from the *saved* copy (not `obj`, which
+  ## is still live); see .transientSimStateNames.
+  for (nm in .transientSimStateNames) envir(objTmp)[[nm]] <- NULL
+
   # Remove Par and mod active bindings --> these shouldn't be .wrap'd
   modulesInSim <- ls(objTmp[[dotMods]])
   for (mo in modulesInSim) {
     try(rm(list = c("Par", "mod"), envir = objTmp[[dotMods]][[mo]]))
+    ## the module imports (spades.reqdPkgsAttach = FALSE) must not be serialized; loadSimList() restores them
+    .setModuleImports(objTmp[[dotMods]][[mo]], character(), mo)
   }
 
   # .wrap the metadata ... i.e,. @depends
   objTmp <- .wrapOrUnwrapSimListAts(objTmp, .wrap)
 
   # Need to wrap the objects in e.g., .mods for e.g., mod objects that might be e.g., SpatVector
-  objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
-  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], cachePath = cachePath, drv = drv, conn = conn, verbose = verbose)
+  objTmp[[dotMods]] <- .wrap(objTmp[[dotMods]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose, ...)
+  objTmp[[dotObjs]] <- .wrap(objTmp[[dotObjs]], filebackedPath = filebackedPath, drv = drv, conn = conn, verbose = verbose, ...)
   # Deal with the potentially large things -- convert to list -- not a copy
   obj2 <- as.list(obj, all.names = FALSE) # don't copy the . or ._ objects, already done
   # Now the individual objects
-  out <- .wrap(obj2, cachePath = cachePath, outputObjects = outputObjects, cacheId = cacheId,
+  out <- .wrap(obj2, filebackedPath = filebackedPath, outputObjects = outputObjects, cacheId = cacheId,
                drv = drv, conn = conn, verbose = verbose, ...)
 
   # for (objName in names(out)) obj[[objName]] <- NULL
   list2env(out, envir = envir(objTmp))
+  ## Keep the tags the wrapped pieces carry (e.g., a file-backed raster's origFilename and filenamesInCache),
+  ##   as reproducible's .wrap.list does: Cache() records attr(<wrapped>, "tags") on the entry, and
+  ##   showCache()/clearCache() and the cloud cache find an entry's files through them. list2env() dropped
+  ##   them, so a cached simList's entry named none of its files.
+  tags <- c(attr(objTmp[[dotMods]], "tags"), attr(objTmp[[dotObjs]], "tags"), attr(out, "tags"))
+  if (length(tags))
+    attr(objTmp, "tags") <- c(attr(obj, "tags"), tags)
   objTmp
 }
 
@@ -1234,25 +1353,33 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #' @rdname dealWithClass
 .unwrap.simList <- function(
   obj,
-  cachePath = getOption("reproducible.cachePath"),
+  filebackedPath = getOption("reproducible.cachePath"),
   cacheId = NULL,
   drv = getOption("reproducible.drv", NULL),
   conn = getOption("reproducible.conn", NULL),
-  ...
+  ...,
+  cachePath
 ) {
+  filebackedPath <- .filebackedPath(filebackedPath, missing(filebackedPath), cachePath, missing(cachePath))
   ## the as.list doesn't get everything. But with a simList, this is OK; rest will stay
-  obj[[dotMods]] <- .unwrap(obj[[dotMods]], cachePath = cachePath, cacheId = cacheId,
+  obj[[dotMods]] <- .unwrap(obj[[dotMods]], filebackedPath = filebackedPath, cacheId = cacheId,
                             drv = drv, conn = conn, ...)
-  obj[[dotObjs]] <- .unwrap(obj[[dotObjs]], cachePath = cachePath, cacheId = cacheId,
+  obj[[dotObjs]] <- .unwrap(obj[[dotObjs]], filebackedPath = filebackedPath, cacheId = cacheId,
                             drv = drv, conn = conn, ...)
   objList <- as.list(obj, all.names = TRUE) # don't overwrite everything, just the ones in the list part
 
-  outList <- .unwrap(objList, cachePath = cachePath, cacheId = cacheId,
+  outList <- .unwrap(objList, filebackedPath = filebackedPath, cacheId = cacheId,
                      drv = drv, conn = conn, ...)
   list2env(outList, envir = envir(obj))
 
   # .unwrap the metadata ... i.e,. @depends
   obj <- .wrapOrUnwrapSimListAts(obj, wrapOrUnwrap = .unwrap)
+
+  ## Drop simInit()/spades()-only transient state (see .transientSimStateNames): entries
+  ## saved before .wrap.simList() stopped keeping it may still carry it, and a loaded
+  ## `obj` fully replaces the live sim (see .runEvent()), so a stale/foreign copy here
+  ## must not overwrite a live simInit() resume context.
+  for (nm in .transientSimStateNames) envir(obj)[[nm]] <- NULL
 
   obj
 }
@@ -1261,7 +1388,9 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #'
 #' Because of the environment slot, `simList` objects don't correctly
 #' memoise a `simList`.
-#' This method for `simList` converts the object to a `simList_` first.
+#' This method for `simList` converts the object to a `simList_` first,
+#' after a [Copy()], so that objects a later event modifies by reference
+#' (e.g., a `data.table`) do not change the memoised copy.
 #'
 #' @inheritParams reproducible::makeMemoisable
 #'
@@ -1273,7 +1402,7 @@ wrapAndUnwrapDotMmoduleDeps <- function(deps, wrapOrUnwrap = .wrap) {
 #' @rdname makeMemoisable
 #' @seealso [reproducible::makeMemoisable()]
 makeMemoisable.simList <- function(x) {
-  as(x, "simList_")
+  as(Copy(x), "simList_")
 }
 
 #' @export
@@ -1429,6 +1558,9 @@ sortInner <- function(l, useNames = FALSE) {
 }
 
 
+.prevSimEnvirs <- ".prevSimListEnvirs"
+.prevSimEnvirsWasNull <- ".prevSimListClassOptionsWasNull"
+
 digestEnviros <- function(objs, .objects, envToLookIn, algo, quick, length, classOptions) {
   dotUnderscoreObjs <- objs[startsWith(objs, "._")]
   objs <- objs[!objs %in% c(dotUnderscoreObjs, modAndParAB)]
@@ -1493,7 +1625,13 @@ upgradeModsToXdata <- function(envirHash, upgradeModsToXdata, moduleFunctionEnvi
         envirHashNew2 <- list()
         for (un in uniqNams) {
           wh <- which(un == nehn)
-          envirHashNew2 <- append(envirHashNew2, list(Reduce(modifyList, envirHashNew[wh])) |> setNames(un))
+          # Only the module entries are lists; an object with the same name as a module
+          # (e.g., sim$climateYear from the climateYear module) is a digest string, which
+          # modifyList() cannot merge. Keep it as its own entry.
+          isList <- vapply(envirHashNew[wh], is.list, logical(1))
+          if (any(isList))
+            envirHashNew2 <- append(envirHashNew2, list(Reduce(modifyList, envirHashNew[wh[isList]])) |> setNames(un))
+          envirHashNew2 <- append(envirHashNew2, envirHashNew[wh[!isList]])
         }
         envirHashNew <- envirHashNew2
         # wh <- which(nehn %in% nehn[dups])
@@ -1608,15 +1746,20 @@ buildDotObjectsList <- function(object, .objects) {
 }
 
 # changedFromCreatesOutputs <- function(hasCurrModule, deps, currModules, simFromCache) {
+## `eventType`: the event whose entry it is. Of the module's `createsOutput`s, only those that event
+##   may write (.outputsOfEvent()) are restored: `changed` of an entry saved before the module
+##   declared `createsOutput(events = )` names every createsOutput, written or not.
 lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
-                             currModules, deps) {
+                             currModules, deps, eventType = NULL) {
   createOutputs <- if (length(hasCurrModule)) {
-    deps[[hasCurrModule]]@outputObjects$objectName
+    .outputsOfEvent(deps[[hasCurrModule]], eventType)
   } else {
     aa <- lapply(deps, function(dep) dep@outputObjects$objectName)
     unique(unlist(aa))
   }
   createOutputs <- na.omit(createOutputs)
+  notThisEvent <- if (length(hasCurrModule))
+    setdiff(.outputsOfEvent(deps[[hasCurrModule]]), createOutputs)
 
   # add the environments for each module - allow local objects
   createOutputs <- c(createOutputs, currModules)
@@ -1637,11 +1780,14 @@ lsObjectsChanged <- function(lsObjectEnv, changedObjs, hasCurrModule,
   changedInputs <- expectsInputs[expectsInputs %in% names(changedObjs)]
 
   dotObjects <- startsWith(lsObjectEnv, ".")
-  dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs)
+  dotObjectsChanged <- dotObjects %in% TRUE & lsObjectEnv %in% names(changedObjs) &
+    !lsObjectEnv %in% notThisEvent
 
   # lsObjectEnv --> this should only be objects that can be outputted, not expectsInputs
-  lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
-                dotObjectsChanged %in% TRUE]
+  out <- lsObjectEnv[lsObjectEnv %in% changedOutputs | lsObjectEnv %in% changedInputs |
+                       dotObjectsChanged %in% TRUE]
+  ## the download ledger belongs to the live run; an entry's copy is stale (see .prepareOutput())
+  setdiff(out, "._urlLog")
 }
 
 # }
@@ -1662,7 +1808,7 @@ lsModObjectsChanged <- function(namesAllMods, changedObjs, hasDotObjs) {
 #' Convenience wrapper around `clearCache` for SpaDES events
 #'
 #' This will clear only the event- and module-level caching that is triggered
-#' using a module parameter, `.useCache`.
+#' using a module parameter, `.useCache` (see [dotParameters]).
 #'
 #' @inheritParams reproducible::clearCache
 #' @param dryRun logical. If `FALSE`, the default, then the function will deleted
@@ -1690,6 +1836,21 @@ clearCacheEventsOnly <- function(ask = TRUE,
     if (isFALSE(dryRun))
       clearCache(cacheId = y, ask = ask, verbose = verbose - 1)
   })
+}
+
+## Merge a cache entry's outputs(sim) rows into the local ones after a cache hit, dropping rows
+##   recorded twice. The local rows come first, so a duplicate keeps the local copy. `file` is
+##   compared by basename only: the same cache may be used from a different outputPath, so the same
+##   saved file can carry a different directory. Comparing without `file` at all collapsed rows that
+##   differ ONLY by file -- e.g. every registerOutputs() row at one saveTime (objectName NA) -- so
+##   all but one of them were lost on a cache hit.
+.mergeCachedOutputs <- function(localOutputs, cachedOutputs) {
+  ooo <- rbindlist(list(localOutputs, cachedOutputs), use.names = TRUE, fill = TRUE)
+  if (!NROW(ooo)) return(ooo)
+  keyCols <- names(ooo)[(sapply(ooo, is, "AsIs") | sapply(ooo, is, "list")) %in% FALSE]
+  key <- ooo[, setdiff(keyCols, "file"), with = FALSE]
+  if ("file" %in% names(ooo)) set(key, NULL, ".fileBasename", basename(as.character(ooo$file)))
+  ooo[!duplicated(key)]
 }
 
 outputsRmDontNeedForCache <- function(nonDotList, whichOutputs) {

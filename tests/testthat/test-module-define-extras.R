@@ -9,7 +9,7 @@ test_that("defineParameter with no arguments returns an empty parameter table", 
   expect_s3_class(p, "data.frame")
   expect_identical(NROW(p), 0L)
   expect_identical(names(p),
-                   c("paramName", "paramClass", "default", "min", "max", "paramDesc"))
+                   c("paramName", "paramClass", "default", "min", "max", "paramDesc", "cacheKey"))
 })
 
 test_that("defineParameter fills min and max with a typed NA when neither is given", {

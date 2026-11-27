@@ -354,6 +354,19 @@ cantCodeCheckMessage <- ": line could not be checked "
   }
 
   #############################################################
+  ###### Functions defined with `=` ###########################
+  #############################################################
+  eqDefs <- .cc_eqFnDefs(.moduleParseData(sim, m))
+  if (nrow(eqDefs)) {
+    hadPrevMessage <- .parseMessage(
+      m, "module code",
+      paste0(paste0(eqDefs$name, " (line ", eqDefs$line, ")", collapse = ", "), " ",
+             .verb(eqDefs$name), " defined with `=`; use `<-`, e.g., ",
+             eqDefs$name[1], " <- function(...)")
+    )
+  }
+
+  #############################################################
   ###### Sim Assignments ######################################
   #############################################################
   # 1
@@ -536,6 +549,23 @@ cantCodeCheckMessage <- ": line could not be checked "
   #############################################################
   if (!hadPrevMessage) .parseMessage(m, "", allCleanMessage)
   return(invisible())
+}
+
+## The parse data of a module's main file: the copy kept when the module was
+## parsed, or, when the source was not kept (`options(keep.source = FALSE)`, the
+## default in Rscript), the file parsed again.
+.moduleParseData <- function(sim, m) {
+  env <- sim@.xData$.mods[[m]]
+  pd <- env[["._parsedData"]]
+  if (is.null(pd)) {
+    f <- env[["._sourceFilename"]]
+    f <- f[basename(f) == paste0(m, ".R") & file.exists(f)]
+    if (length(f)) {
+      pd <- tryCatch(utils::getParseData(parse(f[1], keep.source = TRUE), includeText = TRUE),
+                     error = function(e) NULL)
+    }
+  }
+  pd
 }
 
 #' Prepend module name to a message

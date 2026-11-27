@@ -123,7 +123,7 @@ test_that("cacheChaining does not chain across an uncached .inputObjects", {
 ## Two chains get recorded against ONE cache entry whenever the same upstream
 ##   state is followed by the same event with different parameters -- i.e. any
 ##   time the same project is re-run with a downstream parameter changed. Each is
-##   stored as six `cacheChaining_<column>_<postCacheId>` tags on that entry, and
+##   stored as one `eventChainLink_<postCacheId>` tag on that entry, and
 ##   both have to stay findable.
 ##
 ## Asserting on engagement rather than on results is deliberate: a chain that was
@@ -159,7 +159,7 @@ test_that("cacheChaining finds every chain recorded against one entry", {
 
   ## both branches are now recorded; re-running each must chain the same amount
   nChained <- function(p)
-    length(grep("Using cacheChaining", capture_messages(invisible(runIt(p)))))
+    length(grep("Using cacheChaining|cacheChaining: restored", capture_messages(invisible(runIt(p)))))
   n1 <- nChained(1)
   n2 <- nChained(2)
 
@@ -187,9 +187,155 @@ test_that("the chain is recorded even when spades.cacheChaining is off", {
   runChainTest(cp, FALSE, times, params, modules, modulePath, 42)
 
   tags <- showCache(cp, verbose = -1)
-  chainTags <- tags[startsWith(tags[["tagKey"]], "cacheChaining")]
+  chainTags <- tags[startsWith(tags[["tagKey"]], .chainLinkKeyPrefix)]
   expect_gt(NROW(chainTags), 0L)
 
   ## And the chain written while off is usable by a later run with it on.
   expect_no_error(runChainTest(cp, TRUE, times, params, modules, modulePath, 42))
+})
+
+
+## A link recorded more than once under one postCacheId -- first by an earlier version whose digest
+## differs -- used to stop chaining for good: the reader flattened its recordings into one row (repeated
+## names renamed `digestNonObjects.1`, ...) and compared only the oldest, and the writer appended another
+## copy on every run. The writer now replaces a link's tags and the reader takes its newest recording.
+test_that(".chainSuccessors() reads a link's newest recording, by time", {
+  link <- function(digest, when) data.table::data.table(
+    cacheId = "prev", tagKey = .chainLinkTagKey("post1"),
+    tagValue = .chainLinkText(list(prevCache = "cacheId:prev", digestNonObjects = digest, module = "modC",
+                                   event = ".inputObjects", lastEventDetails = "modB .inputObjects",
+                                   postCacheId = "post1")),
+    createdDate = when)
+  ## stored newest first: "newest" has to come from createdDate, not from storage order
+  sc <- rbind(link("current", "2026-09-14 11:41:17.604587"), link("stale", "2026-09-14 00:38:03.152215"))
+  succ <- .chainSuccessors(sc)
+  expect_equal(nrow(succ), 1L)
+  expect_equal(succ$digestNonObjects, "current")
+  expect_equal(colnames(succ), .chainLinkCols)
+})
+
+## Another process can read an entry while a link is being recorded on it. A group of old-format tags
+## (six, written one at a time) that lacks columns is not a link and must be dropped, never error; a
+## complete old-format group beside it is still read.
+oldLinkTags <- function(post, cols = .chainLinkCols, digest = "d") data.table::data.table(
+  cacheId = "prev", tagKey = paste0("cacheChaining_", cols, "_", post),
+  tagValue = c(prevCache = "cacheId:prev", digestNonObjects = digest, module = "modC", event = "init",
+               lastEventDetails = "modB init", postCacheId = post)[cols],
+  createdDate = "2026-09-14 11:41:17")
+
+test_that(".chainSuccessors() drops incomplete old-format links and reads complete ones", {
+  expect_null(.chainSuccessors(oldLinkTags("p1", .chainLinkCols[1:3])))   # 3 of 6
+  expect_null(.chainSuccessors(oldLinkTags("p1", .chainLinkCols[-4])))    # only `event` missing
+  both <- rbind(oldLinkTags("p1", .chainLinkCols[1:3]), oldLinkTags("p2"))
+  succ <- .chainSuccessors(both)
+  expect_equal(succ$postCacheId, "p2")
+  expect_equal(colnames(succ), .chainLinkCols)
+  ## a one-tag link whose value is not a link is dropped too
+  bad <- data.table::data.table(cacheId = "prev", tagKey = .chainLinkTagKey("p3"), tagValue = "a\tb",
+                                createdDate = "2026-09-14 11:41:17")
+  expect_null(.chainSuccessors(bad))
+})
+
+test_that("a link's tag does not start with cacheChaining, so older readers ignore it", {
+  expect_false(startsWith(.chainLinkTagKey("post1"), "cacheChaining"))
+})
+
+## An entry with a half-written link, or a tag file that cannot be read: the event just runs (no jump).
+setupOn <- function(cp, prevId) {
+  withr::local_options(reproducible.cachePath = cp, .local_envir = parent.frame())
+  cacheChainingSetup(cacheIt = TRUE, prevCache = paste0("cacheId:", prevId), nonObjects = list(a = 1),
+                     fnCallAsExpr = quote(f()), module = "modC", event = "init", led = "modB init")
+}
+
+test_that("cacheChainingSetup() finds no jump on an entry with an incomplete link", {
+  testInit(opts = list())
+  cp <- file.path(tmpdir, "cc"); dir.create(cp, showWarnings = FALSE)
+  prevId <- gsub("cacheId:", "", attr(reproducible::Cache(sum, 1, 2, cachePath = cp), "tags"))
+  for (i in 1:3)
+    reproducible::.updateTagsRepo(prevId, cp, paste0("cacheChaining_", .chainLinkCols[i], "_post1"), "x")
+  out <- expect_no_error(setupOn(cp, prevId))
+  expect_null(out$cacheIdOfSkip)
+})
+
+test_that("cacheChainingSetup() finds no jump when the entry's tag file is unreadable", {
+  testInit(opts = list())
+  skip_if(reproducible:::useDBI())
+  cp <- file.path(tmpdir, "cc"); dir.create(cp, showWarnings = FALSE)
+  prevId <- gsub("cacheId:", "", attr(reproducible::Cache(sum, 1, 2, cachePath = cp), "tags"))
+  writeLines("not a cache file", reproducible:::CacheDBFileSingle(cp, prevId, cacheSaveFormat = "check"))
+  out <- expect_no_error(setupOn(cp, prevId))
+  expect_null(out$cacheIdOfSkip)
+})
+
+chainLinkTags <- function(cp, successor) {
+  sc <- data.table::as.data.table(reproducible::showCache(cp, verbose = -2))
+  tags <- sc[startsWith(tagKey, .chainLinkKeyPrefix)]
+  parsed <- .chainSuccessors(tags)
+  post <- parsed$postCacheId[parsed$module == successor]
+  prevId <- unique(tags$cacheId[tags$tagKey == .chainLinkTagKey(post)])
+  stopifnot(length(post) == 1L, length(prevId) == 1L)
+  list(prevId = prevId, post = post, tags = tags[cacheId == prevId & tagKey == .chainLinkTagKey(post)])
+}
+
+test_that("a link recorded twice, stale first, still chains", {
+  skip_on_cran()
+  testInit("terra", opts = list(spades.debug = TRUE, reproducible.verbose = 1))
+  mp <- file.path(tmpdir, "mods"); dir.create(mp, showWarnings = FALSE)
+  mkChainMod(mp, "modA", 'bindrows(expectsInput("unsupplied0", "numeric", ""))',
+             'bindrows(createsOutput("a", "numeric", ""))', "sim$a <- 1")
+  mkChainMod(mp, "modB", 'bindrows(expectsInput("a", "numeric", ""))',
+             'bindrows(createsOutput("b", "numeric", ""))', "sim$b <- 10")
+  mkChainMod(mp, "modC", 'bindrows(expectsInput("b", "numeric", ""))',
+             'bindrows(createsOutput("cc", "numeric", ""))', "sim$cc <- sim$b + 1")
+  runIt <- function(cp) do.call(simInit, list(
+    times = list(start = 1, end = 1),
+    params = list(modA = list(.useCache = ".inputObjects"), modB = list(.useCache = ".inputObjects"),
+                  modC = list(.useCache = ".inputObjects")),
+    modules = list("modA", "modB", "modC"), paths = list(modulePath = mp, cachePath = cp)))
+  nChained <- function(cp) length(grep("Using cacheChaining|cacheChaining: restored", capture_messages(invisible(runIt(cp)))))
+  withr::local_options(spades.cacheChaining = TRUE)
+
+  cpClean <- file.path(tmpdir, "clean"); invisible(runIt(cpClean))
+  nClean <- nChained(cpClean)
+  expect_gt(nClean, 0)
+
+  ## the state found in a real cache: the modB -> modC link recorded first with a stale digest, then
+  ##   again with the current one. The newest recording must be the one read.
+  cpDup <- file.path(tmpdir, "dup"); invisible(runIt(cpDup))
+  lk <- chainLinkTags(cpDup, "modC")
+  stale <- sub("\t[^\t]*", "\tstale", lk$tags$tagValue)  # digestNonObjects is the 2nd field
+  reproducible::.updateTagsRepo(lk$prevId, cpDup, lk$tags$tagKey, stale)
+  reproducible::.addTagsRepo(lk$prevId, cpDup, tagKey = lk$tags$tagKey, tagValue = lk$tags$tagValue)
+  expect_equal(nrow(chainLinkTags(cpDup, "modC")$tags), 2L)
+  expect_equal(nChained(cpDup), nClean)
+
+})
+
+## The writer, tested directly: re-running the workflow cannot guarantee the re-recorded link lands on
+## the same successor entry, so call cacheChainingPost() twice for one link under one postCacheId.
+test_that("cacheChainingPost() replaces a link recorded again instead of appending a second copy", {
+  testInit(opts = list())
+  cp <- file.path(tmpdir, "cc"); dir.create(cp, showWarnings = FALSE)
+  withr::local_options(reproducible.cachePath = cp)
+  out <- reproducible::Cache(sum, 1, 2, cachePath = cp)
+  prevCache <- attr(out, "tags")
+  prevId <- gsub("cacheId:", "", prevCache)
+  sim <- simInit(paths = list(cachePath = cp))
+  attr(sim, "tags") <- "cacheId:POSTCACHEIDONE"
+  record <- function(digest) {
+    df <- data.table::data.table(prevCache = prevCache, digestNonObjects = digest, module = "modX",
+                                 event = "init", lastEventDetails = "modW init")
+    cacheChainingPost(sim, cacheIt = TRUE, prevCache = prevCache, cacheIdOfSkip = NULL, df = df,
+                      moduleName = "modX", eventType = "init")
+  }
+  record("stale")
+  record("current")
+  sc <- data.table::as.data.table(reproducible::showCache(cp, verbose = -2))
+  link <- sc[cacheId == prevId & tagKey == .chainLinkTagKey("POSTCACHEIDONE")]
+  expect_equal(nrow(link), 1L)   # the whole link is one tag, so it is written under one lock
+  succ <- .chainSuccessors(link)
+  expect_equal(succ$digestNonObjects, "current")
+  expect_equal(unlist(succ[1, ], use.names = FALSE),
+               c(prevCache, "current", "modX", "init", "modW init", "POSTCACHEIDONE"))
+  expect_equal(nrow(sc[cacheId == prevId & startsWith(tagKey, "cacheChaining")]), 0L)
 })

@@ -323,7 +323,14 @@ test_that("saveSimList with file backed objs", {
   )
 
   modules <- list("randomLandscapes", "caribouMovement")
+  ## Set cachePath explicitly, inside tmpdir. Without it the `simList` inherits
+  ## the global `reproducible.cachePath`, which points outside `projectPath`
+  ## (at another test's temp dir). saveSimList() then stores it as "../../..",
+  ## and because this test reloads under a *different* projectPath (newTmpdir),
+  ## that walks back out and loadSimList() creates a stray directory there --
+  ## which R CMD check reports as "detritus in the temp directory".
   paths <- list(
+    cachePath = checkPath(file.path(tmpdir, "cache"), create = TRUE),
     modulePath = modulePath,
     inputPath = inputPath,
     outputPath = outputPath
@@ -479,6 +486,58 @@ test_that("outputs<- still stamps a filename it generates itself", {
   expect_identical(basename(outputs(sim)$file), "cohortData_year3020.rds")
 })
 
+test_that("registerOutputs() rows all survive an event cache hit", {
+  skip_on_cran()
+  testInit("terra")
+  modName <- "regOutsCached"
+  dir.create(file.path(tmpdir, modName), recursive = TRUE, showWarnings = FALSE)
+  writeLines(con = file.path(tmpdir, modName, paste0(modName, ".R")), '
+defineModule(sim, list(name = "regOutsCached", description = "", keywords = "",
+  authors = person("A", "B", email = "a@b.com", role = c("aut", "cre")),
+  childModules = character(0), version = list(regOutsCached = "0.0.1"),
+  spatialExtent = terra::ext(rep(0, 4)), timeframe = as.POSIXlt(c(NA, NA)),
+  timeunit = "year", citation = list(), documentation = list(), reqdPkgs = list(),
+  parameters = rbind(defineParameter(".useCache", "character", "init", NA, NA, "")),
+  inputObjects = bindrows(), outputObjects = bindrows()))
+
+doEvent.regOutsCached <- function(sim, eventTime, eventType, debug = FALSE) {
+  switch(eventType, init = {
+    cat("ran\\n", file = file.path(outputPath(sim), "ranCount.txt"), append = TRUE)
+    for (nm in c("first", "second")) {
+      f <- file.path(outputPath(sim), paste0(nm, ".rds"))
+      saveRDS(nm, f)
+      sim <- registerOutputs(filename = f, sim = sim)
+    }
+  })
+  invisible(sim)
+}
+')
+  outPath <- file.path(tmpdir, "out")
+  runIt <- function() simInitAndSpades(times = list(start = 0, end = 0), modules = modName,
+    paths = list(modulePath = tmpdir, cachePath = tmpCache, outputPath = outPath))
+  cold <- runIt()
+  warm <- runIt()
+  ## the second run really was a cache hit: init did not run again
+  expect_length(readLines(file.path(outPath, "ranCount.txt")), 1L)
+  expect_setequal(basename(outputs(cold)$file), c("first.rds", "second.rds"))
+  ## both rows are restored, although they differ only by `file`
+  expect_setequal(basename(outputs(warm)$file), c("first.rds", "second.rds"))
+})
+
+test_that(".mergeCachedOutputs() keeps rows that differ by file, and one row per file across outputPaths", {
+  testInit()
+  empty <- simInit()@outputs
+  local <- outputsAppend(empty, saveTime = 1, file = "/local/out/a.rds")
+  cached <- outputsAppend(outputsAppend(empty, saveTime = 1, file = "/other/out/a.rds"),
+                          saveTime = 1, file = "/other/out/b.rds")
+  merged <- .mergeCachedOutputs(local, cached)
+  ## a.rds once (the same file under another outputPath), b.rds kept
+  expect_equal(sort(basename(merged$file)), c("a.rds", "b.rds"))
+  ## the local copy of a.rds wins
+  expect_true(any(grepl("^/local/", merged$file[basename(merged$file) == "a.rds"])))
+  expect_false(any(grepl("^/other/out/a", merged$file)))
+})
+
 test_that("outputs<- does not rename a file registerOutputs() already wrote", {
   td <- normPath(withr::local_tempdir())
   sim <- suppressMessages(simInit(times = list(start = 0, end = 3020),
@@ -511,4 +570,67 @@ test_that("the timeunit appearing in a DIRECTORY does not suppress the stamp", {
   outputs(sim) <- data.frame(objectName = "cohortData", saveTime = 3020)
   expect_true(grepl("year", dirname(outputs(sim)$file)))       # unit is in the dir
   expect_identical(basename(outputs(sim)$file), "cohortData_year3020.rds")
+})
+
+test_that("saveFiles() writes terra objects to .rds that can be read back", {
+  skip_if_not_installed("terra")
+  testInit(smcc = FALSE)
+
+  r <- terra::rast(terra::ext(0, 3, 0, 2), res = 1, vals = 1:6)
+  v <- terra::vect(cbind(x = 1:3, y = 3:1))
+  tif <- file.path(tmpdir, "rOnDisk.tif")
+  terra::writeRaster(r, tif)
+  rDisk <- terra::rast(tif)
+  lst <- list(r = r, v = v, n = 1)
+  sim <- simInit(times = list(start = 0, end = 1),
+                 objects = list(r = r, v = v, lst = lst, rDisk = rDisk),
+                 paths = list(outputPath = tmpdir))
+  outputs(sim) <- data.frame(objectName = c("r", "v", "lst", "rDisk"), saveTime = 1,
+                             fun = "saveRDS", package = "base")
+  sim <- spades(sim, .plots = NA)
+
+  files <- outputs(sim)$file
+  expect_true(all(file.exists(files)))
+  expect_true(all(grepl("\\.rds$", files)))
+  readBack <- function(f) reproducible::.unwrap(readRDS(f), filebackedPath = dirname(f))
+
+  rBack <- readBack(files[1])
+  expect_s4_class(rBack, "SpatRaster")
+  expect_equal(terra::values(rBack)[, 1], 1:6)
+  vBack <- readBack(files[2])
+  expect_s4_class(vBack, "SpatVector")
+  expect_equal(terra::crds(vBack)[, "x"], 1:3, ignore_attr = TRUE)
+  lstBack <- readBack(files[3])
+  expect_equal(terra::values(lstBack$r)[, 1], 1:6)
+  expect_s4_class(lstBack$v, "SpatVector")
+  expect_identical(lstBack$n, 1)
+
+  unlink(tif) ## file-backed: the saved .rds must not depend on the original file
+  rDiskBack <- readBack(files[4])
+  expect_equal(terra::values(rDiskBack)[, 1], 1:6)
+
+  ## and they load as inputs, unwrapped
+  sim2 <- simInit(inputs = data.frame(file = files[1:3], objectName = c("rIn", "vIn", "lIn"),
+                                      loadTime = 0),
+                  paths = list(outputPath = tmpdir))
+  expect_equal(terra::values(sim2$rIn)[, 1], 1:6)
+  expect_s4_class(sim2$vIn, "SpatVector")
+  expect_equal(terra::values(sim2$lIn$r)[, 1], 1:6)
+})
+
+test_that("saveFiles() replaces a raster output a previous run wrote", {
+  skip_if_not_installed("terra")
+  testInit(smcc = FALSE)
+
+  r <- terra::rast(terra::ext(0, 3, 0, 2), res = 1, vals = 1:6)
+  runOnce <- function(r) {
+    sim <- simInit(times = list(start = 0, end = 1), objects = list(r = r),
+                   paths = list(outputPath = tmpdir))
+    outputs(sim) <- data.frame(objectName = "r", saveTime = 1, fun = "writeRaster", package = "terra")
+    spades(sim, .plots = NA)
+  }
+  sim <- runOnce(r)
+  expect_equal(terra::values(terra::rast(outputs(sim)$file))[, 1], 1:6)
+  sim <- runOnce(r * 10) # the same file again, as a rerun into the same outputPath does
+  expect_equal(terra::values(terra::rast(outputs(sim)$file))[, 1], (1:6) * 10)
 })

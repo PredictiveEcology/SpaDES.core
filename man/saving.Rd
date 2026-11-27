@@ -40,7 +40,7 @@ with which function. \tab The \strong{user}, across all modules at once
 \tab \code{\link[=outputs]{outputs()}} \cr
 The \code{.saveObjects} parameter plus \code{\link[=saveFiles]{saveFiles()}} called from a module's own
 save event, timed by the \code{.saveInitialTime} and \code{.saveInterval}
-parameters. \tab The \strong{module developer}, for users of that module
+parameters (see \link{dotParameters}). \tab The \strong{module developer}, for users of that module
 \tab \code{\link[=saveFiles]{saveFiles()}} \cr
 Plain \code{saveRDS()}/\code{save()} inside module code. \tab The \strong{module
 developer}, unconditionally -- the least modular option, since the user

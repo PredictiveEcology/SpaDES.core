@@ -12,6 +12,9 @@ utils::globalVariables(c(".", ".I", "tagKey", "whi"))
 #' @param envir an environment to use to store the `.sim` (`simList`) object.
 #'              default is to use the user's global environment (`.GlobalEnv`).
 #'
+#' @return An environment: `envir` if `options(reproducible.memoisePersist = TRUE)`,
+#'   otherwise the `SpaDES.core` package environment used to hold the saved `simList`.
+#'
 #' @export
 #' @rdname savedSimEnv
 savedSimEnv <- function(envir = .GlobalEnv) {
@@ -253,26 +256,12 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           # for future caching of modules
           cacheIt <- FALSE
           eventSeed <- sim@params[[curModuleName]][[".seed"]][[cur[["eventType"]]]]
-          a <- sim@params[[curModuleName]][[._txtDotUseCache]]
-          if (!is.null(a)) {
-            #.useCache is a parameter
-            if (!identical(FALSE, a)) {
-              #.useCache is not FALSE
-              if (!isTRUE(a)) {
-                #.useCache is not TRUE
-                if (cur[["eventType"]] %in% a) {
-                  cacheIt <- TRUE
-                } else if (inherits(a, "POSIXt")) {
-                  cacheIt <- TRUE
-                  notOlderThan <- a
-                }
-              } else {
-                cacheIt <- TRUE
-              }
-            }
-          }
-          
-          
+          eventCache <- .eventIsCached(sim@params[[curModuleName]], cur[["eventType"]],
+                                       curModuleName, verbose = debugToVerbose(debug))
+          cacheIt <- eventCache$cache
+          if (!is.null(eventCache$notOlderThan)) notOlderThan <- eventCache$notOlderThan
+
+          if (!.spadesUseCache()$events) cacheIt <- FALSE # options(spades.useCache = "off")
           # browser(expr = exists("._doEvent_2"))
           showSimilar <- if (is.null(sim@params[[curModuleName]][[".showSimilar"]]) ||
                              isTRUE(is.na(sim@params[[curModuleName]][[".showSimilar"]]))) {
@@ -288,9 +277,15 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           
           skipEvent <- FALSE
           if (!is.null(eventSeed)) {
-            if (exists(".Random.seed", inherits = FALSE, envir = .GlobalEnv))
-              initialRandomSeed <- .Random.seed
+            initialRandomSeed <- get0(".Random.seed", envir = .GlobalEnv, inherits = FALSE)
             set.seed(eventSeed) # will create .Random.seed
+            ## restore the session's stream even if the event errors
+            on.exit({
+              if (is.null(initialRandomSeed))
+                rm(".Random.seed", envir = .GlobalEnv)
+              else
+                assign(".Random.seed", initialRandomSeed, envir = .GlobalEnv)
+            }, add = TRUE)
           }
           
           .pkgEnv <- as.list(get(".pkgEnv", envir = asNamespace("SpaDES.core")))
@@ -339,12 +334,8 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
           
           if (!skipEvent) {
             sim <- .runEvent(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                             showSimilar = showSimilar, .pkgEnv)
-          }
-          
-          if (!is.null(eventSeed)) {
-            if (exists("initialRandomSeed", inherits = FALSE))
-              .Random.seed <- initialRandomSeed
+                             showSimilar = showSimilar, .pkgEnv,
+                             jumpControls = list(events = events, eventsBeforeAfter = eventsBeforeAfter))
           }
           
           # browser(expr = exists("._doEvent_3"))
@@ -375,10 +366,18 @@ doEvent <- function(sim, debug = FALSE, notOlderThan,
       } # end normal-event dispatch (`.inputObjects` is handled by the branch above)
       
       # add to list of completed events
+      jumped <- attr(sim, "cacheChainingJumped") # events a cacheChaining jump recovered along with this one
       if (.pkgEnv[["spades.keepCompleted"]]) { # can skip it with option
         # cur[[._txtClockTime]] <- Sys.time() # adds between 1 and 3 microseconds, per event b/c R won't let us use .Internal(Sys.time())
         sim <- appendCompleted(sim, cur)
+        for (k in seq_len(NROW(jumped))) {
+          sim <- appendCompleted(sim, list(
+            eventTime = if (is.na(jumped$eventTime[k])) cur[["eventTime"]] else jumped$eventTime[k],
+            moduleName = jumped$module[k], eventType = jumped$event[k],
+            eventPriority = cur[["eventPriority"]]))
+        }
       }
+      if (!is.null(jumped)) attr(sim, "cacheChainingJumped") <- NULL
 
       # current event completed, replace current with empty
       slot(sim, "current", check = FALSE) <- list() # is a list
@@ -689,19 +688,30 @@ scheduleConditionalEvent <- function(sim,
 #'                 character (`"graphical"`, `"text"`) or numeric indicating
 #'                 the number of update intervals to show in a graphical progress bar.
 #'
-#' @param cache Logical. If `TRUE`, then the `spades` call will be cached.
+#' @param cache Logical or character. If `TRUE` (same as `"local"`), then the `spades` call
+#'              will be cached.
 #'              This means that if the call is made again with the same `simList`,
 #'              then `spades` will return the return value from the previous run
 #'              of that exact same `simList`. Default `FALSE`. See Details.
+#'              The cached `simList` points at its input and output files where they are, so
+#'              the entry only works on this machine; a cache hit whose output files are gone
+#'              warns and still returns the `simList`. `"portable"` also saves those files with
+#'              [saveSimList()] into the cache, and a hit unpacks them with [loadSimList()]
+#'              into the working directory, so the entry can be used on another machine.
+#'              In [simInitAndSpades()] and [simInit()] (where it is passed in `...`), `cache`
+#'              caches the whole call, and the key includes the content of each module's code
+#'              files (child modules and non-R files too), so editing a module reruns.
+#'              `.useCache` in `...` is the same argument under another name.
 #'              See also the vignette on caching for examples.
 #'
 #' @param .saveInitialTime Numeric. Temporarily override the `.saveInitialTime`
-#'                                  parameter for all modules. See Details.
+#'                                  parameter (see [dotParameters]) for all modules. See Details.
 #'
-#' @param .plots Character. Sets the parameter of this name in all modules.
-#'   See [Plots()] for possible values. Setting this without `"screen"` turns
-#'   off all plotting; setting it with `"screen"` triggers plotting for any
-#'   module that uses this parameter, and has no effect on modules that do not.
+#' @param .plots Character. Sets the `.plots` parameter (see [dotParameters]) in
+#'   all modules for this call. See [Plots()] for possible values. Setting this
+#'   without `"screen"` turns off all plotting; setting it with `"screen"` triggers
+#'   plotting for any module that uses this parameter, and has no effect on modules
+#'   that do not.
 #'
 #'   This replaces the `.plotInitialTime` argument, which was removed. Use
 #'   `.plots = NA` where you previously used `.plotInitialTime = NA`. The
@@ -795,17 +805,16 @@ scheduleConditionalEvent <- function(sim,
 #' can be cached and mixtures of all of these will work. For functions, simply
 #' wrap the call with `Cache`, moving the original function name into
 #' the first argument of Cache. For events or modules, set the module `parameters`,
-#' `.useCache`, e.g.,
-#' `simInit(..., parameters = list(myModule = list(.useCache = "init")))`.
+#' `.useCache` (see [dotParameters]), e.g.,
+#' `simInit(..., params = list(myModule = list(.useCache = "init")))`.
 #' This can be set to an event name, which will cache that event, or a logical,
 #' which will cache *every* event in that module. Event and module caching
 #' makes most sense when the event or module only runs once, such as an initialization
-#' or data preparation event/module. Caching an entire simulation is actually just
-#' a function call to `simInitAndSpades`, for example. So, simply writing
-#' `Cache(simInitAndSpades, modules = ...)` will effectively cache a whole simulation.
-#' Finally for experiments, it is just like a function call:
-#' `Cache(simInitandExperiment, ...)`. The final way Caching can be done is in
-#' `experiment` or `spades`, by setting the `cache` argument.
+#' or data preparation event/module. To cache an entire simulation, use
+#' `simInitAndSpades(..., cache = TRUE)`. Do not wrap it in `Cache()` instead: there the
+#' modules are only names, so an edit to a module's code does not rerun it.
+#' The final way Caching can be done is in `experiment` or `spades`, by setting the
+#' `cache` argument.
 #'
 #' If `cache` is TRUE, this allows for a seamless way to "save" results
 #' of a simulation. The  user does not have to intentionally do any saving manually.
@@ -815,6 +824,12 @@ scheduleConditionalEvent <- function(sim,
 #' a previous run, even if there is stochasticity internally.
 #' Caching is only based on the input `simList.`
 #' See also the vignette on caching for examples.
+#'
+#' A module whose events run for their side effects can list them in its `.neverCache`
+#' parameter (a character vector of event names, possibly `".inputObjects"`). `.neverCache`
+#' wins over every form of `.useCache` (`TRUE`, event names, a time), whether the module, the
+#' user or `.globals` set it, and it is not part of the event cache key. Being declared-only,
+#' `.globals` sets it only in modules that declare it.
 #'
 #' @section `debug`:
 #'
@@ -950,6 +965,17 @@ setMethod(
                         notOlderThan, events, .plots, ...) {
     .warnPlotInitialTimeArg(...names())
 
+    ## `.useCache` is the `cache` argument under another name
+    if (".useCache" %in% ...names()) {
+      dots <- list(...)
+      mode <- .wholeRunCacheMode(NULL, dots[[".useCache"]])
+      dots[[".useCache"]] <- NULL
+      return(doCallSafe("spades", c(list(sim = sim, debug = debug, progress = progress,
+                                       cache = if (isFALSE(mode)) FALSE else mode,
+                                       .saveInitialTime = .saveInitialTime, notOlderThan = notOlderThan,
+                                       events = events, .plots = .plots), dots)))
+    }
+
     ## set the options; then set them back on exit
     optsFromDots <- dealWithOptions(sim = sim, dotNames = ...names())
     if (!is.null(optsFromDots$optsPrev)) {
@@ -993,6 +1019,15 @@ setMethod(
     opt <- options("encoding" = "UTF-8")
     on.exit(options(opt), add = TRUE)
 
+    ## options(spades.useCache = "eventsOnly" / "off"): Cache() calls inside module code take
+    ## reproducible.useCache, so set it for the run; the event-level calls pass useCache explicitly
+    .pkgEnv$neverCacheMsgd <- NULL ## one `.neverCache` message per module and event, per call
+    innerUseCache <- .spadesUseCache()$inner
+    if (!is.null(innerUseCache)) {
+      optInner <- options(reproducible.useCache = innerUseCache)
+      on.exit(options(optInner), add = TRUE)
+    }
+
     if (is.character(getOption("spades.covr", FALSE)) &&  getOption("spades.covr2", TRUE) ) {
       modNam <- getOption("spades.covr")
       tf <- tempfile();
@@ -1033,8 +1068,11 @@ setMethod(
     }
 
 
-    ## need to recheck package loading because `simInit` may have been cached
-    if (getOption("spades.loadReqdPkgs", TRUE)) {
+    ## need to recheck package loading because `simInit` may have been cached; not when
+    ## simInitAndSpades() or restartSpades() marked this simList as having its packages loaded
+    pkgsLoaded <- isTRUE(attr(sim, ".reqdPkgsLoaded"))
+    attr(sim, ".reqdPkgsLoaded") <- NULL
+    if (getOption("spades.loadReqdPkgs", TRUE) && !pkgsLoaded) {
       pkgs <- packages(sim)
       loadPkgs(pkgs)
     }
@@ -1439,9 +1477,6 @@ setMethod(
       if (useLoggingPkg) { # && requireNamespace("logging", quietly = TRUE)) {
         logging::loginfo(msg)
       } else {
-        if (isTRUE(any(grepl("\b", msg)))) {
-          msg <- paste0("\b", gsub("\b *", " ", msg), "\b")
-        }
         message(loggingMessage(msg))
       }
       # This will "muffle" the original message
@@ -1479,18 +1514,25 @@ setMethod(
     }
 
     if (cache) {
+      ## the sim's ledger is the sink while the outer Cache() collects the run's urls (it writes
+      ##   them when it exits, after the inner spades() has restored the option) -- otherwise
+      ##   they go to the session log and never reach the sim; see R/urlLog.R
+      .urlLogToken <- .installUrlLog(sim)
+      on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
+      out <- Cache(spades(sim = sim,
+                          debug = debug,
+                          progress = progress,
+                          .saveInitialTime = .saveInitialTime,
+                          omitArgs = omitArgs,
+                          notOlderThan = notOlderThan,
+                          events = events,
+                          .plots = .plots,
+                          cache = FALSE,
+                          ...
+      ))
+      if (.loadedFromCache(out)) .warnMissingOutputs(out)
       return(
-        Cache(spades(sim = sim,
-                     debug = debug,
-                     progress = progress,
-                     .saveInitialTime = .saveInitialTime,
-                     omitArgs = omitArgs,
-                     notOlderThan = notOlderThan,
-                     events = events,
-                     .plots = .plots,
-                     cache = FALSE,
-                     ...
-        ))
+        out
         # do.call(quote = TRUE, Cache,
         #         args = append(
         #           list(
@@ -1523,21 +1565,41 @@ setMethod(
     }
 })
 
+#' @rdname spades
+setMethod(
+  "spades",
+  signature(cache = "character"),
+  definition = function(sim, debug, progress, cache, .saveInitialTime, notOlderThan = NULL,
+                        events, .plots, ...) {
+    mode <- .wholeRunCacheMode(cache)
+    if (identical(mode, "local"))
+      return(spades(sim, debug = debug, progress = progress, cache = TRUE,
+                    .saveInitialTime = .saveInitialTime, notOlderThan = notOlderThan,
+                    events = events, .plots = .plots, ...))
+    .urlLogToken <- .installUrlLog(sim) # as in the cache = TRUE method
+    on.exit(.restoreUrlLog(.urlLogToken), add = TRUE)
+    .cacheWholeRun("spades", c(list(sim = sim, .saveInitialTime = .saveInitialTime, events = events,
+                                    .plots = .plots), list(...)),
+                   mode, untracked = list(debug = debug, progress = progress, notOlderThan = notOlderThan))
+})
+
 #' @keywords internal
 #' @importFrom cli bg_yellow
 .runEvent <- function(sim, cacheIt, debug, moduleCall, fnEnv, cur, notOlderThan,
-                      showSimilar, .pkgEnv) {
+                      showSimilar, .pkgEnv, jumpControls = NULL) {
   cacheChaining <- getOption("spades.cacheChaining", FALSE)
   classOptions <- moduleSpecificObjects <- NULL # set defaults
   # cacheIt <- cacheChaining || cacheIt
   if (!is.null(sim@depends@dependencies[[cur[["moduleName"]]]]) || cacheChaining) { # allow for super simple simList without a slot outputObjects
     expectsInputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@inputObjects$objectName
-    createsOutputs <- sim@depends@dependencies[[cur[["moduleName"]]]]@outputObjects$objectName
+    ## only the outputs this event type may write (createsOutput(events = )): its cache entry keeps,
+    ##   and its hit restores, no copy of an output another event of the module writes
+    createsOutputs <- .outputsOfEvent(sim@depends@dependencies[[cur[["moduleName"]]]], cur[["eventType"]])
 
     if (cacheIt) { # means that a module or event is to be cached
 
-      fns <- setdiff(ls(fnEnv, all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
-      objs <- setdiff(ls(sim@.xData[[dotObjs]][[cur[["moduleName"]]]], all.names = TRUE), c(".inputObjects", "mod", "Par", ".objects")) # .inputObjects is not run in `spades`; mod is same as .objects
+      fns <- setdiff(ls(fnEnv, all.names = TRUE), .notEventFns)
+      objs <- setdiff(ls(sim@.xData[[dotObjs]][[cur[["moduleName"]]]], all.names = TRUE), .notEventFns)
       moduleSpecificObjects <-
         c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]), # functions in the main .xData that are prefixed with moduleName
           paste0(attr(fnEnv, "name"), ":", fns), # functions in the namespaced location
@@ -1551,13 +1613,22 @@ setMethod(
                                        objSynName
                                        )
       modParamsFull <- sim@params[[cur[["moduleName"]]]]
-      paramsDontCacheOnActual <- names(modParamsFull) %in% paramsDontCacheOn
+      ## options(spades.cacheKeyReachable = TRUE): only what the event's code reaches
+      keyParts <- .narrowKeyParts(sim, fnEnv, cur[["moduleName"]], cur[["eventType"]], fns = fns,
+                                  modParamsFull = modParamsFull, dependsSlots = metadataToDigest,
+                                  verbose = isTRUE(showSimilar) || .verboseKeyScope())
+      if (!identical(keyParts$fns, fns))
+        moduleSpecificObjects <- c(ls(sim@.xData, all.names = TRUE, pattern = cur[["moduleName"]]),
+                                   paste0(attr(fnEnv, "name"), ":", keyParts$fns),
+                                   paste0(attr(fnEnv, "name"), ":", objs),
+                                   na.omit(expectsInputs))
+      paramsDontCacheOnActual <- !keyParts$paramsInKey
       # simParamsDontCacheOn <- modParamsFull[paramsDontCacheOnActual]
       modParams <- modParamsFull[!paramsDontCacheOnActual]
 
       classOptions <- classOptionsForCache(events = cur[["eventType"]],
-                                           paramsWoKnowns = modParams, dependsSlots = metadataToDigest,
-                                           mBase = cur[["moduleName"]])
+                                           paramsWoKnowns = modParams, dependsSlots = keyParts$dependsSlots,
+                                           mBase = cur[["moduleName"]], eventCode = keyParts$eventCode)
 
       # classOptions <- list(events = cur[["eventType"]], current = FALSE, completed = FALSE, simtimes = FALSE,
       #                      paths = FALSE, outputs = FALSE,
@@ -1571,8 +1642,7 @@ setMethod(
     modCall <- get(moduleCall, envir = fnEnv)
     # if (isTRUE(cur$moduleName %in% "fireSense_dataPrepFit")) browser()
     # if (isTRUE(cur$eventType %in% c(".inputObjects", "init"))) browser()
-    extraCacheArgs <- sim@params[[cur[["moduleName"]]]][[._txtDotUseCacheArgs]][[cur[["eventType"]]]]
-    if (!is.list(extraCacheArgs)) extraCacheArgs <- list()
+    extraCacheArgs <- .extraCacheArgsFor(sim@params[[cur[["moduleName"]]]], cur[["eventType"]])
     isCalls <- sapply(extraCacheArgs, function(x) is.call(x))
     if (isTRUE(any(isCalls))) 
       extraCacheArgs[isCalls] <- lapply(extraCacheArgs[isCalls], eval, envir = environment())
@@ -1593,6 +1663,9 @@ setMethod(
                          paste0("eventType:", cur[["eventType"]]),
                          paste0("eventTime:", time(sim))))
     )
+    ## "eventsOnly"/"off"/numeric pass useCache explicitly; "all" leaves it to reproducible.useCache
+    useCacheSpades <- .spadesUseCache()$useCache
+    if (!is.null(useCacheSpades)) defaultCacheArgs$useCache <- useCacheSpades
     as.expression(as.call(c(list(quote(Cache)),
                             modifyList(defaultCacheArgs, extraCacheArgs))))
   } else {
@@ -1618,7 +1691,9 @@ setMethod(
     ## Recording is unconditional; `cacheChaining` only decides whether the chain is USED.
     ## A pass run with the option off would otherwise leave no tags for a later pass.
     {
-      nonObjects <- nonObjectsForCacheChaining(moduleSpecificObjects, fnEnv, classOptions)
+      nonObjects <- nonObjectsForCacheChaining(moduleSpecificObjects, fnEnv, classOptions,
+                                               sim@depends@dependencies[[cur[["moduleName"]]]],
+                                               extraCacheArgs = if (isTRUE(cacheIt)) extraCacheArgs)
       # append(as.list(fnEnv, all.names = TRUE)[extractFns(moduleSpecificObjects)],
       #        classOptions)
 
@@ -1635,33 +1710,53 @@ setMethod(
         event = cur[["eventType"]],
         led = attr(sim, lastEventDetails),
         use = cacheChaining,
-        verbose = verbose)
+        verbose = verbose,
+        sim = sim,
+        jumpControls = jumpControls)
       fnCallAsExpr <- chaining$fnCallAsExpr
+      ## A jump lands on a later event's entry: that event becomes the current one, so the
+      ## entry is merged as if it had just run (see .unwrap.simList()).
+      if (!is.null(chaining$jump))
+        sim <- .chainJumpPrepare(sim, chaining$jump, verbose = verbose)
     }
+    ## A Cache() hit (`fnCallAsExpr` above) returns a brand-new simList (a fresh
+    ## @.xData) built by .unwrap.simList(), which never carries simInit()/spades()-only
+    ## transient state (see .transientSimStateNames) -- that state was never part of what
+    ## was cached. During simInit()'s `.inputObjects` phase, the live `sim` carries
+    ## ._simInitContext; put it back.
+    simInitContextPreCall <- sim@.xData[["._simInitContext"]]
+    eventsPreCall <- sim@events
+    outputsPreCall <- sim@outputs
     if (runFnCallAsExpr) {
       sim <- eval(fnCallAsExpr) ## slower than more direct version just above
       # attr(sim, lastEventDetails) <- paste(cur[["moduleName"]], cur[["eventType"]], collapse = "_")
     }
+    if (!is.null(simInitContextPreCall) && is.null(sim@.xData[["._simInitContext"]]))
+      sim@.xData[["._simInitContext"]] <- simInitContextPreCall
     ## The return guard runs FIRST. An event that returned something other than a simList
     ## must produce .checkEventReturn()'s clear, named error; handing that value to
     ## cacheChainingPost() would fail earlier and less helpfully. This ordering only became
     ## load-bearing when recording stopped being gated by spades.cacheChaining -- before,
     ## the guard was reached first whenever the option was off, which is the common case.
     .checkEventReturn(sim, cur[["moduleName"]], cur[["eventType"]], fromCache = isTRUE(cacheIt))
+    if (!is.null(chaining$jump))
+      sim <- .chainJumpFinish(sim, chaining$jump, cachePath = sim@paths[["cachePath"]], verbose = verbose)
+    chainLast <- .chainLast(chaining$jump, cur[["moduleName"]], cur[["eventType"]])
     sim <- cacheChainingPost(sim, cacheIt, prevCache,
                              chaining$cacheIdOfSkip, chaining$df,
-                             moduleName = cur[["moduleName"]],
-                             eventType = cur[["eventType"]])
+                             moduleName = chainLast$module,
+                             eventType = chainLast$event,
+                             queueDelta = .chainDeltaIfRan(sim, cacheIt, chaining, eventsPreCall,
+                                                           cur[["eventTime"]]),
+                             outputsText = .chainOutTextIfRan(sim, cacheIt, chaining, outputsPreCall),
+                             modText = .chainModTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]]),
+                             ## no `modParamsFull` for a module without an @depends entry
+                             paramsText = if (exists("modParamsFull", inherits = FALSE))
+                               .chainParamsTextIfRan(sim, cacheIt, chaining, cur[["moduleName"]],
+                                                     pre = modParamsFull))
 
     if (identical(rr, .Random.seed) && isTRUE(verbose)) {
       message(cli::bg_yellow(cur[["moduleName"]]))
-    }
-  }
-
-  ## put back the current values of params that were not cached on
-  if (exists("modParams", inherits = FALSE)) {
-    if (sum(paramsDontCacheOnActual)) {
-      sim@params[[cur[["moduleName"]]]][paramsDontCacheOnActual] <- modParamsFull[paramsDontCacheOnActual]
     }
   }
 
@@ -2346,17 +2441,22 @@ loggingMessagePrefixLength <- 15
   clean <- trimws(cli::ansi_strip(msg))
   if (nzchar(clean)) {
     line <- if (is.null(prefix)) loggingMessage(clean) else loggingMessage(clean, prefix = prefix)
+    now <- Sys.time()
     if (grepl("\r", msg, fixed = TRUE)) {
       cat("\r", cli::ansi_strtrim(line, cli::console_width()), "\033[K", sep = "", file = stderr())
       .pkgEnv$.progressInPlace <- TRUE
       .pkgEnv$.inProgressBar <- TRUE
+      # A dynamic frame opens the bar too; without this, the first non-dynamic frame
+      # that follows one (a Drive download inside an event, 2026-09-12) reached the
+      # throttle with `.progressLastShown` NULL: "argument is of length zero".
+      .pkgEnv$.progressLastShown <- now
     } else {
-      now <- Sys.time()
       if (!isTRUE(.pkgEnv$.inProgressBar)) {
         .pkgEnv$.inProgressBar <- TRUE
         .pkgEnv$.progressLastShown <- now
         message(line)
-      } else if (as.numeric(now - .pkgEnv$.progressLastShown) >=
+      } else if (is.null(.pkgEnv$.progressLastShown) ||
+                 as.numeric(now - .pkgEnv$.progressLastShown) >=
                  getOption("spades.progressInterval", 2)) {
         message(line)
         .pkgEnv$.progressLastShown <- now
@@ -2385,22 +2485,23 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     middleFix <- ""
     noNew <- FALSE
     if (numCharsMax > 0) {
-      sim2 <- list() # don't put a `sim` here because .whereInStack will find this one
-      while (!inherits(sim2, "simList")) {
-        simEnv <- .whereInStack("sim")
-        if (is.null(simEnv))
+      # innermost simList `sim` on the stack; a `sim` that is not a simList (e.g. a module
+      #   helper's local variable) is skipped. Not named `sim` so this frame is not found.
+      simFound <- NULL
+      for (fr in rev(sys.frames())) {
+        s <- get0("sim", envir = fr, inherits = FALSE)
+        if (inherits(s, "simList")) {
+          simFound <- s
           break
-        sim <- get0("sim", envir = simEnv, inherits = FALSE)
-        if (inherits(sim, "simList"))
-          sim2 <- sim
+        }
       }
 
-      if (!inherits(sim, "try-error") && !is.null(sim)) {
+      if (!is.null(simFound)) {
         # If this is a nested spades call, will have time already at start
         if (startsWith(mess, strftime(st, format = "%h%d"))) {
           noNew <- TRUE
         } else {
-          middleFix <- paste(sim[[._txtSimNesting]], collapse = "/")
+          middleFix <- paste(simFound[[._txtSimNesting]], collapse = "/")
         }
       }
     }
@@ -2423,6 +2524,11 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
     # Prepend the middle
     if (isTRUE(any(grepl("\b", mess)))) {
       # noNew <- TRUE
+      # Done here, not in the callers, so the simInit and spades message handlers cannot differ:
+      #   the continuation marker `\b` (reproducible's "done! took: ...") stays first, and the
+      #   `\b` characters and the spaces after them become one space
+      mess <- gsub("\b *", " ", mess)
+      mess[1] <- paste0("\b", mess[1])
       mess <- gsub(" {2,100}", " ", mess) # get rid of multi-space -- but only if \b because could be indent
     } else {
       messPoss <- paste0(middleFix, " ", mess)
@@ -2463,6 +2569,11 @@ loggingMessage <- function(mess, suffix = NULL, prefix = NULL) {
 #'     directly in the module environment (`sim[[dotMods]][[moduleName]]`) is not yet
 #'     implemented; it requires `defineEvent()` to be integrated into the module
 #'     parsing steps. Until then, `defineEvent()` is intended for standalone use.
+#'
+#' @return Invisibly, the `simList` supplied as `sim`. Called for its side effect of
+#'   creating the event function `doEvent.<moduleName>.<eventName>` in `envir` and
+#'   recording its digest in the `simList`.
+#'
 #' @export
 #' @seealso [defineModule()], [simInit()], [scheduleEvent()]
 #' @examples
@@ -2629,9 +2740,8 @@ runScheduleEventsOnly <- function(sim, fn, env, wh = c("switch", "scheduleEvent"
   sim
 }
 
-## don't change Caching based on .useCache etc. -
+## paramsDontCacheOn (helpers.R): don't change Caching based on .useCache etc. -
 ## e.g., add "init" to .inputObjects vector shouldn't recalculate
-paramsDontCacheOn <- grep(c("useCache|useCloud"), .knownDotParams, value = TRUE)
 
 appendCompleted <- function(sim, cur) {
 
@@ -2859,12 +2969,21 @@ evalPostEvent <- function(envir = parent.frame()) {
 #'   depend on the option: a pass run with chaining off would otherwise record nothing, and
 #'   a later pass would have no chain to follow. Recording costs a `CacheDigest()` of the
 #'   module's functions plus one tag write, measured at ~4 ms per event.
+#' @param sim The `simList`. When given (and `use` is `TRUE`), a chain hit is followed
+#'   forward through the recorded chain -- see `.chainWalk()` -- and `fnCallAsExpr` is
+#'   pointed at the last entry that checks out; the skipped events are returned as `jump`.
+#' @param userObjects The user-supplied `objects` of `simInit()`, for the `.inputObjects`
+#'   phase: an input a skipped module would have taken from there is digested from there.
+#' @param jumpControls The per-event controls a jump must respect: a list with `events` (the
+#'   whitelist) and `eventsBeforeAfter` (the barriers), as `doEvent()` has them. `NULL` -- a caller
+#'   that does not pass them, e.g. an event run in a future -- means no jump.
 cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
                                module, event, led, use = TRUE,
-                               verbose = getOption("reproducible.verbose")) {
-  df <- cacheIdOfSkip <- NULL
+                               verbose = getOption("reproducible.verbose"),
+                               sim = NULL, userObjects = NULL, jumpControls = NULL) {
+  df <- cacheIdOfSkip <- jump <- NULL
   if (!is.null(prevCache) && isTRUE(cacheIt)) {
-    digestNonObjects <- reproducible::CacheDigest(nonObjects)$outputHash
+    digestNonObjects <- .chainDigest(nonObjects)
 
     df <- setDT(list(prevCache = prevCache, digestNonObjects = digestNonObjects,
                      module = module, event = event))
@@ -2873,27 +2992,13 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
     set(df, NULL, lastEventDetails, led)
     ## Recording is done: `df` is built. The rest is the USE half -- reading the chain
     ## back and pointing this call at the entry it can skip to.
-    if (!isTRUE(use)) return(list(cacheIdOfSkip = NULL, df = df, fnCallAsExpr = fnCallAsExpr))
+    if (!isTRUE(use)) return(list(cacheIdOfSkip = NULL, df = df, fnCallAsExpr = fnCallAsExpr, jump = NULL))
 
     cacheId <- gsub("cacheId:", "", prevCache)
-    sc <- showCacheFast(cacheId = cacheId)
-    ccVals <- sc[startsWith(sc$tagKey, "cacheChaining")]
-    if (NROW(ccVals)) {
-      spli <- strsplit(ccVals$tagKey, "_")
-      nams <- vapply(spli, function(x) x[[2]], character(1))
-      postCacheIds <- vapply(spli, function(x) x[[3]], character(1))
-
-      ## One recorded chain per postCacheId, one row each. Flattening every tag
-      ##   value into a single row collapses them: duplicate column names are
-      ##   mangled (`prevCache.1`, ...) so only the first chain recorded against
-      ##   this entry stays joinable, and the row is built positionally, so any
-      ##   row order other than insertion order can pair one chain's
-      ##   `digestNonObjects` with another's `postCacheId`.
-      prevDF <- rbindlist(
-        lapply(split(seq_along(nams), postCacheIds), function(ix)
-          as.data.frame(as.list(ccVals$tagValue[ix]) |> setNames(nams[ix]))),
-        use.names = TRUE, fill = TRUE)
-
+    sc <- .chainEntryTags(cacheId)
+    ## One recorded chain per postCacheId, one row each (see .chainSuccessors()).
+    prevDF <- if (is.null(sc)) NULL else .chainSuccessors(sc)
+    if (!is.null(prevDF)) {
       # THIS IS THE IMPORTANT LINE; JOIN on ALL COLUMNS especially digestNonObjects
       anyExisting <- prevDF[df, on = colnames(df), nomatch = NULL]
 
@@ -2906,18 +3011,92 @@ cacheChainingSetup <- function(cacheIt, prevCache, nonObjects, fnCallAsExpr,
         ## >1 match would mean two chains recorded the same state under different
         ##   postCacheIds; either recovers it, so take the first.
         cacheIdOfSkip <- anyExisting$postCacheId[[1]]
-        fnCallAsExpr[[1]]$cacheId = cacheIdOfSkip
-        messageCache("Using cacheChaining ... ", verbose = verbose)
+        ## The chain keys on the previous entry plus this module's code and parameters, plus
+        ##   every input this module reads that was NOT produced by an event restored from the
+        ##   recorded chain in THIS run -- a chain hit itself, or an event jumped over / landed
+        ##   on by a jump (see cacheChainingPost(): only those events' outputs go into `produced`).
+        ##   An input produced instead by a freshly computed or ordinarily cache-hit event is not
+        ##   covered by the chain even if the same object was produced by a genuine chain hit
+        ##   earlier in the run; it is digested and compared with what the entry recorded
+        ##   (`preDigest` tags); a difference is not a chain hit.
+        produced <- if (!is.null(sim)) attr(sim, "cacheChainingProduced") else NULL
+        ## one memo of object digests for this hit's check and every link of its walk (.chainExternalInputsMatch())
+        digests <- new.env(parent = emptyenv())
+        okExternal <- if (is.null(sim)) TRUE else {
+          postTags <- .chainEntryTags(cacheIdOfSkip, sim@paths[["cachePath"]])
+          !is.null(postTags) &&
+            .chainExternalInputsMatch(sim, module, postTags, produced = produced, userObjects = userObjects,
+                                      digests = digests)
+        }
+        if (!okExternal) {
+          messageCache("Using cacheChaining; but an input of ", module, " that the chain did not produce ",
+                       "has changed; not chaining", verbose = verbose)
+          cacheIdOfSkip <- NULL
+        } else {
+          ## The attribute tells reproducible::Cache() not to repeat, as "cacheId passed to override",
+          ##   what cacheChaining announces itself (ignored by a reproducible that does not know it)
+          fnCallAsExpr[[1]]$cacheId <- structure(cacheIdOfSkip, cacheIdAnnounced = TRUE)
+          ## Follow the chain on from this entry; land on the last entry that checks out. Only with
+          ##   the per-event controls to respect, and never while spades.evalPostEvent is set: it
+          ##   observes the simList after EACH event, and a jump never materialises the states between.
+          if (!is.null(sim) && !is.null(jumpControls) && is.null(getOption("spades.evalPostEvent"))) {
+            jump <- .chainWalk(sim, cacheIdOfSkip, module, event, cachePath = sim@paths[["cachePath"]],
+                               produced = produced, userObjects = userObjects,
+                               controls = jumpControls, verbose = verbose, digests = digests)
+            if (!is.null(jump)) {
+              ## row 1 is this event's own entry: with the call pointed at the last entry it is
+              ##   never loaded itself, so its outputs are restored like the other skipped ones
+              liveQueue <- attr(jump, "queue") # the queue once every restored event has run (.chainWalk())
+              jump <- rbindlist(list(
+                data.table(cacheId = cacheIdOfSkip, module = module, event = event, eventTime = NA_real_),
+                jump), use.names = TRUE)
+              attr(jump, "queue") <- liveQueue
+              last <- NROW(jump)
+              fnCallAsExpr[[1]]$cacheId <- structure(jump$cacheId[last], cacheIdAnnounced = TRUE)
+              ## the entry loaded is the landing event's: name it, not the event the call started from
+              fnCallAsExpr[[1]]$.functionName <- if (identical(jump$event[last], ".inputObjects"))
+                paste0(".inputObjects_", jump$module[last])
+              else paste0("doEvent.", jump$module[last], "::", jump$event[last])
+            }
+          }
+          ## a jump announces itself in .chainJumpPrepare()
+          if (is.null(jump))
+            messageCache("Using cacheChaining ... ", verbose = verbose)
+        }
       }
     }
   }
-  list(cacheIdOfSkip = cacheIdOfSkip, df = df, fnCallAsExpr = fnCallAsExpr)
+  list(cacheIdOfSkip = cacheIdOfSkip, df = df, fnCallAsExpr = fnCallAsExpr, jump = jump)
 }
 
 
 cacheChainingPost <- function(sim, cacheIt, prevCache,
-                              cacheIdOfSkip, df, moduleName, eventType) {
+                              cacheIdOfSkip, df, moduleName, eventType, queueDelta = NULL, outputsText = NULL,
+                              modText = NULL, paramsText = NULL) {
   attr(sim, lastEventDetails) <- paste(moduleName, eventType, collapse = "_")
+  ## The objects the current unbroken run of cached events has produced; what a later link
+  ##   may trust without digesting (cacheChainingSetup(), .chainWalk()). Reset with the chain.
+  ##   Only events RESTORED FROM THE RECORDED CHAIN belong here: this event itself when it was
+  ##   a chain hit (`cacheIdOfSkip` non-NULL), or an event jumped over / landed on by a jump
+  ##   (`cacheChainingJumped`; each such step was already re-validated by .chainWalk()). A cached
+  ##   event that instead ran fresh, or matched an ordinary (non-chain) cache entry, is not backed
+  ##   by the recorded chain -- its outputs are removed from `produced`, not added, in case an
+  ##   earlier, genuine chain hit in this same run had produced the same name.
+  produced <- if (isTRUE(cacheIt)) {
+    prev <- if (is.null(prevCache)) character() else attr(sim, "cacheChainingProduced")
+    jumped <- attr(sim, "cacheChainingJumped")
+    if (!is.null(jumped)) {
+      steps <- Map(function(m, e) list(module = m, event = e), jumped$module, jumped$event)
+      Reduce(union, lapply(steps, function(s) .chainOutputs(sim, s$module, s$event)), prev)
+    } else if (!is.null(cacheIdOfSkip)) {
+      union(prev, .chainOutputs(sim, moduleName, eventType))
+    } else {
+      setdiff(prev, .chainOutputs(sim, moduleName, eventType))
+    }
+  } else {
+    NULL
+  }
+  attr(sim, "cacheChainingProduced") <- produced
   if (!isTRUE(cacheIt)) {
     attr(sim, "tags") <- NULL # Remove the tag from Cache recovery
   } else if (!is.null(prevCache)) {
@@ -2929,15 +3108,45 @@ cacheChainingPost <- function(sim, cacheIt, prevCache,
       ##   that is the only copy. An in-memory mirror used to be accumulated here
       ##   in a per-cachePath environment in .GlobalEnv, but nothing ever read it
       ##   and it grew for the life of the session.
-      .addTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
-                   tagKey = paste0("cacheChaining_", colnames(df), "_", postCacheId), tagValue = unname(unlist(df)))
+      ## Replace, do not append: the same link can be recorded again under the same postCacheId
+      ##   (its digest changed, e.g. across versions), and a copy appended beside the stale one
+      ##   leaves the reader two recordings of one link. The whole link is one tag (see .chainLinkText()),
+      ##   so a single write, under the tag lock, records all of it.
+      reproducible::.updateTagsRepo(cacheId = gsub("cacheId:", "", df$prevCache), cachePath = cachePath(sim),
+                                    tagKey = .chainLinkTagKey(postCacheId), tagValue = .chainLinkText(df))
     }
   }
+  ## What this event did to the event queue, stored with its entry: a jump replays it (.chainWalk()).
+  ##   Only an event that ran has one; a hit's queue change depends on the queue it was merged into.
+  ##   Its object synonyms go with it, so a jump over it can give them to the live sim (.chainJumpFinish()),
+  ##   and the objects it changed, so a jump loads it only for one of those (.chainJumpFinish()).
+  ##   On every new entry, not only one with a previous entry to chain from: the first cached event after
+  ##   an uncached one has none, and a walk cannot start from an entry without a delta.
+  if (!is.null(queueDelta)) {
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainDeltaTag, tagValue = queueDelta)
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainSynTag, tagValue = .chainSynText(sim))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainObjTag, tagValue = .chainObjText(sim, moduleName, eventType))
+  }
+  ## The outputs rows this event added, on every new entry -- not only one with a previous entry to
+  ##   chain from: a hit restores only those rows (.prepareOutput(), .chainOutAddedRows()), so the first
+  ##   cached event of a run needs the record as much as any other. NULL unless the event ran.
+  if (!is.null(outputsText))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainOutTag, tagValue = outputsText)
+  ## The `mod` objects this event changed, likewise on every new entry (.chainJumpFinish()).
+  if (!is.null(modText))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainModTag, tagValue = modText)
+  ## The params of its own module this event changed, likewise (.prepareOutput(), .chainJumpFinish()).
+  if (!is.null(paramsText))
+    reproducible::.updateTagsRepo(cacheId = cacheId(sim), cachePath = cachePath(sim),
+                                  tagKey = .chainParamsTag, tagValue = paramsText)
   sim
 }
 
-
-lastEventDetails <- "lastEventDetails"
 
 
 extractFns <- function(moduleSpecificObjects) {

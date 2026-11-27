@@ -11,7 +11,9 @@
 test_that("test Event1 and Event2.", {
   module <- list("{{{name}}}")
   path <- list(
-    modulePath = "{{{path}}}",
+    ## relative to tests/testthat/, the working directory testthat gives a running
+    ## test -- whether via tests/unitTests.R or moduleCoverage()
+    modulePath = file.path("..", "..", ".."),
     outputPath = file.path(tempdir(), "outputs")
   )
   parameters <- list(

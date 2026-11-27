@@ -75,9 +75,15 @@ including whether it was downloaded or not, and whether it was renamed
 (because there was a local copy that had the wrong file name).
 }
 \description{
-Download a .zip file of the module and extract (unzip) it to a user-specified location.
+Deprecated. Use \code{\link[SpaDES.project:getModule]{SpaDES.project::getModule()}}, which fetches a module from its own GitHub
+repository at a branch, a version tag or the latest release, and its child modules with it.
 }
 \details{
+Download a .zip file of the module and extract (unzip) it to a user-specified location.
+The default repository, \code{PredictiveEcology/SpaDES-modules}, holds .zip files only for
+a few older modules and has had no new module .zip files since 2022, so current modules
+(e.g. the fireSense and LandR Biomass families) cannot be downloaded this way.
+
 Currently only works with GitHub repositories where modules are located in
 a \code{modules} directory in the root tree on the \code{master} branch.
 Module .zip files' names should contain the version number and be inside their

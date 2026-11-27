@@ -246,13 +246,30 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
   ## metadata-only save and is not expecting portability.
   if (isTRUE(files)) .warnUnanchoredFiles(sim, projectPath = projectPath)
 
+  ## A lazy save keeps the files behind each file-backed object (user's or a module's `mod`
+  ## object) in the sidecar directory, as Cache() keeps them beside an entry
+  ## (<lazyDir>/cacheOutputs/), so the object loads anywhere like any other R object: a file
+  ## in a temporary, scratch or cache folder is otherwise saved as a path that only this
+  ## machine, and only for a while, can open. Other files (outputs, inputs, cache) are
+  ## governed by `files`, as before.
+  filebackedPath <- if (isTRUE(lazy)) .lazyDirName(filename) else NULL
+  if (!is.null(filebackedPath)) {
+    unlink(filebackedPath, recursive = TRUE)
+    sim <- .copyTransientFileBacked(sim, filebackedPath, projectPath)
+  }
+
   ## Pre-wrap file-backed objects one-by-one so a single inaccessible backing file
   ## does not abort the entire save; failed objects are saved as NULL with a warning.
-  sim <- .wrapResiliently(sim, projectPath = projectPath)
+  sim <- .wrapResiliently(sim, projectPath = projectPath, filebackedPath = filebackedPath)
+  ## Each module's source text goes into sim$.mods[[module]]$._source (moduleSource()) after
+  ## .wrap(), which, as the Cache path, keeps no module code: Cache entries never carry it.
+  src <- .moduleSources(sim)
   ## wrap remaining / non-file-backed; `projectPath` is offered as an anchor so a
   ## file-backed object that sits under it -- but under none of the sim's named
   ## paths -- can still be re-rooted on load instead of silently becoming NULL
-  sim <- .wrap(sim, cachePath = NULL, paths = .wrapAnchors(sim, projectPath))
+  sim <- .wrap(sim, filebackedPath = filebackedPath, paths = .wrapAnchors(sim, projectPath),
+               copyFiles = !is.null(filebackedPath))
+  for (m in names(src)) assign(dotModSource, src[[m]], envir = sim@.xData[[dotMods]][[m]])
   sim@.xData$._sim <- NULL # remove circular reference; sim is already a Copy here
   sim@current <- list() # it is presumed that this event should be considered finished prior to saving
 
@@ -261,6 +278,16 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     empties <- nchar(fns) == 0
     if (any(empties)) {
       fns <- fns[!empties]
+    }
+    ## files the run saved, and files it read: these alone also make an archive
+    otherFns <- c()
+    if (isTRUE(outputs)) {
+      os <- outputs(sim)
+      if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE, ]$file)
+    }
+    if (isTRUE(inputs)) {
+      ins <- inputs(sim)
+      if (NROW(ins)) otherFns <- c(otherFns, ins[ins$loaded %in% TRUE, ]$file)
     }
   }
 
@@ -294,6 +321,7 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
     ## and the dot-prefixed internals.
     lazyDir <- .lazyDirName(filename)
     lazyFiles <- .writeLazyObjs(sim, lazyDir, ext = ext)
+    lazyFiles <- c(lazyFiles, dir(reproducible::CacheStorageDir(lazyDir), full.names = TRUE))
 
     if (ext == "rds") {
       saveRDS(sim, file = filename)
@@ -301,17 +329,8 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       qs2::qs_save(sim, file = filename, nthreads = getOption("spades.qsThreads", 1))
     }
 
-    if (isTRUE(files) && length(fns)) {
+    if (isTRUE(files) && (length(fns) || length(otherFns))) {
       fileToDelete <- filename
-      otherFns <- c()
-      if (isTRUE(outputs)) {
-        os <- outputs(sim)
-        if (NROW(os)) otherFns <- c(otherFns, os[os$saved %in% TRUE, ]$file)
-      }
-      if (isTRUE(inputs)) {
-        ins <- inputs(sim)
-        if (NROW(ins)) otherFns <- c(otherFns, ins[ins$loaded %in% TRUE, ]$file)
-      }
 
       srcFiles <- mapply(mod = modules(sim), mp = modulePath(sim),
                          function(mod, mp) {
@@ -372,25 +391,8 @@ saveSimList <- function(sim, filename, projectPath = getwd(),
       srcFiles <- tmpSrcFiles
     }
 
-    if (length(fns)) {
+    if (length(fns) || length(otherFns)) {
       fileToDelete <- filename
-
-      otherFns <- c()
-      if (isTRUE(outputs)) {
-        os <- outputs(sim)
-        if (NROW(os)) {
-          outputFNs <- os[os$saved %in% TRUE, ]$file
-          otherFns <- c(otherFns, outputFNs)
-        }
-      }
-      inputFNs <- NULL
-      if (isTRUE(inputs)) {
-        ins <- inputs(sim)
-        if (NROW(ins)) {
-          inputFNs <- ins[ins$loaded %in% TRUE, ]$file
-          otherFns <- c(otherFns, inputFNs)
-        }
-      }
 
       allFns <- c(fns, otherFns, srcFilesRel)
       if (!is.null(symlinks)) {
@@ -599,7 +601,7 @@ loadSimList <- function(filename, projectPath = getwd(), tempPath = tempdir(),
   isLazyLoad <- file.exists(file.path(lazyDir, .lazyManifestName))
 
   tmpsim <- .unwrapResiliently(tmpsim, paths(tmpsim))
-  tmpsim <- .unwrap(tmpsim, cachePath = NULL, paths = paths(tmpsim))
+  tmpsim <- .unwrap(tmpsim, filebackedPath = NULL, paths = paths(tmpsim))
 
   ## Work around for bug in qs that recovers data.tables as lists
   # tmpsim <- recoverDataTableFromQs(tmpsim)
@@ -855,6 +857,63 @@ recoverDataTableFromQs <- function(sim) {
   sim@.xData[[dotObjs]][[where]]
 }
 
+## A file-backed object whose file is in a temporary place (cachePath, scratchPath, terraPath,
+## rasterPath, tempdir(), terra's temporary folder; the deepest folder holding the file decides),
+## or under none of the simList's other paths, projectPath or getwd(), has no home on another machine, or later on this one: it is copied
+## (reproducible::Copy()) into `dir`, so it is recorded relative to the sidecar directory and
+## restored only there. Others keep their paths, and are restored under the same paths of the
+## simList that loads them. Lists are done element by element. `sim` is saveSimList()'s clone.
+.copyTransientFileBacked <- function(sim, dir, projectPath) {
+  norm <- function(x) unique(normPath(unlist(x)[!is.na(unlist(x)) & nzchar(unlist(x))]))
+  pths <- paths(sim)
+  tmp <- norm(c(pths[intersect(c("cachePath", tmpPaths), names(pths))], tempdir(),
+                if (requireNamespace("terra", quietly = TRUE)) terra::terraOptions(print = FALSE)$tempdir))
+  kept <- norm(c(pths[setdiff(names(pths), c("cachePath", tmpPaths))], projectPath, getwd()))
+  isTransient <- function(x) {
+    fns <- tryCatch(Filenames(x, allowMultiple = TRUE), error = function(e) character())
+    fns <- normPath(fns[!is.na(fns) & nzchar(fns)])
+    ## the deepest folder that holds the file decides: a cache inside projectPath is temporary,
+    ## an outputPath inside tempdir() is not
+    deepest <- function(f, dirs) max(c(0L, nchar(dirs[fs::path_has_parent(f, dirs)])))
+    any(vapply(fns, function(f) deepest(f, tmp) >= deepest(f, kept), logical(1)))
+  }
+  to <- file.path(dir, "files")
+  modObjs <- sim@.xData[[dotObjs]]
+  envs <- c(list(sim@.xData), if (is.environment(modObjs))
+    Filter(is.environment, mget(ls(modObjs, all.names = TRUE), envir = modObjs)))
+  for (i in seq_along(envs)) {
+    env <- envs[[i]]
+    for (nm in ls(env, all.names = i > 1L)) { # the simList's own dot objects are its internals
+      if (bindingIsActive(nm, env)) next
+      obj <- get(nm, envir = env, inherits = FALSE)
+      if (is.environment(obj)) next
+      if (is.list(obj) && !is.data.frame(obj)) {
+        wh <- which(vapply(obj, isTransient, logical(1)))
+        if (!length(wh)) next
+        for (w in wh) obj[[w]] <- Copy(obj[[w]], filebackedDir = to)
+      } else if (isTransient(obj)) {
+        obj <- Copy(obj, filebackedDir = to)
+      } else next
+      assign(nm, obj, envir = env)
+    }
+  }
+  sim
+}
+
+## Where the files behind a lazily saved file-backed object are: `dir` (they are in
+## <dir>/cacheOutputs/, fetched there first if need be), or NULL when the object has none
+## there (saved before saveSimList() kept them), and .unwrap() then uses its recorded paths.
+.lazyFilesDir <- function(obj, dir, fetch = NULL) {
+  tags <- attr(obj, "tags")
+  fns <- sub("^filenamesInCache:", "", grep("^filenamesInCache:", tags, value = TRUE))
+  fns <- unique(fns[nzchar(fns)])
+  if (!length(fns)) return(NULL)
+  stored <- file.path(reproducible::CacheStorageDir(dir), fns)
+  if (is.function(fetch))
+    for (f in stored[!file.exists(stored)]) try(fetch(f), silent = TRUE)
+  if (all(file.exists(stored))) dir else NULL
+}
+
 ## Everything that gets deferred, as a manifest.
 .lazyEntries <- function(sim) {
   ents <- list()
@@ -881,7 +940,7 @@ recoverDataTableFromQs <- function(sim) {
 ## written (manifest included), for the archive.
 .writeLazyObjs <- function(sim, dir, ext = "rds") {
   ents <- .lazyEntries(sim)
-  unlink(dir, recursive = TRUE)
+  ## saveSimList() cleared `dir` before wrapping, which may have put the objects' files in it
   if (!NROW(ents)) return(character())
 
   dir.create(dir, recursive = TRUE, showWarnings = FALSE)
@@ -921,7 +980,7 @@ recoverDataTableFromQs <- function(sim) {
       delayedAssign(.nm, tryCatch({
         obj <- .readOneLazy(.f, fetch = .fetch)
         obj <- .remapFileBackedObj(obj, .pp, .sp)
-        .unwrap(obj, cachePath = NULL, paths = .sp)
+        .unwrap(obj, filebackedPath = .lazyFilesDir(obj, dir, fetch = .fetch), paths = .sp)
       }, error = function(e) {
         warning("Could not load lazy object '", .nm, "' from '", .f, "': ",
                 conditionMessage(e), call. = FALSE)
@@ -992,7 +1051,7 @@ recoverDataTableFromQs <- function(sim) {
 ## inaccessible backing file does not abort saveSimList. Failed objects are
 ## replaced with NULL and a warning is issued; the subsequent monolithic
 ## .wrap(sim, ...) then succeeds on the remaining objects.
-.wrapResiliently <- function(sim, projectPath = NULL) {
+.wrapResiliently <- function(sim, projectPath = NULL, filebackedPath = NULL) {
   nms <- ls(sim@.xData, all.names = FALSE)
   simPaths <- .wrapAnchors(sim, projectPath)
   for (nm in nms) {
@@ -1000,7 +1059,8 @@ recoverDataTableFromQs <- function(sim) {
     fns <- tryCatch(Filenames(obj), error = function(e) character(0))
     if (length(fns) && any(nchar(fns) > 0L)) {
       sim@.xData[[nm]] <- tryCatch(
-        .wrap(obj, cachePath = NULL, paths = simPaths),
+        .wrap(obj, filebackedPath = filebackedPath, paths = simPaths,
+              copyFiles = !is.null(filebackedPath)),
         error = function(e) {
           warning("saveSimList: could not wrap '", nm,
                   "' (backing file inaccessible); saving as NULL.\n",
@@ -1028,7 +1088,7 @@ recoverDataTableFromQs <- function(sim) {
     fns <- tryCatch(Filenames(obj), error = function(e) character(0))
     if (length(fns) && any(nchar(fns) > 0L)) {
       sim@.xData[[nm]] <- tryCatch(
-        .unwrap(obj, cachePath = NULL, paths = simPaths),
+        .unwrap(obj, filebackedPath = NULL, paths = simPaths),
         error = function(e) {
           warning("loadSimList: could not unwrap '", nm,
                   "' (backing file inaccessible); loading as NULL.\n",
@@ -1058,6 +1118,15 @@ recoverDataTableFromQs <- function(sim) {
     simPaths
   } else {
     c(simPaths, list(projectPath = projectPath))
+  }
+  ## A list's elements carry their own tags: remap each like a single object. The
+  ## list-level route below rebuilt each element's path relative to the producer's
+  ## directory, which matched nothing on another machine ("replacement has length zero").
+  if (is(obj, "list") && all(vapply(obj, function(x) is.null(x) || !is.null(attr(x, "tags")),
+                                    logical(1)))) {
+    for (elem in seq_along(obj))
+      if (!is.null(obj[[elem]])) obj[[elem]] <- .remapFileBackedObj(obj[[elem]], projectPath, simPaths)
+    return(obj)
   }
   newFiles <- remapFilenames(tags = tags, cachePath = NULL, paths = pths)
   if (is(obj, "list")) {
@@ -1104,7 +1173,11 @@ warnDeprecFileBacked <- function(arg) {
 
 archiveExtract <- function(archiveName, exdir) {
   if (requireNamespace("archive") && !isWindows()) {
-    archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
+    ## Read the archive the caller named: archive_extract() detects zip and tar
+    ## from the content, so a .zip written on Windows reads here too. Only fall
+    ## back to the .tar.gz name archiveWrite() would have used when it is absent.
+    if (!file.exists(archiveName))
+      archiveName <- archiveConvertFileExt(archiveName, "tar.gz")
     ## `dir` defaults to "."; without it this extracts into the working
     ## directory and ignores `exdir`, diverging from the unzip() branch below
     ## and scattering the archive's own directory names (cache/, outputs/,
@@ -1194,4 +1267,74 @@ absolutizePaths <- function(paths, projectPath, tempdir = tempdir()) {
   p[corePaths] <- sapply(paths[corePaths], fs::path_abs, start = projectPath)
   p[tmpPaths] <- sapply(paths[tmpPaths], fs::path_abs, start = tempdir)
   lapply(p, normPath)
+}
+
+## ---- module source kept in a saved simList -------------------------------
+
+#' The module source a saved `simList` carries
+#'
+#' [saveSimList()] keeps the text of each module's code files (`<module>.R` and the files in
+#' its `R/` folder, as [moduleCodeFiles()] lists them) in the saved `simList`, at
+#' `sim$.mods[[module]]$._source`. [loadSimList()] parses a module from that text only when
+#' the module is not on `modulePath`; when it is, the copy on `modulePath` is used, because
+#' that is the source the user has. The text is in saved `simList` files only, never in
+#' [reproducible::Cache()] entries, and is not part of a `simList`'s cache key.
+#'
+#' @param sim A `simList`.
+#' @param module Character. The modules whose stored source to return; default all
+#'   modules of `sim`.
+#'
+#' @return A named list with one element per module that has stored source: `files`, the
+#'   text of each file, named by its path relative to the module folder; `path`, the module
+#'   folder it was read from; `version`, the module version; and `git`, `list(sha, ref)` if
+#'   that folder was a git checkout, else `NULL`.
+#' @export
+moduleSource <- function(sim, module = unlist(modules(sim), use.names = FALSE)) {
+  out <- lapply(setNames(nm = module), function(m) sim@.xData[[dotMods]][[m]][[dotModSource]])
+  out[lengths(out) > 0]
+}
+
+## What saveSimList() keeps of each module's source (see moduleSource()): read from the module's
+## folder on modulePath; a module not there keeps the text the simList already carries (it was
+## loaded from a save and parsed from that text).
+.moduleSources <- function(sim) {
+  deps <- depends(sim)@dependencies
+  mods <- unlist(modules(sim), use.names = FALSE)
+  out <- lapply(setNames(nm = mods), function(m) {
+    folder <- file.path(modulePath(sim, module = m), m)[1L]
+    if (!file.exists(file.path(folder, paste0(m, ".R"))))
+      return(moduleSource(sim, m)[[m]])
+    files <- moduleCodeFiles(list(modulePath = dirname(folder)), m)
+    files <- files[file.exists(files) & !dir.exists(files)]
+    list(files = setNames(vapply(files, function(f) readChar(f, file.size(f), useBytes = TRUE), character(1)),
+                          as.character(fs::path_rel(files, path.expand(folder)))),
+         path = normPath(folder), version = as.character(deps[[m]]@version), git = .gitCommit(folder))
+  })
+  out[lengths(out) > 0]
+}
+
+## The commit a module folder is at, if it is a git checkout of its own (a `.git` folder, or a
+## `.git` file naming the git dir of a submodule or worktree): `list(sha, ref)`, read from the git files
+## (no git call); `ref` is `NA` for a detached HEAD. `NULL` if the folder is not a checkout.
+.gitCommit <- function(folder) {
+  under <- function(dir, p) if (isAbsolutePath(p)) p else file.path(dir, p)
+  gitDir <- file.path(folder, ".git")
+  if (!file.exists(gitDir)) return(NULL)
+  if (!dir.exists(gitDir)) gitDir <- under(folder, sub("^gitdir: *", "", readLines(gitDir, 1L, warn = FALSE)))
+  if (!file.exists(file.path(gitDir, "HEAD"))) return(NULL) # e.g. a copied submodule
+  head <- readLines(file.path(gitDir, "HEAD"), 1L, warn = FALSE)
+  if (!startsWith(head, "ref: ")) return(list(sha = head, ref = NA_character_))
+  ref <- sub("^ref: *", "", head)
+  commonFile <- file.path(gitDir, "commondir")
+  common <- if (file.exists(commonFile)) under(gitDir, readLines(commonFile, 1L, warn = FALSE)) else gitDir
+  refFile <- file.path(common, ref)
+  packed <- file.path(common, "packed-refs")
+  sha <- if (file.exists(refFile)) {
+    readLines(refFile, 1L, warn = FALSE)
+  } else if (file.exists(packed)) {
+    sub(" .*$", "", grep(paste0(" ", ref, "$"), readLines(packed, warn = FALSE), value = TRUE)[1L])
+  } else {
+    NA_character_
+  }
+  list(sha = sha, ref = sub("^refs/heads/", "", ref))
 }

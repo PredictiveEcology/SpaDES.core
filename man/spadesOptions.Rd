@@ -47,12 +47,33 @@ is after the error is addressed. \code{TRUE} is likely somewhat slower.\cr
 \tab The default local directory in which to cache simulation outputs.
 Default is a temporary directory (typically \verb{/tmp/RtmpXXX/SpaDES/cache}).\cr
 
+\code{spades.useCache} \tab \code{"all"}
+\tab How caching applies inside \code{\link[=simInit]{simInit()}} and \code{\link[=spades]{spades()}}. \code{"all"}: events and
+\code{.inputObjects} are cached as each module's \code{.useCache} parameter (see \link{dotParameters}) asks, and
+\code{Cache()} calls inside module code follow \code{reproducible.useCache}. \code{"eventsOnly"}:
+the \code{.useCache} events are cached (also in a \code{simInit()} nested inside an event),
+but \code{Cache()} calls inside module code are skipped. \code{"off"}: nothing is cached.
+The numbers \code{2}, \code{1} and \code{0} mean the same three, in that order.\cr
+
 \code{spades.cacheChaining} \tab \code{FALSE}
 \tab If set to \code{TRUE}, then sequential events that are cached can re-use
 their \code{digest} step. The second event will only digest the functions and
 parameters, but not objects. Every event will add a tag or remove that tag
 if it is cached or not cached, so this will not mistakenly \code{cacheChain} when
 it isn't appropriate.\cr
+
+\code{spades.cacheKeyReachable} \tab \code{FALSE}
+\tab If \code{TRUE}, a cached event's (or \code{.inputObjects}') cache key holds only the
+module parameters and module functions its code can reach: its branch of
+\verb{doEvent.<module>}, then the module functions that calls, to any depth, the
+parameters they read (\code{P(sim)$x}, \code{Par$x}, \code{P(sim, "x")},
+\code{params(sim)[[currentModule(sim)]]$x}, ...) and \code{.seed}. The module \code{version}
+and \code{reqdPkgs} are left out, as the function bodies carry code changes. When
+the code does something that cannot be read statically (\code{eval()} of code, \code{get()}
+of a computed name, \code{P(sim)} passed to a package function, ...), that event keeps
+the full key. Parameters left out keep their current values after a cache hit.
+With \code{showSimilar}, a message says what each key was narrowed to, or why not.
+Changes every narrowed event's cacheId once.\cr
 
 \code{spades.codeCheckEngine} \tab \code{"v1"}
 \tab Which module code checker \code{simInit()} uses when
@@ -80,6 +101,11 @@ See also \code{?data.table::setDTthreads}.\cr
 (\code{.inputObjects} included), e.g., \code{quote(print(.robustDigest(sim$rstLCC)))}
 will print the digest value of the \code{sim$rstLCC} after each event so a
 user can monitor its changes.\cr
+
+\code{spades.eventFlowFont} \tab \code{"Noto Sans"}
+\tab The font family of the figures that \code{\link[=eventDiagram]{eventDiagram()}} and \code{\link[=objectDiagram]{objectDiagram()}}
+draw from a module's code. If that font is not installed, the generic
+\code{"sans"} family is used.\cr
 
 \code{spades.futureEvents} \tab \code{FALSE}
 \tab  If set to \code{TRUE}, the event simulator will attempt to spawn events
@@ -166,8 +192,8 @@ retain in the \code{completed} event queue.\cr
 \tab The default local directory in which to save simulation outputs.\cr
 
 \code{spades.plots}
-\tab The value of this will passed to \code{.plots} within every module; it will thus
-override all module parameter values for \code{.plots}. This can, e.g., be used
+\tab The value of this will be passed to \code{.plots} (see \link{dotParameters}) within every
+module; it will thus override all module parameter values for \code{.plots}. This can, e.g., be used
 to turn off all plotting.
 \tab The default is \code{NULL}, meaning accept the module-level parameter.\cr
 
@@ -191,6 +217,18 @@ The same mechanism applies during \code{simInit}: a snapshot is taken before eac
 module's \code{.inputObjects} runs, so an interrupted \code{simInit} can be recovered
 with \code{restartSimInit} (see \code{?restartSimInit}).
 There is a message which describes how to find that.\cr
+
+\code{spades.reqdPkgsAttach} \tab \code{TRUE}
+\tab Whether a module's \code{reqdPkgs} are attached (\code{library}) to the search path,
+for every module and the user's session (\code{TRUE}, the historical behaviour).
+If \code{FALSE}, they are loaded (and installed if needed) but not attached;
+instead each module's code sees the exports of its own \code{reqdPkgs}, and of the
+packages those \code{Depends} on, as a package sees its \verb{@import}s, so one module's
+packages do not affect other modules or the session. When two of a module's
+packages export the same name, the one listed later in \code{reqdPkgs} is used, as
+when attaching. Module code that relied on another module's, or the user's,
+attached packages must then use \code{pkg::fn} or list the package in its own
+\code{reqdPkgs}. \code{FALSE} is intended to become the default.\cr
 
 \code{spades.reqdPkgsDontLoad} \tab \code{NULL} \tab Specify any packages that should not
 be \emph{loaded} i.e., no \code{library} or \code{require}, but they should be installed if

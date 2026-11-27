@@ -226,3 +226,80 @@ test_that("C-level (archive-style) progress flood is throttled, not re-prefixed"
   expect_gt(length(shown), 0L)
   expect_true(all(grepl("^[\u2800-\u28FF]", shown)))   # what survived really were ticks
 })
+
+test_that("a non-dynamic tick after a dynamic one does not error on a NULL .progressLastShown", {
+  testInit(smcc = FALSE, debug = FALSE)
+  skip_if_not_installed("cli")
+
+  # .handleProgressTick(): a `\r` (dynamic) frame set `.inProgressBar` but not
+  # `.progressLastShown`; the next plain frame then took the throttle branch and
+  # computed `now - NULL`, which is length zero, and `if` failed with "argument is
+  # of length zero". Seen in a fits job whose event downloaded from Google Drive
+  # (dynamic ticks) before extracting (plain ticks), 2026-09-12.
+  # loggingMessage() looks up a `sim` on the call stack for the module prefix unless
+  # the prefix width is zero; there is no simList here.
+  withr::local_options(spades.messagingNumCharsModule = 0)
+  pe <- .pkgEnv
+  old <- mget(c(".inProgressBar", ".progressLastShown", ".progressInPlace"), envir = pe,
+              ifnotfound = list(NULL))
+  on.exit(for (nm in names(old)) assign(nm, old[[nm]], envir = pe), add = TRUE)
+  pe$.inProgressBar <- NULL
+  pe$.progressLastShown <- NULL
+  pe$.progressInPlace <- NULL
+
+  cond <- function(msg)
+    structure(class = c("cliMessage", "simpleMessage", "message", "condition"),
+              list(message = msg, call = NULL))
+  dynamic <- "\rextracting 50%"
+  # a non-dynamic frame recognised without an active R-level bar (Braille spinner)
+  plain <- "\u2839 13 extracted | 2.3 GB ( 15 MB/s) | 2m 30.4s\n"
+  expect_false(grepl("\r", plain))
+  out <- capture.output({
+    expect_true(.handleProgressTick(cond(dynamic), dynamic))
+    expect_no_error(res <- .handleProgressTick(cond(plain), plain))
+  }, type = "message")
+  expect_true(res)
+  expect_s3_class(pe$.progressLastShown, "POSIXct")
+})
+
+test_that("a message continued with '\\b' (reproducible's 'done! took:') leaves no blank line in an event", {
+  testInit(smcc = FALSE, debug = FALSE)
+  tmpdir <- file.path(tempdir(), "bsMod")
+  dir.create(tmpdir, showWarnings = FALSE)
+  on.exit(unlink(tmpdir, recursive = TRUE), add = TRUE)
+  newModule("bsMod", tmpdir, open = FALSE)
+  f <- file.path(tmpdir, "bsMod", "bsMod.R")
+  src <- readLines(f)
+  iInit <- grep("^Init <- function", src)
+  src <- append(src, c(
+    '  message("cropping...")',
+    '  message("\\bdone! took:  6.57 secs")',
+    '  message("after")'
+  ), after = iInit)
+  writeLines(src, f)
+
+  sim <- simInit(modules = "bsMod", paths = list(modulePath = tmpdir),
+                 times = list(start = 0, end = 1))
+  msgs <- character()
+  withCallingHandlers(
+    spades(sim, events = "init"),
+    message = function(m) {
+      msgs <<- c(msgs, m$message)
+      invokeRestart("muffleMessage")
+    }
+  )
+  iDone <- grep("done! took", msgs)
+  expect_length(iDone, 1L)
+  # the old handler left a second "\b" after the newline, which printed as a blank line
+  expect_false(grepl("\n\b", msgs[iDone], fixed = TRUE))
+})
+
+test_that("loggingMessage() treats a '\\b' continuation the same for the simInit and spades handlers", {
+  testInit(smcc = FALSE, debug = FALSE)
+  withr::local_options(spades.messagingNumCharsModule = 0)
+  msg <- "\bdone! took:  6.57 secs\n"
+  expect_identical(loggingMessage(msg), "\b done! took: 6.57 secs")
+  expect_identical(loggingMessage(msg, prefix = prefixSimInit), loggingMessage(msg))
+  # nested handlers see an already-normalised message and leave it alone
+  expect_identical(loggingMessage(loggingMessage(msg)), loggingMessage(msg))
+})

@@ -403,3 +403,84 @@ test_that(".readOneLazy only calls fetch when the file is missing", {
   expect_true(called)
   expect_identical(got, 1:3)
 })
+
+test_that("a lazy save keeps the files behind file-backed objects, so they load on another machine", {
+  ## A file-backed object should load like any other R object. Before, `files = FALSE` (as
+  ## SpaDES.project::outSave() saves) kept only each object's path: one whose file was in a
+  ## cache, scratch or temporary folder loaded as NULL anywhere else, and a list of rasters
+  ## failed with "replacement has length zero".
+  skip_if_not_installed("rlang")
+  skip_if_not_installed("terra")
+  mk <- function(root) {
+    p <- list(cachePath = "cache", inputPath = "inputs", outputPath = "outputs",
+              modulePath = "modules", scratchPath = "scratch", terraPath = "scratch/terra")
+    p <- lapply(p, function(x) file.path(root, x))
+    lapply(p, dir.create, recursive = TRUE, showWarnings = FALSE)
+    p
+  }
+  here <- normPath(withr::local_tempdir()); there <- normPath(withr::local_tempdir())
+  pA <- mk(here); pB <- mk(there)
+  r <- terra::rast(nrows = 3, ncols = 3, vals = 1:9)
+  w <- function(path) { dir.create(dirname(path), showWarnings = FALSE, recursive = TRUE); terra::writeRaster(r, path) }
+
+  sim <- new("simList")
+  paths(sim) <- pA
+  sim@.xData[["inCache"]] <- w(file.path(pA$cachePath, "spat_1_2_a.tif"))     # as a cache hit leaves it
+  sim@.xData[["inTerra"]] <- w(file.path(pA$terraPath, "spat_1_2_b.tif"))
+  sim@.xData[["inOutputs"]] <- w(file.path(pA$outputPath, "climate", "CMD.tif"))
+  sim@.xData[["aList"]] <- list(CMD = sim@.xData[["inOutputs"]],
+                                MAT = w(file.path(pA$cachePath, "spat_1_2_c.tif")))
+  sim@.xData[[".mods"]] <- new.env(parent = emptyenv())
+  sim@.xData[[".modObjs"]] <- new.env(parent = emptyenv())
+  sim@.xData[[".mods"]][["modA"]] <- new.env(parent = asNamespace("SpaDES.core"))
+  sim@.xData[[".modObjs"]][["modA"]] <- new.env(parent = emptyenv())
+  SpaDES.core:::makeModActiveBinding(sim = sim, mod = "modA")
+  SpaDES.core:::makeParActiveBinding(sim = sim, mod = "modA")
+  sim@.xData[[".modObjs"]][["modA"]]$standAge <- w(file.path(pA$terraPath, "spat_1_2_d.tif"))
+
+  filename <- file.path(pA$outputPath, "sim.rds")
+  suppressWarnings(saveSimList(sim, filename = filename, files = FALSE, lazy = TRUE, projectPath = here))
+
+  ## the other machine has the simList file and its sidecar directory, and none of `here`
+  file.copy(c(filename, file.path(pA$outputPath, "sim_lazy")), pB$outputPath, recursive = TRUE)
+  unlink(here, recursive = TRUE)
+
+  loaded <- suppressWarnings(loadSimList(file.path(pB$outputPath, "sim.rds"), projectPath = there,
+                                         paths = pB))
+  vals <- function(x) as.vector(terra::values(x))
+  for (nm in c("inCache", "inTerra", "inOutputs")) {
+    expect_s4_class(loaded[[nm]], "SpatRaster")
+    expect_identical(vals(loaded[[nm]]), 1:9, label = nm)
+  }
+  expect_identical(vals(loaded$aList$CMD), 1:9)
+  expect_identical(vals(loaded$aList$MAT), 1:9)
+  expect_identical(vals(loaded@.xData[[".modObjs"]][["modA"]]$standAge), 1:9)
+  ## an object that was in outputPath goes back to (this machine's) outputPath
+  expect_true(fs::path_has_parent(terra::sources(loaded$inOutputs), pB$outputPath))
+  ## a file from a temporary place (cache, terra's folder) goes only into the sidecar directory,
+  ## never into this machine's cache or scratch
+  srcs <- c(terra::sources(loaded$inCache), terra::sources(loaded$inTerra), terra::sources(loaded$aList$MAT),
+            terra::sources(loaded@.xData[[".modObjs"]][["modA"]]$standAge))
+  expect_true(all(fs::path_has_parent(srcs, file.path(pB$outputPath, "sim_lazy"))))
+  expect_identical(terra::sources(loaded$aList$CMD), terra::sources(loaded$inOutputs))
+})
+
+test_that("a lazy save leaves the caller's file-backed objects where they are", {
+  skip_if_not_installed("terra")
+  td <- normPath(withr::local_tempdir())
+  p <- list(cachePath = file.path(td, "cache"), outputPath = file.path(td, "outputs"),
+            inputPath = file.path(td, "inputs"), modulePath = file.path(td, "modules"),
+            scratchPath = file.path(td, "scratch"))
+  lapply(p, dir.create, recursive = TRUE, showWarnings = FALSE)
+  sim <- new("simList")
+  paths(sim) <- p
+  f <- file.path(p$cachePath, "spat_1_2_a.tif")
+  sim@.xData[["inCache"]] <- terra::writeRaster(terra::rast(nrows = 2, ncols = 2, vals = 1:4), f)
+  saveSimList(sim, filename = file.path(p$outputPath, "sim.rds"), files = FALSE, lazy = TRUE,
+              projectPath = td)
+  expect_identical(normPath(terra::sources(sim$inCache)), normPath(f))
+  ## loaded on the same machine, with the original still there, it is not pointed back into the cache
+  loaded <- loadSimList(file.path(p$outputPath, "sim.rds"), projectPath = td)
+  expect_true(fs::path_has_parent(terra::sources(loaded$inCache), file.path(p$outputPath, "sim_lazy")))
+  expect_identical(as.vector(terra::values(loaded$inCache)), 1:4)
+})

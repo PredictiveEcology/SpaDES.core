@@ -435,7 +435,7 @@ test_that("test sped-up Caching of sequentially cached events", {
   expect_is(et, "data.table")
   expect_identical(units(et2$elapsedTime), mins)
   expect_identical(colnames(et), c("moduleName", "eventType", "elapsedTime"))
-  oa <- "override automatic"
+  oa <- "Using cacheChaining \\.\\.\\.|cacheChaining: restored"  # one line per chained Cache() call
   expect_false(any(grepl(oa, mess)))
 
   ## Rerun with Cached copies being recovered
@@ -445,17 +445,19 @@ test_that("test sped-up Caching of sequentially cached events", {
   mess <- capture_messages({
     mySimOut <- spades(mySim, debug = 1, .plots = NA)
   })
-  expect_true(sum(grepl(oa, mess)) == 2) # does not continue from .inputObjects to init
+  ## init after a separate simInit() is a genuine hit (the tag is dropped outside simInitAndSpades);
+  ##   the chained inits after it are recovered in one cacheChaining jump
+  expect_equal(sum(grepl(oa, mess)), 1) # does not continue from .inputObjects to init
 
   mess2 <- capture_messages(
     mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
-                              debug = 1, .plotInitialTime = NA)
+                              debug = 1)
   )
   mess3 <- capture_messages(
     mySim <- simInitAndSpades(times, params, modules, objects = list(), paths,
-                              debug = 1, .plotInitialTime = NA)
+                              debug = 1)
   )
-  expect_true(sum(grepl(oa, mess3)) == 3) # continues from .inputObjects to init for simInitAndSpades
+  expect_equal(sum(grepl(oa, mess3)), 1) # continues from .inputObjects to init for simInitAndSpades; one jump
 
 
   ## If they are not sequential, shouldn't do it
@@ -537,13 +539,14 @@ test_that("test sped-up Caching of sequentially cached events 2", {
     mess <- capture_messages({
       mySimOut <- spades(mySim, debug = 1, .plots = NA)
     })
-    oa <- "override automatic"
+    oa <- "Using cacheChaining \\.\\.\\.|cacheChaining: restored"  # one line per chained Cache() call
     if (i == 1) {
       expect_equal(sum(grepl(oa, mess)), 0)
       expect_equal(sum(grepl(oa, mess1)), 0)
     } else if (i == 2) {
-      expect_equal(sum(grepl(oa, mess)), 2)
-      expect_equal(sum(grepl(oa, mess1)), 2)
+      ## after the first cache hit, the chained events are recovered in one cacheChaining jump
+      expect_equal(sum(grepl(oa, mess)), 1)
+      expect_equal(sum(grepl(oa, mess1)), 1)
     }
     if (i == 2) {
       params$fireSpread$.useCache <- NULL # remove the "middle" one, so that it should do none

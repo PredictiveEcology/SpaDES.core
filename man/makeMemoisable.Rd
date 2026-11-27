@@ -19,7 +19,9 @@ A \code{simList_} object or a \code{simList}, in the case of \code{unmakeMemoisa
 \description{
 Because of the environment slot, \code{simList} objects don't correctly
 memoise a \code{simList}.
-This method for \code{simList} converts the object to a \code{simList_} first.
+This method for \code{simList} converts the object to a \code{simList_} first,
+after a \code{\link[reproducible:Copy]{Copy()}}, so that objects a later event modifies by reference
+(e.g., a \code{data.table}) do not change the memoised copy.
 }
 \seealso{
 \code{\link[reproducible:makeMemoisable]{reproducible::makeMemoisable()}}

@@ -13,6 +13,18 @@ setOldClass("person", S4Class = "person4")
 selectMethod("show", "person")
 removeClass("person4")
 
+#' The empty parameter table a module's metadata holds: the columns of [defineParameter()]
+#'
+#' @return A zero-row `data.frame`.
+#' @keywords internal
+#' @rdname parametersDF
+._parametersDF <- function() {
+  data.frame(
+    paramName = character(0), paramClass = character(0),
+    default = I(list()), min = I(list()), max = I(list()),
+    paramDesc = character(0), cacheKey = logical(0), stringsAsFactors = FALSE)
+}
+
 #' Create an empty `data.frame` object for use with `inputObjects` or
 #' `outputObjects`
 #'
@@ -56,6 +68,26 @@ setMethod("._outputObjectsDF",
             )
             return(out.df)
 })
+
+## The optional `outputObjects` column, `createsOutput(events = )`, naming the events that write
+## an output. A module without it has no such column, so its metadata (and cache keys) are unchanged.
+.txtOutputEvents <- "events"
+
+## The `createsOutput`s of module metadata `dep` that `event` may write: those whose `events`
+## include it, and those declaring no `events` (any event may write them). What a cached event
+## saves, records as changed and restores (.runEvent(), .runModuleInputObjects(),
+## lsObjectsChanged(), .chainOutputs(), .chainRestored()). `event = NULL`: all of them.
+.outputsOfEvent <- function(dep, event = NULL) {
+  out <- dep@outputObjects$objectName
+  evs <- dep@outputObjects[[.txtOutputEvents]]
+  if (!is.null(evs) && length(event) == 1L) {
+    out <- out[vapply(evs, function(e) {
+      e <- na.omit(unlist(e))
+      !length(e) || event %in% e
+    }, logical(1))]
+  }
+  out
+}
 
 ################################################################################
 #' The `.moduleDeps` class
@@ -111,7 +143,9 @@ setMethod("._outputObjectsDF",
 #'                      of type `character`, `character`, and
 #'                      `ANY`, respectively. Default values may be
 #'                      overridden by the user by passing a list of parameters
-#'                      to [simInit()].
+#'                      to [simInit()]. Made by [defineParameter()], whose
+#'                      `cacheKey` column says whether a parameter is part
+#'                      of the module's cache keys.
 #'
 #' @slot inputObjects   A `data.frame` specifying the object dependencies of
 #'                      the module, with columns `objectName`,
@@ -149,11 +183,7 @@ setClass(
     spatialExtent = NULL, timeframe = as.POSIXlt(c(NA, NA)),
     timeunit = NA_real_, citation = list(), documentation = list(),
     loadOrder = list(after = NULL, before = NULL), reqdPkgs = list(),
-    parameters = data.frame(
-      paramName = character(0), paramClass = character(0),
-      default = I(list()), min = I(list()), max = I(list()),
-      paramDesc = character(0), stringsAsFactors = FALSE
-    ),
+    parameters = ._parametersDF(),
     inputObjects = ._inputObjectsDF(),
     outputObjects = ._outputObjectsDF()
   ),

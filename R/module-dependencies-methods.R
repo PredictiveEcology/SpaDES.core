@@ -329,6 +329,24 @@ setMethod(
     return(newEdgeList)
 })
 
+## loadOrder metadata as edges: `after = x` in module m is x -> m; `before = y` is m -> y
+.depsLoadOrderEdges <- function(loadOrders) {
+  rbindlist(Map(lo = loadOrders, nam = names(loadOrders), function(lo, nam)
+    data.table(from = c(lo[["after"]], rep(nam, length(lo[["before"]]))),
+               to = c(rep(nam, length(lo[["after"]])), lo[["before"]]))))
+}
+
+## TRUE for each object edge from -> to that no loadOrder path to -> from contradicts
+.depsNotContradicted <- function(objEdges, loEdges) {
+  if (!NROW(objEdges) || !NROW(loEdges)) return(rep(TRUE, NROW(objEdges)))
+  loG <- graph_from_data_frame(loEdges)
+  v <- names(V(loG))
+  vapply(seq_len(NROW(objEdges)), function(i) {
+    f <- objEdges$from[i]; t <- objEdges$to[i]
+    !(f %in% v && t %in% v && is.finite(distances(loG, v = t, to = f, mode = "out")[1, 1]))
+  }, logical(1))
+}
+
 ################################################################################
 #' Determine module load order
 #'
@@ -395,6 +413,23 @@ setMethod(".depsLoadOrder",
                       })
                   simGraph2 <- graph_from_data_frame(dt)
                   tsort <- try(topo_sort(simGraph2, "out"), silent = TRUE)
+                  ## loadOrder is written by a module's author; an object dependency is inferred. Where loadOrder
+                  ## puts B before A, drop the inferred A -> B, instead of every module's loadOrder (the fallback below)
+                  if (iter == 0 && is(tsort, "try-error")) {
+                    objE <- as.data.table(as_data_frame(simGraph))
+                    loE <- .depsLoadOrderEdges(loadOrdersInMetaData)
+                    keep <- .depsNotContradicted(objE, loE)
+                    simGraph3 <- graph_from_data_frame(rbindlist(list(objE[keep], loE), fill = TRUE))
+                    tsort3 <- try(topo_sort(simGraph3, "out"), silent = TRUE)
+                    if (!is(tsort3, "try-error")) {
+                      dropped <- objE[!keep]
+                      message("loadOrder metadata overrides ", NROW(dropped), " object dependenc",
+                              if (NROW(dropped) == 1L) "y" else "ies", ": ",
+                              paste0(dropped$from, " -> ", dropped$to, " (", dropped$objName, ")", collapse = ", "))
+                      tsort <- tsort3
+                      simGraph2 <- simGraph3
+                    }
+                  }
                   if (exists("tsort", inherits = FALSE))
                     if (!is(tsort, "try-error") && iter == 0) {
                       doTopoSort <- FALSE
